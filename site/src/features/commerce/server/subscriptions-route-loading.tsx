@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH10W64, skelH28 } from "../../shell/skeleton-shell";
 import { subscriptionsCopy } from "../subscriptions-i18n";
 
 type Copy = ReturnType<typeof subscriptionsCopy>;
@@ -40,7 +41,7 @@ function SubscriptionsRouteLoading({
     throw new Error("SubscriptionsRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-10 w-64 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH10W64} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -72,8 +73,8 @@ export function SubscriptionsActivateRouteLoading() {
     rows: 0,
     leading: (
       <>
-        <div className="h-10 w-64 rounded bg-inset" />
-        <div className="h-28 rounded bg-inset" />
+        <div className={skelH10W64} />
+        <div className={skelH28} />
       </>
     ),
     titleKey: "activate",
@@ -93,8 +94,8 @@ export function CommerceSubscriptionsRouteLoading() {
     headingId: "subscriptions-loading-heading",
     leading: (
       <>
-        <div className="h-10 w-64 rounded bg-inset" />
-        <div className="h-28 rounded bg-inset" />
+        <div className={skelH10W64} />
+        <div className={skelH28} />
       </>
     ),
     titleKey: "title",

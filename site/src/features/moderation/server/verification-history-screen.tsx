@@ -14,6 +14,12 @@ import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelFlexMinWrapEndP4, panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
+  type2xlBoldPrimary,
+  typeMt2SmMuted,
+  typePrewrapSmSecondary,
+  typeSpace1XsMuted,
+} from "../../shell/type-shell";
+import {
   parseVerificationApplicationsQuery,
   verificationApplicationsHref,
 } from "../../trust/verification-applications-contract";
@@ -87,8 +93,8 @@ export async function VerificationHistoryScreen({
   return (
     <div className={pageShellClass}>
       <header>
-        <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
-        <p className="mt-2 text-sm text-muted">{copy.description}</p>
+        <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
+        <p className={typeMt2SmMuted}>{copy.description}</p>
       </header>
       <Link href="/workspace/verification" className={linkAccentSm}>
         {labels.back}
@@ -109,7 +115,7 @@ export async function VerificationHistoryScreen({
               className={`${platformFieldClass} block min-h-11`}
             />
           </label>
-          <label className="space-y-1 text-xs text-muted">
+          <label className={typeSpace1XsMuted}>
             {copy.status}
             <select
               name="status"
@@ -123,7 +129,7 @@ export async function VerificationHistoryScreen({
               ))}
             </select>
           </label>
-          <label className="space-y-1 text-xs text-muted">
+          <label className={typeSpace1XsMuted}>
             {labels.type}
             <select
               name="type"
@@ -203,7 +209,7 @@ export async function VerificationHistoryScreen({
                 </h2>
                 <span className="text-xs text-muted">{labels[item.status]}</span>
               </div>
-              <p className="whitespace-pre-wrap break-words text-sm text-secondary">{item.notes}</p>
+              <p className={typePrewrapSmSecondary}>{item.notes}</p>
               <p className="break-all text-xs text-muted">{item.id}</p>
               <p className="text-xs text-muted">
                 {labels.submittedAt}:{" "}

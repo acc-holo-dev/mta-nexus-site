@@ -14,6 +14,12 @@ import { linkAccentRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapGap4Sm,
+  typePrewrapSmSecondary,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 import { publisherSearchParams, resourcePublisherHistoryQuery } from "../resource-publisher-query";
 
@@ -100,7 +106,7 @@ export async function ResourcePublisherHistoryScreen({
       <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccentRounded}>
         {copy.back}
       </Link>
-      <h1 className="font-display text-primary">{copy.history}</h1>
+      <h1 className={typeDisplayPrimary}>{copy.history}</h1>
       <p className="break-words text-secondary">{result.product.title}</p>
       <p className="text-sm text-muted">{copy.historyNote}</p>
       <nav className="flex flex-wrap gap-4 text-accent" aria-label={copy.history}>
@@ -121,7 +127,7 @@ export async function ResourcePublisherHistoryScreen({
             <li key={event.id} className={panelSpace2P4}>
               <p>{copy.actions[event.action as keyof typeof copy.actions] ?? event.action}</p>
               {event.status && (
-                <p className="text-sm text-secondary">
+                <p className={typeSmSecondary}>
                   {dictionary.authorResources.statusLabels[
                     event.status as keyof typeof dictionary.authorResources.statusLabels
                   ] ?? event.status}
@@ -134,11 +140,7 @@ export async function ResourcePublisherHistoryScreen({
                   description={copy.reviewNote}
                 />
               ) : null}
-              {event.reason && (
-                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                  {event.reason}
-                </p>
-              )}
+              {event.reason && <p className={typePrewrapSmSecondary}>{event.reason}</p>}
               <time className="text-sm text-muted" dateTime={event.createdAt.toISOString()}>
                 {formatHistoryDate(event.createdAt, locale)} UTC
               </time>
@@ -159,7 +161,7 @@ export async function ResourcePublisherHistoryScreen({
         />
       )}
       {result.totalPages > 1 && (
-        <nav className="flex flex-wrap gap-4 text-sm" aria-label={copy.page}>
+        <nav className={typeFlexWrapGap4Sm} aria-label={copy.page}>
           {result.page > 1 && (
             <Link href={href(result.page - 1)} className={linkAccentRounded}>
               {copy.previous}

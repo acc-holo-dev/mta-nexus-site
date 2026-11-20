@@ -8,6 +8,7 @@ import { linkAccentSmSemibold } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMaxMd as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace5P6Shadow } from "../../shell/panel-shell";
+import { typeDisplayPrimary, typeSmSuccess } from "../../shell/type-shell";
 import {
   type AccountRecoveryProof,
   readAccountRecoveryProofFromWindow,
@@ -101,7 +102,7 @@ export function ResetPasswordPage() {
       <section aria-labelledby="reset-heading" className={panelClipSpace5P6Shadow}>
         <div className="flex items-center gap-3">
           <ShieldCheck className="h-5 w-5 text-accent" aria-hidden="true" />
-          <h1 id="reset-heading" className="font-display text-primary">
+          <h1 id="reset-heading" className={typeDisplayPrimary}>
             {copy.resetTitle}
           </h1>
         </div>
@@ -181,7 +182,7 @@ export function ResetPasswordPage() {
 
         {state.kind === "success" && (
           <>
-            <p role="status" className="text-sm text-success">
+            <p role="status" className={typeSmSuccess}>
               {copy.resetSuccess}
             </p>
             <Link href="/auth/login" className={linkAccentSmSemibold}>

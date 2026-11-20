@@ -18,6 +18,7 @@ import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
 import { panelClipSpace3P5, panelFlexClipWrapEndGap4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeBreakAllXs } from "../../shell/type-shell";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import {
   libraryCollectionHistoryQuery,
@@ -215,7 +216,7 @@ export async function CollectionHistoryPage({
                       {h.recorded}: {receipt.collection.name} · {c[receipt.collection.status]} ·{" "}
                       {c.revision} {receipt.collection.revision}
                     </p>
-                    <code className="block break-all text-xs">{receipt.collection.id}</code>
+                    <code className={typeBreakAllXs}>{receipt.collection.id}</code>
                     {item.currentCollection ? (
                       <p className="break-words">
                         {h.current}:{" "}
@@ -292,7 +293,7 @@ export async function CollectionHistoryPage({
                             ? (resource.currentTitle ?? c.unavailable)
                             : h.unavailable}
                         </p>
-                        <code className="block break-all text-xs">{resource.productId}</code>
+                        <code className={typeBreakAllXs}>{resource.productId}</code>
                         {resource.currentAvailable && (
                           <Link
                             href={`/workspace/library/${encodeURIComponent(resource.productId)}/collections`}

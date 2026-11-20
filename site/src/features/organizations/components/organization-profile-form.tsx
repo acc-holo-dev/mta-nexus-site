@@ -10,6 +10,7 @@ import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { linkAccentSm, linkAccentTightSmPlain } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceSpace2P4 } from "../../shell/surface-shell";
+import { typeGrid2Gap4, typeHeadingPrimary, typePrewrapBreak } from "../../shell/type-shell";
 import { organizationRequest as platformRequest } from "../organization-workspace-client";
 import {
   type EditableOrganization,
@@ -352,7 +353,7 @@ export function OrganizationProfileForm({
   }
   return (
     <form onSubmit={submit} className={panelSpace4P5} aria-busy={busy}>
-      <h2 className="font-heading text-primary">{initial ? copy.profile : copy.create}</h2>
+      <h2 className={typeHeadingPrimary}>{initial ? copy.profile : copy.create}</h2>
       <p className="text-sm text-muted">{initial ? copy.ownerHelp : copy.createHelp}</p>
       {creationNotice && !initial && (!creationReady || verifiedCreationKey === creationKey) ? (
         <ErrorState title={creationNotice} description={formErrorHint} />
@@ -418,7 +419,7 @@ export function OrganizationProfileForm({
               className={textareaClass}
             />
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className={typeGrid2Gap4}>
             {(["logoUrl", "websiteUrl"] as const).map((key) => (
               <Input
                 key={key}
@@ -461,7 +462,7 @@ export function OrganizationProfileForm({
           <p>
             {copy.name}: {newest.name}
           </p>
-          <p className="whitespace-pre-wrap break-words">
+          <p className={typePrewrapBreak}>
             {copy.descriptionLabel}: {newest.description}
           </p>
           <p className="break-words">

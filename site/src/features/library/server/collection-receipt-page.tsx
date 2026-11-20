@@ -14,6 +14,7 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass, pageShellStack3 } from "../../shell/page-shell";
 import { panelClipSpace2P4, panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeBreakAllXs } from "../../shell/type-shell";
 import { LibraryCollectionRestoreControls } from "../collection-restore";
 import {
   collectionReceiptHref,
@@ -95,7 +96,7 @@ export async function CollectionReceiptPage({
         </nav>
         <h1 className="min-w-0 break-words">{r.title}</h1>
         <p>{r.note}</p>
-        <code className="block break-all text-xs">
+        <code className={typeBreakAllXs}>
           {c.receipt}: {report.id}
         </code>
         <p>
@@ -112,14 +113,14 @@ export async function CollectionReceiptPage({
         ) : (
           <article className={panelClipSpace3P5}>
             <h2>{c[receipt.command.action]}</h2>
-            <code className="block break-all text-xs">
+            <code className={typeBreakAllXs}>
               {c.request}: {receipt.requestId}
             </code>
             <p>
               {r.recorded}: {receipt.collection.name} · {c[receipt.collection.status]} ·{" "}
               {c.revision} {receipt.collection.revision}
             </p>
-            <code className="block break-all text-xs">{receipt.collection.id}</code>
+            <code className={typeBreakAllXs}>{receipt.collection.id}</code>
             {"expectedRevision" in receipt.command && (
               <p>
                 {c.revision}: {receipt.command.expectedRevision}
@@ -190,7 +191,7 @@ export async function CollectionReceiptPage({
                     ? (resource.currentTitle ?? c.unavailable)
                     : c.unavailable}
                 </p>
-                <code className="block break-all text-xs">{resource.productId}</code>
+                <code className={typeBreakAllXs}>{resource.productId}</code>
                 <p>
                   {r.expected}:{" "}
                   {resource.restoreAction === "remove" ? c.inCollection : c.notInCollection} ·{" "}

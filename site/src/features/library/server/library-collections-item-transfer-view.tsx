@@ -2,6 +2,7 @@ import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
 import { pageShellMax4xl } from "../../shell/page-shell";
+import { typeFlexWrapEndGap3 } from "../../shell/type-shell";
 import { LibraryCollectionItemCopyForm } from "../collection-item-copy";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import {
@@ -45,7 +46,7 @@ export async function LibraryCollectionsItemTransferView({
         {result.source.revision}
       </p>
       <search aria-label={c.search}>
-        <form method="get" className="flex flex-wrap items-end gap-3">
+        <form method="get" className={typeFlexWrapEndGap3}>
           <label className="grid gap-1">
             {c.search}
             <input

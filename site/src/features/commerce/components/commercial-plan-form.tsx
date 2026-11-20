@@ -13,6 +13,12 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace5P5, panelP5 } from "../../shell/panel-shell";
+import {
+  typeFlexWrapGap3,
+  typeGrid2Gap4,
+  typeSmSecondary,
+  typeSmSuccess,
+} from "../../shell/type-shell";
 import { confirmedCommercialPlan, parseCommercialAmount } from "../commercial-confirmation";
 import { commercialError, getCommercialCopy } from "../commercial-i18n";
 
@@ -250,13 +256,10 @@ export function CommercialPlanForm({
     );
   return (
     <form onSubmit={submit} className={panelClipSpace5P5}>
-      <p role="note" className="text-sm text-secondary">
+      <p role="note" className={typeSmSecondary}>
         {copy.editNote}
       </p>
-      <fieldset
-        disabled={disabled || plan?.status === "archived"}
-        className="grid gap-4 sm:grid-cols-2"
-      >
+      <fieldset disabled={disabled || plan?.status === "archived"} className={typeGrid2Gap4}>
         {!plan ? (
           <>
             <label htmlFor={`${field}-slug`} className="space-y-2">
@@ -407,11 +410,11 @@ export function CommercialPlanForm({
       ) : null}
       {error ? <ErrorState title={error} description={copy.formErrorHint} /> : null}
       {saved ? (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {copy.saved}
         </p>
       ) : null}
-      <div className="flex flex-wrap gap-3">
+      <div className={typeFlexWrapGap3}>
         <Button
           type="submit"
           disabled={disabled || plan?.status === "archived" || (!!plan && !dirty)}

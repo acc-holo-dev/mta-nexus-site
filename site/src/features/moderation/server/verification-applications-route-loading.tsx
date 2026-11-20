@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax3xl, pageShellMax4xl, pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH6W23, skelH10W64 } from "../../shell/skeleton-shell";
 import { verificationApplicationsCopy } from "../verification-applications-copy";
 
 type Copy = ReturnType<typeof verificationApplicationsCopy>;
@@ -40,7 +41,7 @@ function VerificationApplicationsRouteLoading({
     throw new Error("VerificationApplicationsRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-10 w-64 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH10W64} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -71,7 +72,7 @@ export function VerificationDetailRouteLoading() {
     headingId: "verification-detail-loading-heading",
     className: pageShellMax3xl,
     titleClassName: "text-xl font-semibold text-primary",
-    leading: <div className="h-6 w-2/3 rounded bg-inset" />,
+    leading: <div className={skelH6W23} />,
     titleKey: "detail",
   });
 }
@@ -81,7 +82,7 @@ export function VerificationHistoryRouteLoading() {
     headingId: "verification-history-loading-heading",
     className: pageShellMax4xl,
     titleClassName: "text-xl font-semibold text-primary",
-    leading: <div className="h-6 w-2/3 rounded bg-inset" />,
+    leading: <div className={skelH6W23} />,
     titleKey: "title",
   });
 }

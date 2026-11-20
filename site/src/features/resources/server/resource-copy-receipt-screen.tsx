@@ -13,6 +13,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentRounded, linkAccentTightRounded } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeFlexWrapGap4, typeSmSecondary } from "../../shell/type-shell";
 import { ResourceCopyMetadataView } from "../copy-view";
 import { resourceCopyCopy, resourceCopyError } from "../resource-copy-i18n";
 import {
@@ -111,12 +112,12 @@ export async function ResourceCopyReceiptScreen({
         <p>
           {c.current}: {c.statuses[detail.targetStatus as keyof typeof c.statuses] ?? c.unavailable}
         </p>
-        <p role="note" className="text-sm text-secondary">
+        <p role="note" className={typeSmSecondary}>
           {c.notice}
         </p>
         <h2>{c.snapshot}</h2>
         <ResourceCopyMetadataView metadata={receipt.metadata} locale={locale} />
-        <div className="flex flex-wrap gap-4">
+        <div className={typeFlexWrapGap4}>
           <Link
             href={`/workspace/resources/${encodeURIComponent(receipt.target.id)}`}
             className={linkAccentTightRounded}

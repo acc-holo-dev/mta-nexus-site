@@ -14,6 +14,7 @@ import { linkAccentTightSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace4P5Shadow } from "../../shell/panel-shell";
 import { surfaceSpace2P4 } from "../../shell/surface-shell";
+import { typePrewrapBreak, typeSmSemiboldPrimary, typeSmSuccess } from "../../shell/type-shell";
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
@@ -157,7 +158,7 @@ export function PublicProfileForm() {
   }
   return (
     <section aria-labelledby="public-profile-heading" className={panelSpace4P5Shadow}>
-      <h2 id="public-profile-heading" className="text-sm font-semibold text-primary">
+      <h2 id="public-profile-heading" className={typeSmSemiboldPrimary}>
         {copy.profile}
       </h2>
       <p className="text-xs text-muted">{copy.profileDescription}</p>
@@ -179,7 +180,7 @@ export function PublicProfileForm() {
         />
       ) : null}
       {notice && !notice.error ? (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {notice.text}
         </p>
       ) : null}
@@ -251,7 +252,7 @@ export function PublicProfileForm() {
           <p className="break-words">
             {copy.displayName}: {latest.displayName}
           </p>
-          <p className="whitespace-pre-wrap break-words">
+          <p className={typePrewrapBreak}>
             {copy.bio}: {latest.bio}
           </p>
           <p className="break-words">

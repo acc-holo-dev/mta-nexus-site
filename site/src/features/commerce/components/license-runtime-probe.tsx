@@ -9,6 +9,7 @@ import {
   linkGhostAccentSm,
   linkGhostAccentSmNoUnderline,
 } from "../../shell/link-shell";
+import { typeSemiboldPrimary, typeSmSecondary } from "../../shell/type-shell";
 import { getLicenseControlCopy } from "../license-control-i18n";
 import {
   confirmLicenseRelease,
@@ -132,8 +133,8 @@ export function LicenseRuntimeProbe({
   }
   return (
     <section className="space-y-3 border-t border-base pt-4" aria-busy={loading || busy}>
-      <h3 className="font-semibold text-primary">{copy.releaseCheck}</h3>
-      <p className="text-sm text-secondary">{copy.releaseNote}</p>
+      <h3 className={typeSemiboldPrimary}>{copy.releaseCheck}</h3>
+      <p className={typeSmSecondary}>{copy.releaseNote}</p>
       {loading ? (
         <p role="status" aria-live="polite" className="text-sm text-muted">
           {copy.releaseLoading}

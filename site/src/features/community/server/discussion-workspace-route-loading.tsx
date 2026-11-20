@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax4xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH28 } from "../../shell/skeleton-shell";
 import { ownDiscussionCopy } from "../discussion-workspace-copy";
 
 type Copy = ReturnType<typeof ownDiscussionCopy>;
@@ -39,7 +40,7 @@ function DiscussionWorkspaceRouteLoading({
     throw new Error("DiscussionWorkspaceRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-28 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH28} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -70,7 +71,7 @@ export function DiscussionsRouteLoading() {
     headingId: "discussions-loading-heading",
     className: pageShellMax4xl,
     rowClassName: "h-24 rounded bg-inset",
-    leading: <div className="h-28 rounded bg-inset" />,
+    leading: <div className={skelH28} />,
     titleKey: "title",
   });
 }

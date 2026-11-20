@@ -13,6 +13,12 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapGap4Sm,
+  typeGrid2Gap4,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { resourceCartReceiptsCopy } from "../resource-cart-receipts-i18n";
 import {
   resourceCartReceiptQuery,
@@ -86,7 +92,7 @@ export async function AcquisitionReceiptsScreen({
   if (!result) {
     return (
       <div className={pageShellClass}>
-        <nav className="flex flex-wrap gap-4 text-sm">
+        <nav className={typeFlexWrapGap4Sm}>
           <Link href="/workspace/cart" className={linkAccentSmRounded}>
             {copy.cart}
           </Link>
@@ -110,7 +116,7 @@ export async function AcquisitionReceiptsScreen({
   const receiptsFiltered = query.days !== "all" || query.evidence !== "all";
   return (
     <div className={pageShellClass}>
-      <nav className="flex flex-wrap gap-4 text-sm">
+      <nav className={typeFlexWrapGap4Sm}>
         <Link href="/workspace/cart" className={linkAccentSmRounded}>
           {copy.cart}
         </Link>
@@ -121,8 +127,8 @@ export async function AcquisitionReceiptsScreen({
           {copy.library}
         </Link>
       </nav>
-      <h1 className="font-display text-primary">{copy.title}</h1>
-      <p role="note" className="text-sm text-secondary">
+      <h1 className={typeDisplayPrimary}>{copy.title}</h1>
+      <p role="note" className={typeSmSecondary}>
         {copy.note}
       </p>
       <form
@@ -178,7 +184,7 @@ export async function AcquisitionReceiptsScreen({
           }
         />
       ) : (
-        <ol className="grid gap-4 sm:grid-cols-2">
+        <ol className={typeGrid2Gap4}>
           {result.items.map((item) => (
             <li key={item.requestId} className={panelSpace3P5}>
               <h2 className="font-semibold">
@@ -204,7 +210,7 @@ export async function AcquisitionReceiptsScreen({
       <p className="text-sm text-muted">
         {copy.receipts}: {result.total}
       </p>
-      <nav aria-label={copy.page} className="flex flex-wrap gap-4 text-sm">
+      <nav aria-label={copy.page} className={typeFlexWrapGap4Sm}>
         {result.page > 1 ? (
           <Link
             href={resourceCartReceiptsUrl({ ...current, page: result.page - 1 })}

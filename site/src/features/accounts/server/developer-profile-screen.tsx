@@ -17,6 +17,7 @@ import { publicationCopy } from "../../community/publication-feed-copy";
 import { ProductCard } from "../../resources/view";
 import { pageShellStack10 as pageShellClass, pageShellStack6 } from "../../shell/page-shell";
 import { panelHeroBetween } from "../../shell/panel-shell";
+import { typeFlexCenterGap2, typeHeadingPrimary } from "../../shell/type-shell";
 import { trustCopy } from "../../trust/public-user-trust-copy";
 import { DeveloperExperience } from "../developer-experience";
 import { ProfileResourcePagination, parseProfilePage } from "../profile-pagination";
@@ -124,7 +125,7 @@ export async function DeveloperProfileScreen({
             className="h-20 w-20 shrink-0 border-2 border-[color:var(--nexus-accent)]/30"
           />
           <div className="min-w-0 space-y-1.5">
-            <div className="flex items-center gap-2">
+            <div className={typeFlexCenterGap2}>
               <h1 className="truncate text-2xl font-black text-primary">{user.displayName}</h1>
               {user.isVerified && (
                 <span title={copy.verifiedIdentity}>
@@ -176,7 +177,7 @@ export async function DeveloperProfileScreen({
 
       <DeveloperExperience profile={professional} locale={locale} />
       <section id="resources" className={pageShellStack6}>
-        <h2 className="font-heading text-primary">
+        <h2 className={typeHeadingPrimary}>
           {copy.releasesBy} {user.displayName}
         </h2>
         {authorProducts.length > 0 ? (

@@ -12,6 +12,12 @@ import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapGap4Sm,
+  typeGrid2Gap4,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { getResourceActivityCopy } from "../resource-activity-i18n";
 import {
   acquisitionHistoryHref,
@@ -75,7 +81,7 @@ export async function PublisherAcquisitionsScreen({
           <Link href="/workspace/library" className={linkAccentSmRounded}>
             {copy.library}
           </Link>
-          <h1 className="font-display text-primary">{copy.history}</h1>
+          <h1 className={typeDisplayPrimary}>{copy.history}</h1>
         </header>
         <ErrorState
           title={copy.historyLoadUnavailable}
@@ -95,7 +101,7 @@ export async function PublisherAcquisitionsScreen({
         <Link href="/workspace/library" className={linkAccentSmRounded}>
           {copy.library}
         </Link>
-        <h1 className="font-display text-primary">{copy.history}</h1>
+        <h1 className={typeDisplayPrimary}>{copy.history}</h1>
         <Link href="/workspace/acquisitions/receipts" className={linkAccentSmRounded}>
           {resourceCartReceiptsCopy(locale).title}
         </Link>
@@ -128,13 +134,13 @@ export async function PublisherAcquisitionsScreen({
           }
         />
       ) : (
-        <ol className="grid gap-4 sm:grid-cols-2">
+        <ol className={typeGrid2Gap4}>
           {result.items.map((item) => (
             <li key={item.id} className={panelMinSpace3P5}>
               <h2 className="min-w-0 break-words text-base font-semibold">
                 {item.downloadable ? item.title : copy.hidden}
               </h2>
-              <p className="text-sm text-secondary">{copy[item.source]}</p>
+              <p className={typeSmSecondary}>{copy[item.source]}</p>
               <p className="text-xs text-muted">
                 {copy.acquiredAt}{" "}
                 <time dateTime={item.acquiredAt.toISOString()}>
@@ -161,7 +167,7 @@ export async function PublisherAcquisitionsScreen({
         {copy.showing} {result.items.length} {copy.of} {result.total}
       </p>
       {result.totalPages > 1 ? (
-        <nav aria-label={copy.page} className="flex flex-wrap gap-4 text-sm">
+        <nav aria-label={copy.page} className={typeFlexWrapGap4Sm}>
           {result.page > 1 ? (
             <Link
               href={acquisitionHistoryHref(result.filter, result.page - 1)}

@@ -13,6 +13,12 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax6xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapGap4,
+  typeFlexWrapGap4Sm,
+  typeSemiboldPrimary,
+} from "../../shell/type-shell";
 import { formatHistoryDate, parseHistoryPage } from "../commerce-history-format";
 import { financialReferenceLabel, formatFinancialMinor, getFinancialCopy } from "../financial-i18n";
 export async function workspaceFinanceMetadata(): Promise<Metadata> {
@@ -114,12 +120,12 @@ export async function WorkspaceFinanceScreen({
       <Link href="/workspace/sales" className={linkAccentSmRounded}>
         {copy.back}
       </Link>
-      <h1 className="font-display text-primary">{copy.title}</h1>
+      <h1 className={typeDisplayPrimary}>{copy.title}</h1>
       <h2 className="text-xl text-primary">{result.scope.name ?? copy.personal}</h2>
       <p role="note" className="rounded-md border border-base p-4 text-sm text-secondary">
         {copy.note}
       </p>
-      <nav aria-label={copy.currency} className="flex flex-wrap gap-4 text-sm">
+      <nav aria-label={copy.currency} className={typeFlexWrapGap4Sm}>
         <Link href={href(1, null)} className={linkAccentSmRounded}>
           {copy.all}
         </Link>
@@ -138,7 +144,7 @@ export async function WorkspaceFinanceScreen({
         <ul className="grid gap-4 md:grid-cols-3">
           {result.totals.map((total) => (
             <li key={total.currency} className={panelSpace3P5}>
-              <h3 className="font-semibold text-primary">{total.currency}</h3>
+              <h3 className={typeSemiboldPrimary}>{total.currency}</h3>
               <dl className="space-y-2 text-sm">
                 {[
                   [copy.balance, total.balance],
@@ -231,7 +237,7 @@ export async function WorkspaceFinanceScreen({
         <Link href="/workspace/finance" className={linkAccentSmRounded}>
           {copy.personal}
         </Link>
-        <ul className="flex flex-wrap gap-4">
+        <ul className={typeFlexWrapGap4}>
           {scopes.scopes.map((scope) => (
             <li key={scope.id}>
               <Link href={href(1, currency, scope.id)} className={linkAccentSmRounded}>

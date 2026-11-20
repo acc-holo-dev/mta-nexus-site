@@ -15,6 +15,7 @@ import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceBgP4TextSmSecondary } from "../../shell/surface-shell";
+import { typeSmSecondary } from "../../shell/type-shell";
 import {
   formatHistoryAmount,
   formatHistoryDate,
@@ -163,7 +164,7 @@ export async function PurchaseDetailScreen({
                 <h3 className="min-w-0 break-words font-semibold text-primary">
                   {item.productTitle ?? copy.unavailableResource}
                 </h3>
-                <p className="text-sm text-secondary">
+                <p className={typeSmSecondary}>
                   {copy.linePrice}:{" "}
                   {formatHistoryAmount(item.unitPrice, item.currency, typedLocale)}
                 </p>

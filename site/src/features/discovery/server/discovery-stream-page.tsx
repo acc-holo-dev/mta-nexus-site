@@ -6,6 +6,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellStack6 as pageShellClass } from "../../shell/page-shell";
+import { type2xlExtraboldPrimary, typeFlexWrapGap4 } from "../../shell/type-shell";
 import { DirectoryFilters, DirectoryResults } from "../directory-server";
 import { discoverHref } from "../discover-query";
 import { discoveryCopy } from "../discovery-copy";
@@ -53,13 +54,13 @@ export async function DiscoveryStreamPage({
   return (
     <div className={pageShellClass}>
       <header className="space-y-2">
-        <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
+        <h1 className={type2xlExtraboldPrimary}>{copy.title}</h1>
         <p className="text-sm text-muted">{copy.description}</p>
         <Link href={discoverHref(state ?? fallback)} className={linkAccentSm}>
           {copy.paged}
         </Link>
       </header>
-      <nav aria-label={dictionary.discover.tabsLabel} className="flex flex-wrap gap-4">
+      <nav aria-label={dictionary.discover.tabsLabel} className={typeFlexWrapGap4}>
         {STREAM_TYPES.map((type) => (
           <Link
             key={type}

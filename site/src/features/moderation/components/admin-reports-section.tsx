@@ -12,6 +12,7 @@ import {
   linkAccentTight,
   linkAccentTightSm,
 } from "../../shell/link-shell";
+import { typeCaptionFaint } from "../../shell/type-shell";
 import { adminStatusLabel, adminStatusTone } from "../admin-status-labels";
 import { ReportModerationControls } from "../report-controls";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
@@ -136,7 +137,7 @@ export function AdminReportsSection({
                   </p>
                 ) : null}
                 <p className="font-caption text-secondary">{report.reason}</p>
-                <p className="font-caption text-faint">
+                <p className={typeCaptionFaint}>
                   {copy.reporter}: {report.reporterId} · {targetTypeLabel(copy, report.targetType)}{" "}
                   · {new Date(report.createdAt).toLocaleDateString(dateLocale)}
                 </p>
@@ -147,7 +148,7 @@ export function AdminReportsSection({
                   </p>
                 )}
                 {report.resolvedAt && (
-                  <p className="font-caption text-faint">
+                  <p className={typeCaptionFaint}>
                     {copy.reportDecidedAt}: {new Date(report.resolvedAt).toLocaleString(dateLocale)}
                   </p>
                 )}

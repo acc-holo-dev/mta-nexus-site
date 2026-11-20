@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH28, skelH40 } from "../../shell/skeleton-shell";
 import { platformReportCopy } from "../platform-report-i18n";
 
 type Copy = ReturnType<typeof platformReportCopy>;
@@ -40,7 +41,7 @@ function PlatformReportRouteLoading({
     throw new Error("PlatformReportRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-28 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH28} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -73,8 +74,8 @@ export function PlatformReportDetailRouteLoading() {
     rows: 0,
     leading: (
       <>
-        <div className="h-28 rounded bg-inset" />
-        <div className="h-40 rounded bg-inset" />
+        <div className={skelH28} />
+        <div className={skelH40} />
       </>
     ),
     titleKey: "detail",
@@ -85,7 +86,7 @@ export function PlatformReportsRouteLoading() {
   return PlatformReportRouteLoading({
     headingId: "platform-reports-loading-heading",
     className: pageShellMax5xl,
-    leading: <div className="h-28 rounded bg-inset" />,
+    leading: <div className={skelH28} />,
     titleKey: "title",
   });
 }

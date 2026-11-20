@@ -1,6 +1,7 @@
 import type { ResourceCopyMetadata } from "@nexus/domain";
 import type { Locale } from "../../../lib/i18n";
 import { panelSpace4P5 } from "../../shell/panel-shell";
+import { typePrewrapBreak, typeSmSecondary } from "../../shell/type-shell";
 import { resourceCopyCopy } from "../resource-copy-i18n";
 export function ResourceCopyMetadataView({
   metadata,
@@ -22,8 +23,8 @@ export function ResourceCopyMetadataView({
     <dl className={panelSpace4P5}>
       {rows.map(([label, value]) => (
         <div key={label}>
-          <dt className="text-sm text-secondary">{label}</dt>
-          <dd className="whitespace-pre-wrap break-words">{value}</dd>
+          <dt className={typeSmSecondary}>{label}</dt>
+          <dd className={typePrewrapBreak}>{value}</dd>
         </div>
       ))}
     </dl>

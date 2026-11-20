@@ -12,6 +12,13 @@ import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax3xl as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace2P5, panelMinSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import {
+  type2xlBoldPrimary,
+  typeMt2SmMuted,
+  typePrewrapSmSecondary,
+  typeSemiboldPrimary,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
 import { VerificationApplicationAmend } from "../verification-amend";
 import {
@@ -75,8 +82,8 @@ export async function VerificationApplicationScreen({
   return (
     <div className={pageShellClass}>
       <header>
-        <h1 className="text-2xl font-bold text-primary">{copy.detail}</h1>
-        <p className="mt-2 text-sm text-muted">{copy.privacy}</p>
+        <h1 className={type2xlBoldPrimary}>{copy.detail}</h1>
+        <p className={typeMt2SmMuted}>{copy.privacy}</p>
       </header>
       <Link href="/workspace/verification/history" className={linkAccentSm}>
         {copy.title}
@@ -99,7 +106,7 @@ export async function VerificationApplicationScreen({
               <h2 className="min-w-0 break-words font-semibold text-primary">
                 {labels[application.targetType]}
               </h2>
-              <span className="text-sm text-secondary">{labels[application.status]}</span>
+              <span className={typeSmSecondary}>{labels[application.status]}</span>
             </div>
             <p className="break-all text-xs text-muted">{application.id}</p>
             <p className="text-xs text-muted">
@@ -110,9 +117,7 @@ export async function VerificationApplicationScreen({
                 {labels.decidedAt}: {time(application.resolvedAt)}
               </p>
             ) : null}
-            <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-              {application.notes}
-            </p>
+            <p className={typePrewrapSmSecondary}>{application.notes}</p>
             {application.proofUrl ? (
               <a
                 href={application.proofUrl}
@@ -125,17 +130,15 @@ export async function VerificationApplicationScreen({
             ) : null}
             {application.reviewNotes ? (
               <section className="space-y-2">
-                <h3 className="font-semibold text-primary">{labels.reviewNotes}</h3>
-                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                  {application.reviewNotes}
-                </p>
+                <h3 className={typeSemiboldPrimary}>{labels.reviewNotes}</h3>
+                <p className={typePrewrapSmSecondary}>{application.reviewNotes}</p>
               </section>
             ) : null}
             {application.truncated ? <p className="text-xs text-muted">{copy.truncated}</p> : null}
           </article>
           {application.profileState ? (
             <section className={panelMinSpace2P5}>
-              <p className="text-sm text-secondary">
+              <p className={typeSmSecondary}>
                 {
                   copy[
                     application.profileState === "changed"
@@ -166,7 +169,7 @@ export async function VerificationApplicationScreen({
             />
           )}
           <section className={panelMinSpace4P5}>
-            <h2 className="font-semibold text-primary">{copy.events}</h2>
+            <h2 className={typeSemiboldPrimary}>{copy.events}</h2>
             {application.hasEarlierEvents ? (
               <p className="text-xs text-muted">{copy.earlier}</p>
             ) : null}

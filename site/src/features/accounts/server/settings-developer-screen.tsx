@@ -10,6 +10,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax3xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { type2xlBoldPrimary, typeMt2SmMuted } from "../../shell/type-shell";
 import { editableDeveloperSchema } from "../../trust/verification-workspace-contract";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
 import { ProfileChangeHistoryLink } from "../change-history";
@@ -62,8 +63,8 @@ export async function SettingsDeveloperScreen() {
     <div className={pageShellClass}>
       <ProfileChangeHistoryLink locale={locale} />
       <header>
-        <h1 className="text-2xl font-bold text-primary">{copy.profile}</h1>
-        <p className="mt-2 text-sm text-muted">{copy.profileDescription}</p>
+        <h1 className={type2xlBoldPrimary}>{copy.profile}</h1>
+        <p className={typeMt2SmMuted}>{copy.profileDescription}</p>
       </header>
       <DeveloperProfileEditor key={actor.id} actorId={actor.id} initial={initial} locale={locale} />
       <Link href="/settings/privacy" className={linkAccentSm}>

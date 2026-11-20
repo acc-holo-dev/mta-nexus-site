@@ -13,6 +13,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary, typeGrid2Gap4, typeSmSecondary } from "../../shell/type-shell";
 import { ResourcePublisherFilters } from "../publisher-view";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 import {
@@ -79,8 +80,8 @@ export async function AuthorResourcesScreen({
     return (
       <div className={pageShellClass}>
         <header className="space-y-2">
-          <h1 className="font-display text-primary">{copy.title}</h1>
-          <p className="text-sm text-secondary">{copy.subtitle}</p>
+          <h1 className={typeDisplayPrimary}>{copy.title}</h1>
+          <p className={typeSmSecondary}>{copy.subtitle}</p>
         </header>
         <ErrorState
           title={copy.loadUnavailable}
@@ -102,7 +103,7 @@ export async function AuthorResourcesScreen({
     <div className={pageShellClass}>
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-primary">{copy.title}</h1>
+          <h1 className={typeDisplayPrimary}>{copy.title}</h1>
           <p className="mt-2 text-sm text-secondary">{copy.subtitle}</p>
         </div>
         <Link href="/workspace/resources/new" className={primaryCtaClass}>
@@ -130,7 +131,7 @@ export async function AuthorResourcesScreen({
           }
         />
       ) : (
-        <ul aria-label={copy.title} className="grid gap-4 sm:grid-cols-2">
+        <ul aria-label={copy.title} className={typeGrid2Gap4}>
           {result.items.map((product) => (
             <li key={product.id} className="min-w-0 rounded-lg border border-base bg-surface p-5">
               <Link

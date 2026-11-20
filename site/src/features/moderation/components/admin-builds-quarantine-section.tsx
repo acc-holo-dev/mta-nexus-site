@@ -5,6 +5,7 @@ import type { getDictionary, Locale } from "../../../lib/i18n";
 import { BuildQuarantineControls } from "../../resources/quarantine-controls";
 import { linkAccent } from "../../shell/link-shell";
 import { panelFlexBetweenP4 } from "../../shell/panel-shell";
+import { typeCaptionFaint, typeFlexCenterGap2 } from "../../shell/type-shell";
 import { adminStatusLabel, adminStatusTone } from "../admin-status-labels";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 
@@ -85,7 +86,7 @@ export function AdminBuildsQuarantineSection({
             pendingBuilds.map((build) => (
               <div key={build.id} className={panelFlexBetweenP4}>
                 <div className="min-w-0 space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className={typeFlexCenterGap2}>
                     <span className="rounded bg-warning-soft px-2 py-0.5 text-[10px] font-bold uppercase text-warning">
                       {copy.pendingReview}
                     </span>
@@ -120,21 +121,19 @@ export function AdminBuildsQuarantineSection({
                       @{build.publisherUsername}
                     </Link>
                   </p>
-                  <p className="font-caption text-faint">
+                  <p className={typeCaptionFaint}>
                     {copy.scan}: {adminStatusLabel(locale, build.scanStatus)} · {hashLabel}
                   </p>
                   <code className="block break-all font-code text-[10px] text-faint">
                     {build.sha256Hash}
                   </code>
                   {build.scanner && build.scannedAt && (
-                    <p className="font-caption text-faint">
+                    <p className={typeCaptionFaint}>
                       {copy.scanProvenance}: {build.scanner} ·{" "}
                       {new Date(build.scannedAt).toLocaleString(dateLocale)}
                     </p>
                   )}
-                  {build.releaseNotes && (
-                    <p className="font-caption text-faint">{build.releaseNotes}</p>
-                  )}
+                  {build.releaseNotes && <p className={typeCaptionFaint}>{build.releaseNotes}</p>}
                 </div>
                 <div className="flex w-full flex-col items-start gap-3 md:w-auto md:items-end">
                   <StatusBadge
@@ -221,7 +220,7 @@ export function AdminBuildsQuarantineSection({
                       @{build.publisherUsername}
                     </Link>
                   </p>
-                  <p className="font-caption text-faint">
+                  <p className={typeCaptionFaint}>
                     {copy.scan}: {adminStatusLabel(locale, build.scanStatus)} · {hashLabel}
                   </p>
                   <code className="block break-all font-code text-[10px] text-faint">
@@ -235,7 +234,7 @@ export function AdminBuildsQuarantineSection({
                         description={build.quarantineReason ?? undefined}
                       />
                       {build.quarantinedAt && (
-                        <p className="font-caption text-faint">
+                        <p className={typeCaptionFaint}>
                           {copy.quarantinedAt}:{" "}
                           {new Date(build.quarantinedAt).toLocaleString(dateLocale)}
                         </p>

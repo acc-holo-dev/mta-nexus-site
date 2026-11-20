@@ -15,6 +15,12 @@ import { linkGhostAccentSm, linkMinHAccentSemibold } from "../../shell/link-shel
 import { pageShellStack4 } from "../../shell/page-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceSpace2P4 } from "../../shell/surface-shell";
+import {
+  typeFlexWrapGap3,
+  typeSemiboldPrimary,
+  typeSmPrimary,
+  typeSmSuccess,
+} from "../../shell/type-shell";
 import { getManagedServerCopy } from "../managed-server-copy";
 import {
   confirmsServerVisibilityCommand,
@@ -191,10 +197,10 @@ export function ManagedServerVisibilityBatch({
         <h2 className="text-lg font-semibold text-primary">{copy.batchTitle}</h2>
         <p className="text-sm text-muted">{copy.batchHelp}</p>
         <fieldset disabled={busy || blocked || !!preview} className="space-y-4">
-          <legend className="text-sm text-primary">
+          <legend className={typeSmPrimary}>
             {copy.selected}: {selected.length}
           </legend>
-          <div className="flex flex-wrap gap-3">
+          <div className={typeFlexWrapGap3}>
             <Button
               type="button"
               variant="ghost"
@@ -252,7 +258,7 @@ export function ManagedServerVisibilityBatch({
         <ErrorState title={error} description={getDictionary(locale).errors.formErrorHint} />
       ) : null}
       {saved && (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {copy.saved}
         </p>
       )}
@@ -268,7 +274,7 @@ export function ManagedServerVisibilityBatch({
       )}
       {preview && (
         <div className={panelSpace4P5}>
-          <h3 className="font-semibold text-primary">{copy.previewTitle}</h3>
+          <h3 className={typeSemiboldPrimary}>{copy.previewTitle}</h3>
           <p className="text-sm text-muted">{copy[`${preview.visibility}Help`]}</p>
           <p className="text-xs text-muted">{copy.notes}</p>
           <ol className="space-y-3">
@@ -284,7 +290,7 @@ export function ManagedServerVisibilityBatch({
                   {item.organization ? labels.organization : labels.personal} ·{" "}
                   {labels[item.status]}
                 </p>
-                <p className="text-sm text-primary">
+                <p className={typeSmPrimary}>
                   {copy.transition}: {labels[item.before]} → {labels[item.after]}
                 </p>
                 <Link
@@ -311,7 +317,7 @@ export function ManagedServerVisibilityBatch({
           >
             {copy.commitConfirm}
           </ActionConfirmCheckbox>
-          <div className="flex flex-wrap gap-3">
+          <div className={typeFlexWrapGap3}>
             <Button
               type="button"
               variant="outline"

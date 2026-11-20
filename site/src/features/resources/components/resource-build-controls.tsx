@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
+import { typeSmSecondary } from "../../shell/type-shell";
 import { privateRequest } from "../private-request";
 import {
   getResourceBuildWorkspaceCopy,
@@ -124,7 +125,7 @@ export function ResourceBuildControls({
   const blocked = pending || uncertain;
   return (
     <section className="space-y-4" aria-busy={pending}>
-      <p className="text-sm text-secondary">{copy.immutable}</p>
+      <p className={typeSmSecondary}>{copy.immutable}</p>
       <p className="text-sm text-muted">
         {copy.revision}: {current.revision} · {copy.statuses[current.status]}
       </p>
@@ -183,7 +184,7 @@ export function ResourceBuildControls({
           </div>
           {editable && !withdrawn && (
             <>
-              <p className="text-sm text-secondary">{copy.clean}</p>
+              <p className={typeSmSecondary}>{copy.clean}</p>
               <Button
                 type="button"
                 disabled={blocked || !trustedScan || dirty || reason.trim().length < 3}

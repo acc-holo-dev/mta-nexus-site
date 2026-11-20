@@ -11,6 +11,7 @@ import {
 import { pageShellMax6xl } from "../../shell/page-shell";
 import { panelSpace3P4, panelSpace3P5 } from "../../shell/panel-shell";
 import { surfaceP4TextSmSecondary } from "../../shell/surface-shell";
+import { typeDisplayPrimary, typeFlexWrapGap4Sm, typeSmSecondary } from "../../shell/type-shell";
 import { formatFinancialMinor } from "../financial-i18n";
 import { sellerSalesCopy, sellerSalesTime } from "../seller-sales-i18n";
 import { sellerSalesUrl, sellerSaleUrl } from "../seller-sales-query";
@@ -52,7 +53,7 @@ export function SellerSalesReportView({
         {c.back}
       </Link>
       <header className="space-y-2">
-        <h1 className="font-display text-primary">{c.title}</h1>
+        <h1 className={typeDisplayPrimary}>{c.title}</h1>
         <h2 className="text-xl text-primary">{report.scope.name ?? c.personal}</h2>
         <p className="text-sm text-muted">
           {c.observed}:{" "}
@@ -64,7 +65,7 @@ export function SellerSalesReportView({
       <p role="note" className={surfaceP4TextSmSecondary}>
         {query.attribution === "recorded" ? c.recordedNotice : c.notice}
       </p>
-      <p role="note" className="text-sm text-secondary">
+      <p role="note" className={typeSmSecondary}>
         {c.paymentNotice}
       </p>
       <Link
@@ -218,7 +219,7 @@ export function SellerSalesReportView({
           {report.sales.map((sale) => (
             <li key={sale.id} className={panelSpace3P5}>
               <h2 className="break-words font-semibold text-primary">{sale.productTitle}</h2>
-              <p className="text-sm text-secondary">
+              <p className={typeSmSecondary}>
                 {sale.orderNumber} ·{" "}
                 <time dateTime={sale.createdAt.toISOString()}>
                   {sellerSalesTime(sale.createdAt, locale)}
@@ -227,7 +228,7 @@ export function SellerSalesReportView({
               <p className="font-numeric text-primary">
                 {formatFinancialMinor(sale.unitPrice, sale.currency, locale)}
               </p>
-              <p className="text-sm text-secondary">
+              <p className={typeSmSecondary}>
                 {c.statuses[sale.status]} · {c.evidence[sale.evidence]}
               </p>
               <Link
@@ -278,7 +279,7 @@ export function SellerSalesReportView({
       {report.periods.length ? (
         <section className="space-y-3">
           <h2 className="text-xl text-primary">{c.periods}</h2>
-          <p className="text-sm text-secondary">{c.periodNotice}</p>
+          <p className={typeSmSecondary}>{c.periodNotice}</p>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <caption className="sr-only">{c.periods}</caption>
@@ -311,7 +312,7 @@ export function SellerSalesReportView({
       ) : null}
       <section className="space-y-3 border-t border-base pt-5">
         <h2 className="text-lg">{c.organizations}</h2>
-        <nav aria-label={c.account} className="flex flex-wrap gap-4 text-sm">
+        <nav aria-label={c.account} className={typeFlexWrapGap4Sm}>
           <Link
             href={sellerSalesUrl({ ...query, organizationId: undefined, productId: undefined }, 1)}
             className={linkAccentTightRounded}

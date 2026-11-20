@@ -26,6 +26,7 @@ import {
   linkMinHContentAccentSmPlain,
   linkMinHContentAccentSmRounded,
 } from "../../shell/link-shell";
+import { typeFlexWrapEndGap3, typeSemiboldPrimary } from "../../shell/type-shell";
 import { DISCOVER_CONTENT_TYPES, type DiscoverQuery, discoverHref } from "../discover-query";
 import { discoveryCopy } from "../discovery-copy";
 import { type DiscoveryStreamQuery, discoveryStreamHref } from "../discovery-stream-contract";
@@ -55,7 +56,7 @@ export function DirectoryFilters({
   return (
     <FilterBar key={discoverHref(state, path)} action={path} label={copy.filter} layout="stacked">
       {(path === "/discover" || stream) && <input type="hidden" name="type" value={state.type} />}
-      <div className="flex flex-wrap items-end gap-3">
+      <div className={typeFlexWrapEndGap3}>
         <div className="min-w-0 flex-1 sm:min-w-48">
           <SearchField
             className={field}
@@ -278,7 +279,7 @@ export async function DirectoryResults({
           />
           {hasActiveDiscoverFilters(state) && (
             <div className="nexus-panel space-y-2 p-4 text-sm text-secondary">
-              <p className="font-semibold text-primary">{copy.activeFilters}</p>
+              <p className={typeSemiboldPrimary}>{copy.activeFilters}</p>
               <ul className="list-inside list-disc space-y-1">
                 {state.query ? (
                   <li>

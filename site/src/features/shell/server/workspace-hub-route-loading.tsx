@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax5xl } from "../page-shell";
 import { DictionaryFieldRouteLoading } from "../route-honest-loading-server";
+import { skelH10W64, skelH28 } from "../skeleton-shell";
 
 export function WorkspaceHubRouteLoading({
   headingId = "workspace-loading-heading",
@@ -26,7 +27,7 @@ export function WorkspaceHubRouteLoading({
   leading?: ReactNode | null;
 } = {}) {
   const resolvedLeading =
-    leading === undefined ? <div className="h-28 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH28} /> : (leading ?? undefined);
   return DictionaryFieldRouteLoading({
     headingId,
     titlePath,
@@ -46,7 +47,7 @@ export function LibraryVersionsCompareRouteLoading() {
     headingId: "library-versions-compare-loading-heading",
     titlePath: "workspace.libraryTitle",
     rows: 4,
-    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    leading: <div className={skelH10W64} />,
   });
 }
 
@@ -55,6 +56,6 @@ export function LibraryDownloadRouteLoading() {
     headingId: "library-download-loading-heading",
     titlePath: "workspace.libraryTitle",
     rows: 4,
-    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    leading: <div className={skelH10W64} />,
   });
 }

@@ -11,6 +11,11 @@ import { linkAccentSm, linkSecondaryBorder } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace3P5, panelFlexMinWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import {
+  type2xlExtraboldPrimary,
+  typePrewrapSmSecondary,
+  typeSpace1XsMuted,
+} from "../../shell/type-shell";
 import { ownDiscussionHref, parseOwnDiscussionQuery } from "../discussion-workspace-contract";
 import { ownDiscussionCopy, ownDiscussionError } from "../discussion-workspace-copy";
 
@@ -76,7 +81,7 @@ export async function OwnDiscussionsPage({
         {copy.workspace}
       </Link>
       <header className="min-w-0 space-y-2 border-b border-base pb-6">
-        <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
+        <h1 className={type2xlExtraboldPrimary}>{copy.title}</h1>
         <p className="text-sm text-muted">{copy.description}</p>
         <p className="text-xs text-muted">{copy.privacy}</p>
       </header>
@@ -92,7 +97,7 @@ export async function OwnDiscussionsPage({
               className={`${fieldClass} block min-h-11 w-full`}
             />
           </label>
-          <label className="space-y-1 text-xs text-muted">
+          <label className={typeSpace1XsMuted}>
             {copy.availability}
             <select
               name="availability"
@@ -146,7 +151,7 @@ export async function OwnDiscussionsPage({
               <h2 className="min-w-0 break-words font-semibold text-primary">
                 {item.title ?? copy.hidden}
               </h2>
-              <p className="whitespace-pre-wrap break-words text-sm text-secondary">{item.text}</p>
+              <p className={typePrewrapSmSecondary}>{item.text}</p>
               <time className="text-xs text-muted" dateTime={item.createdAt}>
                 {new Date(item.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                   timeZone: "UTC",

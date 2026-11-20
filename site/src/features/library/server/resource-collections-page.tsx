@@ -13,6 +13,12 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapGap4Sm,
+  typeGrid2Gap4,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { LibraryCollectionCommandForm } from "../collection-command";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
@@ -85,7 +91,7 @@ export async function ResourceCollectionsPage({
     const href = `/workspace/library/${encodeURIComponent(id)}/collections`;
     return (
       <div className={pageShellClass}>
-        <nav className="flex flex-wrap gap-4 text-sm" aria-label={c.library}>
+        <nav className={typeFlexWrapGap4Sm} aria-label={c.library}>
           <Link href="/workspace/library" className={linkAccentSmRounded}>
             {c.library}
           </Link>
@@ -107,7 +113,7 @@ export async function ResourceCollectionsPage({
             </Link>
           )}
         </nav>
-        <h1 className="font-display text-primary">{c.resourceCollections}</h1>
+        <h1 className={typeDisplayPrimary}>{c.resourceCollections}</h1>
         <Link
           href={`/workspace/library/collections/history?${new URLSearchParams({ productId: id })}`}
           className={linkAccentSmRounded}
@@ -118,7 +124,7 @@ export async function ResourceCollectionsPage({
           {result.resource.available ? (result.resource.title ?? c.unavailable) : c.unavailable}
         </h2>
         <p className="break-all text-xs text-muted">{id}</p>
-        <p role="note" className="text-sm text-secondary">
+        <p role="note" className={typeSmSecondary}>
           {c.membershipNote}
         </p>
         <p className="text-sm text-muted">{c.limit}</p>
@@ -148,7 +154,7 @@ export async function ResourceCollectionsPage({
           />
         ) : null}
         <LibraryMembershipBatchForm key={id} report={result} locale={locale} />
-        <ol className="grid gap-4 sm:grid-cols-2">
+        <ol className={typeGrid2Gap4}>
           {result.collections.map((collection) => {
             const mutable = collection.status === "active" && collection.revision < 2_147_483_647;
             const action = collection.inCollection ? "remove" : "add";

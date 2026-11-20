@@ -1,5 +1,6 @@
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { authEntryHref } from "../auth-return";
+import { typeDisplayPrimary, typeSmSecondary } from "../type-shell";
 import { GuestAuthLinks } from "./guest-auth-links";
 
 function workspaceGuestAuthCopy(locale: Locale) {
@@ -38,7 +39,7 @@ export function PlatformWorkspaceSignInCopy({
   if (variant === "page-title") {
     return (
       <>
-        <h1 className="font-display text-primary">{signInRequired}</h1>
+        <h1 className={typeDisplayPrimary}>{signInRequired}</h1>
         {signInMessage ? (
           <p className="mx-auto max-w-md text-sm text-secondary">{signInMessage}</p>
         ) : null}
@@ -47,8 +48,8 @@ export function PlatformWorkspaceSignInCopy({
   }
   return (
     <>
-      <p className="text-sm text-secondary">{signInRequired}</p>
-      {signInMessage ? <p className="text-sm text-secondary">{signInMessage}</p> : null}
+      <p className={typeSmSecondary}>{signInRequired}</p>
+      {signInMessage ? <p className={typeSmSecondary}>{signInMessage}</p> : null}
     </>
   );
 }

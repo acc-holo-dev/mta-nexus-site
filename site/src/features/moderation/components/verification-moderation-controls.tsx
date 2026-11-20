@@ -10,6 +10,7 @@ import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
 import { linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
+import { typeFlexWrapGap2 } from "../../shell/type-shell";
 import {
   verificationCopy,
   verificationDecisionError,
@@ -128,7 +129,7 @@ export function VerificationModerationControls({
         />
       </label>
 
-      <div className="flex flex-wrap gap-2">
+      <div className={typeFlexWrapGap2}>
         <Button
           type="button"
           disabled={!hasNotes || pending !== null || blocked}

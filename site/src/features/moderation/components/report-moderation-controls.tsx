@@ -1,12 +1,12 @@
 "use client";
 import { Button, ErrorState } from "@nexus/ui";
-
 import { CheckCircle2, LoaderCircle, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { communityReportCopy } from "../../community/community-report-copy";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
+import { typeFlexWrapGap2 } from "../../shell/type-shell";
 import { adminActionClientError } from "../admin-action-client-error";
 import { confirmsAdminAction } from "../admin-action-confirmation";
 
@@ -78,7 +78,7 @@ export function ReportModerationControls({ reportId }: { reportId: string }) {
           className="w-full resize-y rounded-md border border-base bg-inset px-2.5 py-2 text-xs text-primary outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]"
         />
       </label>
-      <div className="flex flex-wrap gap-2">
+      <div className={typeFlexWrapGap2}>
         <Button
           type="button"
           disabled={!ready || pending !== null}

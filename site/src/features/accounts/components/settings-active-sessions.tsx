@@ -5,6 +5,7 @@ import { Monitor } from "lucide-react";
 import type { getDictionary } from "../../../lib/i18n";
 import { linkGhostAccentSemibold } from "../../shell/link-shell";
 import { panelSpace4P5Shadow } from "../../shell/panel-shell";
+import { typeFlexCenterGap2, typeSmSemiboldPrimary } from "../../shell/type-shell";
 import type { SettingsSession } from "../settings-client-api";
 
 type SettingsCopy = ReturnType<typeof getDictionary>["settings"];
@@ -31,9 +32,9 @@ export function SettingsActiveSessions({
   return (
     <section aria-labelledby="sessions-heading" className={panelSpace4P5Shadow}>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
+        <div className={typeFlexCenterGap2}>
           <Monitor className="h-4 w-4 text-accent" aria-hidden="true" />
-          <h2 id="sessions-heading" className="text-sm font-semibold text-primary">
+          <h2 id="sessions-heading" className={typeSmSemiboldPrimary}>
             {copy.activeSessions}
           </h2>
         </div>

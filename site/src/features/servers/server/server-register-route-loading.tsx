@@ -3,6 +3,8 @@ import { getDictionary } from "../../../lib/i18n";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { pageShellMax2xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH10W64, skelH24, skelH40 } from "../../shell/skeleton-shell";
+import { typeSmSecondary } from "../../shell/type-shell";
 
 export function ServerRegisterRouteLoading({
   headingId = "server-new-loading-heading",
@@ -26,9 +28,9 @@ export function ServerRegisterRouteLoading({
   const resolvedLeading =
     leading === undefined ? (
       <>
-        <div className="h-10 w-64 rounded bg-inset" />
-        <div className="h-40 rounded bg-inset" />
-        <div className="h-24 rounded bg-inset" />
+        <div className={skelH10W64} />
+        <div className={skelH40} />
+        <div className={skelH24} />
       </>
     ) : (
       (leading ?? undefined)
@@ -48,7 +50,7 @@ export function ServerRegisterRouteLoading({
       const platform = getUserPlatformCopy(typedLocale);
       return {
         title: copy.title,
-        description: <p className="text-sm text-secondary">{copy.description}</p>,
+        description: <p className={typeSmSecondary}>{copy.description}</p>,
         loading: platform.loading,
       };
     },

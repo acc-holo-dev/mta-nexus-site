@@ -11,6 +11,7 @@ import { publicationCopy } from "../../community/publication-feed-copy";
 import { publicationFeedView } from "../../community/publication-feed-view";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellStack6 } from "../../shell/page-shell";
+import { type2xlBoldPrimary } from "../../shell/type-shell";
 export async function publicProfileMetadata(): Promise<Metadata> {
   const copy = publicationCopy(await getRequestLocale());
   return {
@@ -73,7 +74,7 @@ export async function PublicProfileActivity({
         <Link href={profilePath} className={linkAccentSmRounded}>
           {kind === "server" ? copy.serverBack : copy.back}
         </Link>
-        <h1 className="text-2xl font-bold text-primary">
+        <h1 className={type2xlBoldPrimary}>
           {profile.name}: {kind === "server" ? copy.serverTitle : copy.activity}
         </h1>
         <p className="text-sm text-muted">

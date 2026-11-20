@@ -12,6 +12,7 @@ import { linkAccentSm, linkSecondaryBorder } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace3P5, panelFlexMinWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { type2xlExtraboldPrimary, typeMt2SmMuted, typeSpace1XsMuted } from "../../shell/type-shell";
 import { parseReactionPage, reactionPageHref } from "../content-reaction-contract";
 import { reactionCopy, reactionError } from "../content-reaction-copy";
 import { ReactionRemoval } from "../reaction-removal";
@@ -74,8 +75,8 @@ export async function ReactionsPageScreen({
         {copy.back}
       </Link>
       <header className="min-w-0 border-b border-base pb-6">
-        <h1 className="text-2xl font-extrabold text-primary">{copy.my}</h1>
-        <p className="mt-2 text-sm text-muted">{copy.description}</p>
+        <h1 className={type2xlExtraboldPrimary}>{copy.my}</h1>
+        <p className={typeMt2SmMuted}>{copy.description}</p>
       </header>
       <search aria-label={copy.query}>
         <form action="/workspace/reactions" method="get" className={panelFlexMinWrapEndP4}>
@@ -89,7 +90,7 @@ export async function ReactionsPageScreen({
               className={`${fieldClass} block min-h-11 w-full`}
             />
           </label>
-          <label className="space-y-1 text-xs text-muted">
+          <label className={typeSpace1XsMuted}>
             {copy.title}
             <select
               name="reaction"

@@ -1,11 +1,11 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { surfaceBgP4TextSmMuted } from "../../shell/surface-shell";
+import { typeDisplayPrimary, typeFlexWrapGap2 } from "../../shell/type-shell";
 
-const filterNavLinkClass =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+const filterNavLinkClass = linkFocusRing;
 
-import { linkAccentTight, linkAccentTightSmRounded } from "../../shell/link-shell";
+import { linkAccentTight, linkAccentTightSmRounded, linkFocusRing } from "../../shell/link-shell";
 import { pageShellMax5xlMid } from "../../shell/page-shell";
 import type { getCommerceHistoryCopy } from "../commerce-history-i18n";
 export type HistoryArea = "purchases" | "licenses" | "sales";
@@ -36,10 +36,10 @@ export function HistoryShell({
         <Link href="/workspace" className={linkAccentTightSmRounded}>
           {copy.back}
         </Link>
-        <h1 className="font-display text-primary">{titles[area]}</h1>
+        <h1 className={typeDisplayPrimary}>{titles[area]}</h1>
         <p className="max-w-2xl text-sm text-secondary">{descriptions[area]}</p>
       </header>
-      <nav aria-label={copy.navigation} className="flex flex-wrap gap-2">
+      <nav aria-label={copy.navigation} className={typeFlexWrapGap2}>
         {(Object.keys(titles) as HistoryArea[]).map((key) => (
           <Link
             key={key}

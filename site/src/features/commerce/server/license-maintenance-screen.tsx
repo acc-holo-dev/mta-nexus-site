@@ -14,6 +14,7 @@ import { linkAccent, linkAccentSm, linkAccentSmRounded, linkMinH } from "../../s
 import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelMinSpace2P4, panelP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary, typeFlexWrapGap4Sm, typeSmSecondary } from "../../shell/type-shell";
 import { formatHistoryDate, licenseStatusLabel } from "../commerce-history-format";
 import { getCommerceHistoryCopy } from "../commerce-history-i18n";
 import { getLicenseMaintenanceCopy } from "../license-maintenance-i18n";
@@ -98,7 +99,7 @@ export async function LicenseMaintenanceScreen({
       <Link href="/admin/licenses" className={linkAccentSm}>
         {copy.back}
       </Link>
-      <h1 className="font-display text-primary">{copy.maintenance}</h1>
+      <h1 className={typeDisplayPrimary}>{copy.maintenance}</h1>
       <p className="text-secondary">{copy.maintenanceNote}</p>
       <dl className="grid gap-4 sm:grid-cols-3">
         {[
@@ -123,7 +124,7 @@ export async function LicenseMaintenanceScreen({
               >
                 {license.productTitle}
               </Link>
-              <p className="text-sm text-secondary">
+              <p className={typeSmSecondary}>
                 {licenseStatusLabel(license.status, history.licenseStatuses)} ·{" "}
                 {license.event === "expired" ? copy.expiredTitle : copy.expiringTitle}
               </p>
@@ -143,7 +144,7 @@ export async function LicenseMaintenanceScreen({
         />
       )}
       {result.totalPages > 1 && (
-        <nav aria-label={copy.currentPage} className="flex flex-wrap gap-4 text-sm">
+        <nav aria-label={copy.currentPage} className={typeFlexWrapGap4Sm}>
           {result.page > 1 && (
             <Link href={`?page=${result.page - 1}`} className={linkAccent}>
               {copy.previous}

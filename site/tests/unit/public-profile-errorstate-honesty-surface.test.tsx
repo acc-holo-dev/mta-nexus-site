@@ -17,7 +17,7 @@ it("locks public profile form failures to ErrorState and keeps success as status
   expect(source).toContain("copy.profileAccountChangedHint");
   expect(source).toContain("copy.unavailableHint");
   expect(source).toContain('role="status"');
-  expect(source).toContain("text-success");
+  expect(source).toMatch(/text-success|typeSmSuccess/);
   expect(source).not.toContain('role={notice.error ? "alert" : "status"}');
   expect(source).not.toContain('role="alert"');
   expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);

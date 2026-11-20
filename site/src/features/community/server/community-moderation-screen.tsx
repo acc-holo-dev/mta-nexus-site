@@ -34,6 +34,14 @@ import {
   panelMinSpace4P5,
 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import {
+  type2xlBoldPrimary,
+  typeFlexWrapGap4,
+  typeHeadingPrimary,
+  typePrewrapSmSecondary,
+  typeSmPrimary,
+  typeSpace1XsMuted,
+} from "../../shell/type-shell";
 import { moderationCopy, moderationError } from "../community-moderation-copy";
 import { ContentModerationControls } from "../content-moderation";
 import { moderatedDiscussionCopy } from "../moderated-discussion-copy";
@@ -135,7 +143,7 @@ export async function CommunityModerationScreen({
           <Link className={linkAccentSm} href="/admin/community">
             {copy.back}
           </Link>
-          <h1 className="text-2xl font-bold text-primary">{copy.detail}</h1>
+          <h1 className={type2xlBoldPrimary}>{copy.detail}</h1>
           {failure(error || copy.unavailable, moderationDetailHref(id))}
         </div>
       );
@@ -181,7 +189,7 @@ export async function CommunityModerationScreen({
           )}
         </header>
         <section className={panelMinSpace3P5}>
-          <h2 className="font-heading text-primary">{copy.body}</h2>
+          <h2 className={typeHeadingPrimary}>{copy.body}</h2>
           <div className="whitespace-pre-wrap break-words text-sm leading-relaxed text-secondary">
             {item.body}
           </div>
@@ -209,7 +217,7 @@ export async function CommunityModerationScreen({
           />
         </section>
         <section className="min-w-0 space-y-4">
-          <h2 className="font-heading text-primary">{copy.history}</h2>
+          <h2 className={typeHeadingPrimary}>{copy.history}</h2>
           <p className="text-sm text-muted">{copy.historyScope}</p>
           <a className={linkAccentSm} href={moderationDetailHref(id)}>
             {copy.latest}
@@ -224,7 +232,7 @@ export async function CommunityModerationScreen({
           <ol className="min-w-0 space-y-3">
             {history.map((event) => (
               <li key={event.id} className={panelMinSpace2P5}>
-                <p className="text-sm text-primary">
+                <p className={typeSmPrimary}>
                   {event.action === "content.published" ? copy.publish : copy.archive} ·{" "}
                   {date(event.createdAt)}
                 </p>
@@ -233,7 +241,7 @@ export async function CommunityModerationScreen({
                   {event.to ? copy[event.to] : copy.unknown}
                 </p>
                 {event.notes ? (
-                  <p className="whitespace-pre-wrap break-words text-sm text-secondary">
+                  <p className={typePrewrapSmSecondary}>
                     {copy.reason}: {event.notes}
                   </p>
                 ) : null}
@@ -273,7 +281,7 @@ export async function CommunityModerationScreen({
   return (
     <div className={pageShellStack6}>
       <header className="min-w-0 space-y-2">
-        <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
+        <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
         <p className="text-sm text-muted">{copy.description}</p>
         <Link className={linkAccentSm} href="/admin/reports">
           {copy.reports}
@@ -293,7 +301,7 @@ export async function CommunityModerationScreen({
                   className={`${platformFieldClass} min-h-11`}
                 />
               </label>
-              <label className="space-y-1 text-xs text-muted">
+              <label className={typeSpace1XsMuted}>
                 {copy.author}
                 <input
                   name="author"
@@ -302,7 +310,7 @@ export async function CommunityModerationScreen({
                   className={`${platformFieldClass} min-h-11`}
                 />
               </label>
-              <label className="space-y-1 text-xs text-muted">
+              <label className={typeSpace1XsMuted}>
                 {copy.status}
                 <select
                   name="status"
@@ -316,7 +324,7 @@ export async function CommunityModerationScreen({
                   ))}
                 </select>
               </label>
-              <label className="space-y-1 text-xs text-muted">
+              <label className={typeSpace1XsMuted}>
                 {copy.type}
                 <select
                   name="type"
@@ -371,7 +379,7 @@ export async function CommunityModerationScreen({
               ))}
             </ul>
           )}
-          <nav aria-label={copy.title} className="flex flex-wrap gap-4">
+          <nav aria-label={copy.title} className={typeFlexWrapGap4}>
             <a className={linkAccentSm} href={moderationHref(filters)}>
               {copy.latest}
             </a>

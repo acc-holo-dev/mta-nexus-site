@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH10W64, skelH28 } from "../../shell/skeleton-shell";
 import { planReviewsCopy } from "../plan-reviews-i18n";
 
 type Copy = ReturnType<typeof planReviewsCopy>;
@@ -40,7 +41,7 @@ function PlanReviewsRouteLoading({
     throw new Error("PlanReviewsRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-10 w-64 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH10W64} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -70,7 +71,7 @@ export function SubscriptionReviewDetailRouteLoading() {
   return PlanReviewsRouteLoading({
     headingId: "subscription-review-detail-loading-heading",
     className: pageShellMax5xl,
-    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    leading: <div className={skelH10W64} />,
     titleKey: "saved",
   });
 }
@@ -80,7 +81,7 @@ export function SubscriptionReviewsRouteLoading() {
     headingId: "subscription-reviews-loading-heading",
     className: pageShellMax5xl,
     rows: 4,
-    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    leading: <div className={skelH10W64} />,
     titleKey: "title",
   });
 }
@@ -92,8 +93,8 @@ export function SubscriptionReviewNewRouteLoading() {
     rows: 0,
     leading: (
       <>
-        <div className="h-10 w-64 rounded bg-inset" />
-        <div className="h-28 rounded bg-inset" />
+        <div className={skelH10W64} />
+        <div className={skelH28} />
       </>
     ),
     titleKey: "newReview",

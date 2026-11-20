@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH10W64 } from "../../shell/skeleton-shell";
 import { getReleaseHistoryCopy } from "../public-release-history";
 
 type Copy = ReturnType<typeof getReleaseHistoryCopy>;
@@ -39,7 +40,7 @@ function PublicReleaseHistoryRouteLoading({
     throw new Error("PublicReleaseHistoryRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-10 w-64 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH10W64} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,

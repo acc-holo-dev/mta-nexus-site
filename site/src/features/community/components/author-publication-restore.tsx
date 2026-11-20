@@ -15,6 +15,7 @@ import {
 import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentSm, linkGhostAccentSm, linkMinHAccentSemibold } from "../../shell/link-shell";
 import { panelClipSpace3P4 } from "../../shell/panel-shell";
+import { typeSmSuccess } from "../../shell/type-shell";
 import { confirmedAuthorPublicationRestore } from "../author-publication-desk-contract";
 import {
   authorPublicationDeskCopy,
@@ -147,7 +148,7 @@ export function AuthorPublicationRestore({
         <ErrorState title={notice} description={getDictionary(locale).errors.formErrorHint} />
       ) : null}
       {notice && saved ? (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {notice}
         </p>
       ) : null}

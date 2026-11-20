@@ -16,7 +16,8 @@ import {
   linkAccentXs,
   linkGhostAccentSm,
 } from "../../shell/link-shell";
-import { panelClipSpace3P4 } from "../../shell/panel-shell";
+import { panelClipSpace3P4, panelClipSpace5P5Sm } from "../../shell/panel-shell";
+import { typeFlexWrapGap3, typeFlexWrapGap4, typeSmSecondary } from "../../shell/type-shell";
 import {
   ContentCommentSubmitError,
   createCommentIntentKey,
@@ -43,7 +44,7 @@ import { DiscussionComposeWriteFeedback } from "./content-discussion-compose-fee
 import { ContentFollowControls } from "./content-follow-controls";
 import { DiscussionCommentActions } from "./discussion-comment-actions";
 
-const shellClass = "nexus-panel min-w-0 space-y-5 overflow-x-clip p-5 sm:p-6";
+const shellClass = panelClipSpace5P5Sm;
 
 function readScopedDiscussionDraft(contentId: string, actorId: string | null) {
   const own = readDiscussionComposeDraft(contentId, { actorId });
@@ -433,7 +434,7 @@ export function ContentDiscussion({
                   })
           }
         />
-        <div className="flex flex-wrap gap-4">
+        <div className={typeFlexWrapGap4}>
           <Link href="/workspace/saved?type=content" className={linkAccentXs}>
             {followCopy(locale).content}
           </Link>
@@ -495,7 +496,7 @@ export function ContentDiscussion({
       </search>
       <form onSubmit={submit} className="min-w-0 space-y-3" aria-busy={submitting}>
         {draftRestoreNotice ? (
-          <p role="status" aria-live="polite" className="text-sm text-secondary">
+          <p role="status" aria-live="polite" className={typeSmSecondary}>
             {workspaceCopy.draftRestored}
           </p>
         ) : null}
@@ -800,7 +801,7 @@ export function ContentDiscussion({
           }
         />
       ) : null}
-      <div className="flex flex-wrap gap-3">
+      <div className={typeFlexWrapGap3}>
         {page?.hasMore && (
           <Button
             type="button"

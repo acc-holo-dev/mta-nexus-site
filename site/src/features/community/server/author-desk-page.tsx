@@ -13,6 +13,13 @@ import { pageShellMax5xlTight as pageShellClass } from "../../shell/page-shell";
 import { panelFlexMinWrapEndP4, panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
+  type2xlExtraboldPrimary,
+  typeFlexWrapGap4,
+  typeMt2SmMuted,
+  typePrewrapSmSecondary,
+  typeSpace1XsMuted,
+} from "../../shell/type-shell";
+import {
   authorPublicationDeskHref,
   parseAuthorPublicationDeskQuery,
 } from "../author-publication-desk-contract";
@@ -88,8 +95,8 @@ export async function AuthorContentPage({
     <div className={pageShellClass}>
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
-          <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
-          <p className="mt-2 text-sm text-muted">{copy.description}</p>
+          <h1 className={type2xlExtraboldPrimary}>{copy.title}</h1>
+          <p className={typeMt2SmMuted}>{copy.description}</p>
         </div>
         <Link
           href="/workspace/content/new"
@@ -110,7 +117,7 @@ export async function AuthorContentPage({
               className={`${platformFieldClass} block min-h-11`}
             />
           </label>
-          <label className="space-y-1 text-xs text-muted">
+          <label className={typeSpace1XsMuted}>
             {labels.status}
             <select
               name="status"
@@ -124,7 +131,7 @@ export async function AuthorContentPage({
               ))}
             </select>
           </label>
-          <label className="space-y-1 text-xs text-muted">
+          <label className={typeSpace1XsMuted}>
             {labels.type}
             <select
               name="type"
@@ -139,7 +146,7 @@ export async function AuthorContentPage({
               ))}
             </select>
           </label>
-          <label className="space-y-1 text-xs text-muted">
+          <label className={typeSpace1XsMuted}>
             {copy.source}
             <select
               name="source"
@@ -153,7 +160,7 @@ export async function AuthorContentPage({
               ))}
             </select>
           </label>
-          <label className="space-y-1 text-xs text-muted">
+          <label className={typeSpace1XsMuted}>
             {copy.tag}
             <input
               name="tag"
@@ -225,9 +232,7 @@ export async function AuthorContentPage({
                   </h2>
                   <span className="text-xs text-muted">{labels[item.status]}</span>
                 </div>
-                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                  {item.excerpt}
-                </p>
+                <p className={typePrewrapSmSecondary}>{item.excerpt}</p>
                 <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
                   <span>{labels[item.type]}</span>
                   <span>{copy[item.source]}</span>
@@ -241,7 +246,7 @@ export async function AuthorContentPage({
                     {labels.comments}: {item.commentCount}
                   </span>
                 </div>
-                <div className="flex flex-wrap gap-4">
+                <div className={typeFlexWrapGap4}>
                   {[item.organization, item.server].map((context) =>
                     context ? (
                       <Link
@@ -265,7 +270,7 @@ export async function AuthorContentPage({
                     </Link>
                   ))}
                 </div>
-                <div className="flex flex-wrap gap-4">
+                <div className={typeFlexWrapGap4}>
                   <Link
                     prefetch={false}
                     href={`/workspace/content/${encodeURIComponent(item.id)}`}
@@ -295,7 +300,7 @@ export async function AuthorContentPage({
           ))}
       </ul>
       {report && filters && (
-        <nav aria-label={copy.title} className="flex flex-wrap gap-4">
+        <nav aria-label={copy.title} className={typeFlexWrapGap4}>
           {report.newerCursor && (
             <Link
               prefetch={false}

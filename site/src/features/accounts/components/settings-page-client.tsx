@@ -17,6 +17,8 @@ import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax3xlRoomy as pageShellClass } from "../../shell/page-shell";
 import { panelSpace4P5Shadow } from "../../shell/panel-shell";
+import { skelH4W13, skelH20 } from "../../shell/skeleton-shell";
+import { typeDisplayPrimary } from "../../shell/type-shell";
 import { authPasswordApiCopy } from "../auth-password-api-copy";
 import { ProfileChangeHistoryLink } from "../change-history";
 import { adSlotRendererEnabled, advertisingLifecycleEnabled } from "../feature-flags";
@@ -505,8 +507,8 @@ export function SettingsPageClient() {
         <div className="animate-pulse space-y-8" aria-hidden="true">
           {[1, 2, 3, 4].map((key) => (
             <div key={key} className={panelSpace4P5Shadow}>
-              <div className="h-4 w-1/3 rounded bg-inset" />
-              <div className="h-20 rounded bg-inset" />
+              <div className={skelH4W13} />
+              <div className={skelH20} />
             </div>
           ))}
         </div>
@@ -522,7 +524,7 @@ export function SettingsPageClient() {
     return (
       <div className={`${pageShellClass} py-12`}>
         <header>
-          <h1 className="font-display text-primary">{copy.unavailable}</h1>
+          <h1 className={typeDisplayPrimary}>{copy.unavailable}</h1>
           <p className="mt-1 font-caption text-muted">{copy.description}</p>
         </header>
         <ErrorState
@@ -546,7 +548,7 @@ export function SettingsPageClient() {
   return (
     <div className={pageShellClass} aria-busy={pending || undefined}>
       <div>
-        <h1 className="font-display text-primary">{copy.title}</h1>
+        <h1 className={typeDisplayPrimary}>{copy.title}</h1>
         <p className="mt-1 font-caption text-muted">{copy.description}</p>
       </div>
 

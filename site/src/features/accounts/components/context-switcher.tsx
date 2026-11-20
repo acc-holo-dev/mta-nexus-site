@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { HonestLoadingShell } from "../../shell/honest-loading";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace3P5 } from "../../shell/panel-shell";
+import { typeSmSemiboldPrimary } from "../../shell/type-shell";
 
 type ContextOption = {
   id: string;
@@ -142,7 +143,7 @@ export function ContextSwitcher() {
   return (
     <section aria-busy={saving ? true : undefined} className={panelSpace3P5}>
       <div>
-        <h2 className="text-sm font-semibold text-primary">{copy.title}</h2>
+        <h2 className={typeSmSemiboldPrimary}>{copy.title}</h2>
         <p className="mt-1 text-xs text-muted">{copy.description}</p>
       </div>
 

@@ -13,6 +13,7 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeSmSecondary } from "../../shell/type-shell";
 import { LibraryCollectionItemCopyForm } from "../collection-item-copy";
 import { libraryCollectionComparisonCopy } from "../library-collection-comparison-i18n";
 import {
@@ -227,7 +228,7 @@ export async function CollectionComparePage({
                 ] as const
               ).map(([key, count]) => (
                 <div key={key} className="nexus-panel min-w-0 overflow-x-clip p-3">
-                  <dt className="text-sm text-secondary">{h[key]}</dt>
+                  <dt className={typeSmSecondary}>{h[key]}</dt>
                   <dd className="text-xl">{count}</dd>
                 </div>
               ))}

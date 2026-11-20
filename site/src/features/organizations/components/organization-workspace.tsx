@@ -22,6 +22,7 @@ import {
 } from "../../shell/link-shell";
 import { pageShellStack6 } from "../../shell/page-shell";
 import { surfaceSpace3P4 } from "../../shell/surface-shell";
+import { typeHeadingPrimary } from "../../shell/type-shell";
 import { organizationContentCopy } from "../organization-content-copy";
 import { organizationGovernanceCopy } from "../organization-governance-copy";
 import { confirmsOrganizationMemberMutation } from "../organization-member-confirmation";
@@ -285,7 +286,7 @@ export function OrganizationWorkspacePanel({
         />
       )}
       <section className="nexus-panel space-y-5 p-5" aria-busy={busy}>
-        <h2 className="font-heading text-primary">{copy.team}</h2>
+        <h2 className={typeHeadingPrimary}>{copy.team}</h2>
         <p className="text-sm text-muted">{copy.roleHelp}</p>
         <p className="text-xs text-muted">{copy.accessHelp}</p>
         {data.owner && (

@@ -25,6 +25,7 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { PlatformSignIn, platformSignInFocusClass } from "../guest-auth";
 import { pageShellStack8 as pageShellClass } from "../page-shell";
 import { PlatformSessionError } from "../session-error";
+import { typeDisplayPrimary, typeFlexWrapGap2 } from "../type-shell";
 export async function workspaceHubMetadata(): Promise<Metadata> {
   return {
     title: `${getDictionary(await getRequestLocale()).workspace.title} | MTA NEXUS`,
@@ -101,7 +102,7 @@ export async function WorkspaceHubPage() {
     <div className={pageShellClass}>
       <header className="flex min-w-0 flex-col justify-between gap-4 border-b border-base pb-6 md:flex-row md:items-center">
         <div className="min-w-0">
-          <h1 className="font-display text-primary">{dictionary.workspace.title}</h1>
+          <h1 className={typeDisplayPrimary}>{dictionary.workspace.title}</h1>
           <p className="mt-0.5 font-caption text-muted">
             @{user.username} · {dictionary.workspace.subtitle}
           </p>
@@ -110,7 +111,7 @@ export async function WorkspaceHubPage() {
 
         {/* UX-23 interim: group by library / servers / publications — history stays below. */}
         <div className="flex min-w-0 flex-col gap-3">
-          <nav className="flex flex-wrap gap-2" aria-label={dictionary.workspace.libraryTitle}>
+          <nav className={typeFlexWrapGap2} aria-label={dictionary.workspace.libraryTitle}>
             <Link href="/workspace/library" className={navChipClass}>
               {dictionary.workspace.libraryTitle}
             </Link>
@@ -122,13 +123,13 @@ export async function WorkspaceHubPage() {
               {dictionary.workspace.publishResource}
             </Link>
           </nav>
-          <nav className="flex flex-wrap gap-2" aria-label={serverCopy.title}>
+          <nav className={typeFlexWrapGap2} aria-label={serverCopy.title}>
             <Link href="/workspace/servers/new" className={secondaryCtaClass}>
               <Plus className="h-3.5 w-3.5" aria-hidden="true" />
               {dictionary.workspace.registerServer}
             </Link>
           </nav>
-          <nav className="flex flex-wrap gap-2" aria-label={ownDiscussionCopy(locale).title}>
+          <nav className={typeFlexWrapGap2} aria-label={ownDiscussionCopy(locale).title}>
             <Link href="/workspace/discussions" className={navChipClass}>
               {ownDiscussionCopy(locale).title}
             </Link>

@@ -19,6 +19,7 @@ import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace3P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeMt2SmMuted, typeXsSecondary } from "../../shell/type-shell";
 import { serverContentId } from "../server-content-api";
 import { serverContentCopy } from "../server-content-copy";
 import { serverPublicationHistoryCopy } from "../server-publication-history-copy";
@@ -77,8 +78,8 @@ export async function ServerPublicationsScreen({
             {team.title}
             {result ? `: ${result.server.name}` : ""}
           </h1>
-          <p className="mt-2 text-sm text-muted">{team.description}</p>
-          <p className="mt-2 text-sm text-muted">{team.notice}</p>
+          <p className={typeMt2SmMuted}>{team.description}</p>
+          <p className={typeMt2SmMuted}>{team.notice}</p>
         </div>
         {result && (
           <Link
@@ -121,7 +122,7 @@ export async function ServerPublicationsScreen({
                         {item.title}
                       </Link>
                     </h2>
-                    <span className="text-xs text-secondary">
+                    <span className={typeXsSecondary}>
                       {copy[item.status as "draft" | "published" | "archived"]}
                     </span>
                   </div>

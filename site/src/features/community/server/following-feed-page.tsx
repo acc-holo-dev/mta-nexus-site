@@ -6,6 +6,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { type2xlBoldPrimary, typeMt2SmMuted } from "../../shell/type-shell";
 import { PublicationFeed } from "../publication-feed";
 import { publicationCopy } from "../publication-feed-copy";
 import { publicationFeedView } from "../publication-feed-view";
@@ -53,10 +54,10 @@ export async function FollowingFeedPage({
   return (
     <div className={pageShellClass}>
       <header>
-        <h1 id="following-feed-heading" className="text-2xl font-bold text-primary">
+        <h1 id="following-feed-heading" className={type2xlBoldPrimary}>
           {copy.title}
         </h1>
-        <p className="mt-2 text-sm text-muted">{copy.description}</p>
+        <p className={typeMt2SmMuted}>{copy.description}</p>
       </header>
       <PublicationFeed
         key={`${actor.id}:${JSON.stringify(filters)}`}

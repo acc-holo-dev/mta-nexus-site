@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax3xl } from "../../shell/page-shell";
 import { DictionaryFieldRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH28 } from "../../shell/skeleton-shell";
 
 export function SecurityCenterRouteLoading({
   headingId = "security-loading-heading",
@@ -26,7 +27,7 @@ export function SecurityCenterRouteLoading({
   leading?: ReactNode | null;
 } = {}) {
   const resolvedLeading =
-    leading === undefined ? <div className="h-28 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH28} /> : (leading ?? undefined);
   return DictionaryFieldRouteLoading({
     headingId,
     titlePath,

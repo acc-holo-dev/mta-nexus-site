@@ -8,6 +8,7 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { unknownMarker } from "../../../lib/i18n/unknown";
 import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace5P5 } from "../../shell/panel-shell";
+import { typeGrid2Gap4, typeSmSecondary } from "../../shell/type-shell";
 import { formatHistoryAmount } from "../commerce-history-format";
 import { commercialTerms, parseCommercialAmount } from "../commercial-confirmation";
 import { confirmedPlanReview, expectedPlanReviewId } from "../plan-review-confirmation";
@@ -224,10 +225,10 @@ export function PlanReviewForm({
         <p className="text-sm">
           {c.revision} {shownPlan.revision} · {plan.scope === "user" ? c.personal : c.organization}
         </p>
-        <p role="note" className="text-sm text-secondary">
+        <p role="note" className={typeSmSecondary}>
           {c.notice}
         </p>
-        <fieldset disabled={busy || frozen} className="grid gap-4 sm:grid-cols-2">
+        <fieldset disabled={busy || frozen} className={typeGrid2Gap4}>
           {plan.scope === "organization" ? (
             <label htmlFor={`${field}-org`} className="space-y-2">
               <span>{c.organization}</span>

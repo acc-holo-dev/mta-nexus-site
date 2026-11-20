@@ -9,6 +9,7 @@ import { formatUnknown } from "../../../lib/i18n/unknown";
 import { productService } from "../../../lib/services/commerce/product-service";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellStack6 } from "../../shell/page-shell";
+import { typeFlexWrapGap2, typeSemiboldPrimary } from "../../shell/type-shell";
 import { MARKET_PAGE_SIZE, MAX_MARKET_PAGE, marketHref, parseMarketQuery } from "../model";
 import { PRODUCT_CATEGORY_KEYS } from "../product-type-labels";
 import { ProductCard } from "../view";
@@ -97,7 +98,7 @@ export async function MarketPage({
       </div>
 
       <search aria-label={dictionary.market.searchLabel}>
-        <form action="/market" method="get" className="flex flex-wrap gap-2">
+        <form action="/market" method="get" className={typeFlexWrapGap2}>
           <input type="hidden" name="type" value={type} />
           <input type="hidden" name="sort" value={sort} />
           <label htmlFor="market-query" className="sr-only">
@@ -211,7 +212,7 @@ export async function MarketPage({
             <div className="mx-auto max-w-lg space-y-4">
               {filtersActive ? (
                 <div className="space-y-2 text-left text-sm text-secondary">
-                  <p className="font-semibold text-primary">{dictionary.market.activeFilters}</p>
+                  <p className={typeSemiboldPrimary}>{dictionary.market.activeFilters}</p>
                   <ul className="list-inside list-disc space-y-1">
                     {activeCategoryLabel ? <li>{activeCategoryLabel}</li> : null}
                     {activeSortLabel ? <li>{activeSortLabel}</li> : null}

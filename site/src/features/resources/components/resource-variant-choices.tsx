@@ -1,6 +1,7 @@
 import type { PublicResourceVariants } from "@nexus/domain";
 import Link from "next/link";
 import { panelSpace3P5 } from "../../shell/panel-shell";
+import { typeFlexWrapGap3 } from "../../shell/type-shell";
 import { getResourceManagementCopy } from "../resource-management-i18n";
 
 export function ResourceVariantChoices({
@@ -18,7 +19,7 @@ export function ResourceVariantChoices({
     <section className={panelSpace3P5} aria-label={copy.browse}>
       <h2 className="text-base font-bold text-primary">{group.title}</h2>
       <p className="text-xs text-muted">{copy.independent}</p>
-      <ul className="flex flex-wrap gap-3">
+      <ul className={typeFlexWrapGap3}>
         {group.variants.map((variant) => (
           <li key={variant.productId}>
             <Link

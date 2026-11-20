@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax4xlTight } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH24 } from "../../shell/skeleton-shell";
 import { discoveryStreamCopy } from "../discovery-stream-copy";
 
 type Copy = ReturnType<typeof discoveryStreamCopy>;
@@ -39,7 +40,7 @@ function DiscoveryStreamRouteLoading({
     throw new Error("DiscoveryStreamRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-24 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH24} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -69,7 +70,7 @@ export function DiscoverStreamRouteLoading() {
   return DiscoveryStreamRouteLoading({
     headingId: "discover-stream-loading-heading",
     className: pageShellMax4xlTight,
-    leading: <div className="h-24 rounded bg-inset" />,
+    leading: <div className={skelH24} />,
     titleKey: "title",
   });
 }

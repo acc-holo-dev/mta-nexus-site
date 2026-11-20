@@ -1,6 +1,7 @@
 import type { AdSlotPlan } from "@nexus/domain";
 import { EmptyState, SectionHeader, StatusBadge } from "@nexus/ui";
 import type { Locale } from "../../../lib/i18n";
+import { typeCaptionFaint } from "../../shell/type-shell";
 import { adminAdPlacementCopy } from "../admin-ad-placement-i18n";
 
 /**
@@ -60,8 +61,8 @@ export function AdminAdPlacementSection({
               </div>
             </li>
           ))}
-          <li className="font-caption text-faint">{copy.enabledTotal(enabledCount)}</li>
-          <li className="font-caption text-faint">
+          <li className={typeCaptionFaint}>{copy.enabledTotal(enabledCount)}</li>
+          <li className={typeCaptionFaint}>
             {rendererEnabled ? copy.rendererOn : copy.rendererOff}
           </li>
         </ul>

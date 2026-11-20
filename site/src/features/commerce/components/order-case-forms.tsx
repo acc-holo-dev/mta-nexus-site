@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { linkAccentRounded, linkGhostAccentSmRounded } from "../../shell/link-shell";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
+import { typeFlexWrapGap3, typeSmSuccess } from "../../shell/type-shell";
 import {
   clearSupportRetry,
   reserveSupportCaseRetry,
@@ -373,7 +374,7 @@ export function OrderCaseReviewForm({
         />
         <span className="block text-sm text-secondary">{copy.notesHelp}</span>
       </label>
-      <div className="flex flex-wrap gap-3">
+      <div className={typeFlexWrapGap3}>
         {actions.map((action) => (
           <Button
             type="button"
@@ -401,7 +402,7 @@ export function OrderCaseReviewForm({
       )}
       {message ? (
         saved ? (
-          <p role="status" className="text-sm text-success">
+          <p role="status" className={typeSmSuccess}>
             {message}
           </p>
         ) : (

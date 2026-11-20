@@ -8,6 +8,7 @@ import { useRef, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { formatUnknown } from "../../../lib/i18n/unknown";
 import { panelFlexColGap3P5 } from "../../shell/panel-shell";
+import { typeFlexWrapGap2 } from "../../shell/type-shell";
 import { type MtaMasterServer, mtaLiveStatus } from "../model/mta-master-directory-shared";
 
 function playerCountLabel(
@@ -270,7 +271,7 @@ export function HomeNetworkServerCard({
         {!isStale && observation.players != null ? ` ${home.players}` : null}
       </p>
 
-      <div className="flex flex-wrap gap-2">
+      <div className={typeFlexWrapGap2}>
         <a
           href={connectUri}
           aria-label={`${copy.connect}: ${name}`}

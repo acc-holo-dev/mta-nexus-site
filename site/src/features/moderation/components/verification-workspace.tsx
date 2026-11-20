@@ -12,9 +12,20 @@ import {
   platformRequest,
 } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
-import { linkGhostAccentSm, linkMuted } from "../../shell/link-shell";
+import { linkFocusRing, linkGhostAccentSm, linkMuted } from "../../shell/link-shell";
 import { pageShellStack6 as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace3P5, panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
+import {
+  typeFlexWrapGap3,
+  typeFlexWrapGap4,
+  typeFlexWrapGap4Sm,
+  typeHeadingPrimary,
+  typePrewrapSmSecondary,
+  typeSmSecondary,
+  typeSmSemiboldPrimary,
+  typeSmSuccess,
+  typeXsSecondary,
+} from "../../shell/type-shell";
 import {
   VERIFICATION_TYPES,
   type VerificationOverview,
@@ -33,8 +44,7 @@ import { verificationApplicationsCopy } from "../verification-applications-copy"
 
 type Target = { type: "user" | "developer" | "organization"; id: string; name: string };
 
-const filterNavLinkClass =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+const filterNavLinkClass = linkFocusRing;
 const accentLinkClass = `inline-flex min-h-11 items-center rounded text-sm text-accent underline ${filterNavLinkClass}`;
 
 export function VerificationWorkspace({
@@ -362,7 +372,7 @@ export function VerificationWorkspace({
     developer = !!profile && ["developer", "admin"].includes(profile.role);
   return (
     <div className={pageShellClass} aria-busy={pending}>
-      <div className="flex flex-wrap gap-4">
+      <div className={typeFlexWrapGap4}>
         <Button
           type="button"
           variant="secondary"
@@ -410,8 +420,8 @@ export function VerificationWorkspace({
       ) : null}
       {profile && (
         <section className={panelSpace3P5}>
-          <h2 className="font-heading text-primary">{copy.current}</h2>
-          <p className="text-sm text-secondary">
+          <h2 className={typeHeadingPrimary}>{copy.current}</h2>
+          <p className={typeSmSecondary}>
             {copy.user}:{" "}
             {profile.identityVerified
               ? copy.verified
@@ -437,7 +447,7 @@ export function VerificationWorkspace({
           </Button>
           {developer ? (
             <>
-              <p className="text-sm text-secondary">
+              <p className={typeSmSecondary}>
                 {copy.developer}:{" "}
                 {profile.experienceVerified
                   ? copy.verified
@@ -469,7 +479,7 @@ export function VerificationWorkspace({
         </section>
       )}
       <section className={panelSpace4P5}>
-        <h2 className="font-heading text-primary">{copy.manage}</h2>
+        <h2 className={typeHeadingPrimary}>{copy.manage}</h2>
         <form
           method="GET"
           action="/workspace/verification"
@@ -543,7 +553,7 @@ export function VerificationWorkspace({
             </div>
           ))}
         </div>
-        <nav className="flex flex-wrap gap-4 text-sm" aria-label={copy.manage}>
+        <nav className={typeFlexWrapGap4Sm} aria-label={copy.manage}>
           {teamFilters.page > 1 ? (
             <Link className={accentLinkClass} href={href({ teamsPage: teamFilters.page - 1 })}>
               {copy.previous}
@@ -561,13 +571,13 @@ export function VerificationWorkspace({
       </section>
       {target && (
         <section className={panelSpace4P5}>
-          <h2 className="font-heading text-primary">{copy.apply}</h2>
+          <h2 className={typeHeadingPrimary}>{copy.apply}</h2>
           <p className="break-words text-sm text-secondary">
             {copy[target.type]} · {target.name}
           </p>
           {savedId ? (
             <div className="space-y-2">
-              <p role="status" className="text-sm text-success">
+              <p role="status" className={typeSmSuccess}>
                 {copy.submitted}
               </p>
               <Link
@@ -654,7 +664,7 @@ export function VerificationWorkspace({
         </Link>
       </section>
       <section className="min-w-0 space-y-4">
-        <nav className="flex flex-wrap gap-3" aria-label={copy.title}>
+        <nav className={typeFlexWrapGap3} aria-label={copy.title}>
           <Link
             href="/workspace/verification/history"
             className={`inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-sm text-accent ${filterNavLinkClass}`}
@@ -739,7 +749,7 @@ export function VerificationWorkspace({
               <h3 className="min-w-0 break-words text-sm font-semibold text-primary">
                 {copy[application.targetType]}
               </h3>
-              <span className="text-xs text-secondary">{copy[application.status]}</span>
+              <span className={typeXsSecondary}>{copy[application.status]}</span>
             </div>
             <p className="break-all text-xs text-muted">{application.targetId}</p>
             <Link
@@ -749,9 +759,7 @@ export function VerificationWorkspace({
             >
               {verificationApplicationsCopy(locale).open}
             </Link>
-            <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-              {application.notes}
-            </p>
+            <p className={typePrewrapSmSecondary}>{application.notes}</p>
             {safeExternalWebUrl(application.proofUrl) ? (
               <a
                 className={accentLinkClass}
@@ -764,10 +772,8 @@ export function VerificationWorkspace({
             ) : null}
             {application.reviewNotes ? (
               <div className="space-y-1">
-                <h4 className="text-sm font-semibold text-primary">{copy.reviewNotes}</h4>
-                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                  {application.reviewNotes}
-                </p>
+                <h4 className={typeSmSemiboldPrimary}>{copy.reviewNotes}</h4>
+                <p className={typePrewrapSmSecondary}>{application.reviewNotes}</p>
               </div>
             ) : null}
             <p className="text-xs text-muted">
@@ -794,7 +800,7 @@ export function VerificationWorkspace({
             ) : null}
           </article>
         ))}
-        <nav className="flex flex-wrap gap-4 text-sm" aria-label={copy.title}>
+        <nav className={typeFlexWrapGap4Sm} aria-label={copy.title}>
           {filters.page > 1 ? (
             <Link className={accentLinkClass} href={href({ page: filters.page - 1 })}>
               {copy.previous}

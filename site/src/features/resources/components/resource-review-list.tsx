@@ -5,6 +5,7 @@ import type { Locale } from "../../../lib/i18n";
 import { unknownMarker } from "../../../lib/i18n/unknown";
 import { linkAccent } from "../../shell/link-shell";
 import { pageShellStack4 } from "../../shell/page-shell";
+import { typePrewrapSmSecondary } from "../../shell/type-shell";
 import { resourceReviewCopy } from "../resource-review-i18n";
 import { ResourceReviewReportForm } from "./resource-review-controls";
 export function ResourceReviewList({
@@ -48,7 +49,7 @@ export function ResourceReviewList({
                 {new Date(review.createdAt).toLocaleDateString(locale === "ru" ? "ru-RU" : "en-US")}
               </time>
             </div>
-            <p className="whitespace-pre-wrap break-words text-sm text-secondary">{review.text}</p>
+            <p className={typePrewrapSmSecondary}>{review.text}</p>
             <p className="text-xs text-muted">
               {review.accessSource === "entitlement"
                 ? copy.entitlement

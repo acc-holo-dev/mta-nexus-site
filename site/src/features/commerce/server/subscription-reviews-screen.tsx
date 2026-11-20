@@ -13,6 +13,7 @@ import { linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelFlexWrapEndGap4P4, panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeFlexWrapGap4Sm, typeSmSecondary } from "../../shell/type-shell";
 import { formatHistoryAmount, formatHistoryDate } from "../commerce-history-format";
 import { planReviewsCopy } from "../plan-reviews-i18n";
 import { planReviewHref, planReviewsPageParams, planReviewsQuery } from "../plan-reviews-query";
@@ -75,7 +76,7 @@ export async function SubscriptionReviewsScreen({
           {c.back}
         </Link>
         <h1 className="font-display">{c.title}</h1>
-        <p role="note" className="text-sm text-secondary">
+        <p role="note" className={typeSmSecondary}>
           {c.notice}
         </p>
         <form method="get" className={panelFlexWrapEndGap4P4}>
@@ -120,7 +121,7 @@ export async function SubscriptionReviewsScreen({
           </Button>
         </form>
         {scopes.totalPages > 1 ? (
-          <nav aria-label={c.scopeNext} className="flex flex-wrap gap-4 text-sm">
+          <nav aria-label={c.scopeNext} className={typeFlexWrapGap4Sm}>
             {scopes.page > 1 ? (
               <Link href={href(result.page, scopes.page - 1)} className={planReviewNavLinkClass}>
                 {c.previous}
@@ -163,7 +164,7 @@ export async function SubscriptionReviewsScreen({
           <EmptyState title={c.empty} description={c.emptyHint} />
         )}
         {result.totalPages > 1 ? (
-          <nav aria-label={c.page} className="flex flex-wrap gap-4 text-sm">
+          <nav aria-label={c.page} className={typeFlexWrapGap4Sm}>
             {result.page > 1 ? (
               <Link href={href(result.page - 1)} className={planReviewNavLinkClass}>
                 {c.previous}

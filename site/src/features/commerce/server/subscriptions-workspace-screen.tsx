@@ -11,6 +11,7 @@ import { subscriptionsService } from "../../../lib/services/commerce/subscriptio
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeFlexWrapGap3, typeFlexWrapGap4, typeSmSecondary } from "../../shell/type-shell";
 import { PlanReviewTerms } from "../plan-reviews-workspace";
 import {
   SubscriptionControls,
@@ -82,7 +83,7 @@ export async function SubscriptionsWorkspaceScreen({
       <section className={pageShellClass}>
         <h1 className="font-display">{c.title}</h1>
         <SubscriptionRecovery key={actor.id} actorId={actor.id} />
-        <nav className="flex flex-wrap gap-4">
+        <nav className={typeFlexWrapGap4}>
           <Link href="/subscriptions" className={subscriptionNavLinkClass}>
             {c.catalog}
           </Link>
@@ -90,10 +91,10 @@ export async function SubscriptionsWorkspaceScreen({
             {c.history}
           </Link>
         </nav>
-        <p role="note" className="text-sm text-secondary">
+        <p role="note" className={typeSmSecondary}>
           {c.notice}
         </p>
-        <form method="get" className="flex flex-wrap gap-3">
+        <form method="get" className={typeFlexWrapGap3}>
           <label htmlFor="subscription-account">
             {c.account}
             <select

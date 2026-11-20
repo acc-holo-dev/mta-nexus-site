@@ -8,6 +8,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { formatUnknown } from "../../../lib/i18n/unknown";
 import { linkAccentTightSm } from "../../shell/link-shell";
 import { surfaceSpace2P4TextSm } from "../../shell/surface-shell";
+import { typeBreakAllXs, typeSemiboldPrimary } from "../../shell/type-shell";
 import { buildPackageCopy } from "../build-package-i18n";
 import { getMtaMetaInspectorIssueMessage } from "../mta-meta-inspector-messages";
 export function BuildPackageSummaryPanel({
@@ -20,7 +21,7 @@ export function BuildPackageSummaryPanel({
   const copy = buildPackageCopy(locale);
   return (
     <section className={surfaceSpace2P4TextSm} aria-label={copy.title}>
-      <h3 className="font-semibold text-primary">{copy.title}</h3>
+      <h3 className={typeSemiboldPrimary}>{copy.title}</h3>
       {!summary ? (
         <p className="text-muted">{copy.legacy}</p>
       ) : (
@@ -119,7 +120,7 @@ export function BuildPackageEvidencePanel({
           {manifest && (
             <section className="space-y-4 rounded-lg border border-base p-4 text-sm">
               <p className="break-words font-code">{manifest.path}</p>
-              <code className="block break-all text-xs">
+              <code className={typeBreakAllXs}>
                 {copy.sha256Label}: {manifest.sha256Hash}
               </code>
               <h3 className="font-semibold">{copy.minimum}</h3>

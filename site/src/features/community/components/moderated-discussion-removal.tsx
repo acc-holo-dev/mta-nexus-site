@@ -6,6 +6,7 @@ import type { Locale } from "../../../lib/i18n";
 import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentSm } from "../../shell/link-shell";
 import { surfaceSpace3P4 } from "../../shell/surface-shell";
+import { typeSmSuccess } from "../../shell/type-shell";
 import { moderationCopy } from "../community-moderation-copy";
 import {
   confirmsModeratedDiscussionRemoval,
@@ -146,7 +147,7 @@ export function ModeratedDiscussionRemoval({
         />
       ) : null}
       {message && (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {message}
         </p>
       )}

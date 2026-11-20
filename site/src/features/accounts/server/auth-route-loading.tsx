@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMaxMdAuthTall } from "../../shell/page-shell";
 import { DictionaryFieldRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH11, skelH28 } from "../../shell/skeleton-shell";
 
 function AuthRouteLoading({
   headingId,
@@ -45,8 +46,8 @@ export function AuthForgotRouteLoading() {
     titlePath: "recovery.forgotTitle",
     leading: (
       <>
-        <div className="h-11 rounded bg-inset" />
-        <div className="h-11 rounded bg-inset" />
+        <div className={skelH11} />
+        <div className={skelH11} />
       </>
     ),
   });
@@ -58,9 +59,9 @@ export function AuthLoginRouteLoading() {
     titlePath: "auth.loginTitle",
     leading: (
       <>
-        <div className="h-11 rounded bg-inset" />
-        <div className="h-11 rounded bg-inset" />
-        <div className="h-11 rounded bg-inset" />
+        <div className={skelH11} />
+        <div className={skelH11} />
+        <div className={skelH11} />
       </>
     ),
   });
@@ -72,10 +73,10 @@ export function AuthRegisterRouteLoading() {
     titlePath: "auth.registerTitle",
     leading: (
       <>
-        <div className="h-11 rounded bg-inset" />
-        <div className="h-11 rounded bg-inset" />
-        <div className="h-11 rounded bg-inset" />
-        <div className="h-11 rounded bg-inset" />
+        <div className={skelH11} />
+        <div className={skelH11} />
+        <div className={skelH11} />
+        <div className={skelH11} />
       </>
     ),
   });
@@ -88,9 +89,9 @@ export function AuthResetRouteLoading() {
     loadingPath: "recovery.checkingReset",
     leading: (
       <>
-        <div className="h-11 rounded bg-inset" />
-        <div className="h-11 rounded bg-inset" />
-        <div className="h-11 rounded bg-inset" />
+        <div className={skelH11} />
+        <div className={skelH11} />
+        <div className={skelH11} />
       </>
     ),
   });
@@ -103,7 +104,7 @@ export function AuthVerifyEmailRouteLoading() {
     loadingPath: "recovery.checkingVerification",
     leading: (
       <>
-        <div className="h-28 rounded bg-inset" />
+        <div className={skelH28} />
         <div className="h-11 w-40 rounded bg-inset" />
       </>
     ),
@@ -117,7 +118,7 @@ export function AuthVerifyRouteLoading() {
     loadingPath: "recovery.checkingVerification",
     leading: (
       <>
-        <div className="h-28 rounded bg-inset" />
+        <div className={skelH28} />
         <div className="h-11 w-40 rounded bg-inset" />
       </>
     ),

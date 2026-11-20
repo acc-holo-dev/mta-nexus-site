@@ -8,6 +8,12 @@ import { privateChangeHistoryCopy } from "../../accounts/private-change-history-
 import { linkAccent, linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax5xlCompactTight } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapGap4,
+  typePrewrapSmSecondary,
+  typeSpace1SmSecondary,
+} from "../../shell/type-shell";
 import { REPORT_TYPES } from "../community-report-contract";
 import { communityReportCopy } from "../community-report-copy";
 import { type ReportGroupsPage, reportGroupsHref } from "../community-report-groups-contract";
@@ -44,7 +50,7 @@ export function CommunityReportGroups({
         {copy.back}
       </Link>
       <header className="min-w-0 space-y-2">
-        <h1 className="font-display text-primary">{copy.title}</h1>
+        <h1 className={typeDisplayPrimary}>{copy.title}</h1>
         <p className="text-sm text-muted">{copy.description}</p>
         <p className="text-xs text-muted">{copy.order}</p>
       </header>
@@ -54,7 +60,7 @@ export function CommunityReportGroups({
           action={path}
           className="nexus-panel grid min-w-0 gap-3 p-4 sm:grid-cols-2"
         >
-          <label className="space-y-1 text-sm text-secondary">
+          <label className={typeSpace1SmSecondary}>
             <span>{copy.search}</span>
             <input
               name="q"
@@ -64,7 +70,7 @@ export function CommunityReportGroups({
               className={platformFieldClass}
             />
           </label>
-          <label className="space-y-1 text-sm text-secondary">
+          <label className={typeSpace1SmSecondary}>
             <span>{copy.period}</span>
             <select name="period" defaultValue={filters.period} className={platformFieldClass}>
               {CHANGE_HISTORY_PERIODS.map((period) => (
@@ -74,14 +80,14 @@ export function CommunityReportGroups({
               ))}
             </select>
           </label>
-          <label className="space-y-1 text-sm text-secondary">
+          <label className={typeSpace1SmSecondary}>
             <span>{copy.view}</span>
             <select name="view" defaultValue={filters.view} className={platformFieldClass}>
               <option value="pending">{copy.pending}</option>
               <option value="history">{copy.history}</option>
             </select>
           </label>
-          <label className="space-y-1 text-sm text-secondary">
+          <label className={typeSpace1SmSecondary}>
             <span>{copy.target}</span>
             <select
               name="target"
@@ -93,7 +99,7 @@ export function CommunityReportGroups({
               <option value="comment">{labels.comment}</option>
             </select>
           </label>
-          <label className="space-y-1 text-sm text-secondary">
+          <label className={typeSpace1SmSecondary}>
             <span>{copy.type}</span>
             <select name="type" defaultValue={filters.type ?? ""} className={platformFieldClass}>
               <option value="">{copy.all}</option>
@@ -135,11 +141,7 @@ export function CommunityReportGroups({
               <h2 className="break-words text-base font-semibold text-primary">
                 {labels[item.targetType]} · {item.target?.title ?? item.targetId}
               </h2>
-              {item.target?.text && (
-                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                  {item.target.text}
-                </p>
-              )}
+              {item.target?.text && <p className={typePrewrapSmSecondary}>{item.target.text}</p>}
               {!item.target ? (
                 <ErrorState
                   id="community-report-unknown-target"
@@ -163,7 +165,7 @@ export function CommunityReportGroups({
                 {copy.first}: <time dateTime={item.firstAt}>{date(item.firstAt)} UTC</time> ·{" "}
                 {copy.last}: <time dateTime={item.lastAt}>{date(item.lastAt)} UTC</time>
               </p>
-              <div className="flex flex-wrap gap-4">
+              <div className={typeFlexWrapGap4}>
                 <Link href={item.reportHref} className={linkAccentSm}>
                   {labels.detail}
                 </Link>
@@ -192,7 +194,7 @@ export function CommunityReportGroups({
           ))}
         </ol>
       )}
-      <nav aria-label={copy.title} className="flex flex-wrap gap-4">
+      <nav aria-label={copy.title} className={typeFlexWrapGap4}>
         <Link href={reportGroupsHref(filters, path, { fresh: true })} className={linkAccentSm}>
           {copy.latest}
         </Link>

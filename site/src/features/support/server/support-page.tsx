@@ -13,6 +13,7 @@ import {
   pageShellMax5xlLooseTight,
 } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary } from "../../shell/type-shell";
 import { SupportCenter } from "../center";
 import { supportQuery } from "../support-workspace-contract";
 import { supportWorkspaceCopy } from "../support-workspace-copy";
@@ -64,7 +65,7 @@ export async function SupportPageSurface({
     return (
       <div className={pageShellMax5xlLooseTight}>
         <header className="space-y-2 border-b border-base pb-6">
-          <h1 className="font-display text-primary">{support.title}</h1>
+          <h1 className={typeDisplayPrimary}>{support.title}</h1>
           <p className="max-w-3xl text-sm text-muted">{support.description}</p>
           <ErrorState
             id="support-no-guaranteed-sla"
@@ -79,7 +80,7 @@ export async function SupportPageSurface({
   if (staff && !can(actor, "admin.moderation"))
     return (
       <div className={pageShellMax5xlBare}>
-        <h1 className="font-display text-primary">{support.staffQueue}</h1>
+        <h1 className={typeDisplayPrimary}>{support.staffQueue}</h1>
         <ErrorState
           title={copy.forbidden}
           description={copy.forbiddenHint}
@@ -101,7 +102,7 @@ export async function SupportPageSurface({
       />
     ) : (
       <div className={pageShellMax5xlDenseTight}>
-        <h1 className="font-display text-primary">{staff ? support.staffQueue : support.title}</h1>
+        <h1 className={typeDisplayPrimary}>{staff ? support.staffQueue : support.title}</h1>
         <ErrorState
           title={copy.notFound}
           description={copy.notFoundHint}
@@ -117,7 +118,7 @@ export async function SupportPageSurface({
   if (!filters)
     return (
       <div className={pageShellMax5xlDenseTight}>
-        <h1 className="font-display text-primary">{staff ? support.staffQueue : support.title}</h1>
+        <h1 className={typeDisplayPrimary}>{staff ? support.staffQueue : support.title}</h1>
         <ErrorState
           title={copy.queryInvalid}
           description={copy.queryInvalidHint}

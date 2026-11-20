@@ -3,6 +3,7 @@
 import type { ResourceMediaItem } from "@nexus/domain";
 import { useState } from "react";
 import { panelSpace4P5 } from "../../shell/panel-shell";
+import { typeGrid2Gap4 } from "../../shell/type-shell";
 import { shouldOpenGalleryLightbox } from "../model/resource-gallery-interaction";
 import { resourceMediaCopy } from "../resource-media-i18n";
 import { ResourceGalleryLightbox } from "./resource-gallery-lightbox";
@@ -23,7 +24,7 @@ export function ResourceGallery({
   return (
     <section className={panelSpace4P5} aria-label={copy.title}>
       <h2 className="text-lg font-semibold text-primary">{copy.title}</h2>
-      <ul className="grid gap-4 sm:grid-cols-2">
+      <ul className={typeGrid2Gap4}>
         {items.map((item, index) => (
           <li key={item.id}>
             <figure className="space-y-2">

@@ -7,6 +7,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax3xlCompact as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary } from "../../shell/type-shell";
 import { getOrganizationCopy } from "../organization-workspace-copy";
 import { OrganizationProfileForm } from "../profile";
 export async function organizationCreateMetadata(): Promise<Metadata> {
@@ -38,7 +39,7 @@ export async function OrganizationCreateScreen() {
       <Link href="/workspace/organizations" className={linkAccentSm}>
         {copy.back}
       </Link>
-      <h1 className="font-display text-primary">{copy.create}</h1>
+      <h1 className={typeDisplayPrimary}>{copy.create}</h1>
       <OrganizationProfileForm locale={locale} actorId={actor.id} />
     </div>
   );

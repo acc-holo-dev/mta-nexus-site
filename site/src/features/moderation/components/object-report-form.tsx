@@ -8,6 +8,7 @@ import { getDictionary, type Locale } from "../../../lib/i18n";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { linkAccent, linkGhostAccentSmBare } from "../../shell/link-shell";
 import { surfaceMinSpace2BgP3 } from "../../shell/surface-shell";
+import { typeFlexWrapGap2 } from "../../shell/type-shell";
 import { platformReportCopy, platformReportError } from "../platform-report-i18n";
 
 const REPORT_TYPES = createReportSchema.shape.type.options;
@@ -196,7 +197,7 @@ export function ObjectReportForm({
       {error ? (
         <ErrorState id="object-report-failed" title={error} description={formErrorHint} />
       ) : null}
-      <div className="flex flex-wrap gap-2">
+      <div className={typeFlexWrapGap2}>
         <Button
           type="submit"
           size="sm"

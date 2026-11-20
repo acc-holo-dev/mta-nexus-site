@@ -1,6 +1,5 @@
 "use client";
 import { Button, ErrorState } from "@nexus/ui";
-
 import { Download, LoaderCircle, ShieldCheck, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
@@ -9,6 +8,7 @@ import { confirmsAdminAction } from "../../moderation/admin-action-confirmation"
 import { confirmAction } from "../../shell/confirm-action";
 import { linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
+import { typeFlexWrapGap2 } from "../../shell/type-shell";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
 import { buildModerationUiState } from "../build-moderation-ui";
 import { getResourceBuildWorkspaceCopy } from "../resource-build-workspace-i18n";
@@ -139,7 +139,7 @@ export function BuildModerationControls({
         />
       ) : null}
 
-      <div className="flex flex-wrap gap-2">
+      <div className={typeFlexWrapGap2}>
         {hasTrustedCleanScan ? (
           <a
             href={`/api/admin/builds/${encodeURIComponent(buildId)}/download`}

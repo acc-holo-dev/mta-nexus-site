@@ -9,6 +9,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary } from "../../shell/type-shell";
 import { getCommercialCopy } from "../commercial-i18n";
 import { CommercialPlanForm } from "../commercial-plans";
 export async function commercialPlanCreateMetadata(): Promise<Metadata> {
@@ -41,7 +42,7 @@ export async function CommercialPlanCreateScreen() {
       <Link href="/admin/commerce/plans" className={linkAccentSm}>
         {copy.back}
       </Link>
-      <h1 className="font-display text-primary">{copy.newPlan}</h1>
+      <h1 className={typeDisplayPrimary}>{copy.newPlan}</h1>
       <CommercialPlanForm key={user.id} actorId={user.id} />
     </div>
   );

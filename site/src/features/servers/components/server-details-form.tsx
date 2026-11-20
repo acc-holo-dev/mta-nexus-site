@@ -8,6 +8,7 @@ import { z } from "zod";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { useNexusLocale } from "../../shell/locale";
 import { surfaceSpace2P4TextSm } from "../../shell/surface-shell";
+import { typePrewrapBreak } from "../../shell/type-shell";
 import { confirmedUpdatedServer } from "../server-mutation-confirmation";
 import { serverMutationErrorMessage } from "../server-mutation-errors";
 
@@ -591,7 +592,7 @@ export function ServerDetailsForm({
           <p>
             {copy.visibility}: {copy[newest.visibility]}
           </p>
-          <p className="whitespace-pre-wrap break-words">
+          <p className={typePrewrapBreak}>
             {copy.description}: {newest.description}
           </p>
           <p className="break-words">
@@ -603,7 +604,7 @@ export function ServerDetailsForm({
           <p className="break-words">
             {copy.rulesUrl}: {newest.rulesUrl}
           </p>
-          <p className="whitespace-pre-wrap break-words">
+          <p className={typePrewrapBreak}>
             {copy.mediaUrls}: {newest.mediaUrls.join("\n")}
           </p>
           <p>

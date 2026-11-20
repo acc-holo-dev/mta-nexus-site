@@ -16,6 +16,7 @@ import {
 } from "../../shell/action-confirm-checkbox";
 import { linkAccentSmRounded, linkAccentTight } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
+import { typeBreakAllXs, typeSmSecondary } from "../../shell/type-shell";
 import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,
@@ -184,7 +185,7 @@ export function LibraryCollectionBatchForm({
       <p className="break-words text-sm">
         {c.destination}: {shownCollection.name} · {c.revision} {shownCollection.revision}
       </p>
-      <p className="text-sm text-secondary">{c.batchLimit}</p>
+      <p className={typeSmSecondary}>{c.batchLimit}</p>
       <fieldset
         disabled={
           busy ||
@@ -234,9 +235,7 @@ export function LibraryCollectionBatchForm({
                 />
                 <span>
                   {item.title ?? c.unavailable}
-                  {item.title === null && (
-                    <code className="block break-all text-xs">{item.productId}</code>
-                  )}
+                  {item.title === null && <code className={typeBreakAllXs}>{item.productId}</code>}
                 </span>
               </label>
             </li>
@@ -318,7 +317,7 @@ export function LibraryCollectionBatchForm({
               );
             })}
           </ul>
-          <code className="block break-all text-xs">
+          <code className={typeBreakAllXs}>
             {c.receipt}: {receiptId}
           </code>
           <a href={collectionReceiptHref(receiptId)} className={linkAccentTight}>

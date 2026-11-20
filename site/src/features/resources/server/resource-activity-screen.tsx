@@ -14,6 +14,7 @@ import { linkAccent } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary, typeFlexWrapGap3, typeSmSecondary } from "../../shell/type-shell";
 import { getResourceActivityCopy } from "../resource-activity-i18n";
 import { resourceActivityDays } from "../resource-activity-view";
 export async function resourceActivityMetadata(): Promise<Metadata> {
@@ -94,13 +95,13 @@ export async function ResourceActivityScreen({
         <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccent}>
           {copy.back}
         </Link>
-        <h1 className="font-display text-primary">{copy.analytics}</h1>
+        <h1 className={typeDisplayPrimary}>{copy.analytics}</h1>
         <h2 className="break-words text-xl">{result.product.title}</h2>
         <p role="note" className="max-w-3xl text-sm text-secondary">
           {copy.analyticsNote}
         </p>
       </header>
-      <nav aria-label={copy.period} className="flex flex-wrap gap-3">
+      <nav aria-label={copy.period} className={typeFlexWrapGap3}>
         {RESOURCE_ACTIVITY_DAYS.map((days) => (
           <Link
             key={days}
@@ -122,7 +123,7 @@ export async function ResourceActivityScreen({
       <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map((key) => (
           <div key={key} className={panelSpace2P5}>
-            <dt className="text-sm text-secondary">{copy[key]}</dt>
+            <dt className={typeSmSecondary}>{copy[key]}</dt>
             <dd className="text-2xl font-semibold">
               {result[key].toLocaleString(locale === "ru" ? "ru-RU" : "en-US")}
             </dd>

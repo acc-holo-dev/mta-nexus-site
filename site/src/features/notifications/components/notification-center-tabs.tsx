@@ -1,11 +1,11 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { linkFocusRing } from "../../shell/link-shell";
 import { type NotificationInboxQuery, notificationInboxHref } from "../notification-inbox-contract";
 
 const STATES = ["all", "unread", "read"] as const;
 
-const filterLinkFocusClass =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+const filterLinkFocusClass = linkFocusRing;
 const activeTabFocusClass =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
 

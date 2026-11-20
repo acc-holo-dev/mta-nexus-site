@@ -16,6 +16,7 @@ import {
 } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace2P4 } from "../../shell/panel-shell";
+import { typeFlexWrapGap4, typePrewrapSmSecondary } from "../../shell/type-shell";
 import {
   confirmedNotificationInboxCommand,
   NOTIFICATION_INBOX_SELECTION_LIMIT,
@@ -448,9 +449,7 @@ export function NotificationInbox({
                 </label>
                 <div className="min-w-0 flex-1 space-y-2">
                   <h2 className="break-words text-sm font-bold text-primary">{item.title}</h2>
-                  <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                    {item.message}
-                  </p>
+                  <p className={typePrewrapSmSecondary}>{item.message}</p>
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
                     <span>{copy[item.category]}</span>
                     <span>{item.isRead ? copy.read : copy.unread}</span>
@@ -486,7 +485,7 @@ export function NotificationInbox({
           </li>
         ))}
       </ul>
-      <nav aria-label={copy.pageNavigation} className="flex flex-wrap gap-4">
+      <nav aria-label={copy.pageNavigation} className={typeFlexWrapGap4}>
         {page.newerCursor && (
           <Link
             prefetch={false}

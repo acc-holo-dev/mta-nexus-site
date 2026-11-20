@@ -5,6 +5,7 @@ import { type FormEvent, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
+import { typeGrid2Gap4, typeSmSecondary } from "../../shell/type-shell";
 import { formatHistoryAmount } from "../commerce-history-format";
 import { parseCommercialAmount } from "../commercial-confirmation";
 import { confirmedSubscriptionEstimate } from "../subscription-confirmation";
@@ -74,10 +75,10 @@ export function SubscriptionFeeEstimator({
   }
   return (
     <form className={panelClipSpace4P5} onSubmit={submit}>
-      <p className="text-sm text-secondary" role="note">
+      <p className={typeSmSecondary} role="note">
         {c.feeNote}
       </p>
-      <fieldset disabled={busy} className="grid gap-4 sm:grid-cols-2">
+      <fieldset disabled={busy} className={typeGrid2Gap4}>
         <label htmlFor={`${field}-amount`}>
           <span className="block">{c.amount}</span>
           <input

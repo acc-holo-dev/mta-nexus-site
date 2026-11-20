@@ -13,6 +13,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax3xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary } from "../../shell/type-shell";
 import { organizationContentId } from "../organization-content-api";
 import {
   organizationContentCopy,
@@ -82,7 +83,7 @@ export async function OrganizationContentEditorPage({
       <Link href={path} className={linkAccentSm}>
         {team.title}
       </Link>
-      <h1 className="font-display text-primary">{contentId ? copy.edit : team.new}</h1>
+      <h1 className={typeDisplayPrimary}>{contentId ? copy.edit : team.new}</h1>
       {contentId && initial && (
         <Link href={`${path}/${encodeURIComponent(contentId)}/history`} className={linkAccentSm}>
           {organizationPublicationHistoryCopy(locale).history}

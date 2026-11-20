@@ -9,6 +9,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax5xlCompact as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary } from "../../shell/type-shell";
 import {
   organizationWorkspaceSchema,
   parseOrganizationPage,
@@ -76,7 +77,7 @@ export async function OrganizationPage({
         </>
       ) : (
         <div className="space-y-4">
-          <h1 className="font-display text-primary">{copy.title}</h1>
+          <h1 className={typeDisplayPrimary}>{copy.title}</h1>
           <ErrorState
             title={failure}
             description={copy.unavailableHint}

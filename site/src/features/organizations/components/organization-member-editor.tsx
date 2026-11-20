@@ -6,6 +6,7 @@ import { useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { linkAccentSmMinWBreak, linkGhostAccentSm } from "../../shell/link-shell";
+import { typeFlexWrapEndGap3, typeSpace1SmSecondary } from "../../shell/type-shell";
 import { organizationGovernanceCopy } from "../organization-governance-copy";
 import { organizationTeamCopy } from "../organization-team-copy";
 import type { OrganizationWorkspace } from "../organization-workspace-contract";
@@ -63,8 +64,8 @@ export function OrganizationMemberEditor({
         </span>
       </div>
       {canEdit && (
-        <fieldset disabled={busy} className="flex flex-wrap items-end gap-3">
-          <label className="space-y-1 text-sm text-secondary">
+        <fieldset disabled={busy} className={typeFlexWrapEndGap3}>
+          <label className={typeSpace1SmSecondary}>
             <span>{copy.role}</span>
             <select
               className={platformFieldClass}

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH10W64 } from "../../shell/skeleton-shell";
 import { resourceDeliveriesCopy } from "../resource-deliveries-i18n";
 
 type Copy = ReturnType<typeof resourceDeliveriesCopy>;
@@ -39,7 +40,7 @@ function ResourceDeliveriesRouteLoading({
     throw new Error("ResourceDeliveriesRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-10 w-64 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH10W64} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -70,7 +71,7 @@ export function LibraryDownloadsRouteLoading() {
     headingId: "library-downloads-loading-heading",
     className: pageShellMax5xl,
     rows: 4,
-    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    leading: <div className={skelH10W64} />,
     titleKey: "title",
   });
 }

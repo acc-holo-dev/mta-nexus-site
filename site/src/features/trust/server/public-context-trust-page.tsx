@@ -9,6 +9,13 @@ import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax4xlTight as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
 import { panelClipSpace2P5, panelClipSpace3P6, panelClipSpace4P5 } from "../../shell/panel-shell";
 import {
+  type2xlExtraboldPrimary,
+  typeGrid2Gap4,
+  typeHeadingPrimary,
+  typeSmPrimary,
+  typeSmSecondary,
+} from "../../shell/type-shell";
+import {
   type ContextKind,
   contextTrustHref,
   parseContextTrustQuery,
@@ -63,25 +70,25 @@ export async function PublicContextTrustPage({
         {copy.back}
       </Link>
       <header className={panelClipSpace3P6}>
-        <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
+        <h1 className={type2xlExtraboldPrimary}>{copy.title}</h1>
         {page && <p className="break-words font-semibold text-primary">{page.subject.name}</p>}
         <p className="text-sm text-muted">{copy.description}</p>
-        <p className="text-sm text-secondary">
+        <p className={typeSmSecondary}>
           {kind === "organization" ? copy.organizationScope : copy.serverScope}
         </p>
       </header>
       {page && (
         <section className={panelClipSpace4P5}>
-          <h2 className="font-heading text-primary">{copy.current}</h2>
+          <h2 className={typeHeadingPrimary}>{copy.current}</h2>
           <p
             className={`text-sm font-semibold ${page.subject.verified ? "text-success" : "text-muted"}`}
           >
             {page.subject.verified ? copy.verified : copy.unverified}
           </p>
-          <dl className="grid gap-4 sm:grid-cols-2">
+          <dl className={typeGrid2Gap4}>
             <div>
               <dt className="text-xs text-muted">{copy.created}</dt>
-              <dd className="text-sm text-primary">
+              <dd className={typeSmPrimary}>
                 <time dateTime={page.subject.createdAt}>
                   {new Date(page.subject.createdAt).toLocaleDateString(
                     locale === "ru" ? "ru-RU" : "en-US",
@@ -92,24 +99,24 @@ export async function PublicContextTrustPage({
             </div>
             <div>
               <dt className="text-xs text-muted">{copy.publications}</dt>
-              <dd className="text-sm text-primary">{page.subject.publications}</dd>
+              <dd className={typeSmPrimary}>{page.subject.publications}</dd>
             </div>
             {page.subject.servers && (
               <>
                 <div>
                   <dt className="text-xs text-muted">{copy.servers}</dt>
-                  <dd className="text-sm text-primary">{page.subject.servers.total}</dd>
+                  <dd className={typeSmPrimary}>{page.subject.servers.total}</dd>
                 </div>
                 <div>
                   <dt className="text-xs text-muted">{copy.verifiedServers}</dt>
-                  <dd className="text-sm text-primary">{page.subject.servers.verified}</dd>
+                  <dd className={typeSmPrimary}>{page.subject.servers.verified}</dd>
                 </div>
               </>
             )}
             {page.subject.ownershipKind && (
               <div>
                 <dt className="text-xs text-muted">{copy.ownership}</dt>
-                <dd className="text-sm text-primary">{copy[page.subject.ownershipKind]}</dd>
+                <dd className={typeSmPrimary}>{copy[page.subject.ownershipKind]}</dd>
               </div>
             )}
             {page.subject.organization && (
@@ -138,7 +145,7 @@ export async function PublicContextTrustPage({
         </section>
       )}
       <section className={pageShellStack4}>
-        <h2 className="font-heading text-primary">{copy.history}</h2>
+        <h2 className={typeHeadingPrimary}>{copy.history}</h2>
         <p className="text-sm text-muted">{approvals.scope}</p>
         <a href={latest} className={linkAccentSm}>
           {copy.latest}
@@ -161,7 +168,7 @@ export async function PublicContextTrustPage({
           <ol className="space-y-3">
             {page.items.map((record) => (
               <li key={record.key} className={panelClipSpace2P5}>
-                <p className="text-sm text-secondary">{copy.approved}</p>
+                <p className={typeSmSecondary}>{copy.approved}</p>
                 <time dateTime={record.approvedAt} className="text-sm text-muted">
                   {new Date(record.approvedAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                     timeZone: "UTC",

@@ -18,6 +18,7 @@ import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeFlexWrapEndGap3, typeFlexWrapGap4, typeGrid2Gap4 } from "../../shell/type-shell";
 import { collectionReleasesCopy } from "../collection-releases-i18n";
 import { collectionHref, collectionPageParams } from "../library-collections-query";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
@@ -137,7 +138,7 @@ export async function CollectionWatchesScreen({
         {resourceReleaseWatchHistoryCopy(locale).title}
       </Link>
       {result.collection.status === "archived" && <p role="note">{copy.archivedCollection}</p>}
-      <form className="flex flex-wrap items-end gap-3">
+      <form className={typeFlexWrapEndGap3}>
         <input type="hidden" name="filter" value={query.filter} />
         <label className="grid gap-1">
           {copy.search}
@@ -152,7 +153,7 @@ export async function CollectionWatchesScreen({
           {copy.search}
         </Button>
       </form>
-      <nav className="flex flex-wrap gap-4" aria-label={copy.collectionTitle}>
+      <nav className={typeFlexWrapGap4} aria-label={copy.collectionTitle}>
         {(["all", "enabled", "disabled", "unavailable"] as const).map((filter) => (
           <Link
             key={filter}
@@ -194,7 +195,7 @@ export async function CollectionWatchesScreen({
           }
         />
       ) : (
-        <ul className="grid gap-4 sm:grid-cols-2">
+        <ul className={typeGrid2Gap4}>
           {result.items.map((item) => (
             <li key={item.productId} className={panelSpace3P5}>
               <h3>
@@ -214,7 +215,7 @@ export async function CollectionWatchesScreen({
                 }}
                 available={item.available}
               />
-              <div className="flex flex-wrap gap-4">
+              <div className={typeFlexWrapGap4}>
                 {item.slug ? (
                   <Link
                     href={`/market/${encodeURIComponent(item.slug)}`}

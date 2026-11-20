@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { getDictionary } from "../../../lib/i18n";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH10W72 } from "../../shell/skeleton-shell";
 import { buildPackageCopy } from "../build-package-i18n";
 import { getResourceBuildWorkspaceCopy } from "../resource-build-workspace-i18n";
 import { resourceMediaCopy } from "../resource-media-i18n";
@@ -28,7 +29,7 @@ function AdminResourceRouteLoading({
   leading?: ReactNode | null;
 }) {
   const resolvedLeading =
-    leading === undefined ? <div className="h-10 w-72 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH10W72} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,

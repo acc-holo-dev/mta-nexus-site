@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax4xlTight } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH10W64, skelH10WFullMaxMd, skelH28 } from "../../shell/skeleton-shell";
 import { notificationInboxCopy } from "../notification-inbox-copy";
 
 type Copy = ReturnType<typeof notificationInboxCopy>;
@@ -39,7 +40,7 @@ function NotificationInboxRouteLoading({
     throw new Error("NotificationInboxRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-10 w-64 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH10W64} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -73,8 +74,8 @@ export function NotificationsNotificationInboxRouteLoading() {
     titleClassName: "text-2xl font-extrabold text-primary",
     leading: (
       <>
-        <div className="h-10 w-full max-w-md rounded bg-inset" />
-        <div className="h-28 rounded bg-inset" />
+        <div className={skelH10WFullMaxMd} />
+        <div className={skelH28} />
       </>
     ),
     titleKey: "title",

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { linkAccentSmRounded } from "../link-shell";
 import { pageShellMax5xlDenseTight } from "../page-shell";
+import { typeDisplayPrimary } from "../type-shell";
 
 export function PlatformSessionError({
   locale,
@@ -17,7 +18,7 @@ export function PlatformSessionError({
 }) {
   return (
     <div className={pageShellMax5xlDenseTight}>
-      <h1 className="font-display text-primary">{title}</h1>
+      <h1 className={typeDisplayPrimary}>{title}</h1>
       <ErrorState
         title={message}
         description={getDictionary(locale).errors.sessionRetryHint}

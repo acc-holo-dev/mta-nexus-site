@@ -9,6 +9,12 @@ import type { Locale } from "../../../lib/i18n";
 import { linkAccentSmRounded, linkAccentTight } from "../../shell/link-shell";
 import { pageShellMax5xlCompact as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapGap4Sm,
+  typeSmSecondary,
+  typeSmSemiboldPrimary,
+} from "../../shell/type-shell";
 import { privateChangeHistoryCopy } from "../private-change-history-copy";
 import { changeHistoryHref } from "../private-change-history-query";
 import type { ProfileChangeHistory } from "../profile-change-history-contract";
@@ -39,7 +45,7 @@ export function ProfileChangeHistoryView({
   return (
     <div className={pageShellClass}>
       <header className="space-y-2">
-        <h1 className="font-display text-primary">{copy.profileTitle}</h1>
+        <h1 className={typeDisplayPrimary}>{copy.profileTitle}</h1>
         <p className="text-sm text-muted">{copy.profileDescription}</p>
         <p className="text-xs text-muted">{copy.privacy}</p>
         <p className="text-xs text-muted">{copy.recorded}</p>
@@ -96,7 +102,7 @@ export function ProfileChangeHistoryView({
           {data.items.map((item) => (
             <article key={item.id} className={panelClipSpace3P5}>
               <div className="flex flex-wrap justify-between gap-3">
-                <h2 className="text-sm font-semibold text-primary">{copy.actions[item.action]}</h2>
+                <h2 className={typeSmSemiboldPrimary}>{copy.actions[item.action]}</h2>
                 <time dateTime={item.createdAt} className="text-xs text-muted">
                   {new Date(item.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                     timeZone: "UTC",
@@ -104,9 +110,7 @@ export function ProfileChangeHistoryView({
                   UTC
                 </time>
               </div>
-              <p className="text-sm text-secondary">
-                {item.actor === "you" ? copy.you : copy.system}
-              </p>
+              <p className={typeSmSecondary}>{item.actor === "you" ? copy.you : copy.system}</p>
               {!!item.fields.length && (
                 <p className="text-xs text-muted">
                   {copy.fields}: {item.fields.map((field) => copy.fieldNames[field]).join(", ")}
@@ -124,7 +128,7 @@ export function ProfileChangeHistoryView({
           ))}
         </>
       )}
-      <nav aria-label={copy.profileTitle} className="flex flex-wrap gap-4 text-sm">
+      <nav aria-label={copy.profileTitle} className={typeFlexWrapGap4Sm}>
         {(filters.cursor || filters.until || !data) && (
           <Link
             className={linkAccentSmRounded}

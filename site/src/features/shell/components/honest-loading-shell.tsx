@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
+import { typeDisplayPrimary } from "../type-shell";
 
 const DEFAULT_HEADER_CLASS = "space-y-2";
-const DEFAULT_TITLE_CLASS = "font-display text-primary";
+const DEFAULT_TITLE_CLASS = typeDisplayPrimary;
 const DEFAULT_STATUS_CLASS = "text-sm text-muted";
 
 export function HonestLoadingShell({

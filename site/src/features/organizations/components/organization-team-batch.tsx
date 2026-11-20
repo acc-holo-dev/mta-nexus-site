@@ -15,6 +15,7 @@ import {
 } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
 import { linkGhostAccentSm } from "../../shell/link-shell";
+import { typeFlexWrapGap3, typeSemiboldPrimary, typeSmPrimary } from "../../shell/type-shell";
 import {
   confirmsOrganizationBatchCommand,
   confirmsOrganizationBatchPreview,
@@ -159,10 +160,10 @@ export function OrganizationTeamBatch({
       <h2 className="text-lg font-semibold text-primary">{copy.title}</h2>
       <p className="text-sm text-muted">{copy.help}</p>
       <fieldset disabled={disabled || preview !== null} className="space-y-3">
-        <legend className="text-sm text-primary">
+        <legend className={typeSmPrimary}>
           {copy.selected}: {selected.length} / 20
         </legend>
-        <div className="flex flex-wrap gap-3">
+        <div className={typeFlexWrapGap3}>
           <Button
             type="button"
             variant="ghost"
@@ -259,7 +260,7 @@ export function OrganizationTeamBatch({
         </Button>
       ) : (
         <div className="space-y-3">
-          <h3 className="font-semibold text-primary">
+          <h3 className={typeSemiboldPrimary}>
             {copy.review} ({preview.changedCount})
           </h3>
           <ul className="space-y-3">
@@ -296,7 +297,7 @@ export function OrganizationTeamBatch({
           >
             {copy.commitConfirm}
           </ActionConfirmCheckbox>
-          <div className="flex flex-wrap gap-3">
+          <div className={typeFlexWrapGap3}>
             <Button
               type="button"
               className="min-h-11"

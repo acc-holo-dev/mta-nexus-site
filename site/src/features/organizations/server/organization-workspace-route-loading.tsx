@@ -5,6 +5,7 @@ import {
   pageShellMax5xlCompact,
 } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH10W23MaxMd, skelH28 } from "../../shell/skeleton-shell";
 import { getOrganizationCopy } from "../organization-workspace-copy";
 
 type OrgCopy = ReturnType<typeof getOrganizationCopy>;
@@ -37,11 +38,7 @@ function OrganizationWorkspaceRouteLoading({
   leading?: ReactNode | null;
 }) {
   const resolvedLeading =
-    leading === undefined ? (
-      <div className="h-10 w-2/3 max-w-md rounded bg-inset" />
-    ) : (
-      (leading ?? undefined)
-    );
+    leading === undefined ? <div className={skelH10W23MaxMd} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -75,7 +72,7 @@ export function OrganizationsRouteLoading() {
     headingId: "organizations-loading-heading",
     titleKey: "title",
     loadingKey: "listLoading",
-    leading: <div className="h-28 rounded bg-inset" />,
+    leading: <div className={skelH28} />,
   });
 }
 

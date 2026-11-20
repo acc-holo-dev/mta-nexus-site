@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
 import { pageShellMax2xlStandard } from "../../shell/page-shell";
+import { typeSmSecondary } from "../../shell/type-shell";
 import { LibraryCollectionCommandForm } from "../collection-command";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../library-collections-query";
@@ -33,7 +34,7 @@ export async function LibraryCollectionsCopyView({
         {c[preview.source.status]} · {c.revision}: {preview.source.revision} · {c.items}:{" "}
         {preview.itemCount}
       </p>
-      <p role="note" className="text-sm text-secondary">
+      <p role="note" className={typeSmSecondary}>
         {c.copyNote}
       </p>
       <p className="text-sm text-muted">{c.limit}</p>

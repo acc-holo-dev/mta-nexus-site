@@ -13,6 +13,7 @@ import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelMinSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeFlexWrapGap4Sm, typeSmSecondary } from "../../shell/type-shell";
 import { formatHistoryDate, parseHistoryPage } from "../commerce-history-format";
 import {
   financialFlags,
@@ -113,7 +114,7 @@ export async function FinancialReconciliationDetailScreen({
       >
         {orderTermsCopy(locale).title}
       </Link>
-      <p role="note" className="text-sm text-secondary">
+      <p role="note" className={typeSmSecondary}>
         {copy.reviewNote}
       </p>
       <p>
@@ -146,7 +147,7 @@ export async function FinancialReconciliationDetailScreen({
         <p className="text-secondary">{copy.empty}</p>
       )}
       {result.totalPages > 1 ? (
-        <nav aria-label={copy.page} className="flex flex-wrap gap-4 text-sm">
+        <nav aria-label={copy.page} className={typeFlexWrapGap4Sm}>
           {result.page > 1 ? (
             <Link href={`?page=${result.page - 1}`} className={linkAccentSm}>
               {copy.previous}

@@ -4,6 +4,11 @@ import { BellOff } from "lucide-react";
 import { useCallback, useState } from "react";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace4P5Shadow } from "../../shell/panel-shell";
+import {
+  typeCaptionFaint,
+  typeFlexCenterGap2,
+  typeSmSemiboldPrimary,
+} from "../../shell/type-shell";
 import { type AdPreference, adPreferenceCookie, parseAdPreference } from "../ad-preference";
 import { adsPreferencesCopy } from "../ads-preferences-i18n";
 
@@ -44,9 +49,9 @@ export function SettingsAdvertisingPreferencesSection({
 
   return (
     <section aria-labelledby="advertising-preferences-heading" className={panelSpace4P5Shadow}>
-      <div className="flex items-center gap-2">
+      <div className={typeFlexCenterGap2}>
         <BellOff className="h-4 w-4 text-accent" aria-hidden="true" />
-        <h2 id="advertising-preferences-heading" className="text-sm font-semibold text-primary">
+        <h2 id="advertising-preferences-heading" className={typeSmSemiboldPrimary}>
           {copy.heading}
         </h2>
       </div>
@@ -64,7 +69,7 @@ export function SettingsAdvertisingPreferencesSection({
           className={`h-4 w-4 accent-[var(--nexus-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]`}
         />
       </div>
-      <p className="font-caption text-faint">{offLine}</p>
+      <p className={typeCaptionFaint}>{offLine}</p>
     </section>
   );
 }

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax5xlTight } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH28 } from "../../shell/skeleton-shell";
 import { communityReportCopy } from "../community-report-copy";
 
 type Copy = ReturnType<typeof communityReportCopy>;
@@ -40,7 +41,7 @@ function CommunityReportRouteLoading({
     throw new Error("CommunityReportRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-28 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH28} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,

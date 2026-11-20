@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax5xlDense } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH6W23 } from "../../shell/skeleton-shell";
 import { privateChangeHistoryCopy } from "../private-change-history-copy";
 
 type Copy = ReturnType<typeof privateChangeHistoryCopy>;
@@ -39,7 +40,7 @@ function PrivateChangeHistoryRouteLoading({
     throw new Error("PrivateChangeHistoryRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-6 w-2/3 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH6W23} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -69,7 +70,7 @@ export function SettingsHistoryRouteLoading() {
   return PrivateChangeHistoryRouteLoading({
     headingId: "settings-history-loading-heading",
     className: pageShellMax5xlDense,
-    leading: <div className="h-6 w-2/3 rounded bg-inset" />,
+    leading: <div className={skelH6W23} />,
     titleKey: "profileTitle",
   });
 }

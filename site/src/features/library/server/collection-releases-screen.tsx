@@ -20,6 +20,12 @@ import {
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeFlexWrapEndGap3,
+  typeFlexWrapGap3,
+  typeFlexWrapGap4,
+  typeGrid2Gap4,
+} from "../../shell/type-shell";
 import { collectionReleasesCopy } from "../collection-releases-i18n";
 import { collectionReleasesQuery } from "../collection-releases-query";
 import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
@@ -155,7 +161,7 @@ export async function CollectionReleasesScreen({
         <form
           method="get"
           action={collectionHref(path.id, "releases")}
-          className="flex flex-wrap items-end gap-3"
+          className={typeFlexWrapEndGap3}
         >
           <input type="hidden" name="filter" value={result.filter} />
           <label className="grid gap-1">
@@ -180,7 +186,7 @@ export async function CollectionReleasesScreen({
           )}
         </form>
       </search>
-      <nav aria-label={c.title} className="flex flex-wrap gap-3">
+      <nav aria-label={c.title} className={typeFlexWrapGap3}>
         {LIBRARY_RELEASE_FILTERS.map((filter) => (
           <Link
             key={filter}
@@ -211,7 +217,7 @@ export async function CollectionReleasesScreen({
           }
         />
       )}
-      <ol className="grid gap-4 sm:grid-cols-2">
+      <ol className={typeGrid2Gap4}>
         {result.items.map((item) => {
           const version = item.mode === "fixed" ? item.selectedVersion : item.latestVersion,
             buildId = item.mode === "fixed" ? item.selectedBuildId : item.latestBuildId;
@@ -259,7 +265,7 @@ export async function CollectionReleasesScreen({
                   hasAccess={item.hasAccess}
                 />
               ) : null}
-              <div className="flex flex-wrap gap-4">
+              <div className={typeFlexWrapGap4}>
                 {item.slug && item.state !== "unavailable" ? (
                   <Link
                     href={`/market/${encodeURIComponent(item.slug)}`}

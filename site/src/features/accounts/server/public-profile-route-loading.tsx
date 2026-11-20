@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellStack6 } from "../../shell/page-shell";
 import { DictionaryFieldRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH28, skelH32 } from "../../shell/skeleton-shell";
 
 export function PublicProfileRouteLoading({
   headingId = "profile-loading-heading",
@@ -28,9 +29,9 @@ export function PublicProfileRouteLoading({
   const resolvedLeading =
     leading === undefined ? (
       <>
-        <div className="h-28 rounded bg-inset" />
-        <div className="h-32 rounded bg-inset" />
-        <div className="h-32 rounded bg-inset" />
+        <div className={skelH28} />
+        <div className={skelH32} />
+        <div className={skelH32} />
       </>
     ) : (
       (leading ?? undefined)

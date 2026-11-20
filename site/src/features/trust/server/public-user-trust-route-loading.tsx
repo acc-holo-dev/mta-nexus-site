@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax4xlTight } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH10W64 } from "../../shell/skeleton-shell";
 import { trustCopy } from "../public-user-trust-copy";
 
 type Copy = ReturnType<typeof trustCopy>;
@@ -39,7 +40,7 @@ function PublicUserTrustRouteLoading({
     throw new Error("PublicUserTrustRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-10 w-64 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH10W64} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,

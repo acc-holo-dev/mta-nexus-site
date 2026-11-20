@@ -14,6 +14,7 @@ import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary, typeFlexWrapEndGap3, typeSmSecondary } from "../../shell/type-shell";
 import { resourceDeliveriesCopy } from "../resource-deliveries-i18n";
 import { deliverySearchParams, publisherDeliveriesQuery } from "../resource-deliveries-query";
 
@@ -114,12 +115,12 @@ export async function PublisherDeliveriesScreen({
       <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccentSm}>
         {copy.back}
       </Link>
-      <h1 className="font-display text-primary">{copy.publisherTitle}</h1>
+      <h1 className={typeDisplayPrimary}>{copy.publisherTitle}</h1>
       <h2 className="break-words text-xl text-primary">{result.product.title}</h2>
-      <p role="note" className="text-sm text-secondary">
+      <p role="note" className={typeSmSecondary}>
         {copy.publisherNote}
       </p>
-      <form method="get" className="flex flex-wrap items-end gap-3">
+      <form method="get" className={typeFlexWrapEndGap3}>
         <label className="grid gap-1 text-sm">
           {copy.days}
           <select name="days" defaultValue={query.days} className={fieldClass}>

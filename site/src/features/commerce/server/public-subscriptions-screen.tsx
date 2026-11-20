@@ -9,6 +9,11 @@ import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { surfaceBgP4TextSmSecondary } from "../../shell/surface-shell";
+import {
+  typeDisplayPrimary,
+  typePrewrapSmSecondary,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { formatHistoryAmount, parseHistoryPage } from "../commerce-history-format";
 import { getCommercialCopy } from "../commercial-i18n";
 import { CommercialFeeCalculator } from "../commercial-plans";
@@ -48,7 +53,7 @@ export async function PublicSubscriptionsScreen({
   if (!result) {
     return (
       <div className={shellClass}>
-        <h1 className="font-display text-primary">{copy.catalog}</h1>
+        <h1 className={typeDisplayPrimary}>{copy.catalog}</h1>
         <ErrorState
           title={copy.loadUnavailable}
           description={subscriptions.notice}
@@ -71,7 +76,7 @@ export async function PublicSubscriptionsScreen({
 
   return (
     <div className={shellClass}>
-      <h1 className="font-display text-primary">{copy.catalog}</h1>
+      <h1 className={typeDisplayPrimary}>{copy.catalog}</h1>
       <nav className="flex min-w-0 flex-wrap gap-4" aria-label={copy.catalog}>
         <Link href="/workspace/subscriptions" className={linkAccentSm}>
           {subscriptions.title}
@@ -102,14 +107,14 @@ export async function PublicSubscriptionsScreen({
               <h2 className="break-words text-xl font-semibold text-primary">
                 {locale === "ru" ? plan.titleRu : plan.titleEn}
               </h2>
-              <p className="whitespace-pre-wrap break-words text-sm text-secondary">
+              <p className={typePrewrapSmSecondary}>
                 {locale === "ru" ? plan.descriptionRu : plan.descriptionEn}
               </p>
               <p className="font-numeric text-primary">
                 {formatHistoryAmount(plan.price, plan.currency, locale)} · {plan.durationDays}{" "}
                 {copy.days}
               </p>
-              <p className="text-sm text-secondary">
+              <p className={typeSmSecondary}>
                 {copy.commission}: {(plan.commissionBps / 100).toLocaleString(locale)}%
               </p>
               <p className="text-xs text-muted">

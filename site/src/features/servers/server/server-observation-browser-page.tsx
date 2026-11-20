@@ -19,6 +19,7 @@ import { pageShellMax6xl as pageShellClass, pageShellMax6xlDense } from "../../s
 import { panelFlexWrapEndP4, panelSpace3P5 } from "../../shell/panel-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { PlatformSessionError } from "../../shell/session-error";
+import { type2xlBoldPrimary, typeFlexWrapGap4, typeSpace1XsMuted } from "../../shell/type-shell";
 import {
   parseServerObservationBrowserQuery,
   type ServerObservationBrowserQuery,
@@ -178,7 +179,7 @@ function ServerObservationBrowserPanel({
         <Link href={base} className={linkAccentSmRounded}>
           {managed ? stats.management : stats.back}
         </Link>
-        <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
+        <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
         <p className="break-words text-lg text-primary">{report.server.name}</p>
         <p className="text-sm text-muted">{copy.description}</p>
         {managed && <p className="text-xs text-muted">{stats.private}</p>}
@@ -226,7 +227,7 @@ function ServerObservationBrowserPanel({
               className={field}
             />
           </label>
-          <label className="space-y-1 text-xs text-muted">
+          <label className={typeSpace1XsMuted}>
             {copy.players}
             <select name="players" defaultValue={query.players} className={field}>
               {(["all", "known", "unknown", "zero"] as const).map((value) => (
@@ -237,7 +238,7 @@ function ServerObservationBrowserPanel({
             </select>
           </label>
           {(["password", "responding"] as const).map((key) => (
-            <label key={key} className="space-y-1 text-xs text-muted">
+            <label key={key} className={typeSpace1XsMuted}>
               {copy[key]}
               <select name={key} defaultValue={query[key]} className={field}>
                 {(["all", "yes", "no", "unknown"] as const).map((value) => (
@@ -342,7 +343,7 @@ function ServerObservationBrowserPanel({
           </table>
         </section>
       )}
-      <nav aria-label={stats.navigation} className="flex flex-wrap gap-4">
+      <nav aria-label={stats.navigation} className={typeFlexWrapGap4}>
         <a href={serverObservationBrowserHref(path, state)} className={linkAccentSmRounded}>
           {copy.latest}
         </a>

@@ -13,6 +13,7 @@ import { linkAccentSmRounded, linkMinHAccent } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { type2xlBoldPrimary, typeFlexWrapGap4, typeSmPrimary } from "../../shell/type-shell";
 import { getManagedServerCopy } from "../managed-server-view";
 import { getServerActivityCopy } from "../server-activity-view";
 import {
@@ -98,7 +99,7 @@ async function ServerWorkspaceHistoryScreen({
         <Link href={`/workspace/servers/${encodeURIComponent(id)}`} className={linkAccentSmRounded}>
           {history.back}
         </Link>
-        <h1 className="text-2xl font-bold text-primary">{history.title}</h1>
+        <h1 className={type2xlBoldPrimary}>{history.title}</h1>
         {data && <p className="break-words font-semibold text-primary">{data.server.name}</p>}
         <p className="text-sm text-muted">{history.description}</p>
         <p className="text-xs text-muted">{history.private}</p>
@@ -211,7 +212,7 @@ async function ServerWorkspaceHistoryScreen({
                     </p>
                   )}
                   {event.transition && (
-                    <p className="text-sm text-primary">
+                    <p className={typeSmPrimary}>
                       {copy.transition}: {labels[event.transition.before]} →{" "}
                       {labels[event.transition.after]}
                     </p>
@@ -220,7 +221,7 @@ async function ServerWorkspaceHistoryScreen({
               ))}
             </ol>
           )}
-          <nav aria-label={history.navigation} className="flex flex-wrap gap-4">
+          <nav aria-label={history.navigation} className={typeFlexWrapGap4}>
             <Link
               prefetch={false}
               href={serverWorkspaceHistoryHref(id, query)}

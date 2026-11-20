@@ -18,6 +18,13 @@ import {
 import { pageShellStack4 } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { surfaceInsetP4TextSmMuted } from "../../shell/surface-shell";
+import {
+  typeFlexWrapGap3,
+  typeGrid2Gap4,
+  typePrewrapBreak,
+  typeSmSecondary,
+  typeSmSuccess,
+} from "../../shell/type-shell";
 import { publicationSupportHref } from "../../support/support-workspace-contract";
 import { authorPublicationDeskCopy } from "../author-publication-desk-copy";
 import {
@@ -277,12 +284,12 @@ export function AuthorContentForm({
   return (
     <div className={pageShellStack4}>
       {server && (
-        <p className="text-sm text-secondary">
+        <p className={typeSmSecondary}>
           {serverContentCopy(locale).context}: <strong>{server.name}</strong>
         </p>
       )}
       {organization && (
-        <p className="text-sm text-secondary">
+        <p className={typeSmSecondary}>
           {organizationContentCopy(locale).context}: <strong>{organization.name}</strong>
         </p>
       )}
@@ -335,7 +342,7 @@ export function AuthorContentForm({
         </div>
       ) : null}
       {notice && !notice.error ? (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {notice.text}
         </p>
       ) : null}
@@ -349,10 +356,10 @@ export function AuthorContentForm({
           <p>
             {copy.title}: {latest.title}
           </p>
-          <p className="whitespace-pre-wrap break-words">
+          <p className={typePrewrapBreak}>
             {copy.excerpt}: {latest.excerpt}
           </p>
-          <p className="whitespace-pre-wrap break-words">
+          <p className={typePrewrapBreak}>
             {copy.body}: {latest.body}
           </p>
           <p className="break-words">
@@ -386,7 +393,7 @@ export function AuthorContentForm({
       >
         <fieldset disabled={busy || archived} className="space-y-4">
           {!saved && (
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className={typeGrid2Gap4}>
               <label className="block space-y-1 text-sm text-secondary">
                 <span>{copy.type}</span>
                 <select name="type" className={platformFieldClass}>
@@ -443,7 +450,7 @@ export function AuthorContentForm({
               className={platformFieldClass}
             />
           </label>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className={typeGrid2Gap4}>
             <label className="block space-y-1 text-sm text-secondary">
               <span>{copy.tags}</span>
               <input
@@ -464,7 +471,7 @@ export function AuthorContentForm({
               />
             </label>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className={typeFlexWrapGap3}>
             <Button type="submit" isLoading={busy} disabled={Boolean(latest)} className="min-h-11">
               {saved ? copy.save : copy.submit}
             </Button>

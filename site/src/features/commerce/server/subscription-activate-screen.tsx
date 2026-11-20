@@ -9,14 +9,16 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { subscriptionsService } from "../../../lib/services/commerce/subscriptions-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeFlexWrapGap4 } from "../../shell/type-shell";
 import { PlanReviewTerms } from "../plan-reviews-workspace";
 import { SubscriptionControls } from "../subscription-controls";
 import { subscriptionNavLinkClass } from "../subscription-workspace";
 import { subscriptionError, subscriptionsCopy } from "../subscriptions-i18n";
 import { subscriptionActivationQuery, subscriptionPageParams } from "../subscriptions-query";
 
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
+const pageShellClass = pageShellMax5xl;
 export async function subscriptionActivateMetadata(): Promise<Metadata> {
   return {
     title: `${subscriptionsCopy(await getRequestLocale()).activate} | MTA NEXUS`,
@@ -90,7 +92,7 @@ export async function SubscriptionActivateScreen({
           scope={plan.scope}
           scopes={scopes.scopes}
         />
-        <nav className="flex flex-wrap gap-4" aria-label={c.organization}>
+        <nav className={typeFlexWrapGap4} aria-label={c.organization}>
           {scopes.page > 1 && (
             <Link href={href(scopes.page - 1)} className={subscriptionNavLinkClass}>
               {c.previous}

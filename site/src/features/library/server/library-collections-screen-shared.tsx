@@ -1,6 +1,7 @@
 import type { User } from "@nexus/domain";
 import Link from "next/link";
 import { linkAccentTight as libraryCollectionsLinkClass } from "../../shell/link-shell";
+import { typeFlexWrapGap4Sm } from "../../shell/type-shell";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref, collectionPageParams } from "../library-collections-query";
 
@@ -54,7 +55,7 @@ export function LibraryCollectionsPagination({
 }) {
   const c = libraryCollectionsCopy(locale);
   return (
-    <nav aria-label={c.page} className="flex flex-wrap gap-4 text-sm">
+    <nav aria-label={c.page} className={typeFlexWrapGap4Sm}>
       {bounds.page > 1 && (
         <Link href={href(bounds.page - 1)} className={libraryCollectionsLinkClass}>
           {c.previous}

@@ -13,6 +13,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xlBare, pageShellStack4, pageShellStack6 } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { type2xlBoldPrimary, typeDisplayPrimary } from "../../shell/type-shell";
 import {
   communityReportDetailSchema,
   communityReportPageQuery,
@@ -84,7 +85,7 @@ export async function CommunityReportScreen({
   if (staff && !can(actor, "admin.moderation")) {
     return (
       <div className={pageShellMax5xlBare}>
-        <h1 className="font-display text-primary">{title}</h1>
+        <h1 className={typeDisplayPrimary}>{title}</h1>
         <ErrorState
           title={copy.forbidden}
           description={copy.forbiddenHint}
@@ -99,7 +100,7 @@ export async function CommunityReportScreen({
   }
   const header = (
     <header className="min-w-0 space-y-2">
-      <h1 className="text-2xl font-bold text-primary">{title}</h1>
+      <h1 className={type2xlBoldPrimary}>{title}</h1>
       <p className="text-sm text-muted">{staff ? copy.queueDescription : copy.description}</p>
       {staff && !id && (
         <Link href="/admin/reports/targets" className={linkAccentSmRounded}>

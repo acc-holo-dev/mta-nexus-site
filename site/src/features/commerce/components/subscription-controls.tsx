@@ -12,6 +12,7 @@ import {
 } from "../../shell/action-confirm-checkbox";
 import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
+import { typeSmSecondary } from "../../shell/type-shell";
 import { commercialTerms } from "../commercial-confirmation";
 import {
   confirmedSubscriptionReceipt,
@@ -259,7 +260,7 @@ export function SubscriptionControls(props: Props) {
   }
   return (
     <form onSubmit={submit} className={panelClipSpace4P5}>
-      <p role="note" className="text-sm text-secondary">
+      <p role="note" className={typeSmSecondary}>
         {props.action === "activate" ? c.notice : c.cancelNote}
       </p>
       <fieldset hidden={ready !== scope} disabled={busy || frozen}>

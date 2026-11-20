@@ -28,6 +28,7 @@ import {
   pageShellStack6,
 } from "../../shell/page-shell";
 import { panelHeroBetween } from "../../shell/panel-shell";
+import { typeHeadingPrimary } from "../../shell/type-shell";
 import { contextTrustCopy } from "../../trust/public-context-trust-copy";
 
 const getProfile = cache((slug: string) => organizationRepository.findBySlug(slug));
@@ -220,7 +221,7 @@ export async function OrganizationProfilePage({
 
       {resourcePage.total > 0 && (
         <section id="resources" className={pageShellStack4}>
-          <h2 className="font-heading text-primary">
+          <h2 className={typeHeadingPrimary}>
             {copy.marketplaceReleases} ({resourcePage.total})
           </h2>
           <div className="grid min-w-0 grid-cols-1 gap-6 overflow-x-clip sm:grid-cols-2 lg:grid-cols-4">
@@ -246,7 +247,7 @@ export async function OrganizationProfilePage({
 
       {articlePage.total > 0 && (
         <section id="articles" className={pageShellStack4}>
-          <h2 className="font-heading text-primary">
+          <h2 className={typeHeadingPrimary}>
             {copy.articles} ({articlePage.total})
           </h2>
           <div className="grid min-w-0 grid-cols-1 gap-6 overflow-x-clip md:grid-cols-3">

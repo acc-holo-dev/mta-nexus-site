@@ -30,6 +30,7 @@ import { authEntryHref } from "../../shell/auth-return";
 import { linkAccentSm, linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellStack6, pageShellStack10 } from "../../shell/page-shell";
 import { surfaceInsetP4TextSmMuted } from "../../shell/surface-shell";
+import { typeHeadingPrimary } from "../../shell/type-shell";
 import { trustCopy } from "../../trust/public-user-trust-copy";
 import { DeveloperExperience } from "../developer-experience";
 import { ProfileResourcePagination, parseProfilePage } from "../profile-pagination";
@@ -232,7 +233,7 @@ export async function UserProfileScreen({
       </Link>
       {resourcePage.total > 0 && (
         <section id="resources" className="space-y-4">
-          <h2 className="font-heading text-primary">
+          <h2 className={typeHeadingPrimary}>
             {copy.authoredResources} ({resourcePage.total})
           </h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -257,7 +258,7 @@ export async function UserProfileScreen({
 
       {serverPage.total > 0 && (
         <section id="servers" className="space-y-4">
-          <h2 className="font-heading text-primary">
+          <h2 className={typeHeadingPrimary}>
             {copy.operatedServers} ({serverPage.total})
           </h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">

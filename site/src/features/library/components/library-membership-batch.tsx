@@ -13,6 +13,7 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 import { linkAccentSmRounded, linkAccentTight } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
+import { typeBreakAllXs, typeSmSecondary } from "../../shell/type-shell";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../library-collections-query";
 import { confirmedMembershipBatch } from "../library-membership-batch-confirmation";
@@ -170,9 +171,9 @@ export function LibraryMembershipBatchForm({
   return (
     <form onSubmit={submit} className={panelSpace4P5}>
       <h2 className="font-semibold">{h.title}</h2>
-      <p className="text-sm text-secondary">{h.note}</p>
+      <p className={typeSmSecondary}>{h.note}</p>
       <p className="text-xs text-muted">{h.quota}</p>
-      <code className="block break-all text-xs">
+      <code className={typeBreakAllXs}>
         {pending.current?.productId ?? report.resource.productId}
       </code>
       <p>
@@ -311,7 +312,7 @@ export function LibraryMembershipBatchForm({
           >
             {c.reload}
           </a>
-          <code className="block break-all text-xs">
+          <code className={typeBreakAllXs}>
             {h.receipt}: {saved.id}
           </code>
           <ul className="space-y-2">
@@ -324,7 +325,7 @@ export function LibraryMembershipBatchForm({
                   {child.collection.name}
                 </a>{" "}
                 · {c.revision} {child.collection.revision}
-                <code className="block break-all text-xs">
+                <code className={typeBreakAllXs}>
                   {c.receipt}: {child.id}
                 </code>
               </li>

@@ -14,6 +14,13 @@ import { changeHistoryHref } from "../../accounts/private-change-history-query";
 import { linkAccent, linkAccentRounded, linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xlCompactTight } from "../../shell/page-shell";
 import { panelFlexMinWrapEndP4, panelMinSpace2P4 } from "../../shell/panel-shell";
+import {
+  typeDisplayPrimary,
+  typePrewrapSmSecondary,
+  typeSmSecondary,
+  typeSmSemiboldPrimary,
+  typeXsSecondary,
+} from "../../shell/type-shell";
 import { communityReportCopy } from "../community-report-copy";
 import type { ReportHistoryPage } from "../community-report-history-contract";
 import { reportHistoryCopy } from "../community-report-history-copy";
@@ -43,8 +50,8 @@ export function CommunityReportHistory({
         {copy.back}
       </Link>
       <header className="min-w-0 space-y-2">
-        <h1 className="font-display text-primary">{copy.title}</h1>
-        <p className="text-sm text-secondary">
+        <h1 className={typeDisplayPrimary}>{copy.title}</h1>
+        <p className={typeSmSecondary}>
           {reportCopy[page.report.targetType]} · {reportCopy[page.report.type]} ·{" "}
           {reportCopy[page.report.status]}
         </p>
@@ -115,7 +122,7 @@ export function CommunityReportHistory({
           {page.items.map((event) => (
             <li key={event.id} className={panelMinSpace2P4}>
               <div className="flex flex-wrap justify-between gap-2">
-                <h2 className="text-sm font-semibold text-primary">{copy.actions[event.action]}</h2>
+                <h2 className={typeSmSemiboldPrimary}>{copy.actions[event.action]}</h2>
                 <time dateTime={event.createdAt} className="text-xs text-muted">
                   {new Date(event.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                     timeZone: "UTC",
@@ -123,8 +130,8 @@ export function CommunityReportHistory({
                   UTC
                 </time>
               </div>
-              <p className="text-xs text-secondary">{copy.by[event.by]}</p>
-              <p className="text-sm text-secondary">
+              <p className={typeXsSecondary}>{copy.by[event.by]}</p>
+              <p className={typeSmSecondary}>
                 {event.from && `${reportCopy[event.from]} → `}
                 {event.to ? reportCopy[event.to] : copy.unknown}
               </p>
@@ -132,9 +139,7 @@ export function CommunityReportHistory({
               {page.audience === "staff" && "notes" in event && event.notes && (
                 <div>
                   <h3 className="text-xs font-semibold text-primary">{copy.notes}</h3>
-                  <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                    {event.notes}
-                  </p>
+                  <p className={typePrewrapSmSecondary}>{event.notes}</p>
                 </div>
               )}
               {page.audience === "staff" && "batchSize" in event && event.batchSize !== null && (

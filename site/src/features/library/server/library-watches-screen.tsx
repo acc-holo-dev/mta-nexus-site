@@ -21,6 +21,7 @@ import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeSmSecondary } from "../../shell/type-shell";
 
 const filterNavClass =
   "inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-sm aria-[current=page]:bg-accent aria-[current=page]:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
@@ -127,10 +128,10 @@ export async function LibraryWatchesScreen({
       <Link href="/workspace/library/watches/history" className={linkAccentSmRounded}>
         {resourceReleaseWatchHistoryCopy(typedLocale).title}
       </Link>
-      <p role="note" className="text-sm text-secondary">
+      <p role="note" className={typeSmSecondary}>
         {copy.note}
       </p>
-      <p className="text-sm text-secondary">
+      <p className={typeSmSecondary}>
         {copy.pinned} {copy.limit}
       </p>
       <Link href="/settings" className={linkAccentSmRounded}>
@@ -157,7 +158,7 @@ export async function LibraryWatchesScreen({
       >
         {copy.export}
       </a>
-      <p className="text-sm text-secondary">
+      <p className={typeSmSecondary}>
         {copy.activeCount}: {result.activeWatchCount ?? 0} / 100
       </p>
       <ResourceReleaseWatchBatchControls
@@ -204,7 +205,7 @@ export async function LibraryWatchesScreen({
               <h2 className="break-words font-semibold text-primary">
                 {watch.available ? (watch.title ?? copy.privateResource) : copy.privateResource}
               </h2>
-              <p className="text-sm text-secondary">
+              <p className={typeSmSecondary}>
                 {watch.enabled ? copy.enabled : copy.disabled}
                 {watch.available ? "" : ` · ${copy.unavailable}`}
               </p>

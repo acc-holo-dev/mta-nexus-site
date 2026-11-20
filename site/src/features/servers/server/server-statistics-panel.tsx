@@ -6,6 +6,7 @@ import type { ServerStatisticsResult } from "../../../lib/services/servers/serve
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellStack6 } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
+import { typeFlexWrapGap3, typeSemiboldPrimary, typeSmSecondary } from "../../shell/type-shell";
 import { serverHistoryBarPercent } from "../server-history-presentation";
 import { serverObservationBrowserCopy } from "../server-observation-browser-copy";
 import { serverStatisticsHref } from "../server-statistics-contract";
@@ -126,7 +127,7 @@ export function ServerStatisticsPanel({
               ).map(([label, from, to, summary]) => (
                 <tr key={label} className="border-t border-base text-secondary">
                   <th scope="row" className="min-w-48 p-2 font-normal">
-                    <span className="font-semibold text-primary">{label}</span>
+                    <span className={typeSemiboldPrimary}>{label}</span>
                     <span className="mt-1 block text-xs text-muted">
                       {time(from)} — {time(to)} UTC
                     </span>
@@ -145,7 +146,7 @@ export function ServerStatisticsPanel({
             </tbody>
           </table>
         </StatisticsScrollArea>
-        <p className="text-sm text-secondary">
+        <p className={typeSmSecondary}>
           {copy.change}:{" "}
           {report.averagePlayerChange == null
             ? copy.unknown
@@ -276,7 +277,7 @@ export function ServerStatisticsPanel({
         </nav>
       </section>
       <section className={panelClipSpace3P5}>
-        <div className="flex flex-wrap gap-3">
+        <div className={typeFlexWrapGap3}>
           <ServerStatisticsExportButton
             url={serverStatisticsHref(exportPath, { ...state, format: "buckets" })}
             label={copy.export}

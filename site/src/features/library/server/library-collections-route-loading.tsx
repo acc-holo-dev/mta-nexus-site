@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax4xl, pageShellMax4xlTight, pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH10W64, skelH10W72, skelH28 } from "../../shell/skeleton-shell";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 
 type CollectionsCopy = ReturnType<typeof libraryCollectionsCopy>;
@@ -33,7 +34,7 @@ function LibraryCollectionsRouteLoading({
   leading?: ReactNode | null;
 }) {
   const resolvedLeading =
-    leading === undefined ? <div className="h-10 w-64 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH10W64} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -102,7 +103,7 @@ export function LibraryCollectionDetailRouteLoading() {
     titleKey: "title",
     className: pageShellMax4xlTight,
     rows: 3,
-    leading: <div className="h-28 rounded bg-inset" />,
+    leading: <div className={skelH28} />,
   });
 }
 
@@ -117,7 +118,7 @@ export function CollectionReconcileRouteLoading() {
   return LibraryCollectionsRouteLoading({
     headingId: "collection-reconcile-loading-heading",
     titleKey: "reconcile-items",
-    leading: <div className="h-10 w-72 rounded bg-inset" />,
+    leading: <div className={skelH10W72} />,
   });
 }
 
@@ -155,7 +156,7 @@ export function LibraryCollectionsRouteLoadingPort() {
     titleKey: "title",
     className: pageShellMax4xl,
     rows: 3,
-    leading: <div className="h-28 rounded bg-inset" />,
+    leading: <div className={skelH28} />,
   });
 }
 

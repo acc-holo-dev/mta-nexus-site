@@ -19,6 +19,12 @@ import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapGap4Sm,
+  typePrewrapSmSecondary,
+  typeSemiboldPrimary,
+} from "../../shell/type-shell";
 
 export async function resourcePublisherModerationMetadata(): Promise<Metadata> {
   return {
@@ -96,7 +102,7 @@ export async function ResourcePublisherModerationScreen({
       <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccentSm}>
         {copy.back}
       </Link>
-      <h1 className="font-display text-primary">{copy.moderationHistory}</h1>
+      <h1 className={typeDisplayPrimary}>{copy.moderationHistory}</h1>
       <h2 className="break-words text-xl text-primary">{product.title}</h2>
       <p className="text-secondary">{copy[product.status]}</p>
       {product.status === "suspended" ? (
@@ -108,17 +114,13 @@ export async function ResourcePublisherModerationScreen({
         <ol className="space-y-3">
           {result.events.map((event) => (
             <li key={event.id} className={panelSpace3P5}>
-              <h3 className="font-semibold text-primary">
+              <h3 className={typeSemiboldPrimary}>
                 {resourceModerationLabel(locale, event.action)}
               </h3>
               <time dateTime={event.createdAt.toISOString()} className="text-xs text-muted">
                 {formatHistoryDate(event.createdAt, locale)}
               </time>
-              {event.reason ? (
-                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                  {event.reason}
-                </p>
-              ) : null}
+              {event.reason ? <p className={typePrewrapSmSecondary}>{event.reason}</p> : null}
             </li>
           ))}
         </ol>
@@ -126,7 +128,7 @@ export async function ResourcePublisherModerationScreen({
         <EmptyState title={copy.moderationHistoryEmpty} description={copy.emptyHint} />
       )}
       {result.totalPages > 1 ? (
-        <nav aria-label={copy.page} className="flex flex-wrap gap-4 text-sm">
+        <nav aria-label={copy.page} className={typeFlexWrapGap4Sm}>
           {result.page > 1 ? (
             <Link href={`?page=${result.page - 1}`} className={linkAccentSm}>
               {copy.previous}

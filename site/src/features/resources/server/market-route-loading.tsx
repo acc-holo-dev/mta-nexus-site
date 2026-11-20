@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellStack6 } from "../../shell/page-shell";
 import { DictionaryFieldRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH11, skelH24, skelH32 } from "../../shell/skeleton-shell";
 
 function MarketRouteLoading({
   headingId,
@@ -28,7 +29,7 @@ function MarketRouteLoading({
   const resolvedLeading =
     leading === undefined ? (
       <>
-        <div className="h-11 rounded bg-inset" />
+        <div className={skelH11} />
         <div className="h-10 w-80 max-w-full rounded bg-inset" />
       </>
     ) : (
@@ -56,8 +57,8 @@ export function MarketResourceRouteLoading() {
       <>
         <div className="h-48 rounded bg-inset" />
         <div className="h-8 w-64 max-w-full rounded bg-inset" />
-        <div className="h-24 rounded bg-inset" />
-        <div className="h-32 rounded bg-inset" />
+        <div className={skelH24} />
+        <div className={skelH32} />
       </>
     ),
   });

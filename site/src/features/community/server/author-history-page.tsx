@@ -12,6 +12,11 @@ import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax4xlTight as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import {
+  type2xlExtraboldPrimary,
+  typeSmSecondary,
+  typeSmSemiboldPrimary,
+} from "../../shell/type-shell";
 import { publicationSupportHref } from "../../support/support-workspace-contract";
 import { parseAuthorPublicationHistoryQuery } from "../author-publication-desk-contract";
 import {
@@ -100,7 +105,7 @@ export async function PublicationHistoryPage({
         {labels.back}
       </Link>
       <header className="min-w-0 space-y-2">
-        <h1 className="text-2xl font-extrabold text-primary">{copy.history}</h1>
+        <h1 className={type2xlExtraboldPrimary}>{copy.history}</h1>
         <p className="text-sm text-muted">{copy.historyDescription}</p>
         {report && (
           <h2 className="break-words text-lg font-semibold text-primary">{report.item.title}</h2>
@@ -155,7 +160,7 @@ export async function PublicationHistoryPage({
             {report.events.map((event) => (
               <li key={event.id} className={panelMinSpace2P4}>
                 <div className="flex flex-wrap justify-between gap-3">
-                  <span className="text-sm font-semibold text-primary">{action(event.kind)}</span>
+                  <span className={typeSmSemiboldPrimary}>{action(event.kind)}</span>
                   <time dateTime={event.createdAt} className="text-xs text-muted">
                     {new Date(event.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                       timeZone: "UTC",
@@ -171,7 +176,7 @@ export async function PublicationHistoryPage({
                       : copy.actorAuthor}
                 </p>
                 {(event.from || event.to) && (
-                  <p className="text-sm text-secondary">
+                  <p className={typeSmSecondary}>
                     {state(event.from)}
                     {event.from && event.to ? " → " : ""}
                     {state(event.to)}

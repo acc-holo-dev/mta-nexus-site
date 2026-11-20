@@ -12,6 +12,7 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import type { Locale } from "../../../lib/i18n";
 import { confirmAction } from "../../shell/confirm-action";
 import { panelSpace4P5 } from "../../shell/panel-shell";
+import { typeSmSecondary, typeSmSuccess, typeSpace1SmSecondary } from "../../shell/type-shell";
 import { confirmedResourceReleaseWatchBatch } from "../resource-release-watch-batch-confirmation";
 import { resourceReleaseWatchesCopy } from "../resource-release-watches-i18n";
 export function ResourceReleaseWatchBatchControls({
@@ -188,7 +189,7 @@ export function ResourceReleaseWatchBatchControls({
   return (
     <section className={panelSpace4P5}>
       <h2>{title}</h2>
-      <p className="text-sm text-secondary">{note}</p>
+      <p className={typeSmSecondary}>{note}</p>
       <p className="text-xs text-muted">{copy.batchLimit}</p>
       {enabling && capacity === 0 ? (
         <ErrorState
@@ -204,7 +205,7 @@ export function ResourceReleaseWatchBatchControls({
             title={copy.skippedNote}
             description={copy.failedDescription}
           />
-          <ul className="space-y-1 text-sm text-secondary">
+          <ul className={typeSpace1SmSecondary}>
             {skipped.map((item) => (
               <li key={item.productId}>
                 {item.title ?? copy.privateResource}:{" "}
@@ -277,7 +278,7 @@ export function ResourceReleaseWatchBatchControls({
       )}
       {error ? <ErrorState title={error} description={copy.failedDescription} /> : null}
       {saved && (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {copy.saved}
         </p>
       )}

@@ -1,8 +1,8 @@
 import Link from "next/link";
 import type { MouseEventHandler, ReactNode } from "react";
+import { linkFocusRing } from "../link-shell";
 
-export const platformSignInFocusClass =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+export const platformSignInFocusClass = linkFocusRing;
 
 const loginLinkClass = `inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-medium text-white underline-offset-4 hover:underline ${platformSignInFocusClass}`;
 const registerLinkClass = `inline-flex min-h-11 items-center text-sm text-secondary underline ${platformSignInFocusClass}`;

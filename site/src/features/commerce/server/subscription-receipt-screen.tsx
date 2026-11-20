@@ -11,6 +11,7 @@ import { subscriptionsService } from "../../../lib/services/commerce/subscriptio
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeSmSecondary } from "../../shell/type-shell";
 import { PlanReviewTerms } from "../plan-reviews-workspace";
 import { formatSubscriptionTime } from "../subscription-time";
 import { subscriptionNavLinkClass } from "../subscription-workspace";
@@ -104,7 +105,7 @@ export async function SubscriptionReceiptScreen({
         </p>
         <h2>{c.snapshot}</h2>
         <PlanReviewTerms terms={s.terms} locale={locale} />
-        <p role="note" className="text-sm text-secondary">
+        <p role="note" className={typeSmSecondary}>
           {c.notice}
         </p>
         <a

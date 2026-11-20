@@ -10,6 +10,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xlDenseTight } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary } from "../../shell/type-shell";
 import { SupportMessageBrowser } from "../components/support-message-browser";
 import { parseSupportMessageQuery } from "../support-message-discovery-contract";
 import { supportMessageCopy, supportMessageError } from "../support-message-discovery-copy";
@@ -81,7 +82,7 @@ export async function SupportMessagePage({
     );
     return (
       <div className={pageShellMax4xlDenseTight}>
-        <h1 className="font-display text-primary">{copy.title}</h1>
+        <h1 className={typeDisplayPrimary}>{copy.title}</h1>
         <ErrorState
           title={title}
           description={

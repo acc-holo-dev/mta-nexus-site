@@ -10,6 +10,7 @@ import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
+import { typeSmSecondary } from "../../shell/type-shell";
 import { resourceDeliveriesCopy } from "../resource-deliveries-i18n";
 import {
   type DownloadFailure,
@@ -185,7 +186,7 @@ export function ResourceDownloadButton({
         />
       ) : null}
       {notice && (
-        <p role="status" className="text-sm text-secondary">
+        <p role="status" className={typeSmSecondary}>
           {notice === "cancelled" ? copy.downloadCancelled : copy.downloadHandedOff}
         </p>
       )}

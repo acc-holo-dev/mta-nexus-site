@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH10W64, skelH10W72, skelH24 } from "../../shell/skeleton-shell";
 import { sellerSalesCopy } from "../seller-sales-i18n";
 
 type Copy = ReturnType<typeof sellerSalesCopy>;
@@ -40,7 +41,7 @@ function SellerSalesRouteLoading({
     throw new Error("SellerSalesRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-10 w-64 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH10W64} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -71,7 +72,7 @@ export function SalesReportDetailRouteLoading() {
     headingId: "sales-report-detail-loading-heading",
     className: pageShellMax5xl,
     rows: 4,
-    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    leading: <div className={skelH10W64} />,
     titleKey: "detail",
     loadingKey: "detailLoading",
   });
@@ -84,8 +85,8 @@ export function SalesReportRouteLoading() {
     rows: 4,
     leading: (
       <>
-        <div className="h-10 w-72 rounded bg-inset" />
-        <div className="h-24 rounded bg-inset" />
+        <div className={skelH10W72} />
+        <div className={skelH24} />
       </>
     ),
     titleKey: "title",

@@ -13,6 +13,7 @@ import { authEntryHref } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { linkAccent } from "../../shell/link-shell";
 import { pageShellMax4xlCompact as pageShellClass } from "../../shell/page-shell";
+import { typeSmSecondary } from "../../shell/type-shell";
 import { ResourceReviewList, ResourceReviewPager } from "../components/resource-review-list";
 import { resourceReviewCopy } from "../resource-review-i18n";
 import { resourceReviewPageQuery } from "../resource-review-query";
@@ -89,7 +90,7 @@ export async function PublicResourceReviewsPage({
         <h1 className="font-display">
           {copy.title} · {product.title}
         </h1>
-        <p className="text-sm text-secondary">{copy.subtitle}</p>
+        <p className={typeSmSecondary}>{copy.subtitle}</p>
         <ErrorState
           title={copy.pageUnavailable}
           description={copy.pageUnavailableDescription}
@@ -111,7 +112,7 @@ export async function PublicResourceReviewsPage({
       <h1 className="font-display">
         {copy.title} · {product.title}
       </h1>
-      <p className="text-sm text-secondary">{copy.subtitle}</p>
+      <p className={typeSmSecondary}>{copy.subtitle}</p>
       {sessionFailed ? (
         <ErrorState
           id="resource-reviews-session-unavailable"

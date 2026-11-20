@@ -20,6 +20,7 @@ import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace4P5 } from "../../shell/panel-shell";
+import { typeSmSecondary, typeSmSuccess } from "../../shell/type-shell";
 import { stashSupportObjectContext } from "../../support/center";
 import { getResourceCommerceCopy, resourceCommerceError } from "../resource-commerce-i18n";
 
@@ -175,7 +176,7 @@ export function ResourceLifecycleControls({
           </dd>
         </div>
       </dl>
-      {nextStepCopy ? <p className="text-sm text-secondary">{nextStepCopy}</p> : null}
+      {nextStepCopy ? <p className={typeSmSecondary}>{nextStepCopy}</p> : null}
       {selectedBuild && buildAvailability !== "available" ? (
         <ErrorState
           title={copy.buildUnavailableTitle}
@@ -232,7 +233,7 @@ export function ResourceLifecycleControls({
               ))}
             </select>
           </div>
-          <p id={`${fieldId}-note`} className="text-sm text-secondary">
+          <p id={`${fieldId}-note`} className={typeSmSecondary}>
             {notes[action]}
             {target ? (
               <span className="mt-1 block">
@@ -287,7 +288,7 @@ export function ResourceLifecycleControls({
       )}
       {error ? <ErrorState title={error} description={copy.actionFailedDescription} /> : null}
       {saved && (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {copy.updated}
           {action === "restore" ? copy.restoreDraftSaved : ""}
         </p>

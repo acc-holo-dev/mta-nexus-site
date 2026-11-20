@@ -9,6 +9,7 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 import { linkAccentTightRounded, linkGhostAccentRounded } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
+import { typeBreakAllXs, typeSmSecondary } from "../../shell/type-shell";
 import { confirmedCollectionCommand } from "../library-collections-confirmation";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../library-collections-query";
@@ -190,7 +191,7 @@ export function LibraryCollectionItemCopyForm({
   const shownDestinations = pending.current ? [pending.current.destination] : destinations;
   return (
     <form onSubmit={submit} className={panelSpace4P5}>
-      <p role="note" className="text-sm text-secondary">
+      <p role="note" className={typeSmSecondary}>
         {shownMove ? c.moveItemsNote : c.copyItemsNote}
       </p>
       <fieldset disabled={busy || frozen || saved} className="space-y-4">
@@ -241,9 +242,7 @@ export function LibraryCollectionItemCopyForm({
                 />
                 <span className="break-words">
                   {item.title ?? c.unavailable}
-                  {item.title === null && (
-                    <code className="block break-all text-xs">{item.productId}</code>
-                  )}
+                  {item.title === null && <code className={typeBreakAllXs}>{item.productId}</code>}
                 </span>
               </label>
             </li>

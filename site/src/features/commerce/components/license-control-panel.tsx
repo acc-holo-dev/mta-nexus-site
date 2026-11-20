@@ -18,6 +18,7 @@ import {
 import { linkAccentTightSmPlain, linkMinH } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
+import { typeSmPrimary, typeSmSecondary } from "../../shell/type-shell";
 import { confirmedLicenseControl } from "../license-control-confirmation";
 import { getLicenseControlCopy, licenseControlError } from "../license-control-i18n";
 import { LicenseRuntimeProbe } from "./license-runtime-probe";
@@ -292,11 +293,11 @@ export function LicenseControlPanel({
       <h2 className="text-lg font-semibold text-primary">
         {moderation ? copy.moderation : copy.title}
       </h2>
-      <p className="text-sm text-secondary">{copy.policy}</p>
+      <p className={typeSmSecondary}>{copy.policy}</p>
       {!moderation && (
         <>
-          <p className="text-sm text-secondary">{copy.bindingPolicy}</p>
-          <p className="text-sm text-secondary">{copy.tokenTerm}</p>
+          <p className={typeSmSecondary}>{copy.bindingPolicy}</p>
+          <p className={typeSmSecondary}>{copy.tokenTerm}</p>
         </>
       )}
       {actions.length > 0 && (
@@ -387,9 +388,9 @@ export function LicenseControlPanel({
                 </div>
               </div>
             )}
-            {action === "revoke" && <p className="text-sm text-secondary">{copy.revokeNote}</p>}
+            {action === "revoke" && <p className={typeSmSecondary}>{copy.revokeNote}</p>}
             {action === "refresh_binding" && (
-              <p className="text-sm text-secondary">
+              <p className={typeSmSecondary}>
                 {copy.recoveryNote} · {copy.endpointRevision}: {license.currentEndpointRevision}
               </p>
             )}
@@ -456,8 +457,8 @@ export function LicenseControlPanel({
       </Button>
       {secret && (
         <div className="min-w-0 space-y-3 overflow-x-clip rounded-md border border-base p-4">
-          <p className="text-sm text-primary">{copy.tokenOnce}</p>
-          <p className="text-sm text-secondary">{copy.tokenPolicy}</p>
+          <p className={typeSmPrimary}>{copy.tokenOnce}</p>
+          <p className={typeSmSecondary}>{copy.tokenPolicy}</p>
           <input
             aria-label={copy.tokenState}
             type="password"
@@ -468,7 +469,7 @@ export function LicenseControlPanel({
             className={`${fieldClassBlock} font-mono`}
             onFocus={(event) => event.target.select()}
           />
-          <p className="text-sm text-secondary">
+          <p className={typeSmSecondary}>
             {copy.expires}:{" "}
             <time dateTime={secret.expiresAt}>
               {new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(

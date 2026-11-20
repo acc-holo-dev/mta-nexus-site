@@ -20,6 +20,7 @@ import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceInsetP3TextSmSecondary } from "../../shell/surface-shell";
+import { typeSmSecondary, typeSmSuccess } from "../../shell/type-shell";
 import { stashSupportObjectContext } from "../../support/center";
 
 const textareaClass =
@@ -125,7 +126,7 @@ export function ResourceModerationControls({
   if (allowed.length === 0) {
     return (
       <div className={panelSpace3P5}>
-        <p role="note" className="text-sm text-secondary">
+        <p role="note" className={typeSmSecondary}>
           {copy.moderationNote}
         </p>
         <ErrorState
@@ -138,7 +139,7 @@ export function ResourceModerationControls({
 
   return (
     <form onSubmit={send} className={panelSpace4P5}>
-      <p role="note" className="text-sm text-secondary">
+      <p role="note" className={typeSmSecondary}>
         {copy.moderationNote}
       </p>
       <dl className="grid gap-2 text-sm text-secondary sm:grid-cols-2">
@@ -193,7 +194,7 @@ export function ResourceModerationControls({
       </fieldset>
       {error ? <ErrorState title={error} description={copy.actionFailedDescription} /> : null}
       {saved ? (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {copy.saved}
           {release ? copy.releaseNextAuthorStep : ""}
         </p>

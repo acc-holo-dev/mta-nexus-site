@@ -16,6 +16,7 @@ import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceP4 } from "../../shell/surface-shell";
+import { typeDisplayPrimary, typeSemiboldPrimary, typeSmSecondary } from "../../shell/type-shell";
 import { buildPackageCopy } from "../build-package-i18n";
 import { BuildModerationControls } from "../components/build-moderation-controls";
 import { ResourceBuildControls } from "../components/resource-build-controls";
@@ -121,7 +122,7 @@ export async function ResourceBuildScreen({
         {staff ? copy.reviewBack : copy.back}
       </Link>
       <header className="space-y-2">
-        <h1 className="font-display text-primary">
+        <h1 className={typeDisplayPrimary}>
           {product.title} · {build.version}
         </h1>
         <p className="text-secondary">
@@ -162,8 +163,8 @@ export async function ResourceBuildScreen({
           <p className="break-words text-sm text-secondary">
             {publisherCopy.tags}: {formatUnknown(locale, (product.tags ?? []).join(", "))}
           </p>
-          <h3 className="font-semibold text-primary">{publisherCopy.requirements}</h3>
-          <p className="text-sm text-secondary">
+          <h3 className={typeSemiboldPrimary}>{publisherCopy.requirements}</h3>
+          <p className={typeSmSecondary}>
             {managementCopy.mta}: {formatUnknown(locale, product.compatibility?.mtaMinVersion)}
           </p>
           <ul className="list-inside list-disc text-sm text-secondary">

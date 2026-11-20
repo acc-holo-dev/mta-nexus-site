@@ -8,6 +8,7 @@ import {
 } from "../../shell/link-shell";
 import { pageShellStack5 } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
+import { typePrewrapSmSecondary } from "../../shell/type-shell";
 import {
   PUBLICATION_SOURCES,
   PUBLICATION_TYPES,
@@ -227,7 +228,7 @@ export function PublicationFeed({
                 {item.title}
               </Link>
             </h2>
-            <p className="whitespace-pre-wrap break-words text-sm text-secondary">{item.excerpt}</p>
+            <p className={typePrewrapSmSecondary}>{item.excerpt}</p>
             {item.tags?.length > 0 && (
               <ul className="flex min-w-0 flex-wrap gap-2" aria-label={copy.tag}>
                 {Array.from(new Set(item.tags)).map((tag) => (

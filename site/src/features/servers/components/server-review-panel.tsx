@@ -10,6 +10,12 @@ import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace2P4TextSm, panelSpace4P5 } from "../../shell/panel-shell";
+import {
+  typePrewrapBreak,
+  typePrewrapSmSecondary,
+  typeSmSemiboldPrimary,
+  typeXsSecondary,
+} from "../../shell/type-shell";
 import { confirmedServerReview } from "../server-review-confirmation";
 import {
   serverReviewCopy,
@@ -354,7 +360,7 @@ export function ServerReviewPanel({
         />
       ) : (
         <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-primary">
+          <h3 className={typeSmSemiboldPrimary}>
             {copy.all} ({page.total})
           </h3>
           {page.reviews.length === 0 ? (
@@ -381,7 +387,7 @@ export function ServerReviewPanel({
       )}
 
       <div className={panelSpace4P5}>
-        <h3 className="text-sm font-semibold text-primary">{copy.write}</h3>
+        <h3 className={typeSmSemiboldPrimary}>{copy.write}</h3>
         {!signedIn ? (
           <GuestAuthLinks
             loginHref={loginHref}
@@ -391,12 +397,12 @@ export function ServerReviewPanel({
           />
         ) : (
           <>
-            <p className="text-xs text-secondary">{copy.access}</p>
+            <p className={typeXsSecondary}>{copy.access}</p>
             {mine?.review && (
               <p className="text-xs text-muted">{serverReviewState(locale, mine.review.status)}</p>
             )}
             {mine?.review?.moderationReason && (
-              <p className="text-xs text-secondary">
+              <p className={typeXsSecondary}>
                 {copy.reason}: {mine.review.moderationReason}
               </p>
             )}
@@ -466,11 +472,7 @@ export function ServerReviewPanel({
                 </Button>
               </form>
             ) : (
-              mine?.review && (
-                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                  {mine.review.text}
-                </p>
-              )
+              mine?.review && <p className={typePrewrapSmSecondary}>{mine.review.text}</p>
             )}
             {mine?.review?.status === "published" && (
               <Button
@@ -528,7 +530,7 @@ export function ServerReviewPanel({
               <div className="space-y-2">
                 <p className="font-semibold">{copy.latestReview}</p>
                 {latest.review ? (
-                  <p className="whitespace-pre-wrap break-words">
+                  <p className={typePrewrapBreak}>
                     {copy.rating}: {latest.review.rating}/5 · {latest.review.text}
                   </p>
                 ) : (

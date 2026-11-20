@@ -13,6 +13,7 @@ import { linkGhostAccentSmDisabled, linkGhostAccentXsDisabled } from "../../shel
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace2P4TextSm, panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceP4 } from "../../shell/surface-shell";
+import { typeSemiboldPrimary, typeSmSecondary, typeSmSuccess } from "../../shell/type-shell";
 import { confirmedVariantCommand } from "../resource-management-confirmation";
 import { getResourceManagementCopy, resourceManagementError } from "../resource-management-i18n";
 
@@ -299,7 +300,7 @@ export function ResourceVariantsForm({
   return (
     <section className="space-y-6">
       <form onSubmit={(event) => submit(event, "save")} className={panelSpace4P5}>
-        <p className="text-sm text-secondary">{copy.variantNote}</p>
+        <p className={typeSmSecondary}>{copy.variantNote}</p>
         <label htmlFor={`${field}-title`} className="block text-sm text-secondary">
           {copy.title}
         </label>
@@ -316,7 +317,7 @@ export function ResourceVariantsForm({
           }}
           className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-primary"
         />
-        <h2 className="font-semibold text-primary">
+        <h2 className={typeSemiboldPrimary}>
           {copy.selected} · {selected.length}/{RESOURCE_VARIANT_LIMIT}
         </h2>
         <ol className="space-y-3">
@@ -413,7 +414,7 @@ export function ResourceVariantsForm({
         </Button>
       </form>
       <section className={panelSpace3P5} aria-labelledby={`${field}-candidates`}>
-        <h2 id={`${field}-candidates`} className="font-semibold text-primary">
+        <h2 id={`${field}-candidates`} className={typeSemiboldPrimary}>
           {copy.candidates}
         </h2>
         <ul className="space-y-2">
@@ -478,8 +479,8 @@ export function ResourceVariantsForm({
       </section>
       {base.group && (
         <form onSubmit={(event) => submit(event, "remove")} className={panelSpace3P5}>
-          <h2 className="font-semibold text-primary">{copy.dissolve}</h2>
-          <p className="text-sm text-secondary">{copy.dissolveNote}</p>
+          <h2 className={typeSemiboldPrimary}>{copy.dissolve}</h2>
+          <p className={typeSmSecondary}>{copy.dissolveNote}</p>
           <p className="text-xs text-muted">{copy.reason}</p>
           <label htmlFor={`${field}-remove-reason`} className="block text-sm text-secondary">
             {copy.reason}
@@ -578,7 +579,7 @@ export function ResourceVariantsForm({
       )}
       {error ? <ErrorState title={error} description={copy.actionFailedDescription} /> : null}
       {saved && (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {copy.saved}
         </p>
       )}

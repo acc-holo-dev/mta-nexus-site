@@ -9,6 +9,7 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { linkAccentRounded } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelGrid2P5 } from "../../shell/panel-shell";
+import { typeFlexWrapGap4, typeSmSecondary } from "../../shell/type-shell";
 import { confirmedResourceCopy } from "../resource-copy-confirmation";
 import { resourceCopyCopy, resourceCopyError } from "../resource-copy-i18n";
 import { ResourceCopyMetadataView } from "./resource-copy-metadata";
@@ -74,7 +75,7 @@ export function ResourceCopyForm({
   }
   return (
     <form onSubmit={submit} aria-busy={busy} className="space-y-5">
-      <p role="note" className="text-sm text-secondary">
+      <p role="note" className={typeSmSecondary}>
         {c.notice}
       </p>
       <p>
@@ -107,7 +108,7 @@ export function ResourceCopyForm({
         <ErrorState id="resource-copy-form-frozen" title={c.frozen} description={c.retry} />
       ) : null}
       {error ? <ErrorState title={error} description={c.errorDescription} /> : null}
-      <div className="flex flex-wrap gap-4">
+      <div className={typeFlexWrapGap4}>
         <Button type="submit" isLoading={busy} className="min-h-11">
           {busy ? c.busy : c.create}
         </Button>

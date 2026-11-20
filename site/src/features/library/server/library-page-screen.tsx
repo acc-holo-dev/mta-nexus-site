@@ -32,6 +32,12 @@ import { pageShellMax5xlMid } from "../../shell/page-shell";
 import { panelFlexColGap3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceBgP4TextSmMuted } from "../../shell/surface-shell";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapGap2,
+  typeFlexWrapGap4,
+  typeXsSecondary,
+} from "../../shell/type-shell";
 import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
 import { collectionInventoryHref } from "../library-collection-inventory-query";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
@@ -90,7 +96,7 @@ export async function LibraryPageScreen({
         >
           {copy.back}
         </Link>
-        <h1 className="font-display text-primary">{copy.title}</h1>
+        <h1 className={typeDisplayPrimary}>{copy.title}</h1>
         <p className="max-w-2xl text-sm text-secondary">{copy.subtitle}</p>
       </header>
 
@@ -135,7 +141,7 @@ export async function LibraryPageScreen({
         />
       ) : (
         <>
-          <nav aria-label={copy.title} className="flex flex-wrap gap-2">
+          <nav aria-label={copy.title} className={typeFlexWrapGap2}>
             {filters.map((value) => (
               <Link
                 key={value}
@@ -191,14 +197,14 @@ export async function LibraryPageScreen({
 
                   {item.downloadable && item.slug && item.version ? (
                     <div className="mt-auto space-y-3">
-                      <p className="text-xs text-secondary">{copy.availableReason}</p>
+                      <p className={typeXsSecondary}>{copy.availableReason}</p>
                       <ResourceDownloadButton
                         productId={item.resourceId}
                         version={item.version}
                         buildId={item.buildId ?? undefined}
                         intent={item.buildId ? "selected" : "latest"}
                       />
-                      <div className="flex flex-wrap gap-4">
+                      <div className={typeFlexWrapGap4}>
                         <Link href={`/market/${item.slug}`} className={linkAccentInlineSm}>
                           {copy.open}
                         </Link>

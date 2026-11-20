@@ -13,6 +13,7 @@ import { linkAccentSmRounded, linkAccentTightRounded } from "../../shell/link-sh
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeFlexWrapGap4, typePrewrapBreak } from "../../shell/type-shell";
 import { LibraryReleaseComparisonSelection } from "../components/library-release-comparison-selection";
 import { collectionPageParams } from "../library-collections-query";
 import { libraryReleaseComparisonCopy } from "../library-release-comparison-i18n";
@@ -165,7 +166,7 @@ export async function LibraryReleaseComparisonScreen({
               {c.preparation}
             </Link>
             <h3>{c.notes}</h3>
-            <p className="whitespace-pre-wrap break-words">{release.releaseNotes ?? c.unknown}</p>
+            <p className={typePrewrapBreak}>{release.releaseNotes ?? c.unknown}</p>
             {release.notesTruncated && <p role="note">{c.truncated}</p>}
             <h3>{c.package}</h3>
             {release.packageSummary ? (
@@ -210,7 +211,7 @@ export async function LibraryReleaseComparisonScreen({
       <p className="text-sm">
         {c.generated}: <time dateTime={result.generatedAt}>{result.generatedAt}</time>
       </p>
-      <nav className="flex flex-wrap gap-4">
+      <nav className={typeFlexWrapGap4}>
         <Link
           href={`${base}/compare?${new URLSearchParams({ ...values, from: query.to, to: query.from })}`}
           className={linkAccentTightRounded}

@@ -11,6 +11,7 @@ import { authEntryHref } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace4P5 } from "../../shell/panel-shell";
+import { typeFlexWrapGap2 } from "../../shell/type-shell";
 import {
   confirmsServerClaimVerification,
   type IssuedServerClaimChallenge,
@@ -369,7 +370,7 @@ export function ServerClaimControlPanel({
             {copy.tokenEphemeral}
           </p>
 
-          <div className="flex flex-wrap gap-2">
+          <div className={typeFlexWrapGap2}>
             <Button
               type="button"
               size="touch"

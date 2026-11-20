@@ -12,6 +12,7 @@ import { GuestAuthLinks } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";
 import { panelMinSpace4P5 } from "../../shell/panel-shell";
 import { surfaceBgP4TextSmSecondary } from "../../shell/surface-shell";
+import { typeSmSecondary, typeSmSuccess } from "../../shell/type-shell";
 import { resourceCartReceiptsCopy } from "../resource-cart-receipts-i18n";
 import { resourceCartReceiptUrl } from "../resource-cart-receipts-query";
 import { confirmedResourceCartReview } from "../resource-cart-review-confirmation";
@@ -265,10 +266,10 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
     unavailable = cart.items.some((item) => !item.available);
   return (
     <div className="space-y-5" aria-busy={busy} data-acquire-intent="batch">
-      <p aria-live="polite" className="text-sm text-secondary">
+      <p aria-live="polite" className={typeSmSecondary}>
         {copy.cart}: {cart.items.length}/{cart.limit}
       </p>
-      <p className="text-sm text-secondary">{copy.batchIntent}</p>
+      <p className={typeSmSecondary}>{copy.batchIntent}</p>
       <p role="note" className={surfaceBgP4TextSmSecondary}>
         {receiptCopy.reviewNote}
       </p>
@@ -332,7 +333,7 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
                       </p>
                     ) : null}
                     {item.alreadyOwned ? (
-                      <p className="text-sm text-success" data-cart-state="owned">
+                      <p className={typeSmSuccess} data-cart-state="owned">
                         {copy.owned}
                       </p>
                     ) : null}

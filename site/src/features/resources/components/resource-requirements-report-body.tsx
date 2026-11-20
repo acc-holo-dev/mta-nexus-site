@@ -3,6 +3,7 @@ import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { linkAccentTightRounded } from "../../shell/link-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
+import { typeFlexWrapGap4 } from "../../shell/type-shell";
 import { ResourceDownloadButton } from "../download";
 import { resourceRequirementsCopy } from "../resource-requirements-i18n";
 import { AddResourceToCart } from "./resource-cart-controls";
@@ -121,7 +122,7 @@ export function ResourceRequirementsReportBody({
                 {copy.hash}: {node.build.sha256Hash}
               </p>
             )}
-            <div className="flex flex-wrap gap-4">
+            <div className={typeFlexWrapGap4}>
               {node.published && (
                 <Link
                   href={`/market/${encodeURIComponent(node.slug)}`}

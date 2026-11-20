@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH10W64, skelH28, skelH32 } from "../../shell/skeleton-shell";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
 
 type Copy = ReturnType<typeof getResourceReleaseControlCopy>;
@@ -40,7 +41,7 @@ function ResourceReleaseControlRouteLoading({
     throw new Error("ResourceReleaseControlRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-10 w-64 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH10W64} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -70,7 +71,7 @@ export function AdminResourceDetailRouteLoading() {
   return ResourceReleaseControlRouteLoading({
     headingId: "admin-resource-detail-loading-heading",
     rowClassName: "h-16 rounded bg-inset",
-    leading: <div className="h-32 rounded bg-inset" />,
+    leading: <div className={skelH32} />,
     titleKey: "moderation",
     loadingKey: "moderationLoading",
   });
@@ -79,7 +80,7 @@ export function AdminResourceDetailRouteLoading() {
 export function AdminResourcesRouteLoading() {
   return ResourceReleaseControlRouteLoading({
     headingId: "admin-resources-loading-heading",
-    leading: <div className="h-28 rounded bg-inset" />,
+    leading: <div className={skelH28} />,
     titleKey: "moderation",
     loadingKey: "moderationLoading",
   });

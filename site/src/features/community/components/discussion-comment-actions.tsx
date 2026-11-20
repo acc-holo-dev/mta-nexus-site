@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentSm } from "../../shell/link-shell";
+import { typeFlexWrapGap3, typeSmSecondary } from "../../shell/type-shell";
 import type { DiscussionPage } from "../content-discussion-contract";
 import { discussionMutationError, getDiscussionCopy } from "../content-discussion-copy";
 import { confirmsDiscussionMutation } from "../discussion-mutation-confirmation";
@@ -156,7 +157,7 @@ export function DiscussionCommentActions({
   return (
     <div className="space-y-3" aria-busy={pending}>
       {!mode ? (
-        <div className="flex flex-wrap gap-3">
+        <div className={typeFlexWrapGap3}>
           {own && editable && (
             <Button
               type="button"
@@ -217,7 +218,7 @@ export function DiscussionCommentActions({
             </label>
           ) : (
             <>
-              <p className="text-sm text-secondary">{copy.moderateRemoveNote}</p>
+              <p className={typeSmSecondary}>{copy.moderateRemoveNote}</p>
               <label className="block space-y-1 text-xs text-secondary">
                 {copy.reason}
                 <textarea
@@ -232,7 +233,7 @@ export function DiscussionCommentActions({
               </label>
             </>
           )}
-          <div className="flex flex-wrap gap-3">
+          <div className={typeFlexWrapGap3}>
             <Button
               type="submit"
               className="min-h-11 text-xs"

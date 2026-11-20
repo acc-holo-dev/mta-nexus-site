@@ -13,6 +13,7 @@ import { linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeFlexWrapGap4 } from "../../shell/type-shell";
 import { formatSubscriptionTime } from "../subscription-time";
 import { subscriptionNavLinkClass } from "../subscription-workspace";
 import { subscriptionError, subscriptionsCopy } from "../subscriptions-i18n";
@@ -80,7 +81,7 @@ export async function SubscriptionHistoryScreen({
         <h1 className="font-display">
           {c.history}: {result.scope.name ?? c.personal}
         </h1>
-        <form method="get" className="flex flex-wrap gap-4">
+        <form method="get" className={typeFlexWrapGap4}>
           {query.organizationId && (
             <input type="hidden" name="organizationId" value={query.organizationId} />
           )}
@@ -126,7 +127,7 @@ export async function SubscriptionHistoryScreen({
         ) : (
           <EmptyState title={c.historyEmpty} description={c.historyEmptyHint} />
         )}
-        <nav className="flex flex-wrap gap-4" aria-label={c.history}>
+        <nav className={typeFlexWrapGap4} aria-label={c.history}>
           {result.page > 1 && (
             <Link href={href(result.page - 1)} className={subscriptionNavLinkClass}>
               {c.previous}

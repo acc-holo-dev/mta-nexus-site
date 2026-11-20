@@ -7,6 +7,7 @@ import { platformFieldClass, platformRequest } from "../../community/user-platfo
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
 import { linkGhostAccentSm } from "../../shell/link-shell";
+import { typeFlexWrapGap3, typeHeadingPrimary, typeSmSecondary } from "../../shell/type-shell";
 import {
   confirmOwnershipTransfer,
   type ownershipTransferResultSchema,
@@ -122,9 +123,9 @@ export function OrganizationOwnershipTransfer({
       className="nexus-panel min-w-0 scroll-mt-20 space-y-4 overflow-x-clip border border-danger/30 p-5"
       aria-busy={busy}
     >
-      <h2 className="font-heading text-primary">{copy.transfer}</h2>
+      <h2 className={typeHeadingPrimary}>{copy.transfer}</h2>
       <p className="text-sm text-muted">{copy.description}</p>
-      <p className="text-sm text-secondary">{copy.consequence}</p>
+      <p className={typeSmSecondary}>{copy.consequence}</p>
       {!target ? (
         <EmptyState title={copy.noSelection} description={copy.noSelectionHint} />
       ) : (
@@ -177,7 +178,7 @@ export function OrganizationOwnershipTransfer({
               {copy.currentPasswordHelp}
             </p>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className={typeFlexWrapGap3}>
             <Button
               type="submit"
               variant="danger"

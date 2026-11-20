@@ -8,6 +8,7 @@ import { licenseModelLabel } from "../../commerce/license-model-i18n";
 import { CopyablePlainCodeBlock } from "../../shell/copyable-plain-code-block";
 import { linkAccentTightSemiboldHover } from "../../shell/link-shell";
 import { panelSpace4P6 } from "../../shell/panel-shell";
+import { typeSmSecondary, typeSmSemiboldPrimary } from "../../shell/type-shell";
 import { ResourceVersionHelpSupportLink } from "./resource-version-help-support-link";
 
 function renderSectionBody({
@@ -86,7 +87,7 @@ export function ResourceVersionHelpSection({
 
       {projection.purpose ? (
         <div className="space-y-2">
-          <h3 className="text-sm font-semibold text-primary">{copy.sections.purpose}</h3>
+          <h3 className={typeSmSemiboldPrimary}>{copy.sections.purpose}</h3>
           {renderSectionBody({
             ...projection.purpose,
             copyLabel: copy.copyCode,
@@ -96,7 +97,7 @@ export function ResourceVersionHelpSection({
       ) : null}
 
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold text-primary">{copy.sections.acquire}</h3>
+        <h3 className={typeSmSemiboldPrimary}>{copy.sections.acquire}</h3>
         <p className="whitespace-pre-line text-sm leading-relaxed text-secondary">
           {copy.acquireBody.replace("{version}", projection.version)}
         </p>
@@ -105,7 +106,7 @@ export function ResourceVersionHelpSection({
 
       {projection.setup ? (
         <div className="space-y-2">
-          <h3 className="text-sm font-semibold text-primary">{copy.sections.setup}</h3>
+          <h3 className={typeSmSemiboldPrimary}>{copy.sections.setup}</h3>
           {renderSectionBody({
             ...projection.setup,
             copyLabel: copy.copyCode,
@@ -115,7 +116,7 @@ export function ResourceVersionHelpSection({
       ) : null}
 
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold text-primary">{copy.sections.limits}</h3>
+        <h3 className={typeSmSemiboldPrimary}>{copy.sections.limits}</h3>
         <dl className="space-y-2 text-sm text-secondary">
           {projection.limits.map((line) => {
             const label = copy.limits[line.key];
@@ -143,8 +144,8 @@ export function ResourceVersionHelpSection({
       </div>
 
       <div className="space-y-2 border-t border-base pt-4">
-        <h3 className="text-sm font-semibold text-primary">{copy.sections.support}</h3>
-        <p className="text-sm text-secondary">{copy.supportBody}</p>
+        <h3 className={typeSmSemiboldPrimary}>{copy.sections.support}</h3>
+        <p className={typeSmSecondary}>{copy.supportBody}</p>
         <div className="flex flex-wrap gap-3 text-sm">
           <Link href={`#${qaAnchorId}`} className={linkAccentTightSemiboldHover}>
             {copy.openQa}

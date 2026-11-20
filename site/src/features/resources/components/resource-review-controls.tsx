@@ -9,6 +9,7 @@ import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentTight } from "../../shell/link-shell";
 import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceSpace2P3TextSm } from "../../shell/surface-shell";
+import { typePrewrapBreak, typeSmSecondary } from "../../shell/type-shell";
 import {
   confirmedReview,
   confirmedReviewDecision,
@@ -143,7 +144,7 @@ export function ResourceReviewEditor({
   }
   return (
     <section className={panelSpace4P5}>
-      <p className="text-sm text-secondary">{copy.access}</p>
+      <p className={typeSmSecondary}>{copy.access}</p>
       {eligibilityNote ? (
         <ErrorState
           id="resource-review-eligibility"
@@ -153,7 +154,7 @@ export function ResourceReviewEditor({
       ) : null}
       {review && <p>{resourceReviewState(locale, review.status)}</p>}
       {review?.moderationReason && (
-        <p className="text-sm text-secondary">
+        <p className={typeSmSecondary}>
           {copy.reason}: {review.moderationReason}
         </p>
       )}
@@ -241,7 +242,7 @@ export function ResourceReviewEditor({
           <p role="status">{copy.draftChanged}</p>
           <p className="font-semibold">{copy.latestReview}</p>
           {review ? (
-            <p className="whitespace-pre-wrap break-words">
+            <p className={typePrewrapBreak}>
               {copy.rating}: {formatUnknown(locale, review.rating)}/5 · {review.text}
             </p>
           ) : (

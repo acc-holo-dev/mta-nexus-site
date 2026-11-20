@@ -21,6 +21,7 @@ import {
 } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeFlexWrapEndGap3, typeFlexWrapGap4Sm } from "../../shell/type-shell";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref, collectionPageParams } from "../library-collections-query";
@@ -164,7 +165,7 @@ export async function LibraryMembershipHistoryScreen({
       result.days !== 30;
     return (
       <div className={pageShellMax5xl}>
-        <nav className="flex flex-wrap gap-4 text-sm" aria-label={m.title}>
+        <nav className={typeFlexWrapGap4Sm} aria-label={m.title}>
           <Link href={collectionHref()} className={linkAccentTight}>
             {c.title}
           </Link>
@@ -174,11 +175,7 @@ export async function LibraryMembershipHistoryScreen({
         </nav>
         <h1>{m.title}</h1>
         <p className="text-secondary">{m.note}</p>
-        <form
-          method="get"
-          action={membershipHistoryHref()}
-          className="flex flex-wrap items-end gap-3"
-        >
+        <form method="get" action={membershipHistoryHref()} className={typeFlexWrapEndGap3}>
           <label className="grid gap-1">
             {h.days}
             <select
@@ -267,7 +264,7 @@ export async function LibraryMembershipHistoryScreen({
           ))}
         </ol>
         {result.totalPages > 1 && (
-          <nav aria-label={c.page} className="flex flex-wrap gap-4 text-sm">
+          <nav aria-label={c.page} className={typeFlexWrapGap4Sm}>
             {result.page > 1 && (
               <Link
                 href={`${membershipHistoryHref()}?${suffix(result.page - 1)}`}

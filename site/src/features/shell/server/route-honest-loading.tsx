@@ -3,11 +3,12 @@ import { getDictionary, type Locale } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { HonestLoadingShell } from "../honest-loading";
 import { pageShellStack6 } from "../page-shell";
+import { skelH20 } from "../skeleton-shell";
 
 type Dictionary = ReturnType<typeof getDictionary>;
 
 const DEFAULT_CLASS = pageShellStack6;
-const DEFAULT_ROW = "h-20 rounded bg-inset";
+const DEFAULT_ROW = skelH20;
 
 function RouteHonestLoading({
   headingId,

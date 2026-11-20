@@ -4,9 +4,10 @@ import { Flag } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
-import { linkGhostAccentSm, linkMuted } from "../../shell/link-shell";
+import { linkFocusRing, linkGhostAccentSm, linkMuted } from "../../shell/link-shell";
 import { pageShellStack5 } from "../../shell/page-shell";
 import { panelFlexMinWrapEndP4, panelMinSpace2P4 } from "../../shell/panel-shell";
+import { typePrewrapSmSecondary, typeXsSecondary } from "../../shell/type-shell";
 import {
   type CommunityReportPage,
   type CommunityReportQuery,
@@ -17,8 +18,7 @@ import { communityReportCopy, communityReportError } from "../community-report-c
 import { platformFieldClass, platformRequest } from "../user-platform-client";
 import { getUserPlatformCopy } from "../user-platform-copy";
 
-const filterNavLinkClass =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+const filterNavLinkClass = linkFocusRing;
 
 export function CommunityReportList({
   initial,
@@ -201,11 +201,9 @@ export function CommunityReportList({
                   >
                     {copy[report.targetType]} · {copy[report.type]}
                   </Link>
-                  <span className="text-xs text-secondary">{copy[report.status]}</span>
+                  <span className={typeXsSecondary}>{copy[report.status]}</span>
                 </div>
-                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                  {report.reason}
-                </p>
+                <p className={typePrewrapSmSecondary}>{report.reason}</p>
                 <p className="text-xs text-muted">
                   {copy.created}:{" "}
                   <time dateTime={report.createdAt}>

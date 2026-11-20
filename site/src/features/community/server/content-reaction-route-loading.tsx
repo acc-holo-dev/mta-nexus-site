@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax4xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH24 } from "../../shell/skeleton-shell";
 import { reactionCopy } from "../content-reaction-copy";
 
 type Copy = ReturnType<typeof reactionCopy>;
@@ -39,7 +40,7 @@ function ContentReactionRouteLoading({
     throw new Error("ContentReactionRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-24 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH24} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -69,7 +70,7 @@ export function ReactionsRouteLoading() {
   return ContentReactionRouteLoading({
     headingId: "reactions-loading-heading",
     className: pageShellMax4xl,
-    leading: <div className="h-24 rounded bg-inset" />,
+    leading: <div className={skelH24} />,
     titleKey: "my",
   });
 }

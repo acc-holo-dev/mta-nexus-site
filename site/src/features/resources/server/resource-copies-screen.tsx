@@ -14,6 +14,7 @@ import { linkAccentRounded, linkAccentTightRounded, linkMinH } from "../../shell
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeFlexWrapGap4 } from "../../shell/type-shell";
 import { resourceCopyCopy, resourceCopyError } from "../resource-copy-i18n";
 import {
   resourceCopiesPageParams,
@@ -105,7 +106,7 @@ export async function ResourceCopiesScreen({
         <h1 className="font-display">
           {c.history}: {result.source.title}
         </h1>
-        <form method="get" className="flex flex-wrap gap-4">
+        <form method="get" className={typeFlexWrapGap4}>
           <label htmlFor="copy-days">
             {c.period}
             <select
@@ -173,7 +174,7 @@ export async function ResourceCopiesScreen({
             ))}
           </ul>
         )}
-        <nav className="flex flex-wrap gap-4" aria-label={c.history}>
+        <nav className={typeFlexWrapGap4} aria-label={c.history}>
           {result.page > 1 && (
             <Link href={href(result.page - 1)} className={linkAccentRounded}>
               {c.previous}

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax4xl, pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH10W64, skelH10W72, skelH28 } from "../../shell/skeleton-shell";
 import { getCommerceHistoryCopy } from "../commerce-history-i18n";
 import { getLicenseControlCopy } from "../license-control-i18n";
 import { getLicenseMaintenanceCopy } from "../license-maintenance-i18n";
@@ -39,7 +40,7 @@ function CommerceHistoryRouteLoading({
     throw new Error("CommerceHistoryRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-10 w-64 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH10W64} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -68,7 +69,7 @@ function CommerceHistoryRouteLoading({
 export function AdminOrderCaseDetailRouteLoading() {
   return CommerceHistoryRouteLoading({
     headingId: "admin-order-case-detail-loading-heading",
-    leading: <div className="h-28 rounded bg-inset" />,
+    leading: <div className={skelH28} />,
     title: (locale) => orderCaseCopy(locale).title,
   });
 }
@@ -76,7 +77,7 @@ export function AdminOrderCaseDetailRouteLoading() {
 export function AdminOrderCasesRouteLoading() {
   return CommerceHistoryRouteLoading({
     headingId: "admin-order-cases-loading-heading",
-    leading: <div className="h-10 w-72 rounded bg-inset" />,
+    leading: <div className={skelH10W72} />,
     title: (locale) => orderCaseCopy(locale).queue,
   });
 }
@@ -85,7 +86,7 @@ export function AdminLicenseHistoryRouteLoading() {
   return CommerceHistoryRouteLoading({
     headingId: "admin-license-history-loading-heading",
     className: pageShellMax4xl,
-    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    leading: <div className={skelH10W64} />,
     title: (locale) => getLicenseControlCopy(locale).fullHistory,
   });
 }
@@ -93,7 +94,7 @@ export function AdminLicenseHistoryRouteLoading() {
 export function AdminLicenseDetailRouteLoading() {
   return CommerceHistoryRouteLoading({
     headingId: "admin-license-detail-loading-heading",
-    leading: <div className="h-28 rounded bg-inset" />,
+    leading: <div className={skelH28} />,
     title: (locale) => getLicenseControlCopy(locale).title,
   });
 }
@@ -101,7 +102,7 @@ export function AdminLicenseDetailRouteLoading() {
 export function AdminLicensesRouteLoading() {
   return CommerceHistoryRouteLoading({
     headingId: "admin-licenses-loading-heading",
-    leading: <div className="h-10 w-72 rounded bg-inset" />,
+    leading: <div className={skelH10W72} />,
     title: (locale) => getLicenseControlCopy(locale).title,
   });
 }
@@ -109,7 +110,7 @@ export function AdminLicensesRouteLoading() {
 export function AdminLicenseMaintenanceRouteLoading() {
   return CommerceHistoryRouteLoading({
     headingId: "admin-license-maintenance-loading-heading",
-    leading: <div className="h-10 w-72 rounded bg-inset" />,
+    leading: <div className={skelH10W72} />,
     title: (locale) => getLicenseMaintenanceCopy(locale).maintenance,
   });
 }
@@ -118,7 +119,7 @@ export function LicenseHistoryRouteLoading() {
   return CommerceHistoryRouteLoading({
     headingId: "license-history-loading-heading",
     className: pageShellMax4xl,
-    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    leading: <div className={skelH10W64} />,
     title: (locale) => getLicenseControlCopy(locale).fullHistory,
   });
 }
@@ -127,7 +128,7 @@ export function LicenseDetailRouteLoading() {
   return CommerceHistoryRouteLoading({
     headingId: "license-detail-loading-heading",
     className: pageShellMax4xl,
-    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    leading: <div className={skelH10W64} />,
     title: (locale) => getLicenseControlCopy(locale).title,
   });
 }

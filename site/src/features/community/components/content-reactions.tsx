@@ -11,6 +11,7 @@ import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return
 import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
+import { typeFlexWrapGap2, typeSmSecondary } from "../../shell/type-shell";
 import {
   confirmedReactionMutation,
   type ReactionState,
@@ -159,10 +160,10 @@ export function ContentReactions({
   const shownState = readyScope.current === scope ? state : null;
   return (
     <section className="space-y-3" aria-label={copy.title} aria-busy={pending}>
-      <p className="text-sm text-secondary">
+      <p className={typeSmSecondary}>
         {!shownState ? copy.unknownCounts : shownState.self ? copy.own : copy.choose}
       </p>
-      <div className="flex flex-wrap gap-2">
+      <div className={typeFlexWrapGap2}>
         {CONTENT_REACTIONS.map((reaction) => (
           <Button
             key={reaction}

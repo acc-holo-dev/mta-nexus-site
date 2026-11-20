@@ -17,6 +17,7 @@ import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary, typeMt2SmMuted, typeXsSecondary } from "../../shell/type-shell";
 import { organizationContentId } from "../organization-content-api";
 import { organizationContentCopy } from "../organization-content-copy";
 import { organizationPublicationHistoryCopy } from "../organization-publication-history-copy";
@@ -72,12 +73,12 @@ export async function OrganizationPublications({
       </Link>
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-primary">
+          <h1 className={typeDisplayPrimary}>
             {team.title}
             {result ? `: ${result.organization.name}` : ""}
           </h1>
-          <p className="mt-2 text-sm text-muted">{team.description}</p>
-          <p className="mt-2 text-sm text-muted">{team.notice}</p>
+          <p className={typeMt2SmMuted}>{team.description}</p>
+          <p className={typeMt2SmMuted}>{team.notice}</p>
         </div>
         {result && (
           <Link
@@ -120,7 +121,7 @@ export async function OrganizationPublications({
                         {item.title}
                       </Link>
                     </h2>
-                    <span className="text-xs text-secondary">
+                    <span className={typeXsSecondary}>
                       {copy[item.status as "draft" | "published" | "archived"]}
                     </span>
                   </div>

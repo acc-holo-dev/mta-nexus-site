@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 import { panelSpace4P5 } from "../../shell/panel-shell";
+import { typeSmSecondary } from "../../shell/type-shell";
 import { libraryReleaseComparisonCopy } from "../library-release-comparison-i18n";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
 import { LibraryReleaseCommandStatus, useLibraryReleaseCommand } from "./library-release-command";
@@ -56,7 +57,7 @@ export function LibraryReleaseComparisonSelection({
       <h2>
         {copy.chooseCompared}: {target.version}
       </h2>
-      <p className="text-sm text-secondary">{control.selectNote}</p>
+      <p className={typeSmSecondary}>{control.selectNote}</p>
       <dl className="grid gap-2 text-sm sm:grid-cols-[auto_1fr]">
         <dt>{control.revision}</dt>
         <dd>{selection.revision}</dd>

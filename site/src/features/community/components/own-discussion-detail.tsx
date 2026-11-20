@@ -5,6 +5,7 @@ import { useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { linkAccentSm } from "../../shell/link-shell";
 import { panelClipSpace4P6 } from "../../shell/panel-shell";
+import { typeSmSuccess } from "../../shell/type-shell";
 import type { OwnDiscussion } from "../discussion-workspace-contract";
 import { ownDiscussionCopy } from "../discussion-workspace-copy";
 import { DiscussionCommentActions } from "./discussion-comment-actions";
@@ -23,7 +24,7 @@ export function OwnDiscussionDetail({
   if (removed)
     return (
       <div className={panelClipSpace4P6}>
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {copy.removed}
         </p>
         <Link href="/workspace/discussions" className={linkAccentSm}>
@@ -100,7 +101,7 @@ export function OwnDiscussionDetail({
         }}
       />
       {saved && (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {copy.edited}
         </p>
       )}

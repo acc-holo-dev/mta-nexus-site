@@ -16,6 +16,7 @@ import { linkAccent } from "../../shell/link-shell";
 import { pageShellMax4xlCompact as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace2P4, panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeFlexWrapGap4 } from "../../shell/type-shell";
 import { resourceReviewCopy, resourceReviewState } from "../resource-review-i18n";
 import { resourceReviewPageQuery } from "../resource-review-query";
 import { ResourceReviewDecisionForm } from "../review-controls";
@@ -188,7 +189,7 @@ export async function ResourceReviewReportScreen({
         {copy.back}
       </Link>
       <h1 className="font-display">{staff ? copy.queue : copy.reports}</h1>
-      <nav aria-label={copy.reports} className="flex flex-wrap gap-4">
+      <nav aria-label={copy.reports} className={typeFlexWrapGap4}>
         {(["pending", "history"] as const).map((view) => (
           <Link
             key={view}

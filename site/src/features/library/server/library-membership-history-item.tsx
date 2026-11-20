@@ -3,6 +3,7 @@ import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { linkAccentTight } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
+import { typeBreakAllXs } from "../../shell/type-shell";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../library-collections-query";
@@ -30,7 +31,7 @@ export function LibraryMembershipHistoryEntry({
       <p>
         {h.time}: <time dateTime={item.createdAt}>{item.createdAt}</time>
       </p>
-      <code className="block break-all text-xs">
+      <code className={typeBreakAllXs}>
         {c.receipt}: {item.id}
       </code>
       {!receipt ? (
@@ -41,7 +42,7 @@ export function LibraryMembershipHistoryEntry({
         />
       ) : (
         <>
-          <code className="block break-all text-xs">
+          <code className={typeBreakAllXs}>
             {c.request}: {receipt.requestId}
           </code>
           {resource && (
@@ -63,7 +64,7 @@ export function LibraryMembershipHistoryEntry({
                   description={resource.productId}
                 />
               )}
-              <code className="block break-all text-xs">{resource.productId}</code>
+              <code className={typeBreakAllXs}>{resource.productId}</code>
               {resource.currentAvailable && (
                 <Link
                   href={`/workspace/library/${encodeURIComponent(resource.productId)}/collections`}
@@ -85,7 +86,7 @@ export function LibraryMembershipHistoryEntry({
                     {h.recorded}: {child.collection.name} · {c[child.collection.status]} ·{" "}
                     {c.revision} {child.collection.revision}
                   </p>
-                  <code className="block break-all text-xs">{child.collection.id}</code>
+                  <code className={typeBreakAllXs}>{child.collection.id}</code>
                   <p>
                     {m.before}: {change?.wasInCollection ? m.present : m.absent} · {m.after}:{" "}
                     {change?.inCollection ? m.present : m.absent}
@@ -121,7 +122,7 @@ export function LibraryMembershipHistoryEntry({
                   >
                     {c.history}
                   </Link>
-                  <code className="block break-all text-xs">
+                  <code className={typeBreakAllXs}>
                     {c.receipt}: {child.id}
                   </code>
                 </li>

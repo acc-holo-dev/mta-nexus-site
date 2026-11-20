@@ -18,6 +18,14 @@ import {
 import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
+import {
+  typeFlexWrapGap3,
+  typeGrid2Gap4,
+  typeSemiboldPrimary,
+  typeSmPrimary,
+  typeSmSemiboldPrimary,
+  typeSmSuccess,
+} from "../../shell/type-shell";
 import { communityReportCopy } from "../community-report-copy";
 import { reportGroupsCopy } from "../community-report-groups-copy";
 import type { discussionReportsPageSchema } from "../discussion-reports-contract";
@@ -211,10 +219,10 @@ export function DiscussionReportBatch({
             {commentId === null ? copy.publicationActionHint : copy.noRemoval}
           </p>
           <fieldset disabled={busy || !!preview || blocked} className="space-y-4">
-            <legend className="text-sm text-primary">
+            <legend className={typeSmPrimary}>
               {copy.selected}: {selected.length}
             </legend>
-            <div className="flex flex-wrap gap-3">
+            <div className={typeFlexWrapGap3}>
               <Button
                 type="button"
                 className={linkGhostAccentSm}
@@ -238,7 +246,7 @@ export function DiscussionReportBatch({
                 {copy.clear}
               </Button>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className={typeGrid2Gap4}>
               <label className="space-y-1 text-sm text-primary">
                 <span>{copy.action}</span>
                 <select
@@ -314,7 +322,7 @@ export function DiscussionReportBatch({
         />
       ) : null}
       {saved && (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {copy.saved}
         </p>
       )}
@@ -330,9 +338,9 @@ export function DiscussionReportBatch({
       ) : null}
       {preview && (
         <div className={panelSpace4P5}>
-          <h3 className="font-semibold text-primary">{copy.previewTitle}</h3>
+          <h3 className={typeSemiboldPrimary}>{copy.previewTitle}</h3>
           <p className="break-words text-sm text-primary">{preview.publication.title}</p>
-          <p className="text-sm font-semibold text-primary">
+          <p className={typeSmSemiboldPrimary}>
             {commentId === null ? copy.publication : copy.comment}
           </p>
           <p className="whitespace-pre-wrap break-words text-sm text-primary">
@@ -377,7 +385,7 @@ export function DiscussionReportBatch({
           >
             {copy.commitConfirm}
           </ActionConfirmCheckbox>
-          <div className="flex flex-wrap gap-3">
+          <div className={typeFlexWrapGap3}>
             <Button
               type="button"
               disabled={busy || blocked || !commitAcknowledged}
@@ -416,7 +424,7 @@ export function DiscussionReportBatch({
                   </span>
                 </label>
               )}
-              <p className="text-sm font-semibold text-primary">
+              <p className={typeSmSemiboldPrimary}>
                 {labels[item.type]} · {labels[item.status]}
               </p>
               <p className="whitespace-pre-wrap break-words text-sm text-primary">{item.reason}</p>

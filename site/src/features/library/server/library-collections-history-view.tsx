@@ -4,6 +4,7 @@ import { formatUnknown } from "../../../lib/i18n/unknown";
 import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
 import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelSpace2P4 } from "../../shell/panel-shell";
+import { typeDisplayPrimary } from "../../shell/type-shell";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import {
   collectionReceiptHref,
@@ -41,7 +42,7 @@ export async function LibraryCollectionsHistoryView({
       <Link href={collectionHref(id)} className={libraryCollectionsLinkClass}>
         {c.back}
       </Link>
-      <h1 className="font-display text-primary">
+      <h1 className={typeDisplayPrimary}>
         {c.history}: {result.collection.name}
       </h1>
       <Link

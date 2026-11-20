@@ -15,6 +15,7 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xlCompact as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeSmSecondary } from "../../shell/type-shell";
 export async function libraryReviewsMetadata(): Promise<Metadata> {
   return {
     title: `${resourceReviewCopy(await getRequestLocale()).own} | MTA NEXUS`,
@@ -87,7 +88,7 @@ export async function LibraryReviewsScreen({
         {copy.back}
       </Link>
       <h1 className="min-w-0 break-words font-display">{copy.own}</h1>
-      <p className="text-sm text-secondary">{copy.subtitle}</p>
+      <p className={typeSmSecondary}>{copy.subtitle}</p>
       <Link href="/workspace/review-reports" className={linkAccentSmRounded}>
         {copy.reports}
       </Link>

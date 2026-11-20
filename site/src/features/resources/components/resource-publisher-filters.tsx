@@ -2,13 +2,13 @@ import { PRODUCT_TYPES, type PublisherResourceQuery, RESOURCE_READINESS } from "
 import { Button, Input } from "@nexus/ui";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
-import { linkAccentTightSm } from "../../shell/link-shell";
+import { linkAccentTightSm, linkFocusRing } from "../../shell/link-shell";
+import { typeFlexWrapGap2 } from "../../shell/type-shell";
 import { PRODUCT_PUBLISHING_KEYS } from "../product-type-labels";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 import { resourcePublisherUrl } from "../resource-publisher-query";
 
-const filterNavLinkClass =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+const filterNavLinkClass = linkFocusRing;
 
 const controlClass =
   "min-h-11 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
@@ -122,7 +122,7 @@ export function ResourcePublisherFilters({
           </div>
         </form>
       </search>
-      <nav aria-label={labels.status} className="flex flex-wrap gap-2">
+      <nav aria-label={labels.status} className={typeFlexWrapGap2}>
         {(["all", "draft", "pending_review", "published", "suspended", "archived"] as const).map(
           (status) => (
             <Link

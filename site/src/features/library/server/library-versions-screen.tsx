@@ -20,6 +20,11 @@ import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass, pageShellStack3 } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typePrewrapSmSecondary,
+  typeSemiboldPrimary,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { libraryReleaseComparisonCopy } from "../library-release-comparison-i18n";
 import { LibraryReleaseSelectionControls } from "../release-selection";
@@ -131,13 +136,13 @@ export async function LibraryVersionsScreen({
           {copy.open}
         </Link>
       ) : null}
-      <p role="note" className="text-sm text-secondary">
+      <p role="note" className={typeSmSecondary}>
         {copy.selectNote}
       </p>
-      <p role="note" className="text-sm text-secondary">
+      <p role="note" className={typeSmSecondary}>
         {copy.latestNote}
       </p>
-      <p className="text-sm text-secondary">
+      <p className={typeSmSecondary}>
         {result.selection.mode === "fixed" ? copy.selected : copy.latest}:{" "}
         {current?.version ?? copy.unavailable}
       </p>
@@ -195,8 +200,8 @@ export async function LibraryVersionsScreen({
         }))}
       />
       <section className={panelClipSpace3P5}>
-        <h2 className="font-semibold text-primary">{watchesCopy.title}</h2>
-        <p className="text-sm text-secondary">{watchesCopy.note}</p>
+        <h2 className={typeSemiboldPrimary}>{watchesCopy.title}</h2>
+        <p className={typeSmSecondary}>{watchesCopy.note}</p>
         <p className="text-xs text-muted">{watchesCopy.pinned}</p>
         <ResourceReleaseWatchControl
           key={`${id}:${watch.revision}`}
@@ -211,7 +216,7 @@ export async function LibraryVersionsScreen({
         <ol className={pageShellStack3}>
           {result.versions.map((version) => (
             <li key={version.id} className={panelClipSpace3P5}>
-              <h3 className="font-semibold text-primary">{version.version}</h3>
+              <h3 className={typeSemiboldPrimary}>{version.version}</h3>
               <p className="text-xs text-muted">
                 {copy.publication}:{" "}
                 <time dateTime={version.createdAt.toISOString()}>
@@ -227,9 +232,7 @@ export async function LibraryVersionsScreen({
                 </Link>
               )}
               {version.releaseNotes ? (
-                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                  {version.releaseNotes}
-                </p>
+                <p className={typePrewrapSmSecondary}>{version.releaseNotes}</p>
               ) : null}
               <BuildProvenanceDetails
                 build={{

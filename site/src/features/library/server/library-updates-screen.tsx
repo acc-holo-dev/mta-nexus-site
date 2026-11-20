@@ -15,6 +15,13 @@ import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapGap3,
+  typeFlexWrapGap4,
+  typeGrid2Gap4,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { LibraryReleaseFollowLatest } from "../release-follow";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
 
@@ -80,14 +87,14 @@ export async function LibraryUpdatesScreen({
       <Link href="/workspace/library" className={linkAccentSm}>
         {copy.library}
       </Link>
-      <h1 className="font-display text-primary">{copy.updates}</h1>
-      <p role="note" className="text-sm text-secondary">
+      <h1 className={typeDisplayPrimary}>{copy.updates}</h1>
+      <p role="note" className={typeSmSecondary}>
         {copy.selectNote}
       </p>
-      <p role="note" className="text-sm text-secondary">
+      <p role="note" className={typeSmSecondary}>
         {copy.latestNote}
       </p>
-      <nav aria-label={copy.updates} className="flex flex-wrap gap-3">
+      <nav aria-label={copy.updates} className={typeFlexWrapGap3}>
         {LIBRARY_RELEASE_FILTERS.map((value) => (
           <Link
             key={value}
@@ -100,7 +107,7 @@ export async function LibraryUpdatesScreen({
         ))}
       </nav>
       {result.items.length ? (
-        <ul className="grid gap-4 sm:grid-cols-2">
+        <ul className={typeGrid2Gap4}>
           {result.items.map((item) => {
             const version = item.mode === "fixed" ? item.selectedVersion : item.latestVersion;
             const buildId = item.mode === "fixed" ? item.selectedBuildId : item.latestBuildId;
@@ -116,7 +123,7 @@ export async function LibraryUpdatesScreen({
                     ? copy.privateResource
                     : (item.title ?? copy.privateResource)}
                 </h2>
-                <p className="text-sm text-secondary">{copy[item.state]}</p>
+                <p className={typeSmSecondary}>{copy[item.state]}</p>
                 {item.latestVersion && item.latestBuildId ? (
                   <p className="text-sm">
                     {copy.latest}: {item.latestVersion}
@@ -156,7 +163,7 @@ export async function LibraryUpdatesScreen({
                   available={item.state !== "unavailable"}
                   hasAccess={item.hasAccess !== false}
                 />
-                <div className="flex flex-wrap gap-4">
+                <div className={typeFlexWrapGap4}>
                   {item.slug && item.state !== "unavailable" ? (
                     <Link
                       href={`/market/${encodeURIComponent(item.slug)}`}

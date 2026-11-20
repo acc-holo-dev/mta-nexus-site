@@ -11,6 +11,7 @@ import {
 } from "../../shell/action-confirm-checkbox";
 import { linkAccentRounded, linkAccentSmRounded, linkAccentTight } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
+import { typeBreakAllXs } from "../../shell/type-shell";
 import { libraryCollectionManifestsCopy } from "../library-collection-manifests-i18n";
 import {
   collectionReceiptHref,
@@ -165,7 +166,7 @@ export function LibraryCollectionReconcileForm({
       <p>
         {c.destination}: {shown.collection.name} · {c.revision} {shown.collection.revision}
       </p>
-      <code className="block break-all text-xs">{shown.collection.id}</code>
+      <code className={typeBreakAllXs}>{shown.collection.id}</code>
       <p>
         {c.add}: {adds.length} · {c.remove}: {removes.length} · {c.selected}: {shownIds.length} /{" "}
         {shown.batchLimit}
@@ -210,7 +211,7 @@ export function LibraryCollectionReconcileForm({
                   <span>
                     {item.canAdd ? c.add : c.remove}:{" "}
                     {item.available ? (item.title ?? c.unavailable) : c.unavailable}
-                    <code className="block break-all text-xs">{item.productId}</code>
+                    <code className={typeBreakAllXs}>{item.productId}</code>
                   </span>
                 </label>
               </li>
@@ -294,7 +295,7 @@ export function LibraryCollectionReconcileForm({
           <p role="status" aria-live="polite">
             {c.saved}
           </p>
-          <code className="block break-all text-xs">
+          <code className={typeBreakAllXs}>
             {c.receipt}: {saved}
           </code>
           <a href={collectionReceiptHref(saved)} className={linkAccentTight}>

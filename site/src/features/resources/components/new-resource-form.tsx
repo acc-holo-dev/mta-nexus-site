@@ -6,6 +6,7 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax2xlStandard } from "../../shell/page-shell";
 import { panelGridClipShadow } from "../../shell/panel-shell";
+import { typeDisplayPrimary, typeSmSecondary } from "../../shell/type-shell";
 import { confirmedAuthorBuild } from "../author-resource-response";
 import { MAX_BUILD_FILE_SIZE_BYTES, validateBuildFileSelection } from "../build-file-validation";
 import { buildPackageCopy } from "../build-package-i18n";
@@ -385,7 +386,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
   return (
     <div className={pageShellMax2xlStandard}>
       <div className="space-y-1.5">
-        <h1 className="font-display text-primary">{copy.resourceTitle}</h1>
+        <h1 className={typeDisplayPrimary}>{copy.resourceTitle}</h1>
         <p className="max-w-xl text-sm leading-relaxed text-muted">{copy.resourceDescription}</p>
       </div>
 
@@ -394,7 +395,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
       ) : null}
       {createdProduct && (
         <div className="flex flex-col gap-3 rounded-lg border border-base bg-inset p-4 sm:flex-row sm:items-center sm:justify-between">
-          <p role="status" className="text-sm text-secondary">
+          <p role="status" className={typeSmSecondary}>
             {copy.buildRetryReady} {copy.pendingDraftLabel} {createdProduct.slug}
           </p>
           <Button

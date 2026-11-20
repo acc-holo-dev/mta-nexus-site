@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax4xlTight } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH28 } from "../../shell/skeleton-shell";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 
 type Copy = ReturnType<typeof libraryCollectionHistoryCopy>;
@@ -39,7 +40,7 @@ function LibraryCollectionHistoryRouteLoading({
     throw new Error("LibraryCollectionHistoryRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-28 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH28} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -69,7 +70,7 @@ export function CollectionHistoryIndexRouteLoading() {
   return LibraryCollectionHistoryRouteLoading({
     headingId: "collection-history-loading-heading",
     className: pageShellMax4xlTight,
-    leading: <div className="h-28 rounded bg-inset" />,
+    leading: <div className={skelH28} />,
     titleKey: "title",
   });
 }

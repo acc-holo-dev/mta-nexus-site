@@ -17,6 +17,7 @@ import {
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeBreakAllXs, typeFlexWrapEndGap3 } from "../../shell/type-shell";
 import { collectionPageParams } from "../library-collections-query";
 import { libraryReleaseHistoryCopy } from "../library-release-history-i18n";
 import { libraryReleaseHistoryQuery } from "../library-release-history-query";
@@ -108,7 +109,7 @@ export async function LibraryReleaseHistoryScreen({
       </Link>
       <h1 className="font-display">{c.title}</h1>
       <p className="text-secondary">{c.note}</p>
-      <form method="get" className="flex flex-wrap items-end gap-3">
+      <form method="get" className={typeFlexWrapEndGap3}>
         <label className="grid gap-1">
           {c.days}
           <select name="days" defaultValue={result.days}>
@@ -164,7 +165,7 @@ export async function LibraryReleaseHistoryScreen({
                 {c.current}: {item.currentTitle}
               </h2>
             )}
-            <code className="block break-all text-xs">{item.productId}</code>
+            <code className={typeBreakAllXs}>{item.productId}</code>
             <p>{c[item.source]}</p>
             {item.selection && (
               <>

@@ -6,6 +6,7 @@ import { type FormEvent, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
+import { typeSmSecondary } from "../../shell/type-shell";
 import { formatHistoryAmount } from "../commerce-history-format";
 import { confirmedCommercialEstimate, parseCommercialAmount } from "../commercial-confirmation";
 import { commercialError, getCommercialCopy } from "../commercial-i18n";
@@ -147,7 +148,7 @@ export function CommercialFeeCalculator({ plans }: { plans: Plan[] }) {
           </dl>
         </div>
       ) : null}
-      <p className="text-sm text-secondary">{copy.hold}</p>
+      <p className={typeSmSecondary}>{copy.hold}</p>
       <p role="note" className="text-sm text-muted">
         {copy.estimateNote}
       </p>

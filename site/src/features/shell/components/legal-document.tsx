@@ -1,4 +1,5 @@
 import { panelP5 } from "../panel-shell";
+import { typeCaptionFaint } from "../type-shell";
 
 type LegalSection = Readonly<{
   title: string;
@@ -30,7 +31,7 @@ export function LegalDocument({
         <p className="font-label uppercase text-accent">{badge}</p>
         <h1 className="text-3xl font-black text-primary">{title}</h1>
         <p className="max-w-2xl text-muted">{lead}</p>
-        <p className="font-caption text-faint">
+        <p className={typeCaptionFaint}>
           {lastUpdatedLabel}: {updated}
         </p>
       </header>

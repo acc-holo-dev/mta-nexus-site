@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax3xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH10W64, skelH24, skelH28 } from "../../shell/skeleton-shell";
 import { profilePrivacyCopy } from "../profile-privacy-copy";
 
 type Copy = ReturnType<typeof profilePrivacyCopy>;
@@ -39,7 +40,7 @@ function ProfilePrivacyRouteLoading({
     throw new Error("ProfilePrivacyRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-10 w-64 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH10W64} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -72,9 +73,9 @@ export function AccountsPrivacyRouteLoading() {
     rows: 0,
     leading: (
       <>
-        <div className="h-28 rounded bg-inset" />
-        <div className="h-24 rounded bg-inset" />
-        <div className="h-24 rounded bg-inset" />
+        <div className={skelH28} />
+        <div className={skelH24} />
+        <div className={skelH24} />
       </>
     ),
     titleKey: "title",

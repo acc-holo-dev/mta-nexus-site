@@ -1,6 +1,7 @@
 import { ErrorState } from "@nexus/ui";
 import { Fingerprint, ShieldCheck } from "lucide-react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
+import { typeFlexCenterGap2 } from "../../shell/type-shell";
 import { getBuildProvenance } from "../model/build-provenance";
 
 const toneClass = {
@@ -62,7 +63,7 @@ export function BuildProvenanceDetails({
       className="rounded-lg border border-base bg-surface"
     >
       <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3 py-2 text-[11px] font-semibold text-secondary">
-        <span className="flex items-center gap-2">
+        <span className={typeFlexCenterGap2}>
           <Fingerprint className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
           {copy.title}
         </span>

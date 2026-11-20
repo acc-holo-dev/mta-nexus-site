@@ -7,6 +7,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax3xlTight as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary } from "../../shell/type-shell";
 import { AuthorContentForm } from "../author-content-form";
 import { getUserPlatformCopy } from "../user-platform-copy";
 export async function newPublicationMetadata(): Promise<Metadata> {
@@ -38,7 +39,7 @@ export async function NewPublicationPage() {
       <Link href="/workspace/content" className={linkAccentSm}>
         {copy.back}
       </Link>
-      <h1 className="font-display text-primary">{copy.create}</h1>
+      <h1 className={typeDisplayPrimary}>{copy.create}</h1>
       <AuthorContentForm locale={locale} />
     </div>
   );

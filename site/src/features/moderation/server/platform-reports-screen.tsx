@@ -11,6 +11,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentMinHInline, linkAccentSm, linkAccentSmPlain } from "../../shell/link-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeSmSecondary, typeSmSemiboldPrimary } from "../../shell/type-shell";
 import { platformReportCopy } from "../platform-report-i18n";
 
 function statusTone(status: string): "warning" | "success" | "danger" | "neutral" {
@@ -100,12 +101,12 @@ export async function PlatformReportsScreen({
             </span>
           </div>
           {report.targetPreview?.title ? (
-            <p className="text-sm font-semibold text-primary">{report.targetPreview.title}</p>
+            <p className={typeSmSemiboldPrimary}>{report.targetPreview.title}</p>
           ) : null}
           {report.targetPreview?.detail ? (
-            <p className="text-sm text-secondary">{report.targetPreview.detail}</p>
+            <p className={typeSmSecondary}>{report.targetPreview.detail}</p>
           ) : null}
-          <p className="text-sm text-secondary">{report.reason}</p>
+          <p className={typeSmSecondary}>{report.reason}</p>
           <p className="text-xs text-faint">
             {copy.submitted}: {new Date(report.createdAt).toLocaleString(dateLocale)}
           </p>
@@ -175,7 +176,7 @@ export async function PlatformReportsScreen({
                   status={copy.statuses[report.status] ?? report.status}
                   tone={statusTone(report.status)}
                 />
-                <span className="text-sm font-semibold text-primary">
+                <span className={typeSmSemiboldPrimary}>
                   {report.targetPreview?.title ?? report.targetId}
                 </span>
                 <span className="text-xs text-muted">

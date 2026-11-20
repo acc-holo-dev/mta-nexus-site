@@ -13,6 +13,12 @@ import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax5xlLoose as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceP4TextSmSecondary } from "../../shell/surface-shell";
+import {
+  typePrewrapBreak,
+  typePrewrapSmSecondary,
+  typeSemiboldPrimary,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { AuthorResourceForms, RetireBuildForm } from "../author-controls";
 import { ResourceLifecycleControls } from "../lifecycle-controls";
 import { ResourcePublicationReadinessPanel } from "../publisher-view";
@@ -132,7 +138,7 @@ export async function ResourceManageScreen({
                       ? commerceCopy.restore
                       : commerceCopy.submit}
                 </p>
-                <p className="whitespace-pre-wrap break-words">
+                <p className={typePrewrapBreak}>
                   {typeof event.details?.reason === "string" ? event.details.reason : ""}
                 </p>
                 <time dateTime={new Date(event.createdAt).toISOString()}>
@@ -165,7 +171,7 @@ export async function ResourceManageScreen({
             {history.builds.map((build) => (
               <li key={build.id} className="space-y-3 rounded-lg border border-base bg-surface p-5">
                 <div className="flex flex-wrap justify-between gap-2">
-                  <h3 className="font-semibold text-primary">{build.version}</h3>
+                  <h3 className={typeSemiboldPrimary}>{build.version}</h3>
                   <time
                     dateTime={new Date(build.createdAt).toISOString()}
                     className="text-sm text-muted"
@@ -175,15 +181,13 @@ export async function ResourceManageScreen({
                     )}
                   </time>
                 </div>
-                <p className="text-sm text-secondary">
+                <p className={typeSmSecondary}>
                   {copy.buildLabels[build.status]} · {copy.scan}:{" "}
                   {copy.scanLabels[build.scanStatus as keyof typeof copy.scanLabels] ??
                     copy.scanLabels.unknown}
                 </p>
                 {build.releaseNotes && (
-                  <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                    {build.releaseNotes}
-                  </p>
+                  <p className={typePrewrapSmSecondary}>{build.releaseNotes}</p>
                 )}
                 {build.status === "quarantined" && build.quarantineReason && (
                   <ErrorState
@@ -204,7 +208,7 @@ export async function ResourceManageScreen({
                         {buildCopy.actions[decision.action as keyof typeof buildCopy.actions] ??
                           decision.action}
                       </p>
-                      <p className="whitespace-pre-wrap break-words">
+                      <p className={typePrewrapBreak}>
                         {typeof decision.details?.notes === "string"
                           ? decision.details.notes
                           : typeof decision.details?.reason === "string"

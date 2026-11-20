@@ -14,6 +14,7 @@ import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelMinSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeFlexWrapGap3, typeFlexWrapGap4Sm } from "../../shell/type-shell";
 import { StorageDiscoveryControls } from "../storage-maintenance";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 import { storageQuery } from "../storage-maintenance-query";
@@ -110,7 +111,7 @@ export async function StaffStorageScreen({
       <p>
         {copy.deletedBytes}: {result.deletedBytes}
       </p>
-      <nav className="flex flex-wrap gap-3" aria-label={copy.status}>
+      <nav className={typeFlexWrapGap3} aria-label={copy.status}>
         {Object.entries(copy.states).map(([view, label]) => (
           <Link
             key={view}
@@ -157,7 +158,7 @@ export async function StaffStorageScreen({
         />
       )}
       {result.totalPages > 1 && (
-        <nav className="flex flex-wrap gap-4 text-sm" aria-label={copy.inventory}>
+        <nav className={typeFlexWrapGap4Sm} aria-label={copy.inventory}>
           {result.page > 1 ? (
             <Link href={href(result.page - 1)} className={linkAccentSm}>
               {copy.previous}

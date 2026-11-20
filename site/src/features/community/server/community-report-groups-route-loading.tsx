@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax4xlTight, pageShellMax5xlTight } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH24, skelH32 } from "../../shell/skeleton-shell";
 import { reportGroupsCopy } from "../community-report-groups-copy";
 
 type Copy = ReturnType<typeof reportGroupsCopy>;
@@ -40,7 +41,7 @@ function CommunityReportGroupsRouteLoading({
     throw new Error("CommunityReportGroupsRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-32 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH32} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -71,7 +72,7 @@ export function AdminPublicationReportsRouteLoading() {
     headingId: "admin-publication-reports-loading-heading",
     className: pageShellMax4xlTight,
     titleClassName: "text-2xl font-extrabold text-primary",
-    leading: <div className="h-24 rounded bg-inset" />,
+    leading: <div className={skelH24} />,
     titleKey: "publicationTitle",
     loadingKey: "publicationLoading",
   });
@@ -81,7 +82,7 @@ export function ReportGroupsRouteLoading() {
   return CommunityReportGroupsRouteLoading({
     headingId: "report-groups-loading-heading",
     className: pageShellMax5xlTight,
-    leading: <div className="h-32 rounded bg-inset" />,
+    leading: <div className={skelH32} />,
     titleKey: "title",
   });
 }

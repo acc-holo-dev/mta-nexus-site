@@ -1,6 +1,7 @@
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { KeyRound } from "lucide-react";
 import type { licenseControlService } from "../../../lib/services/commerce/license-control-service";
+import { typeSmSecondary } from "../../shell/type-shell";
 import { formatHistoryDate, licenseStatusLabel } from "../commerce-history-format";
 import { getCommerceHistoryCopy } from "../commerce-history-i18n";
 import { getLicenseControlCopy, licenseActionLabel } from "../license-control-i18n";
@@ -59,7 +60,7 @@ export function LicenseDetailView({ license, locale }: { license: Detail; locale
       </dl>
       {license.boundServerId ? (
         license.bindingReady ? (
-          <p className="text-sm text-secondary">{copy.available}</p>
+          <p className={typeSmSecondary}>{copy.available}</p>
         ) : (
           <ErrorState
             id="license-binding-changed"

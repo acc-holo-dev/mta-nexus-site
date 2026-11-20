@@ -2,6 +2,7 @@ import type { ManagedServerItem } from "@nexus/db";
 import { StatusBadge } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
+import { typeFlexWrapGap3, typeXsSecondary } from "../../shell/type-shell";
 import { getManagedServerCopy } from "../managed-server-view";
 import { type MtaMasterServer, mtaLiveStatus } from "../model";
 import { getServerActivityCopy } from "../server-activity-view";
@@ -64,12 +65,12 @@ export function ManagedServerCard({
             tone={live === "online" ? "success" : live === "offline" ? "danger" : "neutral"}
           />
           {players != null && (
-            <span className="text-xs text-secondary">
+            <span className={typeXsSecondary}>
               {players} {copy.players}
             </span>
           )}
         </div>
-        <div className="flex flex-wrap gap-3">
+        <div className={typeFlexWrapGap3}>
           <Link
             href={`/workspace/servers/${encodeURIComponent(server.id)}/content`}
             className={linkClass}

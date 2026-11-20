@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
-
 import { linkAccentTightSm } from "../../shell/link-shell";
+import { typeSmSecondary } from "../../shell/type-shell";
 export function ProfileResourcePagination({
   basePath,
   page,
@@ -51,7 +51,7 @@ export function ProfileResourcePagination({
       ) : (
         <span />
       )}
-      <span className="text-sm text-secondary">
+      <span className={typeSmSecondary}>
         {copy.pageLabel} {page} / {totalPages}
       </span>
       {page < totalPages ? (

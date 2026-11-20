@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { panelSpace3P4 } from "../../shell/panel-shell";
+import { typeFlexWrapGap2, typeXsSecondary } from "../../shell/type-shell";
 import { mtaEndpointKey } from "../model/mta-listing-profile-map";
 import type { MtaMasterServer } from "../model/mta-master-directory-shared";
 
@@ -97,7 +98,7 @@ function ServerCard({
             className={`${controlClass} mt-1 w-full font-mono`}
           />
         </label>
-        <div className="flex flex-wrap gap-2">
+        <div className={typeFlexWrapGap2}>
           <a
             href={`mtasa://${server.address}:${server.port}`}
             aria-label={`${copy.connect}: ${name}`}
@@ -285,7 +286,7 @@ export function MtaMasterServerDirectory({
               />
             </div>
 
-            <label className="text-xs text-secondary">
+            <label className={typeXsSecondary}>
               {copy.minimumPlayers}
               <select
                 value={minimumPlayers}
@@ -301,7 +302,7 @@ export function MtaMasterServerDirectory({
             </label>
           </div>
         </search>
-        <p className="text-xs text-secondary">{copy.connectHint}</p>
+        <p className={typeXsSecondary}>{copy.connectHint}</p>
       </div>
 
       {directory?.isStale && !loading ? (
@@ -380,7 +381,7 @@ export function MtaMasterServerDirectory({
             <ChevronLeft className="h-4 w-4" aria-hidden="true" />
             {copy.previous}
           </Button>
-          <span className="text-xs text-secondary">
+          <span className={typeXsSecondary}>
             {copy.page} {page + 1} {copy.of} {totalPages}
           </span>
           <Button

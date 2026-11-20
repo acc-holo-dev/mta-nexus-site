@@ -20,6 +20,12 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace2P4, panelSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import {
+  type2xlBoldPrimary,
+  typeFlexWrapGap4,
+  typeSemiboldPrimary,
+  typeSmPrimary,
+} from "../../shell/type-shell";
 import { publicationSupportHref } from "../../support/support-workspace-contract";
 import { parseAuthorPublicationHistoryQuery } from "../author-publication-desk-contract";
 import { authorPublicationDeskCopy } from "../author-publication-desk-copy";
@@ -100,7 +106,7 @@ export async function ContextPublicationHistoryScreen({
         {workspaceTitle}
       </Link>
       <header className="space-y-2">
-        <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
+        <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
         <p className="text-sm text-muted">{copy.description}</p>
         {data && (
           <p className="break-words font-semibold text-primary">
@@ -149,7 +155,7 @@ export async function ContextPublicationHistoryScreen({
             <ol className="space-y-3">
               {data.events.map((event) => (
                 <li key={event.id} className={panelClipSpace2P4}>
-                  <p className="font-semibold text-primary">{history[event.kind]}</p>
+                  <p className={typeSemiboldPrimary}>{history[event.kind]}</p>
                   <time dateTime={event.createdAt} className="text-xs text-muted">
                     {new Date(event.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                       timeZone: "UTC",
@@ -172,7 +178,7 @@ export async function ContextPublicationHistoryScreen({
                     </Link>
                   )}
                   {(event.from || event.to) && (
-                    <p className="text-sm text-primary">
+                    <p className={typeSmPrimary}>
                       {event.from ? labels[event.from] : ""}
                       {event.from && event.to ? " → " : ""}
                       {event.to ? labels[event.to] : ""}
@@ -182,7 +188,7 @@ export async function ContextPublicationHistoryScreen({
               ))}
             </ol>
           )}
-          <nav aria-label={copy.title} className="flex flex-wrap gap-4">
+          <nav aria-label={copy.title} className={typeFlexWrapGap4}>
             <Link prefetch={false} href={path} className={linkAccentSmRounded}>
               {history.historyLatest}
             </Link>

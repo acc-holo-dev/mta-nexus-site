@@ -23,8 +23,8 @@ it("locks verification amend failure notice to ErrorState with stable id", () =>
 
 it("keeps successful verification amend confirmation on role=status", () => {
   expect(source).toContain('role="status"');
-  expect(source).toContain("text-success");
+  expect(source).toMatch(/text-success|typeSmSuccess/);
   expect(source).toMatch(
-    /\{notice && saved \? \(\s*<p role="status" className="text-sm text-success">\s*\{notice\}\s*<\/p>\s*\) : null\}/u,
+    /\{notice && saved \? \(\s*<p role="status" className=\{?(?:"text-sm text-success"|typeSmSuccess)\}?>\s*\{notice\}\s*<\/p>\s*\) : null\}/u,
   );
 });

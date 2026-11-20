@@ -6,6 +6,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { contentService } from "../../../lib/services/community/content-service";
 import { linkAccentSm, linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellStack6 } from "../../shell/page-shell";
+import { typeFlexWrapGap4 } from "../../shell/type-shell";
 import { ContentCatalogControls, ContentPageNavigation } from "../catalog-controls";
 import { publicationCopy } from "../publication-feed-copy";
 import { communityTypes, contentPageHref, parseContentPage } from "../user-platform-contract";
@@ -49,7 +50,7 @@ export async function CommunityPage({
         </Link>
       </header>
 
-      <div className="flex flex-wrap gap-4">
+      <div className={typeFlexWrapGap4}>
         <Link href="/workspace/content" className={linkAccentSm}>
           {platformCopy.studio}
         </Link>

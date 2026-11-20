@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax5xl, pageShellMax5xlTight } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH10W72, skelH28 } from "../../shell/skeleton-shell";
 import { resourceReleaseWatchesCopy } from "../resource-release-watches-i18n";
 
 type Copy = ReturnType<typeof resourceReleaseWatchesCopy>;
@@ -40,7 +41,7 @@ function ResourceReleaseWatchesRouteLoading({
     throw new Error("ResourceReleaseWatchesRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-28 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH28} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -71,7 +72,7 @@ export function CollectionWatchesRouteLoading() {
     headingId: "collection-watches-loading-heading",
     className: pageShellMax5xl,
     rows: 4,
-    leading: <div className="h-10 w-72 rounded bg-inset" />,
+    leading: <div className={skelH10W72} />,
     titleKey: "title",
   });
 }
@@ -81,7 +82,7 @@ export function ReleaseWatchesRouteLoading() {
     headingId: "release-watches-loading-heading",
     className: pageShellMax5xlTight,
     rowClassName: "h-24 rounded bg-inset",
-    leading: <div className="h-28 rounded bg-inset" />,
+    leading: <div className={skelH28} />,
     titleKey: "title",
   });
 }

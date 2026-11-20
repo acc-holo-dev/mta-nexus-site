@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellStack6 } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH11Max } from "../../shell/skeleton-shell";
 import { discoveryCopy } from "../discovery-copy";
 
 type Copy = ReturnType<typeof discoveryCopy>;
@@ -39,11 +40,7 @@ function DiscoveryRouteLoading({
     throw new Error("DiscoveryRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? (
-      <div className="h-11 max-w-full rounded bg-inset" />
-    ) : (
-      (leading ?? undefined)
-    );
+    leading === undefined ? <div className={skelH11Max} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -75,7 +72,7 @@ export function DiscoveryOrganizationsRouteLoading() {
     className: pageShellStack6,
     rowClassName: "h-24 max-w-full rounded bg-inset",
     rows: 4,
-    leading: <div className="h-11 max-w-full rounded bg-inset" />,
+    leading: <div className={skelH11Max} />,
     titleKey: "organizationsTitle",
     loadingKey: "organizationsLoading",
   });

@@ -4,6 +4,12 @@ import type { Locale } from "../../../lib/i18n";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax4xlTight as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace3P5, panelClipSpace3P6, panelClipSpace4P5 } from "../../shell/panel-shell";
+import {
+  type2xlExtraboldPrimary,
+  typeGrid2Gap4,
+  typeHeadingPrimary,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import type { PublicUserTrust } from "../public-user-trust-contract";
 import { trustCopy } from "../public-user-trust-copy";
 import { approvalCopy } from "../public-verification-history-copy";
@@ -37,14 +43,14 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
             <p className="truncate text-sm text-muted">@{data.user.username}</p>
           </div>
         </div>
-        <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
+        <h1 className={type2xlExtraboldPrimary}>{copy.title}</h1>
         <p className="text-sm text-muted">{copy.description}</p>
         <p className="text-xs text-muted">{copy.source}</p>
       </header>
       <div className="grid min-w-0 gap-4 overflow-x-clip sm:grid-cols-2">
         {(["identity", "developer"] as const).map((kind) => (
           <section key={kind} className={panelClipSpace3P5}>
-            <h2 className="font-heading text-primary">{copy[kind]}</h2>
+            <h2 className={typeHeadingPrimary}>{copy[kind]}</h2>
             <p
               className={
                 data[kind].verified ? "text-sm font-semibold text-success" : "text-sm text-muted"
@@ -52,7 +58,7 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
             >
               {data[kind].verified ? copy.verified : copy.notVerified}
             </p>
-            <p className="text-sm text-secondary">
+            <p className={typeSmSecondary}>
               {copy[kind === "identity" ? "identityScope" : "developerScope"]}
             </p>
             {data[kind].verified && (
@@ -73,17 +79,17 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
         ))}
       </div>
       <section className={panelClipSpace3P5}>
-        <h2 className="font-heading text-primary">{copy.joined}</h2>
-        <time className="text-sm text-secondary" dateTime={data.user.joinedAt}>
+        <h2 className={typeHeadingPrimary}>{copy.joined}</h2>
+        <time className={typeSmSecondary} dateTime={data.user.joinedAt}>
           {date(data.user.joinedAt)}
         </time>
         <p className="text-xs text-muted">{copy.joinedScope}</p>
       </section>
       <section className={panelClipSpace4P5}>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className={typeGrid2Gap4}>
           {(["servers", "organizations"] as const).map((kind) => (
             <div key={kind} className="min-w-0">
-              <h2 className="font-heading text-primary">{copy[kind]}</h2>
+              <h2 className={typeHeadingPrimary}>{copy[kind]}</h2>
               <p className="mt-2 font-numeric text-2xl font-bold text-primary">
                 {data[kind].total}
               </p>
@@ -96,7 +102,7 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
         <p className="text-xs text-muted">{copy.ownershipScope}</p>
       </section>
       <section className={panelClipSpace3P5}>
-        <h2 className="font-heading text-primary">{copy.publications}</h2>
+        <h2 className={typeHeadingPrimary}>{copy.publications}</h2>
         {data.publications === null ? (
           <ErrorState
             id="public-user-trust-hidden-activity"
@@ -114,8 +120,8 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
         <p className="text-xs text-muted">{copy.publicationScope}</p>
       </section>
       <section className={panelClipSpace3P5}>
-        <h2 className="font-heading text-primary">{copy.limits}</h2>
-        <p className="text-sm text-secondary">{copy.limitsDescription}</p>
+        <h2 className={typeHeadingPrimary}>{copy.limits}</h2>
+        <p className={typeSmSecondary}>{copy.limitsDescription}</p>
         <Link href="/workspace/verification" className={linkAccentSm}>
           {copy.settings}
         </Link>

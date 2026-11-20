@@ -6,6 +6,7 @@ import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelMinSpace4P5 } from "../../shell/panel-shell";
 import { surfaceP4TextSmSecondary } from "../../shell/surface-shell";
+import { typeDisplayPrimary, typeFlexWrapGap4Sm, typeSmSecondary } from "../../shell/type-shell";
 import { formatFinancialMinor } from "../financial-i18n";
 import { orderTermsCopy, orderTermsLicenseLabel } from "../order-terms-i18n";
 import { sellerSalesTime } from "../seller-sales-i18n";
@@ -45,7 +46,7 @@ export function OrderTermsReportView({
         {c.back}
       </Link>
       <header className="min-w-0 space-y-3">
-        <h1 className="font-display text-primary">{c.title}</h1>
+        <h1 className={typeDisplayPrimary}>{c.title}</h1>
         <h2 className="break-words text-xl">{report.order.orderNumber}</h2>
         <p className="text-sm text-muted">
           {c.observed}:{" "}
@@ -59,7 +60,7 @@ export function OrderTermsReportView({
       </p>
       <section className={panelMinSpace4P5}>
         <h2 className="text-lg font-semibold">{c.check}</h2>
-        <p className="text-sm text-secondary">{c.consistencyNotice}</p>
+        <p className={typeSmSecondary}>{c.consistencyNotice}</p>
         <dl className="grid gap-3 text-sm sm:grid-cols-3">
           <div>
             <dt>{c.total}</dt>
@@ -88,7 +89,7 @@ export function OrderTermsReportView({
             ))}
           </div>
         ) : (
-          <p className="text-sm text-secondary">{c.clear}</p>
+          <p className={typeSmSecondary}>{c.clear}</p>
         )}
         {report.summary.legacyLines > 0 ? (
           <p className="text-sm text-muted">
@@ -113,7 +114,7 @@ export function OrderTermsReportView({
               <h2 className="break-words text-lg font-semibold">
                 {line.terms?.product.title ?? line.productId}
               </h2>
-              <p className="text-sm text-secondary">
+              <p className={typeSmSecondary}>
                 {c[line.evidence]} · {line.id}
               </p>
               <p className="font-numeric">
@@ -168,7 +169,7 @@ export function OrderTermsReportView({
         />
       )}
       {report.totalPages > 1 ? (
-        <nav aria-label={c.page} className="flex flex-wrap gap-4 text-sm">
+        <nav aria-label={c.page} className={typeFlexWrapGap4Sm}>
           {report.page > 1 ? (
             <Link href={`${base}/terms?page=${report.page - 1}`} className={linkAccentSmRounded}>
               {c.previous}

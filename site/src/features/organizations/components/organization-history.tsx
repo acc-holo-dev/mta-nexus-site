@@ -15,6 +15,7 @@ import { changeHistoryHref } from "../../accounts/private-change-history-query";
 import { linkAccentSm, linkAccentTight } from "../../shell/link-shell";
 import { pageShellMax5xlCompact as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
+import { typeFlexWrapGap4Sm, typeSmSecondary, typeSmSemiboldPrimary } from "../../shell/type-shell";
 import type { OrganizationHistory } from "../organization-governance-contract";
 import { organizationGovernanceCopy } from "../organization-governance-copy";
 import { getOrganizationCopy } from "../organization-workspace-copy";
@@ -106,7 +107,7 @@ export function OrganizationHistoryView({
       {data?.items.map((item) => (
         <article className={panelSpace3P5} key={item.id}>
           <div className="flex flex-wrap justify-between gap-3">
-            <h2 className="text-sm font-semibold text-primary">{copy.actions[item.action]}</h2>
+            <h2 className={typeSmSemiboldPrimary}>{copy.actions[item.action]}</h2>
             <time className="text-xs text-muted" dateTime={item.createdAt}>
               {new Date(item.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                 timeZone: "UTC",
@@ -114,7 +115,7 @@ export function OrganizationHistoryView({
               UTC
             </time>
           </div>
-          <p className="text-sm text-secondary">
+          <p className={typeSmSecondary}>
             {copy.by}:{" "}
             {item.actorUsername ? (
               <Link
@@ -128,7 +129,7 @@ export function OrganizationHistoryView({
             )}
           </p>
           {item.subjectUsername && (
-            <p className="text-sm text-secondary">
+            <p className={typeSmSecondary}>
               {copy.subject}:{" "}
               <Link
                 className={linkAccentTight}
@@ -162,7 +163,7 @@ export function OrganizationHistoryView({
           )}
         </article>
       ))}
-      <nav className="flex flex-wrap gap-4 text-sm" aria-label={copy.history}>
+      <nav className={typeFlexWrapGap4Sm} aria-label={copy.history}>
         {(before || filters.cursor || filters.until || !data) && (
           <Link className={linkAccentSm} href={changeHistoryHref(path, filters, { fresh: true })}>
             {copy.latest}

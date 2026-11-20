@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax4xl, pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH10W72, skelH10W72Max, skelH24 } from "../../shell/skeleton-shell";
 import { getFinancialCopy } from "../financial-i18n";
 
 type Copy = ReturnType<typeof getFinancialCopy>;
@@ -40,7 +41,7 @@ function FinancialRouteLoading({
     throw new Error("FinancialRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-10 w-72 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH10W72} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -71,7 +72,7 @@ export function AdminReconciliationDetailRouteLoading() {
     headingId: "admin-reconciliation-detail-loading-heading",
     className: pageShellMax4xl,
     rows: 4,
-    leading: <div className="h-10 w-72 max-w-full rounded bg-inset" />,
+    leading: <div className={skelH10W72Max} />,
     titleKey: "review",
     loadingKey: "reviewLoading",
   });
@@ -82,7 +83,7 @@ export function AdminReconciliationRouteLoading() {
     headingId: "admin-reconciliation-loading-heading",
     className: pageShellMax5xl,
     rows: 4,
-    leading: <div className="h-10 w-72 max-w-full rounded bg-inset" />,
+    leading: <div className={skelH10W72Max} />,
     titleKey: "review",
     loadingKey: "reviewLoading",
   });
@@ -95,8 +96,8 @@ export function FinanceRouteLoading() {
     rows: 4,
     leading: (
       <>
-        <div className="h-10 w-72 rounded bg-inset" />
-        <div className="h-24 rounded bg-inset" />
+        <div className={skelH10W72} />
+        <div className={skelH24} />
       </>
     ),
     titleKey: "title",

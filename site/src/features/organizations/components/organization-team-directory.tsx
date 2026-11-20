@@ -13,6 +13,7 @@ import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentSm } from "../../shell/link-shell";
 import { panelClipSpace5P5 } from "../../shell/panel-shell";
 import { surfaceSpace2P4 } from "../../shell/surface-shell";
+import { typeFlexWrapGap4, typeSmSuccess } from "../../shell/type-shell";
 import { organizationBatchCopy } from "../organization-batch-copy";
 import { confirmsOrganizationMemberMutation } from "../organization-member-confirmation";
 import {
@@ -298,11 +299,11 @@ export function OrganizationTeamDirectory({
         />
       )}
       {message && (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {message}
         </p>
       )}
-      <nav aria-label={copy.title} className="flex flex-wrap gap-4">
+      <nav aria-label={copy.title} className={typeFlexWrapGap4}>
         <a href={organizationTeamHref(data.organization.id, filters)} className={linkAccentSm}>
           {copy.latest}
         </a>

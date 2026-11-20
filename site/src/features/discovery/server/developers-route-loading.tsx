@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellStack6 } from "../../shell/page-shell";
 import { DictionaryFieldRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH11Max, skelH28Max, skelH40Max } from "../../shell/skeleton-shell";
 
 function DevelopersRouteLoading({
   headingId,
@@ -26,11 +27,7 @@ function DevelopersRouteLoading({
   leading?: ReactNode | null;
 }) {
   const resolvedLeading =
-    leading === undefined ? (
-      <div className="h-11 max-w-full rounded bg-inset" />
-    ) : (
-      (leading ?? undefined)
-    );
+    leading === undefined ? <div className={skelH11Max} /> : (leading ?? undefined);
   return DictionaryFieldRouteLoading({
     headingId,
     titlePath,
@@ -52,8 +49,8 @@ export function DeveloperRouteLoading() {
     rows: 0,
     leading: (
       <>
-        <div className="h-28 max-w-full rounded bg-inset" />
-        <div className="h-40 max-w-full rounded bg-inset" />
+        <div className={skelH28Max} />
+        <div className={skelH40Max} />
       </>
     ),
   });

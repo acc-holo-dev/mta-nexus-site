@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH6W23 } from "../../shell/skeleton-shell";
 import { verificationCopy } from "../verification-workspace-copy";
 
 type Copy = ReturnType<typeof verificationCopy>;
@@ -40,7 +41,7 @@ function VerificationWorkspaceRouteLoading({
     throw new Error("VerificationWorkspaceRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-6 w-2/3 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH6W23} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -71,7 +72,7 @@ export function VerificationRouteLoading() {
     headingId: "verification-loading-heading",
     className: pageShellMax5xl,
     titleClassName: "text-xl font-semibold text-primary",
-    leading: <div className="h-6 w-2/3 rounded bg-inset" />,
+    leading: <div className={skelH6W23} />,
     titleKey: "title",
   });
 }

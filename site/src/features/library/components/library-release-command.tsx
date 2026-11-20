@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import type { Locale } from "../../../lib/i18n";
 import { linkAccentTightBreakAll, linkGhostAccent } from "../../shell/link-shell";
+import { typeSmSuccess } from "../../shell/type-shell";
 import {
   type FrozenLibraryReleaseRequest,
   freezeLibraryReleaseRequest,
@@ -238,7 +239,7 @@ export function LibraryReleaseCommandStatus({
       ) : null}
       {saved ? (
         <div className="space-y-2">
-          <p role="status" className="text-sm text-success">
+          <p role="status" className={typeSmSuccess}>
             {copy.selectSaved}
           </p>
           <Button

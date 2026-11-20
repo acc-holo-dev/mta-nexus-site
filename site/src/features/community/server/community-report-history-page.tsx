@@ -9,6 +9,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax4xlDenseTight } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary } from "../../shell/type-shell";
 import { reportId, reportRateLimit } from "../community-report-api";
 import { parseReportHistoryQuery } from "../community-report-history-contract";
 import { reportHistoryCopy, reportHistoryError } from "../community-report-history-copy";
@@ -72,7 +73,7 @@ export async function CommunityReportHistoryPage({
   } catch (error) {
     return (
       <div className={pageShellMax4xlDenseTight}>
-        <h1 className="font-display text-primary">{copy.title}</h1>
+        <h1 className={typeDisplayPrimary}>{copy.title}</h1>
         <ErrorState
           title={reportHistoryError(
             locale,

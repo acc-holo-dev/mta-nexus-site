@@ -10,6 +10,12 @@ import { linkAccent, linkAccentSm, linkAccentSmRounded } from "../../shell/link-
 import { pageShellMax5xlCompactTight } from "../../shell/page-shell";
 import { panelP5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapEndGap3,
+  typeFlexWrapGap4,
+  typeSpace1SmSecondary,
+} from "../../shell/type-shell";
 import { reportRateLimit } from "../community-report-api";
 import { REPORT_TYPES } from "../community-report-contract";
 import { communityReportCopy, communityReportError } from "../community-report-copy";
@@ -76,11 +82,11 @@ export async function PublicationReportsPage({
     return (
       <div className={pageShellMax5xlCompactTight}>
         <header className="space-y-2">
-          <h1 className="font-display text-primary">{copy.publicationTitle}</h1>
+          <h1 className={typeDisplayPrimary}>{copy.publicationTitle}</h1>
           <p className="break-words text-secondary">{data.publication.title}</p>
           <p className="text-sm text-muted">{copy.publicationDescription}</p>
         </header>
-        <div className="flex flex-wrap gap-4">
+        <div className={typeFlexWrapGap4}>
           <Link href="/admin/reports/targets" className={linkAccentSmRounded}>
             {copy.title}
           </Link>
@@ -102,7 +108,7 @@ export async function PublicationReportsPage({
         </details>
         <search aria-label={copy.search}>
           <form method="get" action={path} className="nexus-panel grid gap-3 p-4 sm:grid-cols-2">
-            <label className="space-y-1 text-sm text-secondary">
+            <label className={typeSpace1SmSecondary}>
               <span>{copy.search}</span>
               <input
                 name="q"
@@ -112,14 +118,14 @@ export async function PublicationReportsPage({
                 className={platformFieldClass}
               />
             </label>
-            <label className="space-y-1 text-sm text-secondary">
+            <label className={typeSpace1SmSecondary}>
               <span>{copy.view}</span>
               <select name="view" defaultValue={filters.view} className={platformFieldClass}>
                 <option value="pending">{labels.pending}</option>
                 <option value="history">{labels.history}</option>
               </select>
             </label>
-            <label className="space-y-1 text-sm text-secondary">
+            <label className={typeSpace1SmSecondary}>
               <span>{copy.type}</span>
               <select name="type" defaultValue={filters.type ?? ""} className={platformFieldClass}>
                 <option value="">{copy.all}</option>
@@ -130,7 +136,7 @@ export async function PublicationReportsPage({
                 ))}
               </select>
             </label>
-            <div className="flex flex-wrap items-end gap-3">
+            <div className={typeFlexWrapEndGap3}>
               <Button type="submit" className="min-h-11" variant="outline">
                 {copy.apply}
               </Button>
@@ -168,7 +174,7 @@ export async function PublicationReportsPage({
   } catch (error) {
     return (
       <div className={pageShellMax5xlCompactTight}>
-        <h1 className="font-display text-primary">{copy.publicationTitle}</h1>
+        <h1 className={typeDisplayPrimary}>{copy.publicationTitle}</h1>
         <ErrorState
           title={communityReportError(
             locale,

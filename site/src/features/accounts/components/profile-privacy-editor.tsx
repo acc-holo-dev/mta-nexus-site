@@ -10,6 +10,13 @@ import { actionConfirmCheckboxFocusClass } from "../../shell/action-confirm-chec
 import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 import { panelClipSpace5P5Sm } from "../../shell/panel-shell";
 import {
+  typeFlexWrapGap3,
+  typeFlexWrapGap4,
+  typeSmSemiboldPrimary,
+  typeSmSuccess,
+  typeSpace1SmSecondary,
+} from "../../shell/type-shell";
+import {
   confirmedPrivacyUpdate,
   type EditablePrivacy,
   parseEditablePrivacy,
@@ -195,7 +202,7 @@ export function ProfilePrivacyEditor({
           </label>
         </fieldset>
         <p className="text-sm text-muted">{copy.scope}</p>
-        <div className="flex flex-wrap gap-3">
+        <div className={typeFlexWrapGap3}>
           <Button
             type="submit"
             isLoading={pending}
@@ -254,7 +261,7 @@ export function ProfilePrivacyEditor({
           }
         />
       ) : notice ? (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {notice.text}
         </p>
       ) : null}
@@ -263,14 +270,14 @@ export function ProfilePrivacyEditor({
           className="min-w-0 space-y-3 overflow-x-clip rounded-lg border border-base p-4"
           aria-label={copy.guestPreview}
         >
-          <h2 className="text-sm font-semibold text-primary">{copy.guestPreview}</h2>
+          <h2 className={typeSmSemiboldPrimary}>{copy.guestPreview}</h2>
           <p className="text-sm text-muted">{copy.guestPreviewNote}</p>
-          <ul className="space-y-1 text-sm text-secondary">
+          <ul className={typeSpace1SmSecondary}>
             <li>{activity ? copy.guestPreviewActivityOn : copy.guestPreviewActivityOff}</li>
             <li>{contacts ? copy.guestPreviewContactsOn : copy.guestPreviewContactsOff}</li>
             <li>{copy.guestPreviewAlways}</li>
           </ul>
-          <div className="flex flex-wrap gap-4">
+          <div className={typeFlexWrapGap4}>
             <Link
               href={`/users/${encodeURIComponent(profile.username)}?preview=guest`}
               className={linkAccentSm}

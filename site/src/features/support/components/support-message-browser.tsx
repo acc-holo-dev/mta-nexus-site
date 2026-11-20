@@ -5,6 +5,11 @@ import type { Locale } from "../../../lib/i18n";
 import { linkAccent, linkAccentTight, linkAccentTightSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xlCompactTight } from "../../shell/page-shell";
 import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
+import {
+  typeDisplayPrimary,
+  typePrewrapSmSecondary,
+  typeSemiboldPrimary,
+} from "../../shell/type-shell";
 import { type SupportMessagePage, supportMessageHref } from "../support-message-discovery-contract";
 import { supportMessageCopy } from "../support-message-discovery-copy";
 
@@ -31,7 +36,7 @@ export function SupportMessageBrowser({
         {copy.back}
       </Link>
       <header className="space-y-2">
-        <h1 className="font-display text-primary">{copy.title}</h1>
+        <h1 className={typeDisplayPrimary}>{copy.title}</h1>
         <p className="text-secondary break-words">{page.supportCase.subject}</p>
         <p className="text-sm text-muted">{copy.description}</p>
       </header>
@@ -114,7 +119,7 @@ export function SupportMessageBrowser({
               className={`nexus-panel scroll-mt-24 p-4 ${message.id === page.focus ? "ring-2 ring-[var(--nexus-accent)]" : ""}`}
             >
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs">
-                <span className="font-semibold text-primary">
+                <span className={typeSemiboldPrimary}>
                   {message.authorRole === "staff" ? copy.staff : copy.requester}
                 </span>
                 <time dateTime={message.createdAt} className="text-muted">
@@ -126,9 +131,7 @@ export function SupportMessageBrowser({
                   {copy.focused}
                 </p>
               )}
-              <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                {message.body}
-              </p>
+              <p className={typePrewrapSmSecondary}>{message.body}</p>
               {message.truncated && <p className="mt-2 text-xs text-muted">{copy.truncated}</p>}
               <Link
                 href={`${path}?focus=${message.id}#message-${message.id}`}

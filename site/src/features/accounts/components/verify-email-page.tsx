@@ -8,6 +8,7 @@ import { linkAccentSmSemibold, linkGhostAccentSm } from "../../shell/link-shell"
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMaxLg as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace5P6Shadow } from "../../shell/panel-shell";
+import { typeDisplayPrimary, typeSmSuccess } from "../../shell/type-shell";
 import {
   type AccountRecoveryProof,
   readAccountRecoveryProofFromWindow,
@@ -80,7 +81,7 @@ export function VerifyEmailPage() {
       <section aria-labelledby="verify-email-heading" className={panelClipSpace5P6Shadow}>
         <div className="flex items-center gap-3">
           <MailCheck className="h-5 w-5 text-accent" aria-hidden="true" />
-          <h1 id="verify-email-heading" className="font-display text-primary">
+          <h1 id="verify-email-heading" className={typeDisplayPrimary}>
             {copy.verifyTitle}
           </h1>
         </div>
@@ -145,7 +146,7 @@ export function VerifyEmailPage() {
 
         {state.kind === "success" && (
           <>
-            <p role="status" className="text-sm text-success">
+            <p role="status" className={typeSmSuccess}>
               {copy.verifiedPrefix} {state.email}
             </p>
             <p className="text-xs text-muted">{copy.confirmationConsumed}</p>

@@ -20,6 +20,12 @@ import { linkAccentSm, linkAccentSmRounded, linkMinH } from "../../shell/link-sh
 import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeFlexWrapGap4Sm,
+  typePrewrapSmSecondary,
+  typeSemiboldPrimary,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { ResourceModerationControls } from "../moderation-controls";
 import { resourceMediaCopy } from "../resource-media-i18n";
 import { resourceRequirementsCopy } from "../resource-requirements-i18n";
@@ -107,7 +113,7 @@ export async function StaffResourceDetailScreen({
       <p className="text-secondary">
         {resourceStatusLabel(locale, product.status)} · {product.currentVersion}
       </p>
-      <p role="note" className="text-sm text-secondary">
+      <p role="note" className={typeSmSecondary}>
         {copy.moderationNote}
       </p>
       <div className="flex min-w-0 flex-wrap gap-4">
@@ -130,17 +136,13 @@ export async function StaffResourceDetailScreen({
         <ol className="min-w-0 space-y-3">
           {result.events.map((event) => (
             <li key={event.id} className={panelMinSpace3P5}>
-              <h3 className="font-semibold text-primary">
+              <h3 className={typeSemiboldPrimary}>
                 {resourceModerationLabel(locale, event.action)}
               </h3>
               <time dateTime={event.createdAt.toISOString()} className="text-xs text-muted">
                 {formatHistoryDate(event.createdAt, locale)}
               </time>
-              {event.reason ? (
-                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                  {event.reason}
-                </p>
-              ) : null}
+              {event.reason ? <p className={typePrewrapSmSecondary}>{event.reason}</p> : null}
             </li>
           ))}
         </ol>
@@ -152,7 +154,7 @@ export async function StaffResourceDetailScreen({
         />
       )}
       {result.totalPages > 1 ? (
-        <nav aria-label={copy.page} className="flex flex-wrap gap-4 text-sm">
+        <nav aria-label={copy.page} className={typeFlexWrapGap4Sm}>
           {result.page > 1 ? (
             <Link href={`?page=${result.page - 1}`} className={linkAccentSm}>
               {copy.previous}

@@ -14,6 +14,12 @@ import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
+  typeFlexWrapGap4Sm,
+  typePrewrapSmSecondary,
+  typeSemiboldPrimary,
+  typeSmSecondary,
+} from "../../shell/type-shell";
+import {
   formatHistoryAmount,
   formatHistoryDate,
   parseHistoryPage,
@@ -115,7 +121,7 @@ export async function CommercialPlanAdminDetailScreen({
       <h1 className="break-words font-display text-primary">
         {locale === "ru" ? plan.titleRu : plan.titleEn}
       </h1>
-      <p className="text-sm text-secondary">
+      <p className={typeSmSecondary}>
         {copy[plan.status]} · {copy.revision} {plan.revision} · {plan.slug} · {copy[plan.scope]}
       </p>
       <CommercialPlanForm
@@ -130,7 +136,7 @@ export async function CommercialPlanAdminDetailScreen({
         <ol className="space-y-3">
           {result.history.map((version) => (
             <li key={version.revision} className={panelMinSpace3P5}>
-              <h3 className="font-semibold text-primary">
+              <h3 className={typeSemiboldPrimary}>
                 {copy.revision} {version.revision} · {copy[version.status]}
               </h3>
               <time dateTime={version.createdAt.toISOString()} className="text-sm text-muted">
@@ -139,10 +145,10 @@ export async function CommercialPlanAdminDetailScreen({
               <p className="break-words text-sm text-primary">
                 {locale === "ru" ? version.terms.titleRu : version.terms.titleEn}
               </p>
-              <p className="whitespace-pre-wrap break-words text-sm text-secondary">
+              <p className={typePrewrapSmSecondary}>
                 {locale === "ru" ? version.terms.descriptionRu : version.terms.descriptionEn}
               </p>
-              <p className="text-sm text-secondary">
+              <p className={typeSmSecondary}>
                 {formatHistoryAmount(version.terms.price, version.terms.currency, locale)} ·{" "}
                 {version.terms.durationDays} {copy.days} · {copy.commission}:{" "}
                 {(version.terms.commissionBps / 100).toLocaleString(locale)}%
@@ -155,7 +161,7 @@ export async function CommercialPlanAdminDetailScreen({
         </ol>
       </section>
       {result.totalPages > 1 ? (
-        <nav aria-label={copy.page} className="flex flex-wrap gap-4 text-sm">
+        <nav aria-label={copy.page} className={typeFlexWrapGap4Sm}>
           {result.page > 1 ? (
             <Link href={`?page=${result.page - 1}`} className={linkAccentSm}>
               {copy.previous}

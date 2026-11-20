@@ -1,4 +1,5 @@
 import type { CommercialPlanTerms } from "@nexus/domain";
+import { typePrewrapSmSecondary } from "../../shell/type-shell";
 import { formatHistoryAmount } from "../commerce-history-format";
 import { planReviewsCopy } from "../plan-reviews-i18n";
 export function PlanReviewTerms({
@@ -14,7 +15,7 @@ export function PlanReviewTerms({
       <h3 className="break-words text-xl font-semibold">
         {locale === "ru" ? terms.titleRu : terms.titleEn}
       </h3>
-      <p className="whitespace-pre-wrap break-words text-sm text-secondary">
+      <p className={typePrewrapSmSecondary}>
         {locale === "ru" ? terms.descriptionRu : terms.descriptionEn}
       </p>
       <dl className="grid gap-3 text-sm sm:grid-cols-3">

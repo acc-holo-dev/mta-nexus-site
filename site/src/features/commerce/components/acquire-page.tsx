@@ -19,6 +19,8 @@ import {
   pageShellMaxXl,
   pageShellMaxXlPy12,
 } from "../../shell/page-shell";
+import { skelH12W48, skelH28 } from "../../shell/skeleton-shell";
+import { typeDisplayPrimary, typeMt2SmMuted } from "../../shell/type-shell";
 import { licenseModelLabel } from "../license-model-i18n";
 
 interface ProductInfo {
@@ -179,10 +181,10 @@ function AcquireContent() {
             <CheckCircle2 className="h-9 w-9" aria-hidden="true" />
           </div>
           <div>
-            <h1 className="font-display text-primary">
+            <h1 className={typeDisplayPrimary}>
               {claimedAccess?.kind === "license" ? activityCopy.licenseTitle : copy.resourceAdded}
             </h1>
-            <p className="mt-2 text-sm text-muted">
+            <p className={typeMt2SmMuted}>
               {claimedAccess?.kind === "license"
                 ? activityCopy.licenseNote
                 : copy.resourceAddedMessage}
@@ -286,8 +288,8 @@ function AcquireContent() {
         statusClassName="text-sm text-muted"
       >
         <div className="animate-pulse space-y-4" aria-hidden="true">
-          <div className="h-28 rounded bg-inset" />
-          <div className="h-12 w-48 rounded bg-inset" />
+          <div className={skelH28} />
+          <div className={skelH12W48} />
         </div>
       </HonestLoadingShell>
     );
@@ -415,8 +417,8 @@ export function AcquirePage() {
           statusClassName="text-sm text-muted"
         >
           <div className="animate-pulse space-y-4" aria-hidden="true">
-            <div className="h-28 rounded bg-inset" />
-            <div className="h-12 w-48 rounded bg-inset" />
+            <div className={skelH28} />
+            <div className={skelH12W48} />
           </div>
         </HonestLoadingShell>
       }

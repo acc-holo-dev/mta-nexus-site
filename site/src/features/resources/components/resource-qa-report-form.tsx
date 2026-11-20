@@ -8,6 +8,7 @@ import { getDictionary, type Locale } from "../../../lib/i18n";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { linkGhostAccentSmBare } from "../../shell/link-shell";
 import { surfaceMinSpace2BgP3 } from "../../shell/surface-shell";
+import { typeFlexWrapGap2 } from "../../shell/type-shell";
 import { resourceQaCopy, resourceQaError } from "../resource-qa-i18n";
 
 const REPORT_TYPES = createReportSchema.shape.type.options;
@@ -175,7 +176,7 @@ export function ResourceQaReportForm({
           description={getDictionary(locale).errors.formErrorHint}
         />
       ) : null}
-      <div className="flex flex-wrap gap-2">
+      <div className={typeFlexWrapGap2}>
         <Button
           type="submit"
           size="sm"

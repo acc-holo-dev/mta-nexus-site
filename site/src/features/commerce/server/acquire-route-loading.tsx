@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax3xl } from "../../shell/page-shell";
 import { DictionaryFieldRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH12W48, skelH20, skelH28 } from "../../shell/skeleton-shell";
 
 export function AcquireRouteLoading({
   headingId = "acquire-loading-heading",
@@ -28,9 +29,9 @@ export function AcquireRouteLoading({
   const resolvedLeading =
     leading === undefined ? (
       <>
-        <div className="h-28 rounded bg-inset" />
-        <div className="h-12 w-48 rounded bg-inset" />
-        <div className="h-20 rounded bg-inset" />
+        <div className={skelH28} />
+        <div className={skelH12W48} />
+        <div className={skelH20} />
       </>
     ) : (
       (leading ?? undefined)

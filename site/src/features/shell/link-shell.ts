@@ -103,3 +103,6 @@ export const linkMinHContentAccentSmPlain =
 export const linkGhostAccentSmNoUnderline = "h-auto min-h-11 px-0 text-sm text-accent";
 export const linkAccentMinHInline = "min-h-11 inline-flex items-center text-accent underline";
 export const linkGhostAccentSemibold = "h-auto px-0 font-semibold text-accent";
+
+export const linkFocusRing =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax4xl, pageShellMax5xl, pageShellMax5xlTight } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH10W64, skelH10W72, skelH28 } from "../../shell/skeleton-shell";
 import { resourceReviewCopy } from "../resource-review-i18n";
 
 type ReviewCopy = ReturnType<typeof resourceReviewCopy>;
@@ -33,7 +34,7 @@ function ResourceReviewRouteLoading({
   leading?: ReactNode | null;
 }) {
   const resolvedLeading =
-    leading === undefined ? <div className="h-10 w-72 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH10W72} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -84,7 +85,7 @@ export function LibraryReviewRouteLoading() {
     headingId: "library-review-loading-heading",
     titleKey: "write",
     loadingKey: "pageLoading",
-    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    leading: <div className={skelH10W64} />,
   });
 }
 
@@ -105,7 +106,7 @@ export function ReviewReportRouteLoading() {
     headingId: "review-report-loading-heading",
     titleKey: "reports",
     rows: 3,
-    leading: <div className="h-28 rounded bg-inset" />,
+    leading: <div className={skelH28} />,
   });
 }
 
@@ -115,6 +116,6 @@ export function ReviewReportsRouteLoading() {
     titleKey: "reports",
     className: pageShellMax5xlTight,
     rows: 3,
-    leading: <div className="h-28 rounded bg-inset" />,
+    leading: <div className={skelH28} />,
   });
 }

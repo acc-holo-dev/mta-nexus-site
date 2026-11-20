@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax4xl, pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH10W72 } from "../../shell/skeleton-shell";
 import { getCommercialCopy } from "../commercial-i18n";
 import { subscriptionsCopy } from "../subscriptions-i18n";
 
@@ -41,7 +42,7 @@ function CommercialRouteLoading({
     throw new Error("CommercialRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-10 w-72 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH10W72} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,

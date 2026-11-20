@@ -2,6 +2,7 @@ import { Compass, Home, SearchX } from "lucide-react";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
+import { typeDisplayPrimary } from "../type-shell";
 
 export async function NotFoundPage() {
   const locale = await getRequestLocale();
@@ -13,7 +14,7 @@ export async function NotFoundPage() {
         <SearchX className="h-7 w-7" aria-hidden="true" />
       </div>
       <div className="space-y-2">
-        <h1 className="font-display text-primary">{dictionary.errors.notFoundTitle}</h1>
+        <h1 className={typeDisplayPrimary}>{dictionary.errors.notFoundTitle}</h1>
         <p className="mx-auto max-w-sm font-caption leading-relaxed text-muted">
           {dictionary.errors.notFoundMessage}
         </p>

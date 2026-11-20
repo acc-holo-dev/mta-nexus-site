@@ -5,6 +5,7 @@ import { ResourceDownloadButton } from "../../resources/download";
 import { resourceReleaseWatchesCopy } from "../../resources/resource-release-watches-i18n";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
+import { typeFlexWrapEndGap3, typeFlexWrapGap4Sm, typeSmSecondary } from "../../shell/type-shell";
 import { LibraryCollectionBatchForm } from "../collection-batch";
 import { LibraryCollectionCommandForm } from "../collection-command";
 import { collectionReleasesCopy } from "../collection-releases-i18n";
@@ -71,7 +72,7 @@ export async function LibraryCollectionsDetailView({
       <p className="text-sm">
         {c[collection.status]} · {c.revision} {collection.revision}
       </p>
-      <p role="note" className="text-sm text-secondary">
+      <p role="note" className={typeSmSecondary}>
         {c.subtitle}
       </p>
       {collection.status === "archived" && (
@@ -135,7 +136,7 @@ export async function LibraryCollectionsDetailView({
           )}
         </section>
       )}
-      <nav className="flex flex-wrap gap-4 text-sm" aria-label={c.title}>
+      <nav className={typeFlexWrapGap4Sm} aria-label={c.title}>
         <a
           href={`/api/library/collections/${encodeURIComponent(id)}/export`}
           className={libraryCollectionsLinkClass}
@@ -178,7 +179,7 @@ export async function LibraryCollectionsDetailView({
         <form
           method="get"
           action={collectionHref(id, adding ? "add" : "")}
-          className="flex flex-wrap items-end gap-3"
+          className={typeFlexWrapEndGap3}
         >
           <label className="space-y-1">
             <span className="block text-sm">{c.search}</span>
@@ -247,7 +248,7 @@ export async function LibraryCollectionsDetailView({
                 description={c.itemUnavailableHint}
               />
             )}
-            <div className="flex flex-wrap gap-4 text-sm">
+            <div className={typeFlexWrapGap4Sm}>
               <Link
                 href={`/workspace/library/${encodeURIComponent(item.productId)}/collections`}
                 className={libraryCollectionsLinkClass}

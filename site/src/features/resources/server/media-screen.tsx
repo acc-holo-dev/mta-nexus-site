@@ -12,6 +12,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccent } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary, typeSmSecondary } from "../../shell/type-shell";
 import { ResourceGallery } from "../components/resource-gallery";
 import { ResourceMediaEditor } from "../components/resource-media-editor";
 import { resourceMediaCopy } from "../resource-media-i18n";
@@ -109,10 +110,10 @@ export async function ResourceMediaScreen({
       >
         {copy.back}
       </Link>
-      <h1 className="font-display text-primary">
+      <h1 className={typeDisplayPrimary}>
         {copy.title} · {gallery.product.title}
       </h1>
-      <p className="text-sm text-secondary">{copy.note}</p>
+      <p className={typeSmSecondary}>{copy.note}</p>
       <ErrorState
         id="resource-media-review-note"
         title={copy.reviewNote}

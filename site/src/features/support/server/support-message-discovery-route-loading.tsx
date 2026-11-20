@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax4xlTight } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH10WFullMaxMd } from "../../shell/skeleton-shell";
 import { supportMessageCopy } from "../support-message-discovery-copy";
 
 type Copy = ReturnType<typeof supportMessageCopy>;
@@ -39,11 +40,7 @@ function SupportMessageDiscoveryRouteLoading({
     throw new Error("SupportMessageDiscoveryRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? (
-      <div className="h-10 w-full max-w-md rounded bg-inset" />
-    ) : (
-      (leading ?? undefined)
-    );
+    leading === undefined ? <div className={skelH10WFullMaxMd} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -75,7 +72,7 @@ export function SupportMessagesRouteLoading() {
     className: pageShellMax4xlTight,
     headerClassName: "space-y-3 border-b border-base pb-6",
     titleClassName: "text-2xl font-extrabold text-primary",
-    leading: <div className="h-10 w-full max-w-md rounded bg-inset" />,
+    leading: <div className={skelH10WFullMaxMd} />,
     titleKey: "title",
   });
 }

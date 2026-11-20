@@ -12,6 +12,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeFlexWrapGap4Sm } from "../../shell/type-shell";
 import { PlanReviewForm } from "../plan-reviews";
 import { planReviewsCopy } from "../plan-reviews-i18n";
 import { planReviewNewQuery, planReviewsPageParams } from "../plan-reviews-query";
@@ -97,7 +98,7 @@ export async function SubscriptionReviewCreateScreen({
           <EmptyState title={c.noOrganizations} description={c.noOrganizationsHint} />
         ) : null}
         {plan.scope === "organization" && scopes.totalPages > 1 ? (
-          <nav aria-label={c.scopeNext} className="flex flex-wrap gap-4 text-sm">
+          <nav aria-label={c.scopeNext} className={typeFlexWrapGap4Sm}>
             {scopes.page > 1 ? (
               <Link href={href(scopes.page - 1)} className={planReviewNavLinkClass}>
                 {c.previous}

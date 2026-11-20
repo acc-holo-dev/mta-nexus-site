@@ -13,6 +13,7 @@ import { linkAccent } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceSpace2P4TextSm } from "../../shell/surface-shell";
+import { typeDisplayPrimary } from "../../shell/type-shell";
 import { buildPackageCopy } from "../build-package-i18n";
 import { buildPackageQueryHref, parseBuildPackageQuery } from "../build-package-query";
 
@@ -127,7 +128,7 @@ export async function BuildPackageScreen({
         {copy.back}
       </Link>
       <header className="space-y-2">
-        <h1 className="font-display text-primary">{copy.inventory}</h1>
+        <h1 className={typeDisplayPrimary}>{copy.inventory}</h1>
         <p className="text-secondary">
           {detail.product.title} · {detail.build.version}
         </p>

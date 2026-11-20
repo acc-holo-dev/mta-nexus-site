@@ -11,6 +11,7 @@ import {
 import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
+import { typeFlexWrapGap2, typeSmSuccess } from "../../shell/type-shell";
 import { moderationCopy, moderationError } from "../community-moderation-copy";
 
 export function ContentModerationControls({
@@ -145,7 +146,7 @@ export function ContentModerationControls({
         />
       </label>
 
-      <div className="flex flex-wrap gap-2">
+      <div className={typeFlexWrapGap2}>
         <Button
           type="button"
           disabled={!hasNotes || pending !== null || blocked || status === "published" || truncated}
@@ -179,7 +180,7 @@ export function ContentModerationControls({
 
       {!hasNotes && <p className="text-[10px] text-faint">{copy.reviewNoteHint}</p>}
       {saved && (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {moderationCopy(locale).saved}
         </p>
       )}

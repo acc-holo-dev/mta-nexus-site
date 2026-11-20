@@ -8,6 +8,7 @@ import { authEntryHref, parseAuthReturnPath, resolveAuthReturnPath } from "../..
 import { linkAccentSemibold } from "../../shell/link-shell";
 import { pageShellMaxMdAuth as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
+import { type2xlBoldPrimary } from "../../shell/type-shell";
 import { authLoginApiCopy } from "../auth-login-api-copy";
 import { authRegisterApiCopy } from "../auth-register-api-copy";
 
@@ -109,9 +110,7 @@ export function AuthForm({
   return (
     <div className={pageShellClass}>
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold text-primary">
-          {registering ? copy.registerTitle : copy.loginTitle}
-        </h1>
+        <h1 className={type2xlBoldPrimary}>{registering ? copy.registerTitle : copy.loginTitle}</h1>
         <p className="text-sm text-muted">
           {registering ? copy.registerDescription : copy.loginDescription}
         </p>

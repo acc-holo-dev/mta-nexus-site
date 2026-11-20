@@ -9,6 +9,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax5xlDenseTight } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary } from "../../shell/type-shell";
 import { reportRateLimit } from "../community-report-api";
 import { parseReportGroupsQuery } from "../community-report-groups-contract";
 import { reportGroupsCopy, reportGroupsError } from "../community-report-groups-copy";
@@ -61,7 +62,7 @@ export async function CommunityReportGroupsPage({
   } catch (error) {
     return (
       <div className={pageShellMax5xlDenseTight}>
-        <h1 className="font-display text-primary">{copy.title}</h1>
+        <h1 className={typeDisplayPrimary}>{copy.title}</h1>
         <ErrorState
           title={reportGroupsError(
             locale,

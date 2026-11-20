@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useState } from "react";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
+import { typeSmSecondary, typeSmSuccess } from "../../shell/type-shell";
 import {
   type AuthorDetailsDraft,
   type AuthorResourceDraft,
@@ -400,12 +401,12 @@ export function AuthorResourceForms({
           />
         ) : null}
         {recovered && (
-          <p role="status" className="text-sm text-secondary">
+          <p role="status" className={typeSmSecondary}>
             {copy.draftRestored}
           </p>
         )}
         {dirty && (
-          <p role="status" className="text-sm text-secondary">
+          <p role="status" className={typeSmSecondary}>
             {copy.unsaved}
           </p>
         )}
@@ -433,7 +434,7 @@ export function AuthorResourceForms({
             description={dictionary.errors.formErrorHint}
           />
         ) : (
-          <p className="text-sm text-secondary">{getResourcePublisherCopy(locale).editNote}</p>
+          <p className={typeSmSecondary}>{getResourcePublisherCopy(locale).editNote}</p>
         )}
         <fieldset
           disabled={uploadBlocked || saving || !ready || Boolean(conflict) || refreshPending}
@@ -484,7 +485,7 @@ export function AuthorResourceForms({
         </fieldset>
         {error ? <ErrorState title={error} description={copy.failedDescription} /> : null}
         {saved && !refreshPending && !conflict && (
-          <p role="status" className="text-sm text-success">
+          <p role="status" className={typeSmSuccess}>
             {copy.saved}
           </p>
         )}
@@ -511,7 +512,7 @@ export function AuthorResourceForms({
             description={getResourceCommerceCopy(locale).errors.fallback}
           />
         ) : (
-          <p className="text-sm text-secondary">{publishing.submittedDescription}</p>
+          <p className={typeSmSecondary}>{publishing.submittedDescription}</p>
         )}
         <fieldset
           disabled={uploadBlocked || uploading || !ready || Boolean(conflict) || refreshPending}
@@ -586,7 +587,7 @@ export function AuthorResourceForms({
           <ErrorState title={uploadError} description={copy.uploadFailedDescription} />
         ) : null}
         {submitted && (
-          <p role="status" className="text-sm text-success">
+          <p role="status" className={typeSmSuccess}>
             {copy.versionSubmitted}
           </p>
         )}
@@ -657,7 +658,7 @@ export function RetireBuildForm({
     }
   }
   return (
-    <details className="text-sm text-secondary">
+    <details className={typeSmSecondary}>
       <summary className="cursor-pointer">
         {copy.retire} · {version}
       </summary>

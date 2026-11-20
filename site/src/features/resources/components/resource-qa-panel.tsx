@@ -18,6 +18,8 @@ import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 import { pageShellStack3, pageShellStack4 } from "../../shell/page-shell";
+import { panelClipSpace4P6 } from "../../shell/panel-shell";
+import { typeFlexWrapGap2 } from "../../shell/type-shell";
 import { resourceQaCopy, resourceQaError } from "../resource-qa-i18n";
 import { ResourceQaReportForm } from "./resource-qa-report-form";
 
@@ -35,7 +37,7 @@ type DetailPayload = {
   capabilities: ResourceQaCapabilities;
 };
 
-const shellClass = "nexus-panel min-w-0 space-y-4 overflow-x-clip p-6";
+const shellClass = panelClipSpace4P6;
 
 function readCode(payload: unknown) {
   if (!payload || typeof payload !== "object") return null;
@@ -478,7 +480,7 @@ export function ResourceQaPanel({
 
           {authenticated === true ? (
             <div className="space-y-1">
-              <div className="flex flex-wrap gap-2">
+              <div className={typeFlexWrapGap2}>
                 <Button
                   type="button"
                   variant="secondary"

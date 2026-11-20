@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax3xl } from "../page-shell";
 import { DictionaryFieldRouteLoading } from "../route-honest-loading-server";
+import { skelH24 } from "../skeleton-shell";
 
 function LegalDocumentRouteLoading({
   headingId,
@@ -29,9 +30,9 @@ function LegalDocumentRouteLoading({
     leading === undefined ? (
       <>
         <div className="h-4 w-40 rounded bg-inset" />
-        <div className="h-24 rounded bg-inset" />
-        <div className="h-24 rounded bg-inset" />
-        <div className="h-24 rounded bg-inset" />
+        <div className={skelH24} />
+        <div className={skelH24} />
+        <div className={skelH24} />
       </>
     ) : (
       (leading ?? undefined)
@@ -64,8 +65,8 @@ export function CopyrightRouteLoading() {
     leading: (
       <>
         <div className="h-4 w-40 rounded bg-inset" />
-        <div className="h-24 rounded bg-inset" />
-        <div className="h-24 rounded bg-inset" />
+        <div className={skelH24} />
+        <div className={skelH24} />
       </>
     ),
   });

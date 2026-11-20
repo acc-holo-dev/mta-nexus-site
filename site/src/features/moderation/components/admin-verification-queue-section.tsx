@@ -4,6 +4,7 @@ import { BadgeCheck } from "lucide-react";
 import Link from "next/link";
 import type { getDictionary, Locale } from "../../../lib/i18n";
 import { linkAccentTight, linkAccentXsBlock } from "../../shell/link-shell";
+import { typeCaptionFaint, typeXsSecondary } from "../../shell/type-shell";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
 import { adminStatusLabel, adminStatusTone } from "../admin-status-labels";
 import { verificationApplicationsCopy } from "../verification-applications-copy";
@@ -111,20 +112,18 @@ export function AdminVerificationQueueSection({
                   {copy.requester} {request.requesterId} •{" "}
                   {new Date(request.createdAt).toLocaleDateString(dateLocale)}
                 </p>
-                {request.notes && <p className="font-caption text-faint">{request.notes}</p>}
+                {request.notes && <p className={typeCaptionFaint}>{request.notes}</p>}
                 {request.evidenceUpdated && (
-                  <p className="text-xs text-secondary">
-                    {verificationApplicationsCopy(locale).updated}
-                  </p>
+                  <p className={typeXsSecondary}>{verificationApplicationsCopy(locale).updated}</p>
                 )}
                 {request.claimScope === "personal" ? (
-                  <p className="text-xs text-secondary">{copy.verificationClaimPersonal}</p>
+                  <p className={typeXsSecondary}>{copy.verificationClaimPersonal}</p>
                 ) : null}
                 {request.claimScope === "organization" ? (
-                  <p className="text-xs text-secondary">{copy.verificationClaimOrganization}</p>
+                  <p className={typeXsSecondary}>{copy.verificationClaimOrganization}</p>
                 ) : null}
                 {request.proofMatchesServer === true ? (
-                  <p className="text-xs text-secondary">{copy.verificationProofCurrent}</p>
+                  <p className={typeXsSecondary}>{copy.verificationProofCurrent}</p>
                 ) : null}
                 {request.proofMatchesServer === false ? (
                   <ErrorState
@@ -196,7 +195,7 @@ export function AdminVerificationQueueSection({
                   </p>
                 )}
                 {request.resolvedAt && (
-                  <p className="font-caption text-faint">
+                  <p className={typeCaptionFaint}>
                     {copy.reportDecidedAt}:{" "}
                     {new Date(request.resolvedAt).toLocaleString(dateLocale)}
                   </p>

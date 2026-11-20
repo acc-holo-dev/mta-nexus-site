@@ -14,6 +14,7 @@ import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceBgP4TextSmSecondary } from "../../shell/surface-shell";
+import { typeDisplayPrimary } from "../../shell/type-shell";
 import {
   formatHistoryAmount,
   formatHistoryDate,
@@ -109,7 +110,7 @@ export async function PurchaseOperationsScreen({
       <Link href={`/workspace/purchases/${encodeURIComponent(id)}`} className={linkAccentSmRounded}>
         {copy.back}
       </Link>
-      <h1 className="font-display text-primary">{copy.paymentOperations}</h1>
+      <h1 className={typeDisplayPrimary}>{copy.paymentOperations}</h1>
       <p className="break-words text-secondary">
         {result.order.orderNumber} · {status(result.order.status)}
       </p>

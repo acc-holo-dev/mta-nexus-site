@@ -12,6 +12,7 @@ import { linkAccentSm, linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xlTight } from "../../shell/page-shell";
 import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { type2xlExtraboldPrimary, typeSpace1XsMuted } from "../../shell/type-shell";
 import { NotificationCenterTabs } from "../components/notification-center-tabs";
 import { NotificationInbox } from "../components/notification-inbox";
 import {
@@ -85,7 +86,7 @@ export async function NotificationCenterPage({
         <Link href="/workspace" className={linkAccentSm}>
           {copy.workspace}
         </Link>
-        <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
+        <h1 className={type2xlExtraboldPrimary}>{copy.title}</h1>
         <p className="text-sm text-muted">{copy.description}</p>
         <p className="text-xs text-muted">{copy.openBetaNote}</p>
         <Link href="/settings#notification-heading" className={linkAccentSm}>
@@ -116,7 +117,7 @@ export async function NotificationCenterPage({
               />
             </label>
             <input type="hidden" name="state" value={filters?.state ?? "all"} />
-            <label className="space-y-1 text-xs text-muted">
+            <label className={typeSpace1XsMuted}>
               {copy.category}
               <select
                 name="category"
@@ -131,7 +132,7 @@ export async function NotificationCenterPage({
                 ))}
               </select>
             </label>
-            <label className="space-y-1 text-xs text-muted">
+            <label className={typeSpace1XsMuted}>
               {copy.period}
               <select
                 name="period"

@@ -16,6 +16,12 @@ import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace2P4, panelSpace2P5, panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceP4TextSmSecondary } from "../../shell/surface-shell";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapEndGap3,
+  typePrewrapSmSecondary,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { SupportCaseThread } from "../../support/thread";
 import { formatHistoryAmount, formatHistoryDate } from "../commerce-history-format";
 import { OrderCaseCreateForm, OrderCaseReviewForm } from "../components/order-case-forms";
@@ -86,7 +92,7 @@ function Evidence({
         {financialOrderLabel(locale, data.orderStatus)} ·{" "}
         {formatHistoryAmount(data.totalAmount, data.currency, locale)}
       </p>
-      <p className="text-sm text-secondary">
+      <p className={typeSmSecondary}>
         {copy.items}: {data.itemCount} · {copy.payments}: {data.paymentCount} · {copy.captures}:{" "}
         {data.recordedCaptureCount} · {copy.refunded}: {data.refundedRecordCount} · {copy.disputed}:{" "}
         {data.disputedRecordCount}
@@ -203,9 +209,9 @@ export async function OrderCaseCreatePage({ orderId }: { orderId: string }) {
       <Link href={orderPath} className={linkAccentSmRounded}>
         {copy.order}: {result.order.orderNumber}
       </Link>
-      <h1 className="font-display text-primary">{copy.create}</h1>
-      <p className="text-sm text-secondary">{copy.intro}</p>
-      <p role="note" className="text-sm text-secondary">
+      <h1 className={typeDisplayPrimary}>{copy.create}</h1>
+      <p className={typeSmSecondary}>{copy.intro}</p>
+      <p role="note" className={typeSmSecondary}>
         {copy.financeNote}
       </p>
       <Evidence data={result.evidence} locale={locale} title={copy.current} />
@@ -287,12 +293,12 @@ export async function OrderCaseListPage({
       <Link href={staff ? "/admin" : "/workspace/purchases"} className={linkAccentSmRounded}>
         {staff ? copy.review : copy.order}
       </Link>
-      <h1 className="font-display text-primary">{staff ? copy.queue : copy.buyerCases}</h1>
-      <p role="note" className="text-sm text-secondary">
+      <h1 className={typeDisplayPrimary}>{staff ? copy.queue : copy.buyerCases}</h1>
+      <p role="note" className={typeSmSecondary}>
         {copy.financeNote}
       </p>
       <search aria-label={copy.filters}>
-        <form action={base} className="flex flex-wrap items-end gap-3">
+        <form action={base} className={typeFlexWrapEndGap3}>
           <label className="space-y-2">
             <span className="block text-sm">{copy.status}</span>
             <select
@@ -344,7 +350,7 @@ export async function OrderCaseListPage({
               <p className="text-sm">
                 {copy.order}: {item.orderNumber} · {orderCaseKindLabel(locale, item.kind)}
               </p>
-              <p className="text-sm text-secondary">
+              <p className={typeSmSecondary}>
                 {orderCaseStatusLabel(locale, item.reviewStatus)} · {copy.thread}:{" "}
                 {orderCaseThreadLabel(locale, item.threadStatus)}
               </p>
@@ -453,7 +459,7 @@ export async function OrderCaseDetailPage({
       <p>
         {copy.order}: {result.order.orderNumber} · {orderCaseKindLabel(locale, result.case.kind)}
       </p>
-      <p className="text-sm text-secondary">
+      <p className={typeSmSecondary}>
         {orderCaseStatusLabel(locale, result.case.reviewStatus)} · {copy.thread}:{" "}
         {orderCaseThreadLabel(locale, result.case.threadStatus)}
       </p>
@@ -500,7 +506,7 @@ export async function OrderCaseDetailPage({
             locale={locale}
           />
         ) : (
-          <p className="text-sm text-secondary">{copy.independent}</p>
+          <p className={typeSmSecondary}>{copy.independent}</p>
         ))}
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">{copy.history}</h2>
@@ -508,11 +514,7 @@ export async function OrderCaseDetailPage({
           {result.history.map((event) => (
             <li key={event.id} className={panelSpace2P4}>
               <p className="text-sm">{orderCaseStatusLabel(locale, event.reviewStatus)}</p>
-              {event.notes && (
-                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                  {event.notes}
-                </p>
-              )}
+              {event.notes && <p className={typePrewrapSmSecondary}>{event.notes}</p>}
               <time dateTime={event.createdAt.toISOString()} className="text-xs text-muted">
                 {formatHistoryDate(event.createdAt, locale)}
               </time>

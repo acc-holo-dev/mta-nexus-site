@@ -17,6 +17,11 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xlMid as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import { surfaceBgP4TextSmMuted } from "../../shell/surface-shell";
+import {
+  typeDisplayPrimary,
+  typePrewrapSmSecondary,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { BuildPackageSummaryPanel } from "../components/build-package-evidence";
 import { BuildProvenanceDetails } from "../components/build-provenance-details";
 import { ResourceDownloadButton } from "../components/resource-download-button";
@@ -66,7 +71,7 @@ export async function PublicResourceVersionsPage({
     return (
       <div className={pageShellClass}>
         <header className="space-y-3 border-b border-base pb-6">
-          <h1 className="font-display text-primary">{copy.title}</h1>
+          <h1 className={typeDisplayPrimary}>{copy.title}</h1>
           <p className="max-w-2xl text-sm text-secondary">{copy.intro}</p>
         </header>
         <ErrorState
@@ -102,7 +107,7 @@ export async function PublicResourceVersionsPage({
           <Link href={back} className={linkAccentSmRounded}>
             {copy.back}
           </Link>
-          <h1 className="font-display text-primary">
+          <h1 className={typeDisplayPrimary}>
             {product.title} — {copy.title}
           </h1>
           <p className="max-w-2xl text-sm text-secondary">{copy.intro}</p>
@@ -147,7 +152,7 @@ export async function PublicResourceVersionsPage({
         <Link href={back} className={linkAccentSmRounded}>
           {copy.back}
         </Link>
-        <h1 className="font-display text-primary">
+        <h1 className={typeDisplayPrimary}>
           {product.title} — {copy.title}
         </h1>
         <p className="max-w-2xl text-sm text-secondary">{copy.intro}</p>
@@ -221,7 +226,7 @@ export async function PublicResourceVersionsPage({
 
               <div className="space-y-2">
                 <h3 className="text-xs font-semibold text-primary">{copy.notes}</h3>
-                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
+                <p className={typePrewrapSmSecondary}>
                   {release.releaseNotes?.trim() || copy.noNotes}
                 </p>
               </div>
@@ -259,7 +264,7 @@ export async function PublicResourceVersionsPage({
       )}
 
       {!canDownload && (
-        <div className="text-sm text-secondary">
+        <div className={typeSmSecondary}>
           {sessionFailed ? (
             <ErrorState
               id="resource-versions-session-unavailable"

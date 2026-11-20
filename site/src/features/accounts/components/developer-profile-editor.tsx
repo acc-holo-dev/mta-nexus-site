@@ -7,6 +7,7 @@ import { platformRequest } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 import { panelClipSpace5P5Sm } from "../../shell/panel-shell";
+import { typeFlexWrapGap3, typeSmSuccess } from "../../shell/type-shell";
 import {
   developerProfileUpdateSchema,
   type EditableDeveloperProfile,
@@ -176,7 +177,7 @@ export function DeveloperProfileEditor({
           disabled={pending || !profile}
           onChange={(event) => setDiscord(event.target.value)}
         />
-        <div className="flex flex-wrap gap-3">
+        <div className={typeFlexWrapGap3}>
           <Button
             type="submit"
             isLoading={pending}
@@ -214,7 +215,7 @@ export function DeveloperProfileEditor({
         />
       ) : null}
       {saved && (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {copy.saved}
         </p>
       )}

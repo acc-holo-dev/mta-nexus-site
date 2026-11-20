@@ -11,6 +11,7 @@ import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { linkAccent, linkAccentSm, linkMinHAccentFocus } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
+import { typeSmSecondary, typeSmSuccess } from "../../shell/type-shell";
 import { resourceReleaseWatchesCopy } from "../resource-release-watches-i18n";
 
 export function ResourceReleaseWatchControl({
@@ -173,7 +174,7 @@ export function ResourceReleaseWatchControl({
   if (guest) {
     return (
       <div className="space-y-2">
-        <p className="text-sm text-secondary">{copy.signInRequired}</p>
+        <p className={typeSmSecondary}>{copy.signInRequired}</p>
         <p className="text-xs text-muted">{copy.note}</p>
         <GuestAuthLinks
           loginHref={loginHref}
@@ -189,7 +190,7 @@ export function ResourceReleaseWatchControl({
     <div className="space-y-2">
       {surface === "detail" ? (
         <>
-          <p className="text-sm text-secondary">{copy.note}</p>
+          <p className={typeSmSecondary}>{copy.note}</p>
           <p className="text-xs text-muted">{copy.pinned}</p>
           <p className="text-xs text-muted">{copy.limit}</p>
         </>
@@ -247,7 +248,7 @@ export function ResourceReleaseWatchControl({
       )}
       {error ? <ErrorState title={error} description={copy.failedDescription} /> : null}
       {saved ? (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {copy.saved}
         </p>
       ) : null}

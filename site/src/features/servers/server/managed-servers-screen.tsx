@@ -15,6 +15,7 @@ import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax6xl as pageShellClass } from "../../shell/page-shell";
 import { panelFlexWrapEndGap4P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary, typeSmSecondary } from "../../shell/type-shell";
 import { ManagedServerCard } from "../managed-card-server";
 import {
   getManagedServerCopy,
@@ -66,7 +67,7 @@ export async function ManagedServersScreen({
   if (!result) {
     return (
       <div className={pageShellClass}>
-        <h1 className="font-display text-primary">{copy.title}</h1>
+        <h1 className={typeDisplayPrimary}>{copy.title}</h1>
         <ErrorState
           title={workspace.unavailable}
           description={workspace.unavailableHint}
@@ -95,7 +96,7 @@ export async function ManagedServersScreen({
           <Link href="/workspace" className={linkAccentSm}>
             ← {copy.back}
           </Link>
-          <h1 className="font-display text-primary">{copy.title}</h1>
+          <h1 className={typeDisplayPrimary}>{copy.title}</h1>
           <p className="max-w-2xl text-sm text-muted">{copy.subtitle}</p>
         </div>
         <Link
@@ -173,7 +174,7 @@ export async function ManagedServersScreen({
         </form>
       </search>
       <p className="max-w-3xl text-xs text-muted">{copy.liveNote}</p>
-      <p className="text-sm text-secondary">
+      <p className={typeSmSecondary}>
         {copy.showing}{" "}
         {result.total === 0
           ? "0"

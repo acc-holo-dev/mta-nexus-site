@@ -19,6 +19,12 @@ import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeBreakAllXs,
+  typeFlexWrapEndGap3,
+  typeFlexWrapGap4,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
 import {
   collectionInventoryHref,
@@ -97,7 +103,7 @@ export async function CollectionInventoryPage({
     const suffix = (page: number) => libraryCollectionInventorySuffix({ ...query, page });
     return (
       <div className={pageShellClass}>
-        <nav className="flex flex-wrap gap-4">
+        <nav className={typeFlexWrapGap4}>
           <Link href={collectionHref()} className={linkAccentSmRounded}>
             {c.title}
           </Link>
@@ -107,9 +113,9 @@ export async function CollectionInventoryPage({
         </nav>
         <h1>{v.title}</h1>
         <p className="text-secondary">{v.note}</p>
-        <p className="text-sm text-secondary">{v.watchNote}</p>
+        <p className={typeSmSecondary}>{v.watchNote}</p>
         {report.collectionId ? (
-          <nav className="flex flex-wrap gap-4" aria-label={v.collection}>
+          <nav className={typeFlexWrapGap4} aria-label={v.collection}>
             <Link
               href={collectionHref(report.collectionId, "releases")}
               className={linkAccentSmRounded}
@@ -125,11 +131,7 @@ export async function CollectionInventoryPage({
           </nav>
         ) : null}
         <search aria-label={v.search}>
-          <form
-            method="get"
-            action={collectionInventoryHref()}
-            className="flex flex-wrap items-end gap-3"
-          >
+          <form method="get" action={collectionInventoryHref()} className={typeFlexWrapEndGap3}>
             <label className="grid gap-1">
               {v.search}
               <input
@@ -214,8 +216,8 @@ export async function CollectionInventoryPage({
             ),
           )}
         </dl>
-        <p className="text-sm text-secondary">{v.countNote}</p>
-        <nav aria-label={v.releaseFilter} className="flex flex-wrap gap-4">
+        <p className={typeSmSecondary}>{v.countNote}</p>
+        <nav aria-label={v.releaseFilter} className={typeFlexWrapGap4}>
           {(["attention", "updates", "pinned", "selection-unavailable", "latest"] as const).map(
             (release) => (
               <Link
@@ -245,7 +247,7 @@ export async function CollectionInventoryPage({
         >
           {v.export}
         </a>
-        <p className="text-sm text-secondary">{v.snapshotNote}</p>
+        <p className={typeSmSecondary}>{v.snapshotNote}</p>
         {!report.items.length ? (
           <EmptyState
             title={v.empty}
@@ -268,7 +270,7 @@ export async function CollectionInventoryPage({
                 <h2 className="break-words font-semibold">
                   {item.available ? (item.title ?? c.unavailable) : c.unavailable}
                 </h2>
-                <code className="block break-all text-xs">{item.productId}</code>
+                <code className={typeBreakAllXs}>{item.productId}</code>
                 <p>
                   {item.available ? v.available : v.unavailable} · {v.memberships}:{" "}
                   {item.memberships.length}
@@ -343,7 +345,7 @@ export async function CollectionInventoryPage({
                     available={item.available}
                   />
                 ) : null}
-                <div className="flex flex-wrap gap-4">
+                <div className={typeFlexWrapGap4}>
                   {item.slug ? (
                     <Link
                       href={`/market/${encodeURIComponent(item.slug)}`}
@@ -390,7 +392,7 @@ export async function CollectionInventoryPage({
           })}
         </ol>
         {report.totalPages > 1 && (
-          <nav aria-label={c.page} className="flex flex-wrap gap-4">
+          <nav aria-label={c.page} className={typeFlexWrapGap4}>
             {report.page > 1 && (
               <Link
                 href={`${collectionInventoryHref()}?${suffix(report.page - 1)}`}

@@ -10,6 +10,7 @@ import { securityCenterService } from "../../../lib/services/accounts/security-c
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xlRoomy as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeFlexCenterGap2, typeSmSemiboldPrimary } from "../../shell/type-shell";
 import { securityActivityLabelKey } from "../security-activity";
 
 const recoveryPanelClass = "nexus-panel min-w-0 overflow-x-clip p-5 shadow-nexus-sm";
@@ -73,9 +74,9 @@ export async function SecurityCenterScreen() {
       </div>
 
       <section aria-labelledby="security-recovery-heading" className={recoveryPanelClass}>
-        <div className="flex items-center gap-2">
+        <div className={typeFlexCenterGap2}>
           <MailCheck className="h-4 w-4 text-accent" aria-hidden="true" />
-          <h2 id="security-recovery-heading" className="text-sm font-semibold text-primary">
+          <h2 id="security-recovery-heading" className={typeSmSemiboldPrimary}>
             {copy.recovery}
           </h2>
         </div>
@@ -100,9 +101,9 @@ export async function SecurityCenterScreen() {
       </section>
 
       <section aria-labelledby="security-sessions-heading" className={panelShellClass}>
-        <div className="flex items-center gap-2">
+        <div className={typeFlexCenterGap2}>
           <Monitor className="h-4 w-4 text-accent" aria-hidden="true" />
-          <h2 id="security-sessions-heading" className="text-sm font-semibold text-primary">
+          <h2 id="security-sessions-heading" className={typeSmSemiboldPrimary}>
             {copy.sessions}
           </h2>
         </div>
@@ -137,9 +138,9 @@ export async function SecurityCenterScreen() {
       </section>
 
       <section aria-labelledby="security-activity-heading" className={panelShellClass}>
-        <div className="flex items-center gap-2">
+        <div className={typeFlexCenterGap2}>
           <Clock3 className="h-4 w-4 text-accent" aria-hidden="true" />
-          <h2 id="security-activity-heading" className="text-sm font-semibold text-primary">
+          <h2 id="security-activity-heading" className={typeSmSemiboldPrimary}>
             {copy.activity}
           </h2>
         </div>

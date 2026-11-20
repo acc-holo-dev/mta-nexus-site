@@ -14,6 +14,12 @@ import { linkAccentSm, linkAccentTightBreakSemibold, linkMinH } from "../../shel
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapGap4Sm,
+  typeSmSecondary,
+  typeSpace1SmSecondary,
+} from "../../shell/type-shell";
 import { parseHistoryPage } from "../commerce-history-format";
 import {
   financialFlags,
@@ -100,11 +106,11 @@ export async function FinancialReconciliationScreen({
       <Link href="/admin" className={linkAccentSm}>
         {copy.back}
       </Link>
-      <h1 className="font-display text-primary">{copy.review}</h1>
-      <p role="note" className="text-sm text-secondary">
+      <h1 className={typeDisplayPrimary}>{copy.review}</h1>
+      <p role="note" className={typeSmSecondary}>
         {copy.reviewNote}
       </p>
-      <nav className="flex flex-wrap gap-4 text-sm" aria-label={copy.review}>
+      <nav className={typeFlexWrapGap4Sm} aria-label={copy.review}>
         <Link href="?filter=review" className={linkAccentSm}>
           {copy.reviewOnly}
         </Link>
@@ -127,11 +133,11 @@ export async function FinancialReconciliationScreen({
               >
                 {order.orderNumber}
               </Link>
-              <p className="text-sm text-secondary">
+              <p className={typeSmSecondary}>
                 {financialOrderLabel(locale, order.status)} ·{" "}
                 {formatFinancialMinor(order.amount, order.currency, locale)}
               </p>
-              <ul className="space-y-1 text-sm text-secondary">
+              <ul className={typeSpace1SmSecondary}>
                 {financialFlags
                   .filter((flag) => order[flag])
                   .map((flag) => (
@@ -159,7 +165,7 @@ export async function FinancialReconciliationScreen({
         />
       )}
       {result.totalPages > 1 ? (
-        <nav aria-label={copy.page} className="flex flex-wrap gap-4 text-sm">
+        <nav aria-label={copy.page} className={typeFlexWrapGap4Sm}>
           {result.page > 1 ? (
             <Link href={href(result.page - 1)} className={linkAccentSm}>
               {copy.previous}

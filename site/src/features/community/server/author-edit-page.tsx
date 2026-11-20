@@ -12,6 +12,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax3xlTight as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary } from "../../shell/type-shell";
 import { AuthorContentForm } from "../author-content-form";
 import { parseEditableContent } from "../user-platform-client";
 import { getUserPlatformCopy } from "../user-platform-copy";
@@ -51,7 +52,7 @@ export async function EditPublicationPage({ params }: { params: Promise<{ id: st
       <Link href="/workspace/content" className={linkAccentSm}>
         {copy.back}
       </Link>
-      <h1 className="font-display text-primary">{copy.edit}</h1>
+      <h1 className={typeDisplayPrimary}>{copy.edit}</h1>
       {initial ? (
         <AuthorContentForm locale={locale} initial={initial} />
       ) : (

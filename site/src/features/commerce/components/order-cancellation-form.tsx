@@ -8,6 +8,7 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
+import { typeSmSuccess } from "../../shell/type-shell";
 import { confirmedOrderCancellation } from "../commercial-confirmation";
 import { commercialError, getCommercialCopy } from "../commercial-i18n";
 
@@ -217,7 +218,7 @@ export function OrderCancellationForm({
       </fieldset>
       {error ? <ErrorState title={error} description={copy.formErrorHint} /> : null}
       {ready === scope && saved ? (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {copy.cancelled}
         </p>
       ) : null}

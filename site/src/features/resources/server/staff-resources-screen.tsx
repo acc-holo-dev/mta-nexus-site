@@ -25,6 +25,12 @@ import {
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelMinSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapGap4Sm,
+  typeSmSecondary,
+  typeSpace1SmSecondary,
+} from "../../shell/type-shell";
 
 const statuses = ["draft", "pending_review", "published", "suspended", "archived"] as const;
 
@@ -113,8 +119,8 @@ export async function StaffResourcesScreen({
       <Link href="/admin" className={linkAccentSm}>
         {copy.back}
       </Link>
-      <h1 className="font-display text-primary">{copy.moderation}</h1>
-      <p role="note" className="text-sm text-secondary">
+      <h1 className={typeDisplayPrimary}>{copy.moderation}</h1>
+      <p role="note" className={typeSmSecondary}>
         {copy.moderationNote}
       </p>
       <form className="flex min-w-0 flex-wrap items-end gap-3" method="get">
@@ -127,7 +133,7 @@ export async function StaffResourcesScreen({
             className="block min-h-11 w-full min-w-0 rounded-md border border-base bg-surface px-3 py-2"
           />
         </label>
-        <label className="space-y-1 text-sm text-secondary">
+        <label className={typeSpace1SmSecondary}>
           {copy.status}
           <select
             name="status"
@@ -161,7 +167,7 @@ export async function StaffResourcesScreen({
               >
                 {product.title}
               </Link>
-              <p className="text-sm text-secondary">
+              <p className={typeSmSecondary}>
                 {resourceStatusLabel(locale, product.status)} · {product.currentVersion}
               </p>
               <time dateTime={product.updatedAt.toISOString()} className="text-xs text-muted">
@@ -185,7 +191,7 @@ export async function StaffResourcesScreen({
         />
       )}
       {result.totalPages > 1 ? (
-        <nav aria-label={copy.page} className="flex flex-wrap gap-4 text-sm">
+        <nav aria-label={copy.page} className={typeFlexWrapGap4Sm}>
           {result.page > 1 ? (
             <Link href={href(result.page - 1)} className={linkAccent}>
               {copy.previous}

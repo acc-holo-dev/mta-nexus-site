@@ -6,6 +6,7 @@ import { verificationWorkspaceService } from "../../../lib/services/moderation/v
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { type2xlBoldPrimary, typeMt2SmMuted } from "../../shell/type-shell";
 import {
   verificationOverviewSchema,
   verificationPageQuery,
@@ -69,8 +70,8 @@ export async function VerificationWorkspacePage({
   return (
     <div className={pageShellClass}>
       <header>
-        <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
-        <p className="mt-2 text-sm text-muted">{copy.description}</p>
+        <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
+        <p className={typeMt2SmMuted}>{copy.description}</p>
       </header>
       <VerificationWorkspace
         key={`${actor.id}:${JSON.stringify(filters)}:${JSON.stringify(teamFilters)}`}

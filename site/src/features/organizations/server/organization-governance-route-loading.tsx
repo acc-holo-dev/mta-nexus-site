@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH10W23MaxMd } from "../../shell/skeleton-shell";
 import { organizationGovernanceCopy } from "../organization-governance-copy";
 
 type Copy = ReturnType<typeof organizationGovernanceCopy>;
@@ -39,11 +40,7 @@ function OrganizationGovernanceRouteLoading({
     throw new Error("OrganizationGovernanceRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? (
-      <div className="h-10 w-2/3 max-w-md rounded bg-inset" />
-    ) : (
-      (leading ?? undefined)
-    );
+    leading === undefined ? <div className={skelH10W23MaxMd} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -74,7 +71,7 @@ export function OrganizationActivityRouteLoading() {
     headingId: "organization-activity-loading-heading",
     className: pageShellMax5xl,
     rowClassName: "h-24 rounded bg-inset",
-    leading: <div className="h-10 w-2/3 max-w-md rounded bg-inset" />,
+    leading: <div className={skelH10W23MaxMd} />,
     titleKey: "history",
     loadingKey: "historyDescription",
   });

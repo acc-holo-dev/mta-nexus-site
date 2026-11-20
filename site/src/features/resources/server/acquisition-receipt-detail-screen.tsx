@@ -14,6 +14,7 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary, typeSmSecondary } from "../../shell/type-shell";
 import { ResourceCartReviewEvidence } from "../cart-view";
 import { ResourceDownloadButton } from "../download";
 import { resourceCartReceiptsCopy } from "../resource-cart-receipts-i18n";
@@ -84,8 +85,8 @@ export async function AcquisitionReceiptDetailScreen({
       <Link href="/workspace/acquisitions/receipts" className={linkAccentSmRounded}>
         {copy.title}
       </Link>
-      <h1 className="font-display text-primary">{copy.receipt}</h1>
-      <p role="note" className="text-sm text-secondary">
+      <h1 className={typeDisplayPrimary}>{copy.receipt}</h1>
+      <p role="note" className={typeSmSecondary}>
         {copy.note}
       </p>
       <p className="break-all font-mono text-xs text-muted">{receipt.requestId}</p>
@@ -107,7 +108,7 @@ export async function AcquisitionReceiptDetailScreen({
           {receipt.items.map((item) => (
             <li key={item.productId} className={panelSpace4P5}>
               <h2 className="break-words text-lg font-semibold">{item.title}</h2>
-              <p className="text-sm text-secondary">
+              <p className={typeSmSecondary}>
                 {item.alreadyClaimed ? copy.alreadyOwned : copy.newlyAdded} ·{" "}
                 {copy[item.accessSource]}
               </p>

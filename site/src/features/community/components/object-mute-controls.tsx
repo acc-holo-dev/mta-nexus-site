@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import type { Locale } from "../../../lib/i18n";
 import { LocaleProvider, useNexusLocale } from "../../shell/locale";
+import { typeFlexWrapGap2, typeXsSecondary } from "../../shell/type-shell";
 import type { FollowTargetType, ObjectMuteDuration } from "../follow-workspace-contract";
 import { followCopy, followError } from "../follow-workspace-copy";
 
@@ -126,12 +127,12 @@ function ObjectMuteControl({
     <div className="space-y-2">
       <p className="text-xs text-muted">{copy.muteHelp}</p>
       {muted && mutedUntil ? (
-        <p role="status" className="text-xs text-secondary">
+        <p role="status" className={typeXsSecondary}>
           {copy.mutedUntil}:{" "}
           {new Date(mutedUntil).toLocaleString(locale === "ru" ? "ru-RU" : "en-US")}
         </p>
       ) : null}
-      <div className="flex flex-wrap gap-2">
+      <div className={typeFlexWrapGap2}>
         {(["24h", "7d", "30d"] as const).map((duration) => (
           <Button
             key={duration}

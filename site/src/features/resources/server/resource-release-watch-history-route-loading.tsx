@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax5xlTight } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH28 } from "../../shell/skeleton-shell";
 import { resourceReleaseWatchHistoryCopy } from "../resource-release-watch-history-i18n";
 
 type Copy = ReturnType<typeof resourceReleaseWatchHistoryCopy>;
@@ -39,7 +40,7 @@ function ResourceReleaseWatchHistoryRouteLoading({
     throw new Error("ResourceReleaseWatchHistoryRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-28 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH28} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -70,7 +71,7 @@ export function ReleaseWatchHistoryRouteLoading() {
     headingId: "release-watch-history-loading-heading",
     className: pageShellMax5xlTight,
     rowClassName: "h-24 rounded bg-inset",
-    leading: <div className="h-28 rounded bg-inset" />,
+    leading: <div className={skelH28} />,
     titleKey: "title",
   });
 }

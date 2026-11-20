@@ -14,6 +14,7 @@ import {
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { panelSpace4P5 } from "../../shell/panel-shell";
+import { typeBreakAllXs } from "../../shell/type-shell";
 import { LibraryCollectionBatchForm } from "../collection-batch";
 import { libraryCollectionManifestsCopy } from "../library-collection-manifests-i18n";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
@@ -209,7 +210,7 @@ export function LibraryCollectionImport({
             {m.current}: {preview.collection.name} · {c[preview.collection.status]} · {c.revision}{" "}
             {preview.collection.revision}
           </p>
-          <code className="block break-all text-xs">{preview.collection.id}</code>
+          <code className={typeBreakAllXs}>{preview.collection.id}</code>
           <p>
             {c.items}: {preview.itemCount} / {preview.itemLimit} · {m.capacity}:{" "}
             {preview.itemLimit - preview.itemCount}
@@ -222,7 +223,7 @@ export function LibraryCollectionImport({
             {preview.items.map((item) => (
               <li key={item.productId} className="break-words border-t border-base pt-2">
                 <p>{item.available ? (item.title ?? c.unavailable) : c.unavailable}</p>
-                <code className="block break-all text-xs">{item.productId}</code>
+                <code className={typeBreakAllXs}>{item.productId}</code>
                 <p>
                   {mode && "canRemove" in item && item.canRemove
                     ? m.removeCandidate

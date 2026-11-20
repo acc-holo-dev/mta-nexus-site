@@ -10,6 +10,7 @@ import { parseEditableProfile } from "../../community/user-platform-client";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceSpace2P3TextSm } from "../../shell/surface-shell";
+import { typePrewrapBreak, typeSmSecondary, typeSmSuccess } from "../../shell/type-shell";
 import { confirmedCompatibility } from "../resource-management-confirmation";
 import { getResourceManagementCopy, resourceManagementError } from "../resource-management-i18n";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
@@ -186,7 +187,7 @@ export function ResourceCompatibilityForm({
   }
   return (
     <form onSubmit={submit} aria-busy={busy} className={panelSpace4P5}>
-      <p className="text-sm text-secondary">{copy.compatibilityNote}</p>
+      <p className={typeSmSecondary}>{copy.compatibilityNote}</p>
       {product.suspended ? (
         <ErrorState
           id="resource-compatibility-suspended-readonly"
@@ -194,7 +195,7 @@ export function ResourceCompatibilityForm({
           description={dictionary.errors.formErrorHint}
         />
       ) : (
-        <p className="text-sm text-secondary">{getResourcePublisherCopy(locale).editNote}</p>
+        <p className={typeSmSecondary}>{getResourcePublisherCopy(locale).editNote}</p>
       )}
       {!foreignActor && identityVerified && (
         <>
@@ -251,7 +252,7 @@ export function ResourceCompatibilityForm({
               <p>
                 {copy.mta}: {formatUnknown(locale, newest.compatibility.mtaMinVersion)}
               </p>
-              <p className="whitespace-pre-wrap break-words">
+              <p className={typePrewrapBreak}>
                 {copy.dependencies}: {(newest.compatibility.dependencies ?? []).join("\n")}
               </p>
               {!newest.suspended && (!needsCheck || checked) && (
@@ -284,7 +285,7 @@ export function ResourceCompatibilityForm({
       )}
       {error ? <ErrorState title={error} description={copy.actionFailedDescription} /> : null}
       {saved && (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {copy.saved}
         </p>
       )}

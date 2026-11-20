@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH6W23 } from "../../shell/skeleton-shell";
 import { reportHistoryCopy } from "../community-report-history-copy";
 
 type Copy = ReturnType<typeof reportHistoryCopy>;
@@ -39,7 +40,7 @@ function CommunityReportHistoryRouteLoading({
     throw new Error("CommunityReportHistoryRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-6 w-2/3 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH6W23} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -70,7 +71,7 @@ export function ReportHistoryRouteLoading() {
     headingId: "report-history-loading-heading",
     className: "nexus-panel min-w-0 space-y-4 overflow-x-clip p-6",
     titleClassName: "text-xl font-semibold text-primary",
-    leading: <div className="h-6 w-2/3 rounded bg-inset" />,
+    leading: <div className={skelH6W23} />,
     titleKey: "title",
   });
 }

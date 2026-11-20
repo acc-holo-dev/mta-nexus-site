@@ -14,6 +14,12 @@ import { pageShellStack5 } from "../../shell/page-shell";
 import { panelMinSpace4P5, panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceSpace3P4 } from "../../shell/surface-shell";
 import {
+  typeFlexWrapGap3,
+  typePrewrapSmSecondary,
+  typeSmSecondary,
+  typeSmSemiboldPrimary,
+} from "../../shell/type-shell";
+import {
   type CommunityReportDetail,
   type communityReportDecisionSchema,
   communityReportDetailSchema,
@@ -213,12 +219,10 @@ export function CommunityReportDetailView({
             <h2 className="break-words text-lg font-semibold text-primary">
               {copy[report.targetType]} · {copy[report.type]}
             </h2>
-            <p className="text-sm text-secondary">
+            <p className={typeSmSecondary}>
               {copy.status}: {copy[report.status]}
             </p>
-            <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-              {report.reason}
-            </p>
+            <p className={typePrewrapSmSecondary}>{report.reason}</p>
             <ReportEvidenceLinks urls={report.evidenceUrls} label={copy.evidence} />
             <dl className="space-y-2 text-xs text-muted">
               <div>
@@ -256,10 +260,8 @@ export function CommunityReportDetailView({
             </dl>
             {staff && report.moderatorNotes && (
               <div className="space-y-1">
-                <h3 className="text-sm font-semibold text-primary">{copy.notes}</h3>
-                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                  {report.moderatorNotes}
-                </p>
+                <h3 className={typeSmSemiboldPrimary}>{copy.notes}</h3>
+                <p className={typePrewrapSmSecondary}>{report.moderatorNotes}</p>
               </div>
             )}
           </section>
@@ -289,9 +291,7 @@ export function CommunityReportDetailView({
                     @{report.target.author}
                   </Link>
                 )}
-                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                  {report.target.text}
-                </p>
+                <p className={typePrewrapSmSecondary}>{report.target.text}</p>
                 {report.target.truncated && <p className="text-xs text-muted">{copy.truncated}</p>}
                 {report.target.href && (
                   <Link className={linkAccentTightSmRounded} href={report.target.href}>
@@ -324,13 +324,13 @@ export function CommunityReportDetailView({
               </label>
               {confirmation ? (
                 <fieldset className={surfaceSpace3P4} aria-label={copy.confirm}>
-                  <p className="text-sm text-secondary">
+                  <p className={typeSmSecondary}>
                     {confirmation.action === "remove_comment"
                       ? copy.confirmRemove
                       : copy.confirmDecision}
                   </p>
-                  <p className="text-sm font-semibold text-primary">{copy[confirmation.action]}</p>
-                  <div className="flex flex-wrap gap-3">
+                  <p className={typeSmSemiboldPrimary}>{copy[confirmation.action]}</p>
+                  <div className={typeFlexWrapGap3}>
                     <Button
                       type="button"
                       isLoading={pending}
@@ -350,7 +350,7 @@ export function CommunityReportDetailView({
                   </div>
                 </fieldset>
               ) : (
-                <div className="flex flex-wrap gap-3">
+                <div className={typeFlexWrapGap3}>
                   {(
                     [
                       ...(report.status === "open" ? ["review" as const] : []),

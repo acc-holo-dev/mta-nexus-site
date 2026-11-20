@@ -13,6 +13,7 @@ import {
   linkMinHAccentFocus,
 } from "../../shell/link-shell";
 import { pageShellStack5 } from "../../shell/page-shell";
+import { typeFlexWrapEndGap3, typeSmSuccess } from "../../shell/type-shell";
 import { confirmsFollowMutation } from "../follow-confirmation";
 import {
   FOLLOW_TYPES,
@@ -187,7 +188,7 @@ export function FollowWorkspace({
         ))}
       </nav>
       <search aria-label={copy.search}>
-        <form action="/workspace/saved" method="get" className="flex flex-wrap items-end gap-3">
+        <form action="/workspace/saved" method="get" className={typeFlexWrapEndGap3}>
           {type && <input name="type" type="hidden" value={type} />}
           <label className="min-w-48 flex-1 space-y-1 text-xs text-secondary">
             {copy.search}
@@ -234,7 +235,7 @@ export function FollowWorkspace({
         />
       )}
       {success && (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {success}
         </p>
       )}

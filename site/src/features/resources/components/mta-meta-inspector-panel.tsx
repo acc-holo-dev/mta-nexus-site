@@ -7,6 +7,7 @@ import { linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceInsetP3 } from "../../shell/surface-shell";
+import { typeLabelUpperFaint, typeXsSecondary } from "../../shell/type-shell";
 import { getMtaMetaInspectorIssueMessage } from "../mta-meta-inspector-messages";
 import { getMtaVersionTargetSuggestion } from "../mta-version-target";
 export type InspectionResponse = {
@@ -159,7 +160,7 @@ export function MtaMetaInspectorPanel({
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
         <label className="min-w-0 flex-1 space-y-1.5">
-          <span className="text-xs text-secondary">{copy.fileLabel}</span>
+          <span className={typeXsSecondary}>{copy.fileLabel}</span>
           <input
             type="file"
             accept={metaInspectorClientPolicy.fileAccept}
@@ -206,7 +207,7 @@ export function MtaMetaInspectorPanel({
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             <div className={surfaceInsetP3}>
-              <div className="font-label uppercase text-faint">{copy.scripts}</div>
+              <div className={typeLabelUpperFaint}>{copy.scripts}</div>
               <div className="mt-1 text-lg font-black text-primary">
                 {inspection.summary.scriptCount}
               </div>
@@ -218,7 +219,7 @@ export function MtaMetaInspectorPanel({
             </div>
 
             <div className={surfaceInsetP3}>
-              <div className="font-label uppercase text-faint">{copy.files}</div>
+              <div className={typeLabelUpperFaint}>{copy.files}</div>
               <div className="mt-1 text-lg font-black text-primary">
                 {inspection.summary.fileCount}
               </div>
@@ -230,7 +231,7 @@ export function MtaMetaInspectorPanel({
             </div>
 
             <div className={surfaceInsetP3}>
-              <div className="font-label uppercase text-faint">{copy.dependencies}</div>
+              <div className={typeLabelUpperFaint}>{copy.dependencies}</div>
               <div className="mt-1 text-lg font-black text-primary">
                 {inspection.summary.dependencyCount}
               </div>
@@ -242,7 +243,7 @@ export function MtaMetaInspectorPanel({
             </div>
 
             <div className={surfaceInsetP3}>
-              <div className="font-label uppercase text-faint">{copy.exports}</div>
+              <div className={typeLabelUpperFaint}>{copy.exports}</div>
               <div className="mt-1 text-lg font-black text-primary">
                 {inspection.summary.exportCount}
               </div>
@@ -310,7 +311,7 @@ export function MtaMetaInspectorPanel({
 
           {inspection.dependencyResources.length > 0 && (
             <div>
-              <div className="font-label uppercase text-faint">{copy.includedResources}</div>
+              <div className={typeLabelUpperFaint}>{copy.includedResources}</div>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {inspection.dependencyResources.map((dependency) => (
                   <span
@@ -327,7 +328,7 @@ export function MtaMetaInspectorPanel({
           {scripts.length > 0 && (
             <section aria-labelledby="meta-inspector-scripts-heading" className="space-y-2">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <h3 id="meta-inspector-scripts-heading" className="font-label uppercase text-faint">
+                <h3 id="meta-inspector-scripts-heading" className={typeLabelUpperFaint}>
                   {copy.scriptsDetails}
                 </h3>
                 <span className="text-[10px] text-faint">
@@ -367,7 +368,7 @@ export function MtaMetaInspectorPanel({
           {files.length > 0 && (
             <section aria-labelledby="meta-inspector-files-heading" className="space-y-2">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <h3 id="meta-inspector-files-heading" className="font-label uppercase text-faint">
+                <h3 id="meta-inspector-files-heading" className={typeLabelUpperFaint}>
                   {copy.filesDetails}
                 </h3>
                 <span className="text-[10px] text-faint">
@@ -400,7 +401,7 @@ export function MtaMetaInspectorPanel({
           {maps.length > 0 && (
             <section aria-labelledby="meta-inspector-maps-heading" className="space-y-2">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <h3 id="meta-inspector-maps-heading" className="font-label uppercase text-faint">
+                <h3 id="meta-inspector-maps-heading" className={typeLabelUpperFaint}>
                   {copy.mapsDetails}
                 </h3>
                 <span className="text-[10px] text-faint">
@@ -433,10 +434,7 @@ export function MtaMetaInspectorPanel({
           {settings.length > 0 && (
             <section aria-labelledby="meta-inspector-settings-heading" className="space-y-2">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <h3
-                  id="meta-inspector-settings-heading"
-                  className="font-label uppercase text-faint"
-                >
+                <h3 id="meta-inspector-settings-heading" className={typeLabelUpperFaint}>
                   {copy.settingsDetails}
                 </h3>
                 <span className="text-[10px] text-faint">
@@ -472,7 +470,7 @@ export function MtaMetaInspectorPanel({
           {inspection.aclRights.length > 0 && (
             <section aria-labelledby="meta-inspector-acl-heading" className="space-y-2">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <h3 id="meta-inspector-acl-heading" className="font-label uppercase text-faint">
+                <h3 id="meta-inspector-acl-heading" className={typeLabelUpperFaint}>
                   {copy.aclRights}
                 </h3>
                 <span className="text-[10px] text-faint">
@@ -513,7 +511,7 @@ export function MtaMetaInspectorPanel({
           {inspection.exports.length > 0 && (
             <section aria-labelledby="meta-inspector-exports-heading" className="space-y-2">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <h3 id="meta-inspector-exports-heading" className="font-label uppercase text-faint">
+                <h3 id="meta-inspector-exports-heading" className={typeLabelUpperFaint}>
                   {copy.exportsDetails}
                 </h3>
                 <span className="text-[10px] text-faint">
@@ -555,7 +553,7 @@ export function MtaMetaInspectorPanel({
 
           {inspection.issues.length > 0 && (
             <div className="space-y-2">
-              <div className="font-label uppercase text-faint">{copy.structuralNotes}</div>
+              <div className={typeLabelUpperFaint}>{copy.structuralNotes}</div>
               <ul className="space-y-1.5">
                 {withOccurrenceKeys(inspection.issues, (issue) =>
                   JSON.stringify([issue.code, issue.severity, issue.message]),

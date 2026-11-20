@@ -13,6 +13,7 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax3xl } from "../../shell/page-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary, typeSmSecondary } from "../../shell/type-shell";
 import { formatFinancialMinor } from "../financial-i18n";
 import { sellerSalesCopy, sellerSalesTime } from "../seller-sales-i18n";
 import { sellerSalesDetailQuery, sellerSalesUrl } from "../seller-sales-query";
@@ -115,13 +116,13 @@ async function SellerSalesReportDetailScreen({ saleId, query }: { saleId: string
       >
         {c.back}
       </Link>
-      <h1 className="font-display text-primary">{c.detail}</h1>
+      <h1 className={typeDisplayPrimary}>{c.detail}</h1>
       <h2 className="break-words text-xl">{sale.productTitle}</h2>
       <p className="text-secondary">{scope.name ?? c.personal}</p>
-      <p role="note" className="text-sm text-secondary">
+      <p role="note" className={typeSmSecondary}>
         {attribution === "recorded" ? c.recordedNotice : c.notice}
       </p>
-      <p role="note" className="text-sm text-secondary">
+      <p role="note" className={typeSmSecondary}>
         {c.paymentNotice}
       </p>
       <dl className={panelSpace4P5}>

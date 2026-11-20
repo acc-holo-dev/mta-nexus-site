@@ -11,6 +11,7 @@ import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax5xlLooseTight } from "../../shell/page-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceInsetP3TextSmSecondary } from "../../shell/surface-shell";
+import { typeFlexCenterGap2, typeHeadingPrimary, typeSmSecondary } from "../../shell/type-shell";
 import {
   confirmSupportCaseCreated,
   parseSupportCasePage,
@@ -327,9 +328,9 @@ export function SupportCenter({
           aria-busy={creating}
           className={panelSpace4P5}
         >
-          <div className="flex items-center gap-2">
+          <div className={typeFlexCenterGap2}>
             <Plus className="h-4 w-4 text-accent" aria-hidden="true" />
-            <h2 className="font-heading text-primary">{copy.newCase}</h2>
+            <h2 className={typeHeadingPrimary}>{copy.newCase}</h2>
           </div>
 
           <label className="block space-y-1.5">
@@ -514,9 +515,7 @@ export function SupportCenter({
       </search>
 
       <section className="space-y-3" aria-busy={loading}>
-        <h2 className="font-heading text-primary">
-          {staffMode ? copy.staffQueue : copy.yourCases}
-        </h2>
+        <h2 className={typeHeadingPrimary}>{staffMode ? copy.staffQueue : copy.yourCases}</h2>
 
         {loading ? (
           <div role="status" aria-live="polite" className="space-y-3">
@@ -603,7 +602,7 @@ export function SupportCenter({
           ) : (
             <span />
           )}
-          <span className="text-sm text-secondary">
+          <span className={typeSmSecondary}>
             {dictionary.market.pageLabel} {page} / {totalPages}
           </span>
           {page < totalPages ? (

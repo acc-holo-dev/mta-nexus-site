@@ -9,6 +9,14 @@ import { publicVerificationHistoryService } from "../../../lib/services/trust/pu
 import { linkAccentSm, linkSecondaryBorder } from "../../shell/link-shell";
 import { pageShellMax4xlTight as pageShellClass, pageShellStack3 } from "../../shell/page-shell";
 import { panelClipSpace2P5, panelClipSpace3P5, panelClipSpace3P6 } from "../../shell/panel-shell";
+import {
+  type2xlExtraboldPrimary,
+  typeGrid2Gap4,
+  typeHeadingPrimary,
+  typeSemiboldPrimary,
+  typeSmSecondary,
+  typeSpace1XsMuted,
+} from "../../shell/type-shell";
 import { approvalPageHref, parseApprovalQuery } from "../public-verification-history-contract";
 import { approvalCopy, approvalError } from "../public-verification-history-copy";
 
@@ -62,19 +70,19 @@ export async function ApprovalHistoryPage({
         {copy.back}
       </Link>
       <header className={panelClipSpace3P6}>
-        <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
+        <h1 className={type2xlExtraboldPrimary}>{copy.title}</h1>
         {page && (
           <p className="break-words font-semibold text-primary">
             {page.subject.name} (@{page.subject.username})
           </p>
         )}
         <p className="text-sm text-muted">{copy.description}</p>
-        <p className="text-sm text-secondary">{copy.scope}</p>
+        <p className={typeSmSecondary}>{copy.scope}</p>
       </header>
       {page && (
         <section className={panelClipSpace3P5}>
-          <h2 className="font-heading text-primary">{copy.current}</h2>
-          <dl className="grid gap-4 sm:grid-cols-2">
+          <h2 className={typeHeadingPrimary}>{copy.current}</h2>
+          <dl className={typeGrid2Gap4}>
             <div>
               <dt className="text-sm text-muted">{copy.user}</dt>
               <dd
@@ -99,7 +107,7 @@ export async function ApprovalHistoryPage({
         method="get"
         className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 overflow-x-clip p-4"
       >
-        <label className="space-y-1 text-xs text-muted">
+        <label className={typeSpace1XsMuted}>
           {copy.type}
           <select
             name="type"
@@ -149,8 +157,8 @@ export async function ApprovalHistoryPage({
         <ol className={pageShellStack3}>
           {page.items.map((record) => (
             <li key={record.key} className={panelClipSpace2P5}>
-              <h2 className="font-semibold text-primary">{copy[record.type]}</h2>
-              <p className="text-sm text-secondary">{copy.approved}</p>
+              <h2 className={typeSemiboldPrimary}>{copy[record.type]}</h2>
+              <p className={typeSmSecondary}>{copy.approved}</p>
               <time dateTime={record.approvedAt} className="text-sm text-muted">
                 {new Date(record.approvedAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                   timeZone: "UTC",

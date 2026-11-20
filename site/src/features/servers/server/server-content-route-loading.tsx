@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax3xl, pageShellMax5xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH10W64 } from "../../shell/skeleton-shell";
 import { serverContentCopy } from "../server-content-copy";
 
 type Copy = ReturnType<typeof serverContentCopy>;
@@ -40,7 +41,7 @@ function ServerContentRouteLoading({
     throw new Error("ServerContentRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-10 w-64 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH10W64} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -71,7 +72,7 @@ export function ServerContentDetailRouteLoading() {
     headingId: "server-content-detail-loading-heading",
     className: pageShellMax3xl,
     rows: 4,
-    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    leading: <div className={skelH10W64} />,
     titleKey: "title",
   });
 }
@@ -81,7 +82,7 @@ export function ServersServerContentRouteLoading() {
     headingId: "server-content-loading-heading",
     className: pageShellMax5xl,
     rows: 4,
-    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    leading: <div className={skelH10W64} />,
     titleKey: "title",
   });
 }
@@ -91,7 +92,7 @@ export function ServerContentNewRouteLoading() {
     headingId: "server-content-new-loading-heading",
     className: pageShellMax3xl,
     rows: 4,
-    leading: <div className="h-10 w-64 rounded bg-inset" />,
+    leading: <div className={skelH10W64} />,
     titleKey: "new",
   });
 }

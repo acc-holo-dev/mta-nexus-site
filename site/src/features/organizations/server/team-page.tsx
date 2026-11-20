@@ -11,6 +11,7 @@ import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { type2xlExtraboldPrimary, typeSpace1XsMuted } from "../../shell/type-shell";
 import {
   organizationTeamHref,
   organizationTeamPageSchema,
@@ -80,7 +81,7 @@ export async function TeamPage({
         {copy.workspace}
       </Link>
       <header className="space-y-2">
-        <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
+        <h1 className={type2xlExtraboldPrimary}>{copy.title}</h1>
         {parsed.success && (
           <p className="break-words font-semibold text-primary">{parsed.data.organization.name}</p>
         )}
@@ -104,7 +105,7 @@ export async function TeamPage({
                   className={`${platformFieldClass} block min-h-11`}
                 />
               </label>
-              <label className="space-y-1 text-xs text-muted">
+              <label className={typeSpace1XsMuted}>
                 {copy.role}
                 <select
                   name="role"
@@ -120,7 +121,7 @@ export async function TeamPage({
                   <option value="other">{copy.other}</option>
                 </select>
               </label>
-              <label className="space-y-1 text-xs text-muted">
+              <label className={typeSpace1XsMuted}>
                 {copy.access}
                 <select
                   name="access"

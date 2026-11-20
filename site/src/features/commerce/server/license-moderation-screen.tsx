@@ -15,6 +15,7 @@ import { linkAccent, linkAccentSm, linkAccentSmRounded, linkMinH } from "../../s
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelMinSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary, typeSemiboldPrimary, typeSmSecondary } from "../../shell/type-shell";
 import {
   effectiveLicenseStatus,
   formatHistoryDate,
@@ -114,8 +115,8 @@ export async function LicenseModerationScreen({
       <Link href="/admin" className={linkAccentSm}>
         {copy.adminBack}
       </Link>
-      <h1 className="font-display text-primary">{copy.moderation}</h1>
-      <p className="text-sm text-secondary">{copy.policy}</p>
+      <h1 className={typeDisplayPrimary}>{copy.moderation}</h1>
+      <p className={typeSmSecondary}>{copy.policy}</p>
       {user.role === "admin" && (
         <Link href="/admin/licenses/maintenance" className={linkAccentSm}>
           {getLicenseMaintenanceCopy(locale).maintenance}
@@ -158,8 +159,8 @@ export async function LicenseModerationScreen({
         <ol className="space-y-3">
           {result.licenses.map((license) => (
             <li key={license.id} className={panelMinSpace2P5}>
-              <h2 className="font-semibold text-primary">{license.productTitle}</h2>
-              <p className="text-sm text-secondary">
+              <h2 className={typeSemiboldPrimary}>{license.productTitle}</h2>
+              <p className={typeSmSecondary}>
                 {licenseStatusLabel(
                   effectiveLicenseStatus(license.status, license.expiresAt),
                   history.licenseStatuses,

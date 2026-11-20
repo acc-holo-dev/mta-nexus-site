@@ -28,6 +28,7 @@ import { linkAccentSmRounded, linkAccentTight, linkAccentXs } from "../../shell/
 import { pageShellMaxMdGuest, pageShellStack6, pageShellStack8 } from "../../shell/page-shell";
 import { panelFlexBetweenP4, panelP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeFlexCenterGap2, typeSemiboldPrimary } from "../../shell/type-shell";
 import {
   AdminAdPlacementSection,
   AdminBuildsQuarantineSection,
@@ -303,7 +304,7 @@ export async function AdminHomeScreen({
             pendingContent.map((item) => (
               <div key={item.id} className={panelFlexBetweenP4}>
                 <div className="min-w-0 space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className={typeFlexCenterGap2}>
                     <span className="rounded bg-warning-soft px-2 py-0.5 text-[10px] font-bold uppercase text-warning">
                       {item.type}
                     </span>
@@ -394,7 +395,7 @@ export async function AdminHomeScreen({
                       <DataTableCell type="code" className="text-purple">
                         {log.actorId}
                       </DataTableCell>
-                      <DataTableCell type="text" className="font-semibold text-primary">
+                      <DataTableCell type="text" className={typeSemiboldPrimary}>
                         {log.action}
                       </DataTableCell>
                       <DataTableCell type="code" className="text-muted">

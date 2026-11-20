@@ -162,7 +162,7 @@ module.exports = {
       severity: "error",
       from: { path: "^site/src/(?!features/shell/)" },
       to: {
-        path: "^site/src/features/shell/(?!(?:shell|navbar|footer|sidebar|locale|session|auth-session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|legal-document|copyable-plain-code-block|confirm-action|action-confirm-checkbox|safe-public-error-reference|home-personal-changes-types|home-personal-changes-server|development-status-server|home-page-server|workspace-hub-server|legal-document-page-server|session-policy|request-client-ip|theme-preference|home-personal-preference|global-error-copy|offline-cache-policy|offline-document-copy|honest-loading|not-found-page-server|global-loading-page|global-error-page|route-error-page|route-honest-loading-server|root-layout-metadata-server|theme-init-script|fonts|root-layout-server|page-shell|panel-shell|link-shell|surface-shell|legal-document-route-loading-server|workspace-hub-route-loading-server)\\.ts$)",
+        path: "^site/src/features/shell/(?!(?:shell|navbar|footer|sidebar|locale|session|auth-session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|legal-document|copyable-plain-code-block|confirm-action|action-confirm-checkbox|safe-public-error-reference|home-personal-changes-types|home-personal-changes-server|development-status-server|home-page-server|workspace-hub-server|legal-document-page-server|session-policy|request-client-ip|theme-preference|home-personal-preference|global-error-copy|offline-cache-policy|offline-document-copy|honest-loading|not-found-page-server|global-loading-page|global-error-page|route-error-page|route-honest-loading-server|root-layout-metadata-server|theme-init-script|fonts|root-layout-server|page-shell|panel-shell|link-shell|surface-shell|type-shell|skeleton-shell|legal-document-route-loading-server|workspace-hub-route-loading-server)\\.ts$)",
       },
     },
     {
@@ -175,7 +175,7 @@ module.exports = {
       name: "shell-client-isolation",
       severity: "error",
       from: {
-        path: "^site/src/features/shell/(?:(?:shell|navbar|footer|sidebar|locale|session|auth-session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|legal-document|copyable-plain-code-block|confirm-action|action-confirm-checkbox|theme-preference|home-personal-preference|global-error-copy|offline-cache-policy|honest-loading|safe-public-error-reference|home-personal-changes-types|session-policy|page-shell|panel-shell|link-shell|surface-shell)\\.ts$|components/)",
+        path: "^site/src/features/shell/(?:(?:shell|navbar|footer|sidebar|locale|session|auth-session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|legal-document|copyable-plain-code-block|confirm-action|action-confirm-checkbox|theme-preference|home-personal-preference|global-error-copy|offline-cache-policy|honest-loading|safe-public-error-reference|home-personal-changes-types|session-policy|page-shell|panel-shell|link-shell|surface-shell|type-shell|skeleton-shell)\\.ts$|components/)",
       },
       to: {
         path: "^(?:site/src/(?:features/(?!shell/|accounts/controls\\.ts$|notifications/bell\\.ts$|servers/managed-server-view\\.ts$|servers/managed-server-copy\\.ts$|community/user-platform-copy\\.ts$|organizations/organization-workspace-copy\\.ts$|trust/verification-workspace-copy\\.ts$|moderation/platform-report-i18n\\.ts$|community/publication-feed-copy\\.ts$|community/discussion-workspace-copy\\.ts$|community/content-reaction-copy\\.ts$|community/community-report-copy\\.ts$)|features/shell/(?:server/|(?:home-personal-changes-server|development-status-server|home-page-server|workspace-hub-server|legal-document-page-server|not-found-page-server|route-honest-loading-server|root-layout-metadata-server|root-layout-server)\\.ts$)|lib/(?!(?:(?:i18n(?:\\.ts$|/))|(?:managed-server-view|organization-batch-copy|notification-copy|http/private-api-request|resource-release-watches-i18n)\\.ts$)))|site/packages/(?:db|storage|security|config)/)",
@@ -185,7 +185,7 @@ module.exports = {
       name: "shell-client-has-no-node-builtins",
       severity: "error",
       from: {
-        path: "^site/src/features/shell/(?:(?:shell|navbar|footer|sidebar|locale|session|auth-session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|legal-document|copyable-plain-code-block|confirm-action|action-confirm-checkbox|theme-preference|home-personal-preference|global-error-copy|offline-cache-policy|honest-loading|safe-public-error-reference|home-personal-changes-types|session-policy|page-shell|panel-shell|link-shell|surface-shell)\\.ts$|components/)",
+        path: "^site/src/features/shell/(?:(?:shell|navbar|footer|sidebar|locale|session|auth-session|auth-return|guest-auth|session-error|modal-dialog|home-personal|pwa-service-worker|legal-document|copyable-plain-code-block|confirm-action|action-confirm-checkbox|theme-preference|home-personal-preference|global-error-copy|offline-cache-policy|honest-loading|safe-public-error-reference|home-personal-changes-types|session-policy|page-shell|panel-shell|link-shell|surface-shell|type-shell|skeleton-shell)\\.ts$|components/)",
       },
       to: { dependencyTypes: ["core"] },
     },

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax4xlDense } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH6W23 } from "../../shell/skeleton-shell";
 import { organizationTeamCopy } from "../organization-team-copy";
 
 type Copy = ReturnType<typeof organizationTeamCopy>;
@@ -39,7 +40,7 @@ function OrganizationTeamRouteLoading({
     throw new Error("OrganizationTeamRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-6 w-2/3 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH6W23} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -71,7 +72,7 @@ export function OrganizationsOrganizationTeamRouteLoading() {
     className: pageShellMax4xlDense,
     titleClassName: "text-xl font-semibold text-primary",
     rowClassName: "h-16 rounded bg-inset",
-    leading: <div className="h-6 w-2/3 rounded bg-inset" />,
+    leading: <div className={skelH6W23} />,
     titleKey: "title",
   });
 }

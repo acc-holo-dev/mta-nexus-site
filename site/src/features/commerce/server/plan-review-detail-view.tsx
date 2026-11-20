@@ -3,6 +3,7 @@ import Link from "next/link";
 import { linkAccentTightRounded } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
+import { typeSmSecondary } from "../../shell/type-shell";
 import { formatHistoryAmount, formatHistoryDate } from "../commerce-history-format";
 import { PlanReviewTerms } from "../components/plan-review-terms";
 import { planReviewsCopy } from "../plan-reviews-i18n";
@@ -24,7 +25,7 @@ export function PlanReviewDetailView({
         {c.history}
       </Link>
       <h1 className="font-display">{c.saved}</h1>
-      <p role="note" className="text-sm text-secondary">
+      <p role="note" className={typeSmSecondary}>
         {c.notice}
       </p>
       <section className={panelSpace4P5}>

@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { getDictionary } from "../../../lib/i18n";
 import { pageShellMax4xl, pageShellMax6xl } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH24, skelH28 } from "../../shell/skeleton-shell";
 import { getManagedServerCopy } from "../managed-server-view";
 
 type Copy = ReturnType<typeof getManagedServerCopy>;
@@ -40,7 +41,7 @@ function ManagedServerRouteLoading({
     throw new Error("ManagedServerRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-28 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH28} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -73,7 +74,7 @@ export function ServerManagementRouteLoading() {
     titleClassName: "text-2xl font-black text-primary",
     rows: 3,
     rowClassName: "h-32 rounded bg-inset",
-    leading: <div className="h-24 rounded bg-inset" />,
+    leading: <div className={skelH24} />,
     title: (locale) => getDictionary(locale).serverManagement.listingDetails,
     loading: (locale) => getDictionary(locale).serverDetail.loading,
   });
@@ -83,7 +84,7 @@ export function ManagedServersRouteLoading() {
   return ManagedServerRouteLoading({
     headingId: "managed-servers-loading-heading",
     className: pageShellMax6xl,
-    leading: <div className="h-28 rounded bg-inset" />,
+    leading: <div className={skelH28} />,
     titleKey: "title",
   });
 }

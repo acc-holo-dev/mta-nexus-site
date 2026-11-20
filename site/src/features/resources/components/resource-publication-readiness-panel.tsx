@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import { linkAccentTight, linkAccentTightSm } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
+import { typeSemiboldPrimary, typeSmSecondary } from "../../shell/type-shell";
 import {
   getResourcePublicationReadinessCopy,
   publicationReadinessDetail,
@@ -41,7 +42,7 @@ export function ResourcePublicationReadinessPanel({
         <h2 id="publication-readiness-heading" className="text-xl font-semibold text-primary">
           {copy.title}
         </h2>
-        <p className="text-sm text-secondary">
+        <p className={typeSmSecondary}>
           {copy.overview}: {overview}
         </p>
       </div>
@@ -53,7 +54,7 @@ export function ResourcePublicationReadinessPanel({
           >
             <div className="min-w-0 space-y-1">
               <div className="flex flex-wrap items-center gap-2 text-sm">
-                <span className="font-semibold text-primary">{copy.items[item.id]}</span>
+                <span className={typeSemiboldPrimary}>{copy.items[item.id]}</span>
                 <span className="font-label uppercase text-[10px] text-muted">
                   {item.tier === "required" ? copy.required : copy.recommendation}
                 </span>
@@ -81,7 +82,7 @@ export function ResourcePublicationReadinessPanel({
                   }
                 />
               ) : (
-                <p className="text-sm text-secondary">{publicationReadinessDetail(locale, item)}</p>
+                <p className={typeSmSecondary}>{publicationReadinessDetail(locale, item)}</p>
               )}
             </div>
             {item.state === "blocked" || item.state === "pending" ? null : (

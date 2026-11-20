@@ -14,6 +14,13 @@ import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelMinSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapGap3,
+  typeFlexWrapGap4Sm,
+  typeSmPrimary,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { formatHistoryAmount, parseHistoryPage } from "../commerce-history-format";
 import { getCommercialCopy } from "../commercial-i18n";
 
@@ -97,7 +104,7 @@ export async function CommercialPlansAdminScreen({
         {copy.adminBack}
       </Link>
       <header className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-display text-primary">{copy.admin}</h1>
+        <h1 className={typeDisplayPrimary}>{copy.admin}</h1>
         <Link
           href="/admin/commerce/plans/new"
           className="inline-flex min-h-11 items-center justify-center rounded-lg bg-accent px-4 text-sm font-medium text-white shadow-nexus-sm transition-colors hover:bg-[var(--nexus-accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]"
@@ -105,10 +112,10 @@ export async function CommercialPlansAdminScreen({
           {copy.newPlan}
         </Link>
       </header>
-      <p role="note" className="text-sm text-secondary">
+      <p role="note" className={typeSmSecondary}>
         {copy.planNote}
       </p>
-      <nav aria-label={copy.status} className="flex flex-wrap gap-3">
+      <nav aria-label={copy.status} className={typeFlexWrapGap3}>
         <Link
           href="/admin/commerce/plans"
           aria-current={!status ? "page" : undefined}
@@ -142,10 +149,10 @@ export async function CommercialPlansAdminScreen({
               >
                 {locale === "ru" ? plan.titleRu : plan.titleEn}
               </Link>
-              <p className="text-sm text-secondary">
+              <p className={typeSmSecondary}>
                 {copy[plan.status]} · {copy[plan.scope]} · {copy.revision} {plan.revision}
               </p>
-              <p className="text-sm text-primary">
+              <p className={typeSmPrimary}>
                 {formatHistoryAmount(plan.price, plan.currency, locale)} · {plan.durationDays}{" "}
                 {copy.days} · {(plan.commissionBps / 100).toLocaleString(locale)}%
               </p>
@@ -167,7 +174,7 @@ export async function CommercialPlansAdminScreen({
         />
       )}
       {result.totalPages > 1 ? (
-        <nav aria-label={copy.page} className="flex flex-wrap gap-4 text-sm">
+        <nav aria-label={copy.page} className={typeFlexWrapGap4Sm}>
           {result.page > 1 ? (
             <Link href={href(result.page - 1)} className={linkAccentSm}>
               {copy.previous}

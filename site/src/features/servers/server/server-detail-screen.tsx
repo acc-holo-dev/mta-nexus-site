@@ -25,6 +25,7 @@ import { authEntryHref } from "../../shell/auth-return";
 import { linkAccentTightHover } from "../../shell/link-shell";
 import { pageShellStack8 } from "../../shell/page-shell";
 import { panelSpace3P6, panelSpace4P5, panelSpace4P6 } from "../../shell/panel-shell";
+import { typeFlexCenterGap2, typeSmSemiboldPrimary } from "../../shell/type-shell";
 import { contextTrustCopy } from "../../trust/public-context-trust-copy";
 import { ServerClaimControlPanel } from "../claim-controls";
 import { ServerConnectControls } from "../connect";
@@ -412,9 +413,9 @@ export async function ServerDetailScreen({
           <div className="text-xs font-semibold uppercase tracking-wider text-muted">
             {copy.runtime}
           </div>
-          <div className="flex items-center gap-2">
+          <div className={typeFlexCenterGap2}>
             <Cpu className="h-4 w-4 text-accent" aria-hidden="true" />
-            <span className="text-sm font-semibold text-primary">{copy.officialDirectory}</span>
+            <span className={typeSmSemiboldPrimary}>{copy.officialDirectory}</span>
           </div>
           <div className="text-[11px] leading-relaxed text-muted">{copy.runtimeDescription}</div>
         </div>

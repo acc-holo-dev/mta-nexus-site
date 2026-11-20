@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useNexusLocale } from "../locale";
 import { readSafePublicErrorReference } from "../safe-public-error-reference";
+import { typeDisplayPrimary } from "../type-shell";
 
 export function RouteErrorPage({
   error,
@@ -38,7 +39,7 @@ export function RouteErrorPage({
         <AlertTriangle className="h-7 w-7" aria-hidden="true" />
       </div>
       <div className="space-y-2">
-        <h1 className="font-display text-primary">{dictionary.errors.title}</h1>
+        <h1 className={typeDisplayPrimary}>{dictionary.errors.title}</h1>
         <p className="mx-auto max-w-sm font-caption leading-relaxed text-muted">
           {dictionary.errors.message}
         </p>

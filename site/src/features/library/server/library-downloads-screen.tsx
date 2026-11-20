@@ -20,6 +20,14 @@ import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapEndGap3,
+  typeFlexWrapGap3,
+  typeFlexWrapGap4,
+  typeFlexWrapGap4Sm,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 
 const filterNavClass =
   "inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] aria-[current=page]:bg-accent aria-[current=page]:text-white";
@@ -106,15 +114,11 @@ export async function LibraryDownloadsScreen({
       <Link href="/workspace/library" className={linkAccentSm}>
         {copy.library}
       </Link>
-      <h1 className="font-display text-primary">{copy.title}</h1>
-      <p role="note" className="text-sm text-secondary">
+      <h1 className={typeDisplayPrimary}>{copy.title}</h1>
+      <p role="note" className={typeSmSecondary}>
         {copy.note}
       </p>
-      <form
-        method="get"
-        action="/workspace/library/downloads"
-        className="flex flex-wrap items-end gap-3"
-      >
+      <form method="get" action="/workspace/library/downloads" className={typeFlexWrapEndGap3}>
         {query.resourceId ? (
           <input type="hidden" name="resourceId" value={query.resourceId} />
         ) : null}
@@ -150,7 +154,7 @@ export async function LibraryDownloadsScreen({
           </Link>
         ) : null}
       </form>
-      <nav aria-label={copy.title} className="flex flex-wrap gap-3">
+      <nav aria-label={copy.title} className={typeFlexWrapGap3}>
         {(["all", ...RESOURCE_DELIVERY_STATUSES] as const).map((status) => (
           <Link
             key={status}
@@ -179,11 +183,11 @@ export async function LibraryDownloadsScreen({
                 <h2 className="break-words font-semibold text-primary">
                   {receipt.title ?? copy.privateResource}
                 </h2>
-                <span className="text-sm text-secondary">{copy[receipt.status]}</span>
+                <span className={typeSmSecondary}>{copy[receipt.status]}</span>
               </div>
               <ResourceDeliveryEvidence receipt={receipt} locale={locale} />
               <p className="text-xs text-muted">{receipt.pinned ? copy.fixed : copy.latest}</p>
-              <div className="flex flex-wrap gap-4">
+              <div className={typeFlexWrapGap4}>
                 <Link
                   href={`/workspace/library/downloads/${encodeURIComponent(receipt.id)}`}
                   className={linkAccentSm}
@@ -229,7 +233,7 @@ export async function LibraryDownloadsScreen({
         />
       )}
       {result.totalPages > 1 ? (
-        <nav aria-label={copy.page} className="flex flex-wrap gap-4 text-sm">
+        <nav aria-label={copy.page} className={typeFlexWrapGap4Sm}>
           {result.page > 1 ? (
             <Link href={href(result.page - 1)} className={linkAccentSm}>
               {copy.previous}

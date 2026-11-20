@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellMax3xl, pageShellStack6 } from "../../shell/page-shell";
 import { DictionaryFieldRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH11, skelH28, skelH40 } from "../../shell/skeleton-shell";
 
 function CommunityCatalogRouteLoading({
   headingId = "community-loading-heading",
@@ -26,7 +27,7 @@ function CommunityCatalogRouteLoading({
   leading?: ReactNode | null;
 } = {}) {
   const resolvedLeading =
-    leading === undefined ? <div className="h-11 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH11} /> : (leading ?? undefined);
   return DictionaryFieldRouteLoading({
     headingId,
     titlePath,
@@ -49,9 +50,9 @@ export function CommunityNewRouteLoading() {
     rows: 0,
     leading: (
       <>
-        <div className="h-11 rounded bg-inset" />
-        <div className="h-40 rounded bg-inset" />
-        <div className="h-28 rounded bg-inset" />
+        <div className={skelH11} />
+        <div className={skelH40} />
+        <div className={skelH28} />
       </>
     ),
   });

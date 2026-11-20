@@ -10,6 +10,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { type2xlExtraboldPrimary, typeMt2SmMuted } from "../../shell/type-shell";
 import { FollowWorkspace } from "../follow";
 import { FOLLOW_TYPES, type FollowTargetType } from "../follow-workspace-contract";
 import { followCopy } from "../follow-workspace-copy";
@@ -64,10 +65,10 @@ export async function SavedFollowsScreen({
     return (
       <div className={pageShellClass}>
         <header className="border-b border-base pb-6">
-          <h1 id="saved-follows-heading" className="text-2xl font-extrabold text-primary">
+          <h1 id="saved-follows-heading" className={type2xlExtraboldPrimary}>
             {copy.title}
           </h1>
-          <p className="mt-2 text-sm text-muted">{copy.description}</p>
+          <p className={typeMt2SmMuted}>{copy.description}</p>
         </header>
         <ErrorState
           title={copy.pageError}
@@ -84,10 +85,10 @@ export async function SavedFollowsScreen({
   return (
     <div className={pageShellClass}>
       <header className="border-b border-base pb-6">
-        <h1 id="saved-follows-heading" className="text-2xl font-extrabold text-primary">
+        <h1 id="saved-follows-heading" className={type2xlExtraboldPrimary}>
           {copy.title}
         </h1>
-        <p className="mt-2 text-sm text-muted">{copy.description}</p>
+        <p className={typeMt2SmMuted}>{copy.description}</p>
       </header>
       <FollowWorkspace
         key={`${type}:${query}`}

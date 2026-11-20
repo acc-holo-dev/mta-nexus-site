@@ -1,14 +1,14 @@
 import { Button, fieldClassBlock as platformFieldClass } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
-import { linkAccentSm } from "../../shell/link-shell";
+import { linkAccentSm, linkFocusRing } from "../../shell/link-shell";
 import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
+import { typeFlexWrapGap2, typeFlexWrapGap4 } from "../../shell/type-shell";
 import { type ServerHistoryWindow, serverHistoryWindows } from "../server-history-window";
 import { serverStatisticsHref } from "../server-statistics-contract";
 import { serverStatisticsCopy } from "../server-statistics-copy";
 
-const filterNavLinkClass =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+const filterNavLinkClass = linkFocusRing;
 
 export function ServerObservationPeriodControls({
   path,
@@ -37,7 +37,7 @@ export function ServerObservationPeriodControls({
   const utc = (date: number) => new Date(date).toISOString().slice(0, 23);
   return (
     <div className="space-y-3">
-      <nav aria-label={copy.windows} className="flex flex-wrap gap-2">
+      <nav aria-label={copy.windows} className={typeFlexWrapGap2}>
         {(
           [
             ["24h", copy.period24h],
@@ -87,7 +87,7 @@ export function ServerObservationPeriodControls({
         </Button>
         <p className="w-full text-xs text-muted">{copy.periodScope}</p>
       </form>
-      <nav aria-label={copy.adjacent} className="flex flex-wrap gap-4">
+      <nav aria-label={copy.adjacent} className={typeFlexWrapGap4}>
         {time - width >= minimum && (
           <Link
             prefetch={false}

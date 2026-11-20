@@ -14,6 +14,7 @@ import {
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax4xlDenseTight, pageShellMax4xlTight } from "../../shell/page-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
+import { typeDisplayPrimary, typeSmSecondary, typeSmSuccess } from "../../shell/type-shell";
 import { supportMessageCopy } from "../support-message-discovery-copy";
 import {
   confirmSupportReply,
@@ -326,7 +327,7 @@ export function SupportCaseThread({
   if (!supportCase) {
     return (
       <div className={pageShellMax4xlDenseTight}>
-        <h1 className="font-display text-primary">{copy.title}</h1>
+        <h1 className={typeDisplayPrimary}>{copy.title}</h1>
         <Link
           href={backHref}
           className="inline-flex min-h-11 items-center text-sm text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -348,7 +349,7 @@ export function SupportCaseThread({
           }
         />
         {success ? (
-          <p role="status" aria-live="polite" className="text-sm text-success">
+          <p role="status" aria-live="polite" className={typeSmSuccess}>
             {success}
           </p>
         ) : null}
@@ -406,7 +407,7 @@ export function SupportCaseThread({
       </header>
 
       {success && (
-        <p role="status" aria-live="polite" className="text-sm text-success">
+        <p role="status" aria-live="polite" className={typeSmSuccess}>
           {success}
         </p>
       )}
@@ -481,7 +482,7 @@ export function SupportCaseThread({
           >
             {dictionary.market.previousPage}
           </Button>
-          <span className="text-sm text-secondary">
+          <span className={typeSmSecondary}>
             {dictionary.market.pageLabel} {messagePage} / {messageTotalPages}
           </span>
           <Button

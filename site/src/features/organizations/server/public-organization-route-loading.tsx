@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { pageShellStack6 } from "../../shell/page-shell";
 import { DictionaryFieldRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH28Max, skelH40Max } from "../../shell/skeleton-shell";
 
 export function PublicOrganizationRouteLoading({
   headingId = "organization-loading-heading",
@@ -28,8 +29,8 @@ export function PublicOrganizationRouteLoading({
   const resolvedLeading =
     leading === undefined ? (
       <>
-        <div className="h-28 max-w-full rounded bg-inset" />
-        <div className="h-40 max-w-full rounded bg-inset" />
+        <div className={skelH28Max} />
+        <div className={skelH40Max} />
         <div className="h-32 max-w-full rounded bg-inset" />
       </>
     ) : (

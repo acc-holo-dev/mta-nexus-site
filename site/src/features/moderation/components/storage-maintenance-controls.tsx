@@ -9,6 +9,7 @@ import {
 } from "../../shell/action-confirm-checkbox";
 import { linkGhostAccent } from "../../shell/link-shell";
 import { panelClipSpace4P4 } from "../../shell/panel-shell";
+import { typeFlexWrapEndGap3, typeFlexWrapGap3 } from "../../shell/type-shell";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 
 async function json(url: string, actorId: string, signal: AbortSignal, body?: unknown) {
@@ -130,7 +131,7 @@ export function StorageDiscoveryControls({ locale, actorId }: { locale: string; 
   return (
     <section className={panelClipSpace4P4}>
       <h2>{copy.discovery}</h2>
-      <div className="flex flex-wrap gap-3">
+      <div className={typeFlexWrapGap3}>
         <Button
           type="button"
           variant="outline"
@@ -153,7 +154,7 @@ export function StorageDiscoveryControls({ locale, actorId }: { locale: string; 
         )}
       </div>
       {owners.length > 0 && (
-        <ul className="flex flex-wrap gap-3">
+        <ul className={typeFlexWrapGap3}>
           {owners.map((owner) => (
             <li key={owner}>
               <Button
@@ -174,7 +175,7 @@ export function StorageDiscoveryControls({ locale, actorId }: { locale: string; 
         </ul>
       )}
       <form
-        className="flex flex-wrap items-end gap-3"
+        className={typeFlexWrapEndGap3}
         onSubmit={(event) => {
           event.preventDefault();
           void run("discover");
@@ -330,7 +331,7 @@ export function StorageCleanupControls({
       >
         {copy.confirm}
       </ActionConfirmCheckbox>
-      <div className="flex flex-wrap gap-3">
+      <div className={typeFlexWrapGap3}>
         <Button
           type="button"
           variant="danger"

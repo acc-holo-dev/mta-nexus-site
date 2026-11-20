@@ -3,6 +3,7 @@
 import { Bell } from "lucide-react";
 import type { getDictionary } from "../../../lib/i18n";
 import { panelSpace4P5Shadow } from "../../shell/panel-shell";
+import { typeFlexCenterGap2, typeSmSemiboldPrimary } from "../../shell/type-shell";
 import type { NotificationPreferences } from "../notification-preferences-confirmation";
 import { type PushIdentity, WebPushSettings } from "./web-push-settings";
 
@@ -33,9 +34,9 @@ export function SettingsNotificationPreferencesSection({
 }: Props) {
   return (
     <section aria-labelledby="notification-heading" className={panelSpace4P5Shadow}>
-      <div className="flex items-center gap-2">
+      <div className={typeFlexCenterGap2}>
         <Bell className="h-4 w-4 text-accent" aria-hidden="true" />
-        <h2 id="notification-heading" className="text-sm font-semibold text-primary">
+        <h2 id="notification-heading" className={typeSmSemiboldPrimary}>
           {copy.notificationPreferences}
         </h2>
       </div>

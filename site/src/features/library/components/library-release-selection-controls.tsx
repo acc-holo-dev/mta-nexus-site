@@ -3,6 +3,7 @@ import { Button } from "@nexus/ui";
 import { libraryReleaseCommandSchema } from "@nexus/validation";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace4P5 } from "../../shell/panel-shell";
+import { typeFlexWrapGap3 } from "../../shell/type-shell";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
 import { LibraryReleaseCommandStatus, useLibraryReleaseCommand } from "./library-release-command";
 export function LibraryReleaseSelectionControls({
@@ -37,7 +38,7 @@ export function LibraryReleaseSelectionControls({
       >
         {busy ? copy.saving : copy.useLatest}
       </Button>
-      <ul className="flex flex-wrap gap-3">
+      <ul className={typeFlexWrapGap3}>
         {versions.map((version) => {
           const command = {
             mode: "fixed" as const,

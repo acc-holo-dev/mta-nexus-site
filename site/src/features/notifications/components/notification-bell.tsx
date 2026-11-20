@@ -10,6 +10,7 @@ import { confirmAction } from "../../shell/confirm-action";
 import { linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { clickedDialogBackdrop, useModalDialog } from "../../shell/modal-dialog";
+import { typeCaptionFaint } from "../../shell/type-shell";
 import { formatNotification } from "../notification-copy";
 import { notificationInboxCopy } from "../notification-inbox-copy";
 import {
@@ -376,7 +377,7 @@ export function NotificationBell() {
           </section>
 
           <div className="space-y-1.5 border-t border-base px-3 py-2 text-center">
-            <p className="font-caption text-faint">{copy.previewFootnote}</p>
+            <p className={typeCaptionFaint}>{copy.previewFootnote}</p>
             <Link
               href="/notifications"
               onClick={() => setIsOpen(false)}

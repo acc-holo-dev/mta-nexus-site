@@ -6,6 +6,7 @@ import {
   pageShellMax5xlTight,
 } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { skelH6W23, skelH10W64, skelH11, skelH32, skelH64 } from "../../shell/skeleton-shell";
 import { authorPublicationDeskCopy } from "../author-publication-desk-copy";
 import { getUserPlatformCopy } from "../user-platform-copy";
 
@@ -46,7 +47,7 @@ function AuthorPublicationDeskRouteLoading({
     throw new Error("AuthorPublicationDeskRouteLoading requires titleKey or title");
   }
   const resolvedLeading =
-    leading === undefined ? <div className="h-10 w-64 rounded bg-inset" /> : (leading ?? undefined);
+    leading === undefined ? <div className={skelH10W64} /> : (leading ?? undefined);
   return LocaleCopyRouteLoading({
     headingId,
     className,
@@ -84,7 +85,7 @@ export function ContentHistoryRouteLoading() {
 export function PublicationDeskRouteLoading() {
   return AuthorPublicationDeskRouteLoading({
     headingId: "publication-desk-loading-heading",
-    leading: <div className="h-32 rounded bg-inset" />,
+    leading: <div className={skelH32} />,
     titleKey: "title",
   });
 }
@@ -96,8 +97,8 @@ export function ContentNewRouteLoading() {
     rows: 0,
     leading: (
       <>
-        <div className="h-11 rounded bg-inset" />
-        <div className="h-64 rounded bg-inset" />
+        <div className={skelH11} />
+        <div className={skelH64} />
       </>
     ),
     titleKey: "title",
@@ -110,7 +111,7 @@ export function CommunityContentHistoryRouteLoading() {
     className: pageShellMax4xlDense,
     headerClassName: "",
     titleClassName: "text-xl font-semibold text-primary",
-    leading: <div className="h-6 w-2/3 rounded bg-inset" />,
+    leading: <div className={skelH6W23} />,
     titleKey: "title",
   });
 }
@@ -123,7 +124,7 @@ export function EditPublicationRouteLoading() {
     leading: (
       <>
         <div className="h-10 w-40 rounded bg-inset" />
-        <div className="h-32 rounded bg-inset" />
+        <div className={skelH32} />
       </>
     ),
     title: (locale) => getUserPlatformCopy(locale).edit,

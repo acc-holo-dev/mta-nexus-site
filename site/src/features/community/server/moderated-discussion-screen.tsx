@@ -19,6 +19,12 @@ import {
 } from "../../shell/page-shell";
 import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import {
+  type2xlBoldPrimary,
+  typeFlexWrapGap4,
+  typePrewrapBreak,
+  typeSemiboldPrimary,
+} from "../../shell/type-shell";
 import { moderationCopy } from "../community-moderation-copy";
 import { ModeratedDiscussionRemoval } from "../components/moderated-discussion-removal";
 import { discussionReportsHref } from "../discussion-reports-contract";
@@ -42,7 +48,7 @@ function ModeratedDiscussionLoadError({
   const copy = moderatedDiscussionCopy(locale),
     dictionary = getDictionary(locale);
   return (
-    <section className={`nexus-panel space-y-3 p-5 ${pageShellClass}`}>
+    <section className={`${panelSpace3P5} ${pageShellClass}`}>
       <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
       <ErrorState
         title={copy.loadUnavailable}
@@ -198,12 +204,12 @@ export async function ModeratedDiscussionScreen({
   return (
     <div className={pageShellClass}>
       <header className="space-y-3">
-        <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
+        <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
         <p className="text-sm text-muted">{copy.description}</p>
         <p className="break-words font-semibold text-primary">
           {publication.title} · {general[publication.status]}
         </p>
-        <nav className="flex flex-wrap gap-4">
+        <nav className={typeFlexWrapGap4}>
           <Link href={`/admin/community/${encodeURIComponent(id)}`} className={linkAccentSm}>
             {copy.publication}
           </Link>
@@ -291,14 +297,14 @@ export async function ModeratedDiscussionScreen({
           <section className={panelSpace4P5}>
             {data.comment ? (
               <>
-                <h2 className="font-semibold text-primary">{copy.body}</h2>
+                <h2 className={typeSemiboldPrimary}>{copy.body}</h2>
                 <p className="text-sm text-muted">
                   {identity(data.comment.author)} · {date(data.comment.createdAt)}
                 </p>
                 {data.comment.parent && (
                   <blockquote className="space-y-2 border-l-2 border-base pl-3 text-sm text-muted">
                     <p>{copy.parent}</p>
-                    <p className="whitespace-pre-wrap break-words">{data.comment.parent}</p>
+                    <p className={typePrewrapBreak}>{data.comment.parent}</p>
                   </blockquote>
                 )}
                 <p className="whitespace-pre-wrap break-words text-primary">{data.comment.text}</p>
@@ -322,7 +328,7 @@ export async function ModeratedDiscussionScreen({
             )}
           </section>
           <section className={panelSpace4P5}>
-            <h2 className="font-semibold text-primary">{copy.history}</h2>
+            <h2 className={typeSemiboldPrimary}>{copy.history}</h2>
             <p className="text-xs text-muted">{copy.historyHelp}</p>
             {data.history.length ? (
               <ul className="space-y-3">
@@ -336,9 +342,7 @@ export async function ModeratedDiscussionScreen({
                       {event.moderator ? copy.moderator : copy.owner}
                     </p>
                     <p className="text-xs text-muted">{date(event.createdAt)}</p>
-                    {event.reason && (
-                      <p className="whitespace-pre-wrap break-words">{event.reason}</p>
-                    )}
+                    {event.reason && <p className={typePrewrapBreak}>{event.reason}</p>}
                   </li>
                 ))}
               </ul>
@@ -348,7 +352,7 @@ export async function ModeratedDiscussionScreen({
           </section>
         </>
       )}
-      <nav aria-label={copy.title} className="flex flex-wrap gap-4">
+      <nav aria-label={copy.title} className={typeFlexWrapGap4}>
         <Link
           prefetch={false}
           href={moderatedDiscussionHref(
