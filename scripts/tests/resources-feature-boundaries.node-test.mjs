@@ -406,7 +406,10 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["app/author-resources-deep.ts", "resources-feature-public-api"],
     ["features/resources/components/author-resources-leak.ts", "resources-view-isolation"],
     ["app/resource-publisher-history-deep.ts", "resources-feature-public-api"],
-    ["features/resources/components/resource-publisher-history-leak.ts", "resources-view-isolation"],
+    [
+      "features/resources/components/resource-publisher-history-leak.ts",
+      "resources-view-isolation",
+    ],
     ["app/review-report-deep.ts", "resources-feature-public-api"],
     ["features/resources/components/review-report-leak.ts", "resources-view-isolation"],
     ["app/package-deep.ts", "resources-feature-public-api"],
