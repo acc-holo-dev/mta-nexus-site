@@ -81,7 +81,7 @@ it("locks residual resources page sources to ErrorState/EmptyState honesty chrom
   expect(compatibility).toContain("loadUnavailableHint");
   expect(compatibility).not.toContain('role="alert"');
 
-  const manage = read("site/src/app/workspace/resources/[id]/page.tsx");
+  const manage = read("site/src/features/resources/server/resource-manage-screen.tsx");
   expect(manage).toContain("ErrorState");
   expect(manage).toContain("EmptyState");
   expect(manage).toContain("overflow-x-clip");

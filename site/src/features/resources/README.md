@@ -34,6 +34,7 @@ Services и repositories не дублируются и не переносят�
 | `delivery-server.ts`                           | `ResourceDeliveryEvidence`; server-only представление выдачи                                                |
 | `staff-resources-server.ts`                    | `StaffResourcesScreen`; server-only `/admin/resources` moderation list                                      |
 | `staff-resource-detail-server.ts`              | `StaffResourceDetailScreen`; server-only `/admin/resources/[id]` decision document                          |
+| `resource-manage-server.ts`                    | `ResourceManageScreen`; server-only `/workspace/resources/[id]` author manage                               |
 | `review-controls.ts`                           | `ResourceReviewEditor`, `ResourceReviewDecisionForm`; клиентские формы для library и moderation             |
 | `reviews-view.ts`                              | `ResourceReviewPager`; общая пагинация для workspace                                                        |
 | `release-watch.ts`                             | `ResourceReleaseWatchControl`; клиентская подписка для detail и library                                     |
