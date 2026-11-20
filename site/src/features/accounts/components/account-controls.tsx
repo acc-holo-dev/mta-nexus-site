@@ -5,14 +5,15 @@ import { LogOut, UserRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
-import { confirmAction } from "../../../components/confirm-action";
-import { useNexusLocale } from "../../../components/locale-context";
-import { parseSessionResponse } from "../../../components/shell-session-payload";
+import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
+import { confirmAction } from "../../shell/confirm-action";
+import { useNexusLocale } from "../../shell/locale";
 import {
+  parseSessionResponse,
   requestShellSessionRefresh,
   SHELL_SESSION_REFRESH_EVENT,
-} from "../../../components/shell-session-refresh";
+} from "../../shell/session";
+import { typeItemsStretchPy4, typeSelectMinH11 } from "../../shell/type-shell";
 
 type Account = { id: string; username: string };
 
@@ -169,7 +170,7 @@ export function AccountControls() {
             isLoading={signingOut}
             aria-label={signingOut ? copy.signingOut : copy.signOut}
             title={signingOut ? copy.signingOut : copy.signOut}
-            className="min-h-11 shrink-0 rounded-md border-base bg-elevated px-2 font-semibold sm:px-2.5"
+            className={typeSelectMinH11}
           >
             <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
             <span className="hidden sm:block">{signingOut ? copy.signingOut : copy.signOut}</span>
@@ -181,7 +182,7 @@ export function AccountControls() {
           variant="outline"
           size="sm"
           onClick={requestShellSessionRefresh}
-          className="min-h-11 shrink-0 rounded-md border-base bg-elevated px-2 font-semibold sm:px-2.5"
+          className={typeSelectMinH11}
         >
           <UserRound className="h-3.5 w-3.5" aria-hidden="true" />
           <span className="hidden sm:block">{copy.retry}</span>
@@ -197,7 +198,7 @@ export function AccountControls() {
 
       {error ? (
         <div className="absolute right-0 top-full z-50 mt-2 w-72 max-w-[85vw] shadow-nexus">
-          <ErrorState title={error} description={copy.errorHint} className="items-stretch py-4" />
+          <ErrorState title={error} description={copy.errorHint} className={typeItemsStretchPy4} />
         </div>
       ) : null}
     </div>

@@ -7,15 +7,15 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8"
 
 describe("shared client localization and request hardening", () => {
   it("localizes workspace context switching and hardens both requests", () => {
-    const source = read("site/src/components/context-switcher.tsx");
+    const source = read("site/src/features/accounts/components/context-switcher.tsx");
 
     expect(source).toContain("useNexusLocale");
     expect(source).toContain("dictionary.workspaceContext");
     expect(source.match(/credentials: "same-origin"/g)?.length).toBe(2);
     expect(source.match(/cache: "no-store"/g)?.length).toBe(2);
     expect(source.match(/AbortSignal.timeout\(10_000\)/g)?.length).toBe(2);
-    expect(source).toContain('role="status"');
-    expect(source).toContain('aria-live="polite"');
+    expect(source).toContain("HonestLoadingShell");
+    expect(source).toContain("headingLevel={2}");
     expect(source).toContain("dictionary.workspace.loading");
 
     const en = getDictionary("en").workspaceContext;

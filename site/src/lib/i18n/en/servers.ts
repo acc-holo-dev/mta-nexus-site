@@ -10,12 +10,15 @@ export const servers = {
     language: "Language",
     region: "Region",
     website: "Website",
+    discord: "Discord",
     rules: "Rules",
     openMedia: "Open media",
     livePlayerLoad: "Live player load",
     noObservation: "No current observation in the official MTA directory.",
     staleSnapshot:
       "Showing the latest available directory snapshot. Player counts may be outdated.",
+    staleSnapshotHint:
+      "A delayed directory refresh is not a connection error. Counts may change after the next observation.",
     connectionIp: "Connection IP",
     selectHint:
       "If the protocol link does not open MTA, copy or select this address and paste it into MTA Quick Connect.",
@@ -24,6 +27,9 @@ export const servers = {
     runtimeDescription:
       "Live status is based on the latest public MTA directory observation. Editorial server details are managed separately.",
     serverFallback: "MTA server",
+    claimSessionUnavailable: "Could not check the session for server verification.",
+    claimSessionUnavailableHint:
+      "A session check failure is not a signed-out guest. Retry before starting a control challenge or signing in.",
   },
   serverManagement: {
     signInRequired: "Sign in required",
@@ -56,12 +62,17 @@ export const servers = {
     visibility: "Visibility",
     description: "Description",
     websiteUrl: "Website URL",
+    websiteUrlPlaceholder: "https://...",
     discordUrl: "Discord URL",
+    discordUrlPlaceholder: "https://discord.gg/...",
     rulesUrl: "Rules URL",
+    rulesUrlPlaceholder: "https://...",
     language: "Language",
     region: "Region",
     gameplayTags: "Gameplay tags",
+    gameplayTagsPlaceholder: "roleplay, economy, freeroam",
     mediaUrls: "Media URLs (one per line)",
+    mediaUrlsPlaceholder: "https://...",
     ipAddress: "IP address or hostname",
     gamePort: "Game port",
     httpPort: "HTTP port",
@@ -72,6 +83,7 @@ export const servers = {
     unlisted: "Unlisted",
     private: "Private",
     saving: "Saving...",
+    savingLocked: "Saving. Fields are temporarily locked.",
     save: "Save details",
   },
   serverClaim: {
@@ -103,6 +115,19 @@ export const servers = {
     verifyUnavailable: "Control proof verification is temporarily unavailable.",
     exactEndpoint:
       "Master-list presence alone is not treated as proof. NEXUS requires the one-time token to appear on the exact server endpoint in a fresh directory snapshot.",
+    sessionOrStorageUnavailable: "Could not check the session or storage. Refresh this page.",
+    sessionChanged: "The session changed or could not be verified. Refresh this page.",
+    markerSaveFailed: "Could not save the operation marker. The request was not sent.",
+    unknownIssueTitle:
+      "The challenge result is unknown. The token cannot be recovered; retry is blocked. Check the status and contact support.",
+    unknownIssueHint:
+      "Open verification requests before creating another token. Retry from this panel stays blocked until the outcome is known.",
+    unknownVerifyTitle:
+      "The verification result is unknown. Retry is blocked; check your requests and contact support.",
+    unknownVerifyHint:
+      "Open verification requests to see whether proof was recorded. Do not start a new challenge until the outcome is known.",
+    checkRequests: "Check requests",
+    checkingSession: "Checking the session before showing the token…",
   },
   serverHistory: {
     chooseWindow: "History period",
@@ -116,6 +141,8 @@ export const servers = {
     title: "Observed player history",
     unavailable:
       "Stored history is temporarily unavailable. Live directory status remains separate from historical observations.",
+    unavailableHint:
+      "Retry reloads this history panel only. A temporary load failure is not an empty observation window.",
     description:
       "Stored observations from the official MTA directory. Missing observations do not mean the server was offline.",
     recordedOnly: "Recorded observations only",
@@ -127,6 +154,7 @@ export const servers = {
     emptyHint:
       "History appears after the NEXUS collector records confirmed master-list observations. Missing observations do not mean the server was offline.",
     window: "Recorded interval",
+    timezoneUtc: "UTC",
     chartLabel: "Recorded peak players by interval",
     playerCountUnknown: "player count unknown",
     players: "players",
@@ -139,6 +167,8 @@ export const servers = {
     description: "Published articles, news, devlogs and announcements linked to this server.",
     moderated: "Moderated content",
     unavailable: "Server updates are temporarily unavailable. Live server status is unaffected.",
+    unavailableHint:
+      "Retry reloads this updates panel only. A temporary load failure is not an empty publication list.",
     empty: "No published server updates yet.",
     emptyHint:
       "Published articles, news, and announcements linked to this server appear here after moderation.",

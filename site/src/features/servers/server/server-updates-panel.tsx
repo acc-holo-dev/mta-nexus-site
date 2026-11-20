@@ -3,12 +3,11 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import { Newspaper } from "lucide-react";
 import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
-import { publicationCopy } from "../../../lib/publication-feed-copy";
 import { ArticleCard } from "../../community/article-view";
-
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { publicationCopy } from "../../community/publication-feed-copy";
+import { linkAccentSm } from "../../shell/link-shell";
+import { pageShellStack4 } from "../../shell/page-shell";
+import { typeMt1XsMuted } from "../../shell/type-shell";
 export function ServerUpdatesPanel({
   updates,
   locale = "en",
@@ -23,7 +22,7 @@ export function ServerUpdatesPanel({
   const retryHref = serverSlug ? `/servers/${encodeURIComponent(serverSlug)}` : undefined;
 
   return (
-    <section className="min-w-0 space-y-4 overflow-x-clip" aria-labelledby="server-updates-heading">
+    <section className={pageShellStack4} aria-labelledby="server-updates-heading">
       <div className="flex min-w-0 items-center justify-between gap-4">
         <div className="min-w-0">
           <h2
@@ -33,12 +32,12 @@ export function ServerUpdatesPanel({
             <Newspaper className="h-4 w-4 shrink-0 text-warning" aria-hidden="true" />
             {copy.title}
           </h2>
-          <p className="mt-1 text-xs text-muted">{copy.description}</p>
+          <p className={typeMt1XsMuted}>{copy.description}</p>
         </div>
         <span className="shrink-0 font-label uppercase text-faint">{copy.moderated}</span>
       </div>
       {serverSlug && (
-        <Link href={`/servers/${encodeURIComponent(serverSlug)}/updates`} className={navLinkClass}>
+        <Link href={`/servers/${encodeURIComponent(serverSlug)}/updates`} className={linkAccentSm}>
           {publicationCopy(locale).allUpdates}
         </Link>
       )}
@@ -46,9 +45,10 @@ export function ServerUpdatesPanel({
       {updates === null ? (
         <ErrorState
           title={copy.unavailable}
+          description={copy.unavailableHint}
           action={
             retryHref ? (
-              <Link href={retryHref} className={navLinkClass}>
+              <Link href={retryHref} className={linkAccentSm}>
                 {dictionary.errors.retry}
               </Link>
             ) : undefined

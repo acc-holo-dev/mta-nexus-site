@@ -1,15 +1,6 @@
-import { SupportPageSurface, supportMetadata } from "../../../features/support/page-server";
-
-const pageShellClass = "min-w-0 overflow-x-clip";
-
 export const dynamic = "force-dynamic";
-export const generateMetadata = () => supportMetadata();
 
-export default async function SupportCasePage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  return (
-    <div className={pageShellClass}>
-      <SupportPageSurface id={id} />
-    </div>
-  );
-}
+export {
+  MemberSupportCasePage as default,
+  memberSupportMetadata as generateMetadata,
+} from "../../../features/support/page-server";

@@ -1,19 +1,27 @@
 import { AppError } from "@nexus/domain";
-import { Button, ErrorState } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { buildPackageCopy } from "../../../lib/build-package-i18n";
-import { buildPackageQueryHref, parseBuildPackageQuery } from "../../../lib/build-package-query";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
-import { buildPackageService } from "../../../lib/services/build-package-service";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { buildPackageService } from "../../../lib/services/resources/build-package-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccent } from "../../shell/link-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import { surfaceSpace2P4TextSm } from "../../shell/surface-shell";
+import {
+  typeDisplayPrimary,
+  typeFlexGap4Sm,
+  typeGridGap4Md2,
+  typeSmMuted,
+  typeSpace1Sm,
+} from "../../shell/type-shell";
+import { buildPackageCopy } from "../build-package-i18n";
+import { buildPackageQueryHref, parseBuildPackageQuery } from "../build-package-query";
 
 function packageAccessError(error: unknown): "missing" | "failed" {
   if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) return "missing";
@@ -32,20 +40,28 @@ function BuildPackageLoadError({
   const copy = buildPackageCopy(locale),
     dictionary = getDictionary(locale);
   return (
-    <section className={pageShellClass}>
-      <Link href={backHref} className={navLinkClass}>
+    <section className={pageShellMax5xl}>
+      <Link href={backHref} className={linkAccent}>
         {copy.back}
       </Link>
       <ErrorState
         title={copy.loadUnavailable}
+        description={copy.loadUnavailableHint}
         action={
-          <Link href={retryHref} className={navLinkClass}>
+          <Link href={retryHref} className={linkAccent}>
             {dictionary.errors.retry}
           </Link>
         }
       />
     </section>
   );
+}
+
+export async function buildPackageMetadata(): Promise<Metadata> {
+  return {
+    title: `${buildPackageCopy(await getRequestLocale()).reviewDocumentTitle} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
 }
 
 export async function BuildPackageScreen({
@@ -61,7 +77,20 @@ export async function BuildPackageScreen({
 }) {
   const locale = await getRequestLocale(),
     copy = buildPackageCopy(locale);
-  const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={"/"}
+      />
+    );
+  }
+
   const rawSearchParams = await searchParams;
   const returnQuery = new URLSearchParams();
   for (const [key, value] of Object.entries(rawSearchParams)) {
@@ -100,27 +129,29 @@ export async function BuildPackageScreen({
       ? [detail.baseline, ...detail.candidates]
       : detail.candidates;
   return (
-    <div className={pageShellClass}>
-      <Link href={base} className={navLinkClass}>
+    <div className={pageShellMax5xl}>
+      <Link href={base} className={linkAccent}>
         {copy.back}
       </Link>
       <header className="space-y-2">
-        <h1 className="font-display text-primary">{copy.inventory}</h1>
+        <h1 className={typeDisplayPrimary}>{copy.inventory}</h1>
         <p className="text-secondary">
           {detail.product.title} · {detail.build.version}
         </p>
       </header>
-      <p className="text-sm text-muted">{copy.comparisonNote}</p>
-      {!detail.build.hasInventory ? <ErrorState title={copy.legacy} /> : null}
+      <p className={typeSmMuted}>{copy.comparisonNote}</p>
+      {!detail.build.hasInventory ? (
+        <ErrorState title={copy.legacy} description={copy.legacyHint} />
+      ) : null}
       {detail.build.hasInventory && !detail.comparisonAvailable ? (
-        <ErrorState title={copy.noBaseline} />
+        <ErrorState title={copy.noBaseline} description={copy.noBaselineHint} />
       ) : null}
       <form
         method="get"
         action={pageBase}
         className="flex flex-wrap items-end gap-4 rounded-lg border border-base p-4"
       >
-        <label className="space-y-1 text-sm">
+        <label className={typeSpace1Sm}>
           <span className="block">{copy.baseline}</span>
           <select
             name="baseline"
@@ -137,7 +168,7 @@ export async function BuildPackageScreen({
             ))}
           </select>
         </label>
-        <label className="space-y-1 text-sm">
+        <label className={typeSpace1Sm}>
           <span className="block">{copy.filter}</span>
           <select
             name="filter"
@@ -155,7 +186,7 @@ export async function BuildPackageScreen({
         <Button type="submit" disabled={options.length === 0} variant="outline" size="touch">
           {copy.apply}
         </Button>
-        <Link href={pageBase} className={navLinkClass}>
+        <Link href={pageBase} className={linkAccent}>
           {copy.reset}
         </Link>
       </form>
@@ -174,10 +205,10 @@ export async function BuildPackageScreen({
       </dl>
       <ol className="space-y-3">
         {detail.files.map((file) => (
-          <li key={file.path} className="space-y-2 rounded-lg border border-base p-4 text-sm">
+          <li key={file.path} className={surfaceSpace2P4TextSm}>
             <p className="break-words font-code">{file.path}</p>
             <p className="text-secondary">{labels[file.status]}</p>
-            <dl className="grid gap-4 md:grid-cols-2">
+            <dl className={typeGridGap4Md2}>
               {file.beforeHash && (
                 <div>
                   <dt>{copy.before}</dt>
@@ -197,28 +228,31 @@ export async function BuildPackageScreen({
         ))}
       </ol>
       {detail.files.length === 0 && detail.build.hasInventory && (
-        <div className="space-y-2">
-          <p className="text-muted">{copy.noFiles}</p>
-          {detail.filter !== "all" && (
-            <Link
-              href={buildPackageQueryHref(pageBase, {
-                ...query,
-                baselineId: detail.baseline?.id,
-                filter: "all",
-                page: 1,
-              })}
-              className={navLinkClass}
-            >
-              {copy.reset}
-            </Link>
-          )}
-        </div>
+        <EmptyState
+          title={copy.noFiles}
+          description={copy.noFilesHint}
+          action={
+            detail.filter !== "all" ? (
+              <Link
+                href={buildPackageQueryHref(pageBase, {
+                  ...query,
+                  baselineId: detail.baseline?.id,
+                  filter: "all",
+                  page: 1,
+                })}
+                className={linkAccent}
+              >
+                {copy.reset}
+              </Link>
+            ) : undefined
+          }
+        />
       )}
       {detail.totalPages > 1 && (
-        <nav className="flex gap-4 text-sm" aria-label={copy.inventory}>
+        <nav className={typeFlexGap4Sm} aria-label={copy.inventory}>
           {detail.page > 1 && (
             <Link
-              className={navLinkClass}
+              className={linkAccent}
               href={buildPackageQueryHref(pageBase, {
                 ...query,
                 baselineId: detail.baseline?.id,
@@ -234,7 +268,7 @@ export async function BuildPackageScreen({
           </span>
           {detail.page < detail.totalPages && (
             <Link
-              className={navLinkClass}
+              className={linkAccent}
               href={buildPackageQueryHref(pageBase, {
                 ...query,
                 baselineId: detail.baseline?.id,
@@ -249,4 +283,26 @@ export async function BuildPackageScreen({
       )}
     </div>
   );
+}
+
+export async function WorkspaceBuildPackagePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string; buildId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const { id, buildId } = await params;
+  return BuildPackageScreen({ productId: id, buildId, searchParams });
+}
+
+export async function StaffBuildPackagePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string; buildId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const { id, buildId } = await params;
+  return BuildPackageScreen({ productId: id, buildId, searchParams, staff: true });
 }

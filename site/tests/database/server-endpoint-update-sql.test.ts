@@ -1,6 +1,6 @@
-import { describe, expect, it, beforeEach, vi } from "vitest";
 import type { SQL } from "drizzle-orm";
 import { PgDialect } from "drizzle-orm/pg-core";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const capture = vi.hoisted(() => ({
   values: null as Record<string, unknown> | null,
@@ -36,6 +36,7 @@ vi.mock("../../packages/db/src/client", () => ({
     },
   },
 }));
+
 import { ServerRepository } from "../../packages/db/src/repositories/servers";
 
 const dialect = new PgDialect();

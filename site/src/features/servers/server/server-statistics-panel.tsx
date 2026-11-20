@@ -1,18 +1,30 @@
-import { EmptyState } from "@nexus/ui";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import type { Locale } from "../../../lib/i18n";
-import { serverHistoryBarPercent } from "../../../lib/server-history-presentation";
-import { serverObservationBrowserCopy } from "../../../lib/server-observation-browser-copy";
-import { serverStatisticsHref } from "../../../lib/server-statistics-contract";
-import { serverStatisticsCopy } from "../../../lib/server-statistics-copy";
-import { serverStatisticsIntervals } from "../../../lib/server-statistics-export";
-import type { ServerStatisticsResult } from "../../../lib/services/server-statistics-service";
-import { ServerObservationPeriodControls } from "../statistics-view";
+import type { ServerStatisticsResult } from "../../../lib/services/servers/server-statistics-service";
+import { linkAccentSm } from "../../shell/link-shell";
+import { pageShellStack6 } from "../../shell/page-shell";
+import { panelClipSpace3P5 } from "../../shell/panel-shell";
+import {
+  typeBorderTSecondary,
+  typeBreakLgSemiboldPrimary,
+  typeFlexWrapGap3,
+  typeLgBoldPrimary,
+  typeMinSpace3,
+  typeSemiboldPrimary,
+  typeSmMuted,
+  typeSmSecondary,
+  typeWFullLeftSm,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import { serverHistoryBarPercent } from "../server-history-presentation";
+import { serverObservationBrowserCopy } from "../server-observation-browser-copy";
+import { serverStatisticsHref } from "../server-statistics-contract";
+import { serverStatisticsCopy } from "../server-statistics-copy";
+import { serverStatisticsIntervals } from "../server-statistics-export";
 import { ServerStatisticsExportButton } from "../statistics-export";
-
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+import { ServerObservationPeriodControls } from "../statistics-view";
 
 function StatisticsScrollArea({
   labelledBy,
@@ -60,44 +72,48 @@ export function ServerStatisticsPanel({
     });
   const exportPath = `${managed ? "/api/workspace" : "/api"}/servers/${encodeURIComponent(report.server.id)}/statistics/export`;
   return (
-    <div className="min-w-0 space-y-6 overflow-x-clip">
-      <header className="min-w-0 space-y-3">
+    <div className={pageShellStack6}>
+      <header className={typeMinSpace3}>
         <Link
           href={
             managed
               ? `/workspace/servers/${encodeURIComponent(report.server.id)}`
               : `/servers/${encodeURIComponent(report.server.slug)}`
           }
-          className={`${navLinkClass} font-semibold hover:underline`}
+          className={`${linkAccentSm} font-semibold hover:underline`}
         >
           ← {managed ? copy.management : copy.back}
         </Link>
         <h1 className="break-words text-2xl font-black text-primary">{copy.title}</h1>
-        <p className="break-words text-lg font-semibold text-primary">{report.server.name}</p>
-        <p className="text-sm text-muted">{copy.description}</p>
-        {managed && <p className="text-xs text-muted">{copy.private}</p>}
+        <p className={typeBreakLgSemiboldPrimary}>{report.server.name}</p>
+        <p className={typeSmMuted}>{copy.description}</p>
+        {managed && <p className={typeXsMuted}>{copy.private}</p>}
         <ServerObservationPeriodControls
           path={path}
           window={report.window}
           end={report.windowEnd}
           locale={locale}
         />
-        <p className="text-xs text-muted">
+        <p className={typeXsMuted}>
           {copy.snapshot}: <time dateTime={report.windowEnd}>{time(report.windowEnd)} UTC</time>
         </p>
-        <p className="text-xs text-muted">{copy.snapshotScope}</p>
+        <p className={typeXsMuted}>{copy.snapshotScope}</p>
       </header>
-      <section className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
-        <h2 id="server-statistics-comparison" className="text-lg font-bold text-primary">
+      <section className={panelClipSpace3P5}>
+        <h2 id="server-statistics-comparison" className={typeLgBoldPrimary}>
           {copy.comparison}
         </h2>
-        <p className="text-sm text-muted">{copy.scope}</p>
-        {report.server.endpointRevision > 0 && (
-          <p className="text-sm text-muted">{copy.lifetime}</p>
-        )}
-        {!report.collectionEligible && <p className="text-sm text-muted">{copy.paused}</p>}
+        <p className={typeSmMuted}>{copy.scope}</p>
+        {report.server.endpointRevision > 0 && <p className={typeSmMuted}>{copy.lifetime}</p>}
+        {!report.collectionEligible ? (
+          <ErrorState
+            id="server-statistics-collection-paused"
+            title={copy.paused}
+            description={copy.pausedHint}
+          />
+        ) : null}
         <StatisticsScrollArea labelledBy="server-statistics-comparison">
-          <table className="w-full text-left text-sm">
+          <table className={typeWFullLeftSm}>
             <caption className="sr-only">{copy.comparison}</caption>
             <thead>
               <tr className="text-muted">
@@ -118,9 +134,9 @@ export function ServerStatisticsPanel({
                   [copy.previous, report.previousStart, report.windowStart, report.previousSummary],
                 ] as const
               ).map(([label, from, to, summary]) => (
-                <tr key={label} className="border-t border-base text-secondary">
+                <tr key={label} className={typeBorderTSecondary}>
                   <th scope="row" className="min-w-48 p-2 font-normal">
-                    <span className="font-semibold text-primary">{label}</span>
+                    <span className={typeSemiboldPrimary}>{label}</span>
                     <span className="mt-1 block text-xs text-muted">
                       {time(from)} — {time(to)} UTC
                     </span>
@@ -139,7 +155,7 @@ export function ServerStatisticsPanel({
             </tbody>
           </table>
         </StatisticsScrollArea>
-        <p className="text-sm text-secondary">
+        <p className={typeSmSecondary}>
           {copy.change}:{" "}
           {report.averagePlayerChange == null
             ? copy.unknown
@@ -149,11 +165,8 @@ export function ServerStatisticsPanel({
             : ` (${report.averagePlayerPercentChange > 0 ? "+" : ""}${report.averagePlayerPercentChange}%)`}
         </p>
       </section>
-      <section
-        className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5"
-        aria-labelledby="server-statistics-chart"
-      >
-        <h2 id="server-statistics-chart" className="text-lg font-bold text-primary">
+      <section className={panelClipSpace3P5} aria-labelledby="server-statistics-chart">
+        <h2 id="server-statistics-chart" className={typeLgBoldPrimary}>
           {copy.chart}
         </h2>
         {report.summary.observationCount === 0 ? (
@@ -180,7 +193,7 @@ export function ServerStatisticsPanel({
                 </li>
               ))}
             </ol>
-            <p className="text-xs text-muted">{copy.chartScope}</p>
+            <p className={typeXsMuted}>{copy.chartScope}</p>
           </>
         )}
         <div className="flex flex-wrap justify-between gap-2 text-xs text-muted">
@@ -188,16 +201,13 @@ export function ServerStatisticsPanel({
           <time dateTime={report.windowEnd}>{time(report.windowEnd)} UTC</time>
         </div>
       </section>
-      <section
-        className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5"
-        aria-labelledby="server-statistics-observations"
-      >
-        <h2 id="server-statistics-observations" className="text-lg font-bold text-primary">
+      <section className={panelClipSpace3P5} aria-labelledby="server-statistics-observations">
+        <h2 id="server-statistics-observations" className={typeLgBoldPrimary}>
           {copy.observations}
         </h2>
-        <p className="text-sm text-muted">{copy.observationsScope}</p>
+        <p className={typeSmMuted}>{copy.observationsScope}</p>
         <Link
-          className={navLinkClass}
+          className={linkAccentSm}
           href={serverStatisticsHref(
             `${managed ? `/workspace/servers/${encodeURIComponent(report.server.id)}` : `/servers/${encodeURIComponent(report.server.slug)}`}/observations`,
             state,
@@ -212,7 +222,7 @@ export function ServerStatisticsPanel({
           />
         ) : (
           <StatisticsScrollArea labelledBy="server-statistics-observations">
-            <table className="w-full text-left text-sm">
+            <table className={typeWFullLeftSm}>
               <caption className="sr-only">{copy.observations}</caption>
               <thead>
                 <tr className="text-muted">
@@ -234,7 +244,7 @@ export function ServerStatisticsPanel({
               </thead>
               <tbody>
                 {report.observations.map((item) => (
-                  <tr key={item.id} className="border-t border-base text-secondary">
+                  <tr key={item.id} className={typeBorderTSecondary}>
                     <th scope="row" className="whitespace-nowrap p-2 font-normal">
                       <time dateTime={item.observedAt}>{time(item.observedAt)}</time>
                     </th>
@@ -261,22 +271,22 @@ export function ServerStatisticsPanel({
           className="flex min-w-0 flex-wrap gap-4 text-sm font-semibold text-accent"
         >
           {before && (
-            <Link href={serverStatisticsHref(path, state)} className={navLinkClass}>
+            <Link href={serverStatisticsHref(path, state)} className={linkAccentSm}>
               {copy.latest}
             </Link>
           )}
           {report.nextCursor && (
             <Link
               href={serverStatisticsHref(path, { ...state, before: report.nextCursor })}
-              className={navLinkClass}
+              className={linkAccentSm}
             >
               {copy.earlier} →
             </Link>
           )}
         </nav>
       </section>
-      <section className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
-        <div className="flex flex-wrap gap-3">
+      <section className={panelClipSpace3P5}>
+        <div className={typeFlexWrapGap3}>
           <ServerStatisticsExportButton
             url={serverStatisticsHref(exportPath, { ...state, format: "buckets" })}
             label={copy.export}
@@ -289,7 +299,7 @@ export function ServerStatisticsPanel({
             disabled={report.observations.length === 0}
           />
         </div>
-        <p className="text-sm text-muted">{copy.exportScope}</p>
+        <p className={typeSmMuted}>{copy.exportScope}</p>
       </section>
     </div>
   );

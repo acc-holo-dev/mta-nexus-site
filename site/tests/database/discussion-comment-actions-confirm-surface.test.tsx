@@ -1,15 +1,15 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { expect, it } from "vitest";
-import { getDiscussionCopy } from "../../src/lib/content-discussion-copy";
+import { getDiscussionCopy } from "../../src/features/community/content-discussion-copy";
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
 it("gates own and moderator comment removal behind confirmAction with localized copy", () => {
   const source = read("site/src/features/community/components/discussion-comment-actions.tsx");
-  const i18n = read("site/src/lib/content-discussion-copy.ts");
+  const i18n = read("site/src/features/community/content-discussion-copy.ts");
 
-  expect(source).toContain('import { confirmAction } from "../../../components/confirm-action"');
+  expect(source).toContain('import { confirmAction } from "../../shell/confirm-action"');
   expect(source).toContain("copy.removeConfirmTitle");
   expect(source).toContain("copy.moderateRemoveConfirmTitle");
   expect(source).toContain("danger: true");

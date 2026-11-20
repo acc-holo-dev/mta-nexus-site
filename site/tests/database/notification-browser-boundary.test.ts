@@ -5,28 +5,22 @@ const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
   getSessionIdentity: vi.fn(async () => null),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
   generateId: () => "wps_a",
 }));
-vi.mock("@nexus/db", () => ({
-  notificationRepository: {
-    markAsRead: vi.fn(),
-    markAllAsRead: vi.fn(),
-    updatePreferences: vi.fn(),
-    getPreferences: vi.fn(),
-  },
-  webPushSubscriptionRepository: {
-    upsertAuthenticated: vi.fn(),
-    removeAuthenticated: vi.fn(),
-    listForSession: vi.fn(),
-  },
-}));
-vi.mock("../../src/lib/services/notification-inbox-service", () => ({
+vi.mock("../../src/lib/services/notifications/notification-inbox-service", () => ({
   notificationInboxService: {
     page: vi.fn(),
     command: vi.fn(),
+    markAsRead: vi.fn(),
+    markAllAsRead: vi.fn(),
+    getPreferences: vi.fn(),
+    updatePreferences: vi.fn(),
+    listWebPushForSession: vi.fn(),
+    upsertWebPushAuthenticated: vi.fn(),
+    removeWebPushAuthenticated: vi.fn(),
   },
 }));
 vi.mock("@nexus/config", () => ({

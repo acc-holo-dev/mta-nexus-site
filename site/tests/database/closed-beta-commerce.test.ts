@@ -23,7 +23,8 @@ vi.mock("@nexus/security", () => ({
 }));
 
 import { POST as disabledCheckout } from "../../src/app/api/checkout/route";
-import { CommerceService } from "../../src/lib/services/commerce-service";
+import { checkoutApiCopy } from "../../src/features/commerce/checkout-api-copy";
+import { CommerceService } from "../../src/lib/services/commerce/commerce-service";
 
 describe("open free-beta commerce behavior", () => {
   beforeEach(() => {
@@ -41,7 +42,7 @@ describe("open free-beta commerce behavior", () => {
 
     expect(response.status).toBe(503);
     expect(await response.json()).toEqual({
-      error: "Paid checkout is not available during the open free beta.",
+      error: checkoutApiCopy("en").disabled,
       code: "CHECKOUT_DISABLED",
     });
   });

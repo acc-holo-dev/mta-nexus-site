@@ -2,15 +2,18 @@ import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { reportRateLimit } from "../../../lib/community-report-api";
-import { parseReportGroupsQuery } from "../../../lib/community-report-groups-contract";
-import { reportGroupsCopy, reportGroupsError } from "../../../lib/community-report-groups-copy";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
-import { communityReportGroupsService } from "../../../lib/services/community-report-groups-service";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { communityReportGroupsService } from "../../../lib/services/community/community-report-groups-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
+import { pageShellMax5xlDenseTight } from "../../shell/page-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary } from "../../shell/type-shell";
+import { reportRateLimit } from "../community-report-api";
+import { parseReportGroupsQuery } from "../community-report-groups-contract";
+import { reportGroupsCopy, reportGroupsError } from "../community-report-groups-copy";
 import { CommunityReportGroups } from "../components/community-report-groups";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { PlatformSessionError } from "../../../components/platform-session-error";
 export async function reportGroupsMetadata() {
   return {
     title: reportGroupsCopy(await getRequestLocale()).title,
@@ -58,18 +61,16 @@ export async function CommunityReportGroupsPage({
     );
   } catch (error) {
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-4 overflow-x-clip">
-        <h1 className="font-display text-primary">{copy.title}</h1>
+      <div className={pageShellMax5xlDenseTight}>
+        <h1 className={typeDisplayPrimary}>{copy.title}</h1>
         <ErrorState
           title={reportGroupsError(
             locale,
             error instanceof AppError ? error.code : "INTERNAL_ERROR",
           )}
+          description={copy.unavailableHint}
           action={
-            <Link
-              href="/admin/reports/targets"
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href="/admin/reports/targets" className={linkAccentSm}>
               {copy.reset}
             </Link>
           }

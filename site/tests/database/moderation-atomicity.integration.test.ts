@@ -1,14 +1,3 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  browserMutationHeaders,
-  stubBrowserMutationOrigin,
-} from "../helpers/browser-mutation-headers";
-import {
-  INTEGRATION_STAFF_PASSWORD,
-  assignIntegrationStaffPassword,
-} from "../helpers/integration-staff-password";
-import { eq } from "drizzle-orm";
-import { NextRequest } from "next/server";
 import {
   auditEvents,
   buildRepository,
@@ -20,7 +9,18 @@ import {
   sessionRepository,
   userRepository,
 } from "@nexus/db";
+import { eq } from "drizzle-orm";
+import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { POST as adminAction } from "../../src/app/api/admin/actions/route";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
+import {
+  assignIntegrationStaffPassword,
+  INTEGRATION_STAFF_PASSWORD,
+} from "../helpers/integration-staff-password";
 
 function adminRequest(token: string, body: Record<string, unknown>) {
   return new NextRequest("http://nexus.test/api/admin/actions", {

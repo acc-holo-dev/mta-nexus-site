@@ -1,10 +1,10 @@
-import type { PreparedWebPushJob, WebPushLease } from "./web-push-worker";
-import { webPushWorkerRepository } from "./web-push-worker";
+import type { WebPushSender, WebPushSendResult } from "../web-push-runtime";
 import {
   WebPushPermanentPayloadError,
   WebPushPermanentSubscriptionError,
 } from "../web-push-runtime";
-import type { WebPushSendResult, WebPushSender } from "../web-push-runtime";
+import type { PreparedWebPushJob, WebPushLease } from "./web-push-worker";
+import { webPushWorkerRepository } from "./web-push-worker";
 
 type Worker = Readonly<{
   candidates(limit?: number): Promise<string[]>;

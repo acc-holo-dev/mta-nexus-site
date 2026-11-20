@@ -1,16 +1,16 @@
 import {
   AppError,
-  NotFoundError,
   LIBRARY_RELEASE_HISTORY_DAYS,
   type LibraryReleaseHistoryQuery,
+  NotFoundError,
   recordedLibraryRelease,
 } from "@nexus/domain";
 import { and, count, eq, gte, lte, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, builds, products, users } from "../schema";
-import { effectiveUserDownloadSources } from "./user-library";
 import { safePublishedBuildCondition } from "./build-safety";
 import { historyPageBounds } from "./history-pagination";
+import { effectiveUserDownloadSources } from "./user-library";
 export async function readLibraryReleaseHistory(userId: string, query: LibraryReleaseHistoryQuery) {
   if (
     !Number.isInteger(query.page) ||

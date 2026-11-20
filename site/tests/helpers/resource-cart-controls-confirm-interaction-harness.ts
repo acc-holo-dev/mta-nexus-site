@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, type Mock, vi } from "vitest";
-import { getResourceCommerceCopy } from "../../src/lib/resource-commerce-i18n";
+import { getResourceCommerceCopy } from "../../src/features/resources/resource-commerce-i18n";
 import { type FlatTestElement, flattenReactTestTree } from "./flatten-react-test-tree";
 
 type ResourceCartControlsConfirmHarness = {

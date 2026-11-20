@@ -1,5 +1,6 @@
 export * from "./avatar";
 export * from "./badge";
+export * from "./brand-mark";
 export * from "./button";
 export * from "./card";
 export * from "./dialog";
@@ -10,6 +11,7 @@ export * from "./filter-bar";
 export * from "./input";
 export * from "./list-keys";
 export * from "./platform";
+export * from "./rise";
 export * from "./search-field";
 export * from "./skeleton";
 export * from "./sponsored-placement-slot";

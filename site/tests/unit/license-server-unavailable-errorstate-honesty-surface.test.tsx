@@ -8,17 +8,23 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
-const surface = "site/src/components/license-detail-view.tsx";
+const surface = "site/src/features/commerce/server/license-detail-view.tsx";
 
 it("locks license server unavailable and binding changed notices to ErrorState", () => {
   const source = read(surface);
   expect(source).toContain("ErrorState");
   expect(source).toContain('id="license-server-unavailable"');
   expect(source).toContain('id="license-binding-changed"');
-  expect(source).toMatch(
-    /<ErrorState id="license-server-unavailable" title=\{copy\.serverUnavailable\}/,
+  expect(source).toContain('id="license-server-unavailable"');
+  expect(source).toContain("title={copy.serverUnavailable}");
+  expect(source).toContain("description={copy.serverUnavailableHint}");
+  expect(read("site/src/features/commerce/license-control-i18n.ts")).toContain(
+    "serverUnavailableHint:",
   );
-  expect(source).toMatch(/<ErrorState id="license-binding-changed" title=\{copy\.changed\}/);
+  expect(source).toContain('id="license-binding-changed"');
+  expect(source).toContain("title={copy.changed}");
+  expect(source).toContain("description={copy.changedHint}");
+  expect(read("site/src/features/commerce/license-control-i18n.ts")).toContain("changedHint:");
   expect(source).not.toContain("? (license.serverName ?? copy.serverUnavailable)");
   expect(source).not.toContain("? copy.available : copy.changed");
 });

@@ -4,21 +4,33 @@ import { Button, ErrorState, Input } from "@nexus/ui";
 import Link from "next/link";
 import { type FormEvent, useEffect, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
+import { authEntryHref, parseAuthReturnPath, resolveAuthReturnPath } from "../../shell/auth-return";
+import { linkAccentSemibold } from "../../shell/link-shell";
+import { pageShellMaxMdAuth } from "../../shell/page-shell";
+import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import {
-  authEntryHref,
-  parseAuthReturnPath,
-  resolveAuthReturnPath,
-} from "../../../components/auth-return-path";
+  type2xlBoldPrimary,
+  typeSmMuted,
+  typeSpace2SmMuted,
+  typeWFullMinH11,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import { authLoginApiCopy } from "../auth-login-api-copy";
+import { authRegisterApiCopy } from "../auth-register-api-copy";
 
 type AuthMode = "login" | "register";
 
-const pageShellClass = "mx-auto min-w-0 max-w-md space-y-6 overflow-x-clip px-4 py-10 sm:px-0";
-const navLinkClass =
-  "inline-flex min-h-11 items-center font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
-function responseError(value: unknown, fallback: string): string {
+function responseError(
+  value: unknown,
+  locale: Locale,
+  registering: boolean,
+  fallback: string,
+): string {
   if (!value || typeof value !== "object") return fallback;
-  const data = value as { error?: unknown; details?: Record<string, { _errors?: unknown }> };
+  const data = value as {
+    code?: unknown;
+    details?: Record<string, { _errors?: unknown }>;
+  };
   const fieldErrors = ["email", "username", "password", "displayName"].flatMap((field) => {
     const errors = data.details?.[field]?._errors;
     return Array.isArray(errors)
@@ -26,7 +38,18 @@ function responseError(value: unknown, fallback: string): string {
       : [];
   });
   if (fieldErrors.length) return fieldErrors.join(" ");
-  return typeof data.error === "string" ? data.error : fallback;
+  if (registering) {
+    const copy = authRegisterApiCopy(locale);
+    if (data.code === "RATE_LIMIT_EXCEEDED" || data.code === "RATE_LIMITED") return copy.rate;
+    if (data.code === "VALIDATION_ERROR") return copy.validationFailed;
+    if (data.code === "UNAUTHORIZED") return copy.unauthorized;
+    if (data.code === "CONFLICT") return copy.conflict;
+    return copy.failed || fallback;
+  }
+  const copy = authLoginApiCopy(locale);
+  if (data.code === "RATE_LIMIT_EXCEEDED" || data.code === "RATE_LIMITED") return copy.rate;
+  if (data.code === "UNAUTHORIZED" || data.code === "INVALID_CREDENTIALS") return copy.unauthorized;
+  return copy.failed || fallback;
 }
 
 export function AuthForm({
@@ -73,7 +96,7 @@ export function AuthForm({
       });
       const data = await response.json().catch(() => null);
       if (!response.ok) {
-        setError(responseError(data, copy.genericError));
+        setError(responseError(data, locale, registering, copy.genericError));
         setLoading(false);
         return;
       }
@@ -91,12 +114,10 @@ export function AuthForm({
   const alternateHref = authEntryHref(registering ? "login" : "register", returnPath);
 
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMaxMdAuth}>
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold text-primary">
-          {registering ? copy.registerTitle : copy.loginTitle}
-        </h1>
-        <p className="text-sm text-muted">
+        <h1 className={type2xlBoldPrimary}>{registering ? copy.registerTitle : copy.loginTitle}</h1>
+        <p className={typeSmMuted}>
           {registering ? copy.registerDescription : copy.loginDescription}
         </p>
       </div>
@@ -104,9 +125,11 @@ export function AuthForm({
         onSubmit={submit}
         aria-busy={loading}
         aria-describedby={error ? "auth-error" : undefined}
-        className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5"
+        className={panelClipSpace4P5}
       >
-        {error ? <ErrorState id="auth-error" title={error} /> : null}
+        {error ? (
+          <ErrorState id="auth-error" title={error} description={copy.formErrorHint} />
+        ) : null}
         <Input
           id="auth-email"
           name="email"
@@ -135,7 +158,7 @@ export function AuthForm({
                 aria-describedby="username-hint"
                 disabled={loading}
               />
-              <p id="username-hint" className="text-xs text-muted">
+              <p id="username-hint" className={typeXsMuted}>
                 {copy.usernameHint}
               </p>
             </div>
@@ -150,7 +173,7 @@ export function AuthForm({
                 aria-describedby="display-name-hint"
                 disabled={loading}
               />
-              <p id="display-name-hint" className="text-xs text-muted">
+              <p id="display-name-hint" className={typeXsMuted}>
                 {copy.displayNameHint}
               </p>
             </div>
@@ -170,12 +193,12 @@ export function AuthForm({
             disabled={loading}
           />
           {registering && (
-            <p id="password-hint" className="text-xs text-muted">
+            <p id="password-hint" className={typeXsMuted}>
               {copy.passwordHint}
             </p>
           )}
         </div>
-        <Button type="submit" size="lg" isLoading={loading} className="w-full min-h-11">
+        <Button type="submit" size="lg" isLoading={loading} className={typeWFullMinH11}>
           {loading
             ? registering
               ? copy.creating
@@ -185,17 +208,17 @@ export function AuthForm({
               : copy.signIn}
         </Button>
       </form>
-      <div className="space-y-2 text-sm text-muted">
+      <div className={typeSpace2SmMuted}>
         {!registering && (
           <p>
-            <Link href="/auth/forgot-password" className={navLinkClass}>
+            <Link href="/auth/forgot-password" className={linkAccentSemibold}>
               {copy.forgot}
             </Link>
           </p>
         )}
         <p>
           {registering ? `${copy.already} ` : `${copy.newUser} `}
-          <Link href={alternateHref} className={navLinkClass}>
+          <Link href={alternateHref} className={linkAccentSemibold}>
             {registering ? copy.signIn : copy.create}
           </Link>
         </p>

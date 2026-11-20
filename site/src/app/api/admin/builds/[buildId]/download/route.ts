@@ -1,22 +1,24 @@
-import { buildRepository, buildReviewDownloadRepository } from "@nexus/db";
 import { AppError, ValidationError } from "@nexus/domain";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 import { storageService } from "@nexus/storage";
 import { type NextRequest, NextResponse } from "next/server";
+import { adminBuildDownloadApiCopy } from "../../../../../../features/resources/admin-build-download-api-copy";
 import {
   assertBuildDownloadMetadata,
   BuildArtifactMismatchError,
-} from "../../../../../../lib/build-download-metadata";
-import { toDownloadWebStream } from "../../../../../../lib/download-web-stream";
+} from "../../../../../../features/resources/build-download-metadata";
+import { toDownloadWebStream } from "../../../../../../features/resources/download-web-stream";
+import { reviewerAttachmentFileName } from "../../../../../../features/resources/resource-attachment-filename";
+import { resolveLocale } from "../../../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   REQUEST_ID_HEADER,
   type RequestLogContext,
-} from "../../../../../../lib/observability";
-import { reviewerAttachmentFileName } from "../../../../../../lib/resource-attachment-filename";
-import { authService } from "../../../../../../lib/services/auth-service";
+} from "../../../../../../lib/platform/observability";
+import { authService } from "../../../../../../lib/services/accounts/auth-service";
+import { productService } from "../../../../../../lib/services/commerce/product-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -46,6 +48,7 @@ export async function GET(
   },
 ) {
   const context = createRequestLogContext(request);
+  const copy = adminBuildDownloadApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
 
   try {
     const token = request.cookies.get("nexus_session")?.value;
@@ -54,7 +57,7 @@ export async function GET(
       return json(
         context,
         {
-          error: "Moderator access required",
+          error: copy.moderatorRequired,
         },
         403,
       );
@@ -65,7 +68,7 @@ export async function GET(
       return json(
         context,
         {
-          error: "Too many reviewer downloads",
+          error: copy.rate,
         },
         429,
       );
@@ -73,19 +76,19 @@ export async function GET(
 
     const { buildId } = await params;
     if (!buildId || buildId.length > 128) {
-      return json(context, { error: "Build not found" }, 404);
+      return json(context, { error: copy.notFound }, 404);
     }
 
-    const build = await buildRepository.findById(buildId);
+    const build = await productService.findBuildById(buildId);
     if (!build) {
-      return json(context, { error: "Build not found" }, 404);
+      return json(context, { error: copy.notFound }, 404);
     }
 
     if (build.status !== "pending_review" && build.status !== "quarantined") {
       return json(
         context,
         {
-          error: "Build is not available for moderator evidence review",
+          error: copy.notAvailableForReview,
         },
         409,
       );
@@ -95,7 +98,7 @@ export async function GET(
       return json(
         context,
         {
-          error: "Reviewer download requires a provenance-backed clean malware scan",
+          error: copy.scanProvenanceRequired,
         },
         422,
       );
@@ -106,7 +109,7 @@ export async function GET(
 
     try {
       request.signal.throwIfAborted();
-      await buildReviewDownloadRepository.authorize({
+      await productService.authorizeReviewDownload({
         actorId: actor.id,
         auditId: generateId("aud"),
         expected: build,
@@ -138,7 +141,7 @@ export async function GET(
       return json(
         context,
         {
-          error: "Download cancelled",
+          error: copy.cancelled,
           code: "DOWNLOAD_CANCELLED",
         },
         499,
@@ -149,7 +152,7 @@ export async function GET(
       return json(
         context,
         {
-          error: "Build file does not match its recorded metadata",
+          error: copy.artifactMismatch,
           code: "BUILD_ARTIFACT_MISMATCH",
         },
         409,
@@ -160,18 +163,14 @@ export async function GET(
       return json(
         context,
         {
-          error: "Resource build file is not available",
+          error: copy.fileUnavailable,
         },
         404,
       );
     }
 
     if (error instanceof AppError) {
-      return json(
-        context,
-        { error: "Reviewer access or build evidence changed", code: error.code },
-        error.statusCode,
-      );
+      return json(context, { error: copy.evidenceChanged, code: error.code }, error.statusCode);
     }
 
     logRequestEvent({
@@ -184,7 +183,7 @@ export async function GET(
     return json(
       context,
       {
-        error: "Could not deliver reviewer artifact",
+        error: copy.deliverFailed,
       },
       500,
     );

@@ -1,16 +1,16 @@
 import type { NextRequest } from "next/server";
-import {
-  readBoundedJson,
-  requireServerJsonContentType,
-} from "../../../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../../../lib/browser-route-adapter";
+import { userPlatformApi } from "../../../../../../../features/accounts/user-platform-api";
 import {
   organizationContentFilters,
   organizationContentId,
   organizationContentRate,
-} from "../../../../../../../lib/organization-content-api";
-import { organizationContentService } from "../../../../../../../lib/services/organization-content-service";
-import { userPlatformApi } from "../../../../../../../lib/user-platform-api";
+} from "../../../../../../../features/organizations/organization-content-api";
+import {
+  readBoundedJson,
+  requireServerJsonContentType,
+} from "../../../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../../../lib/http/browser-route-adapter";
+import { organizationContentService } from "../../../../../../../lib/services/organizations/organization-content-service";
 
 type Context = { params: Promise<{ id: string; contentId: string }> };
 export function GET(request: NextRequest, context: Context) {

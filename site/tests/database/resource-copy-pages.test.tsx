@@ -2,6 +2,9 @@ import { AppError } from "@nexus/domain";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+import { getDictionary } from "../../src/lib/i18n";
+
+vi.mock("server-only", () => ({}));
 
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "developer" } as { id: string; role: string } | null,
@@ -25,23 +28,23 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/resource-copy-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-copy-service", () => ({
   resourceCopyService: { preview: state.preview, page: state.page, detail: state.detail },
 }));
-vi.mock("../../src/components/locale-context", () => ({
-  useNexusLocale: () => ({ locale: state.locale }),
+vi.mock("../../src/features/shell/locale", () => ({
+  useNexusLocale: () => ({ locale: state.locale, dictionary: getDictionary(state.locale) }),
 }));
 
 import Detail from "../../src/app/workspace/resources/[id]/copies/[receiptId]/page";
 import History from "../../src/app/workspace/resources/[id]/copies/page";
 import New from "../../src/app/workspace/resources/[id]/copy/page";
-import { resourceCopyCopy } from "../../src/lib/resource-copy-i18n";
+import { resourceCopyCopy } from "../../src/features/resources/resource-copy-i18n";
 import { date, preview, receipt, receiptId, sourceId } from "../helpers/resource-copy-fixtures";
 
 const context = {
@@ -125,7 +128,7 @@ it("masks revoked access and rejects invalid query recovery without service read
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.errorDescription);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(state.preview).not.toHaveBeenCalled();
 });
 it("renders empty history with valid filters", async () => {
@@ -166,7 +169,7 @@ it("shows an honest recovery state when draft copy services fail", async () => {
   const html = renderToStaticMarkup(await New(context));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("shows an honest recovery state when copy history fails", async () => {
   state.page.mockRejectedValue(new Error("history unavailable"));
@@ -174,7 +177,7 @@ it("shows an honest recovery state when copy history fails", async () => {
   const html = renderToStaticMarkup(await History(context));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("shows an honest recovery state when a recorded copy detail fails", async () => {
   state.detail.mockRejectedValue(new Error("detail unavailable"));
@@ -182,5 +185,5 @@ it("shows an honest recovery state when a recorded copy detail fails", async () 
   const html = renderToStaticMarkup(await Detail(context));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });

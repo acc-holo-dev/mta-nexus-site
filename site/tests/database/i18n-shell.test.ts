@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { adminStatusLabel } from "../../src/app/admin/status-labels";
+import { adminStatusLabel } from "../../src/features/moderation/admin-status-labels";
 import { getDictionary, resolveLocale } from "../../src/lib/i18n";
 
 describe("RU/EN shell foundation", () => {

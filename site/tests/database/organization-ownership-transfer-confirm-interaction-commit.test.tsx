@@ -18,10 +18,11 @@ const harness = vi.hoisted(() => ({
   onReload: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../../src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../../src/features/shell/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
-vi.mock("../../src/lib/user-platform-client", async (original) => {
-  const actual = await original<typeof import("../../src/lib/user-platform-client")>();
+vi.mock("../../src/features/community/user-platform-client", async (original) => {
+  const actual =
+    await original<typeof import("../../src/features/community/user-platform-client")>();
   return {
     ...actual,
     platformRequest: harness.request,
@@ -29,7 +30,7 @@ vi.mock("../../src/lib/user-platform-client", async (original) => {
 });
 
 import { OrganizationOwnershipTransfer } from "../../src/features/organizations/components/organization-ownership-transfer";
-import { organizationGovernanceCopy } from "../../src/lib/organization-governance-copy";
+import { organizationGovernanceCopy } from "../../src/features/organizations/organization-governance-copy";
 
 const { render, submit } = createOrganizationOwnershipTransferConfirmInteractionHelpers(
   harness,

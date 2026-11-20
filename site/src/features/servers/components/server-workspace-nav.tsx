@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Locale } from "../../../lib/i18n";
-import { getServerWorkspaceNavCopy } from "../../../lib/server-workspace-nav-i18n";
+import { getServerWorkspaceNavCopy } from "../server-workspace-nav-i18n";
 
 type NavItem = {
   key: "overview" | "content" | "activity" | "statistics" | "observations";

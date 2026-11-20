@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { expect, it } from "vitest";
-import { formatNotification } from "../../src/lib/notification-copy";
+import { formatNotification } from "../../src/features/notifications/notification-copy";
 
 const reviewCopy = { approved: "", rejected: "", version: "", notes: "" };
 
@@ -25,7 +25,7 @@ it.each(["en", "ru"] as const)(
   (locale) => {
     const activity = formatNotification(
       {
-        title: "Publication activity",
+        title: "Publication activity / Обновление публикации",
         message: "stored",
         data: {
           kind: "publication_activity",
@@ -40,7 +40,7 @@ it.each(["en", "ru"] as const)(
     );
     const reaction = formatNotification(
       {
-        title: "Publication reaction",
+        title: "Publication reaction / Реакция на публикацию",
         message: "stored",
         data: {
           kind: "content_reaction",

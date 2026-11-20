@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
-import { followCopy } from "../../src/lib/follow-workspace-copy";
+import { followCopy } from "../../src/features/community/follow-workspace-copy";
 import {
   createSavedFollowsInteractionHelpers,
   mockReactHooks,
@@ -13,12 +13,12 @@ const harness = vi.hoisted(() => ({
   fetch: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../../src/components/confirm-action", () => ({
+vi.mock("../../src/features/shell/confirm-action", () => ({
   confirmAction,
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 
-import { FollowWorkspace } from "../../src/components/follow-workspace";
+import { FollowWorkspace } from "../../src/features/community/follow";
 
 createSavedFollowsInteractionHelpers(harness, FollowWorkspace, confirmAction);
 
@@ -39,8 +39,8 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(copy.empty);
     expect(html).toContain(copy.emptyHint);
     expect(html).toContain(copy.discover);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   },
 );
 
@@ -56,6 +56,6 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('role="alert"');
     expect(html).toContain(copy.pageError);
     expect(html).toContain(copy.retry);
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   },
 );

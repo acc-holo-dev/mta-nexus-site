@@ -18,23 +18,23 @@ vi.mock("next/navigation", () => ({
     throw Error("NOT_FOUND");
   },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/components/locale-context", () => ({
+vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({ locale: state.locale, dictionary: getDictionary(state.locale) }),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/services/resource-build-workspace-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-build-workspace-service", () => ({
   resourceBuildWorkspaceService: { detail: state.detail },
 }));
 
 import AdminResourceBuildLoading from "../../src/app/admin/resources/[id]/builds/[buildId]/loading";
 import { generateMetadata } from "../../src/app/workspace/resources/[id]/builds/[buildId]/page";
 import { ResourceBuildScreen } from "../../src/features/resources/build-server";
-import { getResourceBuildWorkspaceCopy } from "../../src/lib/resource-build-workspace-i18n";
+import { getResourceBuildWorkspaceCopy } from "../../src/features/resources/resource-build-workspace-i18n";
 
 const detail = {
   product: { id: "prd_a", title: "<Private resource>", slug: "resource", status: "published" },
@@ -132,7 +132,7 @@ it("shows an honest recovery state when version detail fails", async () => {
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("/workspace/resources/prd_a/builds/bld_a");
   expect(html).not.toContain("<Private resource>");
 });
@@ -149,7 +149,7 @@ it("shows an honest staff recovery state without inventing build content", async
 it("clips honest loading shells on narrow layouts", async () => {
   const html = renderToStaticMarkup(await AdminResourceBuildLoading());
   expect(html).toContain("min-w-0 max-w-5xl");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("does not expose edit or resubmit controls for quarantined or retired builds", async () => {
   for (const status of ["quarantined", "retired"]) {

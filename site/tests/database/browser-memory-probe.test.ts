@@ -1,5 +1,5 @@
-import { expect, it, vi } from "vitest";
 import { readFile } from "node:fs/promises";
+import { expect, it, vi } from "vitest";
 import { startBrowserMemoryProbe } from "../../../scripts/browser-memory.mjs";
 
 // /proc can expose a different PID namespace than process.pid in sandboxes.

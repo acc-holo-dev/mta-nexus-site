@@ -4,8 +4,19 @@ import { BookOpen } from "lucide-react";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import { getDictionary } from "../../../lib/i18n";
-import { licenseModelLabel } from "../../../lib/license-model-i18n";
-import { CopyablePlainCodeBlock } from "../../../components/copyable-plain-code-block";
+import { licenseModelLabel } from "../../commerce/license-model-i18n";
+import { CopyablePlainCodeBlock } from "../../shell/copyable-plain-code-block";
+import { linkAccentTightSemiboldHover } from "../../shell/link-shell";
+import { panelSpace4P6 } from "../../shell/panel-shell";
+import {
+  typeFlexWrapGap3Sm,
+  typeIconAccent,
+  typeMt1XsMuted,
+  typeSmSecondary,
+  typeSmSemiboldPrimary,
+  typeSpace2SmSecondary,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import { ResourceVersionHelpSupportLink } from "./resource-version-help-support-link";
 
 function renderSectionBody({
@@ -58,7 +69,7 @@ export function ResourceVersionHelpSection({
 
   return (
     <section
-      className="nexus-panel space-y-4 p-6"
+      className={panelSpace4P6}
       aria-labelledby="resource-version-help-heading"
       data-testid="resource-version-help"
       data-version={projection.version}
@@ -68,19 +79,23 @@ export function ResourceVersionHelpSection({
           id="resource-version-help-heading"
           className="flex items-center gap-2 text-base font-bold text-primary"
         >
-          <BookOpen className="h-4 w-4 text-accent" aria-hidden="true" />
+          <BookOpen className={typeIconAccent} aria-hidden="true" />
           <span>{copy.title.replace("{version}", projection.version)}</span>
         </h2>
-        <p className="mt-1 text-xs text-muted">{copy.versionScope}</p>
+        <p className={typeMt1XsMuted}>{copy.versionScope}</p>
       </div>
 
       {projection.missingAuthorContent ? (
-        <ErrorState id="resource-version-help-missing" title={copy.missingBody} />
+        <ErrorState
+          id="resource-version-help-missing"
+          title={copy.missingBody}
+          description={copy.missingBodyHint}
+        />
       ) : null}
 
       {projection.purpose ? (
         <div className="space-y-2">
-          <h3 className="text-sm font-semibold text-primary">{copy.sections.purpose}</h3>
+          <h3 className={typeSmSemiboldPrimary}>{copy.sections.purpose}</h3>
           {renderSectionBody({
             ...projection.purpose,
             copyLabel: copy.copyCode,
@@ -90,16 +105,16 @@ export function ResourceVersionHelpSection({
       ) : null}
 
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold text-primary">{copy.sections.acquire}</h3>
+        <h3 className={typeSmSemiboldPrimary}>{copy.sections.acquire}</h3>
         <p className="whitespace-pre-line text-sm leading-relaxed text-secondary">
           {copy.acquireBody.replace("{version}", projection.version)}
         </p>
-        <p className="text-xs text-muted">{copy.acquireDisclaimer}</p>
+        <p className={typeXsMuted}>{copy.acquireDisclaimer}</p>
       </div>
 
       {projection.setup ? (
         <div className="space-y-2">
-          <h3 className="text-sm font-semibold text-primary">{copy.sections.setup}</h3>
+          <h3 className={typeSmSemiboldPrimary}>{copy.sections.setup}</h3>
           {renderSectionBody({
             ...projection.setup,
             copyLabel: copy.copyCode,
@@ -109,8 +124,8 @@ export function ResourceVersionHelpSection({
       ) : null}
 
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold text-primary">{copy.sections.limits}</h3>
-        <dl className="space-y-2 text-sm text-secondary">
+        <h3 className={typeSmSemiboldPrimary}>{copy.sections.limits}</h3>
+        <dl className={typeSpace2SmSecondary}>
           {projection.limits.map((line) => {
             const label = copy.limits[line.key];
             let value = copy.unknown;
@@ -133,23 +148,20 @@ export function ResourceVersionHelpSection({
             );
           })}
         </dl>
-        <p className="text-xs text-muted">{copy.limitsNotice}</p>
+        <p className={typeXsMuted}>{copy.limitsNotice}</p>
       </div>
 
       <div className="space-y-2 border-t border-base pt-4">
-        <h3 className="text-sm font-semibold text-primary">{copy.sections.support}</h3>
-        <p className="text-sm text-secondary">{copy.supportBody}</p>
-        <div className="flex flex-wrap gap-3 text-sm">
-          <Link
-            href={`#${qaAnchorId}`}
-            className="font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+        <h3 className={typeSmSemiboldPrimary}>{copy.sections.support}</h3>
+        <p className={typeSmSecondary}>{copy.supportBody}</p>
+        <div className={typeFlexWrapGap3Sm}>
+          <Link href={`#${qaAnchorId}`} className={linkAccentTightSemiboldHover}>
             {copy.openQa}
           </Link>
           {supportContext ? (
             <ResourceVersionHelpSupportLink
               context={supportContext}
-              className="font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentTightSemiboldHover}
             >
               {copy.openSupport}
             </ResourceVersionHelpSupportLink>

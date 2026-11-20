@@ -2,15 +2,18 @@ import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { reportId, reportRateLimit } from "../../../lib/community-report-api";
-import { parseReportHistoryQuery } from "../../../lib/community-report-history-contract";
-import { reportHistoryCopy, reportHistoryError } from "../../../lib/community-report-history-copy";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
-import { communityReportHistoryService } from "../../../lib/services/community-report-history-service";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { communityReportHistoryService } from "../../../lib/services/community/community-report-history-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
+import { pageShellMax4xlDenseTight } from "../../shell/page-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary } from "../../shell/type-shell";
+import { reportId, reportRateLimit } from "../community-report-api";
+import { parseReportHistoryQuery } from "../community-report-history-contract";
+import { reportHistoryCopy, reportHistoryError } from "../community-report-history-copy";
 import { CommunityReportHistory } from "../components/community-report-history";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { PlatformSessionError } from "../../../components/platform-session-error";
 export async function reportHistoryMetadata() {
   return {
     title: reportHistoryCopy(await getRequestLocale()).title,
@@ -69,18 +72,16 @@ export async function CommunityReportHistoryPage({
     );
   } catch (error) {
     return (
-      <div className="mx-auto min-w-0 max-w-4xl space-y-4 overflow-x-clip">
-        <h1 className="font-display text-primary">{copy.title}</h1>
+      <div className={pageShellMax4xlDenseTight}>
+        <h1 className={typeDisplayPrimary}>{copy.title}</h1>
         <ErrorState
           title={reportHistoryError(
             locale,
             error instanceof AppError ? error.code : "INTERNAL_ERROR",
           )}
+          description={copy.unavailableHint}
           action={
-            <Link
-              href={path}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={path} className={linkAccentSm}>
               {copy.reset}
             </Link>
           }
@@ -88,4 +89,24 @@ export async function CommunityReportHistoryPage({
       </div>
     );
   }
+}
+
+export async function WorkspaceCommunityReportHistoryPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return CommunityReportHistoryPage({ id: (await params).id, searchParams });
+}
+
+export async function StaffCommunityReportHistoryPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return CommunityReportHistoryPage({ id: (await params).id, searchParams, staff: true });
 }

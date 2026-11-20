@@ -1,24 +1,49 @@
 import { AppError } from "@nexus/domain";
 import { can } from "@nexus/security";
 import { ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { communityReportService } from "../../../lib/services/community/community-report-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
+import { pageShellMax5xlBare, pageShellStack4, pageShellStack6 } from "../../shell/page-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import {
+  type2xlBoldPrimary,
+  typeDisplayPrimary,
+  typeMinSpace2,
+  typeSmMuted,
+} from "../../shell/type-shell";
 import {
   communityReportDetailSchema,
   communityReportPageQuery,
   communityReportPageSchema,
-} from "../../../lib/community-report-contract";
-import { communityReportCopy } from "../../../lib/community-report-copy";
-import { reportGroupsCopy } from "../../../lib/community-report-groups-copy";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
-import { communityReportService } from "../../../lib/services/community-report-service";
+} from "../community-report-contract";
+import { communityReportCopy } from "../community-report-copy";
+import { reportGroupsCopy } from "../community-report-groups-copy";
 import { CommunityReportDetailView } from "../components/community-report-detail";
 import { CommunityReportList } from "../components/community-report-list";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { PlatformSessionError } from "../../../components/platform-session-error";
+export async function communityReportMetadata(): Promise<Metadata> {
+  return {
+    title: communityReportCopy(await getRequestLocale()).detail,
+    robots: { index: false, follow: false },
+  };
+}
+
+export async function communityReportListMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale();
+  const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
+  return {
+    title: communityReportCopy(typedLocale).title,
+    robots: { index: false, follow: false },
+  };
+}
+
 export async function CommunityReportScreen({
   staff = false,
   id,
@@ -64,15 +89,13 @@ export async function CommunityReportScreen({
   }
   if (staff && !can(actor, "admin.moderation")) {
     return (
-      <div className="mx-auto min-w-0 max-w-5xl overflow-x-clip">
-        <h1 className="font-display text-primary">{title}</h1>
+      <div className={pageShellMax5xlBare}>
+        <h1 className={typeDisplayPrimary}>{title}</h1>
         <ErrorState
           title={copy.forbidden}
+          description={copy.forbiddenHint}
           action={
-            <Link
-              href="/admin"
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href="/admin" className={linkAccentSmRounded}>
               {dictionary.admin.title}
             </Link>
           }
@@ -81,14 +104,11 @@ export async function CommunityReportScreen({
     );
   }
   const header = (
-    <header className="min-w-0 space-y-2">
-      <h1 className="text-2xl font-bold text-primary">{title}</h1>
-      <p className="text-sm text-muted">{staff ? copy.queueDescription : copy.description}</p>
+    <header className={typeMinSpace2}>
+      <h1 className={type2xlBoldPrimary}>{title}</h1>
+      <p className={typeSmMuted}>{staff ? copy.queueDescription : copy.description}</p>
       {staff && !id && (
-        <Link
-          href="/admin/reports/targets"
-          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/admin/reports/targets" className={linkAccentSmRounded}>
           {reportGroupsCopy(locale).open}
         </Link>
       )}
@@ -104,7 +124,7 @@ export async function CommunityReportScreen({
       if (error instanceof AppError && error.statusCode === 404) notFound();
     }
     return (
-      <div className="min-w-0 space-y-6 overflow-x-clip">
+      <div className={pageShellStack6}>
         {header}
         <CommunityReportDetailView
           key={`${actor.id}:${id}:${staff}`}
@@ -119,15 +139,13 @@ export async function CommunityReportScreen({
   const filters = communityReportPageQuery(await searchParams);
   if (!filters)
     return (
-      <div className="min-w-0 space-y-4 overflow-x-clip">
+      <div className={pageShellStack4}>
         {header}
         <ErrorState
           title={copy.queryInvalid}
+          description={copy.queryInvalidHint}
           action={
-            <Link
-              href={base}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={base} className={linkAccentSmRounded}>
               {copy.reset}
             </Link>
           }
@@ -139,7 +157,7 @@ export async function CommunityReportScreen({
     .then((value) => communityReportPageSchema.parse(value))
     .catch(() => null);
   return (
-    <div className="min-w-0 space-y-6 overflow-x-clip">
+    <div className={pageShellStack6}>
       {header}
       <CommunityReportList
         key={`${actor.id}:${staff}:${JSON.stringify(filters)}`}
@@ -150,4 +168,36 @@ export async function CommunityReportScreen({
       />
     </div>
   );
+}
+
+export function WorkspaceCommunityReportsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return CommunityReportScreen({ searchParams });
+}
+
+export function StaffCommunityReportsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return CommunityReportScreen({ staff: true, searchParams });
+}
+
+export async function WorkspaceCommunityReportDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return CommunityReportScreen({ id: (await params).id });
+}
+
+export async function StaffCommunityReportDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return CommunityReportScreen({ staff: true, id: (await params).id });
 }

@@ -1,10 +1,10 @@
 import { AppError } from "@nexus/domain";
 import { resourceReviewCommandSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
-import { readBoundedJson } from "../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
-import { resourceReviewService } from "../../../../../lib/services/resource-review-service";
+import { resourceCommerceRequest } from "../../../../../features/resources/resource-commerce-http";
+import { readBoundedJson } from "../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
+import { resourceReviewService } from "../../../../../lib/services/resources/resource-review-service";
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, false, async (actor) =>
     resourceReviewService.ownDetail(actor, (await params).id),

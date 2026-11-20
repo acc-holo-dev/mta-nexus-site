@@ -1,11 +1,11 @@
-import { describe, expect, it } from "vitest";
-import { eq, sql } from "drizzle-orm";
 import { UnauthorizedError } from "@nexus/domain";
-import { db } from "../../packages/db/src/client";
+import { eq, sql } from "drizzle-orm";
+import { describe, expect, it } from "vitest";
 import {
   accountRecoveryBindings,
   authChallenges,
 } from "../../packages/db/src/account-recovery-schema";
+import { db } from "../../packages/db/src/client";
 import {
   account,
   auditId,

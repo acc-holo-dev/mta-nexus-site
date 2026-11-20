@@ -1,17 +1,17 @@
 import { expect, it, vi } from "vitest";
-import { submitContentCommentRequest } from "../../src/lib/content-comment-client";
+import { submitContentCommentRequest } from "../../src/features/community/content-comment-client";
 import {
   discussionCommentSchema,
   encodeDiscussionCursor,
   parseDiscussionCursor,
-} from "../../src/lib/content-discussion-contract";
+} from "../../src/features/community/content-discussion-contract";
 import {
   discussionError,
   discussionWriteNeedsSignIn,
   getDiscussionCopy,
-} from "../../src/lib/content-discussion-copy";
+} from "../../src/features/community/content-discussion-copy";
+import { formatNotification } from "../../src/features/notifications/notification-copy";
 import { getDictionary } from "../../src/lib/i18n";
-import { formatNotification } from "../../src/lib/notification-copy";
 
 it("round trips exact microsecond cursors through URL query encoding", () => {
   const cursor = { createdAt: "2026-10-10T12:00:00.000123Z", id: "id/with spaces" };
@@ -149,14 +149,19 @@ it.each(["en", "ru"] as const)(
     expect(discussionError(locale, "COMMENT_PARENT_NOT_FOUND")).toBe(
       getDiscussionCopy(locale).invalidParent,
     );
-    const notice = formatNotification(
-      { title: "New article comment", message: "@writer commented on “Article”." },
-      getDictionary(locale).buildReviewNotifications,
-      locale,
-    );
-    expect(notice.title).toBe(locale === "ru" ? "Новый комментарий" : "New comment");
-    expect(notice.message).toContain("@writer");
-    expect(notice.message).toContain("Article");
+    for (const title of [
+      "New article comment",
+      "New article comment / Новый комментарий",
+    ] as const) {
+      const notice = formatNotification(
+        { title, message: "@writer commented on “Article”." },
+        getDictionary(locale).buildReviewNotifications,
+        locale,
+      );
+      expect(notice.title).toBe(locale === "ru" ? "Новый комментарий" : "New comment");
+      expect(notice.message).toContain("@writer");
+      expect(notice.message).toContain("Article");
+    }
   },
 );
 it("does not confirm a different comment id even if all other fields match", async () => {

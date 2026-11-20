@@ -1,20 +1,21 @@
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import {
   AppError,
-  NotFoundError,
-  resourceBuildTargetStatus,
   type BuildStatus,
+  NotFoundError,
   type ResourceBuildCommand,
   type ResourceBuildView,
+  resourceBuildTargetStatus,
 } from "@nexus/domain";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, builds, products } from "../schema";
 import { safePublishedBuildCondition, trustedCleanScanCondition } from "./build-safety";
+import type { ResourceTransaction } from "./entitlements";
 import {
   assertBuildModerationAuthority,
   assertProductMutationAuthority,
 } from "./product-mutation-authority";
-import type { ResourceTransaction } from "./entitlements";
+
 const buildProjection = {
   id: builds.id,
   productId: builds.productId,

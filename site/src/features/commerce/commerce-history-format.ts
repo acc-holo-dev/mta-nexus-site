@@ -1,0 +1,65 @@
+import type { LicenseStatus, OrderStatus } from "@nexus/domain";
+import type { Locale } from "../../lib/i18n";
+import { unknownMarker } from "../../lib/i18n/unknown";
+
+/** Never trust a query string to control SQL page size or large offsets. */
+export function parseHistoryPage(value: string | string[] | undefined): number {
+  return typeof value === "string" && /^[1-9][0-9]{0,5}$/u.test(value) ? Number(value) : 1;
+}
+
+/** Display the effective status without mutating a historical license row. */
+export function effectiveLicenseStatus(
+  status: string,
+  expiresAt: Date | null | undefined,
+  now: Date = new Date(),
+): LicenseStatus | string {
+  if (
+    status === "active" &&
+    expiresAt instanceof Date &&
+    Number.isFinite(expiresAt.getTime()) &&
+    expiresAt.getTime() <= now.getTime()
+  )
+    return "expired";
+  return status;
+}
+
+export function formatHistoryDate(value: Date, locale: Locale): string {
+  return new Intl.DateTimeFormat(locale === "ru" ? "ru-RU" : "en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  }).format(value);
+}
+
+/** Amounts are stored in ISO currency minor units; invalid values fail closed. */
+export function formatHistoryAmount(minorUnits: number, currency: string, locale: Locale): string {
+  if (!Number.isSafeInteger(minorUnits) || !/^[A-Z]{3}$/u.test(currency)) {
+    return unknownMarker(locale);
+  }
+  try {
+    const formatter = new Intl.NumberFormat(locale === "ru" ? "ru-RU" : "en-US", {
+      style: "currency",
+      currency,
+    });
+    const fractionDigits = formatter.resolvedOptions().maximumFractionDigits;
+    if (fractionDigits === undefined) return unknownMarker(locale);
+    return formatter.format(minorUnits / 10 ** fractionDigits);
+  } catch {
+    return unknownMarker(locale);
+  }
+}
+
+export function orderStatusLabel(
+  status: string,
+  labels: Readonly<Record<OrderStatus, string>>,
+): string {
+  return Object.hasOwn(labels, status) ? labels[status as OrderStatus] : status;
+}
+
+export function licenseStatusLabel(
+  status: string,
+  labels: Readonly<Record<LicenseStatus, string>>,
+): string {
+  return Object.hasOwn(labels, status) ? labels[status as LicenseStatus] : status;
+}

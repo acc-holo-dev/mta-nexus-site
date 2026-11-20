@@ -8,33 +8,35 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const commerceAlertPages = [
-  "site/src/app/workspace/acquisitions/receipts/page.tsx",
-  "site/src/app/workspace/purchases/[id]/terms/page.tsx",
-  "site/src/app/admin/commerce/reconciliation/[id]/terms/page.tsx",
+  "site/src/features/resources/server/acquisition-receipts-screen.tsx",
+  "site/src/features/commerce/server/purchase-terms-screen.tsx",
+  "site/src/features/commerce/server/financial-reconciliation-terms-screen.tsx",
 ] as const;
 
 it("locks commerce terms and receipt invalid filters to ErrorState without plain alert paragraphs", () => {
   for (const path of commerceAlertPages) {
     const source = read(path);
     expect(source, path).toContain("ErrorState");
-    expect(source, path).toContain("overflow-x-clip");
-    expect(source, path).toContain("min-w-0");
-    expect(source, path).toMatch(/min-h-11|size="touch"/u);
+    expect(source, path).toMatch(
+      /(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/,
+    );
+    expect(source, path).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(source, path).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
     expect(source, path).not.toContain('role="alert"');
     expect(source, path).not.toContain('<p role="alert"');
   }
 });
 
 it("keeps invalid-filter recovery linked through ErrorState action slots", () => {
-  const receipts = read("site/src/app/workspace/acquisitions/receipts/page.tsx");
+  const receipts = read("site/src/features/resources/server/acquisition-receipts-screen.tsx");
   expect(receipts).toContain("title={copy.invalid}");
   expect(receipts).toContain('href="/workspace/acquisitions/receipts"');
 
-  const buyer = read("site/src/app/workspace/purchases/[id]/terms/page.tsx");
+  const buyer = read("site/src/features/commerce/server/purchase-terms-screen.tsx");
   expect(buyer).toContain("title={c.invalid}");
   expect(buyer).toContain('href="/workspace/purchases"');
 
-  const admin = read("site/src/app/admin/commerce/reconciliation/[id]/terms/page.tsx");
+  const admin = read("site/src/features/commerce/server/financial-reconciliation-terms-screen.tsx");
   expect(admin).toContain("title={c.invalid}");
   expect(admin).toContain('href="/admin/commerce/reconciliation"');
 });

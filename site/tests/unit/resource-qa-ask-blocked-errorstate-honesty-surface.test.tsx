@@ -16,10 +16,10 @@ it("locks QA accessRequired and ask unavailable notices to ErrorState", () => {
   expect(source).toContain('id="resource-qa-access-required"');
   expect(source).toContain('id="resource-qa-ask-unavailable"');
   expect(source).toMatch(
-    /<ErrorState id="resource-qa-access-required" title=\{copy\.accessRequired\}/,
+    /<ErrorState\s+id="resource-qa-access-required"\s+title=\{copy\.accessRequired\}\s+description=\{getDictionary\(locale\)\.errors\.formErrorHint\}/u,
   );
   expect(source).toMatch(
-    /<ErrorState id="resource-qa-ask-unavailable" title=\{copy\.unavailable\}/,
+    /<ErrorState\s+id="resource-qa-ask-unavailable"\s+title=\{copy\.unavailable\}\s+description=\{copy\.unavailableDescription\}/u,
   );
   expect(source).not.toContain('className="text-xs text-muted">{copy.accessRequired}</p>');
 });

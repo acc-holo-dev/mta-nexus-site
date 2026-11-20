@@ -1,7 +1,7 @@
-import { describe, expect, it } from "vitest";
 import { isValidMtaAddress, normalizeMtaAddress } from "@nexus/domain";
 import { createServerSchema, updateServerSchema } from "@nexus/validation";
-import { matchesMtaEndpoint } from "../../src/lib/services/mta-master-directory-service";
+import { describe, expect, it } from "vitest";
+import { matchesMtaEndpoint } from "../../src/lib/services/servers/mta-master-directory-service";
 
 describe("MTA address canonicalization across directory, forms and persistence", () => {
   it.each([

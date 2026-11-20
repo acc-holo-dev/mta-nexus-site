@@ -4,39 +4,86 @@ Feature объединяет клиентское обсуждение публ�
 комментарием, обратную связь при отправке и создание темы. Сервисы, репозитории,
 авторизация и транзакции доставки остаются единственными существующими реализациями.
 
-| Entry                                | Контракт                                                                      |
-| ------------------------------------ | ----------------------------------------------------------------------------- |
-| `community-page-server.ts`           | Каталог обсуждений                                                            |
-| `new-topic-page-server.ts`           | Создание темы                                                                 |
-| `articles-page-server.ts`            | Каталог статей                                                                |
-| `article-page-server.ts`             | Страница публикации и обсуждения                                              |
-| `own-discussions-page-server.ts`     | Свои обсуждения                                                               |
-| `own-discussion-page-server.ts`      | Деталь своего обсуждения                                                      |
-| `author-desk-page-server.ts`         | Авторский кабинет публикаций                                                  |
-| `author-create-page-server.ts`       | Создание авторской публикации                                                 |
-| `author-edit-page-server.ts`         | Редактирование авторской публикации                                           |
-| `author-history-page-server.ts`      | История авторской публикации                                                  |
-| `following-feed-page-server.ts`      | Лента подписок                                                                |
-| `reports-server.ts`                  | `CommunityReportScreen`; server-only жалобы заявителя и staff                 |
-| `report-history-server.ts`           | `CommunityReportHistoryPage`, metadata; server-only история                   |
-| `report-groups-server.ts`            | `CommunityReportGroupsPage`, metadata; server-only группировка                |
-| `moderation-server.ts`               | `CommunityModerationScreen`; server-only модерация публикаций                 |
-| `moderated-discussion-server.ts`     | `ModeratedDiscussionScreen`; server-only модерация обсуждений                 |
-| `discussion-reports-server.ts`       | `DiscussionReportsScreen`; server-only жалобы на обсуждение                   |
-| `publication-reports-server.ts`      | `PublicationReportsPage`, metadata; server-only жалобы на публикацию          |
-| `catalog-controls.ts`                | Фильтры и навигация каталога публикаций                                       |
-| `reactions.ts`                       | `ContentReactions`; реакции на публикацию                                     |
-| `content-moderation.ts`              | `ContentModerationControls`; действия модерации                               |
-| `context-history-server.ts`          | `ContextPublicationHistoryScreen`; server-only история организаций и серверов |
-| `article-view.ts`                    | `ArticleCard`; карточка публикации                                            |
-| `publication-feed.ts`                | `PublicationFeed`; лента публикаций                                           |
-| `publication-feed-loading-server.ts` | `PublicationFeedLoading`; server-only состояние загрузки                      |
-| `author-content-form.ts`             | `AuthorContentForm`; редактор автора                                          |
-| `author-publication-restore.ts`      | `AuthorPublicationRestore`; восстановление публикации                         |
-| `own-discussion.ts`                  | `OwnDiscussionDetail`; клиентская деталь обсуждения                           |
-| `discussion.ts`                      | `ContentDiscussion`; обсуждение публикации                                    |
-| `topic-form.ts`                      | `CommunityTopicForm`; создание темы                                           |
-| `report-form.ts`                     | `CommunityReportForm`; жалоба на публикацию или комментарий                   |
+| Entry                                          | Контракт                                                                      |
+| ---------------------------------------------- | ----------------------------------------------------------------------------- |
+| `community-page-server.ts`                     | Каталог обсуждений                                                            |
+| `new-topic-page-server.ts`                     | Создание темы                                                                 |
+| `articles-page-server.ts`                      | Каталог статей                                                                |
+| `article-page-server.ts`                       | Страница публикации и обсуждения                                              |
+| `own-discussions-page-server.ts`               | Свои обсуждения                                                               |
+| `own-discussion-page-server.ts`                | Деталь своего обсуждения                                                      |
+| `author-desk-page-server.ts`                   | Авторский кабинет публикаций                                                  |
+| `author-create-page-server.ts`                 | Создание авторской публикации                                                 |
+| `author-edit-page-server.ts`                   | Редактирование авторской публикации                                           |
+| `author-history-page-server.ts`                | История авторской публикации                                                  |
+| `following-feed-page-server.ts`                | Лента подписок                                                                |
+| `reports-server.ts`                            | `CommunityReportScreen`; server-only жалобы заявителя и staff                 |
+| `report-history-server.ts`                     | `CommunityReportHistoryPage`, metadata; server-only история                   |
+| `report-groups-server.ts`                      | `CommunityReportGroupsPage`, metadata; server-only группировка                |
+| `moderation-server.ts`                         | `CommunityModerationScreen`; server-only модерация публикаций                 |
+| `moderated-discussion-server.ts`               | `ModeratedDiscussionScreen`; server-only модерация обсуждений                 |
+| `discussion-reports-server.ts`                 | `DiscussionReportsScreen`; server-only жалобы на обсуждение                   |
+| `publication-reports-server.ts`                | `PublicationReportsPage`, metadata; server-only жалобы на публикацию          |
+| `catalog-controls.ts`                          | Фильтры и навигация каталога публикаций                                       |
+| `reactions.ts`                                 | `ContentReactions`; реакции на публикацию                                     |
+| `reactions-page-server.ts`                     | `ReactionsPageScreen`; server-only `/workspace/reactions`                     |
+| `reaction-removal.ts`                          | `ReactionRemoval`; снятие реакции в workspace с подтверждением                |
+| `discussion-mutation-confirmation.ts`          | `confirmsDiscussionMutation`                                                  |
+| `content-moderation.ts`                        | `ContentModerationControls`; действия модерации                               |
+| `context-history-server.ts`                    | `ContextPublicationHistoryScreen`; server-only история организаций и серверов |
+| `article-view.ts`                              | `ArticleCard`; карточка публикации                                            |
+| `publication-feed.ts`                          | `PublicationFeed`; лента публикаций                                           |
+| `publication-feed-loading-server.ts`           | `PublicationFeedLoading`; server-only состояние загрузки                      |
+| `author-content-form.ts`                       | `AuthorContentForm`; редактор автора                                          |
+| `author-publication-restore.ts`                | `AuthorPublicationRestore`; восстановление публикации                         |
+| `own-discussion.ts`                            | `OwnDiscussionDetail`; клиентская деталь обсуждения                           |
+| `discussion.ts`                                | `ContentDiscussion`; обсуждение публикации                                    |
+| `topic-form.ts`                                | `CommunityTopicForm`; создание темы                                           |
+| `report-form.ts`                               | `CommunityReportForm`; жалоба на публикацию или комментарий                   |
+| `report-evidence-links.ts`                     | `ReportEvidenceLinks`; безопасные внешние ссылки на доказательства в жалобе   |
+| `object-mute-controls.ts`                      | `ObjectMuteControls`; временный mute уведомлений по объекту подписки          |
+| `follow.ts`                                    | `FollowButton`, `FollowWorkspace`; подписка и лента сохранённых               |
+| `follow-confirmation.ts`                       | util port `follow-confirmation`                                               |
+| `server-publication-history-contract.ts`       | util port `server-publication-history-contract`                               |
+| `discussion-compose-draft.ts`                  | util port `discussion-compose-draft`                                          |
+| `community-topic-intent.ts`                    | util port `community-topic-intent`                                            |
+| `discussion-reports-copy.ts`                   | util port `discussion-reports-copy`                                           |
+| `community-topic-submission.ts`                | util port `community-topic-submission`                                        |
+| `organization-publication-history-contract.ts` | util port `organization-publication-history-contract`                         |
+| `content-comment-client.ts`                    | util port `content-comment-client`                                            |
+| `community-report-groups-copy.ts`              | util port `community-report-groups-copy`                                      |
+| `content-comment-confirmation.ts`              | util port `content-comment-confirmation`                                      |
+| `report-batch-copy.ts`                         | util port `report-batch-copy`                                                 |
+| `follow-workspace-copy.ts`                     | util port `follow-workspace-copy`                                             |
+| `community-moderation-copy.ts`                 | util port `community-moderation-copy`                                         |
+| `moderated-discussion-copy.ts`                 | util port `moderated-discussion-copy`                                         |
+| `community-report-history-copy.ts`             | util port `community-report-history-copy`                                     |
+| `author-publication-desk-copy.ts`              | util port `author-publication-desk-copy`                                      |
+| `content-discussion-copy.ts`                   | util port `content-discussion-copy`                                           |
+| `follow-initial-state.ts`                      | util port `follow-initial-state`                                              |
+| `community-report-copy.ts`                     | util port `community-report-copy`                                             |
+| `content-reaction-copy.ts`                     | util port `content-reaction-copy`                                             |
+| `discussion-workspace-copy.ts`                 | util port `discussion-workspace-copy`                                         |
+| `publication-feed-copy.ts`                     | util port `publication-feed-copy`                                             |
+| `author-publication-desk-contract.ts`          | util port `author-publication-desk-contract`                                  |
+| `community-report-groups-contract.ts`          | util port `community-report-groups-contract`                                  |
+| `content-reaction-contract.ts`                 | util port `content-reaction-contract`                                         |
+| `discussion-reports-contract.ts`               | util port `discussion-reports-contract`                                       |
+| `discussion-workspace-contract.ts`             | util port `discussion-workspace-contract`                                     |
+| `follow-workspace-contract.ts`                 | util port `follow-workspace-contract`                                         |
+| `community-report-history-contract.ts`         | util port `community-report-history-contract`                                 |
+| `moderated-discussion-contract.ts`             | util port `moderated-discussion-contract`                                     |
+| `content-discussion-contract.ts`               | util port `content-discussion-contract`                                       |
+| `publication-feed-contract.ts`                 | util port `publication-feed-contract`                                         |
+| `community-report-contract.ts`                 | util port `community-report-contract`                                         |
+| `user-platform-copy.ts`                        | util port `user-platform-copy`                                                |
+| `user-platform-contract.ts`                    | util port `user-platform-contract`                                            |
+| `user-platform-client.ts`                      | util port `user-platform-client`                                              |
+| `content-api-copy.ts`                          | util port `content-api-copy`                                                  |
+| `community-report-api.ts`                      | util port `community-report-api`                                              |
+| `community-report-history-http.ts`             | util port `community-report-history-http`                                     |
+| `moderated-discussion-api.ts`                  | util port `moderated-discussion-api`                                          |
+| `publication-feed-view.ts`                     | util port `publication-feed-view`                                             |
 
 Discussion, topic, report form и own discussion — client entries;
 report и moderation screen entries используют `server-only`. Внутренние компоненты импортируются напрямую

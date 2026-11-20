@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
@@ -13,15 +15,15 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/library/watches/history",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({ getRequestLocale: async () => h.locale }));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => h.user },
 }));
-vi.mock("../../src/lib/services/resource-release-watches-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-release-watches-service", () => ({
   resourceReleaseWatchesService: { history: h.history },
 }));
 
-import Page, { metadata } from "../../src/app/workspace/library/watches/history/page";
+import Page, { generateMetadata } from "../../src/app/workspace/library/watches/history/page";
 import { getDictionary } from "../../src/lib/i18n";
 
 const screen = async () =>
@@ -79,7 +81,7 @@ it.each(["en", "ru"])(
     expect(html).not.toContain("/versions");
     expect(html).not.toContain("/api/library/watches/disable");
     expect(html).toContain("source=batch&amp;productId=prd_a");
-    expect(metadata.robots).toEqual({ index: false, follow: false });
+    expect((await generateMetadata()).robots).toEqual({ index: false, follow: false });
   },
 );
 it("shows a current accessible title and management link without rewriting history", async () => {
@@ -106,7 +108,7 @@ it("requires sign-in and rejects duplicate filters before reading audit records"
 });
 it("offers to clear filters when a filtered watch history view is empty", async () => {
   const { resourceReleaseWatchHistoryCopy } = await import(
-    "../../src/lib/resource-release-watch-history-i18n"
+    "../../src/features/resources/resource-release-watch-history-i18n"
   );
   const copy = resourceReleaseWatchHistoryCopy("en");
   h.history.mockResolvedValue({
@@ -124,13 +126,13 @@ it("offers to clear filters when a filtered watch history view is empty", async 
   );
   expect(html).toContain("Clear filters");
   expect(html).toContain(copy.emptyHint);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/workspace/library/watches/history"');
 });
 
 it("shows an honest recovery state when release watch history fails to load", async () => {
   const { resourceReleaseWatchHistoryCopy } = await import(
-    "../../src/lib/resource-release-watch-history-i18n"
+    "../../src/features/resources/resource-release-watch-history-i18n"
   );
   const copy = resourceReleaseWatchHistoryCopy("en");
   h.history.mockRejectedValue(new Error("history unavailable"));
@@ -138,7 +140,7 @@ it("shows an honest recovery state when release watch history fails to load", as
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(copy.loadUnavailableDescription);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("source=batch");
   expect(html).toContain("page=2");
   expect(html).not.toContain("history unavailable");

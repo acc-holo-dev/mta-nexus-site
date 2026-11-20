@@ -22,9 +22,9 @@ import { containsPattern } from "./search-pattern";
 import {
   assertSupportObjectContext,
   assertSupportReadSession,
+  type SupportObjectContext,
   supportAccess,
   supportActor,
-  type SupportObjectContext,
 } from "./support-access";
 import { supportRequesterNotice } from "./support-requester-notice";
 

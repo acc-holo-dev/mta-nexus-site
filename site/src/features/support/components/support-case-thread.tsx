@@ -1,28 +1,49 @@
 "use client";
 import { Button, ErrorState } from "@nexus/ui";
-
 import { ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
-import { supportMessageCopy } from "../../../lib/support-message-discovery-copy";
+import { HonestLoadingShell } from "../../shell/honest-loading";
+import {
+  linkAccentSm,
+  linkAccentTight,
+  linkAccentXs,
+  linkGhostAccent,
+  linkGhostAccentSmNoH,
+} from "../../shell/link-shell";
+import { useNexusLocale } from "../../shell/locale";
+import { pageShellMax4xlDenseTight, pageShellMax4xlTight } from "../../shell/page-shell";
+import { panelSpace3P4 } from "../../shell/panel-shell";
+import {
+  typeDisplayPrimary,
+  typeFlexCenterBetweenGap3,
+  typeFlexWrapStartBetweenGap3,
+  typeLabelSecondary,
+  typeLabelUpperMuted,
+  typeNumericElevenFaint,
+  typePrewrapSmLeadingSecondary,
+  typeSmSecondary,
+  typeSmSuccess,
+  typeSpace2BorderBPb5,
+} from "../../shell/type-shell";
+import { supportMessageCopy } from "../support-message-discovery-copy";
 import {
   confirmSupportReply,
   confirmSupportStatusChanged,
   parseSupportThread,
   type SupportCaseData,
   type SupportMessageData,
-} from "../../../lib/support-response";
+} from "../support-response";
 import {
   clearSupportRetry,
   reserveSupportReplyRetry,
   resolveSupportRetryActorScope,
-} from "../../../lib/support-retry";
+} from "../support-retry";
 import {
   SupportClientFailure,
   supportWorkspaceCopy,
   supportWorkspaceError,
-} from "../../../lib/support-workspace-copy";
-import { useNexusLocale } from "../../../components/locale-context";
+} from "../support-workspace-copy";
 import { SupportCaseActions } from "./support-case-actions";
 import { type SupportFormObjectContext, supportObjectContextHref } from "./support-center";
 import { SupportStatusHistory } from "./support-status-history";
@@ -39,6 +60,10 @@ export function SupportCaseThread({
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.support,
     workspaceCopy = supportWorkspaceCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return Object.values(workspaceCopy).includes(text) ? text : fallback;
+  }
   const [capabilities, setCapabilities] = useState({ staff: false, requester: false });
   const [success, setSuccess] = useState("");
   const [supportCase, setSupportCase] = useState<SupportCaseData | null>(null);
@@ -229,7 +254,7 @@ export function SupportCaseThread({
       setReply("");
     } catch (caught) {
       // Keep the composed reply so a lost response can retry with the same key.
-      setError(caught instanceof SupportClientFailure ? caught.message : workspaceCopy.uncertain);
+      setError(safeMessage(caught, workspaceCopy.uncertain));
     } finally {
       mutationInFlight.current = false;
       setSending(false);
@@ -282,7 +307,7 @@ export function SupportCaseThread({
       setSupportCase(confirmed);
       setSuccess(workspaceCopy.saved);
     } catch (caught) {
-      setError(caught instanceof SupportClientFailure ? caught.message : workspaceCopy.uncertain);
+      setError(safeMessage(caught, workspaceCopy.uncertain));
     } finally {
       mutationInFlight.current = false;
       setUpdatingStatus(false);
@@ -293,33 +318,27 @@ export function SupportCaseThread({
 
   if (loading) {
     return (
-      <section
-        className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip"
-        aria-busy="true"
-        aria-labelledby="support-case-thread-loading-heading"
+      <HonestLoadingShell
+        className={pageShellMax4xlTight}
+        headingId="support-case-thread-loading-heading"
+        title={copy.title}
+        loadingLabel={copy.caseLoading}
+        headerClassName="space-y-2 border-b border-base pb-5"
       >
-        <header className="space-y-2 border-b border-base pb-5">
-          <h1 id="support-case-thread-loading-heading" className="font-display text-primary">
-            {copy.title}
-          </h1>
-          <p role="status" aria-live="polite" className="text-sm text-muted">
-            {copy.caseLoading}
-          </p>
-        </header>
         <div className="animate-pulse space-y-3" aria-hidden="true">
           <div className="h-8 max-w-lg rounded bg-inset" />
           {[1, 2, 3].map((key) => (
             <div key={key} className="h-16 rounded bg-inset" />
           ))}
         </div>
-      </section>
+      </HonestLoadingShell>
     );
   }
 
   if (!supportCase) {
     return (
-      <div className="mx-auto min-w-0 max-w-4xl space-y-4 overflow-x-clip">
-        <h1 className="font-display text-primary">{copy.title}</h1>
+      <div className={pageShellMax4xlDenseTight}>
+        <h1 className={typeDisplayPrimary}>{copy.title}</h1>
         <Link
           href={backHref}
           className="inline-flex min-h-11 items-center text-sm text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -328,11 +347,12 @@ export function SupportCaseThread({
         </Link>
         <ErrorState
           title={error ?? copy.caseLoadError}
+          description={copy.caseLoadErrorHint}
           action={
             <Button
               type="button"
               onClick={() => void load()}
-              className="h-auto min-h-11 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccent}
               variant="ghost"
             >
               {workspaceCopy.reload}
@@ -340,7 +360,7 @@ export function SupportCaseThread({
           }
         />
         {success ? (
-          <p role="status" aria-live="polite" className="text-sm text-success">
+          <p role="status" aria-live="polite" className={typeSmSuccess}>
             {success}
           </p>
         ) : null}
@@ -349,7 +369,7 @@ export function SupportCaseThread({
   }
 
   return (
-    <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip">
+    <div className={pageShellMax4xlTight}>
       <Link
         href={backHref}
         className="inline-flex min-h-11 items-center gap-1 text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -358,10 +378,10 @@ export function SupportCaseThread({
         {copy.back}
       </Link>
 
-      <header className="space-y-2 border-b border-base pb-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
+      <header className={typeSpace2BorderBPb5}>
+        <div className={typeFlexWrapStartBetweenGap3}>
           <div>
-            <p className="font-label uppercase text-muted">
+            <p className={typeLabelUpperMuted}>
               {categories[supportCase.category] ?? supportCase.category}
             </p>
             <h1 className="mt-1 font-display text-primary">{supportCase.subject}</h1>
@@ -392,28 +412,26 @@ export function SupportCaseThread({
           locale={locale}
           onChangeStatus={(status) => void updateStatus(status)}
         />
-        <Link
-          href={`${backHref}/${caseId}/messages`}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={`${backHref}/${caseId}/messages`} className={linkAccentSm}>
           {supportMessageCopy(locale).title}
         </Link>
       </header>
 
       {success && (
-        <p role="status" aria-live="polite" className="text-sm text-success">
+        <p role="status" aria-live="polite" className={typeSmSuccess}>
           {success}
         </p>
       )}
       {error ? (
         <ErrorState
           title={error}
+          description={copy.caseLoadErrorHint}
           action={
             <Button
               type="button"
               disabled={sending || updatingStatus}
               onClick={() => void load()}
-              className="h-auto min-h-11 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccent}
               variant="ghost"
             >
               {workspaceCopy.reload}
@@ -443,17 +461,15 @@ export function SupportCaseThread({
               </span>
               <time
                 dateTime={new Date(message.createdAt).toISOString()}
-                className="font-numeric text-[11px] text-faint"
+                className={typeNumericElevenFaint}
               >
                 {new Date(message.createdAt).toLocaleString(dateLocale)}
               </time>
             </div>
-            <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-secondary">
-              {message.body}
-            </p>
+            <p className={typePrewrapSmLeadingSecondary}>{message.body}</p>
             <Link
               href={`${backHref}/${caseId}/messages?focus=${message.id}#message-${message.id}`}
-              className="mt-2 inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={`mt-2 ${linkAccentXs}`}
             >
               {supportMessageCopy(locale).link}
             </Link>
@@ -462,27 +478,24 @@ export function SupportCaseThread({
       </section>
 
       {messageTotalPages > 1 && (
-        <nav
-          aria-label={dictionary.market.paginationLabel}
-          className="flex items-center justify-between gap-3"
-        >
+        <nav aria-label={dictionary.market.paginationLabel} className={typeFlexCenterBetweenGap3}>
           <Button
             type="button"
             disabled={messagePage <= 1 || loading || sending || updatingStatus}
             onClick={() => setMessagePage((value) => Math.max(1, value - 1))}
-            className="h-auto px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkGhostAccentSmNoH}
             variant="ghost"
           >
             {dictionary.market.previousPage}
           </Button>
-          <span className="text-sm text-secondary">
+          <span className={typeSmSecondary}>
             {dictionary.market.pageLabel} {messagePage} / {messageTotalPages}
           </span>
           <Button
             type="button"
             disabled={messagePage >= messageTotalPages || loading || sending || updatingStatus}
             onClick={() => setMessagePage((value) => Math.min(messageTotalPages, value + 1))}
-            className="h-auto px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkGhostAccentSmNoH}
             variant="ghost"
           >
             {dictionary.market.nextPage}
@@ -495,10 +508,10 @@ export function SupportCaseThread({
         <form
           onSubmit={(event) => void sendReply(event)}
           aria-busy={sending}
-          className="nexus-panel space-y-3 p-4"
+          className={panelSpace3P4}
         >
           <label className="block space-y-1.5">
-            <span className="font-label text-secondary">{copy.reply}</span>
+            <span className={typeLabelSecondary}>{copy.reply}</span>
             <textarea
               value={reply}
               disabled={sending || updatingStatus || !supportCase.updatedAt}
@@ -525,10 +538,7 @@ export function SupportCaseThread({
           {!staffMode && capabilities.requester ? (
             <p>
               {copy.closedNeedNewCase}{" "}
-              <Link
-                href={supportObjectContextHref(relatedContext)}
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={supportObjectContextHref(relatedContext)} className={linkAccentTight}>
                 {copy.openRelatedCase}
               </Link>
             </p>

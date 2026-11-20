@@ -1,5 +1,5 @@
-import type { BuildScanStatus, BuildStatus } from "./entities";
 import type { BuildPackageEvidence } from "./build-package-evidence";
+import type { BuildScanStatus, BuildStatus } from "./entities";
 
 export type ResourceBuildCommand =
   | { action: "save"; expectedRevision: number; releaseNotes: string; mtaVersionTarget: string }

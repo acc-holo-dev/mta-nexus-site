@@ -20,24 +20,24 @@ const state = vi.hoisted(() => ({
   history: vi.fn(),
   restore: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../../src/lib/services/organization-workspace-service", () => ({
+vi.mock("../../src/lib/services/organizations/organization-workspace-service", () => ({
   organizationWorkspaceService: state,
 }));
-vi.mock("../../src/lib/services/community-moderation-service", () => ({
+vi.mock("../../src/lib/services/community/community-moderation-service", () => ({
   communityModerationService: state,
 }));
-vi.mock("../../src/lib/services/organization-content-service", () => ({
+vi.mock("../../src/lib/services/organizations/organization-content-service", () => ({
   organizationContentService: state,
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
 
-vi.mock("../../src/lib/services/community-report-service", () => ({
+vi.mock("../../src/lib/services/community/community-report-service", () => ({
   communityReportService: state,
 }));
-vi.mock("../../src/lib/services/server-content-service", () => ({
+vi.mock("../../src/lib/services/servers/server-content-service", () => ({
   serverContentService: state,
 }));
 

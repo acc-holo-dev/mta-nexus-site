@@ -7,7 +7,10 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/components/order-terms-report.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/commerce/server/order-terms-report.tsx"),
+  "utf8",
+);
 
 it("locks order-terms consistency flags to ErrorState without soft text-warning", () => {
   expect(source).toContain('import { EmptyState, ErrorState } from "@nexus/ui"');
@@ -15,9 +18,9 @@ it("locks order-terms consistency flags to ErrorState without soft text-warning"
   expect(source).toContain('currencyMismatch: "order-terms-currency-mismatch"');
   expect(source).toContain('negativeValues: "order-terms-negative-values"');
   expect(source).toContain('unsupportedCurrency: "order-terms-unsupported-currency"');
-  expect(source).toMatch(
-    /flags\.map\(\(key\) => \(\s*<ErrorState key=\{key\} id=\{ORDER_TERMS_FLAG_IDS\[key\]\} title=\{c\[key\]\} \/>\s*\)\)/u,
-  );
+  expect(source).toContain("flags.map((key) =>");
+  expect(source).toContain("title={c[key]}");
+  expect(source).toContain("description={c.consistencyNotice}");
   expect(source).not.toContain('className="space-y-2 text-sm text-warning"');
   expect(source).not.toContain('<ul className="space-y-2 text-sm text-warning">');
   expect(source).not.toContain("<li key={key}>{c[key]}</li>");

@@ -1,3 +1,3 @@
 import "server-only";
 
-export { default } from "./server/new-topic-page";
+export { NewCommunityTopicPage } from "./server/new-topic-page";

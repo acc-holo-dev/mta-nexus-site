@@ -12,12 +12,20 @@ const features = [
   {
     name: "support",
     clients: ["center", "thread", "download-help"],
+    clientUtilPorts: [
+      "support-message-discovery-copy",
+      "support-response",
+      "support-workspace-copy",
+      "support-retry",
+      "support-workspace-contract",
+      "support-message-discovery-contract",
+    ],
     privateClients: ["support-case-actions", "support-status-history", "support-message-browser"],
     servers: [
       ["page-server", "support-page.tsx"],
       ["messages-server", "support-message-page.tsx"],
     ],
-    safe: "support-response|support-retry|private-api-request|support-workspace-contract|support-workspace-copy|user-platform-client|user-platform-contract|user-platform-copy|support-message-discovery-copy|support-message-discovery-contract|private-change-history-query",
+    safe: "http/private-api-request|user-platform-client|user-platform-contract|user-platform-copy|private-change-history-query|support-idempotency",
   },
   {
     name: "moderation",
@@ -27,26 +35,150 @@ const features = [
       "verification-workspace",
       "verification-amend",
       "verification-controls",
+      "admin-status-labels",
+      "verification-moderation",
+    ],
+    clientUtilPorts: [
+      "admin-status-labels",
+      "verification-moderation",
+      "storage-maintenance-i18n",
+      "verification-applications-copy",
+      "storage-maintenance-query",
+      "admin-action-confirmation",
+      "platform-report-i18n",
+      "report-batch-contract",
+      "community-moderation-contract",
+      "reports-api-copy",
+      "platform-reports-api-copy",
     ],
     privateClients: [],
-    servers: [["reports-server", "platform-reports-screen.tsx"]],
-    safe: "platform-report-i18n|private-api-request|admin-action-confirmation|community-report-copy|user-platform-copy|user-platform-client|user-platform-contract|verification-applications-contract|content-discussion-contract|verification-workspace-contract|verification-applications-copy|verification-workspace-copy|verification-moderation",
+    servers: [
+      ["reports-server", "platform-reports-screen.tsx"],
+      ["admin-home-server", "admin-home-screen.tsx"],
+      ["verification-history-server", "verification-history-screen.tsx"],
+      ["verification-application-server", "verification-application-screen.tsx"],
+      ["verification-workspace-page-server", "verification-workspace-page.tsx"],
+    ],
+    safe: "http/private-api-request|community-report-copy|order-case-i18n|resource-review-i18n|user-platform-copy|user-platform-client|user-platform-contract|verification-applications-contract|content-discussion-contract|verification-workspace-contract|verification-workspace-copy",
   },
   {
     name: "accounts",
-    clients: ["auth", "controls", "settings"],
+    clients: [
+      "auth",
+      "forgot-password-page",
+      "reset-password-page",
+      "verify-email-page",
+      "controls",
+      "settings",
+      "context",
+      "profile",
+      "change-history",
+      "profile-change-history",
+      "profile-pagination",
+      "developer-experience",
+      "ad-preference",
+    ],
     privateClients: [
       "settings-active-sessions",
       "settings-password-form",
       "settings-recovery-email-section",
       "settings-advertising-preferences-section",
     ],
-    servers: [],
-    safe: "notification-preferences-confirmation|notification-inbox-copy|feature-flags|profile-privacy-copy|settings-client-api|private-change-history-copy|user-platform-client|private-api-request|user-platform-contract|user-platform-copy|ad-preference",
+    servers: [
+      ["user-profile-server", "user-profile-screen.tsx"],
+      ["developer-profile-server", "developer-profile-screen.tsx"],
+      ["security-center-server", "security-center-screen.tsx"],
+      ["settings-history-server", "settings-history-screen.tsx"],
+      ["settings-developer-server", "settings-developer-screen.tsx"],
+      ["settings-privacy-server", "settings-privacy-screen.tsx"],
+      ["login-page-server", "login-screen.tsx"],
+      ["register-page-server", "register-screen.tsx"],
+    ],
+    clientUtilPorts: [
+      "profile-pagination",
+      "developer-experience",
+      "ad-preference",
+      "settings-client-api",
+      "feature-flags",
+      "profile-privacy-copy",
+      "auth-password-api-copy",
+      "auth-session-api-copy",
+      "auth-sessions-api-copy",
+      "auth-login-api-copy",
+      "auth-password-reset-api-copy",
+      "auth-register-api-copy",
+      "auth-context-api-copy",
+      "auth-email-verification-api-copy",
+      "session-revocation",
+      "account-recovery-request-policy",
+      "account-recovery-browser",
+      "session-cookie",
+      "profile-change-history-contract",
+      "profile-privacy-contract",
+      "private-change-history-query",
+      "private-change-history-copy",
+      "retention-activation-windows",
+      "security-activity",
+    ],
+    safe: "notification-preferences-confirmation|notification-inbox-copy|user-platform-client|http/private-api-request|user-platform-contract|user-platform-copy|verification-workspace-contract|verification-workspace-copy",
+  },
+  {
+    name: "shell",
+    clients: [
+      "shell",
+      "navbar",
+      "footer",
+      "sidebar",
+      "locale",
+      "session",
+      "auth-session",
+      "auth-return",
+      "guest-auth",
+      "session-error",
+      "home-personal",
+      "modal-dialog",
+      "pwa-service-worker",
+      "legal-document",
+      "copyable-plain-code-block",
+      "confirm-action",
+      "action-confirm-checkbox",
+      "theme-preference",
+      "home-personal-preference",
+      "global-error-copy",
+      "offline-cache-policy",
+      "honest-loading",
+    ],
+    clientUtilPorts: [
+      "auth-return",
+      "session-error",
+      "home-personal",
+      "legal-document",
+      "theme-preference",
+      "home-personal-preference",
+      "global-error-copy",
+      "offline-cache-policy",
+      "honest-loading",
+      "safe-public-error-reference",
+      "home-personal-changes-types",
+      "session-policy",
+    ],
+    privateClients: ["shell-session-unavailable"],
+    servers: [
+      ["home-personal-changes-server", "home-personal-changes.ts"],
+      ["development-status-server", "development-status-screen.tsx"],
+    ],
+    safe: "managed-server-view|managed-server-copy|publication-feed-copy|organization-workspace-copy|organization-batch-copy|user-platform-copy|community-report-copy|content-reaction-copy|content-discussion-copy|discussion-workspace-copy|platform-report-i18n|verification-workspace-copy|license-maintenance-i18n|notification-copy|notification-inbox-copy|http/private-api-request|resource-release-watches-i18n",
   },
   {
     name: "discovery",
     clients: [],
+    clientUtilPorts: [
+      "discovery-search-api-copy",
+      "discovery-stream-copy",
+      "discovery-copy",
+      "discovery-stream-contract",
+      "discover-query",
+    ],
     privateClients: [],
     servers: [["directory-server", "discovery-directory.tsx"]],
     safe: "",
@@ -159,7 +291,7 @@ test("Remaining features reject private, routing, server and infrastructure edge
   assert.notEqual(cruise(fixture, ["site/src", "site/packages"], "err").status, 0);
 });
 
-for (const { name, clients, privateClients, servers, safe } of features) {
+for (const { name, clients, privateClients, servers, safe, clientUtilPorts } of features) {
   if (clients.length)
     test(`${name} client graphs exclude server dependencies transitively`, () => {
       const ports = clients.map((port) => `site/src/features/${name}/${port}.ts`);
@@ -173,7 +305,10 @@ for (const { name, clients, privateClients, servers, safe } of features) {
       assert.deepEqual(graph.summary.violations, []);
       const modules = new Map(graph.modules.map((mod) => [mod.source, mod]));
       const visited = new Set();
-      const safeLib = new RegExp(`^(?:i18n(?:\\.ts$|/)|(?:${safe})\\.ts$)`, "u");
+      const safeLib = new RegExp(
+        `^(?:(?:i18n(?:\\.ts$|/)|platform\\/i18n\\.ts$)|(?:${safe})\\.ts$)`,
+        "u",
+      );
       function visit(path) {
         if (visited.has(path)) return;
         visited.add(path);
@@ -190,8 +325,12 @@ for (const { name, clients, privateClients, servers, safe } of features) {
           visit(edge.resolved);
         }
       }
-      for (const port of ports)
-        assert.match(readFileSync(resolve(root, port), "utf8"), /^"use client";/u);
+      const utilPorts = new Set(clientUtilPorts ?? []);
+      for (const portPath of ports) {
+        const portName = portPath.split("/").pop().replace(/\.ts$/u, "");
+        if (utilPorts.has(portName)) continue;
+        assert.match(readFileSync(resolve(root, portPath), "utf8"), /^"use client";/u);
+      }
       for (const entry of entries) visit(entry);
     });
   if (servers.length)
@@ -212,3 +351,63 @@ for (const { name, clients, privateClients, servers, safe } of features) {
       }
     });
 }
+
+test("discovery discover-page-server stays server-only and avoids routing", () => {
+  const source = "site/src/features/discovery/discover-page-server.ts";
+  assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+  const result = cruise(root, [source]);
+  assert.equal(result.status, 0, result.stderr);
+  const graph = JSON.parse(result.stdout);
+  assert.deepEqual(graph.summary.violations, []);
+  const modules = new Set(graph.modules.map((mod) => mod.source));
+  assert(modules.has("site/src/features/discovery/server/discover-page.tsx"));
+  assert(![...modules].some((path) => path.startsWith("site/src/app/")));
+});
+
+test("discovery discovery-stream-page-server stays server-only and avoids routing", () => {
+  const source = "site/src/features/discovery/discovery-stream-page-server.ts";
+  assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+  const result = cruise(root, [source]);
+  assert.equal(result.status, 0, result.stderr);
+  const graph = JSON.parse(result.stdout);
+  assert.deepEqual(graph.summary.violations, []);
+  const modules = new Set(graph.modules.map((mod) => mod.source));
+  assert(modules.has("site/src/features/discovery/server/discovery-stream-page.tsx"));
+  assert(![...modules].some((path) => path.startsWith("site/src/app/")));
+});
+
+test("shell home-page-server stays server-only and avoids routing", () => {
+  const source = "site/src/features/shell/home-page-server.ts";
+  assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+  const result = cruise(root, [source]);
+  assert.equal(result.status, 0, result.stderr);
+  const graph = JSON.parse(result.stdout);
+  assert.deepEqual(graph.summary.violations, []);
+  const modules = new Set(graph.modules.map((mod) => mod.source));
+  assert(modules.has("site/src/features/shell/server/home-page.tsx"));
+  assert(![...modules].some((path) => path.startsWith("site/src/app/")));
+});
+
+test("shell workspace-hub-server stays server-only and avoids routing", () => {
+  const source = "site/src/features/shell/workspace-hub-server.ts";
+  assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+  const result = cruise(root, [source]);
+  assert.equal(result.status, 0, result.stderr);
+  const graph = JSON.parse(result.stdout);
+  assert.deepEqual(graph.summary.violations, []);
+  const modules = new Set(graph.modules.map((mod) => mod.source));
+  assert(modules.has("site/src/features/shell/server/workspace-hub-page.tsx"));
+  assert(![...modules].some((path) => path.startsWith("site/src/app/")));
+});
+
+test("shell legal-document-page-server stays server-only and avoids routing", () => {
+  const source = "site/src/features/shell/legal-document-page-server.ts";
+  assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+  const result = cruise(root, [source]);
+  assert.equal(result.status, 0, result.stderr);
+  const graph = JSON.parse(result.stdout);
+  assert.deepEqual(graph.summary.violations, []);
+  const modules = new Set(graph.modules.map((mod) => mod.source));
+  assert(modules.has("site/src/features/shell/server/legal-document-page.tsx"));
+  assert(![...modules].some((path) => path.startsWith("site/src/app/")));
+});

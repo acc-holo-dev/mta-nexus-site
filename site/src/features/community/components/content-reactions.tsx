@@ -4,17 +4,25 @@ import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
+import { getDictionary, type Locale } from "../../../lib/i18n";
+import { formatUnknown } from "../../../lib/i18n/unknown";
+import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
+import { confirmAction } from "../../shell/confirm-action";
+import { GuestAuthLinks } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
+import {
+  typeFlexWrapGap2,
+  typeSmSecondary,
+  typeXsMuted,
+  typeXsSuccess,
+} from "../../shell/type-shell";
 import {
   confirmedReactionMutation,
   type ReactionState,
   reactionStateSchema,
-} from "../../../lib/content-reaction-contract";
-import { reactionCopy, reactionError } from "../../../lib/content-reaction-copy";
-import { getDictionary, type Locale } from "../../../lib/i18n";
-import { privateApiRequest } from "../../../lib/private-api-request";
-import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
-import { confirmAction } from "../../../components/confirm-action";
-import { GuestAuthLinks } from "../../../components/guest-auth-links";
+} from "../content-reaction-contract";
+import { reactionCopy, reactionError } from "../content-reaction-copy";
 export function ContentReactions({
   slug,
   contentId,
@@ -157,10 +165,10 @@ export function ContentReactions({
   const shownState = readyScope.current === scope ? state : null;
   return (
     <section className="space-y-3" aria-label={copy.title} aria-busy={pending}>
-      <p className="text-sm text-secondary">
+      <p className={typeSmSecondary}>
         {!shownState ? copy.unknownCounts : shownState.self ? copy.own : copy.choose}
       </p>
-      <div className="flex flex-wrap gap-2">
+      <div className={typeFlexWrapGap2}>
         {CONTENT_REACTIONS.map((reaction) => (
           <Button
             key={reaction}
@@ -173,7 +181,9 @@ export function ContentReactions({
           >
             <span aria-hidden="true">{CONTENT_REACTION_EMOJI[reaction]}</span>
             {copy[reaction]}{" "}
-            <span className="font-numeric">{shownState ? shownState.counts[reaction] : "—"}</span>
+            <span className="font-numeric">
+              {shownState ? shownState.counts[reaction] : formatUnknown(locale, undefined)}
+            </span>
           </Button>
         ))}
         {shownState?.reaction && (
@@ -206,20 +216,26 @@ export function ContentReactions({
         />
       )}
       {shownState?.authenticated && (
-        <Link
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          href="/workspace/reactions"
-        >
+        <Link className={linkAccentSm} href="/workspace/reactions">
           {copy.my}
         </Link>
       )}
-      {message && blocked ? <ErrorState title={message} /> : null}
+      {message && blocked ? (
+        <ErrorState
+          title={message}
+          description={
+            message === copy.unavailable
+              ? copy.unavailableHint
+              : getDictionary(locale).errors.formErrorHint
+          }
+        />
+      ) : null}
       {message && !blocked ? (
-        <p role="status" className="text-xs text-success">
+        <p role="status" className={typeXsSuccess}>
           {message}
         </p>
       ) : null}
-      <p className="text-xs text-muted">{copy.scope}</p>
+      <p className={typeXsMuted}>{copy.scope}</p>
     </section>
   );
 }

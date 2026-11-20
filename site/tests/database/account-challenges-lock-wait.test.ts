@@ -1,13 +1,13 @@
-import { describe, expect, it } from "vitest";
-import { and, eq, isNull, sql } from "drizzle-orm";
 import { setTimeout as delay } from "node:timers/promises";
 import { UnauthorizedError } from "@nexus/domain";
 import { generateSessionToken } from "@nexus/security";
-import { db, sessions, users } from "../../packages/db/src/client";
+import { and, eq, isNull, sql } from "drizzle-orm";
+import { describe, expect, it } from "vitest";
 import {
   accountRecoveryBindings,
   authChallenges,
 } from "../../packages/db/src/account-recovery-schema";
+import { db, sessions, users } from "../../packages/db/src/client";
 import { digestSessionToken } from "../../packages/db/src/repositories/sessions";
 import {
   account,

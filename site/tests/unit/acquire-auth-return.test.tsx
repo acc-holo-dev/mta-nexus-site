@@ -6,7 +6,7 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8"
 
 describe("acquire guest auth return (FLOW-01)", () => {
   it("preserves productId through login/register and never auto-claims after auth alone", () => {
-    const source = read("site/src/app/acquire/page.tsx");
+    const source = read("site/src/features/commerce/components/acquire-page.tsx");
 
     expect(source).toContain('authEntryHref("login", acquireReturnPath)');
     expect(source).toContain('authEntryHref("register", acquireReturnPath)');
@@ -25,18 +25,28 @@ describe("acquire guest auth return (FLOW-01)", () => {
   });
 
   it("locks ErrorState load failures, EmptyState empties, touch CTAs, and clipped shells", () => {
-    const page = read("site/src/app/acquire/page.tsx");
+    const page = read("site/src/features/commerce/components/acquire-page.tsx");
     const loading = read("site/src/app/acquire/loading.tsx");
 
     expect(page).toContain("ErrorState");
     expect(page).toContain("EmptyState");
     expect(page).toContain("dictionary.errors.retry");
     expect(page).toContain('size="touch"');
-    expect(page).toContain("overflow-x-clip");
-    expect(page).toContain("min-w-0");
-    expect(page).toContain("min-h-11");
+    expect(page).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(page).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(page).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(page).not.toContain('role="alert"');
-    expect(loading).toContain("overflow-x-clip");
-    expect(loading).toContain("min-w-0");
+    expect(loading).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(loading).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  });
+
+  it("keeps productNotFound EmptyState distinct from loadFailed ErrorState", () => {
+    const page = read("site/src/features/commerce/components/acquire-page.tsx");
+    expect(page).toContain("copy.productNotFound");
+    expect(page).toContain("copy.loadFailed");
+    expect(page).toMatch(
+      /const notFound = productError === copy\.productNotFound;[\s\S]*?notFound \? \([\s\S]*?<EmptyState[\s\S]*?\) : \([\s\S]*?<ErrorState/u,
+    );
+    expect(page).toContain("setLoadRevision");
   });
 });

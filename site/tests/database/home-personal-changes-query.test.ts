@@ -7,11 +7,11 @@ vi.mock("@nexus/db", () => ({
   notificationRepository: { pageInbox: state.inbox },
   resourceReleaseWatchesRepository: { page: state.watches },
 }));
-vi.mock("../../src/lib/services/follow-workspace-service", () => ({
+vi.mock("../../src/lib/services/community/follow-workspace-service", () => ({
   followWorkspaceService: { page: state.follows },
 }));
 
-import { loadPersonalChangesSummary } from "../../src/lib/home-personal-changes";
+import { loadPersonalChangesSummary } from "../../src/features/shell/home-personal-changes-server";
 
 it("reads one inbox snapshot to classify localized personal changes", async () => {
   state.inbox.mockResolvedValueOnce({

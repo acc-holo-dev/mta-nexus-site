@@ -1,5 +1,6 @@
 import { expect, it, vi } from "vitest";
 import type { Locale } from "../../src/lib/i18n";
+import { getDictionary } from "../../src/lib/i18n";
 import {
   createLibraryReleaseComparisonInteractionHelpers,
   mockReactHooks,
@@ -16,13 +17,13 @@ const h = vi.hoisted(() => ({
 }));
 vi.mock("react", (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) }));
-vi.mock("../../src/components/locale-context", () => ({
-  useNexusLocale: () => ({ locale: h.locale }),
+vi.mock("../../src/features/shell/locale", () => ({
+  useNexusLocale: () => ({ locale: h.locale, dictionary: getDictionary(h.locale) }),
 }));
 
 import { LibraryReleaseComparisonSelection } from "../../src/features/library/components/library-release-comparison-selection";
-import { libraryReleaseComparisonCopy } from "../../src/lib/library-release-comparison-i18n";
-import { getResourceReleaseControlCopy } from "../../src/lib/resource-release-control-i18n";
+import { libraryReleaseComparisonCopy } from "../../src/features/library/library-release-comparison-i18n";
+import { getResourceReleaseControlCopy } from "../../src/features/library/resource-release-control-i18n";
 
 const { button, click, confirm, confirmation, render, setConfirmation, getTarget } =
   createLibraryReleaseComparisonInteractionHelpers(h, LibraryReleaseComparisonSelection);

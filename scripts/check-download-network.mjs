@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { createHash, randomBytes } from "node:crypto";
 import { execFileSync } from "node:child_process";
+import { createHash, randomBytes } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 import { request } from "node:https";
 import { join } from "node:path";

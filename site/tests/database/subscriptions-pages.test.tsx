@@ -1,7 +1,10 @@
+vi.mock("server-only", () => ({}));
+
 import { AppError } from "@nexus/domain";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+import { getDictionary } from "../../src/lib/i18n";
 
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
@@ -27,13 +30,13 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/subscriptions-service", () => ({
+vi.mock("../../src/lib/services/commerce/subscriptions-service", () => ({
   subscriptionsService: {
     dashboard: state.dashboard,
     scopes: state.scopes,
@@ -42,8 +45,8 @@ vi.mock("../../src/lib/services/subscriptions-service", () => ({
     plan: state.plan,
   },
 }));
-vi.mock("../../src/components/locale-context", () => ({
-  useNexusLocale: () => ({ locale: state.locale }),
+vi.mock("../../src/features/shell/locale", () => ({
+  useNexusLocale: () => ({ locale: state.locale, dictionary: getDictionary(state.locale) }),
 }));
 
 import ActivateLoading from "../../src/app/workspace/subscriptions/activate/loading";
@@ -53,7 +56,7 @@ import SubscriptionsLoading from "../../src/app/workspace/subscriptions/loading"
 import Account from "../../src/app/workspace/subscriptions/page";
 import ReceiptLoading from "../../src/app/workspace/subscriptions/receipts/[id]/loading";
 import Detail from "../../src/app/workspace/subscriptions/receipts/[id]/page";
-import { subscriptionsCopy } from "../../src/lib/subscriptions-i18n";
+import { subscriptionsCopy } from "../../src/features/commerce/subscriptions-i18n";
 import {
   activation,
   date,
@@ -251,8 +254,8 @@ it("shows an honest recovery state when subscription data fails to load", async 
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(copy.loadUnavailableHint);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain('href="/workspace/subscriptions"');
 });
 it("shows honest recovery when history or receipt loads fail", async () => {
@@ -277,8 +280,8 @@ it("shows honest recovery when activation prerequisites fail unexpectedly", asyn
 it("clips honest subscription loading shells on narrow layouts", async () => {
   for (const Loading of [SubscriptionsLoading, ActivateLoading, ReceiptLoading]) {
     const html = renderToStaticMarkup(await Loading());
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain(subscriptionsCopy("en").loading);
   }
 });

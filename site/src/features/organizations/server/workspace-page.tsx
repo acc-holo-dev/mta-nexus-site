@@ -2,28 +2,28 @@ import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { OrganizationWorkspacePanel } from "../workspace";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { PlatformSessionError } from "../../../components/platform-session-error";
-import { organizationReturnPath } from "./organization-return-path";
-import { getRequestLocale } from "../../../lib/i18n-server";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { organizationWorkspaceService } from "../../../lib/services/organizations/organization-workspace-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
+import { pageShellMax5xlCompact } from "../../shell/page-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import { typeBreakDisplayPrimary, typeDisplayPrimary } from "../../shell/type-shell";
 import {
   organizationWorkspaceSchema,
   parseOrganizationPage,
-} from "../../../lib/organization-workspace-contract";
-import { getOrganizationCopy, organizationError } from "../../../lib/organization-workspace-copy";
-import { authService } from "../../../lib/services/auth-service";
-import { organizationWorkspaceService } from "../../../lib/services/organization-workspace-service";
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-5 overflow-x-clip py-8";
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-export async function generateMetadata() {
+} from "../organization-workspace-contract";
+import { getOrganizationCopy, organizationError } from "../organization-workspace-copy";
+import { OrganizationWorkspacePanel } from "../workspace";
+import { organizationReturnPath } from "./organization-return-path";
+export async function organizationMetadata() {
   return {
     title: getOrganizationCopy(await getRequestLocale()).title,
     robots: { index: false, follow: false },
   };
 }
-export default async function OrganizationPage({
+export async function OrganizationPage({
   params,
   searchParams,
 }: {
@@ -61,13 +61,13 @@ export default async function OrganizationPage({
       : null;
   const parsed = organizationWorkspaceSchema.safeParse(result);
   return (
-    <div className={pageShellClass}>
-      <Link className={navLinkClass} href="/workspace/organizations">
+    <div className={pageShellMax5xlCompact}>
+      <Link className={linkAccentSm} href="/workspace/organizations">
         {copy.back}
       </Link>
       {parsed.success ? (
         <>
-          <h1 className="break-words font-display text-primary">{parsed.data.organization.name}</h1>
+          <h1 className={typeBreakDisplayPrimary}>{parsed.data.organization.name}</h1>
           <OrganizationWorkspacePanel
             initial={parsed.data}
             actorId={actor.id}
@@ -77,11 +77,12 @@ export default async function OrganizationPage({
         </>
       ) : (
         <div className="space-y-4">
-          <h1 className="font-display text-primary">{copy.title}</h1>
+          <h1 className={typeDisplayPrimary}>{copy.title}</h1>
           <ErrorState
             title={failure}
+            description={copy.unavailableHint}
             action={
-              <Link className={navLinkClass} href={returnPath}>
+              <Link className={linkAccentSm} href={returnPath}>
                 {copy.reload}
               </Link>
             }

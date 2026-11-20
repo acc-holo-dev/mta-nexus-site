@@ -1,9 +1,10 @@
+import { AppError, NotFoundError } from "@nexus/domain";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { adminActionsApiCopy } from "../../src/features/moderation/admin-actions-api-copy";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../helpers/browser-mutation-headers";
-import { AppError, NotFoundError } from "@nexus/domain";
 
 const product = vi.hoisted(() => ({
   updateWithAudit: vi.fn(),
@@ -13,7 +14,7 @@ const product = vi.hoisted(() => ({
 }));
 
 const moderation = vi.hoisted(() => ({ command: vi.fn() }));
-vi.mock("../../src/lib/services/resource-release-control-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-release-control-service", () => ({
   resourceModerationService: moderation,
 }));
 
@@ -30,7 +31,7 @@ vi.mock("next/server", async () => {
   };
 });
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => ({
       id: "usr_mod",
@@ -42,31 +43,37 @@ vi.mock("../../src/lib/services/auth-service", () => ({
   },
 }));
 
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: {
     reviewBuild: vi.fn(),
     quarantineBuild: vi.fn(),
     restoreQuarantinedBuild: vi.fn(),
+    updateWithAudit: product.updateWithAudit,
   },
 }));
 
-vi.mock("../../src/lib/services/content-service", () => ({
+vi.mock("../../src/lib/services/community/content-service", () => ({
   contentService: {
     moderateContent: vi.fn(),
   },
 }));
 
-vi.mock("../../src/lib/services/server-follow-notification-service", () => ({
-  notifyServerFollowersOfPublishedContent: vi.fn(),
+vi.mock("../../src/lib/services/moderation/admin-service", () => ({
+  adminService: {
+    resolveReportRecord: report.resolve,
+    findReportById: report.findById,
+  },
 }));
 
-vi.mock("@nexus/db", () => ({
-  productRepository: product,
-  reportRepository: report,
-  verificationRepository: {
+vi.mock("../../src/lib/services/moderation/verification-workspace-service", () => ({
+  verificationWorkspaceService: {
     resolveRequest: vi.fn(),
-    findById: vi.fn(),
+    findRequestById: vi.fn(),
   },
+}));
+
+vi.mock("../../src/lib/services/notifications/server-follow-notification-service", () => ({
+  notifyServerFollowersOfPublishedContent: vi.fn(),
 }));
 
 vi.mock("@nexus/security", async () => {
@@ -157,7 +164,7 @@ describe("moderation action integrity", () => {
       expect(response.status).toBe(404);
       expectPrivate(response);
       expect(await response.json()).toEqual({
-        error: "Product not found",
+        error: adminActionsApiCopy("en").productNotFound,
       });
       expect(product.updateWithAudit).toHaveBeenCalledWith(
         "prd_missing",
@@ -212,7 +219,7 @@ describe("moderation action integrity", () => {
     const missing = await POST(request("report", "rpt_missing", "resolve"));
     expect(missing.status).toBe(404);
     expect(await missing.json()).toEqual({
-      error: "Report not found",
+      error: adminActionsApiCopy("en").reportNotFound,
     });
 
     report.findById.mockResolvedValueOnce({

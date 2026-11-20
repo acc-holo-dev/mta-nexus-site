@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { expect, it } from "vitest";
-import { formatNotification } from "../../src/lib/notification-copy";
+import { formatNotification } from "../../src/features/notifications/notification-copy";
 
 const reviewCopy = { approved: "", rejected: "", version: "", notes: "" };
 
@@ -24,7 +24,8 @@ it.each(["en", "ru"] as const)(
   (locale) => {
     const notice = formatNotification(
       {
-        title: "Security notice for a downloaded build",
+        title:
+          "Security notice for a downloaded build / Уведомление безопасности о загруженной сборке",
         message:
           "A build you downloaded was quarantined after a security review. Stop using that version and check for an updated release in your library.",
         data: {

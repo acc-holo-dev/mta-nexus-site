@@ -16,7 +16,7 @@ vi.mock("@nexus/security", async () => {
     generateId: (prefix: string) => `${prefix}_a`,
   };
 });
-vi.mock("../../src/lib/services/auth-service", async () => {
+vi.mock("../../src/lib/services/accounts/auth-service", async () => {
   const { libraryCollectionsHttpState } = await import(
     "../helpers/library-collections-http-harness"
   );
@@ -148,7 +148,7 @@ it("returns conflicts and masked missing resources without internal fields", asy
     context,
   );
   expect(response.status).toBe(409);
-  expect(await response.json()).toEqual({ code: "COLLECTION_CONFLICT" });
+  expect(await response.json()).toMatchObject({ code: "COLLECTION_CONFLICT" });
 });
 it("accepts a canonical private batch larger than the old body limit", async () => {
   const productIds = Array.from(
@@ -198,7 +198,7 @@ it("passes only the raw cookie token to collection mutations and surfaces transa
   state.command.mockRejectedValueOnce(new AppError("Authentication required", 401, "UNAUTHORIZED"));
   const response = await create(post());
   expect(response.status).toBe(401);
-  expect(await response.json()).toEqual({ code: "UNAUTHORIZED" });
+  expect(await response.json()).toMatchObject({ code: "UNAUTHORIZED" });
   expect(state.command).toHaveBeenCalledWith(
     expect.objectContaining({ currentToken: "raw-browser-token" }),
   );

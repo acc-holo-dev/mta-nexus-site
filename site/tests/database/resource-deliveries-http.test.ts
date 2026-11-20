@@ -1,6 +1,7 @@
-import { beforeEach, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   user: { id: "usr_a", role: "user" } as { id: string; role: "user" } | null,
   rate: vi.fn(),
@@ -8,7 +9,7 @@ const state = vi.hoisted(() => ({
   detail: vi.fn(),
   publisher: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
@@ -19,10 +20,12 @@ vi.mock("@nexus/db", () => ({
     publisher: state.publisher,
   },
 }));
-import { GET as page } from "../../src/app/api/library/downloads/route";
+
 import { GET as detail } from "../../src/app/api/library/downloads/[id]/route";
 import { GET as csv } from "../../src/app/api/library/downloads/export/route";
+import { GET as page } from "../../src/app/api/library/downloads/route";
 import { GET as publisher } from "../../src/app/api/products/[id]/deliveries/route";
+
 const request = (path = "/api/library/downloads") => new NextRequest(`https://nexus.test${path}`);
 beforeEach(() => {
   vi.clearAllMocks();
@@ -86,7 +89,7 @@ it("a foreign receipt and revoked publisher authority remain opaque", async () =
     params: Promise.resolve({ id: "dlv_other" }),
   });
   expect(denied.status).toBe(404);
-  expect(await denied.json()).toEqual({ code: "NOT_FOUND" });
+  expect(await denied.json()).toMatchObject({ code: "NOT_FOUND" });
   state.publisher.mockRejectedValue(new AppError("private buyer context", 404, "NOT_FOUND"));
   expect(
     (

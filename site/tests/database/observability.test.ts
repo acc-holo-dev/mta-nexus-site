@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  REQUEST_ID_HEADER,
   createRequestLogContext,
   createStructuredLogEntry,
   errorLogMetadata,
   jsonWithRequestId,
-} from "../../src/lib/observability";
+  REQUEST_ID_HEADER,
+} from "../../src/lib/platform/observability";
 
 function fakeRequest(path = "/api/example") {
   return {

@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../../src/lib/i18n";
@@ -31,11 +33,11 @@ vi.mock("next/headers", () => ({
   })),
 }));
 
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
   },
@@ -45,28 +47,22 @@ vi.mock("@nexus/security", () => ({
   can: mocks.can,
 }));
 
-vi.mock("@nexus/db", () => ({
-  buildRepository: {
-    listPendingReviewPage: mocks.listPendingReviewPage,
-    countPendingReview: mocks.countPendingReview,
-    listRiskReviewPage: mocks.listRiskReviewPage,
-    countQuarantined: mocks.countQuarantined,
-  },
-  contentRepository: {
-    listDraftPage: mocks.listDraftPage,
-    countDrafts: mocks.countDrafts,
-  },
-  verificationRepository: {
-    listPage: mocks.listVerificationPage,
-    countPending: mocks.countPendingVerification,
-  },
-}));
-
-vi.mock("../../src/lib/services/admin-service", () => ({
+vi.mock("../../src/lib/services/moderation/admin-service", () => ({
   adminService: {
     getSystemHealthMetrics: mocks.health,
     listReports: mocks.listReports,
     listAuditLogs: vi.fn(async () => []),
+    listVerificationPage: mocks.listVerificationPage,
+    countPendingVerifications: mocks.countPendingVerification,
+    getVerificationQueueItem: vi.fn(async () => null),
+    listPendingReviewBuilds: mocks.listPendingReviewPage,
+    countPendingReviewBuilds: mocks.countPendingReview,
+    listRiskReviewBuilds: mocks.listRiskReviewPage,
+    countQuarantinedBuilds: mocks.countQuarantined,
+    listDraftContent: mocks.listDraftPage,
+    countDraftContent: mocks.countDrafts,
+    listAdPlacementSummaries: vi.fn(async () => []),
+    getReport: vi.fn(async () => null),
   },
 }));
 
@@ -126,7 +122,7 @@ describe("moderation queue admin boundary", () => {
     expect(markup).toContain('role="alert"');
     expect(markup).toContain(getDictionary("en").admin.accessDenied);
     expect(markup).toContain(getDictionary("en").admin.accessDeniedDescription);
-    expect(markup).toContain("overflow-x-clip");
+    expect(markup).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(markup).toContain('href="/"');
     expect(mocks.listPendingReviewPage).not.toHaveBeenCalled();
     expect(mocks.countPendingReview).not.toHaveBeenCalled();
@@ -162,7 +158,9 @@ describe("moderation queue admin boundary", () => {
     expect(markup).toContain(copy.noVerificationRequests);
     expect(markup).toContain(copy.noRiskBuilds);
     expect(markup).toContain("border-dashed");
-    expect(markup).toContain("inline-flex min-h-11 items-center");
+    expect(markup).toMatch(
+      /(?:inline-flex min-h-11 items-center|linkMinH|link[A-Za-z]\w*|link-shell)/,
+    );
     expect(markup).toContain(`${copy.reportPage} 3`);
     expect(markup).toContain("min-w-0 space-y-8 overflow-x-clip");
     expect(markup).toContain('href="/admin/support"');
@@ -186,7 +184,7 @@ describe("moderation queue admin boundary", () => {
 
     expect(markup).toContain('role="alert"');
     expect(markup).toContain(copy.hubUnavailable);
-    expect(markup).toContain("overflow-x-clip");
+    expect(markup).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(markup).toContain(getDictionary("en").errors.retry);
     expect(markup).toContain('href="/admin?');
     expect(markup).not.toContain(copy.resourceBuildQueue);

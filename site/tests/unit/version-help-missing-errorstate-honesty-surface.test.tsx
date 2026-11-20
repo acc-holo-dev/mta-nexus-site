@@ -14,8 +14,6 @@ it("locks version help missing author content notice to ErrorState", () => {
   const source = read(surface);
   expect(source).toContain("ErrorState");
   expect(source).toContain('id="resource-version-help-missing"');
-  expect(source).toMatch(
-    /<ErrorState id="resource-version-help-missing" title=\{copy\.missingBody\}/,
-  );
+  expect(source).toMatch(/description=\{copy\.missingBodyHint\}/);
   expect(source).not.toContain('className="text-sm text-secondary">{copy.missingBody}</p>');
 });

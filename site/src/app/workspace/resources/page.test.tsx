@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
@@ -7,10 +9,10 @@ const mocks = vi.hoisted(() => ({
   list: vi.fn(),
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("../../../lib/services/auth-service", () => ({
+vi.mock("../../../lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => mocks.actor },
 }));
-vi.mock("../../../lib/services/resource-publisher-service", () => ({
+vi.mock("../../../lib/services/resources/resource-publisher-service", () => ({
   resourcePublisherService: { inventory: mocks.list },
 }));
 vi.mock("next/navigation", () => ({
@@ -19,9 +21,11 @@ vi.mock("next/navigation", () => ({
     throw new Error("NEXT_NOT_FOUND");
   },
 }));
-vi.mock("../../../lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../../../lib/i18n/server", () => ({
+  getRequestLocale: async () => mocks.locale,
+}));
 
-import Page, { metadata } from "./page";
+import Page, { generateMetadata } from "./page";
 
 beforeEach(() => {
   mocks.actor = { id: "author" };
@@ -61,7 +65,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(
       locale === "ru" ? 'aria-label="Мои ресурсы"' : 'aria-label="My resources"',
     );
-    expect(metadata.robots).toMatchObject({ index: false });
+    expect((await generateMetadata()).robots).toMatchObject({ index: false });
   },
 );
 it("does not query private resources when signed out", async () => {

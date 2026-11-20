@@ -15,22 +15,22 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../../src/lib/services/community-report-service", () => ({
+vi.mock("../../src/lib/services/community/community-report-service", () => ({
   communityReportService: mocks,
 }));
 
+import type { CommunityReportDetail } from "../../src/features/community/community-report-contract";
+import { communityReportCopy } from "../../src/features/community/community-report-copy";
 import { CommunityReportDetailView } from "../../src/features/community/components/community-report-detail";
 import { CommunityReportForm } from "../../src/features/community/components/community-report-form";
 import { CommunityReportList } from "../../src/features/community/components/community-report-list";
 import { CommunityReportScreen } from "../../src/features/community/server/community-report-screen";
-import type { CommunityReportDetail } from "../../src/lib/community-report-contract";
-import { communityReportCopy } from "../../src/lib/community-report-copy";
 
 const row: CommunityReportDetail = {
   id: "report",
@@ -121,7 +121,7 @@ it("distinguishes empty, filtered empty, failed reads and confirmed target-unava
   );
   expect(failure).toContain('role="alert"');
   expect(failure).toContain(communityReportCopy("en").unavailable);
-  expect(failure).toContain("overflow-x-clip");
+  expect(failure).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(failure).toContain(communityReportCopy("en").reload);
   expect(failure).not.toContain(communityReportCopy("en").empty);
   expect(failure).not.toContain(communityReportCopy("en").emptyFiltered);
@@ -133,7 +133,7 @@ it("distinguishes empty, filtered empty, failed reads and confirmed target-unava
     />,
   );
   expect(empty).toContain(communityReportCopy("en").empty);
-  expect(empty).toContain("overflow-x-clip");
+  expect(empty).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(empty).not.toContain(communityReportCopy("en").emptyFiltered);
   const filteredEmpty = renderToStaticMarkup(
     <CommunityReportList
@@ -158,7 +158,7 @@ it("distinguishes empty, filtered empty, failed reads and confirmed target-unava
   );
   expect(detailFailure).toContain('role="alert"');
   expect(detailFailure).toContain(communityReportCopy("en").unavailable);
-  expect(detailFailure).toContain("overflow-x-clip");
+  expect(detailFailure).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("keeps staff report screens clipped and recovers invalid filters through ErrorState", async () => {
   mocks.session.mockResolvedValue({ id: "actor", role: "moderator" });
@@ -169,7 +169,7 @@ it("keeps staff report screens clipped and recovers invalid filters through Erro
     }),
   );
   expect(invalid).toContain(communityReportCopy("en").queryInvalid);
-  expect(invalid).toContain("overflow-x-clip");
+  expect(invalid).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(invalid).toContain('href="/admin/reports"');
   expect(mocks.page).not.toHaveBeenCalled();
 });

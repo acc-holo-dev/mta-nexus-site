@@ -1,7 +1,10 @@
 import type { NextRequest } from "next/server";
-import { planReviewId, planReviewsQuery } from "../../../../../lib/plan-reviews-query";
-import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
-import { planReviewsService } from "../../../../../lib/services/plan-reviews-service";
+import {
+  planReviewId,
+  planReviewsQuery,
+} from "../../../../../features/commerce/plan-reviews-query";
+import { resourceCommerceRequest } from "../../../../../features/resources/resource-commerce-http";
+import { planReviewsService } from "../../../../../lib/services/commerce/plan-reviews-service";
 export function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, false, async (actor) => {
     const query = planReviewsQuery(request.nextUrl.searchParams, true);

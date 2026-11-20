@@ -4,8 +4,8 @@ import type {
   VerificationOverview,
   VerificationQuery,
   VerificationTargets,
-} from "../../src/lib/verification-workspace-contract";
-import { verificationCopy } from "../../src/lib/verification-workspace-copy";
+} from "../../src/features/trust/verification-workspace-contract";
+import { verificationCopy } from "../../src/features/trust/verification-workspace-copy";
 import { findTestButton, flattenReactTestTree } from "./flatten-react-test-tree";
 
 type VerificationApplicationIntentInteractionHarness = {

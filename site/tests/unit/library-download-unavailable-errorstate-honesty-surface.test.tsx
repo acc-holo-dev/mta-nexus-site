@@ -6,15 +6,16 @@ import { expect, it } from "vitest";
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const source = readFileSync(
-  join(root, "site/src/app/workspace/library/downloads/page.tsx"),
+  join(root, "site/src/features/library/server/library-downloads-screen.tsx"),
   "utf8",
 );
 
 /** Honesty lock for library downloads non-downloadable notice. */
 it("locks library download unavailable notice to ErrorState", () => {
   expect(source).toContain("ErrorState");
-  expect(source).toMatch(
-    /receipt\.downloadable \? \([\s\S]*?\) : \(\s*<ErrorState id="library-download-unavailable" title=\{copy\.unavailable\} \/>\s*\)/u,
-  );
+  expect(source).toContain('id="library-download-unavailable"');
+  expect(source).toContain("title={copy.unavailable}");
+  expect(source).toContain("description={copy.unavailableHint}");
+  expect(source).toMatch(/receipt\.downloadable \?/u);
   expect(source).not.toContain('className="text-xs text-muted">{copy.unavailable}</p>');
 });

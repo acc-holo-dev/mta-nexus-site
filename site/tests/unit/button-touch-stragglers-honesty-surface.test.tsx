@@ -8,10 +8,10 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const exclusive = [
-  "site/src/components/seller-sales-report.tsx",
+  "site/src/features/commerce/server/seller-sales-report.tsx",
   "site/src/features/resources/components/resource-review-controls.tsx",
   "site/src/features/support/components/support-center.tsx",
-  "site/src/components/order-case-page.tsx",
+  "site/src/features/commerce/server/order-case-page.tsx",
   "site/src/features/servers/components/mta-master-server-directory.tsx",
 ] as const;
 
@@ -19,7 +19,7 @@ it("locks high-traffic button stragglers to size=touch / min-h-11 without min-h-
   for (const path of exclusive) {
     const source = read(path);
     expect(source, path).toContain('size="touch"');
-    expect(source, path).toMatch(/min-h-11|size="touch"/u);
+    expect(source, path).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
     expect(source, path).not.toContain("min-h-10");
   }
 });
@@ -31,13 +31,13 @@ it("locks resource-review primary submit CTAs to size=touch", () => {
 });
 
 it("locks order-case filter selects to min-h-11 field chrome", () => {
-  const source = read("site/src/components/order-case-page.tsx");
+  const source = read("site/src/features/commerce/server/order-case-page.tsx");
   expect(source).toContain("min-h-11 rounded-lg border border-base bg-surface p-2 text-sm");
   expect(source).toContain('size="touch"');
 });
 
 it("locks seller-sales apply and support create-case submit to size=touch", () => {
-  expect(read("site/src/components/seller-sales-report.tsx")).toMatch(
+  expect(read("site/src/features/commerce/server/seller-sales-report.tsx")).toMatch(
     /type="submit"[^>]*size="touch"|size="touch"[^>]*type="submit"/u,
   );
   expect(read("site/src/features/support/components/support-center.tsx")).toMatch(

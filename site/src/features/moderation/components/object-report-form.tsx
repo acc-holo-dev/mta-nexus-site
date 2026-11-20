@@ -3,10 +3,18 @@
 import { Button, ErrorState } from "@nexus/ui";
 import { createReportSchema } from "@nexus/validation";
 import { type FormEvent, useRef, useState } from "react";
-import type { Locale } from "../../../lib/i18n";
-import { platformReportCopy, platformReportError } from "../../../lib/platform-report-i18n";
-import { privateApiRequest } from "../../../lib/private-api-request";
-import { GuestAuthLinks } from "../../../components/guest-auth-links";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
+import { getDictionary, type Locale } from "../../../lib/i18n";
+import { GuestAuthLinks } from "../../shell/guest-auth";
+import { linkAccent, linkGhostAccentSmBare } from "../../shell/link-shell";
+import { surfaceMinSpace2BgP3 } from "../../shell/surface-shell";
+import {
+  typeBlockMinSpace1XsMuted,
+  typeFlexWrapGap2,
+  typeXsMuted,
+  typeXsSuccess,
+} from "../../shell/type-shell";
+import { platformReportCopy, platformReportError } from "../platform-report-i18n";
 
 const REPORT_TYPES = createReportSchema.shape.type.options;
 type ObjectReportTarget = "product" | "server" | "user";
@@ -29,6 +37,7 @@ export function ObjectReportForm({
   registerHref: string;
 }) {
   const copy = platformReportCopy(locale);
+  const formErrorHint = getDictionary(locale).errors.formErrorHint;
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
   const [type, setType] = useState<(typeof REPORT_TYPES)[number]>("abuse");
@@ -107,13 +116,11 @@ export function ObjectReportForm({
   if (authenticated === null) {
     return (
       <ErrorState
-        title={copy.unavailable}
+        title={copy.identityUnavailable}
+        description={copy.identityUnavailableDescription}
         action={
           retryHref ? (
-            <a
-              href={retryHref}
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <a href={retryHref} className={linkAccent}>
               {copy.retry}
             </a>
           ) : undefined
@@ -124,7 +131,7 @@ export function ObjectReportForm({
   if (!authenticated) {
     return (
       <div className="space-y-1">
-        <p className="text-xs text-muted">{copy.reportSignIn}</p>
+        <p className={typeXsMuted}>{copy.reportSignIn}</p>
         <GuestAuthLinks
           loginHref={loginHref}
           registerHref={registerHref}
@@ -137,7 +144,7 @@ export function ObjectReportForm({
 
   if (resultId) {
     return (
-      <p className="text-xs text-success">
+      <p className={typeXsSuccess}>
         {copy.reportSubmitted}{" "}
         <a
           href={`/workspace/platform-reports/${encodeURIComponent(resultId)}`}
@@ -155,7 +162,7 @@ export function ObjectReportForm({
         type="button"
         variant="ghost"
         size="sm"
-        className="min-h-11 px-0 text-sm text-accent underline"
+        className={linkGhostAccentSmBare}
         onClick={() => setOpen(true)}
       >
         {copy.report}
@@ -164,12 +171,9 @@ export function ObjectReportForm({
   }
 
   return (
-    <form
-      className="min-w-0 space-y-2 rounded-lg border border-base bg-surface p-3"
-      onSubmit={onSubmit}
-    >
-      <p className="text-xs text-muted">{copy.reportHelp}</p>
-      <label className="block min-w-0 space-y-1 text-xs text-muted">
+    <form className={surfaceMinSpace2BgP3} onSubmit={onSubmit}>
+      <p className={typeXsMuted}>{copy.reportHelp}</p>
+      <label className={typeBlockMinSpace1XsMuted}>
         <span>{copy.reportType}</span>
         <select
           className="min-h-11 w-full rounded-lg border border-base bg-page px-3 py-2 text-sm text-secondary"
@@ -184,7 +188,7 @@ export function ObjectReportForm({
           ))}
         </select>
       </label>
-      <label className="block min-w-0 space-y-1 text-xs text-muted">
+      <label className={typeBlockMinSpace1XsMuted}>
         <span>{copy.reportReason}</span>
         <textarea
           className="min-h-24 w-full rounded-lg border border-base bg-page px-3 py-2 text-sm text-secondary"
@@ -195,8 +199,10 @@ export function ObjectReportForm({
           placeholder={copy.reportReasonPlaceholder}
         />
       </label>
-      {error ? <ErrorState id="object-report-failed" title={error} /> : null}
-      <div className="flex flex-wrap gap-2">
+      {error ? (
+        <ErrorState id="object-report-failed" title={error} description={formErrorHint} />
+      ) : null}
+      <div className={typeFlexWrapGap2}>
         <Button
           type="submit"
           size="sm"

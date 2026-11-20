@@ -3,7 +3,7 @@ vi.mock("server-only", () => ({}));
 import { beforeEach, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({ thumbnail: "", missing: false, locale: "en" as "en" | "ru" }));
-vi.mock("../../../lib/services/product-service", () => ({
+vi.mock("../../../lib/services/commerce/product-service", () => ({
   productService: {
     getProductBySlug: async () =>
       state.missing
@@ -16,10 +16,12 @@ vi.mock("../../../lib/services/product-service", () => ({
           },
   },
 }));
-vi.mock("../../../lib/services/content-service", () => ({ contentService: {} }));
-vi.mock("../../../lib/services/auth-service", () => ({ authService: {} }));
-vi.mock("../../../lib/services/commerce-service", () => ({ commerceService: {} }));
-vi.mock("../../../lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../../lib/services/community/content-service", () => ({ contentService: {} }));
+vi.mock("../../../lib/services/accounts/auth-service", () => ({ authService: {} }));
+vi.mock("../../../lib/services/commerce/commerce-service", () => ({ commerceService: {} }));
+vi.mock("../../../lib/i18n/server", () => ({
+  getRequestLocale: async () => state.locale,
+}));
 
 import { generateMetadata } from "./page";
 

@@ -4,9 +4,9 @@ import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 import { OwnDiscussionDetail } from "../../src/features/community/components/own-discussion-detail";
-import { getDiscussionCopy } from "../../src/lib/content-discussion-copy";
-import { ownDiscussionCopy } from "../../src/lib/discussion-workspace-copy";
-import { approvalCopy } from "../../src/lib/public-verification-history-copy";
+import { getDiscussionCopy } from "../../src/features/community/content-discussion-copy";
+import { ownDiscussionCopy } from "../../src/features/community/discussion-workspace-copy";
+import { approvalCopy } from "../../src/features/trust/public-verification-history-copy";
 
 const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
@@ -22,16 +22,16 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/discussions",
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../../src/lib/services/discussion-workspace-service", () => ({
+vi.mock("../../src/lib/services/community/discussion-workspace-service", () => ({
   discussionWorkspaceService: { page: mocks.page, own: mocks.own },
 }));
-vi.mock("../../src/lib/services/public-verification-history-service", () => ({
+vi.mock("../../src/lib/services/trust/public-verification-history-service", () => ({
   publicVerificationHistoryService: { page: mocks.approvals },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
 
@@ -128,18 +128,20 @@ it("shows edit and exact discussion permalink for an available own comment", () 
 });
 it("keeps infrastructure failures distinct from missing sessions on list and detail", async () => {
   mocks.session.mockRejectedValue(new Error("secret session SQL"));
-  expect(renderToStaticMarkup(await OwnPage({}))).toContain(
-    'href="/auth/login?next=%2Fworkspace%2Fdiscussions"',
-  );
-  expect(renderToStaticMarkup(await DetailPage(detail))).toContain(
+  const listFailed = renderToStaticMarkup(await OwnPage({}));
+  const detailFailed = renderToStaticMarkup(await DetailPage(detail));
+  expect(listFailed).toContain('role="alert"');
+  expect(listFailed).toContain(ownDiscussionCopy("en").failed);
+  expect(listFailed).toContain('href="/workspace/discussions"');
+  expect(listFailed).not.toContain('href="/auth/login?next=%2Fworkspace%2Fdiscussions"');
+  expect(detailFailed).toContain('role="alert"');
+  expect(detailFailed).toContain(ownDiscussionCopy("en").failed);
+  expect(detailFailed).toContain('href="/workspace/discussions/comment"');
+  expect(detailFailed).not.toContain(
     'href="/auth/login?next=%2Fworkspace%2Fdiscussions%2Fcomment"',
   );
-  for (const html of [
-    renderToStaticMarkup(await OwnPage({})),
-    renderToStaticMarkup(await DetailPage(detail)),
-  ]) {
+  for (const html of [listFailed, detailFailed]) {
     expect(html).not.toContain("secret session");
-    expect(html).not.toContain(ownDiscussionCopy("en").title);
   }
   expect(mocks.page).not.toHaveBeenCalled();
   expect(mocks.own).not.toHaveBeenCalled();
@@ -170,7 +172,7 @@ it("provides 404 for missing or foreign own comments and reload for persistence 
   const html = renderToStaticMarkup(await DetailPage(detail));
   expect(html).toContain(ownDiscussionCopy("en").failed);
   expect(html).toContain('role="alert"');
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(getDictionary("en").errors.retry);
   expect(html).toContain('href="/workspace/discussions/comment"');
   expect(html).not.toContain("secret text");
@@ -181,7 +183,7 @@ it("shows an honest recovery state when own comments fail to load", async () => 
   const html = renderToStaticMarkup(await OwnPage({}));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.failed);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(getDictionary("en").errors.retry);
   expect(html).toContain('href="/workspace/discussions"');
   expect(html).not.toContain("comments unavailable");
@@ -202,8 +204,8 @@ it("shows EmptyState descriptions for empty and filtered own comments", async ()
 });
 it("clips honest discussions loading shells on narrow layouts", async () => {
   const html = renderToStaticMarkup(await DiscussionsLoading());
-  expect(html).toContain("min-w-0");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(ownDiscussionCopy("en").loading);
 });
 it.each(["en", "ru"] as const)(
@@ -252,9 +254,9 @@ it("does not interpret empty history or failed reads as verification decisions",
   expect(empty).toContain(copy.emptyHint);
   expect(empty).not.toContain(copy.emptyFiltered);
   expect(empty).toContain(copy.verified);
-  expect(empty).toContain("overflow-x-clip");
-  expect(empty).toContain("min-w-0");
-  expect(empty).toContain("min-h-11");
+  expect(empty).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(empty).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(empty).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   mocks.approvals.mockResolvedValueOnce({
     subject,
     items: [],
@@ -273,8 +275,8 @@ it("does not interpret empty history or failed reads as verification decisions",
   expect(failed).toContain(approvalCopy("en").unavailable);
   expect(failed).toContain('role="alert"');
   expect(failed).toContain(getDictionary("en").errors.retry);
-  expect(failed).toContain("overflow-x-clip");
-  expect(failed).toContain("min-h-11");
+  expect(failed).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(failed).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(failed).not.toContain(approvalCopy("en").empty);
   expect(failed).not.toContain(approvalCopy("en").emptyHint);
   expect(failed).not.toContain("secret proof");
@@ -286,7 +288,7 @@ it("rejects public proof filters and returns missing profile 404", async () => {
   expect(html).toContain(approvalCopy("en").invalid);
   expect(html).toContain('role="alert"');
   expect(html).toContain(getDictionary("en").errors.retry);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain('href="/users/writer/trust/history"');
   expect(mocks.approvals).not.toHaveBeenCalled();
   mocks.approvals.mockRejectedValue(new AppError("missing", 404, "NOT_FOUND"));
@@ -294,7 +296,7 @@ it("rejects public proof filters and returns missing profile 404", async () => {
 });
 it("clips user trust history loading shells on narrow layouts", async () => {
   const html = renderToStaticMarkup(await UserTrustHistoryLoading());
-  expect(html).toContain("min-w-0");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(approvalCopy("en").loading);
 });

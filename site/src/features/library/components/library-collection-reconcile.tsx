@@ -1,25 +1,25 @@
 "use client";
 import type { LibraryCollectionChangesPreview, LibraryCollectionCommand } from "@nexus/domain";
-import { Button, ErrorState } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { libraryCollectionCommandSchema, libraryCollectionReceiptSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { libraryCollectionManifestsCopy } from "../../../lib/library-collection-manifests-i18n";
-import {
-  collectionReceiptHref,
-  libraryCollectionReceiptsCopy,
-} from "../../../lib/library-collection-receipts-i18n";
-import { confirmedCollectionCommand } from "../../../lib/library-collections-confirmation";
-import {
-  libraryCollectionError,
-  libraryCollectionsCopy,
-} from "../../../lib/library-collections-i18n";
-import { collectionHref } from "../../../lib/library-collections-query";
-import { privateApiRequest } from "../../../lib/private-api-request";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
-} from "../../../components/action-confirm-checkbox";
+} from "../../shell/action-confirm-checkbox";
+import { linkAccentRounded, linkAccentSmRounded, linkAccentTight } from "../../shell/link-shell";
+import { panelSpace4P5 } from "../../shell/panel-shell";
+import { typeBreakAllXs } from "../../shell/type-shell";
+import { libraryCollectionManifestsCopy } from "../library-collection-manifests-i18n";
+import {
+  collectionReceiptHref,
+  libraryCollectionReceiptsCopy,
+} from "../library-collection-receipts-i18n";
+import { confirmedCollectionCommand } from "../library-collections-confirmation";
+import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
+import { collectionHref } from "../library-collections-query";
 
 type Command = Extract<LibraryCollectionCommand, { action: "reconcile-items" }>;
 export function LibraryCollectionReconcileForm({
@@ -156,15 +156,17 @@ export function LibraryCollectionReconcileForm({
       if (controller.current === abort) controller.current = null;
     }
   }
-  if (!choices.length && !pending.current) return <p>{m.noChanges}</p>;
+  if (!choices.length && !pending.current) {
+    return <EmptyState title={m.noChanges} description={m.noChangesHint} />;
+  }
   const shownIds = pending.current ? [...adds, ...removes] : selected;
   return (
-    <form onSubmit={submit} className="nexus-panel space-y-4 p-5">
+    <form onSubmit={submit} className={panelSpace4P5}>
       <h2>{c["reconcile-items"]}</h2>
       <p>
         {c.destination}: {shown.collection.name} · {c.revision} {shown.collection.revision}
       </p>
-      <code className="block break-all text-xs">{shown.collection.id}</code>
+      <code className={typeBreakAllXs}>{shown.collection.id}</code>
       <p>
         {c.add}: {adds.length} · {c.remove}: {removes.length} · {c.selected}: {shownIds.length} /{" "}
         {shown.batchLimit}
@@ -209,7 +211,7 @@ export function LibraryCollectionReconcileForm({
                   <span>
                     {item.canAdd ? c.add : c.remove}:{" "}
                     {item.available ? (item.title ?? c.unavailable) : c.unavailable}
-                    <code className="block break-all text-xs">{item.productId}</code>
+                    <code className={typeBreakAllXs}>{item.productId}</code>
                   </span>
                 </label>
               </li>
@@ -251,7 +253,13 @@ export function LibraryCollectionReconcileForm({
                 ? c.retryAction
                 : c["reconcile-items"]}
       </Button>
-      {frozen && !saved && <p role="note">{c.frozen}</p>}
+      {frozen && !saved ? (
+        <ErrorState
+          id="library-collection-reconcile-frozen"
+          title={c.frozen}
+          description={c.retry}
+        />
+      ) : null}
       {error ? (
         <ErrorState
           title={error}
@@ -263,7 +271,7 @@ export function LibraryCollectionReconcileForm({
                 returnHref ??
                 collectionHref(shown.collection.id, "reconcile")
               }
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentSmRounded}
             >
               {c.reload}
             </a>
@@ -277,7 +285,7 @@ export function LibraryCollectionReconcileForm({
             returnHref ??
             collectionHref(shown.collection.id, "reconcile")
           }
-          className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentRounded}
         >
           {c.reload}
         </a>
@@ -287,19 +295,13 @@ export function LibraryCollectionReconcileForm({
           <p role="status" aria-live="polite">
             {c.saved}
           </p>
-          <code className="block break-all text-xs">
+          <code className={typeBreakAllXs}>
             {c.receipt}: {saved}
           </code>
-          <a
-            href={collectionReceiptHref(saved)}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <a href={collectionReceiptHref(saved)} className={linkAccentTight}>
             {libraryCollectionReceiptsCopy(locale).open}
           </a>
-          <a
-            href={collectionHref(shown.collection.id, "history")}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <a href={collectionHref(shown.collection.id, "history")} className={linkAccentTight}>
             {c.history}
           </a>
         </div>

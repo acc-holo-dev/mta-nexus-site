@@ -3,6 +3,8 @@ export const product = {
     notFound: "Product not found",
     privatePreview: "Private creator preview",
     notPublic: "It is not visible in the public catalogue and cannot be downloaded until approval.",
+    notPublicHint:
+      "Wait for moderation approval or open the publisher workspace if you manage this resource.",
     resourceStatus: "Resource status",
     market: "Resources",
     latestBuildNotice:
@@ -91,11 +93,14 @@ export const product = {
     publisher: "Publisher",
     author: "Author",
     publisherUnavailable: "Publisher unavailable",
+    publisherUnavailableHint:
+      "Publisher attribution is hidden on this listing. That is not the same as the resource being unpublished.",
     security:
       "Every release records its SHA-256 checksum, file size and compatibility. Downloads are entitlement-gated; a recorded checksum is not a malware verdict or signature.",
   },
   provenance: {
     title: "Artifact provenance",
+    hash: "SHA-256",
     cleanScanRecorded: "Clean scan recorded",
     blockedMalicious: "Blocked as malicious",
     scannerUnavailable: "Scanner unavailable",
@@ -129,6 +134,8 @@ export const product = {
       "Everything below applies to the published version shown for download, not a hidden latest.",
     missingBody:
       "The author has not added version-specific setup notes yet. Use Q&A or support below with this resource in context.",
+    missingBodyHint:
+      "Ask in Q&A or support with this resource attached. NEXUS does not invent setup steps.",
     sections: {
       purpose: "Purpose",
       acquire: "Get this version",
@@ -160,15 +167,21 @@ export const product = {
   dependencyUi: {
     noneDeclared: "None declared",
     resolutionUnavailable: "Catalogue resolution temporarily unavailable",
+    resolutionUnavailableHint:
+      "A temporary catalogue lookup failure is not a missing dependency list. Try again after the catalogue recovers.",
     selfReference: "self reference",
     notFound: "not found in public NEXUS catalogue",
     resolutionNotice:
       "Resolution checks public catalogue presence only; it is not a compatibility guarantee.",
     reverseUnavailable: "Reverse dependency lookup is temporarily unavailable.",
+    reverseUnavailableHint:
+      "A temporary reverse-lookup failure is not an empty dependents list. Try again after the catalogue recovers.",
     noDependents:
       "No published free NEXUS resources currently declare this resource as a direct dependency.",
     limitReached:
       "Showing the first 50 published direct dependents. More relationships exist than this beta surface displays.",
+    limitReachedHint:
+      "This list is capped. More direct dependents exist than this beta surface displays.",
     reverseNotice:
       "Direct declarations only. This does not imply runtime compatibility or successful installation.",
   },
@@ -222,6 +235,10 @@ export const product = {
     client: "client",
     shared: "shared",
     httpEnabled: "HTTP-enabled",
+    httpExportHint:
+      "HTTP-enabled exports are declared in meta.xml only. Endpoint behavior is not tested here.",
+    structuralIssueHint:
+      "Fix the manifest and inspect again. Static notes are not a malware or runtime verdict.",
     resourceName: "Resource name",
     declaredAuthor: "Declared author",
     minimumMta: "Minimum MTA",
@@ -279,6 +296,8 @@ export const product = {
     noPaymentRequired: "No payment details are required.",
     paidDisabled:
       "Paid resources are disabled during the open free beta. No payment attempt will be created.",
+    paidDisabledHint:
+      "No payment attempt is created during the open free beta. Use free library acquisition instead.",
     adding: "Adding resource...",
     addToLibrary: "Add to library",
     paidUnavailable: "Paid resources unavailable",
@@ -288,6 +307,8 @@ export const product = {
     loadFailed: "Could not load the resource. Please try again.",
     retry: "Try again",
     claimFailed: "Could not add the resource",
+    claimErrorHint:
+      "Retry repeats this library claim only. A temporary failure is not a paid checkout and does not remove existing library access.",
     unexpected: "An unexpected error occurred",
     free: "Free",
   },

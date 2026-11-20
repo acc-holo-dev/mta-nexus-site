@@ -6,7 +6,7 @@ import {
   nextThemePreference,
   parseThemePreference,
   resolveThemePreference,
-} from "../../src/lib/theme-preference";
+} from "../../src/features/shell/theme-preference";
 
 const css = readFileSync(resolve(process.cwd(), "site/src/app/globals.css"), "utf8");
 
@@ -40,5 +40,22 @@ describe("theme preference", () => {
     expect(css).toMatch(/\.dark\s*\{[^}]*color-scheme:\s*dark;/u);
     expect(css).toContain("font-family:");
     expect(css).not.toMatch(/\.font-heading\s*\{\s*font:\s*var\(--font-heading\)/u);
+  });
+
+  /** Wave 61 / UX-05: native widgets + autofill stay theme-aligned; type roles stay longhand. */
+  it("locks native widget color-scheme inherit and autofill to nexus text/inset tokens", () => {
+    expect(css).toMatch(/input,\s*select,\s*textarea,\s*button\s*\{\s*color-scheme:\s*inherit;/u);
+    expect(css).toContain("-webkit-text-fill-color: var(--nexus-text)");
+    expect(css).toContain("caret-color: var(--nexus-text)");
+    expect(css).toContain("box-shadow: 0 0 0 1000px var(--nexus-inset) inset");
+  });
+
+  it("locks typography utility roles to longhand family/size/weight/line-height", () => {
+    for (const role of [".font-display", ".font-heading", ".font-label", ".font-caption"]) {
+      expect(css).toMatch(new RegExp(`${role.replace(".", "\\.")}\\s*\\{[^}]*font-family:`, "u"));
+      expect(css).not.toMatch(
+        new RegExp(`${role.replace(".", "\\.")}\\s*\\{\\s*font:\\s*var\\(`, "u"),
+      );
+    }
   });
 });

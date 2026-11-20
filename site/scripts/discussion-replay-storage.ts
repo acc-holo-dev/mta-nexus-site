@@ -4,11 +4,11 @@ import type { FileHandle } from "node:fs/promises";
 import { open, realpath, rename, unlink } from "node:fs/promises";
 import { hostname } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
-import type { ReplayCheckpoint } from "../src/lib/services/discussion-notification-replay";
+import type { ReplayCheckpoint } from "../src/lib/services/community/discussion-notification-replay";
 import {
   assertDiscussionReplayProgress,
   parseDiscussionReplayCheckpoint,
-} from "../src/lib/services/discussion-replay-checkpoint";
+} from "../src/lib/services/community/discussion-replay-checkpoint";
 
 const maximumBytes = 4096;
 

@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { parseSessionRevocation } from "../../../../lib/session-revocation";
+import { parseSessionRevocation } from "../../../../features/accounts/session-revocation";
 
 const state = vi.hoisted(() => ({
   user: { id: "usr_owner" } as { id: string } | null,
@@ -30,7 +30,7 @@ const listSessions = vi.hoisted(() =>
   ]),
 );
 
-vi.mock("../../../../lib/services/auth-service", () => ({
+vi.mock("../../../../lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
     getSessionIdentity: vi.fn(async () =>
@@ -49,7 +49,7 @@ vi.mock("@nexus/domain", () => ({
   AppError: class AppError extends Error {},
 }));
 
-import { authService } from "../../../../lib/services/auth-service";
+import { authService } from "../../../../lib/services/accounts/auth-service";
 import { DELETE, GET } from "./route";
 
 function listRequest() {

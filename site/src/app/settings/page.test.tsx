@@ -5,15 +5,16 @@ import { getDictionary } from "../../lib/i18n";
 const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
+vi.mock("server-only", () => ({}));
 
-vi.mock("../../lib/i18n-server", () => ({
+vi.mock("../../lib/i18n/server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
 vi.mock("next/navigation", () => ({
   usePathname: () => "/settings",
 }));
 
-import { LocaleProvider } from "../../components/locale-context";
+import { LocaleProvider } from "../../features/shell/locale";
 import SettingsLoading from "./loading";
 import SettingsPage from "./page";
 

@@ -266,7 +266,10 @@ it("replays an authorized committed reply after closure without duplicating mess
     .where(
       and(
         eq(notifications.recipientId, f.owner.id),
-        eq(notifications.message, `Support replied to your case. (${f.supportCase.subject})`),
+        eq(
+          notifications.message,
+          `Support replied to your case. (${f.supportCase.subject}) / Поддержка ответила на ваше обращение. (${f.supportCase.subject})`,
+        ),
       ),
     );
   expect(notices).toHaveLength(1);

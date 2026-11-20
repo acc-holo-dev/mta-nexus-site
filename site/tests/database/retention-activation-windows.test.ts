@@ -3,7 +3,7 @@ import {
   isInsideRetentionWindow,
   retentionDayIndex,
   retentionWindowBounds,
-} from "../../src/lib/retention-activation-windows";
+} from "../../src/features/accounts/retention-activation-windows";
 
 const T0 = Date.UTC(2026, 0, 1, 12, 0, 0);
 

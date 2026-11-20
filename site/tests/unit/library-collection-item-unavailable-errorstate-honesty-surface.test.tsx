@@ -14,8 +14,11 @@ it("locks collection item unavailableNote to ErrorState", () => {
   const source = read(surface);
   expect(source).toContain("ErrorState");
   expect(source).toContain('id="library-collection-item-unavailable"');
-  expect(source).toMatch(
-    /<ErrorState id="library-collection-item-unavailable" title=\{c\.unavailableNote\}/,
+  expect(source).toContain('id="library-collection-item-unavailable"');
+  expect(source).toContain("title={c.unavailableNote}");
+  expect(source).toContain("description={c.itemUnavailableHint}");
+  expect(read("site/src/features/library/library-collections-i18n.ts")).toContain(
+    "itemUnavailableHint:",
   );
   expect(source).not.toContain('className="text-sm text-muted">{c.unavailableNote}</p>');
 });

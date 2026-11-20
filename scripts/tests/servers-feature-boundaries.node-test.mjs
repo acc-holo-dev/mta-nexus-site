@@ -65,6 +65,34 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "statistics-view",
     "registration",
     "claim-controls",
+    "managed-server-copy",
+    "servers-directory-api-copy",
+    "server-claim-api-copy",
+    "server-organizations-api-copy",
+    "servers-api-copy",
+    "server-history-api-copy",
+    "server-observation-browser-contract",
+    "server-statistics-contract",
+    "server-history-window",
+    "server-workspace-contract",
+    "server-publication-history-copy",
+    "server-content-copy",
+    "server-observation-browser-copy",
+    "server-statistics-copy",
+    "server-follow-notifications",
+    "server-review-query",
+    "server-workspace-copy",
+    "server-mutation-errors",
+    "server-review-i18n",
+    "server-activity-view",
+    "server-claim-status-view",
+    "server-workspace-nav-i18n",
+    "server-statistics-download",
+    "server-review-confirmation",
+    "server-mutation-confirmation",
+    "server-history-presentation",
+    "server-claim-confirmation",
+    "server-organization-options",
     "details-controls",
     "workspace-navigation",
     "review-controls",
@@ -93,6 +121,11 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "activity",
     "publication-history",
     "updates",
+    "server-detail",
+    "managed-servers",
+    "publications",
+    "register",
+    "managed-server-workspace",
   ]) {
     write(
       `site/src/features/servers/${port}-server.ts`,
@@ -144,6 +177,34 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     ["features/servers/workspace-navigation.ts", "servers-client-isolation"],
     ["features/servers/registration.ts", "servers-client-isolation"],
     ["features/servers/claim-controls.ts", "servers-client-isolation"],
+    ["features/servers/managed-server-copy.ts", "servers-client-isolation"],
+    ["features/servers/servers-directory-api-copy.ts", "servers-client-isolation"],
+    ["features/servers/server-claim-api-copy.ts", "servers-client-isolation"],
+    ["features/servers/server-organizations-api-copy.ts", "servers-client-isolation"],
+    ["features/servers/servers-api-copy.ts", "servers-client-isolation"],
+    ["features/servers/server-history-api-copy.ts", "servers-client-isolation"],
+    ["features/servers/server-observation-browser-contract.ts", "servers-client-isolation"],
+    ["features/servers/server-statistics-contract.ts", "servers-client-isolation"],
+    ["features/servers/server-history-window.ts", "servers-client-isolation"],
+    ["features/servers/server-workspace-contract.ts", "servers-client-isolation"],
+    ["features/servers/server-publication-history-copy.ts", "servers-client-isolation"],
+    ["features/servers/server-content-copy.ts", "servers-client-isolation"],
+    ["features/servers/server-observation-browser-copy.ts", "servers-client-isolation"],
+    ["features/servers/server-statistics-copy.ts", "servers-client-isolation"],
+    ["features/servers/server-follow-notifications.ts", "servers-client-isolation"],
+    ["features/servers/server-review-query.ts", "servers-client-isolation"],
+    ["features/servers/server-workspace-copy.ts", "servers-client-isolation"],
+    ["features/servers/server-mutation-errors.ts", "servers-client-isolation"],
+    ["features/servers/server-review-i18n.ts", "servers-client-isolation"],
+    ["features/servers/server-activity-view.ts", "servers-client-isolation"],
+    ["features/servers/server-claim-status-view.ts", "servers-client-isolation"],
+    ["features/servers/server-workspace-nav-i18n.ts", "servers-client-isolation"],
+    ["features/servers/server-statistics-download.ts", "servers-client-isolation"],
+    ["features/servers/server-review-confirmation.ts", "servers-client-isolation"],
+    ["features/servers/server-mutation-confirmation.ts", "servers-client-isolation"],
+    ["features/servers/server-history-presentation.ts", "servers-client-isolation"],
+    ["features/servers/server-claim-confirmation.ts", "servers-client-isolation"],
+    ["features/servers/server-organization-options.ts", "servers-client-isolation"],
     ["features/servers/details-controls.ts", "servers-client-isolation"],
     ["features/servers/connect.ts", "servers-client-isolation"],
     ["features/servers/statistics-export.ts", "servers-client-isolation"],
@@ -152,6 +213,11 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     ["features/servers/components/activity-leak.ts", "servers-client-isolation"],
     ["features/servers/components/publication-history-leak.ts", "servers-client-isolation"],
     ["features/servers/components/updates-leak.ts", "servers-client-isolation"],
+    ["features/servers/components/server-detail-leak.ts", "servers-client-isolation"],
+    ["features/servers/components/managed-servers-leak.ts", "servers-client-isolation"],
+    ["features/servers/components/publications-leak.ts", "servers-client-isolation"],
+    ["features/servers/components/register-leak.ts", "servers-client-isolation"],
+    ["features/servers/components/managed-server-workspace-leak.ts", "servers-client-isolation"],
     ["features/servers/components/claim-status-leak.ts", "servers-client-isolation"],
     ["features/servers/components/managed-card-leak.ts", "servers-client-isolation"],
     ["features/servers/components/statistics-leak.ts", "servers-client-isolation"],
@@ -173,6 +239,11 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "app/activity-server.ts",
     "app/publication-history-server.ts",
     "app/updates-server.ts",
+    "app/server-detail-server.ts",
+    "app/managed-servers-server.ts",
+    "app/publications-server.ts",
+    "app/register-server.ts",
+    "app/managed-server-workspace-server.ts",
     "app/claim-status-server.ts",
     "app/managed-card-server.ts",
     "app/statistics-server.ts",
@@ -185,6 +256,34 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "app/workspace-navigation.ts",
     "app/registration.ts",
     "app/claim-controls.ts",
+    "app/managed-server-copy.ts",
+    "app/servers-directory-api-copy.ts",
+    "app/server-claim-api-copy.ts",
+    "app/server-organizations-api-copy.ts",
+    "app/servers-api-copy.ts",
+    "app/server-history-api-copy.ts",
+    "app/server-observation-browser-contract.ts",
+    "app/server-statistics-contract.ts",
+    "app/server-history-window.ts",
+    "app/server-workspace-contract.ts",
+    "app/server-publication-history-copy.ts",
+    "app/server-content-copy.ts",
+    "app/server-observation-browser-copy.ts",
+    "app/server-statistics-copy.ts",
+    "app/server-follow-notifications.ts",
+    "app/server-review-query.ts",
+    "app/server-workspace-copy.ts",
+    "app/server-mutation-errors.ts",
+    "app/server-review-i18n.ts",
+    "app/server-activity-view.ts",
+    "app/server-claim-status-view.ts",
+    "app/server-workspace-nav-i18n.ts",
+    "app/server-statistics-download.ts",
+    "app/server-review-confirmation.ts",
+    "app/server-mutation-confirmation.ts",
+    "app/server-history-presentation.ts",
+    "app/server-claim-confirmation.ts",
+    "app/server-organization-options.ts",
     "app/details-controls.ts",
     "app/connect.ts",
     "app/statistics-export.ts",
@@ -208,6 +307,34 @@ test("real client and model entrypoints have no transitive server dependencies",
     "site/src/features/servers/workspace-navigation.ts",
     "site/src/features/servers/registration.ts",
     "site/src/features/servers/claim-controls.ts",
+    "site/src/features/servers/managed-server-copy.ts",
+    "site/src/features/servers/servers-directory-api-copy.ts",
+    "site/src/features/servers/server-claim-api-copy.ts",
+    "site/src/features/servers/server-organizations-api-copy.ts",
+    "site/src/features/servers/servers-api-copy.ts",
+    "site/src/features/servers/server-history-api-copy.ts",
+    "site/src/features/servers/server-observation-browser-contract.ts",
+    "site/src/features/servers/server-statistics-contract.ts",
+    "site/src/features/servers/server-history-window.ts",
+    "site/src/features/servers/server-workspace-contract.ts",
+    "site/src/features/servers/server-publication-history-copy.ts",
+    "site/src/features/servers/server-content-copy.ts",
+    "site/src/features/servers/server-observation-browser-copy.ts",
+    "site/src/features/servers/server-statistics-copy.ts",
+    "site/src/features/servers/server-follow-notifications.ts",
+    "site/src/features/servers/server-review-query.ts",
+    "site/src/features/servers/server-workspace-copy.ts",
+    "site/src/features/servers/server-mutation-errors.ts",
+    "site/src/features/servers/server-review-i18n.ts",
+    "site/src/features/servers/server-activity-view.ts",
+    "site/src/features/servers/server-claim-status-view.ts",
+    "site/src/features/servers/server-workspace-nav-i18n.ts",
+    "site/src/features/servers/server-statistics-download.ts",
+    "site/src/features/servers/server-review-confirmation.ts",
+    "site/src/features/servers/server-mutation-confirmation.ts",
+    "site/src/features/servers/server-history-presentation.ts",
+    "site/src/features/servers/server-claim-confirmation.ts",
+    "site/src/features/servers/server-organization-options.ts",
     "site/src/features/servers/details-controls.ts",
     "site/src/features/servers/connect.ts",
     "site/src/features/servers/statistics-export.ts",
@@ -223,7 +350,7 @@ test("real client and model entrypoints have no transitive server dependencies",
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/servers\/(?:server(?:\.ts$|\/)|(?:statistics|observations|history|claim-status|managed-card|content-editor|activity|publication-history|updates)-server\.ts$)|lib\/(?!(?:i18n(?:\.ts$|\/)|(?:private-api-request|server-history-window|server-statistics-contract|server-statistics-copy|server-statistics-download|server-claim-confirmation|server-claim-status-view|server-mutation-confirmation|server-mutation-errors|server-organization-options|server-workspace-nav-i18n|managed-server-copy|server-workspace-contract|server-workspace-copy|user-platform-client|user-platform-copy|user-platform-contract|follow-initial-state|follow-confirmation|follow-workspace-contract|follow-workspace-copy|content-discussion-contract|server-review-confirmation|server-review-i18n)\.ts$)))/u.test(
+      !/^site\/src\/(?:app\/|features\/servers\/(?:server(?:\.ts$|\/)|(?:statistics|observations|history|claim-status|managed-card|content-editor|activity|publication-history|updates|publications|register|managed-server-workspace)-server\.ts$)|lib\/(?!(?:(?:i18n(?:\.ts$|\/)|platform\/i18n\.ts$)|(?:http\/private-api-request|user-platform-client|user-platform-copy|user-platform-contract|follow-initial-state|follow-confirmation|follow-workspace-contract|follow-workspace-copy|publication-feed-contract|publication-feed-copy|content-discussion-contract)\.ts$)))/u.test(
         name,
       ),
       name,
@@ -262,6 +389,36 @@ test("real client and model entrypoints have no transitive server dependencies",
   visit("site/src/features/servers/workspace-navigation.ts");
   visit("site/src/features/servers/registration.ts");
   visit("site/src/features/servers/claim-controls.ts");
+  visit("site/src/features/servers/managed-server-copy.ts");
+  visit("site/src/features/servers/servers-directory-api-copy.ts");
+  visit("site/src/features/servers/server-claim-api-copy.ts");
+  visit(
+    "site/src/features/servers/server-organizations-api-copy.ts",
+    "site/src/features/servers/servers-api-copy.ts",
+    "site/src/features/servers/server-history-api-copy.ts",
+  );
+  visit("site/src/features/servers/server-observation-browser-contract.ts");
+  visit("site/src/features/servers/server-statistics-contract.ts");
+  visit("site/src/features/servers/server-history-window.ts");
+  visit("site/src/features/servers/server-workspace-contract.ts");
+  visit("site/src/features/servers/server-publication-history-copy.ts");
+  visit("site/src/features/servers/server-content-copy.ts");
+  visit("site/src/features/servers/server-observation-browser-copy.ts");
+  visit("site/src/features/servers/server-statistics-copy.ts");
+  visit("site/src/features/servers/server-follow-notifications.ts");
+  visit("site/src/features/servers/server-review-query.ts");
+  visit("site/src/features/servers/server-workspace-copy.ts");
+  visit("site/src/features/servers/server-mutation-errors.ts");
+  visit("site/src/features/servers/server-review-i18n.ts");
+  visit("site/src/features/servers/server-activity-view.ts");
+  visit("site/src/features/servers/server-claim-status-view.ts");
+  visit("site/src/features/servers/server-workspace-nav-i18n.ts");
+  visit("site/src/features/servers/server-statistics-download.ts");
+  visit("site/src/features/servers/server-review-confirmation.ts");
+  visit("site/src/features/servers/server-mutation-confirmation.ts");
+  visit("site/src/features/servers/server-history-presentation.ts");
+  visit("site/src/features/servers/server-claim-confirmation.ts");
+  visit("site/src/features/servers/server-organization-options.ts");
   visit("site/src/features/servers/details-controls.ts");
   visit("site/src/features/servers/connect.ts");
   visit("site/src/features/servers/statistics-export.ts");
@@ -299,4 +456,64 @@ test("Servers server entrypoints keep independent composition graphs", () => {
         assert(!modules.has(`site/src/features/servers/server/${otherPage}`), otherPage);
     assert(![...modules].some((name) => name.startsWith("site/src/app/")));
   }
+});
+
+test("Servers server-detail entry stays server-only and avoids routing", () => {
+  const source = "site/src/features/servers/server-detail-server.ts";
+  assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+  const result = cruise(root, [source]);
+  assert.equal(result.status, 0, result.stderr);
+  const graph = JSON.parse(result.stdout);
+  assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+  const modules = new Set(graph.modules.map((module) => module.source));
+  assert(modules.has("site/src/features/servers/server/server-detail-screen.tsx"));
+  assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+});
+
+test("Servers managed-servers entry stays server-only and avoids routing", () => {
+  const source = "site/src/features/servers/managed-servers-server.ts";
+  assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+  const result = cruise(root, [source]);
+  assert.equal(result.status, 0, result.stderr);
+  const graph = JSON.parse(result.stdout);
+  assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+  const modules = new Set(graph.modules.map((module) => module.source));
+  assert(modules.has("site/src/features/servers/server/managed-servers-screen.tsx"));
+  assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+});
+
+test("Servers publications entry stays server-only and avoids routing", () => {
+  const source = "site/src/features/servers/publications-server.ts";
+  assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+  const result = cruise(root, [source]);
+  assert.equal(result.status, 0, result.stderr);
+  const graph = JSON.parse(result.stdout);
+  assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+  const modules = new Set(graph.modules.map((module) => module.source));
+  assert(modules.has("site/src/features/servers/server/publications-screen.tsx"));
+  assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+});
+
+test("Servers register entry stays server-only and avoids routing", () => {
+  const source = "site/src/features/servers/register-server.ts";
+  assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+  const result = cruise(root, [source]);
+  assert.equal(result.status, 0, result.stderr);
+  const graph = JSON.parse(result.stdout);
+  assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+  const modules = new Set(graph.modules.map((module) => module.source));
+  assert(modules.has("site/src/features/servers/server/register-screen.tsx"));
+  assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+});
+
+test("Servers managed-server-workspace entry stays server-only and avoids routing", () => {
+  const source = "site/src/features/servers/managed-server-workspace-server.ts";
+  assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+  const result = cruise(root, [source]);
+  assert.equal(result.status, 0, result.stderr);
+  const graph = JSON.parse(result.stdout);
+  assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+  const modules = new Set(graph.modules.map((module) => module.source));
+  assert(modules.has("site/src/features/servers/server/managed-server-workspace-screen.tsx"));
+  assert(![...modules].some((name) => name.startsWith("site/src/app/")));
 });

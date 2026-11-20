@@ -1,10 +1,10 @@
 import { createHash } from "node:crypto";
-import { sql } from "drizzle-orm";
 import {
   RESOURCE_CART_LIMIT,
   type ResourceCartReview,
   type ResourceCartReviewItem,
 } from "@nexus/domain";
+import { sql } from "drizzle-orm";
 import { builds, entitlements, licenses, products, resourceCartItems } from "../schema";
 import { safePublishedBuildCondition } from "./build-safety";
 import type { ResourceTransaction } from "./entitlements";

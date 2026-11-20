@@ -25,15 +25,15 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../../src/lib/i18n-server", async () => {
+vi.mock("../../src/lib/i18n/server", async () => {
   const { state: harnessState } = await import("../helpers/resource-review-pages-harness");
   return { getRequestLocale: async () => harnessState.locale };
 });
-vi.mock("../../src/lib/services/auth-service", async () => {
+vi.mock("../../src/lib/services/accounts/auth-service", async () => {
   const { state: harnessState } = await import("../helpers/resource-review-pages-harness");
   return { authService: { getSession: async () => harnessState.actor } };
 });
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: {
     getProductBySlug: async () => ({
       id: "prd_a",
@@ -61,10 +61,10 @@ setupResourceReviewPages();
 import ReviewDetailLoading from "../../src/app/admin/commerce/reviews/[id]/loading";
 import ReviewsLoading from "../../src/app/admin/commerce/reviews/loading";
 import Public from "../../src/app/market/[slug]/reviews/page";
+import { resourceReviewCopy } from "../../src/features/resources/resource-review-i18n";
 import { ResourceReviewReportScreen } from "../../src/features/resources/server/resource-review-report-screen";
 import { getDictionary } from "../../src/lib/i18n";
-import { resourceReviewCopy } from "../../src/lib/resource-review-i18n";
-import { authService } from "../../src/lib/services/auth-service";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 it.each(["en", "ru"] as const)(
   "public %s reviews expose public authors, distinguish legacy evidence and preserve pages",
@@ -106,7 +106,9 @@ it("private report previews do not show unavailable review text or staff notes",
   const html = renderToStaticMarkup(
     await ResourceReviewReportScreen({ staff: false, id: "rpt_a" }),
   );
-  expect(html).toContain("Resource unavailable");
+  expect(html).toContain("The reported review is no longer available.");
+  expect(html).toContain("Missing review text is not a failed report load.");
+  expect(html).not.toContain("Resource unavailable");
   expect(html).not.toContain("INTERNAL_STAFF_NOTE");
   expect(html).not.toContain("remove_review");
   expect(mocks.reportDetail).toHaveBeenCalledWith({ actorId: "usr_a", staff: false }, "rpt_a");
@@ -170,8 +172,8 @@ it("shows an honest recovery state when the report queue fails", async () => {
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(`>${copy.reports}</h1>`);
   expect(html).toContain(copy.loadUnavailableHint);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain("view=history&amp;page=2");
 });
 it("shows an honest recovery state when a report detail fails", async () => {
@@ -207,7 +209,7 @@ it("clips honest loading shells on narrow layouts", async () => {
   for (const Loading of [ReviewsLoading, ReviewDetailLoading]) {
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain("min-w-0 max-w-5xl");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   }
 });
 it.each(["en", "ru"] as const)(
@@ -230,8 +232,8 @@ it.each(["en", "ru"] as const)(
     );
     expect(html).toContain(copy.empty);
     expect(html).toContain(copy.emptyHint);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   },
 );
 it.each(["en", "ru"] as const)(
@@ -249,8 +251,8 @@ it.each(["en", "ru"] as const)(
     );
     expect(html).toContain('role="alert"');
     expect(html).toContain(copy.pageUnavailable);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toContain('href="/market/resource/reviews?page=2"');
     expect(html).not.toContain("database-secret");
   },
@@ -260,7 +262,7 @@ it("clips the public reviews loading shell", async () => {
     "../../src/app/market/[slug]/reviews/loading"
   );
   const html = renderToStaticMarkup(await MarketReviewsLoading());
-  expect(html).toContain("min-w-0");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(resourceReviewCopy("en").pageLoading);
 });

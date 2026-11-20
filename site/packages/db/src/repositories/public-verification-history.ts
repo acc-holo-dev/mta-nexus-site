@@ -1,8 +1,9 @@
-import { eq, sql } from "drizzle-orm";
 import { NotFoundError } from "@nexus/domain";
+import { eq, sql } from "drizzle-orm";
 import { db } from "../client";
 import { developerProfiles, users } from "../schema";
 import { publicApprovalRecords } from "./public-approval-records";
+
 class PublicVerificationHistoryRepository {
   async page(
     username: string,

@@ -9,7 +9,7 @@ import {
   userRepository,
   users,
 } from "@nexus/db";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, sql } from "drizzle-orm";
 import { afterEach, expect, it } from "vitest";
 
 const actorIds: string[] = [];
@@ -75,7 +75,8 @@ async function state(f: Fixture) {
     audits: await db
       .select()
       .from(auditEvents)
-      .where(and(eq(auditEvents.actorId, f.actorId), eq(auditEvents.targetId, f.reportId))),
+      .where(and(eq(auditEvents.actorId, f.actorId), eq(auditEvents.targetId, f.reportId)))
+      .orderBy(asc(auditEvents.id)),
   };
 }
 function deferred() {

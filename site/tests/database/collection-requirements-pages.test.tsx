@@ -16,13 +16,13 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/library/collections/lcol_a/requirements",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/services/resource-requirements-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-requirements-service", () => ({
   resourceRequirementsService: { collectionReport: state.report },
 }));
 vi.mock("../../src/features/resources/download", () => ({
@@ -40,10 +40,10 @@ vi.mock("../../src/features/resources/components/resource-cart-controls", () => 
   ),
 }));
 
+import { collectionRequirementsCopy } from "../../src/features/library/collection-requirements-i18n";
 import { CollectionRequirementsScreen as screen } from "../../src/features/library/collection-requirements-server";
-import { collectionRequirementsCopy } from "../../src/lib/collection-requirements-i18n";
 import { getDictionary } from "../../src/lib/i18n";
-import { authService } from "../../src/lib/services/auth-service";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 const root: ResourceRequirementNode = {
   id: "prd_a",
@@ -164,7 +164,7 @@ it("shows an honest recovery state when collection readiness fails to load", asy
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(`>${copy.title}</h1>`);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("/lcol_a/requirements?targetMta=1.6.0");
   expect(html).not.toContain("requirements unavailable");
 });

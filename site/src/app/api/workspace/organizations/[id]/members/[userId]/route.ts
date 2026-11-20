@@ -1,12 +1,12 @@
 import type { NextRequest } from "next/server";
-import { withBrowserMutation } from "../../../../../../../lib/browser-route-adapter";
 import {
   organizationApi,
   organizationId,
   organizationInput,
   organizationMutationToken,
-} from "../../../../../../../lib/organization-workspace-api";
-import { organizationWorkspaceService } from "../../../../../../../lib/services/organization-workspace-service";
+} from "../../../../../../../features/organizations/organization-workspace-api";
+import { withBrowserMutation } from "../../../../../../../lib/http/browser-route-adapter";
+import { organizationWorkspaceService } from "../../../../../../../lib/services/organizations/organization-workspace-service";
 
 type Context = { params: Promise<{ id: string; userId: string }> };
 function mutation(request: NextRequest, context: Context, remove: boolean) {

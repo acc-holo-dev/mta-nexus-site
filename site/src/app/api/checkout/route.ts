@@ -1,6 +1,8 @@
 import type { NextRequest } from "next/server";
-import { withBrowserMutation } from "../../../lib/browser-route-adapter";
-import { createRequestLogContext, jsonWithRequestId } from "../../../lib/observability";
+import { checkoutApiCopy } from "../../../features/commerce/checkout-api-copy";
+import { withBrowserMutation } from "../../../lib/http/browser-route-adapter";
+import { resolveLocale } from "../../../lib/i18n";
+import { createRequestLogContext, jsonWithRequestId } from "../../../lib/platform/observability";
 
 /**
  * Paid checkout is intentionally unavailable in the player-first open free beta.
@@ -8,10 +10,11 @@ import { createRequestLogContext, jsonWithRequestId } from "../../../lib/observa
  */
 export const POST = withBrowserMutation(async function POST(request: NextRequest) {
   const context = createRequestLogContext(request);
+  const copy = checkoutApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
   return jsonWithRequestId(
     context,
     {
-      error: "Paid checkout is not available during the open free beta.",
+      error: copy.disabled,
       code: "CHECKOUT_DISABLED",
     },
     {

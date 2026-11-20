@@ -5,17 +5,28 @@ import { KeyRound, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { getDictionary } from "../../../lib/i18n";
-import { privateApiRequest } from "../../../lib/private-api-request";
+import { authEntryHref } from "../../shell/auth-return";
+import { GuestAuthLinks } from "../../shell/guest-auth";
+import { useNexusLocale } from "../../shell/locale";
+import { panelSpace4P5 } from "../../shell/panel-shell";
+import {
+  typeFlexStartGap3,
+  typeFlexWrapGap2,
+  typeLabelUpperMuted,
+  typeMt1XsLeadingMuted,
+  typeSmBoldPrimary,
+  typeTenFaint,
+  typeTenLeadingFaint,
+  typeXsLeadingMuted,
+} from "../../shell/type-shell";
 import {
   confirmsServerClaimVerification,
   type IssuedServerClaimChallenge,
   parseIssuedServerClaimChallenge,
-} from "../../../lib/server-claim-confirmation";
-import { serverClaimErrorMessage } from "../../../lib/server-claim-status-view";
-import { authEntryHref } from "../../../components/auth-return-path";
-import { GuestAuthLinks } from "../../../components/guest-auth-links";
-import { useNexusLocale } from "../../../components/locale-context";
+} from "../server-claim-confirmation";
+import { serverClaimErrorMessage } from "../server-claim-status-view";
 
 function claimMarkerKey(serverId: string, actor: string) {
   return `nexus:server-claim:v1:${encodeURIComponent(actor)}:${encodeURIComponent(serverId)}`;
@@ -108,11 +119,7 @@ export function ServerClaimControlPanel({
         }
       } catch {
         if (alive) {
-          setError(
-            localeRef.current === "ru"
-              ? "Не удалось проверить сессию или хранилище. Обновите страницу."
-              : "Could not check the session or storage. Refresh this page.",
-          );
+          setError(getDictionary(localeRef.current).serverClaim.sessionOrStorageUnavailable);
           setReadyScope(scope);
           setReady(true);
         }
@@ -150,11 +157,7 @@ export function ServerClaimControlPanel({
             ? "unknown_verify"
             : "unknown_issue",
         );
-        setError(
-          localeRef.current === "ru"
-            ? "Сессия изменилась или не подтверждена. Обновите страницу."
-            : "The session changed or could not be verified. Refresh this page.",
-        );
+        setError(getDictionary(localeRef.current).serverClaim.sessionChanged);
       }
     }
     function visibilityChanged() {
@@ -184,11 +187,7 @@ export function ServerClaimControlPanel({
     )
       return;
     if (!mark(actorId, "issue")) {
-      setError(
-        locale === "ru"
-          ? "Не удалось сохранить отметку операции. Запрос не отправлен."
-          : "Could not save the operation marker. The request was not sent.",
-      );
+      setError(copy.markerSaveFailed);
       return;
     }
     const requestEpoch = identityEpoch.current;
@@ -244,11 +243,7 @@ export function ServerClaimControlPanel({
     )
       return;
     if (!mark(actorId, "verify")) {
-      setError(
-        locale === "ru"
-          ? "Не удалось сохранить отметку операции. Запрос не отправлен."
-          : "Could not save the operation marker. The request was not sent.",
-      );
+      setError(copy.markerSaveFailed);
       return;
     }
     const requestEpoch = identityEpoch.current;
@@ -315,50 +310,39 @@ export function ServerClaimControlPanel({
           <ShieldCheck className="h-4 w-4" aria-hidden="true" />
           <h2 className="text-sm font-bold">{copy.verifiedTitle}</h2>
         </div>
-        <p className="text-xs leading-relaxed text-muted">{copy.verifiedDescription}</p>
-        <p className="text-[10px] text-faint">{copy.moderationSeparate}</p>
+        <p className={typeXsLeadingMuted}>{copy.verifiedDescription}</p>
+        <p className={typeTenFaint}>{copy.moderationSeparate}</p>
       </section>
     );
   }
 
   return (
-    <section className="nexus-panel space-y-4 p-5" aria-labelledby="server-control-proof-heading">
-      <div className="flex items-start gap-3">
+    <section className={panelSpace4P5} aria-labelledby="server-control-proof-heading">
+      <div className={typeFlexStartGap3}>
         <KeyRound className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
         <div>
-          <h2 id="server-control-proof-heading" className="text-sm font-bold text-primary">
+          <h2 id="server-control-proof-heading" className={typeSmBoldPrimary}>
             {copy.title}
           </h2>
-          <p className="mt-1 text-xs leading-relaxed text-muted">{copy.description}</p>
+          <p className={typeMt1XsLeadingMuted}>{copy.description}</p>
         </div>
       </div>
 
       {state === "unknown_issue" || state === "unknown_verify" ? (
         <ErrorState
-          title={
-            state === "unknown_issue"
-              ? locale === "ru"
-                ? "Результат создания проверки неизвестен. Токен восстановить нельзя; повтор заблокирован. Проверьте статус и обратитесь в поддержку."
-                : "The challenge result is unknown. The token cannot be recovered; retry is blocked. Check the status and contact support."
-              : locale === "ru"
-                ? "Результат подтверждения неизвестен. Повтор заблокирован; проверьте заявки и обратитесь в поддержку."
-                : "The verification result is unknown. Retry is blocked; check your requests and contact support."
-          }
+          title={state === "unknown_issue" ? copy.unknownIssueTitle : copy.unknownVerifyTitle}
+          description={state === "unknown_issue" ? copy.unknownIssueHint : copy.unknownVerifyHint}
           action={
             <Link
               href="/workspace/verification"
               className="inline-flex min-h-11 items-center text-accent underline"
             >
-              {locale === "ru" ? "Проверить заявки" : "Check requests"}
+              {copy.checkRequests}
             </Link>
           }
         />
       ) : !identityVisible ? (
-        <p role="status">
-          {locale === "ru"
-            ? "Проверяем сессию перед показом токена…"
-            : "Checking the session before showing the token…"}
-        </p>
+        <p role="status">{copy.checkingSession}</p>
       ) : !challenge ? (
         <Button
           type="button"
@@ -375,7 +359,7 @@ export function ServerClaimControlPanel({
       ) : (
         <div className="space-y-3">
           <div className="rounded-lg border border-[color:var(--nexus-accent)]/20 bg-accent-soft p-3">
-            <div className="font-label uppercase text-muted">{copy.tokenLabel}</div>
+            <div className={typeLabelUpperMuted}>{copy.tokenLabel}</div>
             <code className="mt-2 block select-all break-all font-mono text-sm font-bold text-accent">
               {challenge.token}
             </code>
@@ -389,13 +373,13 @@ export function ServerClaimControlPanel({
             <li>{copy.stepVerify}</li>
           </ol>
 
-          <p className="text-[10px] text-faint">
+          <p className={typeTenFaint}>
             {copy.expires}{" "}
             {new Date(challenge.expiresAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US")}.{" "}
             {copy.tokenEphemeral}
           </p>
 
-          <div className="flex flex-wrap gap-2">
+          <div className={typeFlexWrapGap2}>
             <Button
               type="button"
               size="touch"
@@ -440,9 +424,9 @@ export function ServerClaimControlPanel({
         </div>
       )}
 
-      {error ? <ErrorState title={error} /> : null}
+      {error ? <ErrorState title={error} description={dictionary.errors.formErrorHint} /> : null}
 
-      <p className="text-[10px] leading-relaxed text-faint">{copy.exactEndpoint}</p>
+      <p className={typeTenLeadingFaint}>{copy.exactEndpoint}</p>
     </section>
   );
 }

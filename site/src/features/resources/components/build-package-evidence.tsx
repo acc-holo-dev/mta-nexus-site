@@ -4,10 +4,18 @@ import {
   buildPackageSummary,
 } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
-import { buildPackageCopy } from "../../../lib/build-package-i18n";
 import { getDictionary } from "../../../lib/i18n";
-import { getMtaMetaInspectorIssueMessage } from "../../../lib/mta-meta-inspector-messages";
-
+import { formatUnknown } from "../../../lib/i18n/unknown";
+import { linkAccentTightSm } from "../../shell/link-shell";
+import { surfaceSpace2P4TextSm } from "../../shell/surface-shell";
+import {
+  typeBreakAllXs,
+  typeSemiboldPrimary,
+  typeSmMuted,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import { buildPackageCopy } from "../build-package-i18n";
+import { getMtaMetaInspectorIssueMessage } from "../mta-meta-inspector-messages";
 export function BuildPackageSummaryPanel({
   summary,
   locale,
@@ -17,11 +25,8 @@ export function BuildPackageSummaryPanel({
 }) {
   const copy = buildPackageCopy(locale);
   return (
-    <section
-      className="space-y-2 rounded-lg border border-base p-4 text-sm"
-      aria-label={copy.title}
-    >
-      <h3 className="font-semibold text-primary">{copy.title}</h3>
+    <section className={surfaceSpace2P4TextSm} aria-label={copy.title}>
+      <h3 className={typeSemiboldPrimary}>{copy.title}</h3>
       {!summary ? (
         <p className="text-muted">{copy.legacy}</p>
       ) : (
@@ -67,14 +72,19 @@ export function BuildPackageSummaryPanel({
             <ErrorState
               id="build-package-evidence-missing-refs"
               title={`${copy.references}: ${copy.absent} ${summary.missingReferences} · ${copy.unknown} ${summary.unresolvedReferences}`}
+              description={copy.missingReferencesHint}
             />
           ) : null}
           {summary.referencesTruncated ? (
-            <ErrorState id="build-package-evidence-refs-truncated" title={copy.truncated} />
+            <ErrorState
+              id="build-package-evidence-refs-truncated"
+              title={copy.truncated}
+              description={copy.truncatedHint}
+            />
           ) : null}
         </>
       )}
-      <p className="text-xs text-muted">{copy.publicNote}</p>
+      <p className={typeXsMuted}>{copy.publicNote}</p>
     </section>
   );
 }
@@ -102,28 +112,27 @@ export function BuildPackageEvidencePanel({
       <BuildPackageSummaryPanel summary={buildPackageSummary(evidence)} locale={locale} />
       {evidence && (
         <>
-          <p className="text-xs text-muted">
+          <p className={typeXsMuted}>
             {copy.inspected}:{" "}
             <time dateTime={evidence.inspectedAt}>
               {new Date(evidence.inspectedAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-GB")}
             </time>
           </p>
-          <a
-            href={reportHref}
-            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <a href={reportHref} className={linkAccentTightSm}>
             {copy.export}
           </a>
-          <p className="text-sm text-muted">{copy.note}</p>
+          <p className={typeSmMuted}>{copy.note}</p>
           {manifest && (
             <section className="space-y-4 rounded-lg border border-base p-4 text-sm">
               <p className="break-words font-code">{manifest.path}</p>
-              <code className="block break-all text-xs">SHA-256: {manifest.sha256Hash}</code>
+              <code className={typeBreakAllXs}>
+                {copy.sha256Label}: {manifest.sha256Hash}
+              </code>
               <h3 className="font-semibold">{copy.minimum}</h3>
               <p className="break-words">
-                {copy.server}: {manifest.minimumMta?.server || "—"} · {copy.client}:{" "}
-                {manifest.minimumMta?.client || "—"} · {copy.shared}:{" "}
-                {manifest.minimumMta?.both || "—"}
+                {copy.server}: {formatUnknown(locale, manifest.minimumMta?.server)} · {copy.client}:{" "}
+                {formatUnknown(locale, manifest.minimumMta?.client)} · {copy.shared}:{" "}
+                {formatUnknown(locale, manifest.minimumMta?.both)}
               </p>
               <h3 className="font-semibold">{copy.dependencies}</h3>
               <p className="text-muted">{copy.dependenciesNote}</p>
@@ -138,7 +147,7 @@ export function BuildPackageEvidencePanel({
               <ul className="list-inside list-disc">
                 {[...new Set(manifest.aclRights)].map((v) => (
                   <li key={v} className="break-words">
-                    {v || "—"}
+                    {formatUnknown(locale, v)}
                   </li>
                 ))}
               </ul>
@@ -150,13 +159,14 @@ export function BuildPackageEvidencePanel({
                   ).values(),
                 ].map((v) => (
                   <li key={JSON.stringify([v.kind, v.path, v.status])} className="break-words">
-                    <code>{v.path || "—"}</code> · {v.kind} ·{" "}
+                    <code>{formatUnknown(locale, v.path)}</code> · {v.kind} ·{" "}
                     {v.status === "present" ? (
                       <span className="text-success">{labels[v.status]}</span>
                     ) : (
                       <ErrorState
                         id={`build-package-evidence-ref-${v.kind}-${v.status}-${v.path || "empty"}`}
                         title={labels[v.status]}
+                        description={copy.referenceIssueHint}
                       />
                     )}
                   </li>
@@ -166,6 +176,7 @@ export function BuildPackageEvidencePanel({
                 <ErrorState
                   id="build-package-evidence-manifest-refs-truncated"
                   title={copy.truncated}
+                  description={copy.truncatedHint}
                 />
               ) : null}
               {manifest.issues.length > 0 && (
@@ -184,6 +195,7 @@ export function BuildPackageEvidencePanel({
                             { ...v, message: copy.genericIssue },
                             getDictionary(locale).metaInspector.structuralIssues,
                           )}
+                          description={copy.structuralIssueHint}
                         />
                       </li>
                     ))}

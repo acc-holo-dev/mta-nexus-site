@@ -17,7 +17,7 @@ const state = vi.hoisted(() => ({
 
 const moderateContent = vi.hoisted(() => vi.fn(async () => state.moderated));
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => ({
       id: "usr_mod",
@@ -29,35 +29,27 @@ vi.mock("../../src/lib/services/auth-service", () => ({
   },
 }));
 
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: {
     reviewBuild: vi.fn(),
     quarantineBuild: vi.fn(),
     restoreQuarantinedBuild: vi.fn(),
+    updateWithAudit: vi.fn(),
   },
 }));
 
-vi.mock("../../src/lib/services/content-service", () => ({
+vi.mock("../../src/lib/services/community/content-service", () => ({
   contentService: {
     moderateContent,
   },
 }));
 
-vi.mock("@nexus/db", () => ({
-  productRepository: {
-    updateWithAudit: vi.fn(),
-    suspendPublished: vi.fn(),
-    restoreSuspendedWithPublishedBuild: vi.fn(),
-    findById: vi.fn(),
-  },
-  reportRepository: {
-    resolve: vi.fn(),
-    findById: vi.fn(),
-  },
-  verificationRepository: {
-    resolveRequest: vi.fn(),
-    findById: vi.fn(),
-  },
+vi.mock("../../src/lib/services/moderation/admin-service", () => ({
+  adminService: { resolveReportRecord: vi.fn(), findReportById: vi.fn() },
+}));
+
+vi.mock("../../src/lib/services/moderation/verification-workspace-service", () => ({
+  verificationWorkspaceService: { resolveRequest: vi.fn(), findRequestById: vi.fn() },
 }));
 
 vi.mock("@nexus/security", async () => {

@@ -5,17 +5,26 @@ import { BadgeCheck, LoaderCircle, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
-import { platformRequest } from "../../../lib/user-platform-client";
+import { platformRequest } from "../../community/user-platform-client";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
+import { confirmAction } from "../../shell/confirm-action";
+import { linkGhostAccentSm } from "../../shell/link-shell";
+import { useNexusLocale } from "../../shell/locale";
+import { skelH35W35Spin } from "../../shell/skeleton-shell";
 import {
-  buildVerificationDecisionPayload,
-  normalizeVerificationReviewNotes,
-} from "../../../lib/verification-moderation";
+  typeFlexWrapGap2,
+  typeLabelUpperMuted,
+  typeTenFaint,
+  typeWFullMaxSmSpace2Md80,
+} from "../../shell/type-shell";
 import {
   verificationCopy,
   verificationDecisionError,
-} from "../../../lib/verification-workspace-copy";
-import { confirmAction } from "../../../components/confirm-action";
-import { useNexusLocale } from "../../../components/locale-context";
+} from "../../trust/verification-workspace-copy";
+import {
+  buildVerificationDecisionPayload,
+  normalizeVerificationReviewNotes,
+} from "../verification-moderation";
 
 export function VerificationModerationControls({
   requestId,
@@ -27,6 +36,17 @@ export function VerificationModerationControls({
   const router = useRouter();
   const { dictionary, locale } = useNexusLocale();
   const copy = dictionary.admin;
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    const labels = verificationCopy(locale);
+    return [
+      ...Object.values(copy),
+      ...Object.values(labels),
+      ...Object.values(getUserPlatformCopy(locale)),
+    ].includes(text)
+      ? text
+      : fallback;
+  }
   const [notes, setNotes] = useState("");
   const [pending, setPending] = useState<"approve" | "reject" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -92,9 +112,7 @@ export function VerificationModerationControls({
       router.refresh();
     } catch (caught) {
       if (!alive.current) return;
-      setError(
-        caught instanceof Error ? caught.message : verificationCopy(locale).decisionUnavailable,
-      );
+      setError(safeMessage(caught, verificationCopy(locale).decisionUnavailable));
     } finally {
       guard.current = false;
       if (alive.current) setPending(null);
@@ -102,9 +120,9 @@ export function VerificationModerationControls({
   }
 
   return (
-    <div className="w-full max-w-sm space-y-2 md:w-80" aria-busy={pending !== null}>
+    <div className={typeWFullMaxSmSpace2Md80} aria-busy={pending !== null}>
       <label className="block space-y-1">
-        <span className="font-label uppercase text-muted">{copy.reviewNote}</span>
+        <span className={typeLabelUpperMuted}>{copy.reviewNote}</span>
         <textarea
           value={notes}
           onChange={(event) => setNotes(event.target.value)}
@@ -117,7 +135,7 @@ export function VerificationModerationControls({
         />
       </label>
 
-      <div className="flex flex-wrap gap-2">
+      <div className={typeFlexWrapGap2}>
         <Button
           type="button"
           disabled={!hasNotes || pending !== null || blocked}
@@ -126,7 +144,7 @@ export function VerificationModerationControls({
           variant="outline"
         >
           {pending === "approve" ? (
-            <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+            <LoaderCircle className={skelH35W35Spin} aria-hidden="true" />
           ) : (
             <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />
           )}
@@ -141,7 +159,7 @@ export function VerificationModerationControls({
           variant="outline"
         >
           {pending === "reject" ? (
-            <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+            <LoaderCircle className={skelH35W35Spin} aria-hidden="true" />
           ) : (
             <XCircle className="h-3.5 w-3.5" aria-hidden="true" />
           )}
@@ -149,7 +167,7 @@ export function VerificationModerationControls({
         </Button>
       </div>
 
-      {!hasNotes && <p className="text-[10px] text-faint">{copy.reviewNoteHint}</p>}
+      {!hasNotes && <p className={typeTenFaint}>{copy.reviewNoteHint}</p>}
       {error ? (
         <ErrorState
           title={error}
@@ -159,7 +177,7 @@ export function VerificationModerationControls({
               <Button
                 type="button"
                 onClick={() => router.refresh()}
-                className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkGhostAccentSm}
                 variant="ghost"
               >
                 {verificationCopy(locale).reload}
@@ -171,7 +189,7 @@ export function VerificationModerationControls({
         <Button
           type="button"
           onClick={() => router.refresh()}
-          className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkGhostAccentSm}
           variant="ghost"
         >
           {verificationCopy(locale).reload}

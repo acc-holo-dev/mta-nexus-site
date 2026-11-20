@@ -6,8 +6,8 @@ import { registerHooks } from "node:module";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { parseSync, transformSync } from "@swc/core";
-import React from "react";
 import renderer from "next/dist/compiled/react-server-dom-webpack/server.node.js";
+import React from "react";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const sourceRoot = resolve(root, "site/src");
@@ -31,16 +31,23 @@ const sourceFiles = new Set([
   ...routes.map(([route]) => resolve(sourceRoot, "app", route, "page.tsx")),
   resolve(sourceRoot, "features/organizations/public-profile-server.ts"),
   resolve(sourceRoot, "features/organizations/server/public-profile.tsx"),
-  ...[
-    "i18n.ts",
-    "i18n-server.ts",
-    "profile-pagination.ts",
-    "public-user-trust-copy.ts",
-    "public-context-trust-copy.ts",
-    "publication-feed-copy.ts",
-    "verification-workspace-copy.ts",
-    "server-statistics-copy.ts",
-  ].map((file) => resolve(sourceRoot, "lib", file)),
+  resolve(sourceRoot, "features/servers/server-detail-server.ts"),
+  resolve(sourceRoot, "features/servers/server/server-detail-screen.tsx"),
+  resolve(sourceRoot, "features/accounts/user-profile-server.ts"),
+  resolve(sourceRoot, "features/accounts/server/user-profile-screen.tsx"),
+  resolve(sourceRoot, "features/accounts/developer-profile-server.ts"),
+  resolve(sourceRoot, "features/accounts/server/developer-profile-screen.tsx"),
+  resolve(sourceRoot, "features/shell/page-shell.ts"),
+  resolve(sourceRoot, "features/shell/panel-shell.ts"),
+  resolve(sourceRoot, "features/shell/link-shell.ts"),
+  resolve(sourceRoot, "features/shell/surface-shell.ts"),
+  resolve(sourceRoot, "features/shell/skeleton-shell.ts"),
+  resolve(sourceRoot, "features/shell/type-shell.ts"),
+  resolve(sourceRoot, "features/trust/public-user-trust-copy.ts"),
+  resolve(sourceRoot, "features/trust/public-context-trust-copy.ts"),
+  resolve(sourceRoot, "features/community/publication-feed-copy.ts"),
+  resolve(sourceRoot, "features/trust/verification-workspace-copy.ts"),
+  resolve(sourceRoot, "features/servers/server-statistics-copy.ts"),
   ...collectTsFiles(resolve(sourceRoot, "lib/i18n")),
 ]);
 const emptyPage = async () => ({
@@ -80,6 +87,11 @@ const read = async (kind, key) => {
 };
 const nothing = () => null;
 const mocks = {
+  "profile-pagination": {
+    ProfileResourcePagination: () => null,
+    parseProfilePage: (value) =>
+      typeof value === "string" && /^[1-9]\d{0,8}$/.test(value) ? Number(value) : 1,
+  },
   "@nexus/db": {
     userRepository: { findByUsername: (key) => read("user", key) },
     organizationRepository: { findBySlug: (key) => read("organization", key) },
@@ -165,14 +177,16 @@ function mockModule(specifier, names) {
   const key = mocks[specifier] ? specifier : mocks[id] ? id : null;
   const url = `nexus-rsc-fixture:${encodeURIComponent(specifier + JSON.stringify(names))}`;
   if (!virtualSources.has(url)) {
+    // Emit the remote export name (not the local alias). ESM
+    // `import { remote as local }` resolves against `export const remote`.
     const exports = names
-      .map(([local, exported]) => {
+      .map(([, exported]) => {
         const value = key
           ? `globalThis.__nexusRscMocks[${JSON.stringify(key)}][${JSON.stringify(exported)}]`
           : "() => null";
         return exported === "default"
           ? `export default ${value};`
-          : `export const ${local} = ${value};`;
+          : `export const ${exported} = ${value};`;
       })
       .join("\n");
     virtualSources.set(url, exports);
@@ -247,7 +261,7 @@ registerHooks({
   },
 });
 
-const { getRequestLocale } = await import(pathToFileURL(resolve(sourceRoot, "lib/i18n-server.ts")));
+const { getRequestLocale } = await import(pathToFileURL(resolve(sourceRoot, "lib/i18n/server.ts")));
 async function render(route, key, request) {
   const [name, parameter, kind] = route;
   const { default: Page, generateMetadata } = await import(

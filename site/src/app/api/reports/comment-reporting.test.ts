@@ -1,10 +1,11 @@
-import { NextRequest } from "next/server";
 import { AppError, NotFoundError } from "@nexus/domain";
+import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../../../../tests/helpers/browser-mutation-headers";
+import { reportsApiCopy } from "../../../features/moderation/reports-api-copy";
 
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
@@ -13,7 +14,7 @@ const mocks = vi.hoisted(() => ({
   createWithAudit: vi.fn(),
 }));
 
-vi.mock("../../../lib/services/auth-service", () => ({
+vi.mock("../../../lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
 vi.mock("@nexus/security", () => ({
@@ -93,7 +94,7 @@ describe("comment abuse reporting", () => {
     const response = await POST(request("cmt_missing"));
     expect(response.status).toBe(404);
     expect(await response.json()).toMatchObject({
-      error: "Report target not found",
+      error: reportsApiCopy("en").notFound,
     });
     expect(mocks.createWithAudit).toHaveBeenCalledOnce();
   });
@@ -104,7 +105,10 @@ describe("comment abuse reporting", () => {
     );
     const response = await POST(request());
     expect(response.status).toBe(422);
-    expect(await response.json()).toMatchObject({ error: "Own target", code: "REPORT_OWN_TARGET" });
+    expect(await response.json()).toMatchObject({
+      error: reportsApiCopy("en").cannotReportSelf,
+      code: "REPORT_OWN_TARGET",
+    });
   });
 
   it("rejects unsupported target types before target lookup", async () => {

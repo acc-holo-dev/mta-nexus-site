@@ -1,0 +1,14 @@
+import type { Metadata } from "next";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+
+export async function newTopicLayoutMetadata(): Promise<Metadata> {
+  return {
+    title: `${getDictionary(await getRequestLocale()).community.newTopic} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
+export function NewTopicPassthroughLayout({ children }: { children: React.ReactNode }) {
+  return children;
+}

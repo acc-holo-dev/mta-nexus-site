@@ -1,15 +1,18 @@
 import type { NextRequest } from "next/server";
+import { serversDirectoryApiCopy } from "../../../../features/servers/servers-directory-api-copy";
+import { resolveLocale } from "../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-} from "../../../../lib/observability";
-import { mtaMasterDirectoryService } from "../../../../lib/services/mta-master-directory-service";
+} from "../../../../lib/platform/observability";
+import { mtaMasterDirectoryService } from "../../../../lib/services/servers/mta-master-directory-service";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
+  const copy = serversDirectoryApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
 
   try {
     const directory = await mtaMasterDirectoryService.getDirectory();
@@ -43,7 +46,7 @@ export async function GET(request: NextRequest) {
     return jsonWithRequestId(
       context,
       {
-        error: "MTA server directory is temporarily unavailable",
+        error: copy.mtaUnavailable,
       },
       {
         status: 503,

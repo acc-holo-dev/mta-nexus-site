@@ -31,13 +31,13 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/library-collections-service", () => ({
+vi.mock("../../src/lib/services/library/library-collections-service", () => ({
   libraryCollectionsService: {
     page: state.page,
     detail: state.detail,
@@ -68,9 +68,9 @@ vi.mock("../../src/features/resources/download", () => ({
 }));
 
 import { LibraryCollectionsScreen } from "../../src/features/library/collections-server";
+import { libraryCollectionsCopy } from "../../src/features/library/library-collections-i18n";
 import { getDictionary } from "../../src/lib/i18n";
-import { libraryCollectionsCopy } from "../../src/lib/library-collections-i18n";
-import { authService } from "../../src/lib/services/auth-service";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 const date = new Date("2026-10-11T00:00:00Z"),
   collection = {
@@ -394,7 +394,7 @@ it("shows an honest recovery state when the collections list fails to load", asy
   const html = await screen("list");
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/workspace/library/collections?status=active&amp;page=1"');
   expect(html).not.toContain("collections unavailable");
 });

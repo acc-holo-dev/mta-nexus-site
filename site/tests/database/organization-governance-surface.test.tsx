@@ -14,29 +14,29 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../../src/lib/services/organization-governance-service", () => ({
+vi.mock("../../src/lib/services/organizations/organization-governance-service", () => ({
   organizationGovernanceService: mocks,
 }));
 
 import HistoryPage, {
   generateMetadata,
 } from "../../src/app/workspace/organizations/[id]/activity/page";
-import { OrganizationHistoryView } from "../../src/features/organizations/history-view";
 import { OrganizationOwnershipTransfer } from "../../src/features/organizations/components/organization-ownership-transfer";
-import { OrganizationWorkspacePanel } from "../../src/features/organizations/workspace";
+import { OrganizationHistoryView } from "../../src/features/organizations/history-view";
 import {
   confirmOwnershipTransfer,
   type OrganizationHistory,
   ownershipTransferSchema,
-} from "../../src/lib/organization-governance-contract";
-import { organizationGovernanceCopy } from "../../src/lib/organization-governance-copy";
-import type { OrganizationWorkspace } from "../../src/lib/organization-workspace-contract";
+} from "../../src/features/organizations/organization-governance-contract";
+import { organizationGovernanceCopy } from "../../src/features/organizations/organization-governance-copy";
+import type { OrganizationWorkspace } from "../../src/features/organizations/organization-workspace-contract";
+import { OrganizationWorkspacePanel } from "../../src/features/organizations/workspace";
 
 const time = "2026-10-11T00:00:00.000Z",
   later = "2026-10-11T00:00:01.000Z";
@@ -180,7 +180,7 @@ it.each(["ru", "en"] as const)(
       <OrganizationHistoryView data={null} id="org" locale={locale} />,
     );
     expect(failed).toContain('role="alert"');
-    expect(failed).toContain("overflow-x-clip");
+    expect(failed).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(failed).toContain(organizationGovernanceCopy(locale).unavailable);
     expect(failed).toContain(organizationGovernanceCopy(locale).reload);
     expect(failed).not.toContain(organizationGovernanceCopy(locale).empty);

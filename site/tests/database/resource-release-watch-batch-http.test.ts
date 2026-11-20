@@ -1,24 +1,27 @@
-import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../helpers/browser-mutation-headers";
+
 const h = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,
   rate: vi.fn(),
   page: vi.fn(),
   disable: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => h.user },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: h.rate, generateId: () => "aud_a" }));
 vi.mock("@nexus/db", () => ({
   resourceReleaseWatchesRepository: { page: h.page, disableBatch: h.disable },
 }));
-import { GET as exportPage } from "../../src/app/api/library/watches/export/route";
+
 import { POST as disable } from "../../src/app/api/library/watches/disable/route";
+import { GET as exportPage } from "../../src/app/api/library/watches/export/route";
+
 const command = { items: [{ productId: "prd_a", expectedRevision: 1 }] };
 const get = (query = "") =>
   new NextRequest(`https://nexus.test/api/library/watches/export${query}`);

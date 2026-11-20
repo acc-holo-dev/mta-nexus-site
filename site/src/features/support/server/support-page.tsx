@@ -3,14 +3,21 @@ import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
-import { supportQuery } from "../../../lib/support-workspace-contract";
-import { supportWorkspaceCopy } from "../../../lib/support-workspace-copy";
-import { PlatformGuestAuthPanel } from "../../../components/platform-guest-auth-panel";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { SupportCaseThread } from "../thread";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { PlatformGuestAuthPanel, PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
+import {
+  pageShellMax5xlBare,
+  pageShellMax5xlDenseTight,
+  pageShellMax5xlLooseTight,
+} from "../../shell/page-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary } from "../../shell/type-shell";
 import { SupportCenter } from "../center";
+import { supportQuery } from "../support-workspace-contract";
+import { supportWorkspaceCopy } from "../support-workspace-copy";
+import { SupportCaseThread } from "../thread";
 
 export async function supportMetadata(staff = false) {
   const copy = getDictionary(await getRequestLocale()).support;
@@ -44,31 +51,27 @@ export async function SupportPageSurface({
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   } catch {
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-4 overflow-x-clip">
-        <h1 className="font-display text-primary">{staff ? support.staffQueue : support.title}</h1>
-        <ErrorState
-          title={copy.unavailable}
-          action={
-            <Link
-              href={id === undefined ? listReturnPath : casePath}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {dictionary.errors.retry}
-            </Link>
-          }
-        />
-      </div>
+      <PlatformSessionError
+        locale={locale}
+        title={support.title}
+        message={copy.unavailable}
+        retryHref={id === undefined ? listReturnPath : casePath}
+      />
     );
   }
   if (!actor) {
     // Case detail uses the shared gate; the list keeps the Support H1 shell a11y asserts.
     if (id !== undefined) return <PlatformSignIn locale={locale} returnPath={casePath} />;
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-8 overflow-x-clip">
+      <div className={pageShellMax5xlLooseTight}>
         <header className="space-y-2 border-b border-base pb-6">
-          <h1 className="font-display text-primary">{support.title}</h1>
+          <h1 className={typeDisplayPrimary}>{support.title}</h1>
           <p className="max-w-3xl text-sm text-muted">{support.description}</p>
-          <ErrorState id="support-no-guaranteed-sla" title={support.noGuaranteedSla} />
+          <ErrorState
+            id="support-no-guaranteed-sla"
+            title={support.noGuaranteedSla}
+            description={support.noGuaranteedSlaHint}
+          />
         </header>
         <PlatformGuestAuthPanel locale={locale} returnPath={listReturnPath} />
       </div>
@@ -76,15 +79,13 @@ export async function SupportPageSurface({
   }
   if (staff && !can(actor, "admin.moderation"))
     return (
-      <div className="mx-auto min-w-0 max-w-5xl overflow-x-clip">
-        <h1 className="font-display text-primary">{support.staffQueue}</h1>
+      <div className={pageShellMax5xlBare}>
+        <h1 className={typeDisplayPrimary}>{support.staffQueue}</h1>
         <ErrorState
           title={copy.forbidden}
+          description={copy.forbiddenHint}
           action={
-            <Link
-              href="/support"
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href="/support" className={linkAccentSmRounded}>
               {support.title}
             </Link>
           }
@@ -100,15 +101,13 @@ export async function SupportPageSurface({
         actorId={actor.id}
       />
     ) : (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-4 overflow-x-clip">
-        <h1 className="font-display text-primary">{staff ? support.staffQueue : support.title}</h1>
+      <div className={pageShellMax5xlDenseTight}>
+        <h1 className={typeDisplayPrimary}>{staff ? support.staffQueue : support.title}</h1>
         <ErrorState
           title={copy.notFound}
+          description={copy.notFoundHint}
           action={
-            <Link
-              href={base}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={base} className={linkAccentSmRounded}>
               {support.back}
             </Link>
           }
@@ -118,15 +117,13 @@ export async function SupportPageSurface({
   const filters = supportQuery(params);
   if (!filters)
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-4 overflow-x-clip">
-        <h1 className="font-display text-primary">{staff ? support.staffQueue : support.title}</h1>
+      <div className={pageShellMax5xlDenseTight}>
+        <h1 className={typeDisplayPrimary}>{staff ? support.staffQueue : support.title}</h1>
         <ErrorState
           title={copy.queryInvalid}
+          description={copy.queryInvalidHint}
           action={
-            <Link
-              href={base}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={base} className={linkAccentSmRounded}>
               {copy.reset}
             </Link>
           }
@@ -146,4 +143,31 @@ export async function SupportPageSurface({
       key={`${actor.id}:${params.toString()}`}
     />
   );
+}
+
+export const memberSupportMetadata = () => supportMetadata(false);
+export const adminSupportMetadata = () => supportMetadata(true);
+
+export function MemberSupportQueuePage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return SupportPageSurface({ searchParams });
+}
+
+export function AdminSupportQueuePage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return SupportPageSurface({ searchParams, staff: true });
+}
+
+export async function MemberSupportCasePage({ params }: { params: Promise<{ id: string }> }) {
+  return SupportPageSurface({ id: (await params).id });
+}
+
+export async function AdminSupportCasePage({ params }: { params: Promise<{ id: string }> }) {
+  return SupportPageSurface({ id: (await params).id, staff: true });
 }

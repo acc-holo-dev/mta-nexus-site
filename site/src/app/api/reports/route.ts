@@ -1,17 +1,20 @@
-import { reportRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 import { createReportSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
-import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../lib/browser-route-adapter";
+import { reportsApiCopy } from "../../../features/moderation/reports-api-copy";
+import { readBoundedJson, requireServerJsonContentType } from "../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../lib/http/browser-route-adapter";
+import { localeAppErrorText } from "../../../lib/http/locale-app-error";
+import { resolveLocale } from "../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-} from "../../../lib/observability";
-import { isPostgresDeadlock } from "../../../lib/postgres-error";
-import { authService } from "../../../lib/services/auth-service";
+} from "../../../lib/platform/observability";
+import { isPostgresDeadlock } from "../../../lib/platform/postgres-error";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { platformReportService } from "../../../lib/services/moderation/platform-report-service";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 
@@ -28,21 +31,22 @@ function privateJson(
 
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
+  const copy = reportsApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
 
     if (!user || !can(user, "admin.moderation")) {
-      return privateJson(context, { error: "Unauthorized" }, { status: 403 });
+      return privateJson(context, { error: copy.unauthorized }, { status: 403 });
     }
 
     const rawPage = request.nextUrl.searchParams.get("page") ?? "1";
     const view = request.nextUrl.searchParams.get("view") ?? "pending";
     if (!/^[1-9]\d{0,4}$/.test(rawPage) || !["pending", "history"].includes(view)) {
-      return privateJson(context, { error: "Invalid report page or view" }, { status: 400 });
+      return privateJson(context, { error: copy.invalidPageOrView }, { status: 400 });
     }
     const page = Number(rawPage);
-    const result = await reportRepository.listPage(view as "pending" | "history", page);
+    const result = await platformReportService.listPage(view as "pending" | "history", page);
     return privateJson(context, { ...result, page, view });
   } catch (error: unknown) {
     logRequestEvent({
@@ -52,33 +56,26 @@ export async function GET(request: NextRequest) {
       status: 500,
       error,
     });
-    return privateJson(context, { error: "Failed to load reports" }, { status: 500 });
+    return privateJson(context, { error: copy.listFailed }, { status: 500 });
   }
 }
 
 export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
+  const copy = reportsApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
 
     if (!token || !user) {
-      return privateJson(
-        context,
-        { error: "Authentication required to submit report" },
-        { status: 401 },
-      );
+      return privateJson(context, { error: copy.authenticationRequired }, { status: 401 });
     }
 
     requireServerJsonContentType(request);
     // Abuse protection: limit report spam per user
     const rl = await consumeRateLimit("report", user.id);
     if (!rl.success) {
-      return privateJson(
-        context,
-        { error: "Too many reports submitted. Please try again later." },
-        { status: 429 },
-      );
+      return privateJson(context, { error: copy.rate }, { status: 429 });
     }
 
     const body = await readBoundedJson(request);
@@ -87,17 +84,17 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     if (!parsed.success) {
       return privateJson(
         context,
-        { error: "Validation error", details: parsed.error.format() },
+        { error: copy.validationFailed, details: parsed.error.format() },
         { status: 400 },
       );
     }
 
     if (parsed.data.targetType === "user" && parsed.data.targetId === user.id) {
-      return privateJson(context, { error: "You cannot report your own account" }, { status: 422 });
+      return privateJson(context, { error: copy.cannotReportSelf }, { status: 422 });
     }
 
     const reportId = generateId("rpt");
-    const result = await reportRepository.createWithAudit(
+    const result = await platformReportService.createWithAudit(
       {
         id: reportId,
         reporterId: user.id,
@@ -122,7 +119,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     if (!result.created) {
       return privateJson(
         context,
-        { error: "You already have an open report for this target", reportId: result.report.id },
+        { error: copy.alreadyOpen, reportId: result.report.id },
         { status: 409 },
       );
     }
@@ -131,11 +128,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     return privateJson(context, { success: true, report }, { status: 201 });
   } catch (error: unknown) {
     if (isPostgresDeadlock(error))
-      return privateJson(
-        context,
-        { code: "REPORT_RETRY", error: "Please retry submitting the report" },
-        { status: 409 },
-      );
+      return privateJson(context, { code: "REPORT_RETRY", error: copy.retry }, { status: 409 });
     if (
       error instanceof AppError &&
       [
@@ -151,7 +144,23 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     ) {
       return privateJson(
         context,
-        { error: error.message, code: error.code },
+        {
+          error: localeAppErrorText(
+            error,
+            {
+              unauthorized: copy.authenticationRequired,
+              forbidden: copy.forbidden,
+              notFound: copy.notFound,
+              unsupportedMediaType: copy.unsupportedMediaType,
+              requestBodyTooLarge: copy.requestBodyTooLarge,
+              invalidBodyLength: copy.invalidBodyLength,
+              requestBodyTimeout: copy.requestBodyTimeout,
+              failed: copy.submitFailed,
+            },
+            { REPORT_OWN_TARGET: copy.cannotReportSelf },
+          ),
+          code: error.code,
+        },
         { status: error.statusCode },
       );
     }
@@ -162,6 +171,6 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       status: 500,
       error,
     });
-    return privateJson(context, { error: "Failed to submit report" }, { status: 500 });
+    return privateJson(context, { error: copy.submitFailed }, { status: 500 });
   }
 });

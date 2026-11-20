@@ -1,33 +1,52 @@
 import { buildRepository } from "@nexus/db";
 import { EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../components/auth-return-path";
+import { getDictionary, type Locale } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { unknownMarker } from "../../../lib/i18n/unknown";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { commerceService } from "../../../lib/services/commerce/commerce-service";
+import { productService } from "../../../lib/services/commerce/product-service";
+import { formatHistoryDate } from "../../commerce/commerce-history-format";
+import { authEntryHref } from "../../shell/auth-return";
+import { GuestAuthLinks } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
+import { pageShellMax5xlMid, pageShellStack4 } from "../../shell/page-shell";
+import { panelClipSpace4P5 } from "../../shell/panel-shell";
+import { surfaceBgP4TextSmMuted, surfaceSpace3BorderBPb6 } from "../../shell/surface-shell";
+import {
+  typeBreakSecondary,
+  typeDisplayPrimary,
+  typeFlexWrapStartBetweenGap3,
+  typeMax2xlSmSecondary,
+  typeMinSpace1,
+  typePrewrapSmSecondary,
+  typeSmSecondary,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import { BuildPackageSummaryPanel } from "../components/build-package-evidence";
 import { BuildProvenanceDetails } from "../components/build-provenance-details";
-import { GuestAuthLinks } from "../../../components/guest-auth-links";
 import { ResourceDownloadButton } from "../components/resource-download-button";
-import { formatHistoryDate } from "../../../lib/commerce-history-format";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
 import {
   getReleaseHistoryCopy,
   parseReleaseHistoryPage,
   releaseHistoryHref,
-} from "../../../lib/public-release-history";
-import { authService } from "../../../lib/services/auth-service";
-import { commerceService } from "../../../lib/services/commerce-service";
-import { productService } from "../../../lib/services/product-service";
+} from "../public-release-history";
 
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-7 overflow-x-clip py-8";
-const actionLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
-function formatBuildSize(bytes: number): string {
-  if (!Number.isSafeInteger(bytes) || bytes <= 0) return "—";
+function formatBuildSize(bytes: number, locale: Locale): string {
+  if (!Number.isSafeInteger(bytes) || bytes <= 0) return unknownMarker(locale);
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.ceil(bytes / 1024))} KiB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MiB`;
+}
+
+export async function publicResourceVersionsMetadata(): Promise<Metadata> {
+  return {
+    title: `${getReleaseHistoryCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
 }
 
 export async function PublicResourceVersionsPage({
@@ -55,15 +74,16 @@ export async function PublicResourceVersionsPage({
     product = await productService.getProductBySlug(slug);
   } catch {
     return (
-      <div className={pageShellClass}>
-        <header className="space-y-3 border-b border-base pb-6">
-          <h1 className="font-display text-primary">{copy.title}</h1>
-          <p className="max-w-2xl text-sm text-secondary">{copy.intro}</p>
+      <div className={pageShellMax5xlMid}>
+        <header className={surfaceSpace3BorderBPb6}>
+          <h1 className={typeDisplayPrimary}>{copy.title}</h1>
+          <p className={typeMax2xlSmSecondary}>{copy.intro}</p>
         </header>
         <ErrorState
           title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
           action={
-            <Link href={releaseHistoryHref(slug, requestedPage)} className={actionLinkClass}>
+            <Link href={releaseHistoryHref(slug, requestedPage)} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -73,9 +93,13 @@ export async function PublicResourceVersionsPage({
   }
   if (!product) notFound();
 
-  const user = await authService
-    .getSession(cookieStore.get("nexus_session")?.value)
-    .catch(() => null);
+  let user: Awaited<ReturnType<typeof authService.getSession>> | null = null;
+  let sessionFailed = false;
+  try {
+    user = await authService.getSession(cookieStore.get("nexus_session")?.value);
+  } catch {
+    sessionFailed = true;
+  }
   const history = await buildRepository
     .pagePublishedReleases(product.id, requestedPage)
     .catch(() => null);
@@ -83,22 +107,23 @@ export async function PublicResourceVersionsPage({
 
   if (!history) {
     return (
-      <div className={pageShellClass}>
-        <header className="space-y-3 border-b border-base pb-6">
-          <Link href={back} className={actionLinkClass}>
+      <div className={pageShellMax5xlMid}>
+        <header className={surfaceSpace3BorderBPb6}>
+          <Link href={back} className={linkAccentSmRounded}>
             {copy.back}
           </Link>
-          <h1 className="font-display text-primary">
+          <h1 className={typeDisplayPrimary}>
             {product.title} — {copy.title}
           </h1>
-          <p className="max-w-2xl text-sm text-secondary">{copy.intro}</p>
+          <p className={typeMax2xlSmSecondary}>{copy.intro}</p>
         </header>
         <ErrorState
           title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
           action={
             <Link
               href={releaseHistoryHref(product.slug, requestedPage)}
-              className={actionLinkClass}
+              className={linkAccentSmRounded}
             >
               {dictionary.errors.retry}
             </Link>
@@ -127,33 +152,33 @@ export async function PublicResourceVersionsPage({
     : false;
 
   return (
-    <div className={pageShellClass}>
-      <header className="space-y-3 border-b border-base pb-6">
-        <Link href={back} className={actionLinkClass}>
+    <div className={pageShellMax5xlMid}>
+      <header className={surfaceSpace3BorderBPb6}>
+        <Link href={back} className={linkAccentSmRounded}>
           {copy.back}
         </Link>
-        <h1 className="font-display text-primary">
+        <h1 className={typeDisplayPrimary}>
           {product.title} — {copy.title}
         </h1>
-        <p className="max-w-2xl text-sm text-secondary">{copy.intro}</p>
+        <p className={typeMax2xlSmSecondary}>{copy.intro}</p>
       </header>
 
-      <p role="note" className="rounded-lg border border-base bg-surface p-4 text-sm text-muted">
+      <p role="note" className={surfaceBgP4TextSmMuted}>
         {copy.warning}
       </p>
 
       {history.releases.length === 0 ? (
         <EmptyState title={copy.noBuilds} description={copy.noBuildsHint} />
       ) : (
-        <ol className="min-w-0 space-y-4 overflow-x-clip">
+        <ol className={pageShellStack4}>
           {history.releases.map((release) => (
-            <li key={release.id} className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5">
-              <header className="flex flex-wrap items-start justify-between gap-3">
-                <div className="min-w-0 space-y-1">
+            <li key={release.id} className={panelClipSpace4P5}>
+              <header className={typeFlexWrapStartBetweenGap3}>
+                <div className={typeMinSpace1}>
                   <h2 className="text-base font-semibold text-primary">
                     {copy.version} {release.version}
                   </h2>
-                  <p className="text-xs text-muted">
+                  <p className={typeXsMuted}>
                     {copy.released}{" "}
                     <time dateTime={release.createdAt.toISOString()}>
                       {formatHistoryDate(release.createdAt, locale)}
@@ -168,7 +193,9 @@ export async function PublicResourceVersionsPage({
               <dl className="grid gap-3 text-xs sm:grid-cols-2">
                 <div>
                   <dt className="text-muted">{copy.size}</dt>
-                  <dd className="text-secondary">{formatBuildSize(release.fileSizeBytes)}</dd>
+                  <dd className="text-secondary">
+                    {formatBuildSize(release.fileSizeBytes, locale)}
+                  </dd>
                 </div>
                 <div>
                   <dt className="text-muted">{copy.target}</dt>
@@ -176,7 +203,7 @@ export async function PublicResourceVersionsPage({
                 </div>
                 <div>
                   <dt className="text-muted">{copy.scanner}</dt>
-                  <dd className="break-words text-secondary">{release.scanner}</dd>
+                  <dd className={typeBreakSecondary}>{release.scanner}</dd>
                 </div>
                 <div>
                   <dt className="text-muted">{copy.released}</dt>
@@ -192,19 +219,17 @@ export async function PublicResourceVersionsPage({
                 </div>
               </dl>
 
-              <div className="min-w-0 space-y-1">
-                <p className="text-xs text-muted">{copy.checksum}</p>
+              <div className={typeMinSpace1}>
+                <p className={typeXsMuted}>{copy.checksum}</p>
                 <code className="block select-all break-all rounded-md border border-base bg-inset px-3 py-2 text-xs text-secondary">
                   {release.sha256Hash}
                 </code>
-                <p className="text-xs text-muted">
-                  {release.isSigned ? copy.signed : copy.unsigned}
-                </p>
+                <p className={typeXsMuted}>{release.isSigned ? copy.signed : copy.unsigned}</p>
               </div>
 
               <div className="space-y-2">
                 <h3 className="text-xs font-semibold text-primary">{copy.notes}</h3>
-                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
+                <p className={typePrewrapSmSecondary}>
                   {release.releaseNotes?.trim() || copy.noNotes}
                 </p>
               </div>
@@ -242,11 +267,22 @@ export async function PublicResourceVersionsPage({
       )}
 
       {!canDownload && (
-        <div className="text-sm text-secondary">
-          {user ? (
+        <div className={typeSmSecondary}>
+          {sessionFailed ? (
+            <ErrorState
+              id="resource-versions-session-unavailable"
+              title={copy.sessionUnavailable}
+              description={copy.sessionUnavailableDescription}
+              action={
+                <Link href={returnPath} className={linkAccentSmRounded}>
+                  {dictionary.errors.retry}
+                </Link>
+              }
+            />
+          ) : user ? (
             <Link
               href={`/acquire?productId=${encodeURIComponent(product.id)}`}
-              className={actionLinkClass}
+              className={linkAccentSmRounded}
             >
               {copy.acquire}
             </Link>
@@ -268,7 +304,7 @@ export async function PublicResourceVersionsPage({
         >
           {history.page > 1 ? (
             <Link
-              className={actionLinkClass}
+              className={linkAccentSmRounded}
               href={releaseHistoryHref(product.slug, history.page - 1)}
             >
               {copy.previous}
@@ -281,7 +317,7 @@ export async function PublicResourceVersionsPage({
           </span>
           {history.page < history.totalPages ? (
             <Link
-              className={actionLinkClass}
+              className={linkAccentSmRounded}
               href={releaseHistoryHref(product.slug, history.page + 1)}
             >
               {copy.next}

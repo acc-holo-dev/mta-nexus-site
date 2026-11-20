@@ -1,0 +1,214 @@
+import type { Locale } from "../../lib/i18n";
+import { userPlatformError } from "../community/user-platform-copy";
+import { organizationBatchCopy } from "./organization-batch-copy";
+
+const en = {
+  leave: "Leave organization",
+  leaveConfirm: "Leave this organization? Your team and delegated access will be revoked.",
+  title: "My organizations",
+  description: "Manage your organization profile, team and delegated server access.",
+  create: "Create organization",
+  empty: "You have no organizations yet.",
+  emptyHint: "Create an organization to manage a shared profile, team and delegated server access.",
+  emptyFiltered: "No organizations match this search.",
+  emptyFilteredHint: "Try another name or clear the search to see all of your organizations.",
+  clearSearch: "Clear search",
+  search: "Search organizations",
+  searchTeam: "Search team members",
+  filter: "Search",
+  previous: "Previous",
+  next: "Next",
+  page: "Page",
+  name: "Organization name",
+  slug: "Public address",
+  slugHelp:
+    "3–80 lowercase letters, numbers and hyphens. The address stays the same after creation.",
+  descriptionLabel: "Description",
+  logo: "Logo URL",
+  website: "Website URL",
+  profile: "Public profile",
+  save: "Save profile",
+  saving: "Saving…",
+  saved: "Changes saved.",
+  open: "Open workspace",
+  publicView: "View public page",
+  reload: "Reload current data",
+  listLoading: "Loading organizations…",
+  loading: "Loading organization…",
+  unavailable: "Unable to load the organization. Please try again.",
+  unavailableHint:
+    "Retry reloads this organization list only. A temporary load failure is not an empty organization directory.",
+  invalid: "Check the fields and URL format.",
+  team: "Team",
+  username: "Username",
+  usernameHelp: "Enter the exact username of an existing Nexus account, without @.",
+  add: "Add member",
+  role: "Role",
+  owner: "Owner",
+  admin: "Administrator",
+  developer: "Developer",
+  member: "Member",
+  serverAccess: "Delegated server management",
+  accessHelp:
+    "Owners and administrators already manage servers. This permission also lets other team roles manage the organization's servers.",
+  roleHelp:
+    "Administrators manage the public profile, resources, servers and regular team members. Only the owner can appoint or remove administrators. Commercial permissions already assigned to a member are preserved.",
+  ownerHelp:
+    "Only the owner can transfer ownership to a current team member, with explicit confirmation in the team workspace.",
+  remove: "Remove member",
+  removeConfirm:
+    "Remove this member from the organization? Their organizational access will be revoked.",
+  updateMember: "Save member",
+  noMembers: "No members match this search.",
+  noMembersHint: "Try another search or clear it to see the current team page.",
+  readOnly: "You can view this team. Profile and team changes require an owner or administrator.",
+  readOnlyHint:
+    "Viewing the team does not grant edit access. Open the organization workspace as an owner or administrator to change the profile or membership.",
+  back: "All organizations",
+  errorConflict: "The organization or team changed. Reload current data before saving again.",
+  profileChanged: "The saved organization changed. Compare it with your draft before continuing.",
+  profileLatest: "Latest saved organization profile",
+  profileCheck: "Check saved profile",
+  profileUseLatest: "Use this version as the basis for my draft",
+  profileDraftHelp:
+    "Your draft is kept. Using this version as the basis keeps it; saving will replace the profile fields.",
+  profileVerify: "Verify your account to view the draft",
+  profileActorChanged: "The signed-in account changed. The previous account's draft was closed.",
+  errorExists: "This account already belongs to the organization.",
+  errorMember: "The account or team member was not found.",
+  errorProtected: "You cannot change this member or assign this role.",
+  errorSlug: "This public address is already in use.",
+  added: "Member added.",
+  removed: "Member removed.",
+  updated: "Member updated.",
+  createHelp:
+    "The organization will be owned by your personal account. Verification is handled separately.",
+  restoreFailed: "Could not verify the session or restore the draft.",
+  creationUnconfirmed:
+    "The organization is not confirmed yet. The original request may still complete; creating another is blocked.",
+  resultCheckFailed: "Could not check the result. Sign in to the original account and try again.",
+  checkResult: "Check result",
+};
+const ru: Record<keyof typeof en, string> = {
+  leave: "Покинуть организацию",
+  leaveConfirm: "Покинуть организацию? Доступ команды и делегированные разрешения будут отозваны.",
+  title: "Мои организации",
+  description: "Управляйте профилем организации, командой и доступом к серверам.",
+  create: "Создать организацию",
+  empty: "У вас пока нет организаций.",
+  emptyHint:
+    "Создайте организацию, чтобы вести общий профиль, команду и делегированный доступ к серверам.",
+  emptyFiltered: "По этому запросу организаций нет.",
+  emptyFilteredHint:
+    "Попробуйте другое название или сбросьте поиск, чтобы увидеть все организации.",
+  clearSearch: "Сбросить поиск",
+  search: "Поиск организаций",
+  searchTeam: "Поиск участников",
+  filter: "Найти",
+  previous: "Назад",
+  next: "Далее",
+  page: "Страница",
+  name: "Название организации",
+  slug: "Публичный адрес",
+  slugHelp: "3–80 строчных латинских букв, цифр и дефисов. После создания адрес не меняется.",
+  descriptionLabel: "Описание",
+  logo: "URL логотипа",
+  website: "URL сайта",
+  profile: "Публичный профиль",
+  save: "Сохранить профиль",
+  saving: "Сохранение…",
+  saved: "Изменения сохранены.",
+  open: "Открыть кабинет",
+  publicView: "Публичная страница",
+  reload: "Загрузить актуальные данные",
+  listLoading: "Загрузка организаций…",
+  loading: "Загрузка организации…",
+  unavailable: "Не удалось загрузить организацию. Попробуйте ещё раз.",
+  unavailableHint:
+    "Повтор обновляет только этот список организаций. Временный сбой загрузки — не пустой каталог организаций.",
+  invalid: "Проверьте поля и формат URL.",
+  team: "Команда",
+  username: "Username",
+  usernameHelp: "Точный username существующего аккаунта Nexus, без @.",
+  add: "Добавить участника",
+  role: "Роль",
+  owner: "Владелец",
+  admin: "Администратор",
+  developer: "Разработчик",
+  member: "Участник",
+  serverAccess: "Делегированное управление серверами",
+  accessHelp:
+    "Владельцы и администраторы уже управляют серверами. Это разрешение даёт доступ к управлению серверами и другим ролям команды.",
+  roleHelp:
+    "Администраторы управляют публичным профилем, ресурсами, серверами и обычными участниками команды. Только владелец назначает и удаляет администраторов. Ранее выданные коммерческие разрешения участника сохраняются.",
+  ownerHelp:
+    "Только владелец может передать владение действующему участнику с отдельным подтверждением в кабинете команды.",
+  remove: "Удалить участника",
+  removeConfirm: "Удалить участника из организации? Его организационный доступ будет отозван.",
+  updateMember: "Сохранить участника",
+  noMembers: "По этому запросу участники не найдены.",
+  noMembersHint:
+    "Попробуйте другой поиск или сбросьте его, чтобы увидеть текущую страницу команды.",
+  readOnly:
+    "Вы можете просматривать команду. Для изменения профиля и команды нужны права владельца или администратора.",
+  readOnlyHint:
+    "Просмотр команды не даёт прав на изменения. Откройте кабинет организации как владелец или администратор, чтобы менять профиль или состав.",
+  back: "Все организации",
+  errorConflict:
+    "Организация или команда изменились. Загрузите актуальные данные перед повторным сохранением.",
+  profileChanged:
+    "Сохранённый профиль организации изменился. Сравните его с черновиком перед продолжением.",
+  profileLatest: "Последний сохранённый профиль организации",
+  profileCheck: "Проверить сохранённый профиль",
+  profileUseLatest: "Использовать эту версию как основу черновика",
+  profileDraftHelp:
+    "Черновик сохранён. Выбор этой версии оставит его в форме; при сохранении поля профиля будут заменены.",
+  profileVerify: "Подтвердить аккаунт, чтобы увидеть черновик",
+  profileActorChanged: "Аккаунт изменился. Черновик предыдущего аккаунта закрыт.",
+  errorExists: "Этот аккаунт уже состоит в организации.",
+  errorMember: "Аккаунт или участник команды не найден.",
+  errorProtected: "Вы не можете изменить этого участника или назначить эту роль.",
+  errorSlug: "Этот публичный адрес уже занят.",
+  added: "Участник добавлен.",
+  removed: "Участник удалён.",
+  updated: "Данные участника сохранены.",
+  createHelp:
+    "Организация будет принадлежать вашему личному аккаунту. Верификация выполняется отдельно.",
+  restoreFailed: "Не удалось проверить сессию или восстановить черновик.",
+  creationUnconfirmed:
+    "Организация пока не подтверждена. Исходный запрос ещё может завершиться; повторное создание заблокировано.",
+  resultCheckFailed:
+    "Не удалось проверить результат. Войдите в исходный аккаунт и попробуйте снова.",
+  checkResult: "Проверить результат",
+};
+export const getOrganizationCopy = (locale: Locale) => (locale === "ru" ? ru : en);
+export function organizationError(locale: Locale, code: unknown) {
+  const copy = getOrganizationCopy(locale);
+  switch (code) {
+    case "BATCH_NO_CHANGES":
+      return organizationBatchCopy(locale).noChanges;
+    case "CONFLICT":
+      return copy.errorConflict;
+    case "MEMBER_EXISTS":
+      return copy.errorExists;
+    case "MEMBER_NOT_FOUND":
+      return copy.errorMember;
+    case "MEMBER_PROTECTED":
+    case "FORBIDDEN":
+      return copy.errorProtected;
+    case "SLUG_CONFLICT":
+      return copy.errorSlug;
+    case "UNAUTHORIZED":
+    case "ACTOR_ID_REQUIRED":
+      return copy.restoreFailed;
+    case "ACTOR_CHANGED":
+      return copy.profileActorChanged;
+    case "RATE_LIMIT_EXCEEDED":
+    case "RATE_LIMITED":
+      return copy.resultCheckFailed;
+    case "VALIDATION_ERROR":
+      return copy.invalid;
+    default:
+      return userPlatformError(locale, code);
+  }
+}

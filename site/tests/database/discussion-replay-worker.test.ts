@@ -1,10 +1,10 @@
 import { expect, it, vi } from "vitest";
-import { replayDiscussionNotifications } from "../../src/lib/services/discussion-notification-replay";
+import { replayDiscussionNotifications } from "../../src/lib/services/community/discussion-notification-replay";
 import {
   DiscussionReplayPermanentError,
   isRetryableDiscussionReplayFailure,
   runDiscussionReplayWorker,
-} from "../../src/lib/services/discussion-replay-worker";
+} from "../../src/lib/services/community/discussion-replay-worker";
 
 const complete = { blocked: false, checkpoint: { completed: true } };
 const pending = { blocked: false, checkpoint: { completed: false } };

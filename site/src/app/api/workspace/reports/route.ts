@@ -1,15 +1,18 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { reportFilters, reportRateLimit } from "../../../../lib/community-report-api";
-import { communityReportCreateSchema } from "../../../../lib/community-report-contract";
+import { userPlatformApi } from "../../../../features/accounts/user-platform-api";
+import {
+  reportFilters,
+  reportRateLimit,
+} from "../../../../features/community/community-report-api";
+import { communityReportCreateSchema } from "../../../../features/community/community-report-contract";
 import {
   communityReportError,
   communityReportMutationError,
-} from "../../../../lib/community-report-copy";
-import { communityReportService } from "../../../../lib/services/community-report-service";
-import { userPlatformApi } from "../../../../lib/user-platform-api";
+} from "../../../../features/community/community-report-copy";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { communityReportService } from "../../../../lib/services/community/community-report-service";
 export async function GET(request: NextRequest) {
   return userPlatformApi(
     request,

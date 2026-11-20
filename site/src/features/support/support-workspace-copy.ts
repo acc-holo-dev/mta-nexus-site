@@ -1,0 +1,151 @@
+import type { Locale } from "../../lib/i18n";
+export class SupportClientFailure extends Error {}
+export function supportWorkspaceCopy(locale: Locale) {
+  return locale === "ru"
+    ? {
+        search: "Поиск по теме или номеру",
+        apply: "Применить фильтры",
+        reset: "Сбросить фильтры",
+        noMatches: "По выбранным фильтрам обращений нет.",
+        queryInvalid: "Некорректные фильтры обращений.",
+        queryInvalidHint:
+          "Сброс очищает только фильтры обращений. Некорректные фильтры — не пустой список и не отказ в доступе.",
+        resolveOwn: "Моя проблема решена",
+        reopenOwn: "Проблема осталась",
+        ownHelp:
+          "Отметьте проблему решённой или переоткройте решённое обращение. Закрытое сотрудником обращение может переоткрыть только сотрудник.",
+        resolvedReplyReopens: "Ответ в решённом обращении снова откроет его.",
+        confirmStatus: "Изменить статус обращения?",
+        confirmStatusNote: "Новый статус сохранится только после подтверждения.",
+        cancel: "Отмена",
+        saved: "Состояние обращения сохранено.",
+        replySaved: "Ответ сохранён.",
+        created: "Обращение создано.",
+        reload: "Загрузить актуальное состояние",
+        savedRefresh:
+          "Изменение сохранено, но обновить список не удалось. Откройте обращение или повторите загрузку.",
+        uncertain:
+          "Ответ сервера не подтверждён. Загрузите актуальное состояние. Повторная отправка того же сообщения использует сохранённый ключ запроса.",
+        history: "История статусов",
+        historyEmpty: "Изменений статуса пока нет.",
+        historyEmptyHint:
+          "Изменения статуса появятся здесь после обновления обращения вами или сотрудником. Пустая история — не ошибка загрузки.",
+        historyUnavailable: "Не удалось загрузить историю статусов.",
+        historyUnavailableDescription:
+          "Ошибка загрузки — это не пустая история. Повторите запрос, чтобы получить актуальные события статуса.",
+        historyExpired: "Страница истории больше недоступна. Откройте последние события.",
+        older: "Ранее",
+        latest: "Последние события",
+        auth: "Для работы с обращениями войдите в аккаунт.",
+        forbidden: "Нет прав на это действие.",
+        forbiddenHint:
+          "Вернитесь к списку обращений. Отказ в праве — не сбой загрузки и не удалённое обращение.",
+        notFound: "Обращение недоступно.",
+        notFoundHint:
+          "Откройте актуальный список обращений. Недоступность — не пустой фильтр и не временный сбой сервиса.",
+        invalid: "Проверьте поля запроса.",
+        tooLarge: "Сообщение слишком большое.",
+        media: "Требуется запрос JSON.",
+        rate: "Слишком много запросов. Повторите позднее.",
+        unavailable: "Сервис поддержки временно недоступен.",
+        conflict: "Обращение изменилось. Загрузите актуальное состояние перед повторной попыткой.",
+        closed: "Обращение закрыто. Переоткрыть его может сотрудник поддержки.",
+        keyConflict:
+          "Ключ запроса уже использован для другого сообщения. Загрузите актуальное состояние.",
+      }
+    : {
+        search: "Search subject or case number",
+        apply: "Apply filters",
+        reset: "Reset filters",
+        noMatches: "No cases match these filters.",
+        queryInvalid: "Invalid support case filters.",
+        queryInvalidHint:
+          "Reset clears only these support filters. Invalid filters are not an empty list and do not deny access.",
+        resolveOwn: "My problem is solved",
+        reopenOwn: "I still need help",
+        ownHelp:
+          "Mark your problem as solved or reopen a resolved case. Only staff can reopen a case that staff closed.",
+        resolvedReplyReopens: "A reply on a resolved case reopens it.",
+        confirmStatus: "Change this case status?",
+        confirmStatusNote: "The new status is saved only after you confirm.",
+        cancel: "Cancel",
+        saved: "Case status saved.",
+        replySaved: "Reply saved.",
+        created: "Support case created.",
+        reload: "Load current state",
+        savedRefresh:
+          "The change was saved, but the list could not refresh. Open the case or reload the list.",
+        uncertain:
+          "The server response is unconfirmed. Load the current state. Retrying the same message reuses its saved request key.",
+        history: "Status history",
+        historyEmpty: "No status changes yet.",
+        historyEmptyHint:
+          "Status changes appear here after you or staff update this case. An empty history is not a load failure.",
+        historyUnavailable: "Could not load status history.",
+        historyUnavailableDescription:
+          "A load failure is not an empty history. Retry to fetch the latest status events for this case.",
+        historyExpired: "This history page is no longer available. Open the latest events.",
+        older: "Older",
+        latest: "Latest events",
+        auth: "Sign in to work with support cases.",
+        forbidden: "You cannot perform this action.",
+        forbiddenHint:
+          "Return to the support case list. Missing permission is not a load failure and does not mean the case was deleted.",
+        notFound: "Support case is unavailable.",
+        notFoundHint:
+          "Open the current support list. Unavailability is not an empty filter and not a temporary service outage.",
+        invalid: "Check the request fields.",
+        tooLarge: "The message is too large.",
+        media: "A JSON request is required.",
+        rate: "Too many requests. Try again later.",
+        unavailable: "Support is temporarily unavailable.",
+        conflict: "This case changed. Load the current state before trying again.",
+        closed: "This case is closed. Support staff can reopen it.",
+        keyConflict: "This request key was used for another message. Load the current state.",
+      };
+}
+export function supportWorkspaceError(locale: Locale, code: unknown) {
+  const c = supportWorkspaceCopy(locale);
+  switch (code) {
+    case "UNAUTHORIZED":
+    case 401:
+      return c.auth;
+    case "FORBIDDEN":
+    case 403:
+      return c.forbidden;
+    case "NOT_FOUND":
+    case 404:
+      return c.notFound;
+    case "SUPPORT_ACTIVITY_EXPIRED":
+      return c.historyExpired;
+    case "VALIDATION_ERROR":
+    case "SUPPORT_IDEMPOTENCY_KEY_INVALID":
+    case 400:
+      return c.invalid;
+    case "SUPPORT_BODY_TOO_LARGE":
+    case "PAYLOAD_TOO_LARGE":
+    case 413:
+      return c.tooLarge;
+    case "UNSUPPORTED_MEDIA_TYPE":
+    case 415:
+      return c.media;
+    case "RATE_LIMIT_EXCEEDED":
+    case "RATE_LIMITED":
+    case 429:
+      return c.rate;
+    case "SUPPORT_IDEMPOTENCY_CONFLICT":
+      return c.keyConflict;
+    case "SUPPORT_CASE_CLOSED":
+      return c.closed;
+    case "SUPPORT_MESSAGE_CONFLICT":
+    case "SUPPORT_STATUS_CONFLICT":
+    case "CONFLICT":
+    case "ACTOR_CHANGED":
+    case 409:
+      return c.conflict;
+    case "ACTOR_ID_REQUIRED":
+      return c.auth;
+    default:
+      return c.unavailable;
+  }
+}

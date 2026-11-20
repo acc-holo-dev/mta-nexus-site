@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { readFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import test from "node:test";
@@ -127,6 +127,74 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "copy-view",
     "publisher-view",
     "publisher-navigation",
+    "resource-submission-intent",
+    "resource-release-watches-i18n",
+    "public-resource-attribution",
+    "mta-meta-inspector",
+    "build-package-query",
+    "reverse-dependency-summary",
+    "resource-copy-query",
+    "product-dependency-resolution",
+    "resource-release-watch-history-query",
+    "resource-review-i18n",
+    "resource-requirements-query",
+    "resource-requirements-i18n",
+    "resource-commerce-i18n",
+    "resource-claim-api-copy",
+    "resource-inspect-meta-api-copy",
+    "products-api-copy",
+    "product-download-api-copy",
+    "product-builds-api-copy",
+    "admin-build-download-api-copy",
+    "resource-release-control-query",
+    "build-download-selection",
+    "resource-download-sha256",
+    "resource-management-i18n",
+    "resource-media-i18n",
+    "resource-deliveries-query",
+    "resource-release-watches-query",
+    "resource-activity-i18n",
+    "resource-release-watch-history-i18n",
+    "resource-activity-query",
+    "resource-activity-view",
+    "resource-download-policy",
+    "resource-deliveries-csv",
+    "build-download-metadata",
+    "resource-cart-receipts-csv",
+    "resource-qa-query",
+    "resource-build-workspace-i18n",
+    "resource-publisher-i18n",
+    "resource-copy-i18n",
+    "build-package-i18n",
+    "resource-cart-receipts-i18n",
+    "resource-qa-i18n",
+    "resource-deliveries-i18n",
+    "product-type-labels",
+    "resource-review-query",
+    "resource-publisher-query",
+    "resource-cart-receipts-query",
+    "public-release-history",
+    "resource-commerce-confirmation",
+    "build-file-validation",
+    "author-resource-draft",
+    "private-request",
+    "resource-image-url",
+    "mta-meta-inspector-messages",
+    "resource-cart-review-confirmation",
+    "author-resource-requests",
+    "resource-publisher-nav-i18n",
+    "publishing-error-message",
+    "resource-release-watch-batch-confirmation",
+    "resource-publication-readiness-i18n",
+    "resource-management-confirmation",
+    "author-resource-response",
+    "resource-review-confirmation",
+    "resource-copy-confirmation",
+    "resource-build-workspace-response",
+    "pending-resource-draft",
+    "new-resource-response",
+    "build-moderation-ui",
+    "mta-version-target",
   ]) {
     write(
       `site/src/features/resources/${port}.ts`,
@@ -169,6 +237,20 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "requirements",
     "review-report",
     "delivery",
+    "staff-resources",
+    "staff-resource-detail",
+    "resource-manage",
+    "author-resources",
+    "resource-publisher-history",
+    "publisher-deliveries",
+    "resource-copies",
+    "resource-activity",
+    "resource-publisher-moderation",
+    "resource-copy-receipt",
+    "resource-copy-create",
+    "resource-variants",
+    "resource-compatibility",
+    "resource-create",
   ]) {
     write(
       `site/src/features/resources/${scenario}-server.ts`,
@@ -247,6 +329,74 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["features/resources/copy-view.ts", "resources-view-isolation"],
     ["features/resources/publisher-view.ts", "resources-view-isolation"],
     ["features/resources/publisher-navigation.ts", "resources-view-isolation"],
+    ["features/resources/resource-submission-intent.ts", "resources-view-isolation"],
+    ["features/resources/resource-release-watches-i18n.ts", "resources-view-isolation"],
+    ["features/resources/public-resource-attribution.ts", "resources-view-isolation"],
+    ["features/resources/mta-meta-inspector.ts", "resources-view-isolation"],
+    ["features/resources/build-package-query.ts", "resources-view-isolation"],
+    ["features/resources/reverse-dependency-summary.ts", "resources-view-isolation"],
+    ["features/resources/resource-copy-query.ts", "resources-view-isolation"],
+    ["features/resources/product-dependency-resolution.ts", "resources-view-isolation"],
+    ["features/resources/resource-release-watch-history-query.ts", "resources-view-isolation"],
+    ["features/resources/resource-review-i18n.ts", "resources-view-isolation"],
+    ["features/resources/resource-requirements-query.ts", "resources-view-isolation"],
+    ["features/resources/resource-requirements-i18n.ts", "resources-view-isolation"],
+    ["features/resources/resource-commerce-i18n.ts", "resources-view-isolation"],
+    ["features/resources/resource-claim-api-copy.ts", "resources-view-isolation"],
+    ["features/resources/resource-inspect-meta-api-copy.ts", "resources-view-isolation"],
+    ["features/resources/products-api-copy.ts", "resources-view-isolation"],
+    ["features/resources/product-download-api-copy.ts", "resources-view-isolation"],
+    ["features/resources/product-builds-api-copy.ts", "resources-view-isolation"],
+    ["features/resources/admin-build-download-api-copy.ts", "resources-view-isolation"],
+    ["features/resources/resource-release-control-query.ts", "resources-view-isolation"],
+    ["features/resources/build-download-selection.ts", "resources-view-isolation"],
+    ["features/resources/resource-download-sha256.ts", "resources-view-isolation"],
+    ["features/resources/resource-management-i18n.ts", "resources-view-isolation"],
+    ["features/resources/resource-media-i18n.ts", "resources-view-isolation"],
+    ["features/resources/resource-deliveries-query.ts", "resources-view-isolation"],
+    ["features/resources/resource-release-watches-query.ts", "resources-view-isolation"],
+    ["features/resources/resource-activity-i18n.ts", "resources-view-isolation"],
+    ["features/resources/resource-release-watch-history-i18n.ts", "resources-view-isolation"],
+    ["features/resources/resource-activity-query.ts", "resources-view-isolation"],
+    ["features/resources/resource-activity-view.ts", "resources-view-isolation"],
+    ["features/resources/resource-download-policy.ts", "resources-view-isolation"],
+    ["features/resources/resource-deliveries-csv.ts", "resources-view-isolation"],
+    ["features/resources/build-download-metadata.ts", "resources-view-isolation"],
+    ["features/resources/resource-cart-receipts-csv.ts", "resources-view-isolation"],
+    ["features/resources/resource-qa-query.ts", "resources-view-isolation"],
+    ["features/resources/resource-build-workspace-i18n.ts", "resources-view-isolation"],
+    ["features/resources/resource-publisher-i18n.ts", "resources-view-isolation"],
+    ["features/resources/resource-copy-i18n.ts", "resources-view-isolation"],
+    ["features/resources/build-package-i18n.ts", "resources-view-isolation"],
+    ["features/resources/resource-cart-receipts-i18n.ts", "resources-view-isolation"],
+    ["features/resources/resource-qa-i18n.ts", "resources-view-isolation"],
+    ["features/resources/resource-deliveries-i18n.ts", "resources-view-isolation"],
+    ["features/resources/product-type-labels.ts", "resources-view-isolation"],
+    ["features/resources/resource-review-query.ts", "resources-view-isolation"],
+    ["features/resources/resource-publisher-query.ts", "resources-view-isolation"],
+    ["features/resources/resource-cart-receipts-query.ts", "resources-view-isolation"],
+    ["features/resources/public-release-history.ts", "resources-view-isolation"],
+    ["features/resources/resource-commerce-confirmation.ts", "resources-view-isolation"],
+    ["features/resources/build-file-validation.ts", "resources-view-isolation"],
+    ["features/resources/author-resource-draft.ts", "resources-view-isolation"],
+    ["features/resources/private-request.ts", "resources-view-isolation"],
+    ["features/resources/resource-image-url.ts", "resources-view-isolation"],
+    ["features/resources/mta-meta-inspector-messages.ts", "resources-view-isolation"],
+    ["features/resources/resource-cart-review-confirmation.ts", "resources-view-isolation"],
+    ["features/resources/author-resource-requests.ts", "resources-view-isolation"],
+    ["features/resources/resource-publisher-nav-i18n.ts", "resources-view-isolation"],
+    ["features/resources/publishing-error-message.ts", "resources-view-isolation"],
+    ["features/resources/resource-release-watch-batch-confirmation.ts", "resources-view-isolation"],
+    ["features/resources/resource-publication-readiness-i18n.ts", "resources-view-isolation"],
+    ["features/resources/resource-management-confirmation.ts", "resources-view-isolation"],
+    ["features/resources/author-resource-response.ts", "resources-view-isolation"],
+    ["features/resources/resource-review-confirmation.ts", "resources-view-isolation"],
+    ["features/resources/resource-copy-confirmation.ts", "resources-view-isolation"],
+    ["features/resources/resource-build-workspace-response.ts", "resources-view-isolation"],
+    ["features/resources/pending-resource-draft.ts", "resources-view-isolation"],
+    ["features/resources/new-resource-response.ts", "resources-view-isolation"],
+    ["features/resources/build-moderation-ui.ts", "resources-view-isolation"],
+    ["features/resources/mta-version-target.ts", "resources-view-isolation"],
     ["features/resources/reviews-view.ts", "resources-view-isolation"],
     ["features/resources/client.ts", "resources-view-isolation"],
     ["features/resources/release-watch.ts", "resources-view-isolation"],
@@ -256,6 +406,40 @@ test("Resources feature rejects private imports, server leaks and impure model e
     ["app/reviews-deep.ts", "resources-feature-public-api"],
     ["app/delivery-deep.ts", "resources-feature-public-api"],
     ["features/resources/components/delivery-leak.ts", "resources-view-isolation"],
+    ["app/staff-resources-deep.ts", "resources-feature-public-api"],
+    ["features/resources/components/staff-resources-leak.ts", "resources-view-isolation"],
+    ["app/staff-resource-detail-deep.ts", "resources-feature-public-api"],
+    ["features/resources/components/staff-resource-detail-leak.ts", "resources-view-isolation"],
+    ["app/resource-manage-deep.ts", "resources-feature-public-api"],
+    ["features/resources/components/resource-manage-leak.ts", "resources-view-isolation"],
+    ["app/author-resources-deep.ts", "resources-feature-public-api"],
+    ["features/resources/components/author-resources-leak.ts", "resources-view-isolation"],
+    ["app/resource-publisher-history-deep.ts", "resources-feature-public-api"],
+    [
+      "features/resources/components/resource-publisher-history-leak.ts",
+      "resources-view-isolation",
+    ],
+    ["app/publisher-deliveries-deep.ts", "resources-feature-public-api"],
+    ["features/resources/components/publisher-deliveries-leak.ts", "resources-view-isolation"],
+    ["app/resource-copies-deep.ts", "resources-feature-public-api"],
+    ["features/resources/components/resource-copies-leak.ts", "resources-view-isolation"],
+    ["app/resource-activity-deep.ts", "resources-feature-public-api"],
+    ["features/resources/components/resource-activity-leak.ts", "resources-view-isolation"],
+    ["app/resource-publisher-moderation-deep.ts", "resources-feature-public-api"],
+    [
+      "features/resources/components/resource-publisher-moderation-leak.ts",
+      "resources-view-isolation",
+    ],
+    ["app/resource-copy-receipt-deep.ts", "resources-feature-public-api"],
+    ["features/resources/components/resource-copy-receipt-leak.ts", "resources-view-isolation"],
+    ["app/resource-copy-create-deep.ts", "resources-feature-public-api"],
+    ["features/resources/components/resource-copy-create-leak.ts", "resources-view-isolation"],
+    ["app/resource-variants-deep.ts", "resources-feature-public-api"],
+    ["features/resources/components/resource-variants-leak.ts", "resources-view-isolation"],
+    ["app/resource-compatibility-deep.ts", "resources-feature-public-api"],
+    ["features/resources/components/resource-compatibility-leak.ts", "resources-view-isolation"],
+    ["app/resource-create-deep.ts", "resources-feature-public-api"],
+    ["features/resources/components/resource-create-leak.ts", "resources-view-isolation"],
     ["app/review-report-deep.ts", "resources-feature-public-api"],
     ["features/resources/components/review-report-leak.ts", "resources-view-isolation"],
     ["app/package-deep.ts", "resources-feature-public-api"],
@@ -296,6 +480,74 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/copy-view.ts",
     "app/publisher-view.ts",
     "app/publisher-navigation.ts",
+    "app/resource-submission-intent.ts",
+    "app/resource-release-watches-i18n.ts",
+    "app/public-resource-attribution.ts",
+    "app/mta-meta-inspector.ts",
+    "app/build-package-query.ts",
+    "app/reverse-dependency-summary.ts",
+    "app/resource-copy-query.ts",
+    "app/product-dependency-resolution.ts",
+    "app/resource-release-watch-history-query.ts",
+    "app/resource-review-i18n.ts",
+    "app/resource-requirements-query.ts",
+    "app/resource-requirements-i18n.ts",
+    "app/resource-commerce-i18n.ts",
+    "app/resource-claim-api-copy.ts",
+    "app/resource-inspect-meta-api-copy.ts",
+    "app/products-api-copy.ts",
+    "app/product-download-api-copy.ts",
+    "app/product-builds-api-copy.ts",
+    "app/admin-build-download-api-copy.ts",
+    "app/resource-release-control-query.ts",
+    "app/build-download-selection.ts",
+    "app/resource-download-sha256.ts",
+    "app/resource-management-i18n.ts",
+    "app/resource-media-i18n.ts",
+    "app/resource-deliveries-query.ts",
+    "app/resource-release-watches-query.ts",
+    "app/resource-activity-i18n.ts",
+    "app/resource-release-watch-history-i18n.ts",
+    "app/resource-activity-query.ts",
+    "app/resource-activity-view.ts",
+    "app/resource-download-policy.ts",
+    "app/resource-deliveries-csv.ts",
+    "app/build-download-metadata.ts",
+    "app/resource-cart-receipts-csv.ts",
+    "app/resource-qa-query.ts",
+    "app/resource-build-workspace-i18n.ts",
+    "app/resource-publisher-i18n.ts",
+    "app/resource-copy-i18n.ts",
+    "app/build-package-i18n.ts",
+    "app/resource-cart-receipts-i18n.ts",
+    "app/resource-qa-i18n.ts",
+    "app/resource-deliveries-i18n.ts",
+    "app/product-type-labels.ts",
+    "app/resource-review-query.ts",
+    "app/resource-publisher-query.ts",
+    "app/resource-cart-receipts-query.ts",
+    "app/public-release-history.ts",
+    "app/resource-commerce-confirmation.ts",
+    "app/build-file-validation.ts",
+    "app/author-resource-draft.ts",
+    "app/private-request.ts",
+    "app/resource-image-url.ts",
+    "app/mta-meta-inspector-messages.ts",
+    "app/resource-cart-review-confirmation.ts",
+    "app/author-resource-requests.ts",
+    "app/resource-publisher-nav-i18n.ts",
+    "app/publishing-error-message.ts",
+    "app/resource-release-watch-batch-confirmation.ts",
+    "app/resource-publication-readiness-i18n.ts",
+    "app/resource-management-confirmation.ts",
+    "app/author-resource-response.ts",
+    "app/resource-review-confirmation.ts",
+    "app/resource-copy-confirmation.ts",
+    "app/resource-build-workspace-response.ts",
+    "app/pending-resource-draft.ts",
+    "app/new-resource-response.ts",
+    "app/build-moderation-ui.ts",
+    "app/mta-version-target.ts",
     "app/reviews-view.ts",
     "app/build-route.ts",
     "app/media-route.ts",
@@ -304,6 +556,20 @@ test("Resources feature rejects private imports, server leaks and impure model e
     "app/download.ts",
     "app/evidence.ts",
     "app/delivery.ts",
+    "app/staff-resources.ts",
+    "app/staff-resource-detail.ts",
+    "app/resource-manage.ts",
+    "app/author-resources.ts",
+    "app/resource-publisher-history.ts",
+    "app/publisher-deliveries.ts",
+    "app/resource-copies.ts",
+    "app/resource-activity.ts",
+    "app/resource-publisher-moderation.ts",
+    "app/resource-copy-receipt.ts",
+    "app/resource-copy-create.ts",
+    "app/resource-variants.ts",
+    "app/resource-compatibility.ts",
+    "app/resource-create.ts",
     "app/review-report.ts",
     "app/package.ts",
     "app/requirements.ts",
@@ -339,6 +605,74 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     "site/src/features/resources/copy-view.ts",
     "site/src/features/resources/publisher-view.ts",
     "site/src/features/resources/publisher-navigation.ts",
+    "site/src/features/resources/resource-submission-intent.ts",
+    "site/src/features/resources/resource-release-watches-i18n.ts",
+    "site/src/features/resources/public-resource-attribution.ts",
+    "site/src/features/resources/mta-meta-inspector.ts",
+    "site/src/features/resources/build-package-query.ts",
+    "site/src/features/resources/reverse-dependency-summary.ts",
+    "site/src/features/resources/resource-copy-query.ts",
+    "site/src/features/resources/product-dependency-resolution.ts",
+    "site/src/features/resources/resource-release-watch-history-query.ts",
+    "site/src/features/resources/resource-review-i18n.ts",
+    "site/src/features/resources/resource-requirements-query.ts",
+    "site/src/features/resources/resource-requirements-i18n.ts",
+    "site/src/features/resources/resource-commerce-i18n.ts",
+    "site/src/features/resources/resource-claim-api-copy.ts",
+    "site/src/features/resources/resource-inspect-meta-api-copy.ts",
+    "site/src/features/resources/products-api-copy.ts",
+    "site/src/features/resources/product-download-api-copy.ts",
+    "site/src/features/resources/product-builds-api-copy.ts",
+    "site/src/features/resources/admin-build-download-api-copy.ts",
+    "site/src/features/resources/resource-release-control-query.ts",
+    "site/src/features/resources/build-download-selection.ts",
+    "site/src/features/resources/resource-download-sha256.ts",
+    "site/src/features/resources/resource-management-i18n.ts",
+    "site/src/features/resources/resource-media-i18n.ts",
+    "site/src/features/resources/resource-deliveries-query.ts",
+    "site/src/features/resources/resource-release-watches-query.ts",
+    "site/src/features/resources/resource-activity-i18n.ts",
+    "site/src/features/resources/resource-release-watch-history-i18n.ts",
+    "site/src/features/resources/resource-activity-query.ts",
+    "site/src/features/resources/resource-activity-view.ts",
+    "site/src/features/resources/resource-download-policy.ts",
+    "site/src/features/resources/resource-deliveries-csv.ts",
+    "site/src/features/resources/build-download-metadata.ts",
+    "site/src/features/resources/resource-cart-receipts-csv.ts",
+    "site/src/features/resources/resource-qa-query.ts",
+    "site/src/features/resources/resource-build-workspace-i18n.ts",
+    "site/src/features/resources/resource-publisher-i18n.ts",
+    "site/src/features/resources/resource-copy-i18n.ts",
+    "site/src/features/resources/build-package-i18n.ts",
+    "site/src/features/resources/resource-cart-receipts-i18n.ts",
+    "site/src/features/resources/resource-qa-i18n.ts",
+    "site/src/features/resources/resource-deliveries-i18n.ts",
+    "site/src/features/resources/product-type-labels.ts",
+    "site/src/features/resources/resource-review-query.ts",
+    "site/src/features/resources/resource-publisher-query.ts",
+    "site/src/features/resources/resource-cart-receipts-query.ts",
+    "site/src/features/resources/public-release-history.ts",
+    "site/src/features/resources/resource-commerce-confirmation.ts",
+    "site/src/features/resources/build-file-validation.ts",
+    "site/src/features/resources/author-resource-draft.ts",
+    "site/src/features/resources/private-request.ts",
+    "site/src/features/resources/resource-image-url.ts",
+    "site/src/features/resources/mta-meta-inspector-messages.ts",
+    "site/src/features/resources/resource-cart-review-confirmation.ts",
+    "site/src/features/resources/author-resource-requests.ts",
+    "site/src/features/resources/resource-publisher-nav-i18n.ts",
+    "site/src/features/resources/publishing-error-message.ts",
+    "site/src/features/resources/resource-release-watch-batch-confirmation.ts",
+    "site/src/features/resources/resource-publication-readiness-i18n.ts",
+    "site/src/features/resources/resource-management-confirmation.ts",
+    "site/src/features/resources/author-resource-response.ts",
+    "site/src/features/resources/resource-review-confirmation.ts",
+    "site/src/features/resources/resource-copy-confirmation.ts",
+    "site/src/features/resources/resource-build-workspace-response.ts",
+    "site/src/features/resources/pending-resource-draft.ts",
+    "site/src/features/resources/new-resource-response.ts",
+    "site/src/features/resources/build-moderation-ui.ts",
+    "site/src/features/resources/mta-version-target.ts",
     "site/src/features/resources/release-watch.ts",
     "site/src/features/resources/compatibility-controls.ts",
     "site/src/features/resources/variant-controls.ts",
@@ -365,7 +699,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/resources\/(?:server|(?:detail|versions|reviews|media|build|package|requirements|review-report|delivery)-server)(?:\.ts$|\/)|lib\/(?:services\/|i18n-server\.ts$))/u.test(
+      !/^site\/src\/(?:app\/|features\/resources\/(?:server|(?:detail|versions|reviews|media|build|package|requirements|review-report|delivery|staff-resources|staff-resource-detail|resource-manage|author-resources|resource-publisher-history|publisher-deliveries|resource-copies|resource-activity|resource-publisher-moderation|resource-copy-receipt|resource-copy-create|resource-variants|resource-compatibility|resource-create|publisher-acquisitions|acquisition-receipts|acquisition-receipt-detail)-server)(?:\.ts$|\/)|lib\/(?:services\/|i18n-server\.ts$))/u.test(
         name,
       ),
       name,
@@ -396,6 +730,13 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   );
   assert.doesNotMatch(
     readFileSync(resolve(root, "site/src/features/resources/publisher-view.ts"), "utf8"),
+    /^"use client";/u,
+  );
+  assert.doesNotMatch(
+    readFileSync(
+      resolve(root, "site/src/features/resources/resource-submission-intent.ts"),
+      "utf8",
+    ),
     /^"use client";/u,
   );
   for (const port of [
@@ -455,6 +796,74 @@ test("real client, evidence, view and model entrypoints have no transitive serve
   visit("site/src/features/resources/copy-view.ts");
   visit("site/src/features/resources/publisher-view.ts");
   visit("site/src/features/resources/publisher-navigation.ts");
+  visit("site/src/features/resources/resource-submission-intent.ts");
+  visit("site/src/features/resources/resource-release-watches-i18n.ts");
+  visit("site/src/features/resources/public-resource-attribution.ts");
+  visit("site/src/features/resources/mta-meta-inspector.ts");
+  visit("site/src/features/resources/build-package-query.ts");
+  visit("site/src/features/resources/reverse-dependency-summary.ts");
+  visit("site/src/features/resources/resource-copy-query.ts");
+  visit("site/src/features/resources/product-dependency-resolution.ts");
+  visit("site/src/features/resources/resource-release-watch-history-query.ts");
+  visit("site/src/features/resources/resource-review-i18n.ts");
+  visit("site/src/features/resources/resource-requirements-query.ts");
+  visit("site/src/features/resources/resource-requirements-i18n.ts");
+  visit("site/src/features/resources/resource-commerce-i18n.ts");
+  visit("site/src/features/resources/resource-claim-api-copy.ts");
+  visit("site/src/features/resources/resource-inspect-meta-api-copy.ts");
+  visit("site/src/features/resources/products-api-copy.ts");
+  visit("site/src/features/resources/product-download-api-copy.ts");
+  visit("site/src/features/resources/product-builds-api-copy.ts");
+  visit("site/src/features/resources/admin-build-download-api-copy.ts");
+  visit("site/src/features/resources/resource-release-control-query.ts");
+  visit("site/src/features/resources/build-download-selection.ts");
+  visit("site/src/features/resources/resource-download-sha256.ts");
+  visit("site/src/features/resources/resource-management-i18n.ts");
+  visit("site/src/features/resources/resource-media-i18n.ts");
+  visit("site/src/features/resources/resource-deliveries-query.ts");
+  visit("site/src/features/resources/resource-release-watches-query.ts");
+  visit("site/src/features/resources/resource-activity-i18n.ts");
+  visit("site/src/features/resources/resource-release-watch-history-i18n.ts");
+  visit("site/src/features/resources/resource-activity-query.ts");
+  visit("site/src/features/resources/resource-activity-view.ts");
+  visit("site/src/features/resources/resource-download-policy.ts");
+  visit("site/src/features/resources/resource-deliveries-csv.ts");
+  visit("site/src/features/resources/build-download-metadata.ts");
+  visit("site/src/features/resources/resource-cart-receipts-csv.ts");
+  visit("site/src/features/resources/resource-qa-query.ts");
+  visit("site/src/features/resources/resource-build-workspace-i18n.ts");
+  visit("site/src/features/resources/resource-publisher-i18n.ts");
+  visit("site/src/features/resources/resource-copy-i18n.ts");
+  visit("site/src/features/resources/build-package-i18n.ts");
+  visit("site/src/features/resources/resource-cart-receipts-i18n.ts");
+  visit("site/src/features/resources/resource-qa-i18n.ts");
+  visit("site/src/features/resources/resource-deliveries-i18n.ts");
+  visit("site/src/features/resources/product-type-labels.ts");
+  visit("site/src/features/resources/resource-review-query.ts");
+  visit("site/src/features/resources/resource-publisher-query.ts");
+  visit("site/src/features/resources/resource-cart-receipts-query.ts");
+  visit("site/src/features/resources/public-release-history.ts");
+  visit("site/src/features/resources/resource-commerce-confirmation.ts");
+  visit("site/src/features/resources/build-file-validation.ts");
+  visit("site/src/features/resources/author-resource-draft.ts");
+  visit("site/src/features/resources/private-request.ts");
+  visit("site/src/features/resources/resource-image-url.ts");
+  visit("site/src/features/resources/mta-meta-inspector-messages.ts");
+  visit("site/src/features/resources/resource-cart-review-confirmation.ts");
+  visit("site/src/features/resources/author-resource-requests.ts");
+  visit("site/src/features/resources/resource-publisher-nav-i18n.ts");
+  visit("site/src/features/resources/publishing-error-message.ts");
+  visit("site/src/features/resources/resource-release-watch-batch-confirmation.ts");
+  visit("site/src/features/resources/resource-publication-readiness-i18n.ts");
+  visit("site/src/features/resources/resource-management-confirmation.ts");
+  visit("site/src/features/resources/author-resource-response.ts");
+  visit("site/src/features/resources/resource-review-confirmation.ts");
+  visit("site/src/features/resources/resource-copy-confirmation.ts");
+  visit("site/src/features/resources/resource-build-workspace-response.ts");
+  visit("site/src/features/resources/pending-resource-draft.ts");
+  visit("site/src/features/resources/new-resource-response.ts");
+  visit("site/src/features/resources/build-moderation-ui.ts");
+  visit("site/src/features/resources/mta-version-target.ts");
   visit("site/src/features/resources/components/build-moderation-controls.tsx");
   visit("site/src/features/resources/components/resource-build-controls.tsx");
   visit("site/src/features/resources/components/resource-media-editor.tsx");
@@ -501,6 +910,176 @@ test("Resources server entrypoints keep independent composition graphs", () => {
     ["review-report-server.ts", "resource-review-report-screen.tsx"],
     ["delivery-server.ts", "resource-delivery-evidence.tsx"],
   ];
+  // staff-resources composes outside the pairwise independence set (library/commerce ports).
+  {
+    const source = "site/src/features/resources/staff-resources-server.ts";
+    assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+    const result = cruise(root, [source]);
+    assert.equal(result.status, 0, result.stderr);
+    const graph = JSON.parse(result.stdout);
+    assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+    const modules = new Set(graph.modules.map((module) => module.source));
+    assert(modules.has("site/src/features/resources/server/staff-resources-screen.tsx"));
+    assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+  }
+  // staff-resource-detail likewise composes outside pairwise independence.
+  {
+    const source = "site/src/features/resources/staff-resource-detail-server.ts";
+    assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+    const result = cruise(root, [source]);
+    assert.equal(result.status, 0, result.stderr);
+    const graph = JSON.parse(result.stdout);
+    assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+    const modules = new Set(graph.modules.map((module) => module.source));
+    assert(modules.has("site/src/features/resources/server/staff-resource-detail-screen.tsx"));
+    assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+  }
+  // resource-manage composes publisher/author ports outside pairwise independence.
+  {
+    const source = "site/src/features/resources/resource-manage-server.ts";
+    assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+    const result = cruise(root, [source]);
+    assert.equal(result.status, 0, result.stderr);
+    const graph = JSON.parse(result.stdout);
+    assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+    const modules = new Set(graph.modules.map((module) => module.source));
+    assert(modules.has("site/src/features/resources/server/resource-manage-screen.tsx"));
+    assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+  }
+  // author-resources inventory likewise composes outside pairwise independence.
+  {
+    const source = "site/src/features/resources/author-resources-server.ts";
+    assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+    const result = cruise(root, [source]);
+    assert.equal(result.status, 0, result.stderr);
+    const graph = JSON.parse(result.stdout);
+    assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+    const modules = new Set(graph.modules.map((module) => module.source));
+    assert(modules.has("site/src/features/resources/server/author-resources-screen.tsx"));
+    assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+  }
+  // resource-publisher-history likewise composes outside pairwise independence.
+  {
+    const source = "site/src/features/resources/resource-publisher-history-server.ts";
+    assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+    const result = cruise(root, [source]);
+    assert.equal(result.status, 0, result.stderr);
+    const graph = JSON.parse(result.stdout);
+    assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+    const modules = new Set(graph.modules.map((module) => module.source));
+    assert(modules.has("site/src/features/resources/server/resource-publisher-history-screen.tsx"));
+    assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+  }
+  // publisher-deliveries likewise composes outside pairwise independence.
+  {
+    const source = "site/src/features/resources/publisher-deliveries-server.ts";
+    assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+    const result = cruise(root, [source]);
+    assert.equal(result.status, 0, result.stderr);
+    const graph = JSON.parse(result.stdout);
+    assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+    const modules = new Set(graph.modules.map((module) => module.source));
+    assert(modules.has("site/src/features/resources/server/publisher-deliveries-screen.tsx"));
+    assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+  }
+  // resource-copies likewise composes outside pairwise independence.
+  {
+    const source = "site/src/features/resources/resource-copies-server.ts";
+    assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+    const result = cruise(root, [source]);
+    assert.equal(result.status, 0, result.stderr);
+    const graph = JSON.parse(result.stdout);
+    assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+    const modules = new Set(graph.modules.map((module) => module.source));
+    assert(modules.has("site/src/features/resources/server/resource-copies-screen.tsx"));
+    assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+  }
+  // resource-activity likewise composes outside pairwise independence.
+  {
+    const source = "site/src/features/resources/resource-activity-server.ts";
+    assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+    const result = cruise(root, [source]);
+    assert.equal(result.status, 0, result.stderr);
+    const graph = JSON.parse(result.stdout);
+    assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+    const modules = new Set(graph.modules.map((module) => module.source));
+    assert(modules.has("site/src/features/resources/server/resource-activity-screen.tsx"));
+    assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+  }
+  // resource-publisher-moderation likewise composes outside pairwise independence.
+  {
+    const source = "site/src/features/resources/resource-publisher-moderation-server.ts";
+    assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+    const result = cruise(root, [source]);
+    assert.equal(result.status, 0, result.stderr);
+    const graph = JSON.parse(result.stdout);
+    assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+    const modules = new Set(graph.modules.map((module) => module.source));
+    assert(
+      modules.has("site/src/features/resources/server/resource-publisher-moderation-screen.tsx"),
+    );
+    assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+  }
+  // resource-copy-receipt likewise composes outside pairwise independence.
+  {
+    const source = "site/src/features/resources/resource-copy-receipt-server.ts";
+    assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+    const result = cruise(root, [source]);
+    assert.equal(result.status, 0, result.stderr);
+    const graph = JSON.parse(result.stdout);
+    assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+    const modules = new Set(graph.modules.map((module) => module.source));
+    assert(modules.has("site/src/features/resources/server/resource-copy-receipt-screen.tsx"));
+    assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+  }
+  // resource-copy-create likewise composes outside pairwise independence.
+  {
+    const source = "site/src/features/resources/resource-copy-create-server.ts";
+    assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+    const result = cruise(root, [source]);
+    assert.equal(result.status, 0, result.stderr);
+    const graph = JSON.parse(result.stdout);
+    assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+    const modules = new Set(graph.modules.map((module) => module.source));
+    assert(modules.has("site/src/features/resources/server/resource-copy-create-screen.tsx"));
+    assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+  }
+  // resource-variants likewise composes outside pairwise independence.
+  {
+    const source = "site/src/features/resources/resource-variants-server.ts";
+    assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+    const result = cruise(root, [source]);
+    assert.equal(result.status, 0, result.stderr);
+    const graph = JSON.parse(result.stdout);
+    assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+    const modules = new Set(graph.modules.map((module) => module.source));
+    assert(modules.has("site/src/features/resources/server/resource-variants-screen.tsx"));
+    assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+  }
+  // resource-compatibility likewise composes outside pairwise independence.
+  {
+    const source = "site/src/features/resources/resource-compatibility-server.ts";
+    assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+    const result = cruise(root, [source]);
+    assert.equal(result.status, 0, result.stderr);
+    const graph = JSON.parse(result.stdout);
+    assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+    const modules = new Set(graph.modules.map((module) => module.source));
+    assert(modules.has("site/src/features/resources/server/resource-compatibility-screen.tsx"));
+    assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+  }
+  // resource-create likewise composes outside pairwise independence.
+  {
+    const source = "site/src/features/resources/resource-create-server.ts";
+    assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+    const result = cruise(root, [source]);
+    assert.equal(result.status, 0, result.stderr);
+    const graph = JSON.parse(result.stdout);
+    assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+    const modules = new Set(graph.modules.map((module) => module.source));
+    assert(modules.has("site/src/features/resources/server/resource-create-screen.tsx"));
+    assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+  }
   for (const [entry, ownPage] of entries) {
     const source = `site/src/features/resources/${entry}`;
     assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);

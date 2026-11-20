@@ -2,19 +2,22 @@
 import { Button, ErrorState } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import type { Locale } from "../../../lib/i18n";
-import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
+import { getDictionary, type Locale } from "../../../lib/i18n";
+import { platformFieldClass, platformRequest } from "../../community/user-platform-client";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
+import { confirmAction } from "../../shell/confirm-action";
+import { linkGhostAccentSm } from "../../shell/link-shell";
+import { panelClipSpace4P5 } from "../../shell/panel-shell";
+import { typeSemiboldPrimary, typeSmSuccess, typeXsMuted } from "../../shell/type-shell";
 import {
   confirmedVerificationApplicationAmend,
   verificationApplicationAmendSchema,
-} from "../../../lib/verification-applications-contract";
+} from "../../trust/verification-applications-contract";
+import { verificationCopy } from "../../trust/verification-workspace-copy";
 import {
   verificationApplicationsCopy,
   verificationApplicationsError,
-} from "../../../lib/verification-applications-copy";
-import { verificationCopy } from "../../../lib/verification-workspace-copy";
-import { confirmAction } from "../../../components/confirm-action";
+} from "../verification-applications-copy";
 export function VerificationApplicationAmend({
   id,
   revision,
@@ -30,7 +33,18 @@ export function VerificationApplicationAmend({
 }) {
   const router = useRouter(),
     copy = verificationApplicationsCopy(locale),
-    labels = verificationCopy(locale);
+    labels = verificationCopy(locale),
+    formErrorHint = getDictionary(locale).errors.formErrorHint;
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [
+      ...Object.values(copy),
+      ...Object.values(labels),
+      ...Object.values(getUserPlatformCopy(locale)),
+    ].includes(text)
+      ? text
+      : fallback;
+  }
   const [proof, setProof] = useState(proofUrl ?? ""),
     [explanation, setExplanation] = useState(notes ?? ""),
     [busy, setBusy] = useState(false),
@@ -91,31 +105,16 @@ export function VerificationApplicationAmend({
       setNotice(copy.saved);
       router.refresh();
     } catch (failure) {
-      if (alive.current) {
-        const message = failure instanceof Error ? failure.message : "";
-        setNotice(
-          [
-            ...Object.values(copy),
-            ...Object.values(labels),
-            ...Object.values(getUserPlatformCopy(locale)),
-          ].includes(message)
-            ? message
-            : copy.uncertain,
-        );
-      }
+      if (alive.current) setNotice(safeMessage(failure, copy.uncertain));
     } finally {
       pending.current = false;
       if (alive.current) setBusy(false);
     }
   }
   return (
-    <form
-      onSubmit={(event) => void amend(event)}
-      aria-busy={busy}
-      className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5"
-    >
-      <h2 className="font-semibold text-primary">{copy.amend}</h2>
-      <p className="text-xs text-muted">{labels.proofPrivacy}</p>
+    <form onSubmit={(event) => void amend(event)} aria-busy={busy} className={panelClipSpace4P5}>
+      <h2 className={typeSemiboldPrimary}>{copy.amend}</h2>
+      <p className={typeXsMuted}>{labels.proofPrivacy}</p>
       <fieldset disabled={busy || blocked} className="space-y-4">
         <label className="block space-y-1 text-sm text-secondary">
           {labels.proof}
@@ -144,9 +143,11 @@ export function VerificationApplicationAmend({
           {busy ? labels.loading : copy.amend}
         </Button>
       </fieldset>
-      {notice && !saved ? <ErrorState id="verification-amend-notice" title={notice} /> : null}
+      {notice && !saved ? (
+        <ErrorState id="verification-amend-notice" title={notice} description={formErrorHint} />
+      ) : null}
       {notice && saved ? (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {notice}
         </p>
       ) : null}
@@ -154,7 +155,7 @@ export function VerificationApplicationAmend({
         <Button
           type="button"
           onClick={() => router.refresh()}
-          className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkGhostAccentSm}
           variant="ghost"
         >
           {labels.reload}

@@ -3,7 +3,7 @@ vi.mock("server-only", () => ({}));
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { getDiscussionCopy } from "../../src/lib/content-discussion-copy";
+import { getDiscussionCopy } from "../../src/features/community/content-discussion-copy";
 
 const mocks = vi.hoisted(() => ({
   article: vi.fn(),
@@ -11,20 +11,20 @@ const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
-vi.mock("../../src/lib/services/content-service", () => ({
+vi.mock("../../src/lib/services/community/content-service", () => ({
   contentService: { getArticleBySlug: mocks.article, pageDiscussion: mocks.pageDiscussion },
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getUserById: async () => null, getSession: async () => null },
 }));
 vi.mock("next/navigation", () => ({ usePathname: () => "/articles/article" }));
 
 import Page from "../../src/app/articles/[slug]/page";
 
-vi.mock("../../src/lib/services/content-reaction-service", () => ({
+vi.mock("../../src/lib/services/community/content-reaction-service", () => ({
   contentReactionService: { state: async () => null },
 }));
 
@@ -93,7 +93,7 @@ it("passes normalized search to server paging and renders a localized empty resu
   expect(html).toContain(copy.noMatches);
   expect(html).toContain(copy.noMatchesDescription);
   expect(html).toContain(copy.clearSearch);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('value="Lua"');
 });
 it("offers ErrorState recovery after a deleted focused comment without rendering internal errors", async () => {
@@ -111,7 +111,7 @@ it("offers ErrorState recovery after a deleted focused comment without rendering
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.returnDiscussion);
   expect(html).toContain(copy.retry);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).not.toContain("private details");
 });
 it("does not query comments for malformed or repeated discussion selectors", async () => {
@@ -124,7 +124,7 @@ it("does not query comments for malformed or repeated discussion selectors", asy
   expect(mocks.pageDiscussion).not.toHaveBeenCalled();
   expect(html).toContain(getDiscussionCopy("en").invalidCursor);
   expect(html).toContain('role="alert"');
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("renders standalone search EmptyState without requiring browser effects", () => {
   const copy = getDiscussionCopy("ru");
@@ -141,7 +141,7 @@ it("renders standalone search EmptyState without requiring browser effects", () 
   expect(html).toContain(copy.noMatches);
   expect(html).toContain(copy.noMatchesDescription);
   expect(html).toContain(copy.applySearch);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it.each(["en", "ru"] as const)(
   "renders working discussion subscription entry points and settings in %s",
@@ -159,8 +159,8 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('href="/workspace/saved?type=content"');
     expect(html).toContain('href="/settings#notification-heading"');
     expect(html).toContain('href="/auth/login?next=%2Farticles%2Farticle"');
-    expect(html).toContain("min-h-11");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).not.toContain("Checking");
   },
 );

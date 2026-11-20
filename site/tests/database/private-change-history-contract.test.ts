@@ -1,20 +1,20 @@
 import { expect, it } from "vitest";
 import {
-  organizationChangeHistorySchema,
-  parseOrganizationChangeHistoryQuery,
-} from "../../src/lib/organization-governance-contract";
-import {
   privateChangeHistoryCopy,
   privateChangeHistoryError,
-} from "../../src/lib/private-change-history-copy";
+} from "../../src/features/accounts/private-change-history-copy";
 import {
   changeHistoryHref,
   encodeChangeHistoryCursor,
-} from "../../src/lib/private-change-history-query";
+} from "../../src/features/accounts/private-change-history-query";
 import {
   parseProfileChangeHistoryQuery,
   profileChangeHistorySchema,
-} from "../../src/lib/profile-change-history-contract";
+} from "../../src/features/accounts/profile-change-history-contract";
+import {
+  organizationChangeHistorySchema,
+  parseOrganizationChangeHistoryQuery,
+} from "../../src/features/organizations/organization-governance-contract";
 
 const stamp = "2026-10-12T00:00:00.123456Z",
   context = "a".repeat(64);

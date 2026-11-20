@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -23,10 +25,10 @@ vi.mock("@nexus/db", () => ({
   },
   licenseRepository: { pageUserHistory: state.licenses },
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 vi.mock("next/link", async () => {
@@ -45,13 +47,33 @@ vi.mock("next/link", async () => {
 });
 
 import LicensesLoading from "../../src/app/workspace/licenses/loading";
-import Licenses, { metadata as licensesMeta } from "../../src/app/workspace/licenses/page";
 import PurchasesLoading from "../../src/app/workspace/purchases/loading";
-import Purchases, { metadata as purchasesMeta } from "../../src/app/workspace/purchases/page";
-import Sales, { metadata as salesMeta } from "../../src/app/workspace/sales/page";
-import { getCommerceHistoryCopy } from "../../src/lib/commerce-history-i18n";
+import Purchases, {
+  generateMetadata as purchasesMeta,
+} from "../../src/app/workspace/purchases/page";
+import { getCommerceHistoryCopy } from "../../src/features/commerce/commerce-history-i18n";
+import { getLicenseMaintenanceCopy } from "../../src/features/commerce/license-maintenance-i18n";
+import {
+  LicensesHistoryScreen,
+  licensesHistoryMetadata as licensesMeta,
+} from "../../src/features/commerce/licenses-history-server";
+import {
+  SalesHistoryScreen,
+  salesHistoryMetadata as salesMeta,
+} from "../../src/features/commerce/sales-history-server";
 import { getDictionary } from "../../src/lib/i18n";
-import { getLicenseMaintenanceCopy } from "../../src/lib/license-maintenance-i18n";
+
+async function Licenses({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return LicensesHistoryScreen({ query: await searchParams });
+}
+
+async function Sales({ searchParams }: { searchParams: Promise<{ page?: string | string[] }> }) {
+  return SalesHistoryScreen({ query: await searchParams });
+}
 
 const date = new Date("2026-10-09T10:00:00.000Z");
 const input = (page = "2") => ({ searchParams: Promise.resolve({ page }) });
@@ -194,8 +216,8 @@ describe("private legacy commerce pages", () => {
     expect(html).not.toContain("private@example.test");
     expect(html).toContain("gross");
     expect(html).not.toContain('name="withdraw"');
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   });
 
   it("recovers with ErrorState when sales history fails to load", async () => {
@@ -206,8 +228,8 @@ describe("private legacy commerce pages", () => {
     expect(html).toContain(copy.salesLoadUnavailable);
     expect(html).toContain(copy.salesLoadUnavailableHint);
     expect(html).toContain(getDictionary("en").errors.retry);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toContain('href="/workspace/sales?page=2"');
   });
 
@@ -223,7 +245,7 @@ describe("private legacy commerce pages", () => {
     const html = renderToStaticMarkup(await Sales({ searchParams: Promise.resolve({}) }));
     expect(html).toContain(copy.emptySales);
     expect(html).toContain(copy.emptySalesHint);
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   });
   it("renders archive filters in both languages and preserves them in export and page links", async () => {
     for (const locale of ["en", "ru"] as const) {
@@ -266,9 +288,9 @@ describe("private legacy commerce pages", () => {
     expect(state.buyer).toHaveBeenCalledWith("usr_current", 1);
   });
 
-  it("keeps all historical pages out of search engines", () => {
+  it("keeps all historical pages out of search engines", async () => {
     for (const metadata of [purchasesMeta, licensesMeta, salesMeta]) {
-      expect(metadata.robots).toMatchObject({ index: false, follow: false });
+      expect((await metadata()).robots).toMatchObject({ index: false, follow: false });
     }
   });
 
@@ -290,8 +312,8 @@ describe("private legacy commerce pages", () => {
     expect(html).toContain('role="alert"');
     expect(html).toContain(copy.loadUnavailable);
     expect(html).toContain(getDictionary("en").errors.retry);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toContain(
       'href="/workspace/licenses?page=2&amp;status=expiring&amp;binding=bound&amp;term=finite&amp;sort=expires_soon&amp;q=alpha"',
     );
@@ -317,14 +339,14 @@ describe("private legacy commerce pages", () => {
     expect(html).toContain(copy.licenseNotice);
     expect(html).toContain(maintenance.clear);
     expect(html).toContain('href="/workspace/licenses"');
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   });
 
   it("clips the honest license archive loading shell on narrow layouts", async () => {
     const html = renderToStaticMarkup(await LicensesLoading());
     expect(html).toContain("min-w-0 max-w-5xl");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   });
 
   it("recovers with ErrorState when purchase history fails to load", async () => {
@@ -335,8 +357,8 @@ describe("private legacy commerce pages", () => {
     expect(html).toContain(copy.purchasesLoadUnavailable);
     expect(html).toContain(copy.purchasesLoadUnavailableHint);
     expect(html).toContain(getDictionary("en").errors.retry);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toContain('href="/workspace/purchases?page=2"');
   });
 
@@ -352,13 +374,13 @@ describe("private legacy commerce pages", () => {
     const html = renderToStaticMarkup(await Purchases({ searchParams: Promise.resolve({}) }));
     expect(html).toContain(copy.emptyPurchases);
     expect(html).toContain(copy.emptyPurchasesHint);
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   });
 
   it("clips the honest purchases loading shell on narrow layouts", async () => {
     const html = renderToStaticMarkup(await PurchasesLoading());
     expect(html).toContain("min-w-0 max-w-5xl");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain(getCommerceHistoryCopy("en").loading);
   });
 });

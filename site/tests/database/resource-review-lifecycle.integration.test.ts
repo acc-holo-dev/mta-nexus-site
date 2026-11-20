@@ -1,22 +1,22 @@
 import { randomUUID } from "node:crypto";
-import { and, eq, inArray } from "drizzle-orm";
-import { expect, it } from "vitest";
 import {
-  db,
-  products,
+  auditEvents,
   builds,
   comments,
+  db,
   entitlements,
-  users,
-  reports,
-  auditEvents,
-  resourceReviewsRepository as repo,
-  resourceQaRepository,
-  organizations,
   organizationMembers,
+  organizations,
+  products,
+  resourceReviewsRepository as repo,
   reportRepository,
+  reports,
+  resourceQaRepository,
   sessionRepository,
+  users,
 } from "@nexus/db";
+import { and, eq, inArray } from "drizzle-orm";
+import { expect, it } from "vitest";
 
 it("persists review revisions, grant expiry, live moderation, atomic rollback and aggregate integrity", async () => {
   const suffix = randomUUID().replaceAll("-", ""),

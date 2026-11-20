@@ -13,7 +13,7 @@ const state = vi.hoisted(() => ({
   rateGate: null as Promise<void> | null,
   rateEntered: null as (() => void) | null,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
 vi.mock("@nexus/security", () => ({
@@ -23,10 +23,10 @@ vi.mock("@nexus/security", () => ({
     return { success: state.allowed };
   },
 }));
-vi.mock("../../src/lib/services/server-service", () => ({
+vi.mock("../../src/lib/services/servers/server-service", () => ({
   serverService: { recoverCreatedServer: state.find, createServer: state.create },
 }));
-vi.mock("../../src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../../src/lib/services/servers/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: {},
   indexMtaObservations: vi.fn(),
   matchesMtaEndpoint: vi.fn(),

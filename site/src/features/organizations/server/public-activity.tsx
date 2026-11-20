@@ -1,13 +1,12 @@
-import { PublicProfileActivity } from "../../../components/public-profile-activity";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { publicationCopy } from "../../../lib/publication-feed-copy";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { PublicProfileActivity } from "../../accounts/public-profile-activity-server";
+import { publicationCopy } from "../../community/publication-feed-copy";
+import { pageShellClip } from "../../shell/page-shell";
 
-const pageShellClass = "min-w-0 overflow-x-clip";
-
-export async function generateMetadata() {
+export async function organizationActivityMetadata() {
   return { title: publicationCopy(await getRequestLocale()).activity };
 }
-export default async function OrganizationActivity({
+export async function OrganizationActivity({
   params,
   searchParams,
 }: {
@@ -15,7 +14,7 @@ export default async function OrganizationActivity({
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellClip}>
       {
         await PublicProfileActivity({
           kind: "organization",

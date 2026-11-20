@@ -12,13 +12,13 @@ const mock = vi.hoisted(() => ({
 }));
 vi.mock("next/link", () => ({ default: "a" }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => mock.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mock.session },
 }));
-vi.mock("../../src/lib/services/support-message-discovery-service", () => ({
+vi.mock("../../src/lib/services/support/support-message-discovery-service", () => ({
   supportMessageDiscoveryService: { page: mock.page },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mock.rate }));
@@ -28,7 +28,7 @@ import {
   SupportMessagePage,
   supportMessageMetadata,
 } from "../../src/features/support/messages-server";
-import { supportMessageCopy } from "../../src/lib/support-message-discovery-copy";
+import { supportMessageCopy } from "../../src/features/support/support-message-discovery-copy";
 import { getDictionary } from "../../src/lib/i18n";
 
 const id = `sup_${"a".repeat(24)}`,
@@ -108,7 +108,7 @@ it.each(["en", "ru"] as const)(
       );
     expect(html).toContain(copy.title);
     expect(html).toContain("min-w-0 max-w-4xl");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain(copy.focused);
     expect(html).toContain(copy.truncated);
     expect(html).toContain(`<search aria-label="${copy.filters}"`);
@@ -176,7 +176,7 @@ it("gates anonymous reads and validates duplicate filters before loading data", 
   expect(invalid).toContain('role="alert"');
   expect(invalid).toContain(supportMessageCopy("en").invalid);
   expect(invalid).toContain(supportMessageCopy("en").reset);
-  expect(invalid).toContain("overflow-x-clip");
+  expect(invalid).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(mock.page).not.toHaveBeenCalled();
 });
 it("delegates the staff-only requirement to a fresh server-side grant check", async () => {

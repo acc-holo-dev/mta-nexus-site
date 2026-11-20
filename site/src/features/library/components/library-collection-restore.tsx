@@ -1,11 +1,11 @@
 "use client";
 import type { LibraryCollectionChangesPreview } from "@nexus/domain";
 import { useState } from "react";
-import { LibraryCollectionReconcileForm } from "./library-collection-reconcile";
 import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,
-} from "../../../lib/library-collection-receipts-i18n";
+} from "../library-collection-receipts-i18n";
+import { LibraryCollectionReconcileForm } from "./library-collection-reconcile";
 export function LibraryCollectionRestoreControls({
   preview,
   receiptId,

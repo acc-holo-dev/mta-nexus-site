@@ -1,4 +1,6 @@
-vi.mock("../../../components/follow-button", () => ({
+vi.mock("server-only", () => ({}));
+
+vi.mock("../../../features/community/follow", () => ({
   FollowButton: (props: { initial?: unknown }) => (
     <button type="button" data-follow-initial={JSON.stringify(props.initial ?? null)}>
       Follow
@@ -33,7 +35,7 @@ const state = vi.hoisted(() => ({
   followStates: vi.fn(async (): Promise<string[]> => []),
   muteState: vi.fn(async () => ({ muted: false, mutedUntil: null as string | null })),
 }));
-vi.mock("../../../lib/services/auth-service", () => ({
+vi.mock("../../../lib/services/accounts/auth-service", () => ({
   authService: {
     getUserByUsername: async () => state.user,
     getSession: () => state.session(),
@@ -46,16 +48,16 @@ vi.mock("@nexus/db", () => ({
     muteState: state.muteState,
   },
 }));
-vi.mock("../../../lib/services/product-service", () => ({
+vi.mock("../../../lib/services/commerce/product-service", () => ({
   productService: {
     getPublicAttributions: async () => new Map(),
   },
 }));
-vi.mock("../../../lib/i18n-server", () => ({
+vi.mock("../../../lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
   getRequestCookieStore: async () => ({ get: () => ({ value: "session" }) }),
 }));
-vi.mock("../../../lib/services/profile-privacy-service", () => ({
+vi.mock("../../../lib/services/accounts/profile-privacy-service", () => ({
   profilePrivacyService: {
     visibility: async () => ({ showActivity: state.showActivity, showProfessionalContacts: true }),
   },
@@ -276,7 +278,7 @@ it("keeps the public profile available and shows a recoverable follow error when
   state.session.mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
   const html = renderToStaticMarkup(await Page(params()));
   expect(html).toContain(
-    "&quot;authenticated&quot;:false,&quot;actorId&quot;:null,&quot;following&quot;:false,&quot;error&quot;:true",
+    "&quot;authenticated&quot;:null,&quot;actorId&quot;:null,&quot;following&quot;:false,&quot;error&quot;:true",
   );
   expect(html).not.toContain("PRIVATE_SESSION");
   expect(state.followStates).not.toHaveBeenCalled();

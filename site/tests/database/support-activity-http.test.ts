@@ -1,13 +1,18 @@
-import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const mocks = vi.hoisted(() => ({ session: vi.fn(), rate: vi.fn(), history: vi.fn() }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
-vi.mock("@nexus/db", () => ({ supportActivityRepository: { history: mocks.history } }));
+vi.mock("../../src/lib/services/support/support-case-service", () => ({
+  supportCaseService: { activityHistory: mocks.history },
+}));
+
 import { GET } from "../../src/app/api/support/[id]/activity/route";
+
 const id = `sup_${"a".repeat(24)}`,
   context = { params: Promise.resolve({ id }) };
 function request(query = "") {
@@ -66,9 +71,28 @@ it("keeps foreign/expired cases and storage failures private and localized", asy
   mocks.history.mockRejectedValueOnce(new AppError("secret internal target", 404, "NOT_FOUND"));
   const missing = await GET(request(), context);
   expect(missing.status).toBe(404);
-  expect(await missing.text()).not.toContain("secret internal");
+  const missingBody = await missing.json();
+  expect(JSON.stringify(missingBody)).not.toContain("secret internal");
+  expect(missingBody).toMatchObject({
+    error: "Обращение недоступно.",
+    code: "NOT_FOUND",
+  });
   mocks.history.mockRejectedValueOnce(new Error("database connection secret"));
   const failed = await GET(request(), context);
   expect(failed.status).toBe(503);
   expect(await failed.text()).not.toContain("database connection");
+});
+it("localizes English support envelopes for nexus_locale=en", async () => {
+  mocks.history.mockRejectedValueOnce(new AppError("secret internal target", 404, "NOT_FOUND"));
+  const missing = await GET(
+    new NextRequest(`https://nexus.test/api/support/${id}/activity`, {
+      headers: { cookie: "nexus_session=test;nexus_locale=en" },
+    }),
+    context,
+  );
+  expect(missing.status).toBe(404);
+  expect(await missing.json()).toMatchObject({
+    error: "Support case is unavailable.",
+    code: "NOT_FOUND",
+  });
 });

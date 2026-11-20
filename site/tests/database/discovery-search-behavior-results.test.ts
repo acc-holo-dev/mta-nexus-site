@@ -20,17 +20,17 @@ vi.mock("@nexus/security", async () => {
     consumeRateLimit: (...args: unknown[]) => harnessSources.rateLimit(...args),
   };
 });
-vi.mock("../../src/lib/services/mta-master-directory-service", async (importOriginal) => {
+vi.mock("../../src/lib/services/servers/mta-master-directory-service", async (importOriginal) => {
   const { sources: harnessSources } = await import("../helpers/discovery-search-behavior-harness");
   return {
     ...(await importOriginal<
-      typeof import("../../src/lib/services/mta-master-directory-service")
+      typeof import("../../src/lib/services/servers/mta-master-directory-service")
     >()),
     mtaMasterDirectoryService: { getDirectory: harnessSources.directory },
   };
 });
 
-import { discoveryService } from "../../src/lib/services/discovery-service";
+import { discoveryService } from "../../src/lib/services/discovery/discovery-service";
 
 setupDiscoverySearchBehavior();
 
@@ -173,6 +173,39 @@ describe("discovery search results and pagination", () => {
     expect(sources.articles).not.toHaveBeenCalled();
     expect(sources.developers).not.toHaveBeenCalled();
     expect(sources.organizations).not.toHaveBeenCalled();
+  });
+
+  it("uses bilingual serverDetail.serverFallback when server description is empty", async () => {
+    sources.servers.mockResolvedValue([
+      {
+        id: "bare",
+        name: "Bare",
+        slug: "bare",
+        ipAddress: "203.0.113.10",
+        port: 22003,
+        gameMode: "RP",
+      },
+      {
+        id: "mode-less",
+        name: "ModeLess",
+        slug: "mode-less",
+        ipAddress: "203.0.113.11",
+        port: 22003,
+      },
+    ]);
+    sources.directory.mockResolvedValue({ isStale: false, servers: [] });
+
+    const english = await discoveryService.search("Bare", 2, "server", "en");
+    expect(english).toMatchObject([
+      { id: "bare", description: "RP MTA server" },
+      { id: "mode-less", description: "MTA server" },
+    ]);
+
+    const russian = await discoveryService.search("Bare", 2, "server", "ru");
+    expect(russian).toMatchObject([
+      { id: "bare", description: "RP Сервер MTA" },
+      { id: "mode-less", description: "Сервер MTA" },
+    ]);
   });
 
   it("does not let a full product page hide other matching categories", async () => {

@@ -1,5 +1,12 @@
 import { createHash } from "node:crypto";
-import { type AuditEvent, ForbiddenError, type Report, UnauthorizedError } from "@nexus/domain";
+import {
+  type AuditEvent,
+  ForbiddenError,
+  noticeStoredMessages,
+  noticeStoredTitles,
+  type Report,
+  UnauthorizedError,
+} from "@nexus/domain";
 import { and, asc, count, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, reportNotificationDeliveries, reports, users } from "../schema";
@@ -239,8 +246,8 @@ export class ReportRepository {
             .update(JSON.stringify([audit.id, resolved.reporterId]))
             .digest("hex")}`,
           recipientId: resolved.reporterId,
-          title: "Platform report status",
-          message: `Report status: ${status}.`,
+          title: noticeStoredTitles.platformReportStatus,
+          message: noticeStoredMessages.reportStatuses[status],
           link: `/workspace/platform-reports/${encodeURIComponent(resolved.id)}`,
           type: "security",
           category: "security",

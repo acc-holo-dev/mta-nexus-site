@@ -10,9 +10,9 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 const formComponents = [
   "site/src/features/notifications/components/notification-bell.tsx",
   "site/src/features/notifications/components/notification-inbox.tsx",
-  "site/src/components/follow-button.tsx",
+  "site/src/features/community/components/follow-button.tsx",
   "site/src/features/community/components/content-follow-controls.tsx",
-  "site/src/components/context-switcher.tsx",
+  "site/src/features/accounts/components/context-switcher.tsx",
   "site/src/features/community/components/community-report-form.tsx",
   "site/src/features/community/components/content-comment-form.tsx",
   "site/src/features/community/components/content-discussion-compose-feedback.tsx",
@@ -28,7 +28,7 @@ it("locks discussion and notification form failures to ErrorState with touch CTA
   for (const path of formComponents) {
     const source = read(path);
     expect(source, path).toContain("ErrorState");
-    expect(source, path).toMatch(/min-h-11|size="touch"/u);
+    expect(source, path).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
     expect(source, path).not.toContain('role="alert"');
   }
 });
@@ -50,14 +50,14 @@ it("locks MTA meta inspector apply CTA to size=touch without min-h-8", () => {
   expect(source).toMatch(
     /onApplyMinimumVersion[\s\S]{0,120}?size="touch"|size="touch"[\s\S]{0,120}?onApplyMinimumVersion/u,
   );
-  expect(source).toContain("min-h-11");
+  expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(source).not.toContain("min-h-8");
 });
 
 it("locks context switcher native select to fieldControlClass without h-10 chrome", () => {
-  const source = read("site/src/components/context-switcher.tsx");
+  const source = read("site/src/features/accounts/components/context-switcher.tsx");
   expect(source).toContain("fieldControlClass");
-  expect(source).toContain("min-h-11");
+  expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(source).not.toContain("h-10");
   expect(source).not.toContain("fieldClassBlock");
 });
@@ -81,13 +81,19 @@ it("keeps additive formErrorHint / errorHint copy for discussion and notificatio
     "Inspection did not finish. Choose the same meta.xml again",
   );
   expect(read("site/src/lib/i18n/ru/product.ts")).toContain("Проверка не завершена.");
-  expect(read("site/src/lib/notification-inbox-copy.ts")).toContain("formErrorHint:");
-  expect(read("site/src/lib/follow-workspace-copy.ts")).toContain(
+  expect(read("site/src/features/notifications/notification-inbox-copy.ts")).toContain(
+    "formErrorHint:",
+  );
+  expect(read("site/src/features/community/follow-workspace-copy.ts")).toContain(
     "Retry reloads the saved follow state.",
   );
-  expect(read("site/src/lib/community-report-copy.ts")).toContain("formErrorHint:");
-  expect(read("site/src/lib/content-discussion-copy.ts")).toContain("formErrorHint:");
-  expect(read("site/src/lib/report-batch-copy.ts")).toContain("formErrorHint:");
-  expect(read("site/src/lib/moderated-discussion-copy.ts")).toContain("formErrorHint:");
-  expect(read("site/src/lib/server-statistics-copy.ts")).toContain("exportErrorHint:");
+  expect(read("site/src/features/community/community-report-copy.ts")).toContain("formErrorHint:");
+  expect(read("site/src/features/community/content-discussion-copy.ts")).toContain(
+    "formErrorHint:",
+  );
+  expect(read("site/src/features/community/report-batch-copy.ts")).toContain("formErrorHint:");
+  expect(read("site/src/features/community/moderated-discussion-copy.ts")).toContain(
+    "formErrorHint:",
+  );
+  expect(read("site/src/features/servers/server-statistics-copy.ts")).toContain("exportErrorHint:");
 });

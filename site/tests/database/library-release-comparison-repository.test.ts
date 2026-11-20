@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const h = vi.hoisted(() => ({
   rows: [] as unknown[][],
   queries: [] as { sql: string; params: unknown[] }[],
@@ -24,7 +25,9 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
+
 import { readLibraryReleaseComparison } from "../../packages/db/src/repositories/library-release-comparison";
+
 const query = { from: "bld_a", to: "bld_b", returnPage: 2 },
   date = "2026-10-12T00:00:00.000Z";
 const build = (id: string, hash = "a".repeat(64)) => [

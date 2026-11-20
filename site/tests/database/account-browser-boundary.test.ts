@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => ({ id: "usr_owner", role: "user" })),
@@ -17,22 +17,22 @@ const verificationWorkspaceService = vi.hoisted(() => ({
   updateProfile: vi.fn(async () => ({ id: "usr_owner", specialties: ["Lua"] })),
 }));
 
-vi.mock("../../src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit }));
-vi.mock("../../src/lib/services/public-profile-service", () => ({
+vi.mock("../../src/lib/services/accounts/public-profile-service", () => ({
   publicProfileService,
   editableProfile: (user: { id: string }) => ({ id: user.id }),
 }));
-vi.mock("../../src/lib/services/profile-privacy-service", () => ({
+vi.mock("../../src/lib/services/accounts/profile-privacy-service", () => ({
   profilePrivacyService,
 }));
-vi.mock("../../src/lib/services/verification-workspace-service", () => ({
+vi.mock("../../src/lib/services/moderation/verification-workspace-service", () => ({
   verificationWorkspaceService,
 }));
 
-import { GET as profileGet, PATCH as profilePatch } from "../../src/app/api/account/profile/route";
-import { GET as privacyGet, PATCH as privacyPatch } from "../../src/app/api/account/privacy/route";
 import { PATCH as developerPatch } from "../../src/app/api/account/developer/route";
+import { GET as privacyGet, PATCH as privacyPatch } from "../../src/app/api/account/privacy/route";
+import { GET as profileGet, PATCH as profilePatch } from "../../src/app/api/account/profile/route";
 
 const profileBody = {
   displayName: "Owner",

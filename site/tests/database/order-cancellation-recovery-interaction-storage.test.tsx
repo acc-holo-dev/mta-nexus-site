@@ -1,4 +1,5 @@
 import { expect, it, vi } from "vitest";
+import { getDictionary } from "../../src/lib/i18n";
 import {
   createOrderCancellationRecoveryInteractionHelpers,
   mockReactHooks,
@@ -16,11 +17,11 @@ const h = vi.hoisted(() => ({
 }));
 vi.mock("react", (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) }));
-vi.mock("../../src/components/locale-context", () => ({
-  useNexusLocale: () => ({ locale: "en" }),
+vi.mock("../../src/features/shell/locale", () => ({
+  useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }),
 }));
 
-import { OrderCancellationForm } from "../../src/components/order-cancellation-form";
+import { OrderCancellationForm } from "../../src/features/commerce/order-cancellation";
 
 const { render, mount, prepare, submit, cancelPosts } =
   createOrderCancellationRecoveryInteractionHelpers(h, OrderCancellationForm);

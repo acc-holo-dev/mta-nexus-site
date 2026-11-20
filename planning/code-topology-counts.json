@@ -1,0 +1,103 @@
+{
+  "app": {
+    "route_ts": 282
+  },
+  "components": {
+    "root_files": 0,
+    "shellish_root_files": [],
+    "tree_bytes": 0,
+    "tree_files": 0
+  },
+  "features": {
+    "accounts": {
+      "bytes": 234699,
+      "files": 91
+    },
+    "commerce": {
+      "bytes": 554909,
+      "files": 146
+    },
+    "community": {
+      "bytes": 635391,
+      "files": 154
+    },
+    "discovery": {
+      "bytes": 49927,
+      "files": 22
+    },
+    "library": {
+      "bytes": 521073,
+      "files": 124
+    },
+    "moderation": {
+      "bytes": 219976,
+      "files": 56
+    },
+    "notifications": {
+      "bytes": 141979,
+      "files": 27
+    },
+    "organizations": {
+      "bytes": 201839,
+      "files": 59
+    },
+    "resources": {
+      "bytes": 915968,
+      "files": 231
+    },
+    "servers": {
+      "bytes": 382913,
+      "files": 111
+    },
+    "shell": {
+      "bytes": 201421,
+      "files": 101
+    },
+    "support": {
+      "bytes": 117750,
+      "files": 28
+    },
+    "trust": {
+      "bytes": 83844,
+      "files": 28
+    }
+  },
+  "husks": {
+    "git_tracked_paths": [],
+    "legacy_root_paths_not_in_workspace": [
+      "packages/config",
+      "packages/db",
+      "packages/domain",
+      "packages/security",
+      "packages/storage",
+      "packages/ui",
+      "packages/validation",
+      "apps/web"
+    ],
+    "note": "Canonical packages live under site/packages/*. Root packages/* and apps/web are not workspace members and must stay untracked; host leftovers vary by machine.",
+    "workspace_members": ["site", "site/packages/*"]
+  },
+  "lib": {
+    "i18n_modules": 0,
+    "root_dirs": ["http", "i18n", "platform", "services"],
+    "root_files": 0,
+    "root_prefix_hotspots": [],
+    "services_root_files": 0,
+    "tree_bytes": 567742,
+    "tree_files": 130
+  },
+  "packages_src_files": {
+    "config": 1,
+    "db": 201,
+    "domain": 56,
+    "security": 10,
+    "storage": 6,
+    "ui": 20,
+    "validation": 18
+  },
+  "scope": "Git-tracked blobs under site/ at source_sha (git ls-tree). Ignores untracked/ignored host files so CI and dirty worktrees match.",
+  "source_sha": "e6479fde148fddb81b5877fea8c15bd4a52a7e1e",
+  "tests": {
+    "site_tests_files": 1681
+  }
+}

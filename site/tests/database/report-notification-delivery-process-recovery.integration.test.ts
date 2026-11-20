@@ -33,8 +33,8 @@ it("resumes bounded pages across concurrent workers, deduplicating without chang
     recipientId: recipients[0],
     type: "security",
     category: "security",
-    title: "New report",
-    message: "A report is awaiting review.",
+    title: "New community report / Новая жалоба сообщества",
+    message: "A community report is awaiting review. / Жалоба сообщества ожидает рассмотрения.",
     isRead: true,
     createdAt: originalTime,
   });
@@ -53,8 +53,8 @@ it("resumes bounded pages across concurrent workers, deduplicating without chang
   });
   for (const row of stored.filter((row) => row.id !== existingId)) {
     expect(row).toMatchObject({
-      title: "New report",
-      message: "A report is awaiting review.",
+      title: "New community report / Новая жалоба сообщества",
+      message: "A community report is awaiting review. / Жалоба сообщества ожидает рассмотрения.",
       link: `/admin/reports/${f.reportId}`,
       category: "security",
     });

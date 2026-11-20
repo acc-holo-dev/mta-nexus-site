@@ -1,6 +1,6 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Build, Product, User } from "@nexus/domain";
 import { eventBus } from "@nexus/domain";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   findBuild: vi.fn(),
@@ -30,7 +30,7 @@ vi.mock("@nexus/security", () => ({
   generateId: vi.fn((prefix: string) => `${prefix}_test`),
 }));
 
-import { ProductService } from "../../src/lib/services/product-service";
+import { ProductService } from "../../src/lib/services/commerce/product-service";
 
 const staffPasswordHash = "hash_mod";
 

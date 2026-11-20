@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
   generateId: () => "cnt_a",
@@ -12,13 +12,13 @@ vi.mock("@nexus/security", () => ({
 vi.mock("@nexus/db", () => ({
   authorContentRepository: { pageByAuthor: vi.fn(), findAuthored: vi.fn(), mutate: vi.fn() },
 }));
-vi.mock("../../src/lib/services/author-content-service", () => ({
+vi.mock("../../src/lib/services/organizations/author-content-service", () => ({
   authorContentService: { create: vi.fn(), update: vi.fn(), get: vi.fn(), restore: vi.fn() },
 }));
-vi.mock("../../src/lib/services/discussion-workspace-service", () => ({
+vi.mock("../../src/lib/services/community/discussion-workspace-service", () => ({
   discussionWorkspaceService: { own: vi.fn(), mutate: vi.fn() },
 }));
-vi.mock("../../src/lib/services/content-reaction-service", () => ({
+vi.mock("../../src/lib/services/community/content-reaction-service", () => ({
   contentReactionService: { remove: vi.fn() },
 }));
 
@@ -33,7 +33,7 @@ import {
   PATCH as editDiscussion,
 } from "../../src/app/api/workspace/discussions/[id]/route";
 import { DELETE as removeReaction } from "../../src/app/api/workspace/reactions/[id]/route";
-import { authorContentService } from "../../src/lib/services/author-content-service";
+import { authorContentService } from "../../src/lib/services/organizations/author-content-service";
 
 const context = { params: Promise.resolve({ id: "cnt_a" }) };
 const mutations = [

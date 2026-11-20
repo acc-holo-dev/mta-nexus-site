@@ -1,1 +1,4 @@
-export { ServersPage as default } from "../../features/servers/server";
+export {
+  ServersPage as default,
+  serversMetadata as generateMetadata,
+} from "../../features/servers/server";

@@ -1,3 +1,3 @@
 import "server-only";
 
-export { MarketPage } from "./server/market-page";
+export { MarketPage, marketMetadata } from "./server/market-page";

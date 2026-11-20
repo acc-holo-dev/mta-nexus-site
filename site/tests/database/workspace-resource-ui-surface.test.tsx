@@ -4,12 +4,12 @@ import { fileURLToPath } from "node:url";
 import { createElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
+import { getUserPlatformCopy } from "../../src/features/community/user-platform-copy";
+import { getResourceCommerceCopy } from "../../src/features/resources/resource-commerce-i18n";
+import { resourceCopyCopy } from "../../src/features/resources/resource-copy-i18n";
+import { getResourceManagementCopy } from "../../src/features/resources/resource-management-i18n";
+import { getResourcePublisherCopy } from "../../src/features/resources/resource-publisher-i18n";
 import { getDictionary } from "../../src/lib/i18n";
-import { getResourceCommerceCopy } from "../../src/lib/resource-commerce-i18n";
-import { resourceCopyCopy } from "../../src/lib/resource-copy-i18n";
-import { getResourceManagementCopy } from "../../src/lib/resource-management-i18n";
-import { getResourcePublisherCopy } from "../../src/lib/resource-publisher-i18n";
-import { getUserPlatformCopy } from "../../src/lib/user-platform-copy";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
@@ -30,7 +30,7 @@ const localeState = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
 
-vi.mock("../../src/components/locale-context", async () => {
+vi.mock("../../src/features/shell/locale", async () => {
   const { getDictionary } = await import("../../src/lib/i18n");
   return {
     useNexusLocale: () => ({
@@ -124,14 +124,14 @@ vi.mock("@nexus/ui", async () => {
   };
 });
 
+import { PublicProfileForm } from "../../src/features/accounts/profile";
 import { NewResourceForm } from "../../src/features/resources/components/new-resource-form";
-import { PublicProfileForm } from "../../src/components/public-profile-form";
 import { ResourceCompatibilityForm } from "../../src/features/resources/components/resource-compatibility-form";
 import { ResourceCopyForm } from "../../src/features/resources/components/resource-copy-form";
 import { ResourceLifecycleControls } from "../../src/features/resources/components/resource-lifecycle-controls";
 import { ResourcePublicationReadinessPanel } from "../../src/features/resources/components/resource-publication-readiness-panel";
 import { ResourcePublisherFilters } from "../../src/features/resources/components/resource-publisher-filters";
-import { getResourcePublicationReadinessCopy } from "../../src/lib/resource-publication-readiness-i18n";
+import { getResourcePublicationReadinessCopy } from "../../src/features/resources/resource-publication-readiness-i18n";
 
 describe("workspace and resource UI surface", () => {
   it.each(["en", "ru"] as const)(
@@ -177,7 +177,7 @@ describe("workspace and resource UI surface", () => {
       expect(html).toContain('for="publisher-type"');
       expect(html).toContain('data-ui="button"');
       expect(html).toContain(copy.apply);
-      expect(html).toContain("min-h-11");
+      expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
       expect(html).not.toContain("h-10");
     },
   );

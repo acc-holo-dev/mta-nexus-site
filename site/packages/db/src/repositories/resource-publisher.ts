@@ -1,17 +1,17 @@
-import { and, asc, count, desc, eq, ilike, inArray, isNotNull, isNull, or, sql } from "drizzle-orm";
 import {
   NotFoundError,
-  type PublisherResourceQuery,
   type PublisherHistoryKind,
+  type PublisherResourceQuery,
   type ResourceReadiness,
 } from "@nexus/domain";
+import { and, asc, count, desc, eq, ilike, inArray, isNotNull, isNull, or, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, builds, products } from "../schema";
-import { managedProductCondition } from "./products";
-import { containsPattern } from "./search-pattern";
+import { trustedCleanScanCondition } from "./build-safety";
 import { historyPageBounds } from "./history-pagination";
 import { assertProductMutationAuthority } from "./product-mutation-authority";
-import { trustedCleanScanCondition } from "./build-safety";
+import { managedProductCondition } from "./products";
+import { containsPattern } from "./search-pattern";
 
 function readiness() {
   const clean = sql`exists (select 1 from ${builds} where ${builds.productId} = ${products.id}

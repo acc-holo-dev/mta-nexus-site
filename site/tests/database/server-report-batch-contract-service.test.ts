@@ -15,20 +15,20 @@ vi.mock("@nexus/db", () => ({
   contentRepository: {},
 }));
 
+import { reportBatchCopy } from "../../src/features/community/report-batch-copy";
+import {
+  confirmedServerPublicationRestore,
+  serverPublicationHistorySchema,
+} from "../../src/features/community/server-publication-history-contract";
 import {
   confirmsReportBatchCommand,
   confirmsReportBatchPreview,
   reportBatchCommandInput,
   reportBatchPreviewInput,
-} from "../../src/lib/report-batch-contract";
-import { reportBatchCopy } from "../../src/lib/report-batch-copy";
-import {
-  confirmedServerPublicationRestore,
-  serverPublicationHistorySchema,
-} from "../../src/lib/server-publication-history-contract";
-import { serverPublicationHistoryCopy } from "../../src/lib/server-publication-history-copy";
-import { communityReportService as reports } from "../../src/lib/services/community-report-service";
-import { serverContentService as servers } from "../../src/lib/services/server-content-service";
+} from "../../src/features/moderation/report-batch-contract";
+import { serverPublicationHistoryCopy } from "../../src/features/servers/server-publication-history-copy";
+import { communityReportService as reports } from "../../src/lib/services/community/community-report-service";
+import { serverContentService as servers } from "../../src/lib/services/servers/server-content-service";
 
 const actor = { id: "staff", role: "moderator" } as User,
   time = "2026-10-11T00:00:00.123456Z",

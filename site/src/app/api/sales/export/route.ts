@@ -1,8 +1,8 @@
 import type { NextRequest } from "next/server";
-import { resourceCommerceRequest } from "../../../../lib/resource-commerce-http";
-import { sellerSalesCsv } from "../../../../lib/seller-sales-csv";
-import { sellerSalesQuery } from "../../../../lib/seller-sales-query";
-import { sellerSalesService } from "../../../../lib/services/seller-sales-service";
+import { sellerSalesCsv } from "../../../../features/commerce/seller-sales-csv";
+import { sellerSalesQuery } from "../../../../features/commerce/seller-sales-query";
+import { resourceCommerceRequest } from "../../../../features/resources/resource-commerce-http";
+import { sellerSalesService } from "../../../../lib/services/commerce/seller-sales-service";
 export function GET(request: NextRequest) {
   return resourceCommerceRequest(request, false, async (actor) => {
     const report = await sellerSalesService.report(

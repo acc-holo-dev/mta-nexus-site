@@ -2,24 +2,19 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import { getManagedServerCopy } from "../../src/features/servers/managed-server-view";
 import { ManagedServerCard } from "../../src/features/servers/server/managed-server-card";
 import { getDictionary } from "../../src/lib/i18n";
-import { getManagedServerCopy } from "../../src/lib/managed-server-view";
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
 describe("localized legal and workspace shell", () => {
   it("serves legal pages from one RU/EN document system", () => {
-    for (const [path, key] of [
-      ["site/src/app/terms/page.tsx", "terms"],
-      ["site/src/app/privacy/page.tsx", "privacy"],
-      ["site/src/app/copyright/page.tsx", "copyright"],
-      ["site/src/app/community-rules/page.tsx", "communityRules"],
-    ] as const) {
-      const page = read(path);
-      expect(page).toContain("getRequestLocale");
-      expect(page).toContain(`.legal.${key}`);
-      expect(page).toContain("<LegalDocument");
+    const page = read("site/src/features/shell/server/legal-document-page.tsx");
+    expect(page).toContain("getRequestLocale");
+    expect(page).toContain("<LegalDocument");
+    for (const key of ["terms", "privacy", "copyright", "communityRules"] as const) {
+      expect(page).toContain(`legal.${key}`);
     }
 
     const en = getDictionary("en").legal;
@@ -31,8 +26,8 @@ describe("localized legal and workspace shell", () => {
   });
 
   it("uses the shared locale provider for route errors and loading", () => {
-    const error = read("site/src/app/error.tsx");
-    const loading = read("site/src/app/loading.tsx");
+    const error = read("site/src/features/shell/components/route-error-page.tsx");
+    const loading = read("site/src/features/shell/components/global-loading-page.tsx");
 
     expect(error).toContain("useNexusLocale");
     expect(error).not.toContain("document.cookie");

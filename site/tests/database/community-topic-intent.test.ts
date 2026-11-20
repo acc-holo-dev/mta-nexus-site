@@ -3,7 +3,7 @@ import {
   clearCommunityTopicIntent,
   readCommunityTopicIntent,
   writeCommunityTopicIntent,
-} from "../../src/lib/community-topic-intent";
+} from "../../src/features/community/community-topic-intent";
 
 const intent = {
   actorId: "usr_a",

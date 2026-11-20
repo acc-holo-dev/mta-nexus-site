@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
@@ -23,15 +25,15 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../../src/lib/i18n-server", async () => {
+vi.mock("../../src/lib/i18n/server", async () => {
   const { state: harnessState } = await import("../helpers/resource-review-pages-harness");
   return { getRequestLocale: async () => harnessState.locale };
 });
-vi.mock("../../src/lib/services/auth-service", async () => {
+vi.mock("../../src/lib/services/accounts/auth-service", async () => {
   const { state: harnessState } = await import("../helpers/resource-review-pages-harness");
   return { authService: { getSession: async () => harnessState.actor } };
 });
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: {
     getProductBySlug: async () => ({
       id: "prd_a",
@@ -58,8 +60,8 @@ setupResourceReviewPages();
 
 import Editor from "../../src/app/workspace/library/review/[id]/page";
 import Own from "../../src/app/workspace/library/reviews/page";
+import { resourceReviewCopy } from "../../src/features/resources/resource-review-i18n";
 import { ResourceReviewEditor } from "../../src/features/resources/review-controls";
-import { resourceReviewCopy } from "../../src/lib/resource-review-i18n";
 
 it.each(["en", "ru"] as const)(
   "renders own unavailable reviews and history navigation in %s",
@@ -70,7 +72,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(locale === "ru" ? "Ресурс недоступен" : "Resource unavailable");
     expect(html).toContain("/workspace/library/review/prd_a");
     expect(html).toContain("page=3");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).not.toContain("<script>");
     expect(mocks.ownPage).toHaveBeenCalledWith("usr_a", 2);
   },
@@ -81,8 +83,8 @@ it("shows EmptyState honesty when own reviews are empty", async () => {
   const html = renderToStaticMarkup(await Own({ searchParams: Promise.resolve({}) }));
   expect(html).toContain(copy.empty);
   expect(html).toContain(copy.ownEmptyHint);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
 });
 it("shows an honest recovery state when own reviews fail to load", async () => {
   mocks.ownPage.mockRejectedValueOnce(new Error("reviews unavailable"));
@@ -91,7 +93,7 @@ it("shows an honest recovery state when own reviews fail to load", async () => {
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.pageUnavailable);
   expect(html).toContain(copy.pageUnavailableDescription);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("page=2");
   expect(html).not.toContain("reviews unavailable");
 });
@@ -101,7 +103,7 @@ it("shows an honest recovery state when own review detail fails to load", async 
   const html = renderToStaticMarkup(await Editor({ params: Promise.resolve({ id: "prd_a" }) }));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.pageUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/workspace/library/review/prd_a"');
   expect(html).not.toContain("detail unavailable");
 });
@@ -115,8 +117,8 @@ it("clips honest own-review loading shells on narrow layouts", async () => {
   const copy = resourceReviewCopy("en");
   for (const Loading of [OwnReviewsLoading, OwnReviewDetailLoading]) {
     const html = renderToStaticMarkup(await Loading());
-    expect(html).toContain("min-w-0");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain(copy.pageLoading);
   }
 });

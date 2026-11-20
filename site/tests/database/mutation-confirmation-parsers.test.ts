@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
+import { confirmedCommentId } from "../../src/features/community/content-comment-confirmation";
 import {
   confirmedNotificationPreferences,
   parseNotificationPreferences,
-} from "../../src/lib/notification-preferences-confirmation";
-import { confirmedCommentId } from "../../src/lib/content-comment-confirmation";
+} from "../../src/features/notifications/notification-preferences-confirmation";
 import {
   confirmsServerClaimVerification,
   parseIssuedServerClaimChallenge,
-} from "../../src/lib/server-claim-confirmation";
+} from "../../src/features/servers/server-claim-confirmation";
 
 const preferences = {
   followsEnabled: true,

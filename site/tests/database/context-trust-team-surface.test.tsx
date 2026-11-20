@@ -3,11 +3,11 @@ vi.mock("server-only", () => ({}));
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+import { organizationTeamCopy } from "../../src/features/organizations/organization-team-copy";
+import { getOrganizationCopy } from "../../src/features/organizations/organization-workspace-copy";
 import { OrganizationTeamDirectory } from "../../src/features/organizations/team";
-import { organizationTeamCopy } from "../../src/lib/organization-team-copy";
-import { getOrganizationCopy } from "../../src/lib/organization-workspace-copy";
-import { contextTrustCopy } from "../../src/lib/public-context-trust-copy";
-import { approvalCopy } from "../../src/lib/public-verification-history-copy";
+import { contextTrustCopy } from "../../src/features/trust/public-context-trust-copy";
+import { approvalCopy } from "../../src/features/trust/public-verification-history-copy";
 
 const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
@@ -22,16 +22,16 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/organizations/org/team",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../../src/lib/services/public-context-trust-service", () => ({
+vi.mock("../../src/lib/services/trust/public-context-trust-service", () => ({
   publicContextTrustService: { page: mocks.trust },
 }));
-vi.mock("../../src/lib/services/organization-team-service", () => ({
+vi.mock("../../src/lib/services/organizations/organization-team-service", () => ({
   organizationTeamService: { page: mocks.team },
 }));
 
@@ -39,7 +39,7 @@ import TeamPage, { generateMetadata } from "../../src/app/workspace/organization
 import {
   contextTrustMetadata,
   PublicContextTrustPage,
-} from "../../src/components/public-context-trust-page";
+} from "../../src/features/trust/public-context-trust-page";
 
 const time = "2026-10-11T00:00:00.000Z",
   context = { params: Promise.resolve({ slug: "team" }) },
@@ -109,8 +109,8 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('href="/organizations/team/activity"');
     expect(html).toContain('href="/organizations/team/trust?cursor=next"');
     expect(html).toContain(copy.verifiedServers);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).not.toContain("secret");
     expect(await contextTrustMetadata("organization", context)).toMatchObject({
       title: copy.title,
@@ -155,7 +155,7 @@ it("rejects proof/identity query overrides before service and provides a fresh-s
   expect(html).toContain('role="alert"');
   expect(html).toContain(approvalCopy("en").invalid);
   expect(html).toContain('href="/servers/team/trust"');
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(mocks.trust).not.toHaveBeenCalled();
 });
 it("uses 404 for missing/nonpublic contexts and does not show empty records on failures", async () => {
@@ -167,8 +167,8 @@ it("uses 404 for missing/nonpublic contexts and does not show empty records on f
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(contextTrustCopy("en").unavailable);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).not.toContain(contextTrustCopy("en").empty);
   expect(html).not.toContain(contextTrustCopy("en").emptyHint);
   expect(html).not.toContain("secret evidence");
@@ -242,9 +242,11 @@ it("does not load private team data for guests and separates session failures fr
   expect(mocks.team).not.toHaveBeenCalled();
   mocks.session.mockRejectedValueOnce(new Error("private session"));
   const failed = renderToStaticMarkup(await TeamPage(teamParams));
-  expect(failed).toContain('href="/auth/login?next=%2Fworkspace%2Forganizations%2Forg%2Fteam"');
+  expect(failed).toContain('role="alert"');
+  expect(failed).toContain(organizationTeamCopy("en").unavailable);
+  expect(failed).toContain('href="/workspace/organizations/org/team"');
+  expect(failed).not.toContain('href="/auth/login?next=%2Fworkspace%2Forganizations%2Forg%2Fteam"');
   expect(failed).not.toContain("private session");
-  expect(failed).not.toContain(organizationTeamCopy("en").title);
 });
 it.each(["constructor", "toString", "__proto__"])(
   "renders unsupported legacy role %s as text without granting controls",

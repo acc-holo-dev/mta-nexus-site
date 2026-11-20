@@ -1,3 +1,8 @@
 import "server-only";
 
-export { SupportMessagePage, supportMessageMetadata } from "./server/support-message-page";
+export {
+  AdminSupportMessagesPage,
+  MemberSupportMessagesPage,
+  SupportMessagePage,
+  supportMessageMetadata,
+} from "./server/support-message-page";

@@ -2,20 +2,31 @@ import { Avatar, Button, EmptyState, ErrorState, FilterBar, SearchField } from "
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import {
+  linkAccentSmRounded,
+  linkAccentXsRounded,
+  linkMinHAccentSemibold,
+} from "../../shell/link-shell";
+import { pageShellStack5 } from "../../shell/page-shell";
+import { panelClipSpace3P5 } from "../../shell/panel-shell";
+import {
+  typeFlexMinWrapGap2,
+  typeFlexMinWrapGap3,
+  typeMinSpace4,
+  typeMlAutoXsMuted,
+  typePrewrapSmSecondary,
+  typeSpace1XsSecondary,
+} from "../../shell/type-shell";
+import {
   PUBLICATION_SOURCES,
   PUBLICATION_TYPES,
   type PublicationPage,
   type PublicationQuery,
   publicationHref,
   SERVER_PUBLICATION_TYPES,
-} from "../../../lib/publication-feed-contract";
-import { publicationCopy, publicationError } from "../../../lib/publication-feed-copy";
-import { platformFieldClass } from "../../../lib/user-platform-client";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
-
-const actionLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+} from "../publication-feed-contract";
+import { publicationCopy, publicationError } from "../publication-feed-copy";
+import { platformFieldClass } from "../user-platform-client";
+import { getUserPlatformCopy } from "../user-platform-copy";
 export function PublicationFeed({
   initial,
   filters,
@@ -65,7 +76,7 @@ export function PublicationFeed({
   return (
     <Root
       {...(sectionLabelledBy ? { "aria-labelledby": sectionLabelledBy } : {})}
-      className="min-w-0 space-y-5 overflow-x-clip"
+      className={pageShellStack5}
     >
       {following && filters.target && (
         <p className="nexus-panel flex min-w-0 flex-wrap items-center gap-3 p-4 text-sm text-muted">
@@ -73,7 +84,7 @@ export function PublicationFeed({
           <Link
             prefetch={false}
             href={publicationHref(path, { ...filters, target: undefined, cursor: undefined })}
-            className={actionLinkClass}
+            className={linkAccentSmRounded}
           >
             {copy.clearTarget}
           </Link>
@@ -96,7 +107,7 @@ export function PublicationFeed({
             placeholder={copy.queryHint}
           />
         </div>
-        <label className="space-y-1 text-xs text-secondary">
+        <label className={typeSpace1XsSecondary}>
           {copy.type}
           <select name="type" defaultValue={filters.type ?? ""} className={platformFieldClass}>
             <option value="">{copy.all}</option>
@@ -108,7 +119,7 @@ export function PublicationFeed({
           </select>
         </label>
         {following && !filters.target && (
-          <label className="space-y-1 text-xs text-secondary">
+          <label className={typeSpace1XsSecondary}>
             {copy.source}
             <select
               name="source"
@@ -144,16 +155,17 @@ export function PublicationFeed({
             defaultValue={filters.tag ?? ""}
           />
         </label>
-        <Button type="submit" variant="outline" className="min-h-11 font-semibold text-accent">
+        <Button type="submit" variant="outline" className={linkMinHAccentSemibold}>
           {copy.search}
         </Button>
-        <Link href={path} className={actionLinkClass}>
+        <Link href={path} className={linkAccentSmRounded}>
           {copy.reset}
         </Link>
       </FilterBar>
       {error && (
         <ErrorState
           title={error}
+          description={copy.loadUnavailableHint}
           action={
             <a
               href={publicationHref(
@@ -168,9 +180,9 @@ export function PublicationFeed({
           }
         />
       )}
-      <div className="min-w-0 space-y-4">
+      <div className={typeMinSpace4}>
         {page?.items.map((item) => (
-          <article key={item.id} className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
+          <article key={item.id} className={panelClipSpace3P5}>
             <header className="flex min-w-0 flex-wrap items-center gap-3">
               <Avatar
                 src={item.author.avatar ?? undefined}
@@ -186,12 +198,12 @@ export function PublicationFeed({
               </Link>
               <Link
                 href={publicationHref(path, { ...filters, author: item.author.username })}
-                className="inline-flex min-h-11 items-center rounded text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentXsRounded}
                 prefetch={false}
               >
                 {copy.onlyAuthor}
               </Link>
-              <time dateTime={item.publishedAt} className="ml-auto text-xs text-muted">
+              <time dateTime={item.publishedAt} className={typeMlAutoXsMuted}>
                 {new Date(item.publishedAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                   timeZone: "UTC",
                   timeZoneName: "short",
@@ -223,9 +235,9 @@ export function PublicationFeed({
                 {item.title}
               </Link>
             </h2>
-            <p className="whitespace-pre-wrap break-words text-sm text-secondary">{item.excerpt}</p>
+            <p className={typePrewrapSmSecondary}>{item.excerpt}</p>
             {item.tags?.length > 0 && (
-              <ul className="flex min-w-0 flex-wrap gap-2" aria-label={copy.tag}>
+              <ul className={typeFlexMinWrapGap2} aria-label={copy.tag}>
                 {Array.from(new Set(item.tags)).map((tag) => (
                   <li key={tag}>
                     <Link
@@ -242,7 +254,7 @@ export function PublicationFeed({
             <Link
               href={`/articles/${encodeURIComponent(item.slug)}#discussion`}
               prefetch={false}
-              className="inline-flex min-h-11 items-center rounded text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentXsRounded}
             >
               {copy.comments}: {item.commentCount}
             </Link>
@@ -262,7 +274,7 @@ export function PublicationFeed({
                       target: undefined,
                       cursor: undefined,
                     })}
-                    className={actionLinkClass}
+                    className={linkAccentSmRounded}
                   >
                     {copy.clearTarget}
                   </Link>
@@ -279,7 +291,7 @@ export function PublicationFeed({
                       tag: undefined,
                       cursor: undefined,
                     })}
-                    className={actionLinkClass}
+                    className={linkAccentSmRounded}
                   >
                     {copy.reset}
                   </Link>
@@ -288,13 +300,13 @@ export function PublicationFeed({
                   <Link
                     prefetch={false}
                     href={publicationHref(path, { ...filters, cursor: undefined })}
-                    className={actionLinkClass}
+                    className={linkAccentSmRounded}
                   >
                     {copy.latest}
                   </Link>
                 )}
                 {emptyFollowingHonest && (
-                  <Link href="/discover" className={actionLinkClass}>
+                  <Link href="/discover" className={linkAccentSmRounded}>
                     {copy.discover}
                   </Link>
                 )}
@@ -303,7 +315,7 @@ export function PublicationFeed({
           />
         )}
       </div>
-      <nav aria-label={copy.activity} className="flex min-w-0 flex-wrap gap-3">
+      <nav aria-label={copy.activity} className={typeFlexMinWrapGap3}>
         {page?.previousCursor && (
           <Link
             href={publicationHref(path, filters, page.previousCursor)}
@@ -329,7 +341,7 @@ export function PublicationFeed({
           </Link>
         )}
         {following && (
-          <Link href="/workspace/saved" className={actionLinkClass}>
+          <Link href="/workspace/saved" className={linkAccentSmRounded}>
             {copy.manage}
           </Link>
         )}

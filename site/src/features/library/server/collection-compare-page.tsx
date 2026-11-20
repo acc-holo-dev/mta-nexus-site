@@ -4,39 +4,45 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { LibraryCollectionItemCopyForm } from "../collection-item-copy";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { PlatformSessionError } from "../../../components/platform-session-error";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { libraryCollectionComparisonCopy } from "../../../lib/library-collection-comparison-i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelClipSpace2P5 } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeBorderT,
+  typeBreakSemibold,
+  typeFlexMinWrapEndGap3,
+  typeFlexMinWrapGap4Sm,
+  typeMinBreakDisplay,
+  typeSmMuted,
+  typeSmSecondary,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import { LibraryCollectionItemCopyForm } from "../collection-item-copy";
+import { libraryCollectionComparisonCopy } from "../library-collection-comparison-i18n";
 import {
   libraryCollectionComparisonQuery,
   libraryCollectionComparisonSuffix,
-} from "../../../lib/library-collection-comparison-query";
-import {
-  libraryCollectionError,
-  libraryCollectionsCopy,
-} from "../../../lib/library-collections-i18n";
+} from "../library-collection-comparison-query";
+import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
 import {
   collectionHref,
-  collectionId as parseCollectionId,
   collectionPageParams,
-} from "../../../lib/library-collections-query";
-import { authService } from "../../../lib/services/auth-service";
-import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
+  collectionId as parseCollectionId,
+} from "../library-collections-query";
 
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
-export async function generateMetadata(): Promise<Metadata> {
+export async function collectionCompareMetadata(): Promise<Metadata> {
   return {
     title: `${libraryCollectionComparisonCopy(await getRequestLocale()).title} | MTA NEXUS`,
     robots: { index: false, follow: false },
   };
 }
-export default async function Page({
+export async function CollectionComparePage({
   params,
   searchParams,
 }: {
@@ -87,13 +93,13 @@ export default async function Page({
       });
     if (!report) {
       return (
-        <div className={pageShellClass}>
+        <div className={pageShellMax5xl}>
           <h1 className="font-display">{h.title}</h1>
           <ErrorState
             title={h.loadUnavailable}
             description={h.loadUnavailableDescription}
             action={
-              <Link href={retryHref} className={navLinkClass}>
+              <Link href={retryHref} className={linkAccentSmRounded}>
                 {dictionary.errors.retry}
               </Link>
             }
@@ -107,19 +113,19 @@ export default async function Page({
     const writableDestination =
       comparison?.destination.status === "active" && comparison.destination.revision < 2147483647;
     return (
-      <div className={pageShellClass}>
-        <nav className="flex min-w-0 flex-wrap gap-4 text-sm" aria-label={h.title}>
-          <Link href={collectionHref(id)} className={navLinkClass}>
+      <div className={pageShellMax5xl}>
+        <nav className={typeFlexMinWrapGap4Sm} aria-label={h.title}>
+          <Link href={collectionHref(id)} className={linkAccentSmRounded}>
             {c.back}
           </Link>
-          <Link href={collectionHref()} className={navLinkClass}>
+          <Link href={collectionHref()} className={linkAccentSmRounded}>
             {c.title}
           </Link>
         </nav>
-        <h1 className="min-w-0 break-words font-display">{h.title}</h1>
+        <h1 className={typeMinBreakDisplay}>{h.title}</h1>
         <p className="text-secondary">{h.note}</p>
-        <section className="nexus-panel min-w-0 space-y-2 overflow-x-clip p-5">
-          <h2 className="break-words font-semibold">
+        <section className={panelClipSpace2P5}>
+          <h2 className={typeBreakSemibold}>
             {c.source}: {report.source.name}
           </h2>
           <p>
@@ -131,7 +137,7 @@ export default async function Page({
           <form
             method="get"
             action={collectionHref(id, "compare")}
-            className="flex min-w-0 flex-wrap items-end gap-3"
+            className={typeFlexMinWrapEndGap3}
           >
             <label className="grid min-w-0 max-w-full gap-1.5">
               <span className="font-label uppercase text-secondary">{h.destination}</span>
@@ -205,10 +211,13 @@ export default async function Page({
           />
         ) : (
           <>
-            <section className="nexus-panel min-w-0 space-y-2 overflow-x-clip p-5">
-              <h2 className="break-words font-semibold">
+            <section className={panelClipSpace2P5}>
+              <h2 className={typeBreakSemibold}>
                 {c.destination}:{" "}
-                <Link href={collectionHref(comparison.destination.id)} className={navLinkClass}>
+                <Link
+                  href={collectionHref(comparison.destination.id)}
+                  className={linkAccentSmRounded}
+                >
                   {comparison.destination.name}
                 </Link>
               </h2>
@@ -228,7 +237,7 @@ export default async function Page({
                 ] as const
               ).map(([key, count]) => (
                 <div key={key} className="nexus-panel min-w-0 overflow-x-clip p-3">
-                  <dt className="text-sm text-secondary">{h[key]}</dt>
+                  <dt className={typeSmSecondary}>{h[key]}</dt>
                   <dd className="text-xl">{count}</dd>
                 </div>
               ))}
@@ -257,7 +266,7 @@ export default async function Page({
                 </thead>
                 <tbody>
                   {comparison.items.map((item) => (
-                    <tr key={item.productId} className="border-t border-base">
+                    <tr key={item.productId} className={typeBorderT}>
                       <th scope="row" className="break-words p-2 font-normal">
                         {item.available ? (item.title ?? c.unavailable) : c.unavailable}
                         <code className="block break-all text-xs text-muted">{item.productId}</code>
@@ -273,16 +282,21 @@ export default async function Page({
                 </tbody>
               </table>
             </div>
-            <p role="note" className="text-sm text-muted">
+            <p role="note" className={typeSmMuted}>
               {h.referenceNote}
             </p>
             {!writableDestination ? (
               <ErrorState
                 id="library-collection-compare-destination-readonly"
                 title={h.destinationReadOnly}
+                description={h.destinationReadOnlyHint}
               />
             ) : !transferable.length ? (
-              <ErrorState id="library-collection-compare-no-source-items" title={h.noSourceItems} />
+              <ErrorState
+                id="library-collection-compare-no-source-items"
+                title={h.noSourceItems}
+                description={h.noSourceItemsHint}
+              />
             ) : (
               <LibraryCollectionItemCopyForm
                 key={`${id}:${report.source.revision}:${comparison.destination.id}:${comparison.destination.revision}:${comparison.page}:${comparison.filter}:${comparison.q}:${comparison.transfer}`}
@@ -305,11 +319,11 @@ export default async function Page({
               />
             )}
             {comparison.totalPages > 1 && (
-              <nav aria-label={c.page} className="flex min-w-0 flex-wrap gap-4 text-sm">
+              <nav aria-label={c.page} className={typeFlexMinWrapGap4Sm}>
                 {comparison.page > 1 && (
                   <Link
                     href={`${collectionHref(id, "compare")}?${suffix(comparison.page - 1)}`}
-                    className={navLinkClass}
+                    className={linkAccentSmRounded}
                   >
                     {c.previous}
                   </Link>
@@ -317,7 +331,7 @@ export default async function Page({
                 {comparison.page < comparison.totalPages && (
                   <Link
                     href={`${collectionHref(id, "compare")}?${suffix(comparison.page + 1)}`}
-                    className={navLinkClass}
+                    className={linkAccentSmRounded}
                   >
                     {c.next}
                   </Link>
@@ -326,12 +340,12 @@ export default async function Page({
             )}
           </>
         )}
-        <p className="text-xs text-muted">
+        <p className={typeXsMuted}>
           <time dateTime={report.generatedAt}>{report.generatedAt}</time>
         </p>
         <a
           href={`/api/library/collections/${encodeURIComponent(id)}/compare?${suffix(comparison?.page ?? 1)}`}
-          className={navLinkClass}
+          className={linkAccentSmRounded}
         >
           {c.json}
         </a>
@@ -341,12 +355,12 @@ export default async function Page({
     if (!(error instanceof AppError)) throw error;
     if (error.statusCode === 404) notFound();
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax5xl}>
         <ErrorState
           title={libraryCollectionError(typedLocale, error.code)}
           description={h.loadUnavailableDescription}
           action={
-            <Link href={collectionHref(id, "compare")} className={navLinkClass}>
+            <Link href={collectionHref(id, "compare")} className={linkAccentSmRounded}>
               {c.reload}
             </Link>
           }

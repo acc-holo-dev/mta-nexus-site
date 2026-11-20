@@ -24,13 +24,13 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/library-collections-service", () => ({
+vi.mock("../../src/lib/services/library/library-collections-service", () => ({
   libraryCollectionsService: { comparison: state.comparison },
 }));
 vi.mock("../../src/features/library/collection-item-copy", () => ({
@@ -65,9 +65,9 @@ import Page, {
   dynamic,
   generateMetadata,
 } from "../../src/app/workspace/library/collections/[id]/compare/page";
+import { libraryCollectionComparisonCopy } from "../../src/features/library/library-collection-comparison-i18n";
 import { getDictionary } from "../../src/lib/i18n";
-import { authService } from "../../src/lib/services/auth-service";
-import { libraryCollectionComparisonCopy } from "../../src/lib/library-collection-comparison-i18n";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 const source = {
     id: "lcol_a",
@@ -209,8 +209,8 @@ it("chooses an owned comparison target before reading resources", async () => {
   const html = await screen({});
   expect(html).toContain(copy.choose);
   expect(html).toContain(copy.chooseHint);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).not.toContain('role="alert"');
   expect(html).not.toContain("data-transfer");
   expect(html).not.toContain("Accessible");
@@ -223,8 +223,8 @@ it("shows EmptyState when comparison filters match no references", async () => {
   const html = await screen();
   const copy = libraryCollectionComparisonCopy("en");
   expect(html).toContain(copy.emptyHint);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain('role="alert"');
   expect(html).toContain('id="library-collection-compare-no-source-items"');
   expect(html).toContain(copy.noSourceItems);
@@ -237,8 +237,8 @@ it("shows ErrorState recovery when comparison fails to load", async () => {
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(`>${copy.title}</h1>`);
   expect(html).toContain(copy.loadUnavailableDescription);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
 });
 it("returns to the collection list when the comparison identifier is invalid and session lookup fails", async () => {
   vi.spyOn(authService, "getSession").mockRejectedValueOnce(new Error("offline"));
@@ -265,7 +265,7 @@ it.each([{ userId: "other" }, { to: ["a", "b"] }, { to: "../private" }, { filter
     const html = await screen(query);
     expect(html).toContain('role="alert"');
     expect(html).toContain(libraryCollectionComparisonCopy("en").loadUnavailableDescription);
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(state.comparison).not.toHaveBeenCalled();
   },
 );

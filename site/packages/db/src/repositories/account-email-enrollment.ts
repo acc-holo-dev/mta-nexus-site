@@ -1,12 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { ordinaryRecoveryEligible } from "@nexus/security";
 import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
+import { accountRecoveryBindings, authChallenges } from "../account-recovery-schema";
 import { db } from "../client";
 import { auditEvents, users } from "../schema";
-import { accountRecoveryBindings, authChallenges } from "../account-recovery-schema";
 import { accountChallengeRepository } from "./account-challenges";
-import { accountMailOutboxRepository } from "./account-mail-outbox";
 import type { AccountMailCipher } from "./account-mail-crypto";
+import { accountMailOutboxRepository } from "./account-mail-outbox";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 

@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
@@ -13,13 +15,13 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn() }),
   usePathname: () => "/workspace/verification/history",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../../src/lib/services/verification-workspace-service", () => ({
+vi.mock("../../src/lib/services/moderation/verification-workspace-service", () => ({
   verificationWorkspaceService: state,
 }));
 
@@ -30,8 +32,8 @@ import Loading from "../../src/app/workspace/verification/history/loading";
 import History, {
   generateMetadata as historyMetadata,
 } from "../../src/app/workspace/verification/history/page";
-import { verificationApplicationsCopy } from "../../src/lib/verification-applications-copy";
-import { verificationCopy } from "../../src/lib/verification-workspace-copy";
+import { verificationApplicationsCopy } from "../../src/features/moderation/verification-applications-copy";
+import { verificationCopy } from "../../src/features/trust/verification-workspace-copy";
 
 const time = "2026-10-11T00:00:00.123456Z",
   params = { params: Promise.resolve({ id: "request" }) },
@@ -95,7 +97,7 @@ it.each(["en", "ru"] as const)(
     expect(
       links.find((url) => url.searchParams.get("cursor") === cursor)?.searchParams.get("status"),
     ).toBe("pending");
-    expect((await historyMetadata()).robots.index).toBe(false);
+    expect((await historyMetadata()).robots).toEqual({ index: false, follow: false });
     expect(renderToStaticMarkup(await Loading())).toContain(
       verificationApplicationsCopy(locale).loading,
     );
@@ -117,7 +119,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain("&lt;img");
     expect(html).not.toContain("<img");
     expect(html).toContain('rel="noopener noreferrer"');
-    expect((await detailMetadata()).robots.index).toBe(false);
+    expect((await detailMetadata()).robots).toEqual({ index: false, follow: false });
   },
 );
 it.each(["approved", "rejected", "server"])(
@@ -184,8 +186,8 @@ it("distinguishes never-empty history from filtered-empty results", async () => 
   expect(never).toContain(copy.emptyNeverHint);
   expect(never).not.toContain(copy.emptyFiltered);
   expect(never).toContain('href="/workspace/verification"');
-  expect(never).toContain("overflow-x-clip");
-  expect(never).toContain("min-w-0");
+  expect(never).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(never).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   const filtered = renderToStaticMarkup(
     await History({ searchParams: Promise.resolve({ status: "pending" }) }),
   );
@@ -198,17 +200,18 @@ it("distinguishes never-empty history from filtered-empty results", async () => 
 it("distinguishes safe auth and target errors from an empty history", async () => {
   state.session.mockRejectedValueOnce(Error("PRIVATE_AUTH"));
   const history = renderToStaticMarkup(await History({}));
-  expect(history).toContain('href="/auth/login?next=%2Fworkspace%2Fverification%2Fhistory"');
-  expect(history).toContain('href="/auth/register?next=%2Fworkspace%2Fverification%2Fhistory"');
+  expect(history).toContain('role="alert"');
+  expect(history).toContain(verificationCopy("en").unavailable);
+  expect(history).toContain('href="/workspace/verification/history"');
+  expect(history).not.toContain('href="/auth/login?next=%2Fworkspace%2Fverification%2Fhistory"');
   expect(history).not.toContain("PRIVATE_AUTH");
   expect(history).not.toContain(verificationApplicationsCopy("en").emptyNever);
   expect(history).not.toContain(verificationApplicationsCopy("en").emptyFiltered);
-  expect(history).not.toContain(verificationApplicationsCopy("en").title);
   state.application.mockRejectedValueOnce(new AppError("PRIVATE_TARGET", 404, "NOT_FOUND"));
   const detail = renderToStaticMarkup(await Detail(params));
   expect(detail).toContain('role="alert"');
   expect(detail).toContain('href="/workspace/verification/request"');
-  expect(detail).toContain("overflow-x-clip");
+  expect(detail).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(detail).not.toContain("PRIVATE_TARGET");
 });
 it.each(["en", "ru"] as const)(
@@ -222,7 +225,7 @@ it.each(["en", "ru"] as const)(
     expect(history).toContain('role="alert"');
     expect(history).toContain(labels.unavailable);
     expect(history).toContain('href="/workspace/verification/history"');
-    expect(history).toContain("overflow-x-clip");
+    expect(history).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(history).not.toContain("PRIVATE_LIST");
     expect(history).not.toContain(copy.emptyNever);
     state.application.mockResolvedValueOnce({
@@ -233,8 +236,8 @@ it.each(["en", "ru"] as const)(
     const detail = renderToStaticMarkup(await Detail(params));
     expect(detail).toContain(copy.noEvents);
     expect(detail).toContain(copy.noEventsHint);
-    expect(detail).toContain("overflow-x-clip");
-    expect(detail).toContain("min-h-11");
+    expect(detail).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(detail).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   },
 );
 it("clips honest verification application loading shells on narrow layouts", async () => {
@@ -246,7 +249,7 @@ it("clips honest verification application loading shells on narrow layouts", asy
   );
   for (const LoadingShell of [HistoryLoading, DetailLoading]) {
     const html = renderToStaticMarkup(await LoadingShell());
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   }
 });

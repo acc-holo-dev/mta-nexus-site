@@ -5,8 +5,11 @@ import {
   confirmedAuthorPublicationRestore,
   parseAuthorPublicationDeskQuery,
   parseAuthorPublicationHistoryQuery,
-} from "../../src/lib/author-publication-desk-contract";
-import { parsePublicationQuery, publicationHref } from "../../src/lib/publication-feed-contract";
+} from "../../src/features/community/author-publication-desk-contract";
+import {
+  parsePublicationQuery,
+  publicationHref,
+} from "../../src/features/community/publication-feed-contract";
 
 const point = {
   id: "article",

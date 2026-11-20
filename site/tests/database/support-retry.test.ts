@@ -5,7 +5,7 @@ import {
   reserveSupportReplyRetry,
   resolveSupportRetryActorScope,
   type SupportRetryStorage,
-} from "../../src/lib/support-retry";
+} from "../../src/features/support/support-retry";
 
 const NOW = 1_797_000_000_000;
 const CASE_ID = `sup_${"a".repeat(24)}`;

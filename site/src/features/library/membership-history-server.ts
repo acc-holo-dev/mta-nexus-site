@@ -1,3 +1,7 @@
 import "server-only";
 
-export { LibraryMembershipHistoryScreen } from "./server/library-membership-history-screen";
+export {
+  LibraryMembershipHistoryScreen,
+  libraryMembershipHistoryDetailMetadata,
+  libraryMembershipHistoryMetadata,
+} from "./server/library-membership-history-screen";

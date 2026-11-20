@@ -2,8 +2,10 @@
 
 import type { ResourceMediaItem } from "@nexus/domain";
 import { useState } from "react";
-import { resourceMediaCopy } from "../../../lib/resource-media-i18n";
+import { panelSpace4P5 } from "../../shell/panel-shell";
+import { typeBreakSmSecondary, typeGrid2Gap4, typeLgSemiboldPrimary } from "../../shell/type-shell";
 import { shouldOpenGalleryLightbox } from "../model/resource-gallery-interaction";
+import { resourceMediaCopy } from "../resource-media-i18n";
 import { ResourceGalleryLightbox } from "./resource-gallery-lightbox";
 import { ResourcePreview } from "./resource-preview";
 
@@ -20,9 +22,9 @@ export function ResourceGallery({
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   if (!items.length) return null;
   return (
-    <section className="nexus-panel space-y-4 p-5" aria-label={copy.title}>
-      <h2 className="text-lg font-semibold text-primary">{copy.title}</h2>
-      <ul className="grid gap-4 sm:grid-cols-2">
+    <section className={panelSpace4P5} aria-label={copy.title}>
+      <h2 className={typeLgSemiboldPrimary}>{copy.title}</h2>
+      <ul className={typeGrid2Gap4}>
         {items.map((item, index) => (
           <li key={item.id}>
             <figure className="space-y-2">
@@ -46,9 +48,7 @@ export function ResourceGallery({
                 />
               </a>
               {item.caption && (
-                <figcaption className="break-words text-sm text-secondary">
-                  {item.caption}
-                </figcaption>
+                <figcaption className={typeBreakSmSecondary}>{item.caption}</figcaption>
               )}
             </figure>
           </li>

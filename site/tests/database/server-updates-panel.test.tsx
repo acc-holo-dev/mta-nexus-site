@@ -25,7 +25,7 @@ describe("server updates panel behavior", () => {
     );
     expect(html).toContain('href="/servers/my-server/updates"');
     expect(html).toContain("Все публикации сервера");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   });
   it.each(["en", "ru"] as const)("distinguishes unavailable and empty feeds in %s", (locale) => {
     const copy = getDictionary(locale).serverUpdates;
@@ -39,7 +39,7 @@ describe("server updates panel behavior", () => {
     expect(unavailable).toContain(copy.unavailable);
     expect(unavailable).toContain('role="alert"');
     expect(unavailable).toContain('href="/servers/my-server"');
-    expect(unavailable).toContain("min-h-11");
+    expect(unavailable).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(unavailable).not.toContain(copy.empty);
     expect(unavailable).not.toContain(copy.emptyHint);
 

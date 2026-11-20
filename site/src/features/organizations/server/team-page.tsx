@@ -2,29 +2,38 @@ import { AppError } from "@nexus/domain";
 import { Button, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { OrganizationTeamDirectory } from "../team";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { getRequestLocale } from "../../../lib/i18n-server";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { organizationTeamService } from "../../../lib/services/organizations/organization-team-service";
+import { platformFieldClass } from "../../community/user-platform-client";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
+import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import {
+  type2xlExtraboldPrimary,
+  typeBreakSemiboldPrimary,
+  typeMinH11Semibold,
+  typeMinW40Flex1Space1XsMuted,
+  typeSmMuted,
+  typeSpace1XsMuted,
+} from "../../shell/type-shell";
 import {
   organizationTeamHref,
   organizationTeamPageSchema,
   parseOrganizationTeamQuery,
-} from "../../../lib/organization-team-contract";
-import { organizationTeamCopy, organizationTeamError } from "../../../lib/organization-team-copy";
-import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
-import { authService } from "../../../lib/services/auth-service";
-import { organizationTeamService } from "../../../lib/services/organization-team-service";
-import { platformFieldClass } from "../../../lib/user-platform-client";
-const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-export async function generateMetadata() {
+} from "../organization-team-contract";
+import { organizationTeamCopy, organizationTeamError } from "../organization-team-copy";
+import { getOrganizationCopy } from "../organization-workspace-copy";
+import { OrganizationTeamDirectory } from "../team";
+export async function teamMetadata() {
   return {
     title: organizationTeamCopy(await getRequestLocale()).title,
     robots: { index: false, follow: false },
   };
 }
-export default async function TeamPage({
+export async function TeamPage({
   params,
   searchParams,
 }: {
@@ -46,9 +55,19 @@ export default async function TeamPage({
     : query.size
       ? `/workspace/organizations/${encodeURIComponent(id)}/team?${query}`
       : organizationTeamHref(id, { query: "" });
-  const actor = await authService
-    .getSession((await cookies()).get("nexus_session")?.value)
-    .catch(() => null);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={copy.title}
+        message={copy.unavailable}
+        retryHref={returnPath}
+      />
+    );
+  }
   if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const filters = teamFilters;
   let error = filters ? "" : copy.invalid;
@@ -64,16 +83,16 @@ export default async function TeamPage({
   const parsed = organizationTeamPageSchema.safeParse(result);
   if (result && !parsed.success) error = copy.unavailable;
   return (
-    <div className={pageShellClass}>
-      <Link href={`/workspace/organizations/${encodeURIComponent(id)}`} className={navLinkClass}>
+    <div className={pageShellMax4xl}>
+      <Link href={`/workspace/organizations/${encodeURIComponent(id)}`} className={linkAccentSm}>
         {copy.workspace}
       </Link>
       <header className="space-y-2">
-        <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
+        <h1 className={type2xlExtraboldPrimary}>{copy.title}</h1>
         {parsed.success && (
-          <p className="break-words font-semibold text-primary">{parsed.data.organization.name}</p>
+          <p className={typeBreakSemiboldPrimary}>{parsed.data.organization.name}</p>
         )}
-        <p className="text-sm text-muted">{copy.description}</p>
+        <p className={typeSmMuted}>{copy.description}</p>
       </header>
       {parsed.success && filters && (
         <>
@@ -81,9 +100,9 @@ export default async function TeamPage({
             <form
               action={organizationTeamHref(id, { query: "" })}
               method="get"
-              className="nexus-panel flex flex-wrap items-end gap-3 p-4"
+              className={panelFlexWrapEndP4}
             >
-              <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
+              <label className={typeMinW40Flex1Space1XsMuted}>
                 {copy.search}
                 <input
                   type="search"
@@ -93,7 +112,7 @@ export default async function TeamPage({
                   className={`${platformFieldClass} block min-h-11`}
                 />
               </label>
-              <label className="space-y-1 text-xs text-muted">
+              <label className={typeSpace1XsMuted}>
                 {copy.role}
                 <select
                   name="role"
@@ -109,7 +128,7 @@ export default async function TeamPage({
                   <option value="other">{copy.other}</option>
                 </select>
               </label>
-              <label className="space-y-1 text-xs text-muted">
+              <label className={typeSpace1XsMuted}>
                 {copy.access}
                 <select
                   name="access"
@@ -121,10 +140,10 @@ export default async function TeamPage({
                   <option value="no">{copy.no}</option>
                 </select>
               </label>
-              <Button type="submit" className="min-h-11 font-semibold">
+              <Button type="submit" className={typeMinH11Semibold}>
                 {team.filter}
               </Button>
-              <Link href={organizationTeamHref(id, { query: "" })} className={navLinkClass}>
+              <Link href={organizationTeamHref(id, { query: "" })} className={linkAccentSm}>
                 {copy.reset}
               </Link>
             </form>
@@ -141,8 +160,9 @@ export default async function TeamPage({
       {error && (
         <ErrorState
           title={error}
+          description={copy.unavailableHint}
           action={
-            <a href={organizationTeamHref(id, filters ?? { query: "" })} className={navLinkClass}>
+            <a href={organizationTeamHref(id, filters ?? { query: "" })} className={linkAccentSm}>
               {team.reload}
             </a>
           }

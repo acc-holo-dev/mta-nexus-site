@@ -43,17 +43,18 @@ Services, SQL visibility и download authority сохраняют прежние
 
 Предметные UI и server composition сгруппированы в `site/src/features`:
 
-| Feature                                                       | Область                                    |
-| ------------------------------------------------------------- | ------------------------------------------ |
-| [Servers](../site/src/features/servers/README.md)             | Каталог, статистика и управление серверами |
-| [Community](../site/src/features/community/README.md)         | Обсуждения и публикации                    |
-| [Organizations](../site/src/features/organizations/README.md) | Организации и команды                      |
-| [Notifications](../site/src/features/notifications/README.md) | Уведомления и настройки                    |
-| [Library](../site/src/features/library/README.md)             | Коллекции и библиотека                     |
-| [Support](../site/src/features/support/README.md)             | Обращения и переписка                      |
-| [Moderation](../site/src/features/moderation/README.md)       | Жалобы и верификация                       |
-| [Accounts](../site/src/features/accounts/README.md)           | Вход, аккаунт и настройки                  |
-| [Discovery](../site/src/features/discovery/README.md)         | Общая композиция каталогов                 |
+| Feature                                                       | Область                                                      |
+| ------------------------------------------------------------- | ------------------------------------------------------------ |
+| [Servers](../site/src/features/servers/README.md)             | Каталог, статистика и управление серверами                   |
+| [Community](../site/src/features/community/README.md)         | Обсуждения и публикации                                      |
+| [Organizations](../site/src/features/organizations/README.md) | Организации и команды                                        |
+| [Notifications](../site/src/features/notifications/README.md) | Уведомления и настройки                                      |
+| [Library](../site/src/features/library/README.md)             | Коллекции и библиотека                                       |
+| [Support](../site/src/features/support/README.md)             | Обращения и переписка                                        |
+| [Moderation](../site/src/features/moderation/README.md)       | Жалобы, верификация, staff `/admin`, storage maintenance UI  |
+| [Accounts](../site/src/features/accounts/README.md)           | Вход, аккаунт и настройки                                    |
+| [Discovery](../site/src/features/discovery/README.md)         | Общая композиция каталогов                                   |
+| [Commerce](../site/src/features/commerce/README.md)           | Workspace commerce history, license + subscription UI (beta) |
 
 Маршруты, сервисы, авторизация, repositories и workers сохраняют свои слои; входы и ограничения каждой feature описаны в её README.
 
@@ -117,6 +118,8 @@ Unit timing helper: after `pnpm test:unit`, run `node scripts/summarize-unit-tim
 приложения, packages и tests в `site/`, инфраструктуры в `docker/`,
 шаблонов env в `config/env/`. Compose identity и данные сохраняются отдельно от путей.
 
+Живой AS-IS/TO-BE scoreboard внутренней топологии (counts `lib/` / `components/` / `features`, husks, очередь slices): [code-topology](current/code-topology.md). Снимок: `planning/code-topology-counts.json`; регенерация — `planning/tools/inventory_code_topology.py`. Направление shell 2027: [design-direction](current/design-direction.md).
+
 ## Документы по роли
 
 | Нужно                                     | Открыть                                                                                                            |
@@ -124,10 +127,10 @@ Unit timing helper: after `pnpm test:unit`, run `node scripts/summarize-unit-tim
 | Как начать и выбрать задачу               | [AGENT.md](AGENT.md), [AGENTS.md](../AGENTS.md)                                                                    |
 | Что подтверждено сейчас                   | [CURRENT-STATE.md](CURRENT-STATE.md)                                                                               |
 | Что строим / ближайший выпуск             | [PRODUCT.md](PRODUCT.md)                                                                                           |
-| Ресурсы / библиотека / публикация         | [RESOURCES.md](RESOURCES.md)                                                                                       |
-| Сообщество / identity                     | [COMMUNITY.md](COMMUNITY.md)                                                                                       |
-| Серверы / организации                     | [SERVERS-ORGS.md](SERVERS-ORGS.md)                                                                                 |
-| Доверие / staff / аккаунт                 | [TRUST-STAFF.md](TRUST-STAFF.md)                                                                                   |
+| Ресурсы / библиотека / публикация         | [current/domains/RESOURCES.md](current/domains/RESOURCES.md)                                                       |
+| Сообщество / identity                     | [COMMUNITY.md](current/domains/COMMUNITY.md)                                                                       |
+| Серверы / организации                     | [SERVERS-ORGS.md](current/domains/SERVERS-ORGS.md)                                                                 |
+| Доверие / staff / аккаунт                 | [TRUST-STAFF.md](current/domains/TRUST-STAFF.md)                                                                   |
 | Коммерция / DRM (будущее)                 | [COMMERCIAL-FUTURE.md](COMMERCIAL-FUTURE.md)                                                                       |
 | Решения (NX + указатель baseline)         | [DECISIONS.md](DECISIONS.md)                                                                                       |
 | Полный реестр decision ID                 | [13-DECISION-REGISTER.md](handbook/13-DECISION-REGISTER.md), `planning/decision-baseline.json`                     |

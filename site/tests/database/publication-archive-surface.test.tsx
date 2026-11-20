@@ -1,19 +1,20 @@
 vi.mock("server-only", () => ({}));
 
-import { beforeEach, expect, it, vi } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
 import { AppError } from "@nexus/domain";
+import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, expect, it, vi } from "vitest";
 import { PublicationFeed } from "../../src/features/community/publication-feed";
-import { publicationCopy } from "../../src/lib/publication-feed-copy";
 import {
-  publicationPageQuery,
   type PublicationPage,
-} from "../../src/lib/publication-feed-contract";
+  publicationPageQuery,
+} from "../../src/features/community/publication-feed-contract";
+import { publicationCopy } from "../../src/features/community/publication-feed-copy";
+
 const state = vi.hoisted(() => ({ locale: "en" as "ru" | "en", resolve: vi.fn(), page: vi.fn() }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/publication-feed-service", () => ({
+vi.mock("../../src/lib/services/discovery/publication-feed-service", () => ({
   publicationFeedService: { resolve: state.resolve, page: state.page },
 }));
 vi.mock("next/navigation", () => ({
@@ -21,8 +22,10 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-import ServerUpdates, { generateMetadata } from "../../src/app/servers/[slug]/updates/page";
+
 import Loading from "../../src/app/servers/[slug]/updates/loading";
+import ServerUpdates, { generateMetadata } from "../../src/app/servers/[slug]/updates/page";
+
 const cursor = {
   version: 1,
   createdAt: "2026-10-11T00:00:00.123456Z",

@@ -1,3 +1,7 @@
 import "server-only";
 
-export { CommunityModerationScreen } from "./server/community-moderation-screen";
+export {
+  AdminCommunityModerationDetailPage,
+  AdminCommunityModerationListPage,
+  communityModerationMetadata,
+} from "./server/community-moderation-screen";

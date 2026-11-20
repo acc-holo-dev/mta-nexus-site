@@ -1,20 +1,23 @@
-import { contentRepository, organizationRepository, productRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 import { createContentSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
-import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../lib/browser-route-adapter";
+import { contentApiCopy } from "../../../features/community/content-api-copy";
+import { readBoundedJson, requireServerJsonContentType } from "../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../lib/http/browser-route-adapter";
+import { localeAppErrorText } from "../../../lib/http/locale-app-error";
+import { resolveLocale } from "../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
-} from "../../../lib/observability";
-import { isPostgresDeadlock } from "../../../lib/postgres-error";
-import { authService } from "../../../lib/services/auth-service";
-import { productService } from "../../../lib/services/product-service";
-import { serverService } from "../../../lib/services/server-service";
+} from "../../../lib/platform/observability";
+import { isPostgresDeadlock } from "../../../lib/platform/postgres-error";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { productService } from "../../../lib/services/commerce/product-service";
+import { contentService } from "../../../lib/services/community/content-service";
+import { serverService } from "../../../lib/services/servers/server-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -38,13 +41,14 @@ function privateJson(context: RequestLogContext, body: unknown, status = 200) {
 
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
+  const copy = contentApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
 
   try {
     const requestedLimit = Number(request.nextUrl.searchParams.get("limit") || "50");
     const limit = Number.isFinite(requestedLimit)
       ? Math.min(Math.max(Math.floor(requestedLimit), 1), 100)
       : 50;
-    const content = await contentRepository.listPublished(limit);
+    const content = await contentService.listPublished(limit);
 
     // Visibility of associated servers and resources can change at any time.
     return Response.json({ content, limit }, { headers: publicHeaders });
@@ -59,7 +63,7 @@ export async function GET(request: NextRequest) {
     return jsonWithRequestId(
       context,
       {
-        error: "Published content is temporarily unavailable",
+        error: copy.listUnavailable,
       },
       { status: 503, headers: errorHeaders },
     );
@@ -68,17 +72,20 @@ export async function GET(request: NextRequest) {
 
 export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
+  const copy = contentApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
 
     if (!token || !user) {
-      return privateJson(context, { error: "Authentication required" }, 401);
+      return privateJson(context, { error: copy.authenticationRequired }, 401);
     }
 
     const expectedActor = request.headers.get("x-nexus-actor-id");
-    if (!expectedActor) return privateJson(context, { code: "ACTOR_ID_REQUIRED" }, 428);
-    if (expectedActor !== user.id) return privateJson(context, { code: "ACTOR_CHANGED" }, 409);
+    if (!expectedActor)
+      return privateJson(context, { code: "ACTOR_ID_REQUIRED", error: copy.actorRequired }, 428);
+    if (expectedActor !== user.id)
+      return privateJson(context, { code: "ACTOR_CHANGED", error: copy.actorChanged }, 409);
 
     requireServerJsonContentType(request);
     const rateLimit = await consumeRateLimit("contentCreation", user.id);
@@ -86,7 +93,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return privateJson(
         context,
         {
-          error: "Content creation limit exceeded",
+          error: copy.creationLimitExceeded,
         },
         429,
       );
@@ -97,7 +104,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return privateJson(
         context,
         {
-          error: "Invalid content details",
+          error: copy.invalidDetails,
           details: parsed.error.format(),
         },
         400,
@@ -107,14 +114,14 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     if (parsed.data.serverId) {
       const linkedServer = await serverService.getServerById(parsed.data.serverId);
       if (!linkedServer) {
-        return privateJson(context, { error: "Linked server was not found" }, 404);
+        return privateJson(context, { error: copy.linkedServerNotFound }, 404);
       }
 
       if (!(await serverService.canManageServer(linkedServer, user))) {
         return privateJson(
           context,
           {
-            error: "You do not manage the linked server",
+            error: copy.linkedServerNotManaged,
           },
           403,
         );
@@ -122,12 +129,12 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     }
 
     if (parsed.data.productId) {
-      const linkedProduct = await productRepository.findById(parsed.data.productId);
+      const linkedProduct = await productService.findProductRecord(parsed.data.productId);
       if (!linkedProduct) {
         return privateJson(
           context,
           {
-            error: "Linked resource was not found",
+            error: copy.linkedResourceNotFound,
           },
           404,
         );
@@ -137,7 +144,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         return privateJson(
           context,
           {
-            error: "You do not manage the linked resource",
+            error: copy.linkedResourceNotManaged,
           },
           403,
         );
@@ -145,18 +152,18 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     }
 
     if (parsed.data.organizationId) {
-      const organization = await organizationRepository.findById(parsed.data.organizationId);
+      const organization = await authService.findOrganizationById(parsed.data.organizationId);
       if (!organization) {
         return privateJson(
           context,
           {
-            error: "Linked organization was not found",
+            error: copy.linkedOrganizationNotFound,
           },
           404,
         );
       }
 
-      const memberships = await organizationRepository.listUserMemberships(user.id);
+      const memberships = await authService.listUserMemberships(user.id);
       const membership = memberships.find(
         (item) => item.organizationId === parsed.data.organizationId,
       );
@@ -169,7 +176,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         return privateJson(
           context,
           {
-            error: "You do not manage this organization",
+            error: copy.organizationNotManaged,
           },
           403,
         );
@@ -184,7 +191,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         : "draft";
 
     const contentId = generateId("cnt");
-    const contentItem = await contentRepository.createWithAudit(
+    const contentItem = await contentService.createWithAudit(
       {
         ...parsed.data,
         status,
@@ -222,7 +229,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     if (isPostgresDeadlock(error)) {
       return privateJson(
         context,
-        { error: "Please retry creating the publication", code: "CONTENT_CREATION_RETRY" },
+        { error: copy.creationRetry, code: "CONTENT_CREATION_RETRY" },
         409,
       );
     }
@@ -238,7 +245,23 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         "UNAUTHORIZED",
       ].includes(error.code)
     ) {
-      return privateJson(context, { error: error.message, code: error.code }, error.statusCode);
+      return privateJson(
+        context,
+        {
+          error: localeAppErrorText(error, {
+            unauthorized: copy.authenticationRequired,
+            forbidden: copy.forbidden,
+            notFound: copy.notFound,
+            unsupportedMediaType: copy.unsupportedMediaType,
+            requestBodyTooLarge: copy.requestBodyTooLarge,
+            invalidBodyLength: copy.invalidBodyLength,
+            requestBodyTimeout: copy.requestBodyTimeout,
+            failed: copy.createFailed,
+          }),
+          code: error.code,
+        },
+        error.statusCode,
+      );
     }
     logRequestEvent({
       level: "error",
@@ -247,6 +270,6 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       status: 500,
       error,
     });
-    return privateJson(context, { error: "Failed to create content" }, 500);
+    return privateJson(context, { error: copy.createFailed }, 500);
   }
 });

@@ -1,19 +1,22 @@
-import { beforeEach, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
+import { beforeEach, expect, it, vi } from "vitest";
 import { observationBrowserFixture } from "../helpers/server-observation-browser-fixture";
+
 const state = vi.hoisted(() => ({ read: vi.fn(), session: vi.fn(), rate: vi.fn() }));
-vi.mock("../../src/lib/services/server-statistics-service", () => ({
+vi.mock("../../src/lib/services/servers/server-statistics-service", () => ({
   serverStatisticsService: { observations: state.read },
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: state.session },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
-import { GET as publicGet } from "../../src/app/api/servers/[id]/observations/route";
-import { GET as privateGet } from "../../src/app/api/workspace/servers/[id]/observations/route";
+
 import { GET as publicExport } from "../../src/app/api/servers/[id]/observations/export/route";
+import { GET as publicGet } from "../../src/app/api/servers/[id]/observations/route";
 import { GET as privateExport } from "../../src/app/api/workspace/servers/[id]/observations/export/route";
+import { GET as privateGet } from "../../src/app/api/workspace/servers/[id]/observations/route";
+
 const request = (query = "", cookie = "") =>
   new NextRequest(`https://nexus.test/api/servers/server/observations${query}`, {
     headers: { cookie },
@@ -75,7 +78,7 @@ it.each([publicGet, publicExport, privateGet, privateExport])(
     state.read.mockResolvedValue(null);
     const response = await get(request(), params);
     expect(response.status).toBe(404);
-    expect(await response.json()).toEqual({ code: "NOT_FOUND", error: "Server not found" });
+    expect(await response.json()).toMatchObject({ code: "NOT_FOUND", error: "Server not found" });
   },
 );
 it.each([

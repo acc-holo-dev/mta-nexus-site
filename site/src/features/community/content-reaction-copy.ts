@@ -1,0 +1,103 @@
+import type { Locale } from "../../lib/i18n";
+import { userPlatformError } from "./user-platform-copy";
+
+const en = {
+  title: "Publication reactions",
+  helpful: "Helpful",
+  thanks: "Thank you",
+  insight: "Insightful",
+  choose: "React to this publication",
+  remove: "Remove reaction",
+  removeConfirmTitle: "Remove your reaction?",
+  removeConfirm:
+    "Your reaction will be removed from this publication. You can react again later if the publication is still available.",
+  cancel: "Cancel",
+  own: "Your publication: reactions from other readers are shown here.",
+  signIn: "Sign in to react",
+  loading: "Loading reactions…",
+  saving: "Saving…",
+  saved: "Reaction saved.",
+  removed: "Reaction removed.",
+  unavailable: "Unable to load reactions. Try again.",
+  unavailableHint:
+    "Retry reloads this reactions list only. A temporary load failure is not an empty reaction history.",
+  uncertain: "The result is not confirmed. Reload the saved state before trying again.",
+  unknownCounts: "Counts unavailable until the saved state loads.",
+  reload: "Reload saved state",
+  invalid: "Invalid reaction or page. Open the latest page to continue.",
+  my: "My reactions",
+  description:
+    "Your reactions to articles and community publications. You can remove reactions even when a publication is no longer available.",
+  query: "Search publication titles",
+  all: "All reactions",
+  search: "Search",
+  reset: "Clear filters",
+  latest: "Latest reactions",
+  next: "Older reactions",
+  empty: "You have not reacted to any publications yet.",
+  emptyDescription: "Reactions you leave on publications appear here so you can remove them later.",
+  emptyFiltered: "No reactions match these filters.",
+  emptyFilteredDescription: "Clear the filters or open the latest reactions page to continue.",
+  hidden: "Publication unavailable",
+  hiddenDescription: "The publication was removed or is no longer public.",
+  scope:
+    "Reactions are reader feedback only. Clicks are not points, reputation, or a usefulness score. Verification is reviewed separately.",
+  back: "Back to workspace",
+};
+const ru: Record<keyof typeof en, string> = {
+  title: "Реакции на публикации",
+  helpful: "Полезно",
+  thanks: "Спасибо",
+  insight: "Интересная мысль",
+  choose: "Оцените публикацию",
+  remove: "Удалить реакцию",
+  removeConfirmTitle: "Удалить вашу реакцию?",
+  removeConfirm:
+    "Реакция будет снята с этой публикации. При доступности публикации вы сможете отреагировать снова.",
+  cancel: "Отмена",
+  own: "Ваша публикация: здесь показаны реакции других читателей.",
+  signIn: "Войдите, чтобы оставить реакцию",
+  loading: "Загрузка реакций…",
+  saving: "Сохранение…",
+  saved: "Реакция сохранена.",
+  removed: "Реакция удалена.",
+  unavailable: "Не удалось загрузить реакции. Попробуйте ещё раз.",
+  unavailableHint:
+    "Повтор обновляет только этот список реакций. Временный сбой загрузки — не пустая история реакций.",
+  uncertain: "Результат не подтверждён. Загрузите сохранённое состояние перед повторной попыткой.",
+  unknownCounts: "Счётчики недоступны, пока не загружено сохранённое состояние.",
+  reload: "Загрузить сохранённое состояние",
+  invalid: "Некорректная реакция или страница. Откройте страницу новых реакций, чтобы продолжить.",
+  my: "Мои реакции",
+  description:
+    "Ваши реакции на статьи и публикации сообщества. Реакции можно удалить, даже если публикация больше недоступна.",
+  query: "Поиск по названиям публикаций",
+  all: "Все реакции",
+  search: "Найти",
+  reset: "Сбросить фильтры",
+  latest: "Новые реакции",
+  next: "Старые реакции",
+  empty: "Вы пока не оставили реакций на публикации.",
+  emptyDescription:
+    "Реакции, которые вы оставляете на публикации, появляются здесь, чтобы их можно было удалить позже.",
+  emptyFiltered: "По этим фильтрам реакций нет.",
+  emptyFilteredDescription:
+    "Сбросьте фильтры или откройте страницу новых реакций, чтобы продолжить.",
+  hidden: "Публикация недоступна",
+  hiddenDescription: "Публикация удалена или больше не является публичной.",
+  scope:
+    "Реакции — только отзыв читателя. Клики не дают очки, репутацию или оценку полезности. Верификация проходит отдельно.",
+  back: "К кабинету",
+};
+export const reactionCopy = (locale: Locale) => (locale === "ru" ? ru : en);
+export function reactionError(locale: Locale, code: unknown) {
+  if (code === "VALIDATION_ERROR" || code === "INVALID_CURSOR") return reactionCopy(locale).invalid;
+  if (code === "REACTION_SELF") return reactionCopy(locale).own;
+  if (code === "UNCONFIRMED") return reactionCopy(locale).uncertain;
+  if (code === "INTERNAL_ERROR") return reactionCopy(locale).unavailable;
+  if (code === "UNAUTHORIZED" || code === "ACTOR_ID_REQUIRED") return reactionCopy(locale).signIn;
+  if (code === "ACTOR_CHANGED" || code === "CONFLICT") return reactionCopy(locale).uncertain;
+  if (code === "FORBIDDEN" || code === "RATE_LIMIT_EXCEEDED" || code === "RATE_LIMITED")
+    return reactionCopy(locale).unavailable;
+  return userPlatformError(locale, code);
+}

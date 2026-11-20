@@ -4,13 +4,20 @@ import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { getDictionary } from "../../../lib/i18n";
-import { privateApiRequest } from "../../../lib/private-api-request";
-import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
-import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
-import { confirmAction } from "../../../components/confirm-action";
-import { GuestAuthLinks } from "../../../components/guest-auth-links";
-import { useNexusLocale } from "../../../components/locale-context";
+import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
+import { confirmAction } from "../../shell/confirm-action";
+import { GuestAuthLinks } from "../../shell/guest-auth";
+import { linkAccent, linkAccentSm, linkMinHAccentFocus } from "../../shell/link-shell";
+import { useNexusLocale } from "../../shell/locale";
+import {
+  typeFlexWrapGap3Sm,
+  typeSmSecondary,
+  typeSmSuccess,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import { resourceReleaseWatchesCopy } from "../resource-release-watches-i18n";
 
 export function ResourceReleaseWatchControl({
   watch,
@@ -121,13 +128,19 @@ export function ResourceReleaseWatchControl({
       if (active.current !== controller) return;
       if (!response.ok) {
         setError(
-          body?.code === "RELEASE_WATCH_CONFLICT"
+          body?.code === "RELEASE_WATCH_CONFLICT" || body?.code === "ACTOR_CHANGED"
             ? copy.conflict
             : body?.code === "RELEASE_WATCH_LIMIT"
               ? copy.maximum
-              : response.status === 404 || body?.code === "RELEASE_WATCH_UNAVAILABLE"
-                ? copy.access
-                : copy.failed,
+              : body?.code === "UNAUTHORIZED" ||
+                  body?.code === "ACTOR_ID_REQUIRED" ||
+                  response.status === 401
+                ? copy.signInRequired
+                : body?.code === "FORBIDDEN" ||
+                    response.status === 404 ||
+                    body?.code === "RELEASE_WATCH_UNAVAILABLE"
+                  ? copy.access
+                  : copy.failed,
         );
         if ([400, 401, 403, 404, 409, 413, 415].includes(response.status)) {
           settled.current = true;
@@ -166,8 +179,8 @@ export function ResourceReleaseWatchControl({
   if (guest) {
     return (
       <div className="space-y-2">
-        <p className="text-sm text-secondary">{copy.signInRequired}</p>
-        <p className="text-xs text-muted">{copy.note}</p>
+        <p className={typeSmSecondary}>{copy.signInRequired}</p>
+        <p className={typeXsMuted}>{copy.note}</p>
         <GuestAuthLinks
           loginHref={loginHref}
           registerHref={registerHref}
@@ -182,18 +195,17 @@ export function ResourceReleaseWatchControl({
     <div className="space-y-2">
       {surface === "detail" ? (
         <>
-          <p className="text-sm text-secondary">{copy.note}</p>
-          <p className="text-xs text-muted">{copy.pinned}</p>
-          <p className="text-xs text-muted">{copy.limit}</p>
+          <p className={typeSmSecondary}>{copy.note}</p>
+          <p className={typeXsMuted}>{copy.pinned}</p>
+          <p className={typeXsMuted}>{copy.limit}</p>
         </>
       ) : null}
-      {!commerceEnabled ? <ErrorState title={copy.suppressed} /> : null}
-      {disabledReason ? <ErrorState title={disabledReason} /> : null}
+      {!commerceEnabled ? (
+        <ErrorState title={copy.suppressed} description={copy.suppressedHint} />
+      ) : null}
+      {disabledReason ? <ErrorState title={disabledReason} description={copy.blockedHint} /> : null}
       {!hasAccess && acquireHref ? (
-        <Link
-          href={acquireHref}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={acquireHref} className={linkAccentSm}>
           {copy.acquireRequired}
         </Link>
       ) : null}
@@ -204,16 +216,18 @@ export function ResourceReleaseWatchControl({
           onClick={save}
           disabled={busy || saved || (!canToggle && !watch.enabled)}
           isLoading={busy}
-          className="min-h-11 text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkMinHAccentFocus}
         >
           {busy ? copy.busy : watch.enabled ? copy.unwatch : copy.watch}
         </Button>
       )}
       {pending && !saved && (
         <div className="space-y-2">
-          <p role="note" className="text-sm text-muted">
-            {copy.pendingNote}
-          </p>
+          <ErrorState
+            id="resource-release-watch-pending"
+            title={copy.pendingNote}
+            description={copy.failedDescription}
+          />
           {!blocked && (
             <Button
               type="button"
@@ -221,7 +235,7 @@ export function ResourceReleaseWatchControl({
               onClick={save}
               disabled={busy}
               isLoading={busy}
-              className="min-h-11 text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkMinHAccentFocus}
             >
               {busy ? copy.busy : copy.retrySame}
             </Button>
@@ -231,7 +245,7 @@ export function ResourceReleaseWatchControl({
             variant="outline"
             onClick={() => router.refresh()}
             disabled={busy}
-            className="min-h-11 text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkMinHAccentFocus}
           >
             {copy.reloadState}
           </Button>
@@ -239,23 +253,17 @@ export function ResourceReleaseWatchControl({
       )}
       {error ? <ErrorState title={error} description={copy.failedDescription} /> : null}
       {saved ? (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {copy.saved}
         </p>
       ) : null}
       {surface === "detail" || !commerceEnabled ? (
-        <div className="flex flex-wrap gap-3 text-sm">
-          <Link
-            href={settingsHref}
-            className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+        <div className={typeFlexWrapGap3Sm}>
+          <Link href={settingsHref} className={linkAccent}>
             {copy.settings}
           </Link>
           {surface === "detail" ? (
-            <Link
-              href="/workspace/library/watches"
-              className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href="/workspace/library/watches" className={linkAccent}>
               {copy.watchCenter}
             </Link>
           ) : null}

@@ -1,5 +1,6 @@
 import type { ReactElement, ReactNode } from "react";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const h = vi.hoisted(() => ({
   slots: [] as unknown[],
   cursor: 0,
@@ -30,9 +31,10 @@ vi.mock("react", async (original) => ({
 }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) }));
 
+import type { LibraryCollectionChangesPreview } from "@nexus/domain";
 import { LibraryCollectionRestoreControls } from "../../src/features/library/collection-restore";
 import { LibraryCollectionReconcileForm } from "../../src/features/library/components/library-collection-reconcile";
-import type { LibraryCollectionChangesPreview } from "@nexus/domain";
+
 type Element = ReactElement<Record<string, unknown>>;
 function nodes(node: ReactNode): Element[] {
   if (Array.isArray(node)) return node.flatMap(nodes);

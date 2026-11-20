@@ -1,11 +1,19 @@
 import { PageHeader } from "@nexus/ui";
 import { Plus, Server as ServerIcon } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { MtaMasterServerDirectory } from "../components/mta-master-server-directory";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { serverService } from "../../../lib/services/servers/server-service";
+import { pageShellStack8 } from "../../shell/page-shell";
+import { MtaMasterServerDirectory } from "../components/mta-master-server-directory";
 import { mtaListingProfileRecord } from "../model/mta-listing-profile-map";
-import { serverService } from "../../../lib/services/server-service";
+
+export async function serversMetadata(): Promise<Metadata> {
+  return {
+    title: `${getDictionary(await getRequestLocale()).servers.title} | MTA NEXUS`,
+  };
+}
 
 export async function ServersPage() {
   const locale = await getRequestLocale();
@@ -14,7 +22,7 @@ export async function ServersPage() {
   const profileByEndpoint = mtaListingProfileRecord(listings);
 
   return (
-    <div className="min-w-0 space-y-8 overflow-x-clip">
+    <div className={pageShellStack8}>
       <PageHeader
         title={dictionary.servers.title}
         description={dictionary.servers.description}

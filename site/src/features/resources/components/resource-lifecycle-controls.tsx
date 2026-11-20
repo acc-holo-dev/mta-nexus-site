@@ -14,22 +14,27 @@ import { resourceLifecycleSchema } from "@nexus/validation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
-import { privateApiRequest } from "../../../lib/private-api-request";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
+import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
+import { confirmAction } from "../../shell/confirm-action";
+import { linkAccentSm } from "../../shell/link-shell";
+import { useNexusLocale } from "../../shell/locale";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import {
-  getResourceCommerceCopy,
-  resourceCommerceError,
-} from "../../../lib/resource-commerce-i18n";
-import { ActionConfirmCheckbox } from "../../../components/action-confirm-checkbox";
-import { confirmAction } from "../../../components/confirm-action";
-import { useNexusLocale } from "../../../components/locale-context";
+  typeGridGap2SmSecondarySm2,
+  typeLabelBlockUpperSecondary,
+  typeLabelUpperMuted,
+  typeSmSecondary,
+  typeSmSuccess,
+  typeXlSemiboldPrimary,
+} from "../../shell/type-shell";
 import { stashSupportObjectContext } from "../../support/center";
+import { getResourceCommerceCopy, resourceCommerceError } from "../resource-commerce-i18n";
 
 const controlClass =
   "min-h-11 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
-const nativeLabelClass = "block font-label uppercase text-secondary";
-
 export function ResourceLifecycleControls({
   product,
   selectedBuild = null,
@@ -146,9 +151,7 @@ export function ResourceLifecycleControls({
       : nextStep === "restore"
         ? copy.restoreNote
         : nextStep === "wait_review"
-          ? locale === "ru"
-            ? "Ресурс ожидает проверки. Публикация не происходит автоматически."
-            : "This resource is waiting for review. It is not published automatically."
+          ? copy.waitReviewNote
           : nextStep === "suspended_support"
             ? copy.blocked
             : nextStep === "archive"
@@ -158,56 +161,40 @@ export function ResourceLifecycleControls({
   return (
     <section
       id="author-resource-lifecycle"
-      className="nexus-panel space-y-4 p-5"
+      className={panelSpace4P5}
       aria-labelledby={`${fieldId}-heading`}
     >
-      <h2 id={`${fieldId}-heading`} className="text-xl font-semibold text-primary">
+      <h2 id={`${fieldId}-heading`} className={typeXlSemiboldPrimary}>
         {copy.lifecycle}
       </h2>
-      <dl className="grid gap-2 text-sm text-secondary sm:grid-cols-2">
+      <dl className={typeGridGap2SmSecondarySm2}>
         <div>
-          <dt className="font-label uppercase text-muted">
-            {locale === "ru" ? "Статус ресурса" : "Resource status"}
-          </dt>
+          <dt className={typeLabelUpperMuted}>{copy.resourceStatus}</dt>
           <dd className="text-primary">{product.status}</dd>
         </div>
         <div>
-          <dt className="font-label uppercase text-muted">
-            {locale === "ru" ? "Выбранная сборка" : "Selected build"}
-          </dt>
+          <dt className={typeLabelUpperMuted}>{copy.selectedBuild}</dt>
           <dd className="text-primary">
             {selectedBuild
               ? `${selectedBuild.version ?? selectedBuild.id} · ${selectedBuild.status}`
-              : locale === "ru"
-                ? "Не выбрана"
-                : "None selected"}
+              : copy.noneSelected}
           </dd>
         </div>
       </dl>
-      {nextStepCopy ? <p className="text-sm text-secondary">{nextStepCopy}</p> : null}
+      {nextStepCopy ? <p className={typeSmSecondary}>{nextStepCopy}</p> : null}
       {selectedBuild && buildAvailability !== "available" ? (
         <ErrorState
-          title={
-            locale === "ru"
-              ? "Эта сборка недоступна для публичной выдачи"
-              : "This build is unavailable for public delivery"
-          }
-          description={
-            locale === "ru"
-              ? "Скачивание и новая подписка на релизы блокируются, пока сборка снова не станет допустимой."
-              : "Download and new release watches stay blocked until a valid build is available."
-          }
+          title={copy.buildUnavailableTitle}
+          description={copy.buildUnavailableDescription}
           action={
             <Link
               href={unavailableBuildSupportHref()}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentSm}
               onClick={() =>
                 stashSupportObjectContext({ productId: product.id, buildId: selectedBuild.id })
               }
             >
-              {locale === "ru"
-                ? "Обратиться в поддержку с этим контекстом"
-                : "Contact support with this context"}
+              {copy.contactSupportContext}
             </Link>
           }
         />
@@ -215,14 +202,15 @@ export function ResourceLifecycleControls({
       {actions.length === 0 ? (
         <ErrorState
           title={copy.blocked}
+          description={copy.actionFailedDescription}
           action={
             product.status === "suspended" ? (
               <Link
                 href={unavailableBuildSupportHref()}
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentSm}
                 onClick={() => stashSupportObjectContext({ productId: product.id })}
               >
-                {locale === "ru" ? "Открыть обращение" : "Open a support case"}
+                {copy.openSupportCase}
               </Link>
             ) : undefined
           }
@@ -230,7 +218,7 @@ export function ResourceLifecycleControls({
       ) : (
         <form onSubmit={submit} aria-busy={busy} className="space-y-4">
           <div className="space-y-1.5">
-            <label htmlFor={`${fieldId}-action`} className={nativeLabelClass}>
+            <label htmlFor={`${fieldId}-action`} className={typeLabelBlockUpperSecondary}>
               {copy.lifecycle}
             </label>
             <select
@@ -250,31 +238,24 @@ export function ResourceLifecycleControls({
               ))}
             </select>
           </div>
-          <p id={`${fieldId}-note`} className="text-sm text-secondary">
+          <p id={`${fieldId}-note`} className={typeSmSecondary}>
             {notes[action]}
             {target ? (
               <span className="mt-1 block">
-                {locale === "ru" ? "Следующее состояние" : "Next status"}: {target}
-                {target === "draft"
-                  ? locale === "ru"
-                    ? " → затем отправка на проверку"
-                    : " → then submit for review"
-                  : ""}
+                {copy.nextStatus}: {target}
+                {target === "draft" ? copy.thenSubmitReview : ""}
               </span>
             ) : null}
           </p>
           {action === "restore" ? (
             <ErrorState
               id="resource-lifecycle-restore-draft"
-              title={
-                locale === "ru"
-                  ? "После восстановления ресурс станет черновиком, а не снова опубликованным."
-                  : "Restore returns a draft. It does not republish the resource."
-              }
+              title={copy.restoreDraftWarning}
+              description={copy.restoreNote}
             />
           ) : null}
           <div className="space-y-1.5">
-            <label htmlFor={`${fieldId}-reason`} className={nativeLabelClass}>
+            <label htmlFor={`${fieldId}-reason`} className={typeLabelBlockUpperSecondary}>
               {copy.reason}
             </label>
             <textarea
@@ -312,13 +293,9 @@ export function ResourceLifecycleControls({
       )}
       {error ? <ErrorState title={error} description={copy.actionFailedDescription} /> : null}
       {saved && (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {copy.updated}
-          {action === "restore"
-            ? locale === "ru"
-              ? " Черновик готов к проверке; автоматической публикации нет."
-              : " Draft is ready for review; nothing was auto-published."
-            : ""}
+          {action === "restore" ? copy.restoreDraftSaved : ""}
         </p>
       )}
     </section>

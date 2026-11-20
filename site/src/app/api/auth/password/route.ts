@@ -2,11 +2,17 @@ import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { changePasswordSchema } from "@nexus/validation";
 import { type NextRequest, NextResponse } from "next/server";
-import { readAuthJson } from "../../../../lib/auth-request-body";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
-import { authService } from "../../../../lib/services/auth-service";
-import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../../../lib/session-cookie";
+import { authAppErrorText } from "../../../../features/accounts/auth-app-error";
+import { authPasswordApiCopy } from "../../../../features/accounts/auth-password-api-copy";
+import {
+  SESSION_COOKIE_NAME,
+  sessionCookieOptions,
+} from "../../../../features/accounts/session-cookie";
+import { readAuthJson } from "../../../../lib/http/auth-request-body";
+import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { resolveLocale } from "../../../../lib/i18n";
+import { createRequestLogContext, logRequestEvent } from "../../../../lib/platform/observability";
+import { authService } from "../../../../lib/services/accounts/auth-service";
 
 function json(body: unknown, status = 200) {
   return NextResponse.json(body, {
@@ -17,29 +23,24 @@ function json(body: unknown, status = 200) {
 
 export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
+  const copy = authPasswordApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
-    if (!user || !token) return json({ error: "Authentication required" }, 401);
+    if (!user || !token) return json({ error: copy.authenticationRequired }, 401);
 
     const rateLimit = await consumeRateLimit("passwordChange", user.id);
     if (!rateLimit.success) {
-      return json({ error: "Too many password change attempts. Please try again later." }, 429);
+      return json({ error: copy.rate }, 429);
     }
     const parsed = changePasswordSchema.safeParse(await readAuthJson(request));
     if (!parsed.success) {
-      return json(
-        { error: "Password change validation failed", details: parsed.error.format() },
-        400,
-      );
+      return json({ error: copy.validationFailed, details: parsed.error.format() }, 400);
     }
     if (parsed.data.expectedActorId !== user.id)
       return json(
         {
-          error:
-            request.cookies.get("nexus_locale")?.value === "ru"
-              ? "Аккаунт изменился. Обновите настройки и попробуйте снова."
-              : "Account changed. Reload settings and try again.",
+          error: copy.accountChanged,
           code: "ACCOUNT_CHANGED",
         },
         409,
@@ -58,7 +59,18 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     return response;
   } catch (error: unknown) {
     if (error instanceof AppError) {
-      return json({ error: error.message, code: error.code }, error.statusCode);
+      return json(
+        {
+          error: authAppErrorText(error, {
+            unauthorized: copy.unauthorized,
+            freshAuthRequired: copy.freshAuthRequired,
+            conflict: copy.accountChanged,
+            failed: copy.unavailable,
+          }),
+          code: error.code,
+        },
+        error.statusCode,
+      );
     }
     // SQL errors may include bound values: never log passwords, hashes or tokens.
     logRequestEvent({
@@ -68,9 +80,6 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       status: 503,
       error,
     });
-    return json(
-      { error: "Could not confirm the password change. Sign in again before retrying." },
-      503,
-    );
+    return json({ error: copy.unavailable }, 503);
   }
 });

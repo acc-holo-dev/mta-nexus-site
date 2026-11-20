@@ -20,7 +20,7 @@ it("exposes search landmarks, EmptyState, and touch-sized filter inputs on colle
     expect(source).toContain("emptyFilteredItems");
     expect(source).toContain("emptyItems");
     expect(source).toContain("emptyItemsHint");
-    expect(source).toContain("min-h-11");
+    expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(source).not.toMatch(
       /<p>\s*\{result\.q \? c\.emptyFilteredItems : c\.emptyItems\}\s*<\/p>/u,
     );

@@ -10,20 +10,37 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
-import { organizationContentCopy } from "../../../lib/organization-content-copy";
-import { organizationGovernanceCopy } from "../../../lib/organization-governance-copy";
-import { confirmsOrganizationMemberMutation } from "../../../lib/organization-member-confirmation";
-import { organizationTeamCopy } from "../../../lib/organization-team-copy";
-import { organizationRequest as platformRequest } from "../../../lib/organization-workspace-client";
+import { platformFieldClass } from "../../community/user-platform-client";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
+import { confirmAction } from "../../shell/confirm-action";
+import {
+  linkAccentSm,
+  linkAccentSmMinWBreak,
+  linkAccentTightSmPlain,
+  linkGhostAccentSm,
+  linkMuted,
+} from "../../shell/link-shell";
+import { pageShellStack6 } from "../../shell/page-shell";
+import { surfaceSpace3P4 } from "../../shell/surface-shell";
+import {
+  typeHeadingPrimary,
+  typeMinFlex1Space1SmSecondary,
+  typeMlAutoXsMuted,
+  typeSmMuted,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import { organizationContentCopy } from "../organization-content-copy";
+import { organizationGovernanceCopy } from "../organization-governance-copy";
+import { confirmsOrganizationMemberMutation } from "../organization-member-confirmation";
+import { organizationTeamCopy } from "../organization-team-copy";
+import { organizationRequest as platformRequest } from "../organization-workspace-client";
 import {
   editableOrganizationSchema,
   memberAddSchema,
   type OrganizationWorkspace,
   organizationWorkspaceSchema,
-} from "../../../lib/organization-workspace-contract";
-import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
-import { platformFieldClass } from "../../../lib/user-platform-client";
-import { confirmAction } from "../../../components/confirm-action";
+} from "../organization-workspace-contract";
+import { getOrganizationCopy } from "../organization-workspace-copy";
 import { OrganizationMemberEditor } from "./organization-member-editor";
 import { OrganizationOwnershipTransfer } from "./organization-ownership-transfer";
 import { OrganizationProfileForm } from "./organization-profile-form";
@@ -40,6 +57,12 @@ export function OrganizationWorkspacePanel({
   query: string;
 }) {
   const copy = getOrganizationCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(text)
+      ? text
+      : fallback;
+  }
   const governanceCopy = organizationGovernanceCopy(locale);
   const router = useRouter();
   const [data, setData] = useState(initial);
@@ -114,7 +137,7 @@ export function OrganizationWorkspacePanel({
       router.refresh();
       return true;
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : copy.unavailable);
+      setError(safeMessage(caught, copy.unavailable));
       return false;
     } finally {
       guard.current = false;
@@ -160,7 +183,7 @@ export function OrganizationWorkspacePanel({
       router.push("/workspace/organizations");
       router.refresh();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : copy.unavailable);
+      setError(safeMessage(caught, copy.unavailable));
     } finally {
       guard.current = false;
       setBusy(false);
@@ -192,17 +215,21 @@ export function OrganizationWorkspacePanel({
       setServers(false);
     }
   }
-  const navLinkClass =
-    "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
   return (
-    <div className="min-w-0 space-y-6 overflow-x-clip">
+    <div className={pageShellStack6}>
       <Link
         href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/team`}
-        className={navLinkClass}
+        className={linkAccentSm}
       >
         {organizationTeamCopy(locale).title}
       </Link>
-      {!manageable && <ErrorState id="organization-workspace-readonly" title={copy.readOnly} />}
+      {!manageable && (
+        <ErrorState
+          id="organization-workspace-readonly"
+          title={copy.readOnly}
+          description={copy.readOnlyHint}
+        />
+      )}
       <OrganizationProfileForm
         key={`${actorId}:${data.organization.id}`}
         locale={locale}
@@ -221,7 +248,7 @@ export function OrganizationWorkspacePanel({
       />
       {manageable && (
         <Link
-          className={navLinkClass}
+          className={linkAccentSm}
           href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/content`}
         >
           {organizationContentCopy(locale).title}
@@ -229,7 +256,7 @@ export function OrganizationWorkspacePanel({
       )}
       {manageable && (
         <Link
-          className={navLinkClass}
+          className={linkAccentSm}
           href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/activity`}
         >
           {governanceCopy.history}
@@ -265,9 +292,9 @@ export function OrganizationWorkspacePanel({
         />
       )}
       <section className="nexus-panel space-y-5 p-5" aria-busy={busy}>
-        <h2 className="font-heading text-primary">{copy.team}</h2>
-        <p className="text-sm text-muted">{copy.roleHelp}</p>
-        <p className="text-xs text-muted">{copy.accessHelp}</p>
+        <h2 className={typeHeadingPrimary}>{copy.team}</h2>
+        <p className={typeSmMuted}>{copy.roleHelp}</p>
+        <p className={typeXsMuted}>{copy.accessHelp}</p>
         {data.owner && (
           <div className="flex items-center gap-3 rounded-lg border border-base p-3">
             <Avatar
@@ -277,15 +304,15 @@ export function OrganizationWorkspacePanel({
             />
             <Link
               href={`/users/${encodeURIComponent(data.owner.username)}`}
-              className="inline-flex min-h-11 min-w-0 items-center break-words text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentSmMinWBreak}
             >
               {data.owner.displayName} (@{data.owner.username})
             </Link>
-            <span className="ml-auto text-xs text-muted">{copy.owner}</span>
+            <span className={typeMlAutoXsMuted}>{copy.owner}</span>
           </div>
         )}
         {manageable && (
-          <form onSubmit={add} className="space-y-3 rounded-lg border border-base p-4">
+          <form onSubmit={add} className={surfaceSpace3P4}>
             <fieldset disabled={busy} className="grid gap-3 sm:grid-cols-2">
               <label className="block space-y-1 text-sm text-secondary">
                 <span>{copy.username}</span>
@@ -339,7 +366,7 @@ export function OrganizationWorkspacePanel({
             action={`/workspace/organizations/${encodeURIComponent(data.organization.id)}`}
             className="flex flex-wrap items-end gap-2"
           >
-            <label className="min-w-0 flex-1 space-y-1 text-sm text-secondary">
+            <label className={typeMinFlex1Space1SmSecondary}>
               <span>{copy.searchTeam}</span>
               <input
                 type="search"
@@ -421,7 +448,7 @@ export function OrganizationWorkspacePanel({
         >
           {data.page > 1 ? (
             <Link
-              className={navLinkClass}
+              className={linkAccentSm}
               href={teamHref(data.organization.id, data.page - 1, query)}
             >
               {copy.previous}
@@ -429,12 +456,12 @@ export function OrganizationWorkspacePanel({
           ) : (
             <span />
           )}
-          <span className="inline-flex min-h-11 items-center text-muted">
+          <span className={linkMuted}>
             {copy.page} {data.page}
           </span>
           {data.hasMore && (
             <Link
-              className={navLinkClass}
+              className={linkAccentSm}
               href={teamHref(data.organization.id, data.page + 1, query)}
             >
               {copy.next}
@@ -444,12 +471,13 @@ export function OrganizationWorkspacePanel({
         {error && (
           <ErrorState
             title={error}
+            description={copy.unavailableHint}
             action={
               <Button
                 type="button"
                 variant="ghost"
                 disabled={busy}
-                className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkGhostAccentSm}
                 onClick={() => router.refresh()}
               >
                 {copy.reload}
@@ -458,10 +486,7 @@ export function OrganizationWorkspacePanel({
           />
         )}
         {message && (
-          <p
-            role="status"
-            className="text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <p role="status" className={linkAccentTightSmPlain}>
             {message}
           </p>
         )}
@@ -480,7 +505,7 @@ export function OrganizationWorkspacePanel({
           type="button"
           variant="ghost"
           disabled={busy}
-          className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkGhostAccentSm}
           onClick={() => router.refresh()}
         >
           {copy.reload}

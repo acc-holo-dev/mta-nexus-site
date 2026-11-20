@@ -3,13 +3,13 @@ vi.mock("server-only", () => ({}));
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 import { ContentDiscussion } from "../../src/features/community/components/content-discussion";
+import { getDiscussionCopy } from "../../src/features/community/content-discussion-copy";
 import { PublicationFeed } from "../../src/features/community/publication-feed";
-import { getDiscussionCopy } from "../../src/lib/content-discussion-copy";
 import {
   type PublicationPage,
   publicationPageQuery,
-} from "../../src/lib/publication-feed-contract";
-import { publicationCopy } from "../../src/lib/publication-feed-copy";
+} from "../../src/features/community/publication-feed-contract";
+import { publicationCopy } from "../../src/features/community/publication-feed-copy";
 
 const mocks = vi.hoisted(() => ({
   page: vi.fn(),
@@ -27,16 +27,16 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/articles/topic",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session, getUserById: mocks.author },
 }));
-vi.mock("../../src/lib/services/publication-feed-service", () => ({
+vi.mock("../../src/lib/services/discovery/publication-feed-service", () => ({
   publicationFeedService: { page: mocks.page, resolve: mocks.resolve },
 }));
-vi.mock("../../src/lib/services/content-service", () => ({
+vi.mock("../../src/lib/services/community/content-service", () => ({
   contentService: { getArticleBySlug: mocks.article, pageDiscussion: mocks.discussion },
 }));
 
@@ -44,7 +44,7 @@ import ArticlePage from "../../src/app/articles/[slug]/page";
 import UserActivity from "../../src/app/users/[username]/activity/page";
 import FollowingPage from "../../src/app/workspace/feed/page";
 
-vi.mock("../../src/lib/services/content-reaction-service", () => ({
+vi.mock("../../src/lib/services/community/content-reaction-service", () => ({
   contentReactionService: { state: async () => null },
 }));
 const time = "2026-10-10T12:00:00.000Z";

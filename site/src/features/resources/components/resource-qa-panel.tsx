@@ -9,13 +9,26 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { CircleHelp, MessageCircle } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
 import type { Locale } from "../../../lib/i18n";
 import { getDictionary } from "../../../lib/i18n";
-import { privateApiRequest } from "../../../lib/private-api-request";
-import { resourceQaCopy, resourceQaError } from "../../../lib/resource-qa-i18n";
-import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
-import { confirmAction } from "../../../components/confirm-action";
-import { GuestAuthLinks } from "../../../components/guest-auth-links";
+import { formatUnknown } from "../../../lib/i18n/unknown";
+import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
+import { confirmAction } from "../../shell/confirm-action";
+import { GuestAuthLinks } from "../../shell/guest-auth";
+import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
+import { pageShellStack3, pageShellStack4 } from "../../shell/page-shell";
+import { panelClipSpace4P6 } from "../../shell/panel-shell";
+import {
+  typeBlockMinSpace1XsMuted,
+  typeBreakSmSecondary,
+  typeElevenFaint,
+  typeFlexWrapGap2,
+  typeMinSpace2,
+  typeXsFaint,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import { resourceQaCopy, resourceQaError } from "../resource-qa-i18n";
 import { ResourceQaReportForm } from "./resource-qa-report-form";
 
 type BuildOption = { id: string; version: string };
@@ -32,11 +45,7 @@ type DetailPayload = {
   capabilities: ResourceQaCapabilities;
 };
 
-const shellClass = "nexus-panel min-w-0 space-y-4 overflow-x-clip p-6";
-const ghostActionClass =
-  "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-const textActionClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+const shellClass = panelClipSpace4P6;
 
 function readCode(payload: unknown) {
   if (!payload || typeof payload !== "object") return null;
@@ -55,7 +64,8 @@ export function ResourceQaPanel({
 }: {
   productId: string;
   locale: Locale;
-  authenticated: boolean;
+  /** `null` = session probe failed (not a guest). */
+  authenticated: boolean | null;
   canManage: boolean;
   initial: PagePayload | null;
   builds: BuildOption[];
@@ -415,7 +425,7 @@ export function ResourceQaPanel({
     >
       <div className="min-w-0 space-y-1 border-b border-base pb-3">
         <h2 className="min-w-0 break-words text-base font-bold text-primary">{copy.title}</h2>
-        <p className="text-xs text-muted">{copy.help}</p>
+        <p className={typeXsMuted}>{copy.help}</p>
       </div>
 
       {readError ? (
@@ -426,7 +436,7 @@ export function ResourceQaPanel({
             <Button
               type="button"
               variant="ghost"
-              className={ghostActionClass}
+              className={linkGhostAccentSm}
               disabled={busy || loadingDetail || loadingPage}
               onClick={retryRead}
             >
@@ -435,13 +445,19 @@ export function ResourceQaPanel({
           }
         />
       ) : null}
-      {writeError ? <ErrorState id="resource-qa-write-failed" title={writeError} /> : null}
+      {writeError ? (
+        <ErrorState
+          id="resource-qa-write-failed"
+          title={writeError}
+          description={getDictionary(locale).errors.formErrorHint}
+        />
+      ) : null}
 
       {selectedId && detail ? (
-        <div className="min-w-0 space-y-4 overflow-x-clip">
+        <div className={pageShellStack4}>
           <button
             type="button"
-            className={textActionClass}
+            className={linkAccentSm}
             onClick={() => {
               setSelectedId(null);
               setDetail(null);
@@ -461,15 +477,18 @@ export function ResourceQaPanel({
                 </span>
               ) : null}
             </div>
-            <p className="break-words text-sm text-secondary">{detail.thread.body}</p>
-            <p className="text-xs text-faint">
-              {detail.thread.author?.displayName ?? detail.thread.author?.username ?? "—"}
+            <p className={typeBreakSmSecondary}>{detail.thread.body}</p>
+            <p className={typeXsFaint}>
+              {formatUnknown(
+                locale,
+                detail.thread.author?.displayName ?? detail.thread.author?.username,
+              )}
             </p>
           </article>
 
-          {authenticated ? (
+          {authenticated === true ? (
             <div className="space-y-1">
-              <div className="flex flex-wrap gap-2">
+              <div className={typeFlexWrapGap2}>
                 <Button
                   type="button"
                   variant="secondary"
@@ -493,7 +512,7 @@ export function ResourceQaPanel({
                   </Button>
                 ) : null}
               </div>
-              <p className="text-[11px] text-faint">{copy.followingHelp}</p>
+              <p className={typeElevenFaint}>{copy.followingHelp}</p>
               <ResourceQaReportForm
                 threadId={detail.thread.id}
                 locale={locale}
@@ -512,7 +531,7 @@ export function ResourceQaPanel({
             />
           )}
 
-          <div className="min-w-0 space-y-3 overflow-x-clip">
+          <div className={pageShellStack3}>
             {detail.thread.answers.length === 0 ? (
               <EmptyState
                 title={copy.noAnswers}
@@ -529,14 +548,16 @@ export function ResourceQaPanel({
                       : "border-base bg-surface"
                   }`}
                 >
-                  <p className="break-words text-sm text-secondary">{item.body}</p>
+                  <p className={typeBreakSmSecondary}>{item.body}</p>
                   <div className="flex flex-wrap items-center gap-3 text-xs text-faint">
-                    <span>{item.author?.displayName ?? item.author?.username ?? "—"}</span>
+                    <span>
+                      {formatUnknown(locale, item.author?.displayName ?? item.author?.username)}
+                    </span>
                     {item.isResolved ? <span>{copy.resolved}</span> : null}
                     {canResolve && detail.thread.status !== "resolved" ? (
                       <button
                         type="button"
-                        className={textActionClass}
+                        className={linkAccentSm}
                         disabled={busy}
                         onClick={() => void onResolve(item.id)}
                       >
@@ -546,7 +567,7 @@ export function ResourceQaPanel({
                     {canModerate ? (
                       <button
                         type="button"
-                        className={textActionClass}
+                        className={linkAccentSm}
                         disabled={busy}
                         onClick={() => void onRemoveAnswer(item.id, item.body)}
                       >
@@ -573,8 +594,8 @@ export function ResourceQaPanel({
           ) : null}
 
           {canAnswer ? (
-            <form className="min-w-0 space-y-2" onSubmit={onAnswer}>
-              <label className="block min-w-0 space-y-1 text-xs text-muted">
+            <form className={typeMinSpace2} onSubmit={onAnswer}>
+              <label className={typeBlockMinSpace1XsMuted}>
                 <span>{copy.answer}</span>
                 <textarea
                   className="min-h-24 w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-secondary"
@@ -597,10 +618,16 @@ export function ResourceQaPanel({
           ) : null}
         </div>
       ) : (
-        <div className="min-w-0 space-y-4 overflow-x-clip">
-          {!authenticated ? (
+        <div className={pageShellStack4}>
+          {authenticated === null ? (
+            <ErrorState
+              id="resource-qa-identity-unavailable"
+              title={copy.identityUnavailable}
+              description={copy.identityUnavailableDescription}
+            />
+          ) : !authenticated ? (
             <div className="space-y-2">
-              <p className="text-xs text-muted">{copy.publicRead}</p>
+              <p className={typeXsMuted}>{copy.publicRead}</p>
               <GuestAuthLinks
                 loginHref={loginHref}
                 registerHref={registerHref}
@@ -609,10 +636,14 @@ export function ResourceQaPanel({
               />
             </div>
           ) : capabilities?.askReason === "access_required" ? (
-            <ErrorState id="resource-qa-access-required" title={copy.accessRequired} />
+            <ErrorState
+              id="resource-qa-access-required"
+              title={copy.accessRequired}
+              description={getDictionary(locale).errors.formErrorHint}
+            />
           ) : canAsk ? (
-            <form className="min-w-0 space-y-2" onSubmit={onAsk}>
-              <label className="block min-w-0 space-y-1 text-xs text-muted">
+            <form className={typeMinSpace2} onSubmit={onAsk}>
+              <label className={typeBlockMinSpace1XsMuted}>
                 <span>{copy.ask}</span>
                 <textarea
                   className="min-h-24 w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-secondary"
@@ -624,7 +655,7 @@ export function ResourceQaPanel({
                 />
               </label>
               {builds.length > 0 ? (
-                <label className="block min-w-0 space-y-1 text-xs text-muted">
+                <label className={typeBlockMinSpace1XsMuted}>
                   <span>{copy.optionalBuild}</span>
                   <select
                     className="min-h-11 w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-secondary"
@@ -651,11 +682,15 @@ export function ResourceQaPanel({
               </Button>
             </form>
           ) : !readError ? (
-            <ErrorState id="resource-qa-ask-unavailable" title={copy.unavailable} />
+            <ErrorState
+              id="resource-qa-ask-unavailable"
+              title={copy.unavailable}
+              description={copy.unavailableDescription}
+            />
           ) : null}
 
           {loadingDetail ? (
-            <p role="status" className="text-xs text-faint">
+            <p role="status" className={typeXsFaint}>
               {copy.loadingThread}
             </p>
           ) : null}
@@ -668,7 +703,7 @@ export function ResourceQaPanel({
             />
           ) : null}
           {!readError && page && page.threads.length > 0 ? (
-            <ul className="min-w-0 space-y-3 overflow-x-clip">
+            <ul className={pageShellStack3}>
               {page.threads.map((thread) => (
                 <li
                   key={thread.id}
@@ -684,10 +719,10 @@ export function ResourceQaPanel({
                       </span>
                     ) : null}
                   </div>
-                  <p className="break-words text-sm text-secondary">{thread.body}</p>
+                  <p className={typeBreakSmSecondary}>{thread.body}</p>
                   <button
                     type="button"
-                    className={`mt-2 ${textActionClass}`}
+                    className={`mt-2 ${linkAccentSm}`}
                     onClick={() => void loadThread(thread.id)}
                   >
                     {copy.loadThread}

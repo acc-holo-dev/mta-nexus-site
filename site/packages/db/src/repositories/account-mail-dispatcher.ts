@@ -1,12 +1,12 @@
 import { parseAccountMailAppUrl } from "./account-mail-app-url";
 import { type AccountMailCipher, AccountMailKeyUnavailableError } from "./account-mail-crypto";
-import { accountMailWorkerRepository } from "./account-mail-worker";
-import type { MailLease, PreparedAccountMail } from "./account-mail-worker";
 import type {
   AccountMailTransportInput,
   AccountMailTransportResult,
   AccountMailTransportStage,
 } from "./account-mail-smtp";
+import type { MailLease, PreparedAccountMail } from "./account-mail-worker";
+import { accountMailWorkerRepository } from "./account-mail-worker";
 
 type Worker = Readonly<{
   candidates(limit?: number): Promise<string[]>;
@@ -58,14 +58,16 @@ function messageFor(mail: PreparedAccountMail, base: URL): AccountMailTransportI
   // The secret stays in the fragment so the initial page request/proxy log does
   // not receive it. The future UI must remove the fragment before confirmation.
   url.hash = `token=${encodeURIComponent(mail.token)}`;
+  // No stored recipient locale yet: keep a single bilingual slash payload so RU
+  // and EN readers both get a usable subject/body without a preference column.
   const subject =
     mail.purpose === "email_verify"
-      ? "Confirm your MTA NEXUS email"
-      : "Reset your MTA NEXUS password";
+      ? "Confirm your MTA NEXUS email / Подтвердите email MTA NEXUS"
+      : "Reset your MTA NEXUS password / Сбросьте пароль MTA NEXUS";
   const text =
     mail.purpose === "email_verify"
-      ? `Confirm this email address for your MTA NEXUS account:\n\n${url.toString()}\n\nIf you did not request this, ignore this message.`
-      : `Use this link to reset your MTA NEXUS password:\n\n${url.toString()}\n\nIf you did not request this, ignore this message.`;
+      ? `Confirm this email address for your MTA NEXUS account / Подтвердите этот email для аккаунта MTA NEXUS:\n\n${url.toString()}\n\nIf you did not request this, ignore this message. / Если вы не запрашивали это, проигнорируйте сообщение.`
+      : `Use this link to reset your MTA NEXUS password / Используйте ссылку, чтобы сбросить пароль MTA NEXUS:\n\n${url.toString()}\n\nIf you did not request this, ignore this message. / Если вы не запрашивали это, проигнорируйте сообщение.`;
   return {
     recipient: mail.recipient,
     subject,

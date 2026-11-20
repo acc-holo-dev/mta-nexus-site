@@ -2,12 +2,21 @@ import type { ResourcePublicationReadinessSummary } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
+import { linkAccentTight, linkAccentTightSm } from "../../shell/link-shell";
+import { panelSpace4P5 } from "../../shell/panel-shell";
+import {
+  typeMinSpace1,
+  typeSemiboldPrimary,
+  typeSmSecondary,
+  typeSpace2SmMuted,
+  typeXlSemiboldPrimary,
+} from "../../shell/type-shell";
 import {
   getResourcePublicationReadinessCopy,
   publicationReadinessDetail,
   publicationReadinessOverview,
-} from "../../../lib/resource-publication-readiness-i18n";
-import { getResourcePublisherCopy } from "../../../lib/resource-publisher-i18n";
+} from "../resource-publication-readiness-i18n";
+import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 
 const stateTone: Partial<
   Record<ResourcePublicationReadinessSummary["items"][number]["state"], string>
@@ -32,14 +41,14 @@ export function ResourcePublicationReadinessPanel({
   return (
     <section
       id="publication-readiness"
-      className="nexus-panel space-y-4 p-5"
+      className={panelSpace4P5}
       aria-labelledby="publication-readiness-heading"
     >
       <div className="space-y-1">
-        <h2 id="publication-readiness-heading" className="text-xl font-semibold text-primary">
+        <h2 id="publication-readiness-heading" className={typeXlSemiboldPrimary}>
           {copy.title}
         </h2>
-        <p className="text-sm text-secondary">
+        <p className={typeSmSecondary}>
           {copy.overview}: {overview}
         </p>
       </div>
@@ -49,9 +58,9 @@ export function ResourcePublicationReadinessPanel({
             key={item.id}
             className="flex flex-col gap-2 rounded-lg border border-base bg-inset p-4 sm:flex-row sm:items-start sm:justify-between"
           >
-            <div className="min-w-0 space-y-1">
+            <div className={typeMinSpace1}>
               <div className="flex flex-wrap items-center gap-2 text-sm">
-                <span className="font-semibold text-primary">{copy.items[item.id]}</span>
+                <span className={typeSemiboldPrimary}>{copy.items[item.id]}</span>
                 <span className="font-label uppercase text-[10px] text-muted">
                   {item.tier === "required" ? copy.required : copy.recommendation}
                 </span>
@@ -73,16 +82,13 @@ export function ResourcePublicationReadinessPanel({
                   title={copy.states[item.state]}
                   description={publicationReadinessDetail(locale, item)}
                   action={
-                    <Link
-                      href={item.actionPath}
-                      className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                    >
+                    <Link href={item.actionPath} className={linkAccentTightSm}>
                       {copy.fix}
                     </Link>
                   }
                 />
               ) : (
-                <p className="text-sm text-secondary">{publicationReadinessDetail(locale, item)}</p>
+                <p className={typeSmSecondary}>{publicationReadinessDetail(locale, item)}</p>
               )}
             </div>
             {item.state === "blocked" || item.state === "pending" ? null : (
@@ -96,14 +102,11 @@ export function ResourcePublicationReadinessPanel({
           </li>
         ))}
       </ul>
-      <div className="space-y-2 text-sm text-muted">
+      <div className={typeSpace2SmMuted}>
         <p>{copy.checklistNote}</p>
         <p>
           {copy.previewNote}{" "}
-          <Link
-            href={previewHref}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href={previewHref} className={linkAccentTight}>
             {copy.openPreview}
           </Link>
         </p>

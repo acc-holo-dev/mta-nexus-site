@@ -9,21 +9,21 @@ import { Button, ErrorState } from "@nexus/ui";
 import { libraryCollectionCommandSchema, libraryCollectionReceiptSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import {
-  collectionReceiptHref,
-  libraryCollectionReceiptsCopy,
-} from "../../../lib/library-collection-receipts-i18n";
-import { confirmedCollectionCommand } from "../../../lib/library-collections-confirmation";
-import {
-  libraryCollectionError,
-  libraryCollectionsCopy,
-} from "../../../lib/library-collections-i18n";
-import { collectionHref } from "../../../lib/library-collections-query";
-import { privateApiRequest } from "../../../lib/private-api-request";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
-} from "../../../components/action-confirm-checkbox";
+} from "../../shell/action-confirm-checkbox";
+import { linkAccentSmRounded, linkAccentTight } from "../../shell/link-shell";
+import { panelSpace4P5 } from "../../shell/panel-shell";
+import { typeBreakAllXs, typeBreakSm, typeSmSecondary, typeSpace1Sm } from "../../shell/type-shell";
+import {
+  collectionReceiptHref,
+  libraryCollectionReceiptsCopy,
+} from "../library-collection-receipts-i18n";
+import { confirmedCollectionCommand } from "../library-collections-confirmation";
+import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
+import { collectionHref } from "../library-collections-query";
 
 export function LibraryCollectionBatchForm({
   locale,
@@ -180,12 +180,12 @@ export function LibraryCollectionBatchForm({
       )
     : items;
   return (
-    <form onSubmit={submit} className="nexus-panel space-y-4 p-5">
+    <form onSubmit={submit} className={panelSpace4P5}>
       <h2 className="font-semibold">{c[shownAction]}</h2>
-      <p className="break-words text-sm">
+      <p className={typeBreakSm}>
         {c.destination}: {shownCollection.name} · {c.revision} {shownCollection.revision}
       </p>
-      <p className="text-sm text-secondary">{c.batchLimit}</p>
+      <p className={typeSmSecondary}>{c.batchLimit}</p>
       <fieldset
         disabled={
           busy ||
@@ -235,9 +235,7 @@ export function LibraryCollectionBatchForm({
                 />
                 <span>
                   {item.title ?? c.unavailable}
-                  {item.title === null && (
-                    <code className="block break-all text-xs">{item.productId}</code>
-                  )}
+                  {item.title === null && <code className={typeBreakAllXs}>{item.productId}</code>}
                 </span>
               </label>
             </li>
@@ -285,11 +283,9 @@ export function LibraryCollectionBatchForm({
                 ? c.retryAction
                 : c[shownAction]}
       </Button>
-      {frozen && !saved && (
-        <p role="note" className="text-xs text-muted">
-          {c.frozen}
-        </p>
-      )}
+      {frozen && !saved ? (
+        <ErrorState id="library-collection-batch-frozen" title={c.frozen} description={c.retry} />
+      ) : null}
       {error ? (
         <ErrorState
           title={error}
@@ -299,7 +295,7 @@ export function LibraryCollectionBatchForm({
           action={
             <a
               href={pending.current?.reloadHref ?? returnHref ?? collectionHref(collection.id)}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentSmRounded}
             >
               {c.reload}
             </a>
@@ -311,7 +307,7 @@ export function LibraryCollectionBatchForm({
           <p role="status" aria-live="polite">
             {c.saved}
           </p>
-          <ul className="space-y-1 text-sm">
+          <ul className={typeSpace1Sm}>
             {collectionCommandItemResults(pending.current.command).map((entry) => {
               const item = shownItems.find((value) => value.productId === entry.productId);
               return (
@@ -321,25 +317,19 @@ export function LibraryCollectionBatchForm({
               );
             })}
           </ul>
-          <code className="block break-all text-xs">
+          <code className={typeBreakAllXs}>
             {c.receipt}: {receiptId}
           </code>
-          <a
-            href={collectionReceiptHref(receiptId)}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <a href={collectionReceiptHref(receiptId)} className={linkAccentTight}>
             {libraryCollectionReceiptsCopy(locale).open}
           </a>
           <a
             href={collectionHref(pending.current.collection.id, "history")}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentTight}
           >
             {c.history}
           </a>
-          <a
-            href={pending.current.reloadHref}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <a href={pending.current.reloadHref} className={linkAccentTight}>
             {c.reload}
           </a>
         </div>

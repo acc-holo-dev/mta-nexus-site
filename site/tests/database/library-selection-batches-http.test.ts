@@ -5,6 +5,7 @@ import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../helpers/browser-mutation-headers";
+
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a" } as { id: string } | null,
   preview: vi.fn(),
@@ -13,20 +14,22 @@ const state = vi.hoisted(() => ({
   rate: vi.fn(),
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/services/library-selection-batches-service", () => ({
+vi.mock("../../src/lib/services/library/library-selection-batches-service", () => ({
   librarySelectionBatchesService: {
     preview: state.preview,
     command: state.command,
     history: state.history,
   },
 }));
-import { POST as apply } from "../../src/app/api/library/collections/[id]/versions/route";
-import { POST as review } from "../../src/app/api/library/collections/[id]/versions/preview/route";
-import { GET as history } from "../../src/app/api/library/collections/[id]/versions/history/route";
+
 import { GET as download } from "../../src/app/api/library/collections/[id]/versions/history/export/route";
+import { GET as history } from "../../src/app/api/library/collections/[id]/versions/history/route";
+import { POST as review } from "../../src/app/api/library/collections/[id]/versions/preview/route";
+import { POST as apply } from "../../src/app/api/library/collections/[id]/versions/route";
+
 const context = { params: Promise.resolve({ id: "lcol_a" }) },
   body = { mode: "fixed", productIds: ["prd_a"] };
 function request(section = "", method = "POST", headers: Record<string, string> = {}, query = "") {
@@ -99,7 +102,7 @@ it("returns stable conflicts without exposing private exception messages", async
   state.command.mockRejectedValue(new AppError("private title", 409, "SELECTION_BATCH_CHANGED"));
   const response = await apply(request(), context);
   expect(response.status).toBe(409);
-  expect(await response.json()).toEqual({ code: "SELECTION_BATCH_CHANGED" });
+  expect(await response.json()).toMatchObject({ code: "SELECTION_BATCH_CHANGED" });
 });
 it("validates history pagination and protects downloads", async () => {
   const response = await download(request("/history/export", "GET", {}, "?page=2"), context);

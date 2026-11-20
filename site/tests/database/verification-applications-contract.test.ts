@@ -4,8 +4,8 @@ import {
   parseVerificationApplicationsQuery as parse,
   verificationApplicationAmendSchema,
   verificationApplicationsHref,
-} from "../../src/lib/verification-applications-contract";
-import { verificationDecisionSchema } from "../../src/lib/verification-workspace-contract";
+} from "../../src/features/trust/verification-applications-contract";
+import { verificationDecisionSchema } from "../../src/features/trust/verification-workspace-contract";
 
 const revision = "a".repeat(64),
   next = "b".repeat(64),

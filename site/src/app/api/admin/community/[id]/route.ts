@@ -1,15 +1,18 @@
 import { AppError, UnauthorizedError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
+import { userPlatformApi } from "../../../../../features/accounts/user-platform-api";
+import { moderationError } from "../../../../../features/community/community-moderation-copy";
+import { reportRateLimit } from "../../../../../features/community/community-report-api";
 import {
   moderationCommandSchema,
   parseModerationDetailQuery,
-} from "../../../../../lib/community-moderation-contract";
-import { moderationError } from "../../../../../lib/community-moderation-copy";
-import { reportRateLimit } from "../../../../../lib/community-report-api";
-import { communityModerationService } from "../../../../../lib/services/community-moderation-service";
-import { userPlatformApi } from "../../../../../lib/user-platform-api";
+} from "../../../../../features/moderation/community-moderation-contract";
+import {
+  readBoundedJson,
+  requireServerJsonContentType,
+} from "../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
+import { communityModerationService } from "../../../../../lib/services/community/community-moderation-service";
 
 type Context = { params: Promise<{ id: string }> };
 export async function GET(request: NextRequest, { params }: Context) {

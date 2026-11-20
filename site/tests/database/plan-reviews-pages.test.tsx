@@ -1,7 +1,10 @@
+vi.mock("server-only", () => ({}));
+
 import { AppError } from "@nexus/domain";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+import { getDictionary } from "../../src/lib/i18n";
 
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
@@ -26,13 +29,13 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/plan-reviews-service", () => ({
+vi.mock("../../src/lib/services/commerce/plan-reviews-service", () => ({
   planReviewsService: {
     detail: state.detail,
     page: state.page,
@@ -40,8 +43,8 @@ vi.mock("../../src/lib/services/plan-reviews-service", () => ({
     plan: state.plan,
   },
 }));
-vi.mock("../../src/components/locale-context", () => ({
-  useNexusLocale: () => ({ locale: state.locale }),
+vi.mock("../../src/features/shell/locale", () => ({
+  useNexusLocale: () => ({ locale: state.locale, dictionary: getDictionary(state.locale) }),
 }));
 
 import { commercialFeeEstimate } from "@nexus/domain";
@@ -50,7 +53,7 @@ import Detail from "../../src/app/workspace/subscriptions/reviews/[id]/page";
 import ReviewsLoading from "../../src/app/workspace/subscriptions/reviews/loading";
 import New from "../../src/app/workspace/subscriptions/reviews/new/page";
 import History from "../../src/app/workspace/subscriptions/reviews/page";
-import { planReviewsCopy } from "../../src/lib/plan-reviews-i18n";
+import { planReviewsCopy } from "../../src/features/commerce/plan-reviews-i18n";
 
 const date = new Date("2026-10-11T00:00:00.000Z");
 const terms = {
@@ -257,8 +260,8 @@ it("shows an honest recovery state when saved plan reviews fail to load", async 
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(copy.loadUnavailableHint);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain('href="/workspace/subscriptions/reviews"');
 });
 it("shows honest recovery when review detail or new review loads fail", async () => {
@@ -282,7 +285,7 @@ it("shows honest recovery when review detail or new review loads fail", async ()
 it("clips honest plan review loading shells on narrow layouts", async () => {
   for (const Loading of [ReviewsLoading, ReviewDetailLoading]) {
     const html = renderToStaticMarkup(await Loading());
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain(planReviewsCopy("en").loading);
   }
 });

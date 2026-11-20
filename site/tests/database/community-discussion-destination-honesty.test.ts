@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { expect, it } from "vitest";
-import { formatNotification } from "../../src/lib/notification-copy";
+import { formatNotification } from "../../src/features/notifications/notification-copy";
 
 const reviewCopy = { approved: "", rejected: "", version: "", notes: "" };
 
@@ -43,7 +43,7 @@ it.each(["en", "ru"] as const)(
   (locale) => {
     const result = formatNotification(
       {
-        title: "Discussion moderation",
+        title: "Discussion moderation / Модерация обсуждения",
         message: "Comment cmt_a: removed.",
         data: undefined,
       },

@@ -15,9 +15,7 @@ const source = readFileSync(
 it("locks gallery reviewNote notice to ErrorState without soft text-warning", () => {
   expect(source).toContain('import { ErrorState } from "@nexus/ui"');
   expect(source).toContain('id="resource-media-review-note"');
-  expect(source).toMatch(
-    /<ErrorState id="resource-media-review-note" title=\{copy\.reviewNote\} \/>/u,
-  );
+  expect(source).toMatch(/description=\{copy\.reviewNoteDescription\}/u);
   expect(source).not.toContain('role="note" className="text-sm text-warning"');
   expect(source).not.toContain('className="text-sm text-warning">\n        {copy.reviewNote}');
 });

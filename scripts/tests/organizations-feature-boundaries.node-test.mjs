@@ -8,6 +8,20 @@ import test from "node:test";
 const root = resolve(import.meta.dirname, "../..");
 const cruiser = resolve(root, "node_modules/dependency-cruiser/bin/dependency-cruiser.mjs");
 const config = resolve(root, ".dependency-cruiser.cjs");
+const utilPorts = [
+  "organization-member-confirmation",
+  "organization-workspace-client",
+  "organization-team-copy",
+  "organization-governance-copy",
+  "organization-batch-copy",
+  "organization-content-copy",
+  "organization-publication-history-copy",
+  "organization-workspace-copy",
+  "organization-batch-contract",
+  "organization-governance-contract",
+  "organization-team-contract",
+  "organization-workspace-contract",
+];
 const clientPorts = ["workspace", "team", "profile", "history-view"];
 const serverPorts = [
   "content-editor",
@@ -21,9 +35,10 @@ const serverPorts = [
   "public-profile",
   "public-activity",
   "public-trust",
+  "organization-create",
 ];
 const safeLib =
-  /^(?:i18n(?:\.ts$|\/)|(?:organization-governance-contract|organization-workspace-contract|user-platform-contract|private-change-history-query|organization-governance-copy|organization-workspace-copy|organization-batch-copy|user-platform-copy|private-change-history-copy|organization-workspace-client|user-platform-client|private-api-request|organization-member-confirmation|organization-team-contract|content-discussion-contract|organization-team-copy|organization-batch-contract|organization-content-copy)\.ts$)/u;
+  /^(?:(?:i18n(?:\.ts$|\/)|platform\/i18n\.ts$)|(?:organization-governance-contract|user-platform-contract|private-change-history-query|user-platform-copy|private-change-history-copy|user-platform-client|http\/private-api-request|content-discussion-contract)\.ts$)/u;
 function cruise(cwd, entries, output = "json") {
   return spawnSync(
     process.execPath,
@@ -54,7 +69,7 @@ test("Organizations rejects private, routing, server and infrastructure edges", 
   write("site/src/lib/services/session.ts", 'export type { Row } from "@nexus/db";');
   write("site/src/features/organizations/components/private.ts", "export const value = 1;");
   write("site/src/features/organizations/server/page.ts", "export const value = 1;");
-  for (const port of clientPorts) {
+  for (const port of [...clientPorts, ...utilPorts]) {
     write(`site/src/features/organizations/${port}.ts`, 'export { value } from "./server/page";');
     write(`site/src/app/${port}.ts`, `export { value } from "../features/organizations/${port}";`);
   }
@@ -100,7 +115,7 @@ test("Organizations rejects private, routing, server and infrastructure edges", 
     assert(mod, name);
     return mod.dependencies.flatMap((edge) => edge.rules?.map((rule) => rule.name) || []);
   };
-  for (const port of clientPorts) {
+  for (const port of [...clientPorts, ...utilPorts]) {
     assert(
       rules(`features/organizations/${port}.ts`).includes("organizations-client-isolation"),
       port,
@@ -127,7 +142,9 @@ test("Organizations rejects private, routing, server and infrastructure edges", 
 });
 
 test("Organizations client graphs exclude server dependencies transitively", () => {
-  const entries = clientPorts.map((port) => `site/src/features/organizations/${port}.ts`);
+  const entries = [...clientPorts, ...utilPorts].map(
+    (port) => `site/src/features/organizations/${port}.ts`,
+  );
   const result = cruise(root, entries);
   assert.equal(result.status, 0, result.stderr);
   const graph = JSON.parse(result.stdout);
@@ -138,7 +155,7 @@ test("Organizations client graphs exclude server dependencies transitively", () 
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/organizations\/(?:server\/|(?:content-editor|publication-history|directory-page|workspace-page|team-page|activity-page|content-page|public-directory|public-profile|public-activity|public-trust)-server\.ts$))/u.test(
+      !/^site\/src\/(?:app\/|features\/organizations\/(?:server\/|(?:content-editor|publication-history|directory-page|workspace-page|team-page|activity-page|content-page|public-directory|public-profile|public-activity|public-trust|organization-create)-server\.ts$))/u.test(
         name,
       ),
       name,
@@ -153,9 +170,13 @@ test("Organizations client graphs exclude server dependencies transitively", () 
       visit(edge.resolved);
     }
   }
+  const utilPortSet = new Set(utilPorts);
   for (const entry of entries) {
-    if (!entry.endsWith("/history-view.ts"))
-      assert.match(readFileSync(resolve(root, entry), "utf8"), /^"use client";/u);
+    if (!entry.endsWith("/history-view.ts")) {
+      const portName = entry.split("/").pop().replace(/\.ts$/u, "");
+      if (!utilPortSet.has(portName))
+        assert.match(readFileSync(resolve(root, entry), "utf8"), /^"use client";/u);
+    }
     visit(entry);
   }
   for (const child of [
@@ -179,6 +200,7 @@ test("Organizations server entries stay server-only and separately composed", ()
     ["public-profile", "public-profile.tsx"],
     ["public-activity", "public-activity.tsx"],
     ["public-trust", "public-trust.tsx"],
+    ["organization-create", "organization-create-screen.tsx"],
   ];
   for (const [port, page] of entries) {
     const source = `site/src/features/organizations/${port}-server.ts`;
@@ -210,7 +232,10 @@ test("Organizations route entries retain dynamic rendering and metadata", () => 
   ]) {
     const source = readFileSync(resolve(root, `site/src/app/${route}/page.tsx`), "utf8");
     assert.match(source, /export const dynamic = "force-dynamic";/u);
-    assert.match(source, /export\s*\{\s*default,\s*generateMetadata,?\s*\}\s*from/u);
+    assert.match(
+      source,
+      /export\s*\{\s*(?:default,\s*generateMetadata|[A-Za-z]\w*\s+as\s+default,\s*[A-Za-z]\w*\s+as\s+generateMetadata),?\s*\}\s*from/u,
+    );
     assert(source.includes(`/${port}-server";`));
   }
 });

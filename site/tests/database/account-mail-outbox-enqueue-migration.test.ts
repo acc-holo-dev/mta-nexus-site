@@ -4,7 +4,6 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { sql } from "drizzle-orm";
 import { describe, it } from "vitest";
-import { authService } from "../../src/lib/services/auth-service";
 import { db } from "../../packages/db/src/client";
 import type {
   MailContext,
@@ -12,6 +11,7 @@ import type {
 } from "../../packages/db/src/repositories/account-mail-crypto";
 import { AccountMailCipher } from "../../packages/db/src/repositories/account-mail-crypto";
 import { userRepository } from "../../packages/db/src/repositories/users";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 import {
   account,
   cipher,

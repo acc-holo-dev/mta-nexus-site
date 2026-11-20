@@ -1,17 +1,25 @@
 "use client";
 import { Button, ErrorState } from "@nexus/ui";
-
 import { Archive, LoaderCircle, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { confirmsAdminAction } from "../../../lib/admin-action-confirmation";
+import { confirmsAdminAction } from "../../moderation/admin-action-confirmation";
 import {
   confirmsModerationCommand,
   moderationDetailHref,
-} from "../../../lib/community-moderation-contract";
-import { moderationCopy, moderationError } from "../../../lib/community-moderation-copy";
-import { confirmAction } from "../../../components/confirm-action";
-import { useNexusLocale } from "../../../components/locale-context";
+} from "../../moderation/community-moderation-contract";
+import { confirmAction } from "../../shell/confirm-action";
+import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
+import { useNexusLocale } from "../../shell/locale";
+import { skelH35W35Spin } from "../../shell/skeleton-shell";
+import {
+  typeFlexWrapGap2,
+  typeLabelUpperMuted,
+  typeSmSuccess,
+  typeTenFaint,
+  typeWFullMaxSmSpace2Md80,
+} from "../../shell/type-shell";
+import { moderationCopy, moderationError } from "../community-moderation-copy";
 
 export function ContentModerationControls({
   contentId,
@@ -105,9 +113,7 @@ export function ContentModerationControls({
           workspace
             ? moderationError(locale, response.ok ? "UNCONFIRMED" : data?.code)
             : data?.code === "CONTENT_STATE_CHANGED"
-              ? locale === "ru"
-                ? "Публикация изменилась. Загрузите и проверьте новую версию перед решением."
-                : "The publication changed. Reload and review the new version before deciding."
+              ? moderationError(locale, "CONTENT_STATE_CHANGED")
               : copy.contentFailed,
         );
         return;
@@ -129,12 +135,9 @@ export function ContentModerationControls({
   }
 
   return (
-    <div
-      className="w-full max-w-sm space-y-2 md:w-80"
-      aria-busy={pending !== null ? true : undefined}
-    >
+    <div className={typeWFullMaxSmSpace2Md80} aria-busy={pending !== null ? true : undefined}>
       <label className="block space-y-1">
-        <span className="font-label uppercase text-muted">{copy.reviewNote}</span>
+        <span className={typeLabelUpperMuted}>{copy.reviewNote}</span>
         <textarea
           disabled={pending !== null || blocked}
           value={notes}
@@ -147,7 +150,7 @@ export function ContentModerationControls({
         />
       </label>
 
-      <div className="flex flex-wrap gap-2">
+      <div className={typeFlexWrapGap2}>
         <Button
           type="button"
           disabled={!hasNotes || pending !== null || blocked || status === "published" || truncated}
@@ -156,7 +159,7 @@ export function ContentModerationControls({
           variant="outline"
         >
           {pending === "publish" ? (
-            <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+            <LoaderCircle className={skelH35W35Spin} aria-hidden="true" />
           ) : (
             <Send className="h-3.5 w-3.5" aria-hidden="true" />
           )}
@@ -171,7 +174,7 @@ export function ContentModerationControls({
           variant="outline"
         >
           {pending === "archive" ? (
-            <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+            <LoaderCircle className={skelH35W35Spin} aria-hidden="true" />
           ) : (
             <Archive className="h-3.5 w-3.5" aria-hidden="true" />
           )}
@@ -179,17 +182,14 @@ export function ContentModerationControls({
         </Button>
       </div>
 
-      {!hasNotes && <p className="text-[10px] text-faint">{copy.reviewNoteHint}</p>}
+      {!hasNotes && <p className={typeTenFaint}>{copy.reviewNoteHint}</p>}
       {saved && (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {moderationCopy(locale).saved}
         </p>
       )}
       {saved && (
-        <a
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          href={workspace ? moderationDetailHref(contentId) : "/admin"}
-        >
+        <a className={linkAccentSm} href={workspace ? moderationDetailHref(contentId) : "/admin"}>
           {moderationCopy(locale).reload}
         </a>
       )}
@@ -202,7 +202,7 @@ export function ContentModerationControls({
               type="button"
               disabled={pending !== null}
               onClick={() => router.refresh()}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
               variant="ghost"
             >
               {moderationCopy(locale).reload}

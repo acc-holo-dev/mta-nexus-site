@@ -1,6 +1,7 @@
 import { getTableColumns } from "drizzle-orm";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { serverObservations } from "../../packages/db/src/schema";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   results: [] as unknown[][][],
@@ -28,7 +29,9 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
+
 import { ServerObservationRepository } from "../../packages/db/src/repositories/server-observations";
+
 const repository = new ServerObservationRepository();
 const now = new Date("2026-10-09T12:00:00Z");
 const sample = {

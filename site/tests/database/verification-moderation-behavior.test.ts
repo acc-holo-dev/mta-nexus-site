@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildVerificationDecisionPayload,
   normalizeVerificationReviewNotes,
-} from "../../src/lib/verification-moderation";
+} from "../../src/features/moderation/verification-moderation";
 
 describe("verification moderation client contract", () => {
   it("normalizes review notes inside the same 3..2000 character boundary as the API", () => {

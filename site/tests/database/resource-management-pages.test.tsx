@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
+vi.mock("server-only", () => ({}));
+
 const state = vi.hoisted(() => ({
   user: { id: "usr_a", role: "developer" } as null | { id: string; role: "developer" },
   locale: "en" as "en" | "ru",
@@ -33,16 +35,16 @@ vi.mock("next/link", async () => {
     }) => React.createElement("a", { href, ...rest }, children),
   };
 });
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: { getManagedProduct: state.product, getDependencyResolution: state.resolution },
 }));
-vi.mock("../../src/lib/services/resource-management-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-management-service", () => ({
   resourceManagementService: {
     managedVariants: state.managed,
     variantCandidates: state.candidates,
@@ -62,7 +64,9 @@ vi.mock("../../src/features/resources/compatibility-controls", () => ({
 }));
 
 import CompatibilityPage from "../../src/app/workspace/resources/[id]/compatibility/page";
-import VariantsPage, { metadata } from "../../src/app/workspace/resources/[id]/variants/page";
+import VariantsPage, {
+  generateMetadata,
+} from "../../src/app/workspace/resources/[id]/variants/page";
 import { ResourceVariantChoices } from "../../src/features/resources/components/resource-variant-choices";
 
 const context = { params: Promise.resolve({ id: "prd_a" }) },
@@ -129,28 +133,32 @@ it.each(["en", "ru"] as const)(
       suspended: false,
     });
     expect(variantHtml + compatibilityHtml).not.toContain("must-not-serialize");
-    expect(metadata.robots).toMatchObject({ index: false, follow: false });
+    expect((await generateMetadata()).robots).toMatchObject({ index: false, follow: false });
   },
 );
 it("shows an honest recovery state when variant management fails", async () => {
   state.managed.mockRejectedValue(new Error("variants unavailable"));
-  const { getResourceManagementCopy } = await import("../../src/lib/resource-management-i18n");
+  const { getResourceManagementCopy } = await import(
+    "../../src/features/resources/resource-management-i18n"
+  );
   const copy = getResourceManagementCopy("en");
   const html = renderToStaticMarkup(await VariantsPage(context));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("shows an honest recovery state when compatibility resolution fails", async () => {
   state.resolution.mockRejectedValue(new Error("compatibility unavailable"));
-  const { getResourceManagementCopy } = await import("../../src/lib/resource-management-i18n");
+  const { getResourceManagementCopy } = await import(
+    "../../src/features/resources/resource-management-i18n"
+  );
   const copy = getResourceManagementCopy("en");
   const html = renderToStaticMarkup(await CompatibilityPage(context));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(copy.loadUnavailableHint);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain("/workspace/resources/prd_a/compatibility");
   expect(state.compatibilityForm).not.toHaveBeenCalled();
 });

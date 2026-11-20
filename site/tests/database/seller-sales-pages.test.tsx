@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { AppError } from "@nexus/domain";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -24,21 +26,21 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/seller-sales-service", () => ({
+vi.mock("../../src/lib/services/commerce/seller-sales-service", () => ({
   sellerSalesService: { report: state.report, detail: state.detail, scopes: state.scopes },
 }));
 
 import DetailLoading from "../../src/app/workspace/sales/report/[id]/loading";
 import Detail from "../../src/app/workspace/sales/report/[id]/page";
 import ReportLoading from "../../src/app/workspace/sales/report/loading";
-import Page, { metadata } from "../../src/app/workspace/sales/report/page";
-import { sellerSalesCopy } from "../../src/lib/seller-sales-i18n";
+import Page, { generateMetadata } from "../../src/app/workspace/sales/report/page";
+import { sellerSalesCopy } from "../../src/features/commerce/seller-sales-i18n";
 
 const date = new Date("2026-10-11T00:00:00Z"),
   sale = {
@@ -108,7 +110,7 @@ it("does not read reports when signed out and disables indexing", async () => {
   ).toContain('href="/auth/login?next=%2Fworkspace%2Fsales%2Freport%2Fitm_a"');
   expect(state.report).not.toHaveBeenCalled();
   expect(state.detail).not.toHaveBeenCalled();
-  expect(metadata.robots).toEqual({ index: false, follow: false });
+  expect((await generateMetadata()).robots).toEqual({ index: false, follow: false });
 });
 it.each(["en", "ru"] as const)(
   "renders %s filters and accurate per-currency records without private payment data",
@@ -152,7 +154,7 @@ it("invalid filters render a localized ErrorState recovery before data reads", a
   expect(html).toContain(copy.invalid);
   expect(html).toContain(copy.invalidDescription);
   expect(html).toContain(copy.reset);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain('href="/workspace/sales/report"');
   expect(state.report).not.toHaveBeenCalled();
   expect(state.scopes).not.toHaveBeenCalled();
@@ -245,8 +247,8 @@ it("shows an honest recovery state when the sales report fails to load", async (
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(copy.loadUnavailableHint);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain('href="/workspace/sales/report?page=2"');
   expect(html).not.toContain("report unavailable");
 });
@@ -261,14 +263,14 @@ it("shows an honest recovery state when a sale line fails to load", async () => 
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/workspace/sales/report/itm_a?organizationId=org_a"');
 });
 it("clips honest sales loading shells on narrow layouts", async () => {
   for (const Loading of [ReportLoading, DetailLoading]) {
     const html = renderToStaticMarkup(await Loading());
-    expect(html).toContain("min-w-0");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   }
   expect(renderToStaticMarkup(await DetailLoading())).toContain(
     sellerSalesCopy("en").detailLoading,

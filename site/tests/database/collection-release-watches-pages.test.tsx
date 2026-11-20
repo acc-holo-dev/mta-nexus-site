@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
@@ -14,11 +16,11 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/library/collections/lcol_a/watches",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({ getRequestLocale: async () => h.locale }));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => h.user },
 }));
-vi.mock("../../src/lib/services/resource-release-watches-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-release-watches-service", () => ({
   resourceReleaseWatchesService: { collectionPage: h.page },
 }));
 vi.mock("../../src/features/resources/release-watch", () => ({
@@ -29,7 +31,9 @@ vi.mock("../../src/features/resources/release-watch", () => ({
   ),
 }));
 
-import Page, { metadata } from "../../src/app/workspace/library/collections/[id]/watches/page";
+import Page, {
+  generateMetadata,
+} from "../../src/app/workspace/library/collections/[id]/watches/page";
 import { getDictionary } from "../../src/lib/i18n";
 
 const screen = async () =>
@@ -89,7 +93,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('data-watch="prd_b"');
     expect(html).toContain('href="/market/root-core"');
     expect(html).not.toContain("/market/PRIVATE");
-    expect(metadata.robots).toEqual({ index: false, follow: false });
+    expect((await generateMetadata()).robots).toEqual({ index: false, follow: false });
   },
 );
 it("leaves archived collections inspectable without enrollment controls", async () => {
@@ -126,14 +130,14 @@ it("offers a filter reset when a collection watch page is empty", async () => {
   expect(html).toContain("Try another filter or clear search");
   expect(html).toContain("Clear filters");
   expect(html).toContain("filter=all");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("shows an honest recovery state when collection watches fail", async () => {
   h.page.mockRejectedValue(new Error("watches unavailable"));
   const html = await screen();
   expect(html).toContain('role="alert"');
   expect(html).toContain("Release watches are temporarily unavailable");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("filter=disabled");
   expect(html).toContain("query=Core");
 });

@@ -1,15 +1,15 @@
 import { AppError, RateLimitExceededError, UnauthorizedError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { profilePrivacyUpdateSchema } from "../../../../lib/profile-privacy-contract";
+import { profilePrivacyUpdateSchema } from "../../../../features/accounts/profile-privacy-contract";
 import {
   profilePrivacyError,
   profilePrivacyMutationError,
-} from "../../../../lib/profile-privacy-copy";
-import { profilePrivacyService } from "../../../../lib/services/profile-privacy-service";
-import { userPlatformApi } from "../../../../lib/user-platform-api";
+} from "../../../../features/accounts/profile-privacy-copy";
+import { userPlatformApi } from "../../../../features/accounts/user-platform-api";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { profilePrivacyService } from "../../../../lib/services/accounts/profile-privacy-service";
 
 export const dynamic = "force-dynamic";
 const validQuery = (request: NextRequest) => {

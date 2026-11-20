@@ -1,12 +1,14 @@
-import { notificationRepository } from "@nexus/db";
 import type { NextRequest } from "next/server";
+import { notificationsApiCopy } from "../../../features/notifications/notifications-api-copy";
+import { resolveLocale } from "../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
-} from "../../../lib/observability";
-import { authService } from "../../../lib/services/auth-service";
+} from "../../../lib/platform/observability";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { notificationInboxService } from "../../../lib/services/notifications/notification-inbox-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -22,6 +24,7 @@ function json(context: RequestLogContext, body: unknown, status = 200) {
 
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
+  const copy = notificationsApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
@@ -41,8 +44,8 @@ export async function GET(request: NextRequest) {
     const unreadOnly = request.nextUrl.searchParams.get("unreadOnly") === "true";
 
     const [notifications, unreadCount] = await Promise.all([
-      notificationRepository.listByUser(user.id, limit, unreadOnly),
-      notificationRepository.countUnread(user.id),
+      notificationInboxService.listByUser(user.id, limit, unreadOnly),
+      notificationInboxService.countUnread(user.id),
     ]);
 
     return json(context, {
@@ -60,6 +63,6 @@ export async function GET(request: NextRequest) {
       status: 500,
       error,
     });
-    return json(context, { error: "Failed to fetch notifications" }, 500);
+    return json(context, { error: copy.fetchFailed }, 500);
   }
 }

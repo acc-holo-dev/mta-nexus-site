@@ -4,11 +4,18 @@ import { Avatar, Button } from "@nexus/ui";
 import Link from "next/link";
 import { useState } from "react";
 import type { Locale } from "../../../lib/i18n";
-import { organizationGovernanceCopy } from "../../../lib/organization-governance-copy";
-import { organizationTeamCopy } from "../../../lib/organization-team-copy";
-import type { OrganizationWorkspace } from "../../../lib/organization-workspace-contract";
-import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
-import { platformFieldClass } from "../../../lib/user-platform-client";
+import { platformFieldClass } from "../../community/user-platform-client";
+import { linkAccentSmMinWBreak, linkGhostAccentSm } from "../../shell/link-shell";
+import {
+  typeFlexCenterGap3,
+  typeFlexWrapEndGap3,
+  typeMlAutoXsMuted,
+  typeSpace1SmSecondary,
+} from "../../shell/type-shell";
+import { organizationGovernanceCopy } from "../organization-governance-copy";
+import { organizationTeamCopy } from "../organization-team-copy";
+import type { OrganizationWorkspace } from "../organization-workspace-contract";
+import { getOrganizationCopy } from "../organization-workspace-copy";
 export function OrganizationMemberEditor({
   member,
   locale,
@@ -41,19 +48,19 @@ export function OrganizationMemberEditor({
       }}
       className="space-y-3 rounded-lg border border-base bg-inset p-4"
     >
-      <div className="flex items-center gap-3">
+      <div className={typeFlexCenterGap3}>
         <Avatar
           src={member.avatarUrl ?? undefined}
           alt={member.displayName}
           fallback={member.username}
         />
         <Link
-          className="inline-flex min-h-11 min-w-0 items-center break-words text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentSmMinWBreak}
           href={`/users/${encodeURIComponent(member.username)}`}
         >
           {member.displayName} (@{member.username})
         </Link>
-        <span className="ml-auto text-xs text-muted">
+        <span className={typeMlAutoXsMuted}>
           {member.role === "owner"
             ? organizationTeamCopy(locale).legacyOwner
             : ["admin", "member", "developer"].includes(member.role)
@@ -62,8 +69,8 @@ export function OrganizationMemberEditor({
         </span>
       </div>
       {canEdit && (
-        <fieldset disabled={busy} className="flex flex-wrap items-end gap-3">
-          <label className="space-y-1 text-sm text-secondary">
+        <fieldset disabled={busy} className={typeFlexWrapEndGap3}>
+          <label className={typeSpace1SmSecondary}>
             <span>{copy.role}</span>
             <select
               className={platformFieldClass}
@@ -106,7 +113,7 @@ export function OrganizationMemberEditor({
           variant="ghost"
           disabled={busy}
           onClick={onSelectOwner}
-          className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkGhostAccentSm}
         >
           {organizationGovernanceCopy(locale).choose}
         </Button>

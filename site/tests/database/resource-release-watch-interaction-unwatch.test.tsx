@@ -1,4 +1,5 @@
 import { expect, it, vi } from "vitest";
+import { getDictionary } from "../../src/lib/i18n";
 import {
   createResourceReleaseWatchInteractionHelpers,
   mockReactHooks,
@@ -10,15 +11,15 @@ const h = vi.hoisted(() => ({
   fetch: vi.fn(),
   refresh: vi.fn(),
   reload: vi.fn(),
-  locale: "en",
+  locale: "en" as "en" | "ru",
   cleanup: null as (() => void) | null,
 }));
 vi.mock("react", async (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../../src/components/confirm-action", () => ({ confirmAction }));
-vi.mock("../../src/components/locale-context", () => ({
-  useNexusLocale: () => ({ locale: h.locale }),
+vi.mock("../../src/features/shell/confirm-action", () => ({ confirmAction }));
+vi.mock("../../src/features/shell/locale", () => ({
+  useNexusLocale: () => ({ locale: h.locale, dictionary: getDictionary(h.locale) }),
 }));
 
 import { ResourceReleaseWatchControl } from "../../src/features/resources/release-watch";

@@ -22,7 +22,7 @@ vi.mock("@nexus/db", () => ({
 }));
 vi.mock("@nexus/storage", () => ({ getStorageProvider: () => state.provider }));
 
-import { storageMaintenanceService as service } from "../../src/lib/services/storage-maintenance-service";
+import { storageMaintenanceService as service } from "../../src/lib/services/moderation/storage-maintenance-service";
 
 beforeEach(() => {
   vi.clearAllMocks();

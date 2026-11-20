@@ -1,27 +1,43 @@
 import { AppError } from "@nexus/domain";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { getManagedServerCopy } from "../../../lib/managed-server-view";
-import { getServerActivityCopy } from "../../../lib/server-activity-view";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { serverWorkspaceHistoryService } from "../../../lib/services/servers/server-workspace-history-service";
+import { platformFieldClass } from "../../community/user-platform-client";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded, linkMinHAccent } from "../../shell/link-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
+import { panelClipSpace2P5 } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import {
+  type2xlBoldPrimary,
+  typeBreakSemiboldPrimary,
+  typeFlexWrapGap4,
+  typeSmBoldPrimary,
+  typeSmMuted,
+  typeSmPrimary,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import { getManagedServerCopy } from "../managed-server-view";
+import { getServerActivityCopy } from "../server-activity-view";
 import {
   parseServerWorkspaceHistoryQuery,
   serverWorkspaceHistoryHref,
   serverWorkspaceHistorySchema,
-} from "../../../lib/server-workspace-contract";
-import { serverWorkspaceCopy, serverWorkspaceError } from "../../../lib/server-workspace-copy";
-import { authService } from "../../../lib/services/auth-service";
-import { serverWorkspaceHistoryService } from "../../../lib/services/server-workspace-history-service";
-import { platformFieldClass } from "../../../lib/user-platform-client";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+} from "../server-workspace-contract";
+import { serverWorkspaceCopy, serverWorkspaceError } from "../server-workspace-copy";
+export async function serverWorkspaceHistoryMetadata(): Promise<Metadata> {
+  return {
+    title: `${getServerActivityCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
-const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
-export async function ServerWorkspaceHistoryScreen({
+async function ServerWorkspaceHistoryScreen({
   id,
   searchParams,
 }: {
@@ -33,17 +49,24 @@ export async function ServerWorkspaceHistoryScreen({
     history = getServerActivityCopy(locale),
     labels = getManagedServerCopy(locale);
   let failure = "";
-  const actor = await authService
-    .getSession((await cookies()).get("nexus_session")?.value)
-    .catch(() => {
-      failure = copy.historyUnavailable;
-      return null;
-    });
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={history.title}
+        message={copy.historyUnavailable}
+        retryHref={`/workspace/servers/${encodeURIComponent(id)}/activity`}
+      />
+    );
+  }
   if (!actor) {
     return (
       <PlatformSignIn
         locale={locale}
-        returnPath={`/workspace/servers/${encodeURIComponent(id)}/history`}
+        returnPath={`/workspace/servers/${encodeURIComponent(id)}/activity`}
       />
     );
   }
@@ -79,15 +102,15 @@ export async function ServerWorkspaceHistoryScreen({
   const exportPath = `/api/workspace/servers/${encodeURIComponent(id)}/activity/export${exportParams.size ? `?${exportParams}` : ""}`;
   const filtered = query.period !== "all" || query.action !== "all";
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax4xl}>
       <header className="space-y-2">
-        <Link href={`/workspace/servers/${encodeURIComponent(id)}`} className={navLinkClass}>
+        <Link href={`/workspace/servers/${encodeURIComponent(id)}`} className={linkAccentSmRounded}>
           {history.back}
         </Link>
-        <h1 className="text-2xl font-bold text-primary">{history.title}</h1>
-        {data && <p className="break-words font-semibold text-primary">{data.server.name}</p>}
-        <p className="text-sm text-muted">{history.description}</p>
-        <p className="text-xs text-muted">{history.private}</p>
+        <h1 className={type2xlBoldPrimary}>{history.title}</h1>
+        {data && <p className={typeBreakSemiboldPrimary}>{data.server.name}</p>}
+        <p className={typeSmMuted}>{history.description}</p>
+        <p className={typeXsMuted}>{history.private}</p>
       </header>
       <form action={base} method="get" className="nexus-panel flex flex-wrap items-end gap-4 p-5">
         <label className="flex flex-col gap-2 text-sm text-primary">
@@ -120,18 +143,19 @@ export async function ServerWorkspaceHistoryScreen({
             )}
           </select>
         </label>
-        <Button type="submit" variant="outline" className="min-h-11 text-accent">
+        <Button type="submit" variant="outline" className={linkMinHAccent}>
           {copy.apply}
         </Button>
-        <Link href={base} className={navLinkClass}>
+        <Link href={base} className={linkAccentSmRounded}>
           {copy.reset}
         </Link>
       </form>
       {!data ? (
         <ErrorState
           title={failure || copy.historyUnavailable}
+          description={copy.historyUnavailableHint}
           action={
-            <Link href={serverWorkspaceHistoryHref(id, query)} className={navLinkClass}>
+            <Link href={serverWorkspaceHistoryHref(id, query)} className={linkAccentSmRounded}>
               {copy.reload}
             </Link>
           }
@@ -139,10 +163,10 @@ export async function ServerWorkspaceHistoryScreen({
       ) : (
         <>
           <div className="space-y-2">
-            <a href={exportPath} className={navLinkClass}>
+            <a href={exportPath} className={linkAccentSmRounded}>
               {copy.export}
             </a>
-            <p className="text-xs text-muted">{copy.exportHelp}</p>
+            <p className={typeXsMuted}>{copy.exportHelp}</p>
           </div>
           {!data.events.length ? (
             <EmptyState
@@ -150,7 +174,7 @@ export async function ServerWorkspaceHistoryScreen({
               description={filtered ? copy.historyEmptyHint : copy.historyEmptyNeverHint}
               action={
                 filtered ? (
-                  <Link href={base} className={navLinkClass}>
+                  <Link href={base} className={linkAccentSmRounded}>
                     {copy.reset}
                   </Link>
                 ) : undefined
@@ -159,17 +183,15 @@ export async function ServerWorkspaceHistoryScreen({
           ) : (
             <ol className="space-y-3">
               {data.events.map((event) => (
-                <li key={event.id} className="nexus-panel min-w-0 space-y-2 overflow-x-clip p-5">
-                  <h2 className="text-sm font-bold text-primary">
-                    {history.actions[event.action]}
-                  </h2>
-                  <time dateTime={event.createdAt} className="text-xs text-muted">
+                <li key={event.id} className={panelClipSpace2P5}>
+                  <h2 className={typeSmBoldPrimary}>{history.actions[event.action]}</h2>
+                  <time dateTime={event.createdAt} className={typeXsMuted}>
                     {new Date(event.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-GB", {
                       timeZone: "UTC",
                       timeZoneName: "short",
                     })}
                   </time>
-                  <p className="text-xs text-muted">
+                  <p className={typeXsMuted}>
                     {history.actor}:{" "}
                     {event.actor === "you"
                       ? history.you
@@ -184,19 +206,19 @@ export async function ServerWorkspaceHistoryScreen({
                   {event.identity && (
                     <Link
                       href={`/users/${encodeURIComponent(event.identity.username)}`}
-                      className={navLinkClass}
+                      className={linkAccentSmRounded}
                     >
                       {copy.identity}: {event.identity.name} (@{event.identity.username})
                     </Link>
                   )}
                   {event.fields.length > 0 && (
-                    <p className="text-sm text-muted">
+                    <p className={typeSmMuted}>
                       {history.fields}:{" "}
                       {event.fields.map((field) => history.fieldNames[field]).join(", ")}
                     </p>
                   )}
                   {event.transition && (
-                    <p className="text-sm text-primary">
+                    <p className={typeSmPrimary}>
                       {copy.transition}: {labels[event.transition.before]} →{" "}
                       {labels[event.transition.after]}
                     </p>
@@ -205,11 +227,11 @@ export async function ServerWorkspaceHistoryScreen({
               ))}
             </ol>
           )}
-          <nav aria-label={history.navigation} className="flex flex-wrap gap-4">
+          <nav aria-label={history.navigation} className={typeFlexWrapGap4}>
             <Link
               prefetch={false}
               href={serverWorkspaceHistoryHref(id, query)}
-              className={navLinkClass}
+              className={linkAccentSmRounded}
             >
               {history.latest}
             </Link>
@@ -217,7 +239,7 @@ export async function ServerWorkspaceHistoryScreen({
               <Link
                 prefetch={false}
                 href={serverWorkspaceHistoryHref(id, query, data.nextCursor)}
-                className={navLinkClass}
+                className={linkAccentSmRounded}
               >
                 {history.older}
               </Link>
@@ -227,4 +249,14 @@ export async function ServerWorkspaceHistoryScreen({
       )}
     </div>
   );
+}
+
+export async function ManagedServerActivityRoutePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return ServerWorkspaceHistoryScreen({ id: (await params).id, searchParams });
 }

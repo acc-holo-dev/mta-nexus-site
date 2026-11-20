@@ -8,10 +8,10 @@ const mocks = vi.hoisted(() => ({
   listPublicPage: vi.fn(),
 }));
 
-vi.mock("../../lib/i18n-server", () => ({
+vi.mock("../../lib/i18n/server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
-vi.mock("../../lib/services/product-service", () => ({
+vi.mock("../../lib/services/commerce/product-service", () => ({
   productService: {
     listPublicPage: mocks.listPublicPage,
     getPublicAttributions: async () => new Map(),

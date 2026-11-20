@@ -1,0 +1,197 @@
+import type { Locale } from "../../lib/i18n";
+
+const en = {
+  title: "Release notifications",
+  resumeTitle: "Resume stopped release watches",
+  resumeNote:
+    "Choose up to 20 accessible stopped watches. Current revisions, publication safety, access and the account limit are checked together. Releases already approved are skipped; version choices and existing notices are retained.",
+  confirmResume: "I confirm resuming future release notifications for the selected resources.",
+  applyResume: "Resume selected watches",
+  collectionTitle: "Collection release notifications",
+  enrollTitle: "Enable notifications for selected resources",
+  enrollNote:
+    "Select up to 20 accessible resources. Only releases approved after enrollment are considered. Current collection membership, watch revisions, access and the account limit are checked together.",
+  confirmEnroll:
+    "I confirm enabling notifications about future releases for the selected resources.",
+  applyEnroll: "Enable selected watches",
+  activeCount: "Active watches across your library",
+  archivedCollection: "This collection is archived. Restore it before enrolling resource watches.",
+  watchCenter: "Manage all release watches",
+  search: "Search accessible resource titles",
+  export: "Export this page as JSON",
+  batchTitle: "Stop several release watches",
+  batchNote:
+    "Choose up to 20 enabled watches on this page. Current revisions are checked together; unavailable resources can still be stopped. Existing inbox notices are retained.",
+  confirmBatch: "I confirm stopping notifications for the selected resources.",
+  applyBatch: "Stop selected watches",
+  retrySame: "Retry the same request",
+  reloadState: "Reload current state",
+  pendingNote: "The result is unconfirmed. Retry the same selection or reload before changing it.",
+  watch: "Notify me about new versions",
+  unwatch: "Stop release notifications",
+  stopConfirmTitle: "Stop release notifications?",
+  stopConfirm:
+    "Future release notices for this resource stop. Existing inbox notices stay. You can turn notifications back on later if the resource is still available.",
+  cancel: "Cancel",
+  enabled: "Enabled",
+  disabled: "Disabled",
+  unavailable: "Currently unavailable",
+  all: "All",
+  library: "Library",
+  versions: "Versions",
+  signIn: "Sign in",
+  signInRequired: "Sign in to manage release notifications",
+  note: "Opt in per resource. Only future approved versions are considered. Your current library access and resource activity notification preferences are checked before a notice is created. Inbox notices may also use your existing Web Push settings.",
+  pinned: "Notifications do not change a saved version or download files automatically.",
+  limit: "Up to 100 active resource watches per account.",
+  batchLimit: "Up to 20 watches can be changed in one request.",
+  settings: "Notification preferences",
+  suppressed:
+    "Resource activity notifications are turned off in settings. Enabling a watch still saves the preference, but notices stay suppressed until that category is on. Turning the category back on does not deliver skipped releases.",
+  acquireRequired: "Add this free resource to your library before enabling release notifications.",
+  noSafeBuild: "A published safe build is required before release notifications can be enabled.",
+  empty: "You have no release watches yet.",
+  emptyHint: "Enable notifications for resources you keep to learn about future approved releases.",
+  emptyFiltered: "No resource watches match this filter.",
+  emptyFilteredHint: "Try another filter or clear search to see all of your watches.",
+  loadUnavailable: "Release watches are temporarily unavailable. Please try again.",
+  loadUnavailableDescription:
+    "A load failure is not an empty watch list. Retry to fetch your current release notification preferences.",
+  reset: "Clear filters",
+  loading: "Loading release watches…",
+  busy: "Saving…",
+  saved: "Release preference saved",
+  failed: "Could not save the release preference",
+  failedDescription:
+    "A failed save is not an updated watch preference. Retry the same request or reload before changing it.",
+  conflict: "The preference changed. Refresh and try again.",
+  access: "Current library access is required to enable notifications.",
+  maximum: "The limit of 100 active watches has been reached.",
+  maximumHint: "Stop an active watch before enabling another.",
+  batchMaximum: "Select at most 20 watches for this request.",
+  batchMaximumHint: "Select fewer watches for this batch request.",
+  blockedHint: "Complete the condition above before enabling release notifications.",
+  suppressedHint:
+    "Turn resource activity notifications on in settings before expecting inbox notices.",
+  alreadyOn: "Already watching",
+  noAccessItem: "No current library access",
+  privateResource: "Resource currently unavailable",
+  skippedNote: "Skipped items are listed with their reason and are not part of this request.",
+  page: "Page",
+  previous: "Previous",
+  next: "Next",
+  of: "of",
+  updated: "Updated",
+  invalid: "Invalid watch filters",
+  invalidDescription:
+    "Invalid filters are not a load failure. Clear them and open the release watches list again.",
+  published: "Resource version published",
+};
+const ru: typeof en = {
+  title: "Уведомления о версиях",
+  resumeTitle: "Возобновить отключённые подписки",
+  resumeNote:
+    "Выберите до 20 доступных ресурсов с отключёнными подписками. Текущие версии настроек, безопасная публикация, доступ и лимит аккаунта проверяются вместе. Уже одобренные выпуски пропускаются; выбор версий и созданные уведомления сохраняются.",
+  confirmResume: "Подтверждаю возобновление уведомлений о будущих выпусках выбранных ресурсов.",
+  applyResume: "Возобновить выбранные подписки",
+  collectionTitle: "Уведомления о выпусках коллекции",
+  enrollTitle: "Включить уведомления для выбранных ресурсов",
+  enrollNote:
+    "Выберите до 20 доступных ресурсов. Учитываются только выпуски, одобренные после включения подписки. Состав коллекции, версии настроек, права доступа и лимит аккаунта проверяются вместе.",
+  confirmEnroll: "Подтверждаю включение уведомлений о будущих выпусках выбранных ресурсов.",
+  applyEnroll: "Включить выбранные подписки",
+  activeCount: "Активные подписки во всей библиотеке",
+  archivedCollection: "Коллекция в архиве. Восстановите её перед включением подписок на ресурсы.",
+  watchCenter: "Управлять всеми подписками на выпуски",
+  search: "Поиск по названиям доступных ресурсов",
+  export: "Экспортировать эту страницу в JSON",
+  batchTitle: "Отключить несколько подписок",
+  batchNote:
+    "Выберите до 20 включённых подписок на этой странице. Текущие версии настроек проверяются вместе; недоступные ресурсы тоже можно отключить. Уведомления, уже созданные в ящике, сохраняются.",
+  confirmBatch: "Подтверждаю отключение уведомлений для выбранных ресурсов.",
+  applyBatch: "Отключить выбранные подписки",
+  retrySame: "Повторить тот же запрос",
+  reloadState: "Обновить текущее состояние",
+  pendingNote:
+    "Результат не подтверждён. Повторите тот же выбор или обновите состояние перед изменением.",
+  watch: "Сообщать о новых версиях",
+  unwatch: "Отключить уведомления о версиях",
+  stopConfirmTitle: "Отключить уведомления о версиях?",
+  stopConfirm:
+    "Новые уведомления об этом ресурсе прекратятся. Уже полученные сообщения останутся. Уведомления можно включить снова, если ресурс ещё доступен.",
+  cancel: "Отмена",
+  enabled: "Включены",
+  disabled: "Отключены",
+  unavailable: "Сейчас недоступно",
+  all: "Все",
+  library: "Библиотека",
+  versions: "Версии",
+  signIn: "Войти",
+  signInRequired: "Войдите для управления уведомлениями о версиях",
+  note: "Подписка включается отдельно для каждого ресурса и учитывает будущие одобренные версии. Перед созданием уведомления проверяются действующие права библиотеки и настройки уведомлений о событиях ресурсов. Для доставки могут использоваться существующие настройки Web Push.",
+  pinned: "Уведомления не меняют закреплённую версию и не скачивают файлы автоматически.",
+  limit: "До 100 активных подписок на ресурсы на аккаунт.",
+  batchLimit: "За один запрос можно изменить не больше 20 подписок.",
+  settings: "Настройки уведомлений",
+  suppressed:
+    "Уведомления о событиях ресурсов выключены в настройках. Подписка всё равно сохраняется, но уведомления подавляются, пока категория выключена. Включение категории не догоняет пропущенные выпуски.",
+  acquireRequired:
+    "Сначала добавьте этот бесплатный ресурс в библиотеку, чтобы включить уведомления о версиях.",
+  noSafeBuild: "Для включения уведомлений о версиях нужна опубликованная безопасная сборка.",
+  empty: "У вас пока нет подписок на выпуски.",
+  emptyHint:
+    "Включите уведомления для ресурсов, которые вы храните, чтобы узнавать о будущих одобренных выпусках.",
+  emptyFiltered: "Нет подписок по выбранному фильтру.",
+  emptyFilteredHint: "Выберите другой фильтр или сбросьте поиск, чтобы увидеть все ваши подписки.",
+  loadUnavailable: "Подписки на выпуски временно недоступны. Попробуйте ещё раз.",
+  loadUnavailableDescription:
+    "Ошибка загрузки — это не пустой список подписок. Повторите запрос, чтобы получить актуальные настройки уведомлений.",
+  reset: "Сбросить фильтры",
+  loading: "Загружаем подписки на выпуски…",
+  busy: "Сохранение…",
+  saved: "Настройка сохранена",
+  failed: "Не удалось сохранить настройку",
+  failedDescription:
+    "Неуспешное сохранение не обновляет подписку. Повторите тот же запрос или обновите состояние перед изменением.",
+  conflict: "Настройка изменилась. Обновите страницу и повторите.",
+  access: "Для включения уведомлений нужны действующие права библиотеки.",
+  maximum: "Достигнут предел в 100 активных подписок.",
+  maximumHint: "Отключите активную подписку, прежде чем включать другую.",
+  batchMaximum: "Выберите не больше 20 подписок для этого запроса.",
+  batchMaximumHint: "Выберите меньше подписок для этого пакетного запроса.",
+  blockedHint: "Выполните условие выше, прежде чем включать уведомления о выпусках.",
+  suppressedHint:
+    "Включите уведомления о событиях ресурсов в настройках, прежде чем ждать сообщения в ящике.",
+  alreadyOn: "Уже включено",
+  noAccessItem: "Нет действующего доступа к библиотеке",
+  privateResource: "Ресурс сейчас недоступен",
+  skippedNote: "Пропущенные позиции указаны с причиной и не входят в этот запрос.",
+  page: "Страница",
+  previous: "Назад",
+  next: "Далее",
+  of: "из",
+  updated: "Обновлено",
+  invalid: "Некорректные фильтры подписок",
+  invalidDescription:
+    "Некорректные фильтры — не ошибка загрузки. Сбросьте их и снова откройте список подписок.",
+  published: "Опубликована версия ресурса",
+};
+export function resourceReleaseWatchesCopy(locale: Locale) {
+  return locale === "ru" ? ru : en;
+}
+export function resourceReleaseNotification(data: unknown, locale: Locale) {
+  if (!data || typeof data !== "object" || Array.isArray(data)) return null;
+  const row = data as Record<string, unknown>;
+  if (
+    row.kind !== "resource_release" ||
+    typeof row.resourceTitle !== "string" ||
+    typeof row.version !== "string" ||
+    row.resourceTitle.length > 200 ||
+    row.version.length > 64
+  )
+    return null;
+  return {
+    title: resourceReleaseWatchesCopy(locale).published,
+    message: `${row.resourceTitle} · ${row.version}`,
+  };
+}

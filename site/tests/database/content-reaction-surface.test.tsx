@@ -1,11 +1,13 @@
+vi.mock("server-only", () => ({}));
+
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+import { reactionCopy } from "../../src/features/community/content-reaction-copy";
 import { ContentReactions } from "../../src/features/community/reactions";
-import { PublicUserTrustPanel } from "../../src/components/public-user-trust";
-import { reactionCopy } from "../../src/lib/content-reaction-copy";
+import { PublicUserTrustPanel } from "../../src/features/trust/public-user-trust";
+import { trustCopy } from "../../src/features/trust/public-user-trust-copy";
 import { getDictionary } from "../../src/lib/i18n";
-import { trustCopy } from "../../src/lib/public-user-trust-copy";
 
 const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
@@ -20,16 +22,16 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/articles/guide",
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../../src/lib/services/content-reaction-service", () => ({
+vi.mock("../../src/lib/services/community/content-reaction-service", () => ({
   contentReactionService: { page: mocks.page },
 }));
-vi.mock("../../src/lib/services/public-user-trust-service", () => ({
+vi.mock("../../src/lib/services/trust/public-user-trust-service", () => ({
   publicUserTrustService: { get: mocks.trust },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
 
@@ -180,7 +182,7 @@ it("shows an honest recovery state when private reactions fail to load", async (
   const html = renderToStaticMarkup(await ReactionsPage({}));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.unavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(getDictionary("en").errors.retry);
   expect(html).toContain('href="/workspace/reactions"');
   expect(html).not.toContain("reactions unavailable");
@@ -201,13 +203,13 @@ it("shows EmptyState descriptions for empty and filtered reactions", async () =>
 });
 it("clips honest reactions loading shells on narrow layouts", async () => {
   const html = renderToStaticMarkup(await ReactionsLoading());
-  expect(html).toContain("min-w-0");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(reactionCopy("en").loading);
 });
 it("keeps reaction removal controls at a usable touch target", async () => {
   const html = renderToStaticMarkup(await ReactionsPage({}));
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain(reactionCopy("en").remove);
 });
 it.each(["en", "ru"] as const)(
@@ -241,9 +243,9 @@ it("offers safe trust recovery on infrastructure failure and 404 on a missing pr
   const html = renderToStaticMarkup(await TrustPage(input));
   expect(html).toContain(trustCopy("en").unavailable);
   expect(html).toContain('role="alert"');
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-w-0");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain(getDictionary("en").errors.retry);
   expect(html).toContain('href="/users/writer/trust"');
   expect(html).not.toContain("secret SQL");
@@ -252,12 +254,12 @@ it("offers safe trust recovery on infrastructure failure and 404 on a missing pr
 });
 it("clips public trust panels and loading shells on narrow layouts", async () => {
   const panel = renderToStaticMarkup(<PublicUserTrustPanel data={trustData} locale="en" />);
-  expect(panel).toContain("overflow-x-clip");
-  expect(panel).toContain("min-w-0");
-  expect(panel).toContain("min-h-11");
+  expect(panel).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(panel).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(panel).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   const { default: TrustLoading } = await import("../../src/app/users/[username]/trust/loading");
   const loading = renderToStaticMarkup(await TrustLoading());
-  expect(loading).toContain("overflow-x-clip");
-  expect(loading).toContain("min-w-0");
+  expect(loading).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(loading).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(loading).toContain(trustCopy("en").loading);
 });

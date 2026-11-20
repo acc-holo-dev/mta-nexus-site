@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { noticeStoredMessages, noticeStoredTitles } from "@nexus/domain";
 import { and, asc, eq, gt, isNull, lte, sql } from "drizzle-orm";
 import { db } from "../client";
 import { users, verificationNotificationDeliveries } from "../schema";
@@ -25,13 +26,13 @@ function verificationPendingLink(verificationRequestId: string) {
 function noticeCopy(event: "application" | "server_claim") {
   if (event === "server_claim") {
     return {
-      title: "Server ownership proof requires review",
-      message: "A verified server control proof is awaiting review.",
+      title: noticeStoredTitles.serverOwnershipProofReview,
+      message: noticeStoredMessages.serverOwnershipProofReview,
     };
   }
   return {
-    title: "New verification request",
-    message: "A verification request is awaiting review.",
+    title: noticeStoredTitles.newVerificationRequest,
+    message: noticeStoredMessages.newVerificationRequest,
   };
 }
 

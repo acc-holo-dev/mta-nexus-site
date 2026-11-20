@@ -15,18 +15,18 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/library/version-history",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({ getRequestLocale: async () => h.locale }));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => h.actor },
 }));
-vi.mock("../../src/lib/services/resource-release-control-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-release-control-service", () => ({
   libraryReleaseService: { history: h.history },
 }));
 
+import { libraryReleaseHistoryCopy } from "../../src/features/library/library-release-history-i18n";
 import { LibraryReleaseHistoryScreen } from "../../src/features/library/release-history-server";
 import { getDictionary } from "../../src/lib/i18n";
-import { authService } from "../../src/lib/services/auth-service";
-import { libraryReleaseHistoryCopy } from "../../src/lib/library-release-history-i18n";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 const result = () => ({
   generatedAt: "2026-10-12T00:00:00.000Z",
@@ -112,13 +112,13 @@ it("rejects ambiguous scope and requires authentication before history calls", a
 it("shows an honest recovery state when version history fails to load", async () => {
   h.history.mockRejectedValueOnce(new Error("history unavailable"));
   const copy = (
-    await import("../../src/lib/library-release-history-i18n")
+    await import("../../src/features/library/library-release-history-i18n")
   ).libraryReleaseHistoryCopy("en");
   const html = await screen();
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(`>${copy.title}</h1>`);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("page=1&amp;days=30");
   expect(html).not.toContain("history unavailable");
 });

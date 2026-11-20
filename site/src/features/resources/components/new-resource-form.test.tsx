@@ -5,10 +5,10 @@ import { PRODUCT_TYPES } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
 import { getDictionary } from "../../../lib/i18n";
-import { PRODUCT_PUBLISHING_KEYS } from "../../../lib/product-type-labels";
+import { PRODUCT_PUBLISHING_KEYS } from "../product-type-labels";
 
 const state = vi.hoisted(() => ({ locale: "en" as "en" | "ru" }));
-vi.mock("../../../components/locale-context", () => ({
+vi.mock("../../shell/locale", () => ({
   useNexusLocale: () => ({ locale: state.locale, dictionary: getDictionary(state.locale) }),
 }));
 
@@ -47,7 +47,9 @@ it.each(["en", "ru"] as const)("renders localized build constraints in %s", (loc
 
 it("locks new resource form honesty to ErrorState without ad-hoc alerts", () => {
   expect(source).toContain("ErrorState");
-  expect(source).toContain("The submission may have completed");
+  expect(source).toContain("copy.errorMayHaveCompleted");
+  expect(source).toContain("copy.resultMayBeUnknown");
+  expect(source).not.toContain("The submission may have completed");
   expect(source).not.toContain('role="alert"');
 });
 

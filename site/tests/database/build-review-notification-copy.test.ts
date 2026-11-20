@@ -1,7 +1,8 @@
-import { expect, it } from "vitest";
 import type { Notification } from "@nexus/domain";
-import { formatNotification } from "../../src/lib/notification-copy";
+import { expect, it } from "vitest";
+import { formatNotification } from "../../src/features/notifications/notification-copy";
 import { getDictionary } from "../../src/lib/i18n";
+
 const notice = {
   title: "Fallback",
   message: "Stored message",

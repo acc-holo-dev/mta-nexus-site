@@ -1,19 +1,19 @@
 import { expect, it } from "vitest";
-import { formatNotification } from "../../src/lib/notification-copy";
-import { userPlatformError } from "../../src/lib/user-platform-copy";
+import { userPlatformError } from "../../src/features/community/user-platform-copy";
+import { formatNotification } from "../../src/features/notifications/notification-copy";
 import {
   developerProfileUpdateSchema,
   editableDeveloperSchema,
   parseVerificationQuery,
   verificationApplicationSchema,
   verificationDecisionSchema,
-} from "../../src/lib/verification-workspace-contract";
+} from "../../src/features/trust/verification-workspace-contract";
 import {
   verificationCopy,
   verificationDecisionError,
   verificationError,
   verificationMutationError,
-} from "../../src/lib/verification-workspace-copy";
+} from "../../src/features/trust/verification-workspace-copy";
 
 const profile = {
   specialties: [" Lua ", "Lua", "TypeScript"],
@@ -135,7 +135,7 @@ it.each(["ru", "en"] as const)(
     expect(
       formatNotification(
         {
-          title: "Verification approved",
+          title: "Verification approved / Верификация одобрена",
           message: "developer verification for usr_dev was approved.",
           data: null,
         },

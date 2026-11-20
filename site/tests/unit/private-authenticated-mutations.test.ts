@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { describe, expect, it } from "vitest";
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
@@ -20,7 +20,7 @@ describe("private authenticated mutation responses", () => {
   });
 
   it("keeps login and registration session cookies hardened", () => {
-    const cookiePolicy = read("site/src/lib/session-cookie.ts");
+    const cookiePolicy = read("site/src/features/accounts/session-cookie.ts");
     expect(cookiePolicy).toContain("httpOnly: true");
     expect(cookiePolicy).toContain('secure: process.env.NODE_ENV === "production"');
     expect(cookiePolicy).toContain('sameSite: "lax"');
@@ -38,7 +38,7 @@ describe("private authenticated mutation responses", () => {
   });
 
   it("keeps context switching non-optimistic", () => {
-    const source = read("site/src/components/context-switcher.tsx");
+    const source = read("site/src/features/accounts/components/context-switcher.tsx");
 
     const requestStart = source.indexOf('fetch("/api/auth/context"');
     const confirmation = source.indexOf("data?.success !== true");

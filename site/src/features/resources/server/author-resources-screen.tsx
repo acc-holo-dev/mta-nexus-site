@@ -1,0 +1,192 @@
+import { AppError, type Product } from "@nexus/domain";
+import { EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { resourcePublisherService } from "../../../lib/services/resources/resource-publisher-service";
+import { getCommercialCopy } from "../../commerce/commercial-i18n";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm, linkMinH } from "../../shell/link-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapCenterGap4Sm,
+  typeGrid2Gap4,
+  typeMt2SmSecondary,
+  typeMt2XsMuted,
+  typeSmSecondary,
+} from "../../shell/type-shell";
+import { ResourcePublisherFilters } from "../publisher-view";
+import { getResourcePublisherCopy } from "../resource-publisher-i18n";
+import {
+  publisherInventoryTotal,
+  publisherSearchParams,
+  resourcePublisherQuery,
+  resourcePublisherUrl,
+} from "../resource-publisher-query";
+
+const primaryCtaClass =
+  "inline-flex min-h-11 items-center rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export async function authorResourcesMetadata(): Promise<Metadata> {
+  return {
+    title: `${getDictionary(await getRequestLocale()).authorResources.title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
+export async function AuthorResourcesScreen({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const locale = await getRequestLocale();
+  const dictionary = getDictionary(locale);
+  const copy = dictionary.authorResources;
+  const publisherCopy = getResourcePublisherCopy(locale);
+  const rawParams = await searchParams;
+  const returnParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(rawParams)) {
+    if (Array.isArray(value)) for (const part of value) returnParams.append(key, part);
+    else if (value !== undefined) returnParams.append(key, value);
+  }
+  const returnPath = returnParams.size
+    ? `/workspace/resources?${returnParams}`
+    : "/workspace/resources";
+  let user: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    user = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={returnPath}
+      />
+    );
+  }
+
+  if (!user) {
+    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+  }
+  let query: ReturnType<typeof resourcePublisherQuery>;
+  try {
+    query = resourcePublisherQuery(publisherSearchParams(rawParams));
+  } catch (error) {
+    if (error instanceof AppError && error.statusCode === 400) notFound();
+    throw error;
+  }
+  const result = await resourcePublisherService.inventory(user, query).catch(() => null);
+  if (!result) {
+    return (
+      <div className={pageShellMax5xl}>
+        <header className="space-y-2">
+          <h1 className={typeDisplayPrimary}>{copy.title}</h1>
+          <p className={typeSmSecondary}>{copy.subtitle}</p>
+        </header>
+        <ErrorState
+          title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
+          action={
+            <Link href={returnPath} className={linkAccentSm}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
+  const href = (page: number) => resourcePublisherUrl({ ...query, page });
+  const inventoryTotal = publisherInventoryTotal(result.statusCounts);
+  const emptyTitle = inventoryTotal === 0 ? copy.empty : copy.emptyFilter;
+  const emptyDescription = inventoryTotal === 0 ? copy.emptyHint : copy.emptyFilterHint;
+  return (
+    <div className={pageShellMax5xl}>
+      <header className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className={typeDisplayPrimary}>{copy.title}</h1>
+          <p className={typeMt2SmSecondary}>{copy.subtitle}</p>
+        </div>
+        <Link href="/workspace/resources/new" className={primaryCtaClass}>
+          {dictionary.workspace.publishResource}
+        </Link>
+      </header>
+      <Link href="/subscriptions" className={linkAccentSm}>
+        {getCommercialCopy(locale).catalog}
+      </Link>
+      <ResourcePublisherFilters query={query} statusCounts={result.statusCounts} locale={locale} />
+      {result.items.length === 0 ? (
+        <EmptyState
+          title={emptyTitle}
+          description={emptyDescription}
+          action={
+            inventoryTotal > 0 ? (
+              <Link href="/workspace/resources" className={linkAccentSm}>
+                {publisherCopy.reset}
+              </Link>
+            ) : (
+              <Link href="/workspace/resources/new" className={linkAccentSm}>
+                {dictionary.workspace.publishResource}
+              </Link>
+            )
+          }
+        />
+      ) : (
+        <ul aria-label={copy.title} className={typeGrid2Gap4}>
+          {result.items.map((product) => (
+            <li key={product.id} className="min-w-0 rounded-lg border border-base bg-surface p-5">
+              <Link
+                href={`/workspace/resources/${product.id}#publication-readiness`}
+                className="break-words text-lg font-semibold text-primary hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {product.title}
+              </Link>
+              <p className={typeMt2SmSecondary}>
+                {copy.statusLabels[product.status as Product["status"]]} · {product.currentVersion}
+              </p>
+              <p className="mt-2 break-words text-sm text-muted">{product.shortDescription}</p>
+              <p className={typeMt2SmSecondary}>
+                {publisherCopy.readiness[product.readiness]} · {publisherCopy.versions}:{" "}
+                {product.buildCount}
+              </p>
+              <p className={typeMt2XsMuted}>
+                {product.scope === "personal" ? publisherCopy.personal : publisherCopy.organization}
+              </p>
+              {product.metadataReviewRequired ? (
+                <ErrorState
+                  id="resource-metadata-review-required"
+                  className="mt-2"
+                  title={publisherCopy.reviewRequired}
+                  description={publisherCopy.reviewNote}
+                />
+              ) : null}
+            </li>
+          ))}
+        </ul>
+      )}
+      {result.totalPages > 1 && (
+        <nav aria-label={copy.page} className={typeFlexWrapCenterGap4Sm}>
+          {result.page > 1 && (
+            <Link href={href(result.page - 1)} className={linkAccentSm}>
+              {copy.previous}
+            </Link>
+          )}
+          <span className={linkMinH}>
+            {copy.page} {result.page} {copy.of} {result.totalPages}
+          </span>
+          {result.page < result.totalPages && (
+            <Link href={href(result.page + 1)} className={linkAccentSm}>
+              {copy.next}
+            </Link>
+          )}
+        </nav>
+      )}
+    </div>
+  );
+}

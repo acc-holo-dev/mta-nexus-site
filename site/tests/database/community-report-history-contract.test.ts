@@ -1,13 +1,13 @@
 import { expect, it } from "vitest";
+import { encodeChangeHistoryCursor } from "../../src/features/accounts/private-change-history-query";
 import {
   communityReportPageQuery,
   parseCommunityReportQuery,
-} from "../../src/lib/community-report-contract";
+} from "../../src/features/community/community-report-contract";
 import {
   parseReportHistoryQuery,
   reportHistoryPageSchema,
-} from "../../src/lib/community-report-history-contract";
-import { encodeChangeHistoryCursor } from "../../src/lib/private-change-history-query";
+} from "../../src/features/community/community-report-history-contract";
 
 it("accepts canonical exact-time filtered cursors and rejects ambiguous history queries", () => {
   const cursor = {

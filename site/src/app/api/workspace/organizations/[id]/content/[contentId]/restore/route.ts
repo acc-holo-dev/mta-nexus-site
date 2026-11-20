@@ -1,17 +1,17 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
-import {
-  readBoundedJson,
-  requireServerJsonContentType,
-} from "../../../../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../../../../lib/browser-route-adapter";
+import { userPlatformApi } from "../../../../../../../../features/accounts/user-platform-api";
 import {
   organizationContentId,
   organizationContentRate,
-} from "../../../../../../../../lib/organization-content-api";
-import { organizationPublicationHistoryError } from "../../../../../../../../lib/organization-publication-history-copy";
-import { organizationContentService } from "../../../../../../../../lib/services/organization-content-service";
-import { userPlatformApi } from "../../../../../../../../lib/user-platform-api";
+} from "../../../../../../../../features/organizations/organization-content-api";
+import { organizationPublicationHistoryError } from "../../../../../../../../features/organizations/organization-publication-history-copy";
+import {
+  readBoundedJson,
+  requireServerJsonContentType,
+} from "../../../../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../../../../lib/http/browser-route-adapter";
+import { organizationContentService } from "../../../../../../../../lib/services/organizations/organization-content-service";
 export const POST = withBrowserMutation(
   (request: NextRequest, { params }: { params: Promise<{ id: string; contentId: string }> }) => {
     return userPlatformApi(

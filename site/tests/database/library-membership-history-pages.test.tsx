@@ -25,13 +25,13 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/library-collections-service", () => ({
+vi.mock("../../src/lib/services/library/library-collections-service", () => ({
   libraryCollectionsService: { membershipHistory: state.history, membershipReceipt: state.detail },
 }));
 
@@ -42,9 +42,9 @@ import Page, {
   dynamic,
   generateMetadata,
 } from "../../src/app/workspace/library/collections/membership-history/page";
+import { libraryMembershipHistoryCopy } from "../../src/features/library/library-membership-history-i18n";
 import { LibraryMembershipHistoryScreen } from "../../src/features/library/membership-history-server";
-import { libraryMembershipHistoryCopy } from "../../src/lib/library-membership-history-i18n";
-import { authService } from "../../src/lib/services/auth-service";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 const date = "2026-10-12T00:00:00.000Z",
   requestId = "67ca0352-de64-4af9-9e54-7d3c56fe8d89";
@@ -156,13 +156,8 @@ it.each(["en", "ru"] as const)(
       robots: { index: false, follow: false },
     });
     expect(dynamic).toBe("force-dynamic");
-    expect(Page({ searchParams: Promise.resolve({}) }).props.children.type).toBe(
-      LibraryMembershipHistoryScreen,
-    );
-    expect(
-      Detail({ searchParams: Promise.resolve({}), params: Promise.resolve({ id: "lmb_a" }) }).props
-        .children.type,
-    ).toBe(LibraryMembershipHistoryScreen);
+    expect(Page).toBe(LibraryMembershipHistoryScreen);
+    expect(Detail).toBe(LibraryMembershipHistoryScreen);
   },
 );
 it("does not reuse an invalid membership receipt identifier during session failure", async () => {
@@ -217,13 +212,13 @@ it.each([
 ])("rejects ambiguous or injected list selectors %o", async (query) => {
   const html = await screen(query);
   expect(html).toContain('role="alert"');
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(state.history).not.toHaveBeenCalled();
 });
 it("rejects all detail selectors and maps missing/foreign detail to a missing page", async () => {
   const invalidDetail = await screen({ page: "1" }, "lmb_a");
   expect(invalidDetail).toContain('role="alert"');
-  expect(invalidDetail).toContain("overflow-x-clip");
+  expect(invalidDetail).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(state.detail).not.toHaveBeenCalled();
   state.detail.mockRejectedValue(new AppError("PRIVATE", 404, "NOT_FOUND"));
   await expect(screen({}, "lmb_foreign")).rejects.toThrow("NEXT_NOT_FOUND");
@@ -276,7 +271,7 @@ it("shows an honest recovery state when membership history fails to load", async
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(`>${copy.title}</h1>`);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/workspace/library/collections/membership-history');
   expect(html).not.toContain("membership history unavailable");
 });

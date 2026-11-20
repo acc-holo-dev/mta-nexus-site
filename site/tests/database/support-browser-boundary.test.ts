@@ -1,10 +1,11 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({ authService }));
+vi.mock("server-only", () => ({}));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   can: () => false,
   consumeRateLimit: vi.fn(async () => ({ success: true })),
@@ -21,14 +22,17 @@ vi.mock("@nexus/db", () => ({
     findMutationReplay: vi.fn(),
     updateStatus: vi.fn(),
   },
+  supportActivityRepository: {
+    history: vi.fn(),
+  },
   userRepository: { listModeratorIds: vi.fn() },
 }));
-vi.mock("../../src/lib/services/notification-dispatch-service", () => ({
+vi.mock("../../src/lib/services/notifications/notification-dispatch-service", () => ({
   dispatchNotificationsBestEffort: vi.fn(),
 }));
 
+import { POST as addMessage, PATCH as updateCase } from "../../src/app/api/support/[id]/route";
 import { POST as createCase } from "../../src/app/api/support/route";
-import { PATCH as updateCase, POST as addMessage } from "../../src/app/api/support/[id]/route";
 
 const caseId = `sup_${"a".repeat(24)}`;
 const context = { params: Promise.resolve({ id: caseId }) };

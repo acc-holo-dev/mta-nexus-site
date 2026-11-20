@@ -1,0 +1,98 @@
+import { CHANGE_HISTORY_PERIODS, type ChangeHistoryFilters } from "@nexus/domain";
+import { Button, Input } from "@nexus/ui";
+import Link from "next/link";
+import type { Locale } from "../../../lib/i18n";
+import { linkAccentSm } from "../../shell/link-shell";
+import { panelFlexWrapEndGap4P4 } from "../../shell/panel-shell";
+import {
+  typeLabelBlockUpperSecondary,
+  typeMinFlex1Space15SmSecondary,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import { privateChangeHistoryCopy } from "../private-change-history-copy";
+
+const selectClass =
+  "min-h-11 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
+export function PrivateChangeHistoryFilters<
+  Group extends keyof ReturnType<typeof privateChangeHistoryCopy>["groups"],
+>({
+  path,
+  filters,
+  groups,
+  locale,
+  search = false,
+}: {
+  path: string;
+  filters: ChangeHistoryFilters<Group>;
+  groups: readonly Group[];
+  locale: Locale;
+  search?: boolean;
+}) {
+  const copy = privateChangeHistoryCopy(locale);
+  return (
+    <search aria-label={search ? copy.search : copy.apply}>
+      <form method="get" action={path} className={panelFlexWrapEndGap4P4}>
+        <label className={typeMinFlex1Space15SmSecondary}>
+          <span className={typeLabelBlockUpperSecondary}>{copy.period}</span>
+          <select name="period" className={selectClass} defaultValue={filters.period}>
+            {CHANGE_HISTORY_PERIODS.map((period) => (
+              <option key={period} value={period}>
+                {copy.periods[period]}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className={typeMinFlex1Space15SmSecondary}>
+          <span className={typeLabelBlockUpperSecondary}>{copy.group}</span>
+          <select name="group" className={selectClass} defaultValue={filters.group}>
+            {groups.map((group) => (
+              <option key={group} value={group}>
+                {copy.groups[group]}
+              </option>
+            ))}
+          </select>
+        </label>
+        {search && (
+          <div className="min-w-0 basis-full space-y-1.5">
+            <Input
+              name="q"
+              type="search"
+              label={copy.search}
+              maxLength={80}
+              defaultValue={filters.query}
+              aria-describedby="change-history-search-help"
+            />
+            <span id="change-history-search-help" className="block text-xs text-muted">
+              {copy.searchHelp}
+            </span>
+          </div>
+        )}
+        <Button type="submit" variant="secondary">
+          {copy.apply}
+        </Button>
+        <Link href={path} className={linkAccentSm}>
+          {copy.reset}
+        </Link>
+      </form>
+    </search>
+  );
+}
+export function PrivateChangeHistoryCutoff({ until, locale }: { until: string; locale: Locale }) {
+  const copy = privateChangeHistoryCopy(locale);
+  return (
+    <p className={typeXsMuted}>
+      {copy.until}:{" "}
+      <time dateTime={until}>
+        {new Date(until).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", { timeZone: "UTC" })}{" "}
+        UTC
+      </time>
+    </p>
+  );
+}
+export function ProfileChangeHistoryLink({ locale }: { locale: Locale }) {
+  return (
+    <Link href="/settings/history" className={linkAccentSm}>
+      {privateChangeHistoryCopy(locale).profileTitle}
+    </Link>
+  );
+}

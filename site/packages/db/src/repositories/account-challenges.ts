@@ -1,14 +1,14 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
-import { and, eq, gt, isNull, sql } from "drizzle-orm";
 import { UnauthorizedError } from "@nexus/domain";
 import { ordinaryRecoveryEligible } from "@nexus/security";
-import { db } from "../client";
-import { auditEvents, sessions, users } from "../schema";
+import { and, eq, gt, isNull, sql } from "drizzle-orm";
 import {
   accountAuthState,
   accountRecoveryBindings,
   authChallenges,
 } from "../account-recovery-schema";
+import { db } from "../client";
+import { auditEvents, sessions, users } from "../schema";
 import { digestSessionToken } from "./sessions";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];

@@ -3,8 +3,8 @@ import { PgDialect } from "drizzle-orm/pg-core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { auditEvents, comments, content, discussionNotificationDeliveries } from "../schema";
 import {
-  commentIdFromIntentKey,
   ContentCommentsRepository,
+  commentIdFromIntentKey,
   parseCommentIntentKey,
 } from "./content-comments";
 
@@ -113,8 +113,8 @@ vi.mock("../client", () => ({
   },
 }));
 
-import { ContentRepository } from "./content";
 import { users } from "../schema";
+import { ContentRepository } from "./content";
 
 describe("article comment intent protocol", () => {
   beforeEach(() => {

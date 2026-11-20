@@ -1,9 +1,9 @@
-import { describe, expect, it } from "vitest";
-import { eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { UnauthorizedError } from "@nexus/domain";
-import { db } from "../../packages/db/src/client";
+import { eq } from "drizzle-orm";
+import { describe, expect, it } from "vitest";
 import { accountRecoveryBindings } from "../../packages/db/src/account-recovery-schema";
+import { db } from "../../packages/db/src/client";
 import {
   account,
   challenge,

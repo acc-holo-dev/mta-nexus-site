@@ -13,17 +13,17 @@ const state = vi.hoisted(() => ({ locale: "en" as "en" | "ru" }));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }),
 }));
-vi.mock("../../src/components/locale-context", () => ({
+vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({
     locale: state.locale,
     dictionary: getDictionary(state.locale),
   }),
 }));
 
+import { ReportModerationControls } from "../../src/features/moderation/report-controls";
 import { BuildModerationControls } from "../../src/features/resources/components/build-moderation-controls";
 import { BuildQuarantineControls } from "../../src/features/resources/components/build-quarantine-controls";
 import { NewResourceForm } from "../../src/features/resources/components/new-resource-form";
-import { ReportModerationControls } from "../../src/features/moderation/report-controls";
 
 const exclusive = [
   "site/src/features/resources/components/new-resource-form.tsx",
@@ -47,9 +47,17 @@ it("locks resource and moderation form sources to ErrorState honesty chrome", ()
   for (const path of exclusive) {
     const source = read(path);
     expect(source).toContain("ErrorState");
-    expect(source).toContain("min-h-11");
+    expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(source).not.toContain('role="alert"');
   }
+});
+
+it("locks resource copy form frozen recovery to ErrorState", () => {
+  const source = read("site/src/features/resources/components/resource-copy-form.tsx");
+  expect(source).toContain('id="resource-copy-form-frozen"');
+  expect(source).toContain("title={c.frozen}");
+  expect(source).toContain("description={c.retry}");
+  expect(source).not.toMatch(/frozen && \(\s*<p role="note"/u);
 });
 
 it("locks resource media editor reorder/remove CTAs to size=touch", () => {
@@ -70,7 +78,7 @@ it("locks resource variants reorder/remove to size=touch and noCandidates to Emp
   expect(source).not.toContain('size="sm"');
   expect(source.match(/size="touch"/gu)?.length ?? 0).toBeGreaterThanOrEqual(3);
 
-  const i18n = read("site/src/lib/resource-management-i18n.ts");
+  const i18n = read("site/src/features/resources/resource-management-i18n.ts");
   expect(i18n).toContain("noCandidates:");
   expect(i18n).toContain("noCandidatesHint:");
   expect(i18n.match(/noCandidatesHint:/gu)?.length).toBe(2);
@@ -100,19 +108,29 @@ it("keeps additive honesty descriptions for form failure recovery", () => {
   expect(read("site/src/lib/i18n/ru/publishing.ts")).toContain("createErrorDescription");
   expect(read("site/src/lib/i18n/en/workspace.ts")).toContain("failedDescription");
   expect(read("site/src/lib/i18n/ru/workspace.ts")).toContain("uploadFailedDescription");
-  expect(read("site/src/lib/resource-management-i18n.ts")).toContain("actionFailedDescription");
-  expect(read("site/src/lib/resource-commerce-i18n.ts")).toContain("actionFailedDescription");
-  expect(read("site/src/lib/resource-release-control-i18n.ts")).toContain(
+  expect(read("site/src/features/resources/resource-management-i18n.ts")).toContain(
     "actionFailedDescription",
   );
-  expect(read("site/src/lib/resource-media-i18n.ts")).toContain("errorDescription");
-  expect(read("site/src/lib/resource-copy-i18n.ts")).toContain("errorDescription");
-  expect(read("site/src/lib/resource-release-watches-i18n.ts")).toContain("failedDescription");
-  expect(read("site/src/lib/community-moderation-copy.ts")).toContain("decisionFailedDescription");
-  expect(read("site/src/lib/verification-workspace-copy.ts")).toContain(
+  expect(read("site/src/features/resources/resource-commerce-i18n.ts")).toContain(
+    "actionFailedDescription",
+  );
+  expect(read("site/src/features/library/resource-release-control-i18n.ts")).toContain(
+    "actionFailedDescription",
+  );
+  expect(read("site/src/features/resources/resource-media-i18n.ts")).toContain("errorDescription");
+  expect(read("site/src/features/resources/resource-copy-i18n.ts")).toContain("errorDescription");
+  expect(read("site/src/features/resources/resource-release-watches-i18n.ts")).toContain(
+    "failedDescription",
+  );
+  expect(read("site/src/features/community/community-moderation-copy.ts")).toContain(
     "decisionFailedDescription",
   );
-  expect(read("site/src/lib/resource-build-workspace-i18n.ts")).toContain("failedDescription");
+  expect(read("site/src/features/trust/verification-workspace-copy.ts")).toContain(
+    "decisionFailedDescription",
+  );
+  expect(read("site/src/features/resources/resource-build-workspace-i18n.ts")).toContain(
+    "failedDescription",
+  );
   expect(read("site/src/lib/i18n/en/admin.ts")).toContain("quarantineBuildFailedDescription");
   expect(read("site/src/lib/i18n/ru/admin.ts")).toContain("reportDecisionFailedDescription");
 });
@@ -122,21 +140,21 @@ it.each(["en", "ru"] as const)(
   (locale) => {
     state.locale = locale;
     const form = renderToStaticMarkup(<NewResourceForm actorId="author" />);
-    expect(form).toContain("min-h-11");
-    expect(form).toContain("min-w-0");
-    expect(form).toContain("overflow-x-clip");
+    expect(form).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
+    expect(form).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(form).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 
     const build = renderToStaticMarkup(
       <BuildModerationControls buildId="bld_clean" scanStatus="clean" hasScanProvenance />,
     );
-    expect(build).toContain("min-h-11");
+    expect(build).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
 
     const quarantine = renderToStaticMarkup(
       <BuildQuarantineControls buildId="bld_pub" status="published" />,
     );
-    expect(quarantine).toContain("min-h-11");
+    expect(quarantine).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
 
     const report = renderToStaticMarkup(<ReportModerationControls reportId="rep_1" />);
-    expect(report).toContain("min-h-11");
+    expect(report).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   },
 );

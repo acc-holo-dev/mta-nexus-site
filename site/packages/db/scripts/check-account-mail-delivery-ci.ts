@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
-import { closeDatabaseConnection, db } from "../src/client";
 import { accountMailOutbox } from "../src/account-mail-schema";
 import { authChallenges } from "../src/account-recovery-schema";
+import { closeDatabaseConnection, db } from "../src/client";
 import { auditEvents } from "../src/schema";
 
 if (

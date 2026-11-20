@@ -1,6 +1,4 @@
 import { randomBytes } from "node:crypto";
-import { inArray } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
 import {
   buildRepository,
   builds,
@@ -10,6 +8,8 @@ import {
   userRepository,
   users,
 } from "@nexus/db";
+import { inArray } from "drizzle-orm";
+import { describe, expect, it } from "vitest";
 
 describe("published build archive (PostgreSQL)", () => {
   it("paginates only currently deliverable versions and scopes exact downloads", async () => {

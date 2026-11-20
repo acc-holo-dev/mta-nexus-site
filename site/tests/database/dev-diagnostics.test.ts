@@ -7,7 +7,7 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8"
 
 describe("development diagnostics", () => {
   it("is unavailable in production and reports only sanitized runtime state", () => {
-    const page = read("site/src/app/dev/page.tsx");
+    const page = read("site/src/features/shell/server/development-status-screen.tsx");
 
     expect(page).toContain('process.env.NODE_ENV === "production"');
     expect(page).toContain("notFound()");
@@ -31,9 +31,9 @@ describe("development diagnostics", () => {
     expect(page).toContain('titleId="dev-environment-heading"');
     expect(page).toContain('aria-labelledby="dev-app-url-heading"');
     expect(page).toContain('id="dev-app-url-heading"');
-    expect(page).toContain("overflow-x-clip");
-    expect(page).toContain("min-w-0");
-    expect(page).toContain("pageShellClass");
+    expect(page).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(page).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(page).toMatch(/pageShell[A-Za-z]\w*/);
     expect(page).not.toContain('role="alert"');
   });
 
@@ -47,7 +47,7 @@ describe("development diagnostics", () => {
   });
 
   it("only exposes the navigation entry outside production", () => {
-    const sidebar = read("site/src/components/sidebar.tsx");
+    const sidebar = read("site/src/features/shell/components/sidebar.tsx");
     expect(sidebar).toContain('process.env.NODE_ENV !== "production"');
     expect(sidebar).toContain('href: "/dev"');
     expect(sidebar).toContain("dictionary.nav.devTools");

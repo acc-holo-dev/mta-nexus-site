@@ -1,16 +1,16 @@
-import { and, asc, count, desc, eq, sql } from "drizzle-orm";
 import { ForbiddenError, NotFoundError } from "@nexus/domain";
+import { and, asc, count, desc, eq, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   ledgerEntries as ledger,
+  orders,
   organizationMembers,
   organizations,
-  orders,
   payments,
   users,
 } from "../schema";
-import { historyPageBounds } from "./history-pagination";
 import type { ResourceTransaction } from "./entitlements";
+import { historyPageBounds } from "./history-pagination";
 
 /** Shared live financial-account policy: product-management grants do not apply. */
 export async function lockFinancialAccountAuthority(

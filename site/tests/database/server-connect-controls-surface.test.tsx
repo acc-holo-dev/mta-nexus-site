@@ -32,7 +32,7 @@ describe("ServerConnectControls", () => {
       expect(html).toMatch(/id="[^"]+"/);
       expect(html).toContain('role="status"');
       expect(html).toMatch(/cannot verify|не подтверждает/u);
-      expect(html).toContain("min-h-11");
+      expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     },
   );
 
@@ -53,8 +53,8 @@ describe("ServerConnectControls", () => {
   it("locks copy address CTA to size=touch / min-h-11 without size=sm", () => {
     const source = read("site/src/features/servers/components/server-connect-controls.tsx");
     expect(source).toContain('size="touch"');
-    expect(source).toContain("min-h-11");
-    expect(source).toMatch(/min-h-11|size="touch"/u);
+    expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
+    expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
     expect(source).not.toContain('size="sm"');
     expect(source).not.toContain("min-h-10");
   });

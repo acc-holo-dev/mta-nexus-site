@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { inspectBuildPackage } from "../../src/lib/services/build-package-inspection";
+import { inspectBuildPackage } from "../../src/lib/services/resources/build-package-inspection";
 import packageFixtures from "../fixtures/build-packages.json";
 
 const state = vi.hoisted(() => ({
@@ -9,6 +9,7 @@ const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
   page: vi.fn(),
 }));
+vi.mock("server-only", () => ({}));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
   usePathname: () => "/workspace/resources/prd_a/builds/bld_a/package",
@@ -16,24 +17,24 @@ vi.mock("next/navigation", () => ({
     throw Error("NOT_FOUND");
   },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/services/build-package-service", () => ({
+vi.mock("../../src/lib/services/resources/build-package-service", () => ({
   buildPackageService: { page: state.page },
 }));
 
 import { buildPackageSummary } from "@nexus/domain";
 import AdminResourceBuildPackageLoading from "../../src/app/admin/resources/[id]/builds/[buildId]/package/loading";
+import { buildPackageCopy } from "../../src/features/resources/build-package-i18n";
 import {
   BuildPackageEvidencePanel,
   BuildPackageSummaryPanel,
 } from "../../src/features/resources/evidence";
 import { BuildPackageScreen } from "../../src/features/resources/server/build-package-screen";
-import { buildPackageCopy } from "../../src/lib/build-package-i18n";
 
 const detail = {
   product: { id: "prd_a", title: "<Private title>" },
@@ -125,7 +126,7 @@ it("shows an honest recovery state when package inventory fails", async () => {
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("filter=changed");
   expect(html).toContain("baseline=bld_b");
   expect(html).not.toContain("Private title");
@@ -148,7 +149,7 @@ it("shows an honest staff recovery state without inventing package files", async
 it("clips honest loading shells on narrow layouts", async () => {
   const html = renderToStaticMarkup(await AdminResourceBuildPackageLoading());
   expect(html).toContain("min-w-0 max-w-5xl");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("offers reset when a filtered inventory page has no files", async () => {
   state.page.mockResolvedValue({

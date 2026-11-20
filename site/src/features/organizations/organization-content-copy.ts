@@ -1,0 +1,40 @@
+import type { Locale } from "../../lib/i18n";
+import { organizationError } from "./organization-workspace-copy";
+export const organizationContentCopy = (locale: Locale) =>
+  locale === "ru"
+    ? {
+        title: "Редакция организации",
+        description:
+          "Владелец и администраторы команды управляют всеми публикациями организации, включая материалы других авторов.",
+        context: "Публикация от организации",
+        back: "К организации",
+        author: "Автор",
+        new: "Создать публикацию организации",
+        notice:
+          "Автор и владелец организации получают уведомления о создании, правках, архивировании и решениях модерации, если включены уведомления о контенте.",
+        uncertain:
+          "Не удалось подтвердить сохранение. Проверьте публикацию в редакции перед повторной отправкой.",
+        emptyHint: "Создайте первую публикацию организации или дождитесь материалов команды.",
+        emptyFilteredHint:
+          "Сбросьте фильтры или измените запрос, чтобы увидеть публикации команды.",
+      }
+    : {
+        title: "Organization editorial workspace",
+        description:
+          "The owner and team administrators manage all organization publications, including work by other authors.",
+        context: "Publication for organization",
+        back: "Back to organization",
+        author: "Author",
+        new: "Create organization publication",
+        notice:
+          "The author and organization owner receive creation, edit, archive and moderation notices when content notifications are enabled.",
+        uncertain:
+          "Could not confirm the save. Check the publication in the editorial workspace before submitting again.",
+        emptyHint: "Create the first organization publication or wait for team contributions.",
+        emptyFilteredHint: "Reset filters or change the query to see team publications.",
+      };
+export function organizationContentMutationError(locale: Locale, code: unknown) {
+  return code === "INTERNAL_ERROR" || code === "UNCONFIRMED"
+    ? organizationContentCopy(locale).uncertain
+    : organizationError(locale, code);
+}

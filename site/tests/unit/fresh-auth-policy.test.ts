@@ -1,8 +1,8 @@
 import { readFileSync } from "node:fs";
 import {
   CRITICAL_STAFF_ADMIN_ACTIONS,
-  FRESH_AUTH_ACTIONS,
   criticalStaffAdminFreshAuthAction,
+  FRESH_AUTH_ACTIONS,
   freshAuthProofAccepted,
   freshAuthRequirement,
   ordinaryRecoveryEligible,

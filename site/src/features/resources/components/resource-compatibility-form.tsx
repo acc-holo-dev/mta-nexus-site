@@ -4,20 +4,25 @@ import { Button, ErrorState, Input } from "@nexus/ui";
 import { resourceCompatibilitySchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
-import { privateApiRequest } from "../../../lib/private-api-request";
-import { confirmedCompatibility } from "../../../lib/resource-management-confirmation";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
+import { formatUnknown } from "../../../lib/i18n/unknown";
+import { parseEditableProfile } from "../../community/user-platform-client";
+import { useNexusLocale } from "../../shell/locale";
+import { panelSpace4P5 } from "../../shell/panel-shell";
+import { surfaceSpace2P3TextSm } from "../../shell/surface-shell";
 import {
-  getResourceManagementCopy,
-  resourceManagementError,
-} from "../../../lib/resource-management-i18n";
-import { getResourcePublisherCopy } from "../../../lib/resource-publisher-i18n";
-import { parseEditableProfile } from "../../../lib/user-platform-client";
-import { useNexusLocale } from "../../../components/locale-context";
+  typeLabelBlockUpperSecondary,
+  typePrewrapBreak,
+  typeSmSecondary,
+  typeSmSuccess,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import { confirmedCompatibility } from "../resource-management-confirmation";
+import { getResourceManagementCopy, resourceManagementError } from "../resource-management-i18n";
+import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 font-mono text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
-const nativeLabelClass = "block font-label uppercase text-secondary";
-
 export function ResourceCompatibilityForm({
   product,
   actorId,
@@ -30,7 +35,7 @@ export function ResourceCompatibilityForm({
     suspended: boolean;
   };
 }) {
-  const { locale } = useNexusLocale(),
+  const { dictionary, locale } = useNexusLocale(),
     copy = getResourceManagementCopy(locale),
     router = useRouter();
   const field = useId(),
@@ -185,15 +190,16 @@ export function ResourceCompatibilityForm({
     }
   }
   return (
-    <form onSubmit={submit} aria-busy={busy} className="nexus-panel space-y-4 p-5">
-      <p className="text-sm text-secondary">{copy.compatibilityNote}</p>
+    <form onSubmit={submit} aria-busy={busy} className={panelSpace4P5}>
+      <p className={typeSmSecondary}>{copy.compatibilityNote}</p>
       {product.suspended ? (
         <ErrorState
           id="resource-compatibility-suspended-readonly"
           title={getResourcePublisherCopy(locale).readonly}
+          description={dictionary.errors.formErrorHint}
         />
       ) : (
-        <p className="text-sm text-secondary">{getResourcePublisherCopy(locale).editNote}</p>
+        <p className={typeSmSecondary}>{getResourcePublisherCopy(locale).editNote}</p>
       )}
       {!foreignActor && identityVerified && (
         <>
@@ -204,7 +210,7 @@ export function ResourceCompatibilityForm({
             maxLength={64}
             disabled={busy}
             readOnly={product.suspended}
-            placeholder="1.6.0"
+            placeholder={copy.mtaPlaceholder}
             onChange={(event) => {
               setMta(event.target.value);
               setDirty(true);
@@ -212,7 +218,7 @@ export function ResourceCompatibilityForm({
             }}
           />
           <div className="space-y-1.5">
-            <label htmlFor={`${field}-dependencies`} className={nativeLabelClass}>
+            <label htmlFor={`${field}-dependencies`} className={typeLabelBlockUpperSecondary}>
               {copy.dependencies}
             </label>
             <textarea
@@ -231,24 +237,26 @@ export function ResourceCompatibilityForm({
               className={textareaClass}
             />
           </div>
-          <p id={`${field}-hint`} className="text-xs text-muted">
+          <p id={`${field}-hint`} className={typeXsMuted}>
             {copy.dependencyHint}
           </p>
-          {product.suspended ? <ErrorState title={copy.errors.PRODUCT_STATE_CHANGED} /> : null}
+          {product.suspended ? (
+            <ErrorState
+              title={copy.errors.PRODUCT_STATE_CHANGED}
+              description={copy.errors.fallback}
+            />
+          ) : null}
           <Button type="submit" isLoading={busy} disabled={disabled} className="min-h-11">
             {busy ? copy.working : copy.save}
           </Button>
           {newest && (
-            <section
-              aria-label={copy.compatibilityLatest}
-              className="space-y-2 rounded-lg border border-base p-3 text-sm"
-            >
+            <section aria-label={copy.compatibilityLatest} className={surfaceSpace2P3TextSm}>
               <p>{copy.compatibilityChanged}</p>
               <p>{copy.compatibilityDraftHelp}</p>
               <p>
-                {copy.mta}: {newest.compatibility.mtaMinVersion ?? "—"}
+                {copy.mta}: {formatUnknown(locale, newest.compatibility.mtaMinVersion)}
               </p>
-              <p className="whitespace-pre-wrap break-words">
+              <p className={typePrewrapBreak}>
                 {copy.dependencies}: {(newest.compatibility.dependencies ?? []).join("\n")}
               </p>
               {!newest.suspended && (!needsCheck || checked) && (
@@ -281,7 +289,7 @@ export function ResourceCompatibilityForm({
       )}
       {error ? <ErrorState title={error} description={copy.actionFailedDescription} /> : null}
       {saved && (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {copy.saved}
         </p>
       )}

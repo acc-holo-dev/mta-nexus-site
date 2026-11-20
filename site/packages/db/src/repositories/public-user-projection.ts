@@ -1,5 +1,5 @@
-import { getTableColumns } from "drizzle-orm";
 import type { User } from "@nexus/domain";
+import { getTableColumns } from "drizzle-orm";
 import { users } from "../schema";
 
 type StoredUser = typeof users.$inferSelect;

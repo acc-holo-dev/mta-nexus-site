@@ -1,14 +1,15 @@
-import { expect, it } from "vitest";
 import { resourceModerationTarget } from "@nexus/domain";
 import { libraryReleaseCommandSchema, resourceModerationCommandSchema } from "@nexus/validation";
+import { expect, it } from "vitest";
 import {
   confirmedLibraryRelease,
   confirmedResourceModeration,
-} from "../../src/lib/resource-release-control-confirmation";
+} from "../../src/features/library/resource-release-control-confirmation";
 import {
   libraryReleaseQuery,
   resourceModerationQuery,
-} from "../../src/lib/resource-release-control-query";
+} from "../../src/features/resources/resource-release-control-query";
+
 const revision = "2026-10-10T12:00:00.000Z";
 it("always releases a suspension into a draft requiring a new review", () => {
   expect(resourceModerationTarget("suspended", "release")).toBe("draft");

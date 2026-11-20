@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
-import { parseResourceActivityQuery } from "../../../../../lib/resource-activity-query";
-import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
-import { resourceActivityService } from "../../../../../lib/services/resource-activity-service";
+import { parseResourceActivityQuery } from "../../../../../features/resources/resource-activity-query";
+import { resourceCommerceRequest } from "../../../../../features/resources/resource-commerce-http";
+import { resourceActivityService } from "../../../../../lib/services/resources/resource-activity-service";
 
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, false, async (actor) => {

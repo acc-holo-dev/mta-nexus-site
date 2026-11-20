@@ -14,9 +14,9 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: () => undefined }),
 }));
 
-import { ManagedServerVisibilityBatch } from "../../src/features/servers/components/managed-server-visibility-batch";
 import { MtaMasterServerDirectory } from "../../src/features/servers/client";
-import { serverWorkspaceCopy } from "../../src/lib/server-workspace-copy";
+import { ManagedServerVisibilityBatch } from "../../src/features/servers/components/managed-server-visibility-batch";
+import { serverWorkspaceCopy } from "../../src/features/servers/server-workspace-copy";
 
 describe("MTA directory/visibility chrome", () => {
   it("renders directory controls with shared Button chrome", () => {

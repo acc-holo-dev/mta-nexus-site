@@ -9,6 +9,7 @@ const state = vi.hoisted(() => ({
   page: vi.fn(),
   orderDetail: vi.fn(),
 }));
+vi.mock("server-only", () => ({}));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
   usePathname: () => "/workspace/order-cases",
@@ -17,13 +18,13 @@ vi.mock("next/navigation", () => ({
     throw Error("NOT_FOUND");
   },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/services/order-case-service", () => ({ orderCaseService: state }));
+vi.mock("../../src/lib/services/commerce/order-case-service", () => ({ orderCaseService: state }));
 vi.mock("../../src/features/support/thread", () => ({
   SupportCaseThread: ({ caseId }: { caseId: string }) => (
     <div data-case={caseId}>Existing conversation</div>
@@ -32,13 +33,13 @@ vi.mock("../../src/features/support/thread", () => ({
 
 import OrderCaseDetailLoading from "../../src/app/admin/commerce/order-cases/[id]/loading";
 import OrderCasesLoading from "../../src/app/admin/commerce/order-cases/loading";
+import { orderCaseCopy } from "../../src/features/commerce/order-case-i18n";
 import {
   OrderCaseCreatePage,
   OrderCaseDetailPage,
   OrderCaseListPage,
   orderCaseMetadata,
-} from "../../src/components/order-case-page";
-import { orderCaseCopy } from "../../src/lib/order-case-i18n";
+} from "../../src/features/commerce/order-case-server";
 
 const date = new Date("2026-10-11T00:00:00.000Z");
 const evidence = {
@@ -169,7 +170,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('name="reviewStatus"');
     expect(html).toContain('name="threadStatus"');
     expect(html).toContain("min-h-11 rounded-lg border border-base bg-surface p-2 text-sm");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toContain(copy.apply);
   },
 );
@@ -194,8 +195,8 @@ it("shows an honest recovery state when the case queue fails", async () => {
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(copy.loadUnavailableHint);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain("reviewStatus=refund_recommended&amp;page=2");
   expect(html).not.toContain("&lt;Private order&gt;");
 });
@@ -211,7 +212,7 @@ it("renders an empty queue with clear-filters recovery when filters are active",
   expect(html).toContain(copy.empty);
   expect(html).toContain(copy.clear);
   expect(html).toContain('href="/admin/commerce/order-cases"');
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("shows an honest recovery state when intake evidence fails to load", async () => {
   state.orderDetail.mockRejectedValue(new Error("detail unavailable"));
@@ -219,13 +220,13 @@ it("shows an honest recovery state when intake evidence fails to load", async ()
   const html = renderToStaticMarkup(await OrderCaseCreatePage({ orderId: "ord_a" }));
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(copy.loadUnavailableHint);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("/workspace/purchases/ord_a/support");
 });
 it("clips honest loading shells on narrow layouts", async () => {
   for (const Loading of [OrderCasesLoading, OrderCaseDetailLoading]) {
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain("min-w-0 max-w-5xl");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   }
 });

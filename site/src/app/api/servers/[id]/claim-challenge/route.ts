@@ -1,16 +1,19 @@
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
+import { serverClaimApiCopy } from "../../../../../features/servers/server-claim-api-copy";
+import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
+import { localeAppErrorText } from "../../../../../lib/http/locale-app-error";
+import { resolveLocale } from "../../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
-} from "../../../../../lib/observability";
-import { isPostgresDeadlock } from "../../../../../lib/postgres-error";
-import { authService } from "../../../../../lib/services/auth-service";
-import { serverClaimService } from "../../../../../lib/services/server-claim-service";
+} from "../../../../../lib/platform/observability";
+import { isPostgresDeadlock } from "../../../../../lib/platform/postgres-error";
+import { authService } from "../../../../../lib/services/accounts/auth-service";
+import { serverClaimService } from "../../../../../lib/services/servers/server-claim-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -27,29 +30,26 @@ function json(context: RequestLogContext, body: unknown, status = 200) {
 export const POST = withBrowserMutation(
   async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     const context = createRequestLogContext(request);
+    const copy = serverClaimApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
     try {
       const token = request.cookies.get("nexus_session")?.value;
       const user = await authService.getSession(token);
       if (!token || !user) {
-        return json(context, { error: "Authentication required" }, 401);
+        return json(context, { error: copy.authenticationRequired }, 401);
       }
 
       const expectedActor = request.headers.get("x-nexus-actor-id");
       if (!expectedActor)
-        return json(
-          context,
-          { code: "ACTOR_ID_REQUIRED", error: "Actor precondition required" },
-          428,
-        );
+        return json(context, { code: "ACTOR_ID_REQUIRED", error: copy.actorRequired }, 428);
       if (expectedActor !== user.id)
-        return json(context, { code: "ACTOR_CHANGED", error: "Account changed" }, 409);
+        return json(context, { code: "ACTOR_CHANGED", error: copy.accountChanged }, 409);
 
       const rateLimit = await consumeRateLimit("serverClaimProof", user.id);
       if (!rateLimit.success) {
         return json(
           context,
           {
-            error: "Too many server control proof attempts",
+            error: copy.rate,
           },
           429,
         );
@@ -57,7 +57,7 @@ export const POST = withBrowserMutation(
 
       const { id: serverId } = await params;
       if (!serverId || serverId.length > 128) {
-        return json(context, { error: "Server not found" }, 404);
+        return json(context, { error: copy.serverNotFound }, 404);
       }
 
       const challenge = await serverClaimService.issueChallenge(serverId, user, token);
@@ -66,23 +66,36 @@ export const POST = withBrowserMutation(
         context,
         {
           challenge,
-          instruction:
-            "Temporarily add the exact token to the MTA server name, keep the server visible in the official master-list, then verify control before the challenge expires.",
+          instruction: copy.instruction,
         },
         201,
       );
     } catch (error: unknown) {
       if (isPostgresDeadlock(error))
-        return json(
-          context,
-          { code: "SERVER_CLAIM_RETRY", error: "Please retry the server claim" },
-          409,
-        );
+        return json(context, { code: "SERVER_CLAIM_RETRY", error: copy.retry }, 409);
       if (error instanceof AppError) {
         return json(
           context,
           {
-            error: error.message,
+            error: localeAppErrorText(
+              error,
+              {
+                unauthorized: copy.authenticationRequired,
+                forbidden: copy.forbidden,
+                notFound: copy.serverNotFound,
+                conflict: copy.accountChanged,
+                unsupportedMediaType: copy.unsupportedMediaType,
+                requestBodyTooLarge: copy.requestBodyTooLarge,
+                invalidBodyLength: copy.invalidBodyLength,
+                requestBodyTimeout: copy.requestBodyTimeout,
+                failed: copy.createFailed,
+              },
+              {
+                ACTOR_REQUIRED: copy.actorRequired,
+                SERVER_CLAIM_SCOPE_CHANGED: copy.claimChanged,
+                SERVER_CLAIM_AUTHORITY_CHANGED: copy.claimChanged,
+              },
+            ),
             code: error.code,
           },
           error.statusCode,
@@ -98,7 +111,7 @@ export const POST = withBrowserMutation(
       return json(
         context,
         {
-          error: "Could not create server control challenge",
+          error: copy.createFailed,
         },
         500,
       );

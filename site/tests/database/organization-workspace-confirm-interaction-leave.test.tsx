@@ -17,7 +17,7 @@ const harness = vi.hoisted(() => ({
   refresh: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../../src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../../src/features/shell/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: harness.push, refresh: harness.refresh }),
@@ -27,13 +27,13 @@ vi.mock("next/link", () => ({
     <a {...props}>{children}</a>
   ),
 }));
-vi.mock("../../src/lib/organization-workspace-client", () => ({
+vi.mock("../../src/features/organizations/organization-workspace-client", () => ({
   organizationRequest: harness.request,
 }));
 
+import { organizationGovernanceCopy } from "../../src/features/organizations/organization-governance-copy";
+import { getOrganizationCopy } from "../../src/features/organizations/organization-workspace-copy";
 import { OrganizationWorkspacePanel } from "../../src/features/organizations/workspace";
-import { organizationGovernanceCopy } from "../../src/lib/organization-governance-copy";
-import { getOrganizationCopy } from "../../src/lib/organization-workspace-copy";
 
 const { clickLeave } = createOrganizationWorkspaceConfirmInteractionHelpers(
   harness,

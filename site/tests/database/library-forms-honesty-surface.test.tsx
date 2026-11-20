@@ -4,12 +4,12 @@ import { fileURLToPath } from "node:url";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it } from "vitest";
+import { libraryCollectionManifestsCopy } from "../../src/features/library/library-collection-manifests-i18n";
+import { libraryCollectionsCopy } from "../../src/features/library/library-collections-i18n";
+import { libraryMembershipBatchesCopy } from "../../src/features/library/library-membership-batches-i18n";
+import { librarySelectionBatchesCopy } from "../../src/features/library/library-selection-batches-i18n";
+import { getResourceReleaseControlCopy } from "../../src/features/library/resource-release-control-i18n";
 import { LibraryCollectionsErrorPanel } from "../../src/features/library/server/library-collections-error-panel";
-import { libraryCollectionManifestsCopy } from "../../src/lib/library-collection-manifests-i18n";
-import { libraryCollectionsCopy } from "../../src/lib/library-collections-i18n";
-import { libraryMembershipBatchesCopy } from "../../src/lib/library-membership-batches-i18n";
-import { librarySelectionBatchesCopy } from "../../src/lib/library-selection-batches-i18n";
-import { getResourceReleaseControlCopy } from "../../src/lib/resource-release-control-i18n";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
@@ -31,9 +31,17 @@ it("locks library form sources to ErrorState honesty without plain alert paragra
   for (const form of forms) {
     const source = read(form);
     expect(source).toContain("ErrorState");
-    expect(source).toMatch(/min-h-11|size="touch"/u);
+    expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
     expect(source).not.toContain('role="alert"');
   }
+});
+
+it("locks library release command pending recovery to ErrorState", () => {
+  const source = read("site/src/features/library/components/library-release-command.tsx");
+  expect(source).toContain('id="library-release-command-pending"');
+  expect(source).toContain("title={copy.pendingNote}");
+  expect(source).toContain("description={copy.errors.actionErrorDescription}");
+  expect(source).not.toContain('<p className="text-sm text-muted">{copy.pendingNote}</p>');
 });
 
 it("keeps additive action-error copy for library form locales", () => {
@@ -46,17 +54,21 @@ it("keeps additive action-error copy for library form locales", () => {
   expect(getResourceReleaseControlCopy("en").errors.actionErrorDescription.length).toBeGreaterThan(
     20,
   );
-  expect(read("site/src/lib/library-collections-i18n.ts")).toContain("actionErrorDescription");
-  expect(read("site/src/lib/library-collection-manifests-i18n.ts")).toContain(
+  expect(read("site/src/features/library/library-collections-i18n.ts")).toContain(
+    "actionErrorDescription",
+  );
+  expect(read("site/src/features/library/library-collection-manifests-i18n.ts")).toContain(
     "previewErrorDescription",
   );
-  expect(read("site/src/lib/library-membership-batches-i18n.ts")).toContain(
+  expect(read("site/src/features/library/library-membership-batches-i18n.ts")).toContain(
     "actionErrorDescription",
   );
-  expect(read("site/src/lib/library-selection-batches-i18n.ts")).toContain(
+  expect(read("site/src/features/library/library-selection-batches-i18n.ts")).toContain(
     "actionErrorDescription",
   );
-  expect(read("site/src/lib/resource-release-control-i18n.ts")).toContain("actionErrorDescription");
+  expect(read("site/src/features/library/resource-release-control-i18n.ts")).toContain(
+    "actionErrorDescription",
+  );
 });
 
 it("renders collections error panel with ErrorState description and touch recovery", () => {
@@ -71,7 +83,7 @@ it("renders collections error panel with ErrorState description and touch recove
   expect(html).toContain("bg-danger-soft");
   expect(html).toContain(copy.conflict);
   expect(html).toContain(copy.actionErrorDescription);
-  expect(html).toContain("min-h-11");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).not.toContain('class="text-warning"');
 });

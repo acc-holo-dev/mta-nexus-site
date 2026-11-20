@@ -1,8 +1,8 @@
-import { describe, expect, it } from "vitest";
-import { sql } from "drizzle-orm";
-import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { sql } from "drizzle-orm";
+import { describe, expect, it } from "vitest";
 import { db } from "../../packages/db/src/client";
 
 // Real PostgreSQL on disposable CI data. Never seed or write existing user data.

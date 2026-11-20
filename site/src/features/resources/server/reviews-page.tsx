@@ -1,22 +1,25 @@
 import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../components/auth-return-path";
-import { GuestAuthLinks } from "../../../components/guest-auth-links";
-import { ResourceReviewList, ResourceReviewPager } from "../components/resource-review-list";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { resourceReviewCopy } from "../../../lib/resource-review-i18n";
-import { resourceReviewPageQuery } from "../../../lib/resource-review-query";
-import { authService } from "../../../lib/services/auth-service";
-import { productService } from "../../../lib/services/product-service";
-import { resourceReviewService } from "../../../lib/services/resource-review-service";
-
-const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-5 overflow-x-clip py-8";
-const actionLinkClass =
-  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { productService } from "../../../lib/services/commerce/product-service";
+import { resourceReviewService } from "../../../lib/services/resources/resource-review-service";
+import { authEntryHref } from "../../shell/auth-return";
+import { GuestAuthLinks } from "../../shell/guest-auth";
+import { linkAccent } from "../../shell/link-shell";
+import { pageShellMax4xlCompact } from "../../shell/page-shell";
+import { typeSmSecondary } from "../../shell/type-shell";
+import { ResourceReviewList, ResourceReviewPager } from "../components/resource-review-list";
+import { resourceReviewCopy } from "../resource-review-i18n";
+import { resourceReviewPageQuery } from "../resource-review-query";
+export async function publicResourceReviewsMetadata(): Promise<Metadata> {
+  return { title: `${resourceReviewCopy(await getRequestLocale()).title} | MTA NEXUS` };
+}
 
 export async function PublicResourceReviewsPage({
   params,
@@ -41,14 +44,15 @@ export async function PublicResourceReviewsPage({
     product = await productService.getProductBySlug(target.slug);
   } catch {
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax4xlCompact}>
         <h1 className="font-display">{copy.title}</h1>
         <ErrorState
           title={copy.pageUnavailable}
+          description={copy.pageUnavailableDescription}
           action={
             <Link
               href={`/market/${encodeURIComponent(target.slug)}/reviews`}
-              className={actionLinkClass}
+              className={linkAccent}
             >
               {dictionary.errors.retry}
             </Link>
@@ -59,9 +63,13 @@ export async function PublicResourceReviewsPage({
   }
   if (product?.status !== "published") notFound();
 
-  const actor = await authService
-    .getSession(cookieStore.get("nexus_session")?.value)
-    .catch(() => null);
+  let actor: Awaited<ReturnType<typeof authService.getSession>> | null = null;
+  let sessionFailed = false;
+  try {
+    actor = await authService.getSession(cookieStore.get("nexus_session")?.value);
+  } catch {
+    sessionFailed = true;
+  }
   const result = await resourceReviewService
     .publicPage(product.id, pageQuery.page)
     .catch((error) => {
@@ -75,18 +83,19 @@ export async function PublicResourceReviewsPage({
 
   if (!result) {
     return (
-      <section className={pageShellClass}>
-        <Link href={`/market/${encodeURIComponent(product.slug)}`} className={actionLinkClass}>
+      <section className={pageShellMax4xlCompact}>
+        <Link href={`/market/${encodeURIComponent(product.slug)}`} className={linkAccent}>
           {copy.back}
         </Link>
         <h1 className="font-display">
           {copy.title} · {product.title}
         </h1>
-        <p className="text-sm text-secondary">{copy.subtitle}</p>
+        <p className={typeSmSecondary}>{copy.subtitle}</p>
         <ErrorState
           title={copy.pageUnavailable}
+          description={copy.pageUnavailableDescription}
           action={
-            <Link href={reviewsPath} className={actionLinkClass}>
+            <Link href={reviewsPath} className={linkAccent}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -96,18 +105,29 @@ export async function PublicResourceReviewsPage({
   }
 
   return (
-    <section className={pageShellClass}>
-      <Link href={`/market/${encodeURIComponent(product.slug)}`} className={actionLinkClass}>
+    <section className={pageShellMax4xlCompact}>
+      <Link href={`/market/${encodeURIComponent(product.slug)}`} className={linkAccent}>
         {copy.back}
       </Link>
       <h1 className="font-display">
         {copy.title} · {product.title}
       </h1>
-      <p className="text-sm text-secondary">{copy.subtitle}</p>
-      {actor ? (
+      <p className={typeSmSecondary}>{copy.subtitle}</p>
+      {sessionFailed ? (
+        <ErrorState
+          id="resource-reviews-session-unavailable"
+          title={copy.sessionUnavailable}
+          description={copy.sessionUnavailableDescription}
+          action={
+            <Link href={reviewsPath} className={linkAccent}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      ) : actor ? (
         <Link
           href={`/workspace/library/review/${encodeURIComponent(product.id)}`}
-          className={actionLinkClass}
+          className={linkAccent}
         >
           {copy.write}
         </Link>
@@ -122,7 +142,7 @@ export async function PublicResourceReviewsPage({
       <ResourceReviewList
         reviews={result.reviews}
         productId={product.id}
-        authenticated={!!actor}
+        authenticated={sessionFailed ? null : Boolean(actor)}
         locale={locale}
       />
       <ResourceReviewPager

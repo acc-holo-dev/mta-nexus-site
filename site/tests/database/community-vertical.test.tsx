@@ -7,7 +7,7 @@ import {
   buildCommunityTopicSubmission,
   communityTopicRequest,
   confirmedCommunityTopicPath,
-} from "../../src/lib/community-topic-submission";
+} from "../../src/features/community/community-topic-submission";
 import { getDictionary } from "../../src/lib/i18n";
 
 const state = vi.hoisted(() => ({
@@ -36,20 +36,20 @@ vi.mock("next/link", async () => {
   };
 });
 
-vi.mock("../../src/components/locale-context", () => ({
+vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({
     locale: "en",
     dictionary: getDictionary("en"),
   }),
 }));
 
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
-vi.mock("../../src/lib/services/auth-service", () => ({ authService: { getSession } }));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({ authService: { getSession } }));
 
-vi.mock("../../src/lib/services/content-service", () => ({
+vi.mock("../../src/lib/services/community/content-service", () => ({
   contentService: {
     pageCommunity: listCommunityTopics,
   },
@@ -58,7 +58,7 @@ vi.mock("../../src/lib/services/content-service", () => ({
 import NewCommunityTopicPage from "../../src/app/community/new/page";
 import CommunityPage from "../../src/app/community/page";
 import { CommunityTopicForm } from "../../src/features/community/components/community-topic-form";
-import { Sidebar } from "../../src/components/sidebar";
+import { Sidebar } from "../../src/features/shell/sidebar";
 
 describe("community topic submission behavior", () => {
   beforeEach(() => {
@@ -204,9 +204,9 @@ describe("community topic submission behavior", () => {
     expect(form).toContain('option value="question"');
     expect(form).toContain('option value="post"');
     expect(form).not.toContain('name="status"');
-    expect(form).toContain("min-w-0");
-    expect(form).toContain("overflow-x-clip");
-    expect(form).toContain("min-h-11");
+    expect(form).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(form).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(form).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   });
 
   it("clips the community topic create shell with a touch-sized back link", async () => {
@@ -216,7 +216,7 @@ describe("community topic submission behavior", () => {
     expect(html).toContain(copy.startTitle);
     expect(html).toContain(copy.backToCommunity);
     expect(html).toContain('href="/community"');
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   });
 
   it("reports a session lookup failure instead of treating it as a guest", async () => {

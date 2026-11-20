@@ -3,8 +3,10 @@ import {
   AppError,
   ConflictError,
   ForbiddenError,
+  noticeStoredTitles,
   serverClaimMatchesOwnershipScope,
   UnauthorizedError,
+  verificationResolutionNoticeMessage,
 } from "@nexus/domain";
 import { generateId } from "@nexus/security";
 import { and, asc, count, desc, eq, getTableColumns, inArray, isNotNull, sql } from "drizzle-orm";
@@ -629,17 +631,22 @@ export class VerificationRepository {
         createdAt: new Date(),
       });
 
-      const decisionLabel = input.decision === "approved" ? "approved" : "rejected";
       const serverResolution = request.targetType === "server";
       const [resolutionNotification] = await tx
         .insert(notifications)
         .values({
           id: `ntf_verification_resolution_${request.id}`,
           recipientId: request.requesterId,
-          title: input.decision === "approved" ? "Verification approved" : "Verification rejected",
-          message: serverResolution
-            ? `Server ownership verification was ${decisionLabel}.`
-            : `${request.targetType} verification for ${request.targetId} was ${decisionLabel}.`,
+          title:
+            input.decision === "approved"
+              ? noticeStoredTitles.verificationApproved
+              : noticeStoredTitles.verificationRejected,
+          message: verificationResolutionNoticeMessage({
+            approved: input.decision === "approved",
+            serverResolution,
+            targetType: request.targetType,
+            targetId: request.targetId,
+          }),
           link: serverResolution
             ? `/workspace/servers/${encodeURIComponent(request.targetId)}`
             : verificationRequesterHref(request.id),

@@ -1,14 +1,14 @@
 import { AppError, NotFoundError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { getTrustedRequestIp } from "../../../../../features/shell/request-client-ip";
 import {
   parseContextKind,
   parseContextTrustQuery,
-} from "../../../../../lib/public-context-trust-contract";
-import { contextTrustError } from "../../../../../lib/public-context-trust-copy";
-import { publicPlatformApi } from "../../../../../lib/public-platform-api";
-import { getTrustedRequestIp } from "../../../../../lib/request-client-ip";
-import { publicContextTrustService } from "../../../../../lib/services/public-context-trust-service";
+} from "../../../../../features/trust/public-context-trust-contract";
+import { contextTrustError } from "../../../../../features/trust/public-context-trust-copy";
+import { publicPlatformApi } from "../../../../../lib/http/public-platform-api";
+import { publicContextTrustService } from "../../../../../lib/services/trust/public-context-trust-service";
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ kind: string; slug: string }> },

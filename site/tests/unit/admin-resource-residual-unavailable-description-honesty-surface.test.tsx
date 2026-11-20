@@ -1,0 +1,79 @@
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { expect, it } from "vitest";
+
+let root = dirname(fileURLToPath(import.meta.url));
+while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
+const read = (relative: string) => readFileSync(join(root, relative), "utf8");
+
+const pages: Array<[string, string]> = [
+  ["site/src/features/moderation/server/admin-home-screen.tsx", "copy.hubUnavailableHint"],
+  ["site/src/features/resources/server/staff-resources-screen.tsx", "copy.loadUnavailableHint"],
+  [
+    "site/src/features/resources/server/staff-resource-detail-screen.tsx",
+    "copy.loadUnavailableHint",
+  ],
+  ["site/src/features/moderation/server/staff-storage-screen.tsx", "copy.loadUnavailableHint"],
+  [
+    "site/src/features/moderation/server/staff-storage-object-screen.tsx",
+    "copy.loadUnavailableHint",
+  ],
+  [
+    "site/src/features/commerce/server/commercial-plans-admin-screen.tsx",
+    "copy.loadUnavailableHint",
+  ],
+  [
+    "site/src/features/commerce/server/commercial-plan-admin-detail-screen.tsx",
+    "copy.loadUnavailableHint",
+  ],
+  [
+    "site/src/features/commerce/server/financial-reconciliation-screen.tsx",
+    "copy.loadUnavailableHint",
+  ],
+  [
+    "site/src/features/commerce/server/financial-reconciliation-detail-screen.tsx",
+    "copy.loadUnavailableHint",
+  ],
+  [
+    "site/src/features/commerce/server/financial-reconciliation-terms-screen.tsx",
+    "c.loadUnavailableHint",
+  ],
+  ["site/src/features/resources/server/resource-activity-screen.tsx", "copy.loadUnavailableHint"],
+  [
+    "site/src/features/resources/server/resource-publisher-history-screen.tsx",
+    "copy.loadUnavailableHint",
+  ],
+  [
+    "site/src/features/resources/server/resource-publisher-moderation-screen.tsx",
+    "copy.loadUnavailableHint",
+  ],
+  ["site/src/features/resources/server/resource-copies-screen.tsx", "c.loadUnavailableHint"],
+  ["site/src/features/resources/server/resource-copy-create-screen.tsx", "c.loadUnavailableHint"],
+  ["site/src/features/resources/server/resource-copy-receipt-screen.tsx", "c.loadUnavailableHint"],
+  ["site/src/features/commerce/server/purchase-operations-screen.tsx", "copy.loadUnavailableHint"],
+  ["site/src/features/commerce/server/purchase-terms-screen.tsx", "c.loadUnavailableHint"],
+];
+
+it("locks residual admin/resource loadUnavailable ErrorStates to recovery hints", () => {
+  for (const [path, hint] of pages) {
+    expect(read(path), path).toContain(`description={${hint}}`);
+  }
+  expect(read("site/src/lib/i18n/en/admin.ts")).toContain("hubUnavailableHint:");
+  expect(read("site/src/lib/i18n/ru/admin.ts")).toContain("hubUnavailableHint:");
+  expect(read("site/src/features/library/resource-release-control-i18n.ts")).toContain(
+    "loadUnavailableHint:",
+  );
+  expect(read("site/src/features/moderation/storage-maintenance-i18n.ts")).toContain(
+    "loadUnavailableHint:",
+  );
+  expect(read("site/src/features/commerce/commercial-i18n.ts")).toContain("loadUnavailableHint:");
+  expect(read("site/src/features/commerce/financial-i18n.ts")).toContain("loadUnavailableHint:");
+  expect(read("site/src/features/commerce/order-terms-i18n.ts")).toContain("loadUnavailableHint:");
+  expect(read("site/src/features/resources/resource-activity-i18n.ts")).toContain(
+    "loadUnavailableHint:",
+  );
+  expect(read("site/src/features/resources/resource-copy-i18n.ts")).toContain(
+    "loadUnavailableHint:",
+  );
+});

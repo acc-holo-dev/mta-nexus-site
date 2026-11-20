@@ -1,17 +1,19 @@
-import { notificationRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
-import { readBoundedText } from "../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { parseNotificationReadTarget } from "../../../../lib/notification-read";
+import { notificationMarkReadApiCopy } from "../../../../features/notifications/notification-mark-read-api-copy";
+import { parseNotificationReadTarget } from "../../../../features/notifications/notification-read";
+import { readBoundedText } from "../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { resolveLocale } from "../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
-} from "../../../../lib/observability";
-import { authService } from "../../../../lib/services/auth-service";
+} from "../../../../lib/platform/observability";
+import { authService } from "../../../../lib/services/accounts/auth-service";
+import { notificationInboxService } from "../../../../lib/services/notifications/notification-inbox-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -27,12 +29,15 @@ function json(context: RequestLogContext, body: unknown, status = 200) {
 
 export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
+  const copy = notificationMarkReadApiCopy(
+    resolveLocale(request.cookies.get("nexus_locale")?.value),
+  );
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
 
     if (!user) {
-      return json(context, { error: "Unauthorized" }, 401);
+      return json(context, { error: copy.unauthorized }, 401);
     }
 
     const rateLimit = await consumeRateLimit("notificationMutation", user.id);
@@ -40,7 +45,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: "Too many notification updates. Please try again shortly.",
+          error: copy.rate,
         },
         429,
       );
@@ -48,22 +53,18 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
 
     const target = parseNotificationReadTarget(await readBoundedText(request, 4096));
     if (!target) {
-      return json(context, { error: "Invalid notification target" }, 400);
+      return json(context, { error: copy.invalidTarget }, 400);
     }
     if (target.expectedActorId !== user.id)
-      return json(
-        context,
-        { error: "Account changed. Reload notifications.", code: "ACCOUNT_CHANGED" },
-        409,
-      );
+      return json(context, { error: copy.accountChanged, code: "ACCOUNT_CHANGED" }, 409);
 
     if (target.scope === "single") {
-      const updated = await notificationRepository.markAsRead(target.id, user.id);
+      const updated = await notificationInboxService.markAsRead(target.id, user.id);
       if (!updated) {
         return json(
           context,
           {
-            error: "Notification not found or not owned by you",
+            error: copy.notFound,
           },
           404,
         );
@@ -75,7 +76,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       });
     }
 
-    await notificationRepository.markAllAsRead(user.id);
+    await notificationInboxService.markAllAsRead(user.id);
     return json(context, {
       success: true,
       scope: "all",
@@ -85,7 +86,14 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       error instanceof AppError &&
       ["INVALID_BODY_LENGTH", "REQUEST_BODY_TOO_LARGE", "REQUEST_BODY_TIMEOUT"].includes(error.code)
     ) {
-      return json(context, { error: error.message, code: error.code }, error.statusCode);
+      return json(
+        context,
+        {
+          error: copy.invalidTarget,
+          code: error.code,
+        },
+        error.statusCode,
+      );
     }
     logRequestEvent({
       level: "error",
@@ -97,7 +105,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     return json(
       context,
       {
-        error: "Failed to mark notifications read",
+        error: copy.markFailed,
       },
       500,
     );

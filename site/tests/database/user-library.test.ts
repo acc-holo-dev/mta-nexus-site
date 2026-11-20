@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { collectLibraryEntries } from "../../src/lib/user-library";
+import { collectLibraryEntries } from "../../src/features/library/user-library";
 
 describe("personal download library", () => {
   it("includes legacy access, hides unrelated permissions, and deduplicates resource claims", () => {

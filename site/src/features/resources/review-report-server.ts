@@ -1,3 +1,9 @@
 import "server-only";
 
-export { ResourceReviewReportScreen } from "./server/resource-review-report-screen";
+export {
+  resourceReviewReportMetadata,
+  StaffResourceReviewReportDetailPage,
+  StaffResourceReviewReportsPage,
+  WorkspaceResourceReviewReportDetailPage,
+  WorkspaceResourceReviewReportsPage,
+} from "./server/resource-review-report-screen";

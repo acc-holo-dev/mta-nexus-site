@@ -2,17 +2,23 @@ import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
+import { serverClaimApiCopy } from "../../../../../../features/servers/server-claim-api-copy";
+import {
+  readBoundedJson,
+  requireServerJsonContentType,
+} from "../../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../../lib/http/browser-route-adapter";
+import { localeAppErrorText } from "../../../../../../lib/http/locale-app-error";
+import { resolveLocale } from "../../../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
-} from "../../../../../../lib/observability";
-import { isPostgresDeadlock } from "../../../../../../lib/postgres-error";
-import { authService } from "../../../../../../lib/services/auth-service";
-import { serverClaimService } from "../../../../../../lib/services/server-claim-service";
+} from "../../../../../../lib/platform/observability";
+import { isPostgresDeadlock } from "../../../../../../lib/platform/postgres-error";
+import { authService } from "../../../../../../lib/services/accounts/auth-service";
+import { serverClaimService } from "../../../../../../lib/services/servers/server-claim-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -39,29 +45,26 @@ const verifySchema = z
 export const POST = withBrowserMutation(
   async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     const context = createRequestLogContext(request);
+    const copy = serverClaimApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
     try {
       const sessionToken = request.cookies.get("nexus_session")?.value;
       const user = await authService.getSession(sessionToken);
       if (!sessionToken || !user) {
-        return json(context, { error: "Authentication required" }, 401);
+        return json(context, { error: copy.authenticationRequired }, 401);
       }
 
       const expectedActor = request.headers.get("x-nexus-actor-id");
       if (!expectedActor)
-        return json(
-          context,
-          { code: "ACTOR_ID_REQUIRED", error: "Actor precondition required" },
-          428,
-        );
+        return json(context, { code: "ACTOR_ID_REQUIRED", error: copy.actorRequired }, 428);
       if (expectedActor !== user.id)
-        return json(context, { code: "ACTOR_CHANGED", error: "Account changed" }, 409);
+        return json(context, { code: "ACTOR_CHANGED", error: copy.accountChanged }, 409);
 
       const rateLimit = await consumeRateLimit("serverClaimProof", user.id);
       if (!rateLimit.success) {
         return json(
           context,
           {
-            error: "Too many server control proof attempts",
+            error: copy.rate,
           },
           429,
         );
@@ -73,7 +76,7 @@ export const POST = withBrowserMutation(
         return json(
           context,
           {
-            error: "Invalid server control proof",
+            error: copy.invalidProof,
           },
           400,
         );
@@ -81,7 +84,7 @@ export const POST = withBrowserMutation(
 
       const { id: serverId } = await params;
       if (!serverId || serverId.length > 128) {
-        return json(context, { error: "Server not found" }, 404);
+        return json(context, { error: copy.serverNotFound }, 404);
       }
 
       // Moderator inbox fanout is committed with the verification request.
@@ -98,16 +101,31 @@ export const POST = withBrowserMutation(
       return json(context, result, 201);
     } catch (error: unknown) {
       if (isPostgresDeadlock(error))
-        return json(
-          context,
-          { code: "SERVER_CLAIM_RETRY", error: "Please retry the server claim" },
-          409,
-        );
+        return json(context, { code: "SERVER_CLAIM_RETRY", error: copy.retry }, 409);
       if (error instanceof AppError) {
         return json(
           context,
           {
-            error: error.message,
+            error: localeAppErrorText(
+              error,
+              {
+                unauthorized: copy.authenticationRequired,
+                forbidden: copy.forbidden,
+                notFound: copy.serverNotFound,
+                conflict: copy.accountChanged,
+                unsupportedMediaType: copy.unsupportedMediaType,
+                requestBodyTooLarge: copy.requestBodyTooLarge,
+                invalidBodyLength: copy.invalidBodyLength,
+                requestBodyTimeout: copy.requestBodyTimeout,
+                failed: copy.verifyFailed,
+              },
+              {
+                ACTOR_REQUIRED: copy.actorRequired,
+                VALIDATION_ERROR: copy.invalidProof,
+                SERVER_CLAIM_SCOPE_CHANGED: copy.claimChanged,
+                SERVER_CLAIM_AUTHORITY_CHANGED: copy.claimChanged,
+              },
+            ),
             code: error.code,
           },
           error.statusCode,
@@ -123,7 +141,7 @@ export const POST = withBrowserMutation(
       return json(
         context,
         {
-          error: "Could not verify server control",
+          error: copy.verifyFailed,
         },
         500,
       );

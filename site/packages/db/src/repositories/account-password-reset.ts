@@ -1,11 +1,11 @@
+import { noticeStoredMessages, noticeStoredTitles, UnauthorizedError } from "@nexus/domain";
 import { and, eq, sql } from "drizzle-orm";
-import { UnauthorizedError } from "@nexus/domain";
+import { authChallenges } from "../account-recovery-schema";
 import { db } from "../client";
 import { auditEvents, notifications, sessions, users } from "../schema";
-import { authChallenges } from "../account-recovery-schema";
 import { accountChallengeRepository, digestAccountChallenge } from "./account-challenges";
-import { accountMailOutboxRepository } from "./account-mail-outbox";
 import type { AccountMailCipher } from "./account-mail-crypto";
+import { accountMailOutboxRepository } from "./account-mail-outbox";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 const invalid = () => new UnauthorizedError("Invalid or expired password reset");
@@ -105,8 +105,8 @@ export class AccountPasswordResetRepository {
         await tx.insert(notifications).values({
           id: input.notificationId,
           recipientId: proof.userId,
-          title: "Password reset completed",
-          message: "Your password was reset and all existing sessions were signed out.",
+          title: noticeStoredTitles.passwordResetCompleted,
+          message: noticeStoredMessages.passwordResetCompleted,
           link: "/auth/login",
           type: "security",
           category: "security",

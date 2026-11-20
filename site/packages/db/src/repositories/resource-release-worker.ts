@@ -1,21 +1,27 @@
 import { randomUUID } from "node:crypto";
+import {
+  noticeStoredTitles,
+  RESOURCE_RELEASE_WORKER_LIMIT,
+  type ResourceReleaseWorkerResult,
+  resourceReleaseNoticeMessage,
+} from "@nexus/domain";
 import { and, asc, eq, gt, sql } from "drizzle-orm";
-import { RESOURCE_RELEASE_WORKER_LIMIT, type ResourceReleaseWorkerResult } from "@nexus/domain";
 import { db } from "../client";
 import {
   auditEvents,
   builds,
+  resourceReleaseEvents as events,
   notificationPreferences,
   notifications,
   products,
-  resourceReleaseEvents as events,
-  resourceReleaseWatches as watches,
   users,
+  resourceReleaseWatches as watches,
 } from "../schema";
-import { lockUserDownloadAccess } from "./entitlements";
 import { safePublishedBuildCondition } from "./build-safety";
+import { lockUserDownloadAccess } from "./entitlements";
 import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
 import { enqueueWebPushWithRecoveryWithin } from "./web-push-admission-recovery";
+
 function pending() {
   return sql`exists (select 1 from ${events} where ${events.productId} = ${watches.productId} and ${events.sequence} > ${watches.lastSequence})`;
 }
@@ -137,8 +143,8 @@ class ResourceReleaseWorkerRepository {
             recipientId: user.id,
             type: "system",
             category: "commerce",
-            title: "Resource version published / Опубликована версия ресурса",
-            message: `${product.title} · ${event.version}`,
+            title: noticeStoredTitles.resourceVersionPublished,
+            message: resourceReleaseNoticeMessage(product.title, event.version),
             link: `/workspace/library/${encodeURIComponent(product.id)}/versions`,
             data: {
               kind: "resource_release",

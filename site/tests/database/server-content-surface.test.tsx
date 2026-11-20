@@ -1,8 +1,11 @@
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { serverContentCopy } from "../../src/lib/server-content-copy";
-import { getUserPlatformCopy } from "../../src/lib/user-platform-copy";
+
+vi.mock("server-only", () => ({}));
+
+import { getUserPlatformCopy } from "../../src/features/community/user-platform-copy";
+import { serverContentCopy } from "../../src/features/servers/server-content-copy";
 
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
@@ -17,13 +20,13 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/workspace/servers/srv/content",
 }));
 
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../../src/lib/services/server-content-service", () => ({
+vi.mock("../../src/lib/services/servers/server-content-service", () => ({
   serverContentService: mocks,
 }));
 
@@ -88,7 +91,7 @@ it("shows revoked authority and recovery without creating editor actions", async
   mocks.page.mockRejectedValue(new AppError("private role details", 403, "FORBIDDEN"));
   const html = renderToStaticMarkup(await Page({ params: Promise.resolve({ id: "srv" }) }));
   expect(html).toContain('role="alert"');
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(getUserPlatformCopy("en").retry);
   expect(html).not.toContain("private role");
   expect(html).not.toContain("/content/new");

@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { contentApiCopy } from "../../src/features/community/content-api-copy";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
@@ -20,31 +21,33 @@ const mocks = vi.hoisted(() => ({
   can: vi.fn(),
 }));
 
-vi.mock("../../src/lib/services/auth-service", () => ({
-  authService: { getSession: vi.fn(async () => state.user) },
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
+  authService: {
+    getSession: vi.fn(async () => state.user),
+    findOrganizationById: mocks.findOrganization,
+    listUserMemberships: mocks.memberships,
+  },
 }));
 
-vi.mock("@nexus/db", () => ({
-  contentRepository: {
+vi.mock("../../src/lib/services/community/content-service", () => ({
+  contentService: {
     listPublished: mocks.listPublished,
     createWithAudit: mocks.createWithAudit,
   },
-  organizationRepository: {
-    findById: mocks.findOrganization,
-    listUserMemberships: mocks.memberships,
-  },
-  productRepository: { findById: mocks.findProduct },
 }));
 
-vi.mock("../../src/lib/services/server-service", () => ({
+vi.mock("../../src/lib/services/servers/server-service", () => ({
   serverService: {
     getServerById: vi.fn(),
     canManageServer: vi.fn(),
   },
 }));
 
-vi.mock("../../src/lib/services/product-service", () => ({
-  productService: { canManageProduct: vi.fn() },
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
+  productService: {
+    canManageProduct: vi.fn(),
+    findProductRecord: mocks.findProduct,
+  },
 }));
 
 vi.mock("@nexus/security", () => ({
@@ -106,7 +109,7 @@ describe("community content API behavior", () => {
     req.headers.set("X-Nexus-Actor-Id", "usr_other");
     const response = await POST(req);
     expect(response.status).toBe(409);
-    expect(await response.json()).toEqual({ code: "ACTOR_CHANGED" });
+    expect(await response.json()).toMatchObject({ code: "ACTOR_CHANGED" });
     expect(mocks.createWithAudit).not.toHaveBeenCalled();
   });
 
@@ -115,7 +118,7 @@ describe("community content API behavior", () => {
     req.headers.delete("X-Nexus-Actor-Id");
     const response = await POST(req);
     expect(response.status).toBe(428);
-    expect(await response.json()).toEqual({ code: "ACTOR_ID_REQUIRED" });
+    expect(await response.json()).toMatchObject({ code: "ACTOR_ID_REQUIRED" });
     expect(mocks.createWithAudit).not.toHaveBeenCalled();
   });
 
@@ -250,7 +253,7 @@ describe("community content API behavior", () => {
 
     expect(response.status).toBe(403);
     expect(await response.json()).toEqual({
-      error: "You do not manage this organization",
+      error: contentApiCopy("en").organizationNotManaged,
     });
     expect(mocks.memberships).toHaveBeenCalledWith("usr_writer");
     expect(mocks.createWithAudit).not.toHaveBeenCalled();

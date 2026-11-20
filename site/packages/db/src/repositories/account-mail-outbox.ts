@@ -1,10 +1,10 @@
 import { randomUUID } from "node:crypto";
 import { and, eq, gt, inArray, isNull, lte, sql } from "drizzle-orm";
-import { db } from "../client";
-import { authChallenges } from "../account-recovery-schema";
 import { accountMailOutbox, accountMailQueueGate } from "../account-mail-schema";
-import { accountChallengeRepository } from "./account-challenges";
+import { authChallenges } from "../account-recovery-schema";
+import { db } from "../client";
 import type { ChallengeIntent } from "./account-challenges";
+import { accountChallengeRepository } from "./account-challenges";
 import type { AccountMailCipher } from "./account-mail-crypto";
 
 export class AccountMailQueueFullError extends Error {

@@ -1,0 +1,86 @@
+{
+  "allowlist": [
+    {
+      "id": "brand.mark.wordmark",
+      "kind": "jsx-text",
+      "path": "site/packages/ui/src/brand-mark.tsx",
+      "text": "MTA NEXUS"
+    },
+    {
+      "id": "brand.mark.aria",
+      "kind": "aria-label",
+      "path": "site/packages/ui/src/brand-mark.tsx",
+      "text": "MTA NEXUS"
+    },
+    {
+      "id": "brand.mark.tile",
+      "kind": "jsx-text",
+      "path": "site/packages/ui/src/brand-mark.tsx",
+      "text": "NX"
+    },
+    {
+      "id": "meta.title-template",
+      "kind": "template",
+      "path": "site/src/features/shell/server/root-layout-metadata.tsx",
+      "text": "%s | MTA NEXUS"
+    },
+    {
+      "id": "global-error.brand.wordmark",
+      "kind": "jsx-text",
+      "path": "site/src/features/shell/components/global-error-page.tsx",
+      "text": "MTA NEXUS"
+    }
+  ],
+  "findings": [
+    {
+      "allowlist_id": "brand.mark.tile",
+      "kind": "jsx-text",
+      "line": 45,
+      "path": "site/packages/ui/src/brand-mark.tsx",
+      "text": "NX"
+    },
+    {
+      "allowlist_id": "brand.mark.wordmark",
+      "kind": "jsx-text",
+      "line": 52,
+      "path": "site/packages/ui/src/brand-mark.tsx",
+      "text": "MTA NEXUS"
+    },
+    {
+      "allowlist_id": "brand.mark.aria",
+      "kind": "aria-label",
+      "line": 63,
+      "path": "site/packages/ui/src/brand-mark.tsx",
+      "text": "MTA NEXUS"
+    },
+    {
+      "allowlist_id": "brand.mark.aria",
+      "kind": "aria-label",
+      "line": 80,
+      "path": "site/packages/ui/src/brand-mark.tsx",
+      "text": "MTA NEXUS"
+    },
+    {
+      "allowlist_id": "global-error.brand.wordmark",
+      "kind": "jsx-text",
+      "line": 92,
+      "path": "site/src/features/shell/components/global-error-page.tsx",
+      "text": "MTA NEXUS"
+    }
+  ],
+  "scan_roots": [
+    "site/src/features/shell",
+    "site/src/app/page.tsx",
+    "site/src/app/layout.tsx",
+    "site/packages/ui/src/brand-mark.tsx"
+  ],
+  "scope": "Git-tracked shell feature (excluding server/ and *-server ports), home page/panels, root layout metadata, and BrandMark — hard-coded guest-facing literals + locale copy ternaries.",
+  "source_sha": "e6479fde148fddb81b5877fea8c15bd4a52a7e1e",
+  "summary": {
+    "allowlisted": 5,
+    "findings": 5,
+    "locale_copy_ternaries": 0,
+    "scanned_files": 74,
+    "unallowlisted": 0
+  }
+}

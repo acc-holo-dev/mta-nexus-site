@@ -1,23 +1,33 @@
 import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { organizationContentId } from "../../../lib/organization-content-api";
-import { organizationContentCopy } from "../../../lib/organization-content-copy";
-import { organizationPublicationHistoryCopy } from "../../../lib/organization-publication-history-copy";
-import { authService } from "../../../lib/services/auth-service";
-import { organizationContentService } from "../../../lib/services/organization-content-service";
-import { parseEditableContent } from "../../../lib/user-platform-client";
-import { getUserPlatformCopy, userPlatformError } from "../../../lib/user-platform-copy";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { organizationContentService } from "../../../lib/services/organizations/organization-content-service";
 import { AuthorContentForm } from "../../community/author-content-form";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { PlatformSessionError } from "../../../components/platform-session-error";
+import { parseEditableContent } from "../../community/user-platform-client";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
+import { pageShellMax3xl } from "../../shell/page-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary } from "../../shell/type-shell";
+import { organizationContentId } from "../organization-content-api";
+import {
+  organizationContentCopy,
+  organizationContentMutationError,
+} from "../organization-content-copy";
+import { organizationPublicationHistoryCopy } from "../organization-publication-history-copy";
 import { organizationReturnPath } from "./organization-return-path";
+export async function organizationContentEditorMetadata(): Promise<Metadata> {
+  return {
+    title: getUserPlatformCopy(await getRequestLocale()).edit,
+    robots: { index: false, follow: false },
+  };
+}
 
-const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8";
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 export async function OrganizationContentEditorPage({
   id,
   contentId,
@@ -61,19 +71,21 @@ export async function OrganizationContentEditorPage({
     })
     .catch((error: unknown) => {
       failure =
-        error instanceof AppError ? userPlatformError(locale, error.code) : copy.unavailable;
+        error instanceof AppError
+          ? organizationContentMutationError(locale, error.code)
+          : copy.unavailable;
       return null;
     });
   const initial = result?.content ? parseEditableContent(result.content) : null;
   const path = `/workspace/organizations/${encodeURIComponent(id)}/content`;
   return (
-    <div className={pageShellClass}>
-      <Link href={path} className={navLinkClass}>
+    <div className={pageShellMax3xl}>
+      <Link href={path} className={linkAccentSm}>
         {team.title}
       </Link>
-      <h1 className="font-display text-primary">{contentId ? copy.edit : team.new}</h1>
+      <h1 className={typeDisplayPrimary}>{contentId ? copy.edit : team.new}</h1>
       {contentId && initial && (
-        <Link href={`${path}/${encodeURIComponent(contentId)}/history`} className={navLinkClass}>
+        <Link href={`${path}/${encodeURIComponent(contentId)}/history`} className={linkAccentSm}>
           {organizationPublicationHistoryCopy(locale).history}
         </Link>
       )}
@@ -87,10 +99,11 @@ export async function OrganizationContentEditorPage({
       ) : (
         <ErrorState
           title={failure}
+          description={copy.unavailableHint}
           action={
             <Link
               href={contentId ? `${path}/${encodeURIComponent(contentId)}` : `${path}/new`}
-              className={navLinkClass}
+              className={linkAccentSm}
             >
               {copy.retry}
             </Link>
@@ -99,4 +112,20 @@ export async function OrganizationContentEditorPage({
       )}
     </div>
   );
+}
+
+export async function OrganizationContentNewRoutePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return OrganizationContentEditorPage(await params);
+}
+
+export async function OrganizationContentEditRoutePage({
+  params,
+}: {
+  params: Promise<{ id: string; contentId: string }>;
+}) {
+  return OrganizationContentEditorPage(await params);
 }

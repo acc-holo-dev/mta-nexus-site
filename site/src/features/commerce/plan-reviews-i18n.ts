@@ -1,0 +1,161 @@
+import type { Locale } from "../../lib/i18n";
+
+const copy = {
+  en: {
+    title: "Saved plan reviews",
+    loading: "Loading saved plan reviews…",
+    loadUnavailable: "Saved plan reviews are temporarily unavailable. Please try again.",
+    loadUnavailableHint:
+      "Retry keeps the same filters and selection. A temporary load failure does not erase saved reviews.",
+    selectionRecoverHint:
+      "Reload with a corrected selection, or return and open the page again from a valid link.",
+    newReview: "Save selected terms",
+    back: "Back to plan catalog",
+    save: "Save review",
+    saving: "Saving…",
+    signIn: "Sign in",
+    signInRequired: "Sign in to review a plan",
+    access: "This account is unavailable. Check your current organization permissions.",
+    rate: "Too many requests. Wait before retrying the same selection.",
+    personal: "Personal",
+    organization: "Organization",
+    account: "Account",
+    all: "All time",
+    days: "days",
+    period: "Period",
+    apply: "Apply",
+    empty: "No saved reviews in this period.",
+    emptyHint:
+      "Saved reviews appear here after you record selected plan terms for this account and period.",
+    revision: "Version",
+    price: "Plan price",
+    term: "Plan term",
+    commission: "Commission",
+    amount: "Example sale amount",
+    currency: "Example sale currency",
+    estimate: "Saved commission estimate",
+    fee: "Estimated platform fee",
+    proceeds: "Estimated seller proceeds",
+    hold: "Initial hold baseline",
+    previous: "Previous",
+    next: "Next",
+    page: "Page",
+    of: "of",
+    export: "Download JSON",
+    saved: "Recorded terms",
+    latest: "Current published terms",
+    current: "The selected version is still published.",
+    changed: "A different version is published. Compare the terms before making a new selection.",
+    unavailable: "The selected plan is no longer published. Saved terms remain historical.",
+    observed: "Checked at",
+    scopeNext: "More organizations",
+    history: "View saved reviews",
+    noOrganizations: "You do not manage an organization on this page.",
+    noOrganizationsHint:
+      "Organization-scoped plans need an organization you manage. Switch page or choose a personal plan.",
+    invalid: "The request is invalid. Reload and check your selection.",
+    retry:
+      "The result could not be confirmed. Retry the same selection; it will not create a duplicate.",
+    conflict:
+      "The request key is already bound to a different selection. Reload before selecting again.",
+    limit: "This account has reached the 500-review limit.",
+    planChanged: "The published plan changed. Reload the catalog and review the latest terms.",
+    notice:
+      "A saved review records your selection and an illustrative fee estimate. It does not reserve a price, activate a subscription, charge money or grant benefits. Provider fees and taxes are excluded. License validity is separate from the plan term; resource licenses remain monthly and bound to one server.",
+    baseline:
+      "The initial hold baseline is 7 days. Estimated proceeds are not a balance or an available payout.",
+    frozen:
+      "After an uncertain result, the original selection is saved in this tab and only that request can be retried.",
+    formErrorHint:
+      "No plan review was recorded. Retry the same selection or reload before changing details.",
+    restoreFailed:
+      "Could not verify the session or restore the selection. Refresh and sign in to the original account.",
+    recoverySaveFailed: "Could not save recovery data. The review was not submitted.",
+  },
+  ru: {
+    title: "Сохранённые обзоры тарифов",
+    loading: "Загрузка сохранённых обзоров тарифов…",
+    loadUnavailable: "Сохранённые обзоры тарифов временно недоступны. Попробуйте ещё раз.",
+    loadUnavailableHint:
+      "Повтор сохраняет те же фильтры и выбор. Временный сбой загрузки не удаляет сохранённые обзоры.",
+    selectionRecoverHint:
+      "Обновите страницу с исправленным выбором или откройте её снова по корректной ссылке.",
+    newReview: "Сохранить выбранные условия",
+    back: "К каталогу тарифов",
+    save: "Сохранить обзор",
+    saving: "Сохранение…",
+    signIn: "Войти",
+    signInRequired: "Войдите для обзора тарифа",
+    access: "Аккаунт недоступен. Проверьте текущие права в организации.",
+    rate: "Слишком много запросов. Подождите перед повтором того же выбора.",
+    personal: "Личный аккаунт",
+    organization: "Организация",
+    account: "Аккаунт",
+    all: "За всё время",
+    days: "дней",
+    period: "Период",
+    apply: "Применить",
+    empty: "За этот период обзоров нет.",
+    emptyHint:
+      "Сохранённые обзоры появятся здесь после записи выбранных условий тарифа для этого аккаунта и периода.",
+    revision: "Версия",
+    price: "Цена тарифа",
+    term: "Срок тарифа",
+    commission: "Комиссия",
+    amount: "Сумма продажи для примера",
+    currency: "Валюта продажи для примера",
+    estimate: "Сохранённый расчёт комиссии",
+    fee: "Расчётная комиссия платформы",
+    proceeds: "Расчётная сумма продавца",
+    hold: "Исходный срок удержания",
+    previous: "Назад",
+    next: "Далее",
+    page: "Страница",
+    of: "из",
+    export: "Скачать JSON",
+    saved: "Сохранённые условия",
+    latest: "Текущие опубликованные условия",
+    current: "Выбранная версия ещё опубликована.",
+    changed: "Опубликована другая версия. Сравните условия перед новым выбором.",
+    unavailable: "Тариф больше не опубликован. Сохранённые условия остаются историей.",
+    observed: "Проверено",
+    scopeNext: "Другие организации",
+    history: "История обзоров",
+    noOrganizations: "На этой странице нет организаций под вашим управлением.",
+    noOrganizationsHint:
+      "Для тарифов организации нужна организация под вашим управлением. Смените страницу или выберите личный тариф.",
+    invalid: "Некорректный запрос. Обновите страницу и проверьте выбор.",
+    retry: "Результат не подтверждён. Повторите тот же выбор — дубликат не появится.",
+    conflict: "Ключ запроса уже связан с другим выбором. Обновите страницу перед новым выбором.",
+    limit: "Достигнут лимит: 500 обзоров на аккаунт.",
+    planChanged: "Опубликованный тариф изменился. Обновите каталог и проверьте новые условия.",
+    notice:
+      "Обзор сохраняет ваш выбор и пример расчёта комиссии. Он не резервирует цену, не активирует подписку, не списывает деньги и не выдаёт преимущества. Комиссии провайдера и налоги не учтены. Срок лицензии отдельный: лицензия ресурса действует месяц и привязана к одному серверу.",
+    baseline:
+      "Исходное удержание — 7 дней. Расчётная сумма продавца не является балансом или доступной выплатой.",
+    frozen:
+      "После неопределённого результата исходный выбор сохранён в этой вкладке; повторить можно только исходный запрос.",
+    formErrorHint:
+      "Обзор тарифа не сохранён. Повторите тот же выбор или обновите страницу перед изменением деталей.",
+    restoreFailed:
+      "Не удалось проверить сессию или восстановить выбор. Обновите страницу и войдите в исходный аккаунт.",
+    recoverySaveFailed: "Не удалось сохранить данные восстановления. Обзор не отправлен.",
+  },
+};
+export const planReviewsCopy = (locale: Locale) => copy[locale];
+export function planReviewError(locale: Locale, code: unknown) {
+  const c = copy[locale];
+  if (code === "UNAUTHORIZED" || code === "ACTOR_ID_REQUIRED") return c.signInRequired;
+  if (code === "ACTOR_CHANGED") return c.conflict;
+  if (code === "FORBIDDEN" || code === "NOT_FOUND") return c.access;
+  if (code === "RATE_LIMIT_EXCEEDED" || code === "RATE_LIMITED") return c.rate;
+  return code === "PLAN_REVIEW_CONFLICT" || code === "CONFLICT"
+    ? c.conflict
+    : code === "PLAN_REVIEW_PLAN_CHANGED"
+      ? c.planChanged
+      : code === "PLAN_REVIEW_LIMIT"
+        ? c.limit
+        : code === "PLAN_REVIEW_INVALID" || code === "VALIDATION_ERROR"
+          ? c.invalid
+          : c.retry;
+}

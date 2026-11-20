@@ -1,13 +1,13 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
-import { parseAuthorPublicationHistoryQuery } from "../../../../../../../../lib/author-publication-desk-contract";
+import { userPlatformApi } from "../../../../../../../../features/accounts/user-platform-api";
+import { parseAuthorPublicationHistoryQuery } from "../../../../../../../../features/community/author-publication-desk-contract";
 import {
   organizationContentId,
   organizationContentRate,
-} from "../../../../../../../../lib/organization-content-api";
-import { organizationPublicationHistoryError } from "../../../../../../../../lib/organization-publication-history-copy";
-import { organizationContentService } from "../../../../../../../../lib/services/organization-content-service";
-import { userPlatformApi } from "../../../../../../../../lib/user-platform-api";
+} from "../../../../../../../../features/organizations/organization-content-api";
+import { organizationPublicationHistoryError } from "../../../../../../../../features/organizations/organization-publication-history-copy";
+import { organizationContentService } from "../../../../../../../../lib/services/organizations/organization-content-service";
 export function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string; contentId: string }> },

@@ -3,7 +3,7 @@ import { expect, it, vi } from "vitest";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/market" }));
 
-import { FooterContribute } from "../../src/components/footer-contribute";
+import { FooterContribute } from "../../src/features/shell/footer";
 import { getDictionary } from "../../src/lib/i18n";
 
 it.each(["en", "ru"] as const)(

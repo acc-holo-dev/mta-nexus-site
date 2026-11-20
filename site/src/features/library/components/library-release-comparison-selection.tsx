@@ -2,9 +2,11 @@
 import { Button } from "@nexus/ui";
 import { useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
-import { libraryReleaseComparisonCopy } from "../../../lib/library-release-comparison-i18n";
-import { getResourceReleaseControlCopy } from "../../../lib/resource-release-control-i18n";
-import { ActionConfirmCheckbox } from "../../../components/action-confirm-checkbox";
+import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
+import { panelSpace4P5 } from "../../shell/panel-shell";
+import { typeSmSecondary } from "../../shell/type-shell";
+import { libraryReleaseComparisonCopy } from "../library-release-comparison-i18n";
+import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
 import { LibraryReleaseCommandStatus, useLibraryReleaseCommand } from "./library-release-command";
 export function LibraryReleaseComparisonSelection({
   productId,
@@ -51,11 +53,11 @@ export function LibraryReleaseComparisonSelection({
     });
   }
   return (
-    <section className="nexus-panel space-y-4 p-5" aria-label={copy.chooseCompared}>
+    <section className={panelSpace4P5} aria-label={copy.chooseCompared}>
       <h2>
         {copy.chooseCompared}: {target.version}
       </h2>
-      <p className="text-sm text-secondary">{control.selectNote}</p>
+      <p className={typeSmSecondary}>{control.selectNote}</p>
       <dl className="grid gap-2 text-sm sm:grid-cols-[auto_1fr]">
         <dt>{control.revision}</dt>
         <dd>{selection.revision}</dd>

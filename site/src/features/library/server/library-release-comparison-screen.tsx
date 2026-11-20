@@ -1,18 +1,30 @@
 import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { collectionPageParams } from "../../../lib/library-collections-query";
-import { libraryReleaseComparisonCopy } from "../../../lib/library-release-comparison-i18n";
-import { libraryReleaseComparisonQuery } from "../../../lib/library-release-comparison-query";
-import { authService } from "../../../lib/services/auth-service";
-import { libraryReleaseService } from "../../../lib/services/resource-release-control-service";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { libraryReleaseService } from "../../../lib/services/resources/resource-release-control-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded, linkAccentTightRounded } from "../../shell/link-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import { typeFlexWrapGap4, typePrewrapBreak, typeWFullLeftSm } from "../../shell/type-shell";
 import { LibraryReleaseComparisonSelection } from "../components/library-release-comparison-selection";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { PlatformSessionError } from "../../../components/platform-session-error";
+import { collectionPageParams } from "../library-collections-query";
+import { libraryReleaseComparisonCopy } from "../library-release-comparison-i18n";
+import { libraryReleaseComparisonQuery } from "../library-release-comparison-query";
+export async function libraryReleaseComparisonMetadata(): Promise<Metadata> {
+  return {
+    title: `${libraryReleaseComparisonCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
 export async function LibraryReleaseComparisonScreen({
   params,
   searchParams,
@@ -69,21 +81,19 @@ export async function LibraryReleaseComparisonScreen({
     });
   if (!result) {
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+      <div className={pageShellMax5xl}>
         <Link
           href={`/workspace/library/${encodeURIComponent(path.id)}/versions?page=${query.returnPage}`}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentTightRounded}
         >
           {c.back}
         </Link>
         <h1 className="font-display">{c.title}</h1>
         <ErrorState
           title={c.loadUnavailable}
+          description={c.loadUnavailableDescription}
           action={
-            <Link
-              href={retryHref}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={retryHref} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -105,11 +115,8 @@ export async function LibraryReleaseComparisonScreen({
     [c.signed, result.from.isSigned ? c.yes : c.no, result.to.isSigned ? c.yes : c.no],
   ];
   return (
-    <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
-      <Link
-        href={`${base}?page=${query.returnPage}`}
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellMax5xl}>
+      <Link href={`${base}?page=${query.returnPage}`} className={linkAccentTightRounded}>
         {c.back}
       </Link>
       <h1 id="library-release-comparison-heading" className="font-display">
@@ -124,7 +131,7 @@ export async function LibraryReleaseComparisonScreen({
         {c.delta}: {result.sizeDeltaBytes}
       </p>
       <section aria-labelledby="library-release-comparison-heading" className="overflow-x-auto">
-        <table className="w-full text-left text-sm">
+        <table className={typeWFullLeftSm}>
           <caption className="sr-only">{c.title}</caption>
           <thead>
             <tr>
@@ -148,18 +155,18 @@ export async function LibraryReleaseComparisonScreen({
       </section>
       <div className="grid gap-5 md:grid-cols-2">
         {([result.from, result.to] as const).map((release, index) => (
-          <section key={release.id} className="nexus-panel space-y-3 p-5">
+          <section key={release.id} className={panelSpace3P5}>
             <h2>
               {index === 0 ? c.from : c.to}: {release.version}
             </h2>
             <Link
               href={`/workspace/library/${encodeURIComponent(path.id)}/requirements?${new URLSearchParams({ previewBuildId: release.id, returnFrom: index === 0 ? result.to.id : result.from.id, returnPage: String(query.returnPage) })}`}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentTightRounded}
             >
               {c.preparation}
             </Link>
             <h3>{c.notes}</h3>
-            <p className="whitespace-pre-wrap break-words">{release.releaseNotes ?? c.unknown}</p>
+            <p className={typePrewrapBreak}>{release.releaseNotes ?? c.unknown}</p>
             {release.notesTruncated && <p role="note">{c.truncated}</p>}
             <h3>{c.package}</h3>
             {release.packageSummary ? (
@@ -204,16 +211,16 @@ export async function LibraryReleaseComparisonScreen({
       <p className="text-sm">
         {c.generated}: <time dateTime={result.generatedAt}>{result.generatedAt}</time>
       </p>
-      <nav className="flex flex-wrap gap-4">
+      <nav className={typeFlexWrapGap4}>
         <Link
           href={`${base}/compare?${new URLSearchParams({ ...values, from: query.to, to: query.from })}`}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentTightRounded}
         >
           {c.swap}
         </Link>
         <a
           href={`/api/library/releases/${encodeURIComponent(path.id)}/compare/export?${suffix}`}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentTightRounded}
         >
           {c.export}
         </a>

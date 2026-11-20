@@ -1,14 +1,14 @@
-import { describe, expect, it } from "vitest";
-import { eq, sql } from "drizzle-orm";
 import { setTimeout as delay } from "node:timers/promises";
-import { db, auditEvents, sessions, users } from "../client";
-import { authRepository } from "./auth";
-import { auditRepository } from "./audit";
-import { sessionRepository, digestSessionToken } from "./sessions";
-import { userRepository } from "./users";
 import { ConflictError, UnauthorizedError } from "@nexus/domain";
 import { generateId, generateSessionToken, hashPassword } from "@nexus/security";
-import { authService } from "../../../../src/lib/services/auth-service";
+import { eq, sql } from "drizzle-orm";
+import { describe, expect, it } from "vitest";
+import { authService } from "../../../../src/lib/services/accounts/auth-service";
+import { auditEvents, db, sessions, users } from "../client";
+import { auditRepository } from "./audit";
+import { authRepository } from "./auth";
+import { digestSessionToken, sessionRepository } from "./sessions";
+import { userRepository } from "./users";
 
 type Mode = "selected" | "others";
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];

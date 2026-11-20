@@ -1,8 +1,10 @@
+vi.mock("server-only", () => ({}));
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+import { getUserPlatformCopy } from "../../../../features/community/user-platform-copy";
 import { getDictionary } from "../../../../lib/i18n";
-import { getUserPlatformCopy } from "../../../../lib/user-platform-copy";
-import { authService } from "../../../../lib/services/auth-service";
+import { authService } from "../../../../lib/services/accounts/auth-service";
 
 const mocks = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
@@ -13,10 +15,12 @@ vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "s
 vi.mock("next/navigation", () => ({
   usePathname: () => "/workspace/resources/new",
 }));
-vi.mock("../../../../lib/services/auth-service", () => ({
+vi.mock("../../../../lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => mocks.actor },
 }));
-vi.mock("../../../../lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../../../../lib/i18n/server", () => ({
+  getRequestLocale: async () => mocks.locale,
+}));
 vi.mock("../../../../features/resources/create-controls", () => ({
   NewResourceForm: (props: unknown) => {
     mocks.forms(props);
@@ -24,7 +28,7 @@ vi.mock("../../../../features/resources/create-controls", () => ({
   },
 }));
 
-import Page, { metadata } from "./page";
+import Page, { generateMetadata } from "./page";
 
 beforeEach(() => {
   mocks.actor = { id: "author" };
@@ -33,7 +37,7 @@ beforeEach(() => {
 it("passes authenticated actor identity to the publishing form and disables indexing", async () => {
   renderToStaticMarkup(await Page());
   expect(mocks.forms).toHaveBeenCalledWith({ actorId: "author" });
-  expect(metadata.robots).toMatchObject({ index: false, follow: false });
+  expect((await generateMetadata()).robots).toMatchObject({ index: false, follow: false });
 });
 it.each(["en", "ru"] as const)("requires sign-in before showing the form in %s", async (locale) => {
   mocks.actor = null;

@@ -14,6 +14,7 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
+
 import { OrganizationRepository } from "../../packages/db/src/repositories/organizations";
 
 const repository = new OrganizationRepository();

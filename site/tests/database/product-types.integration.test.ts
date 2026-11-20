@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
+import { PRODUCT_TYPES } from "@nexus/domain";
 import { sql } from "drizzle-orm";
 import { expect, it } from "vitest";
-import { PRODUCT_TYPES } from "@nexus/domain";
 import { db } from "../../packages/db/src/client";
 
 const migration = readFileSync(

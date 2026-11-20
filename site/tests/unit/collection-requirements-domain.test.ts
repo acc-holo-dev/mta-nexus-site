@@ -1,8 +1,9 @@
 import {
-  buildCollectionRequirementsReport as report,
   type ResourceRequirementNode,
+  buildCollectionRequirementsReport as report,
 } from "@nexus/domain";
 import { expect, it } from "vitest";
+
 const node = (slug: string, dependencies: string[] = []): ResourceRequirementNode => ({
   id: `prd_${slug}`,
   slug,

@@ -1,15 +1,15 @@
 import { expect, it } from "vitest";
-import { formatNotification } from "../../src/lib/notification-copy";
+import { formatNotification } from "../../src/features/notifications/notification-copy";
 import {
   organizationHistoryCursor,
   organizationHistorySchema,
   ownershipTransferSchema,
-} from "../../src/lib/organization-governance-contract";
+} from "../../src/features/organizations/organization-governance-contract";
 import {
   organizationGovernanceCopy,
   organizationGovernanceError,
   organizationGovernanceMutationError,
-} from "../../src/lib/organization-governance-copy";
+} from "../../src/features/organizations/organization-governance-copy";
 
 const transfer = {
   targetId: "target",
@@ -78,7 +78,7 @@ it.each(["ru", "en"] as const)(
     ] as const) {
       const legacy = formatNotification(
         {
-          title: "Organization access changed",
+          title: "Organization access changed / Доступ к организации изменён",
           message: `Organization org_1: ${action}.`,
           data: null,
         },
@@ -90,7 +90,7 @@ it.each(["ru", "en"] as const)(
       expect(legacy.message.length).toBeGreaterThan(5);
       const structured = formatNotification(
         {
-          title: "Organization access changed",
+          title: "Organization access changed / Доступ к организации изменён",
           message: "stored",
           data: {
             kind: "organization_access",

@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
@@ -26,7 +27,9 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
+
 import { readManagedServerClaimStatus } from "../../packages/db/src/repositories/server-claim-status";
+
 const actor = { id: "manager", role: "user" as const };
 beforeEach(() => {
   state.queries = [];

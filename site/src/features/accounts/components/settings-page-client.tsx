@@ -8,23 +8,31 @@ import {
   confirmedNotificationPreferences,
   type NotificationPreferences,
   parseNotificationPreferences,
-} from "../../../lib/notification-preferences-confirmation";
-import { profilePrivacyCopy } from "../../../lib/profile-privacy-copy";
-import { adSlotRendererEnabled, advertisingLifecycleEnabled } from "../../../lib/feature-flags";
+} from "../../notifications/notification-preferences-confirmation";
+import { SettingsNotificationPreferencesSection } from "../../notifications/preferences";
+import { confirmAction } from "../../shell/confirm-action";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { HonestLoadingShell } from "../../shell/honest-loading";
+import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
+import { useNexusLocale } from "../../shell/locale";
+import { pageShellMax3xlRoomy } from "../../shell/page-shell";
+import { panelSpace4P5Shadow } from "../../shell/panel-shell";
+import { skelH4W13, skelH20 } from "../../shell/skeleton-shell";
+import { typeDisplayPrimary, typeSmMuted } from "../../shell/type-shell";
+import { authPasswordApiCopy } from "../auth-password-api-copy";
+import { ProfileChangeHistoryLink } from "../change-history";
+import { adSlotRendererEnabled, advertisingLifecycleEnabled } from "../feature-flags";
+import { PublicProfileForm } from "../profile";
+import { profilePrivacyCopy } from "../profile-privacy-copy";
 import {
+  isSettingsSignedOutError,
   type SettingsRecoveryEmail,
   SettingsRequestError,
   type SettingsSession,
   settingsClientRequest,
-} from "../../../lib/settings-client-api";
-import { confirmAction } from "../../../components/confirm-action";
-import { ContextSwitcher } from "../../../components/context-switcher";
-import { useNexusLocale } from "../../../components/locale-context";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { ProfileChangeHistoryLink } from "../../../components/private-change-history-controls";
-import { PublicProfileForm } from "../../../components/public-profile-form";
+} from "../settings-client-api";
+import { ContextSwitcher } from "./context-switcher";
 import { SettingsActiveSessions } from "./settings-active-sessions";
-import { SettingsNotificationPreferencesSection } from "../../notifications/preferences";
 import { SettingsAdvertisingPreferencesSection } from "./settings-advertising-preferences-section";
 import { SettingsPasswordForm } from "./settings-password-form";
 import { SettingsRecoveryEmailSection } from "./settings-recovery-email-section";
@@ -65,16 +73,16 @@ function parseSessionSnapshot(value: unknown): SessionSnapshot | null {
   return { actorId: data.actorId, sessions: data.sessions };
 }
 
-const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-8 overflow-x-clip";
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-const retryButtonClass =
-  "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
 export function SettingsPageClient() {
   const pathname = usePathname();
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.settings;
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [...Object.values(copy), ...Object.values(authPasswordApiCopy(locale))].includes(text)
+      ? text
+      : fallback;
+  }
   const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
   const [sessionSnapshot, setSessionSnapshot] = useState<SessionSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
@@ -243,11 +251,7 @@ export function SettingsPageClient() {
     try {
       await action();
     } catch (error: unknown) {
-      if (
-        error instanceof SettingsRequestError &&
-        error.status === 401 &&
-        error.message === "Authentication required"
-      ) {
+      if (error instanceof SettingsRequestError && isSettingsSignedOutError(error)) {
         setSignedOut(true);
         setSessionSnapshot(null);
         setPreferences(null);
@@ -259,7 +263,7 @@ export function SettingsPageClient() {
 
       setNotice({
         error: true,
-        text: error instanceof SettingsRequestError ? error.message : copy.requestUnconfirmed,
+        text: safeMessage(error, copy.requestUnconfirmed),
       });
     } finally {
       actionInFlight.current = false;
@@ -492,28 +496,23 @@ export function SettingsPageClient() {
 
   if (loading) {
     return (
-      <section
-        className={pageShellClass}
-        aria-busy="true"
-        aria-labelledby="settings-loading-heading"
+      <HonestLoadingShell
+        className={pageShellMax3xlRoomy}
+        headingId="settings-loading-heading"
+        title={copy.title}
+        loadingLabel={copy.loading}
+        headerClassName=""
+        statusClassName="mt-1 font-caption text-muted"
       >
-        <header>
-          <h1 id="settings-loading-heading" className="font-display text-primary">
-            {copy.title}
-          </h1>
-          <p role="status" aria-live="polite" className="mt-1 font-caption text-muted">
-            {copy.loading}
-          </p>
-        </header>
         <div className="animate-pulse space-y-8" aria-hidden="true">
           {[1, 2, 3, 4].map((key) => (
-            <div key={key} className="nexus-panel space-y-4 p-5 shadow-nexus-sm">
-              <div className="h-4 w-1/3 rounded bg-inset" />
-              <div className="h-20 rounded bg-inset" />
+            <div key={key} className={panelSpace4P5Shadow}>
+              <div className={skelH4W13} />
+              <div className={skelH20} />
             </div>
           ))}
         </div>
-      </section>
+      </HonestLoadingShell>
     );
   }
 
@@ -523,18 +522,19 @@ export function SettingsPageClient() {
 
   if (loadError) {
     return (
-      <div className={`${pageShellClass} py-12`}>
+      <div className={`${pageShellMax3xlRoomy} py-12`}>
         <header>
-          <h1 className="font-display text-primary">{copy.unavailable}</h1>
+          <h1 className={typeDisplayPrimary}>{copy.unavailable}</h1>
           <p className="mt-1 font-caption text-muted">{copy.description}</p>
         </header>
         <ErrorState
           title={notice?.text ?? copy.loadFailed}
+          description={copy.loadFailedHint}
           action={
             <Button
               type="button"
               variant="ghost"
-              className={retryButtonClass}
+              className={linkGhostAccentSm}
               onClick={() => setRevision((current) => current + 1)}
             >
               {copy.retry}
@@ -546,9 +546,9 @@ export function SettingsPageClient() {
   }
 
   return (
-    <div className={pageShellClass} aria-busy={pending || undefined}>
+    <div className={pageShellMax3xlRoomy} aria-busy={pending || undefined}>
       <div>
-        <h1 className="font-display text-primary">{copy.title}</h1>
+        <h1 className={typeDisplayPrimary}>{copy.title}</h1>
         <p className="mt-1 font-caption text-muted">{copy.description}</p>
       </div>
 
@@ -556,12 +556,13 @@ export function SettingsPageClient() {
         <ErrorState
           id="settings-notice"
           title={notice.text}
+          description={copy.loadFailedHint}
           action={
             <Button
               type="button"
               variant="ghost"
               disabled={pending}
-              className={retryButtonClass}
+              className={linkGhostAccentSm}
               onClick={() => setRevision((current) => current + 1)}
             >
               {copy.retry}
@@ -580,7 +581,7 @@ export function SettingsPageClient() {
       ) : null}
 
       {pending && (
-        <p role="status" aria-live="polite" className="text-sm text-muted">
+        <p role="status" aria-live="polite" className={typeSmMuted}>
           {copy.saving}
         </p>
       )}
@@ -588,7 +589,7 @@ export function SettingsPageClient() {
       <ContextSwitcher />
       <PublicProfileForm />
       <ProfileChangeHistoryLink locale={locale} />
-      <Link href="/settings/privacy" className={navLinkClass}>
+      <Link href="/settings/privacy" className={linkAccentSm}>
         {profilePrivacyCopy(locale).title}
       </Link>
 

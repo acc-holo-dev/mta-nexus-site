@@ -3,23 +3,42 @@ import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { z } from "zod";
+import type { Locale } from "../../../lib/i18n";
+import {
+  linkAccentSmRounded,
+  linkAccentTightSmPlain,
+  linkAccentTightSmRounded,
+  linkGhostAccentSm,
+} from "../../shell/link-shell";
+import { pageShellStack5 } from "../../shell/page-shell";
+import { panelMinSpace4P5, panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
+import { surfaceSpace3P4 } from "../../shell/surface-shell";
+import {
+  typeBreakLgSemiboldPrimary,
+  typeFlexWrapGap3,
+  typeLgSemiboldPrimary,
+  typePrewrapSmSecondary,
+  typeSmSecondary,
+  typeSmSemiboldPrimary,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import {
   type CommunityReportDetail,
   type communityReportDecisionSchema,
   communityReportDetailSchema,
   confirmsReportDecision,
-} from "../../../lib/community-report-contract";
+} from "../community-report-contract";
 import {
   communityReportCopy,
   communityReportDecisionError,
   communityReportError,
-} from "../../../lib/community-report-copy";
-import { reportGroupsCopy } from "../../../lib/community-report-groups-copy";
-import { reportHistoryCopy } from "../../../lib/community-report-history-copy";
-import { discussionReportsCopy } from "../../../lib/discussion-reports-copy";
-import type { Locale } from "../../../lib/i18n";
-import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
-import { ReportEvidenceLinks } from "../../../components/report-evidence-links";
+} from "../community-report-copy";
+import { reportGroupsCopy } from "../community-report-groups-copy";
+import { reportHistoryCopy } from "../community-report-history-copy";
+import { discussionReportsCopy } from "../discussion-reports-copy";
+import { ReportEvidenceLinks } from "../report-evidence-links";
+import { platformFieldClass, platformRequest } from "../user-platform-client";
+import { getUserPlatformCopy } from "../user-platform-copy";
 
 type Decision = z.infer<typeof communityReportDecisionSchema>;
 export function CommunityReportDetailView({
@@ -35,6 +54,12 @@ export function CommunityReportDetailView({
 }) {
   const copy = communityReportCopy(locale),
     path = `${staff ? "/admin/reports" : "/workspace/reports"}/${encodeURIComponent(id)}`;
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(text)
+      ? text
+      : fallback;
+  }
   const [report, setReport] = useState(initial),
     [notes, setNotes] = useState("");
   const [pending, setPending] = useState(false),
@@ -70,7 +95,7 @@ export function CommunityReportDetailView({
       setReport(await read());
       setNeedsReload(false);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : copy.unavailable);
+      setError(safeMessage(caught, copy.unavailable));
     } finally {
       guard.current = false;
       setPending(false);
@@ -141,18 +166,18 @@ export function CommunityReportDetailView({
     } catch (caught) {
       setConfirmation(null);
       setNeedsReload(true);
-      setError(caught instanceof Error ? caught.message : copy.decisionUnavailable);
+      setError(safeMessage(caught, copy.decisionUnavailable));
     } finally {
       guard.current = false;
       setPending(false);
     }
   }
   return (
-    <div className="min-w-0 space-y-5 overflow-x-clip" aria-busy={pending}>
+    <div className={pageShellStack5} aria-busy={pending}>
       <div className="flex min-w-0 flex-wrap items-center gap-4">
         <Link
           href={staff ? "/admin/reports" : "/workspace/reports"}
-          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentSmRounded}
         >
           {copy.back}
         </Link>
@@ -169,13 +194,14 @@ export function CommunityReportDetailView({
       {error ? (
         <ErrorState
           title={error}
+          description={copy.unavailableHint}
           action={
             <Button
               type="button"
               variant="ghost"
               disabled={pending}
               onClick={() => void reload()}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
             >
               {pending ? copy.loading : copy.reload}
             </Button>
@@ -183,31 +209,23 @@ export function CommunityReportDetailView({
         />
       ) : null}
       {success ? (
-        <p
-          role="status"
-          className="text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <p role="status" className={linkAccentTightSmPlain}>
           {success}
         </p>
       ) : null}
       {report ? (
         <>
-          <Link
-            href={`${path}/history`}
-            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href={`${path}/history`} className={linkAccentSmRounded}>
             {reportHistoryCopy(locale).title}
           </Link>
-          <section className="nexus-panel min-w-0 space-y-4 p-5">
-            <h2 className="break-words text-lg font-semibold text-primary">
+          <section className={panelMinSpace4P5}>
+            <h2 className={typeBreakLgSemiboldPrimary}>
               {copy[report.targetType]} · {copy[report.type]}
             </h2>
-            <p className="text-sm text-secondary">
+            <p className={typeSmSecondary}>
               {copy.status}: {copy[report.status]}
             </p>
-            <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-              {report.reason}
-            </p>
+            <p className={typePrewrapSmSecondary}>{report.reason}</p>
             <ReportEvidenceLinks urls={report.evidenceUrls} label={copy.evidence} />
             <dl className="space-y-2 text-xs text-muted">
               <div>
@@ -245,29 +263,21 @@ export function CommunityReportDetailView({
             </dl>
             {staff && report.moderatorNotes && (
               <div className="space-y-1">
-                <h3 className="text-sm font-semibold text-primary">{copy.notes}</h3>
-                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                  {report.moderatorNotes}
-                </p>
+                <h3 className={typeSmSemiboldPrimary}>{copy.notes}</h3>
+                <p className={typePrewrapSmSecondary}>{report.moderatorNotes}</p>
               </div>
             )}
           </section>
-          <section className="nexus-panel space-y-3 p-5">
-            <h2 className="text-lg font-semibold text-primary">{copy.currentTarget}</h2>
-            <p className="text-xs text-muted">{copy.currentHint}</p>
+          <section className={panelSpace3P5}>
+            <h2 className={typeLgSemiboldPrimary}>{copy.currentTarget}</h2>
+            <p className={typeXsMuted}>{copy.currentHint}</p>
             {staff && report.moderationHref && (
-              <Link
-                href={report.moderationHref}
-                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={report.moderationHref} className={linkAccentSmRounded}>
                 {discussionReportsCopy(locale).link}
               </Link>
             )}
             {staff && report.moderationHref && (
-              <Link
-                href={`${report.moderationHref}/reports`}
-                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={`${report.moderationHref}/reports`} className={linkAccentSmRounded}>
                 {reportGroupsCopy(locale).inspect}
               </Link>
             )}
@@ -284,25 +294,24 @@ export function CommunityReportDetailView({
                     @{report.target.author}
                   </Link>
                 )}
-                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                  {report.target.text}
-                </p>
-                {report.target.truncated && <p className="text-xs text-muted">{copy.truncated}</p>}
+                <p className={typePrewrapSmSecondary}>{report.target.text}</p>
+                {report.target.truncated && <p className={typeXsMuted}>{copy.truncated}</p>}
                 {report.target.href && (
-                  <Link
-                    className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                    href={report.target.href}
-                  >
+                  <Link className={linkAccentTightSmRounded} href={report.target.href}>
                     {copy.viewTarget}
                   </Link>
                 )}
               </>
             ) : (
-              <ErrorState id="community-report-target-missing" title={copy.missing} />
+              <ErrorState
+                id="community-report-target-missing"
+                title={copy.missing}
+                description={copy.missingHint}
+              />
             )}
           </section>
           {staff && (report.status === "open" || report.status === "under_review") && (
-            <section className="nexus-panel space-y-4 p-5">
+            <section className={panelSpace4P5}>
               <label className="block space-y-1 text-sm text-secondary">
                 <span>{copy.notes}</span>
                 <textarea
@@ -317,17 +326,14 @@ export function CommunityReportDetailView({
                 <span className="block text-xs text-muted">{copy.notesHint}</span>
               </label>
               {confirmation ? (
-                <fieldset
-                  className="space-y-3 rounded-lg border border-base p-4"
-                  aria-label={copy.confirm}
-                >
-                  <p className="text-sm text-secondary">
+                <fieldset className={surfaceSpace3P4} aria-label={copy.confirm}>
+                  <p className={typeSmSecondary}>
                     {confirmation.action === "remove_comment"
                       ? copy.confirmRemove
                       : copy.confirmDecision}
                   </p>
-                  <p className="text-sm font-semibold text-primary">{copy[confirmation.action]}</p>
-                  <div className="flex flex-wrap gap-3">
+                  <p className={typeSmSemiboldPrimary}>{copy[confirmation.action]}</p>
+                  <div className={typeFlexWrapGap3}>
                     <Button
                       type="button"
                       isLoading={pending}
@@ -347,7 +353,7 @@ export function CommunityReportDetailView({
                   </div>
                 </fieldset>
               ) : (
-                <div className="flex flex-wrap gap-3">
+                <div className={typeFlexWrapGap3}>
                   {(
                     [
                       ...(report.status === "open" ? ["review" as const] : []),

@@ -23,7 +23,8 @@ const source = readFileSync(
 
 it("locks null catalogue resolution to ErrorState without inventing retry", () => {
   expect(source).toContain('import { ErrorState } from "@nexus/ui"');
-  expect(source).toContain("<ErrorState title={copy.resolutionUnavailable} />");
+  expect(source).toContain("title={copy.resolutionUnavailable}");
+  expect(source).toContain("description={copy.resolutionUnavailableHint}");
   expect(source).not.toMatch(/text-\[10px\] text-warning>\{\s*copy\.resolutionUnavailable\s*\}/u);
   expect(source).not.toMatch(/ErrorState[\s\S]*action=/u);
 });
@@ -59,6 +60,7 @@ it.each(["en", "ru"] as const)(
     );
 
     expect(markup).toContain(copy.resolutionUnavailable);
+    expect(markup).toContain(copy.resolutionUnavailableHint);
     expect(markup).toContain('role="alert"');
     expect(markup).toContain("bg-danger-soft");
     expect(markup).not.toContain("core-ui, missing-pack");

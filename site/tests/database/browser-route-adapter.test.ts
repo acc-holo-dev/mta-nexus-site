@@ -1,10 +1,13 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest, NextResponse } from "next/server";
-import { BROWSER_ROUTE_ADAPTER, withBrowserMutation } from "../../src/lib/browser-route-adapter";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  BROWSER_ROUTE_ADAPTER,
+  withBrowserMutation,
+} from "../../src/lib/http/browser-route-adapter";
 import {
   LICENSE_BEARER_ROUTE_ADAPTER,
   withLicenseBearerRoute,
-} from "../../src/lib/license-bearer-route-adapter";
+} from "../../src/lib/http/license-bearer-route-adapter";
 
 const licenseRuntimeRequest = vi.hoisted(() =>
   vi.fn(async (_request: NextRequest, operation: (digest: string) => Promise<unknown | null>) => {
@@ -13,7 +16,7 @@ const licenseRuntimeRequest = vi.hoisted(() =>
   }),
 );
 
-vi.mock("../../src/lib/license-runtime-http", () => ({
+vi.mock("../../src/features/commerce/license-runtime-http", () => ({
   licenseRuntimeRequest,
 }));
 

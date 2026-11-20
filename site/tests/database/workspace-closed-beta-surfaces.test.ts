@@ -1,9 +1,8 @@
+vi.mock("server-only", () => ({}));
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  showAdminDestination,
-  showWorkspaceTools,
-} from "../../src/components/shell-destination-policy";
+import { showAdminDestination, showWorkspaceTools } from "../../src/features/shell/session";
 import { getDictionary } from "../../src/lib/i18n";
 
 const state = vi.hoisted(() => ({
@@ -40,25 +39,41 @@ vi.mock("@nexus/db", () => ({
   serverRepository: { listActivePublicByIds: repos.servers },
 }));
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.session),
   },
 }));
 
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 
-vi.mock("../../src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../../src/lib/services/servers/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: { getDirectory: repos.directory },
   indexMtaObservations: vi.fn(() => () => undefined),
 }));
 
-import LicensesPage from "../../src/app/workspace/licenses/page";
 import PurchasesPage from "../../src/app/workspace/purchases/page";
-import SalesPage from "../../src/app/workspace/sales/page";
 import SavedPage from "../../src/app/workspace/saved/page";
+import { LicensesHistoryScreen } from "../../src/features/commerce/licenses-history-server";
+import { SalesHistoryScreen } from "../../src/features/commerce/sales-history-server";
+
+async function LicensesPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return LicensesHistoryScreen({ query: await searchParams });
+}
+
+async function SalesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string | string[] }>;
+}) {
+  return SalesHistoryScreen({ query: await searchParams });
+}
 
 describe("open free-beta workspace behavior", () => {
   beforeEach(() => {

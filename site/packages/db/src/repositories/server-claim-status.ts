@@ -1,5 +1,5 @@
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { serverClaimMatchesOwnershipScope, type User } from "@nexus/domain";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../client";
 import { serverClaimChallenges, servers, verificationRequests } from "../schema";
 import { managedServerScope } from "./server-management-scope";

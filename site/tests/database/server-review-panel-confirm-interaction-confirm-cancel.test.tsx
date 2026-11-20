@@ -1,4 +1,5 @@
 import { expect, it, vi } from "vitest";
+import { getDictionary } from "../../src/lib/i18n";
 import {
   createServerReviewPanelConfirmInteractionHelpers,
   mockReactHooks,
@@ -13,18 +14,18 @@ const harness = vi.hoisted(() => ({
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
 
-vi.mock("../../src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../../src/features/shell/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({
   usePathname: () => "/servers/demo",
   useRouter: () => ({ refresh: harness.refresh }),
 }));
-vi.mock("../../src/components/locale-context", () => ({
-  useNexusLocale: () => ({ locale: "en" as const }),
+vi.mock("../../src/features/shell/locale", () => ({
+  useNexusLocale: () => ({ locale: "en" as const, dictionary: getDictionary("en") }),
 }));
 
 import { ServerReviewPanel } from "../../src/features/servers/components/server-review-panel";
-import { serverReviewCopy } from "../../src/lib/server-review-i18n";
+import { serverReviewCopy } from "../../src/features/servers/server-review-i18n";
 
 const { render, control } = createServerReviewPanelConfirmInteractionHelpers(
   harness,

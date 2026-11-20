@@ -171,5 +171,137 @@ class TrackerContractTests(unittest.TestCase):
         result=subprocess.run([sys.executable,str(ROOT/'planning/tools/render_backlog.py'),'--check'],capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)
 
+    def test_code_topology_inventory_matches_committed_snapshot(self):
+        snapshot = ROOT / 'planning' / 'code-topology-counts.json'
+        doc = ROOT / 'docs' / 'current' / 'code-topology.md'
+        self.assertTrue(snapshot.is_file(), 'missing planning/code-topology-counts.json')
+        self.assertTrue(doc.is_file(), 'missing docs/current/code-topology.md')
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / 'planning' / 'tools' / 'inventory_code_topology.py'),
+                '--check',
+                str(snapshot),
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        snapshot_data = json.loads(snapshot.read_text(encoding='utf8'))
+        self.assertNotIn(
+            'local_leftovers',
+            snapshot_data.get('husks', {}),
+            'host-local husk probes must stay out of the committed inventory',
+        )
+        self.assertEqual(snapshot_data.get('husks', {}).get('git_tracked_paths'), [])
+        gitignore = (ROOT / '.gitignore').read_text(encoding='utf8')
+        self.assertRegex(gitignore, r'(?m)^/packages/$')
+        self.assertRegex(gitignore, r'(?m)^/apps/$')
+        tracked = subprocess.check_output(
+            ['git', 'ls-files', 'packages', 'apps/web'],
+            cwd=ROOT,
+            text=True,
+        ).strip()
+        self.assertEqual(tracked, '', 'root packages/ and apps/web must stay untracked')
+        body = doc.read_text(encoding='utf8')
+        self.assertIn('planning/code-topology-counts.json', body)
+        self.assertIn('inventory_code_topology.py', body)
+        self.assertIn('features/shell', body)
+        self.assertIn('/packages/', body)
+        self.assertIn('/apps/', body)
+
+    def test_shell_home_i18n_inventory_matches_committed_snapshot(self):
+        snapshot = ROOT / 'planning' / 'shell-home-hardcoded-strings.json'
+        doc = ROOT / 'docs' / 'current' / 'code-topology.md'
+        self.assertTrue(snapshot.is_file(), 'missing planning/shell-home-hardcoded-strings.json')
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / 'planning' / 'tools' / 'inventory_shell_home_i18n.py'),
+                '--check',
+                str(snapshot),
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        snapshot_data = json.loads(snapshot.read_text(encoding='utf8'))
+        self.assertEqual(snapshot_data.get('summary', {}).get('unallowlisted'), 0)
+        self.assertEqual(snapshot_data.get('summary', {}).get('locale_copy_ternaries'), 0)
+        body = doc.read_text(encoding='utf8')
+        self.assertIn('planning/shell-home-hardcoded-strings.json', body)
+        self.assertIn('inventory_shell_home_i18n.py', body)
+
+    def test_public_guest_i18n_inventory_matches_committed_snapshot(self):
+        snapshot = ROOT / 'planning' / 'public-guest-hardcoded-strings.json'
+        doc = ROOT / 'docs' / 'current' / 'code-topology.md'
+        self.assertTrue(snapshot.is_file(), 'missing planning/public-guest-hardcoded-strings.json')
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / 'planning' / 'tools' / 'inventory_public_guest_i18n.py'),
+                '--check',
+                str(snapshot),
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        snapshot_data = json.loads(snapshot.read_text(encoding='utf8'))
+        self.assertEqual(snapshot_data.get('summary', {}).get('unallowlisted'), 0)
+        self.assertEqual(snapshot_data.get('summary', {}).get('locale_copy_ternaries'), 0)
+        body = doc.read_text(encoding='utf8')
+        self.assertIn('planning/public-guest-hardcoded-strings.json', body)
+        self.assertIn('inventory_public_guest_i18n.py', body)
+
+    def test_workspace_member_i18n_inventory_matches_committed_snapshot(self):
+        snapshot = ROOT / 'planning' / 'workspace-member-hardcoded-strings.json'
+        doc = ROOT / 'docs' / 'current' / 'code-topology.md'
+        self.assertTrue(snapshot.is_file(), 'missing planning/workspace-member-hardcoded-strings.json')
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / 'planning' / 'tools' / 'inventory_workspace_member_i18n.py'),
+                '--check',
+                str(snapshot),
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        snapshot_data = json.loads(snapshot.read_text(encoding='utf8'))
+        self.assertEqual(snapshot_data.get('summary', {}).get('unallowlisted'), 0)
+        self.assertEqual(snapshot_data.get('summary', {}).get('locale_copy_ternaries'), 0)
+        body = doc.read_text(encoding='utf8')
+        self.assertIn('planning/workspace-member-hardcoded-strings.json', body)
+        self.assertIn('inventory_workspace_member_i18n.py', body)
+
+    def test_feature_server_i18n_inventory_matches_committed_snapshot(self):
+        snapshot = ROOT / 'planning' / 'feature-server-hardcoded-strings.json'
+        doc = ROOT / 'docs' / 'current' / 'code-topology.md'
+        self.assertTrue(snapshot.is_file(), 'missing planning/feature-server-hardcoded-strings.json')
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / 'planning' / 'tools' / 'inventory_feature_server_i18n.py'),
+                '--check',
+                str(snapshot),
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        snapshot_data = json.loads(snapshot.read_text(encoding='utf8'))
+        self.assertEqual(snapshot_data.get('summary', {}).get('unallowlisted'), 0)
+        self.assertEqual(snapshot_data.get('summary', {}).get('locale_copy_ternaries'), 0)
+        body = doc.read_text(encoding='utf8')
+        self.assertIn('planning/feature-server-hardcoded-strings.json', body)
+        self.assertIn('inventory_feature_server_i18n.py', body)
+
 
 if __name__=='__main__':unittest.main()

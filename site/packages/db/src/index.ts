@@ -1,10 +1,10 @@
 export * from "./client";
 export { readDatabaseUrl } from "./database-config";
+export { discussionNotificationDeliveryRepository } from "./repositories/discussion-notification-delivery";
 export * from "./repositories/index";
+export { publicationNotificationDeliveryRepository } from "./repositories/publication-notification-delivery";
 export { supportNotificationDeliveryRepository } from "./repositories/support-notification-delivery";
 export { verificationNotificationDeliveryRepository } from "./repositories/verification-notification-delivery";
-export { discussionNotificationDeliveryRepository } from "./repositories/discussion-notification-delivery";
-export { publicationNotificationDeliveryRepository } from "./repositories/publication-notification-delivery";
 export {
   WebPushAdmissionRecoveryRepository,
   type WebPushAdmissionRecoveryResult,

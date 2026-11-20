@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+vi.mock("server-only", () => ({}));
+
 const state = vi.hoisted(() => ({
   user: null as null | {
     id: string;
@@ -47,11 +49,11 @@ vi.mock("next/link", async () => {
   };
 });
 
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: auth,
 }));
 
@@ -62,8 +64,8 @@ vi.mock("@nexus/db", () => ({
 }));
 
 import SecurityPage from "../../src/app/security/page";
-import { SECURITY_ACTIVITY_ACTIONS } from "../../src/lib/security-activity";
-import { SecurityCenterService } from "../../src/lib/services/security-center-service";
+import { SECURITY_ACTIVITY_ACTIONS } from "../../src/features/accounts/security-activity";
+import { SecurityCenterService } from "../../src/lib/services/accounts/security-center-service";
 
 describe("Security Center behavior", () => {
   beforeEach(() => {

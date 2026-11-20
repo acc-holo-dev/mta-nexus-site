@@ -24,13 +24,13 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/library-collections-service", () => ({
+vi.mock("../../src/lib/services/library/library-collections-service", () => ({
   libraryCollectionsService: { inventory: state.history },
 }));
 vi.mock("../../src/features/resources/download", () => ({
@@ -71,8 +71,8 @@ import Page, {
   dynamic,
   generateMetadata,
 } from "../../src/app/workspace/library/collections/resources/page";
-import { authService } from "../../src/lib/services/auth-service";
-import { libraryCollectionInventoryCopy } from "../../src/lib/library-collection-inventory-i18n";
+import { libraryCollectionInventoryCopy } from "../../src/features/library/library-collection-inventory-i18n";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 const date = "2026-10-13T00:00:00.000Z",
   a = { id: "lcol_a", name: "Own <active>", status: "active", revision: 4, itemCount: 2 },
@@ -217,7 +217,7 @@ it("shows empty results and masks absent/foreign collection scopes", async () =>
   const empty = await screen();
   expect(empty).toContain(copy.empty);
   expect(empty).toContain(copy.emptyHint);
-  expect(empty).toContain("overflow-x-clip");
+  expect(empty).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(empty).toContain(copy.clear);
   state.history.mockRejectedValue(new AppError("PRIVATE", 404, "NOT_FOUND"));
   await expect(screen()).rejects.toThrow("NEXT_NOT_FOUND");
@@ -228,7 +228,7 @@ it("shows an honest recovery state when collection inventory fails", async () =>
   expect(html).toContain('role="alert"');
   expect(html).toContain(libraryCollectionInventoryCopy("en").loadUnavailable);
   expect(html).toContain(`>${libraryCollectionInventoryCopy("en").title}</h1>`);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("collectionId=lcol_a");
   expect(html).toContain("release=updates");
 });

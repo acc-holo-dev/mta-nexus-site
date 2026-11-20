@@ -1,0 +1,245 @@
+import { serverRepository } from "@nexus/db";
+import { Button, EmptyState, ErrorState, fieldClass } from "@nexus/ui";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import {
+  indexMtaObservations,
+  mtaMasterDirectoryService,
+} from "../../../lib/services/servers/mta-master-directory-service";
+import { PlatformSignIn, platformSignInFocusClass } from "../../shell/guest-auth";
+import { linkAccentSm, linkMinH } from "../../shell/link-shell";
+import { pageShellMax6xl } from "../../shell/page-shell";
+import { panelFlexWrapEndGap4P4 } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapCenterGap4Sm,
+  typeFlexWrapStartBetweenGap4,
+  typeMinH11Semibold,
+  typeMinSpace2,
+  typeSmSecondary,
+} from "../../shell/type-shell";
+import { ManagedServerCard } from "../managed-card-server";
+import {
+  getManagedServerCopy,
+  managedServerHref,
+  parseManagedServerQuery,
+} from "../managed-server-view";
+import { serverWorkspaceCopy } from "../server-workspace-copy";
+import { ManagedServerVisibilityBatch } from "../visibility-batch";
+
+export async function managedServersMetadata(): Promise<Metadata> {
+  return {
+    title: `${getManagedServerCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
+export async function ManagedServersScreen({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const [locale, cookieStore, query] = await Promise.all([
+    getRequestLocale(),
+    cookies(),
+    searchParams,
+  ]);
+  const copy = getManagedServerCopy(locale);
+  const workspace = serverWorkspaceCopy(locale);
+  const { filters, page } = parseManagedServerQuery(query);
+  let user: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    user = await authService.getSession(cookieStore.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={workspace.unavailable}
+        retryHref={"/workspace/servers"}
+      />
+    );
+  }
+  if (!user) {
+    return <PlatformSignIn locale={locale} returnPath={managedServerHref(filters, page)} />;
+  }
+  const result = await serverRepository
+    .pageManagedByUser(user.id, page, filters, 20)
+    .catch(() => null);
+  if (!result) {
+    return (
+      <div className={pageShellMax6xl}>
+        <h1 className={typeDisplayPrimary}>{copy.title}</h1>
+        <ErrorState
+          title={workspace.unavailable}
+          description={workspace.unavailableHint}
+          action={
+            <Link href={managedServerHref(filters, page)} className={linkAccentSm}>
+              {workspace.reload}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
+  const directory =
+    result.servers.length > 0
+      ? await mtaMasterDirectoryService.getDirectory().catch(() => null)
+      : null;
+  const observationFor = indexMtaObservations(directory?.servers ?? []);
+  const isStale = !directory || directory.isStale;
+  const filtered = Boolean(
+    filters.query || filters.status || filters.visibility || filters.verification,
+  );
+  return (
+    <div className={pageShellMax6xl}>
+      <header className={typeFlexWrapStartBetweenGap4}>
+        <div className={typeMinSpace2}>
+          <Link href="/workspace" className={linkAccentSm}>
+            ← {copy.back}
+          </Link>
+          <h1 className={typeDisplayPrimary}>{copy.title}</h1>
+          <p className="max-w-2xl text-sm text-muted">{copy.subtitle}</p>
+        </div>
+        <Link
+          href="/workspace/servers/new"
+          className={`inline-flex min-h-11 items-center rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white ${platformSignInFocusClass}`}
+        >
+          {copy.register}
+        </Link>
+      </header>
+      <search aria-label={copy.search}>
+        <form action="/workspace/servers" method="get" className={panelFlexWrapEndGap4P4}>
+          <label className="flex min-w-0 flex-1 flex-col gap-1.5 text-xs text-secondary">
+            {copy.search}
+            <input
+              type="search"
+              name="q"
+              maxLength={120}
+              defaultValue={filters.query ?? ""}
+              className={`${fieldClass} min-h-11`}
+            />
+          </label>
+          <label className="flex flex-col gap-1.5 text-xs text-secondary">
+            {copy.visibility}
+            <select
+              name="visibility"
+              defaultValue={filters.visibility ?? "all"}
+              className={`${fieldClass} min-h-11`}
+            >
+              <option value="all">{copy.all}</option>
+              {(["public", "unlisted", "private"] as const).map((value) => (
+                <option key={value} value={value}>
+                  {copy[value]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex flex-col gap-1.5 text-xs text-secondary">
+            {copy.verification}
+            <select
+              name="verification"
+              defaultValue={filters.verification ?? "all"}
+              className={`${fieldClass} min-h-11`}
+            >
+              <option value="all">{copy.all}</option>
+              {(["verified", "unverified"] as const).map((value) => (
+                <option key={value} value={value}>
+                  {copy[value]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex flex-col gap-1.5 text-xs text-secondary">
+            {copy.listingStatus}
+            <select
+              name="status"
+              defaultValue={filters.status ?? "all"}
+              className={`${fieldClass} min-h-11`}
+            >
+              <option value="all">{copy.all}</option>
+              {(["active", "inactive", "maintenance", "suspended"] as const).map((value) => (
+                <option key={value} value={value}>
+                  {copy[value]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <Button type="submit" className={typeMinH11Semibold}>
+            {copy.apply}
+          </Button>
+          {filtered && (
+            <Link href="/workspace/servers" className={linkAccentSm}>
+              {copy.reset}
+            </Link>
+          )}
+        </form>
+      </search>
+      <p className="max-w-3xl text-xs text-muted">{copy.liveNote}</p>
+      <p className={typeSmSecondary}>
+        {copy.showing}{" "}
+        {result.total === 0
+          ? "0"
+          : `${(result.page - 1) * result.pageSize + 1}–${(result.page - 1) * result.pageSize + result.servers.length}`}{" "}
+        {copy.of} {result.total}
+      </p>
+      {result.servers.length === 0 ? (
+        <EmptyState
+          title={filtered ? copy.emptyFilter : copy.empty}
+          description={filtered ? copy.emptyFilterHint : copy.emptyHint}
+          action={
+            filtered ? (
+              <Link href="/workspace/servers" className={linkAccentSm}>
+                {copy.reset}
+              </Link>
+            ) : (
+              <Link href="/workspace/servers/new" className={linkAccentSm}>
+                {copy.register}
+              </Link>
+            )
+          }
+        />
+      ) : (
+        <ManagedServerVisibilityBatch
+          key={`${result.page}:${JSON.stringify(filters)}:${result.servers.map((server) => `${server.id}:${server.visibility}:${server.updatedAt.toISOString()}`).join(":")}`}
+          locale={locale}
+          items={result.servers.map((server) => ({
+            id: server.id,
+            name: server.name,
+            card: (
+              <ManagedServerCard
+                key={server.id}
+                server={server}
+                observation={observationFor(server)}
+                isStale={isStale}
+                locale={locale}
+              />
+            ),
+          }))}
+        />
+      )}
+      {result.totalPages > 1 && (
+        <nav aria-label={copy.page} className={typeFlexWrapCenterGap4Sm}>
+          {result.page > 1 && (
+            <Link href={managedServerHref(filters, result.page - 1)} className={linkAccentSm}>
+              {copy.previous}
+            </Link>
+          )}
+          <span className={linkMinH}>
+            {copy.page} {result.page} {copy.of} {result.totalPages}
+          </span>
+          {result.page < result.totalPages && (
+            <Link href={managedServerHref(filters, result.page + 1)} className={linkAccentSm}>
+              {copy.next}
+            </Link>
+          )}
+        </nav>
+      )}
+    </div>
+  );
+}

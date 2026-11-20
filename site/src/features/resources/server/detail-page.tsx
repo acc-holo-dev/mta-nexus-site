@@ -1,3 +1,4 @@
+import { config } from "@nexus/config";
 import {
   followWorkspaceRepository,
   notificationRepository,
@@ -6,13 +7,37 @@ import {
 import { buildResourceVersionHelp } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { CheckCircle2, Key, Layers, MessageSquare, ShieldCheck } from "lucide-react";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { authEntryHref } from "../../../components/auth-return-path";
-import { BuildProvenanceDetails } from "../components/build-provenance-details";
-import { FollowButton } from "../../../components/follow-button";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { commerceService } from "../../../lib/services/commerce/commerce-service";
+import { productService } from "../../../lib/services/commerce/product-service";
+import { resourceManagementService } from "../../../lib/services/resources/resource-management-service";
+import { resourceQaService } from "../../../lib/services/resources/resource-qa-service";
+import { resourceReleaseWatchesService } from "../../../lib/services/resources/resource-release-watches-service";
+import { resourceReviewService } from "../../../lib/services/resources/resource-review-service";
+import { licenseModelLabel } from "../../commerce/license-model-i18n";
+import { FollowButton } from "../../community/follow";
 import { ObjectReportForm } from "../../moderation/object-report";
+import { authEntryHref } from "../../shell/auth-return";
+import { linkAccentSmRounded, linkAccentTightSemiboldHover } from "../../shell/link-shell";
+import { pageShellStack4, pageShellStack10 } from "../../shell/page-shell";
+import { panelSpace4P6 } from "../../shell/panel-shell";
+import {
+  type3xlBlackPrimary,
+  typeFlexWrapCenterGap2,
+  typeIconAccent,
+  typeMonoSecondary,
+  typeMt1XsMuted,
+  typeNumericElevenFaint,
+  typeXsLeadingMuted,
+} from "../../shell/type-shell";
+import { buildPackageCopy } from "../build-package-i18n";
+import { BuildProvenanceDetails } from "../components/build-provenance-details";
 import { ProductDependencyList } from "../components/product-dependency-list";
 import { AddResourceToCart } from "../components/resource-cart-controls";
 import { ResourceDownloadButton } from "../components/resource-download-button";
@@ -24,25 +49,12 @@ import { ResourceReviewList } from "../components/resource-review-list";
 import { ResourceVariantChoices } from "../components/resource-variant-choices";
 import { ResourceVersionHelpSection } from "../components/resource-version-help-section";
 import { ReverseDependencyList } from "../components/reverse-dependency-list";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { licenseModelLabel } from "../../../lib/license-model-i18n";
-import { PRODUCT_PUBLISHING_KEYS } from "../../../lib/product-type-labels";
-import { getReleaseHistoryCopy, releaseHistoryHref } from "../../../lib/public-release-history";
-import { getResourceCommerceCopy } from "../../../lib/resource-commerce-i18n";
-import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
-import { resourceReviewCopy } from "../../../lib/resource-review-i18n";
-import { authService } from "../../../lib/services/auth-service";
-import { commerceService } from "../../../lib/services/commerce-service";
-import { productService } from "../../../lib/services/product-service";
-import { resourceManagementService } from "../../../lib/services/resource-management-service";
-import { resourceQaService } from "../../../lib/services/resource-qa-service";
-import { resourceReleaseWatchesService } from "../../../lib/services/resource-release-watches-service";
-import { resourceReviewService } from "../../../lib/services/resource-review-service";
-
-const pageShellClass = "min-w-0 space-y-10 overflow-x-clip";
-const actionLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+import { PRODUCT_PUBLISHING_KEYS } from "../product-type-labels";
+import { getReleaseHistoryCopy, releaseHistoryHref } from "../public-release-history";
+import { getResourceCommerceCopy } from "../resource-commerce-i18n";
+import { safeResourceImageUrl } from "../resource-image-url";
+import { resourceReleaseWatchesCopy } from "../resource-release-watches-i18n";
+import { resourceReviewCopy } from "../resource-review-i18n";
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024 * 1024) {
@@ -94,6 +106,41 @@ function readQaThreadId(value: string | string[] | undefined): string | null {
   return /^[A-Za-z0-9_-]{8,128}$/.test(id) ? id : null;
 }
 
+export async function productDetailMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const [locale, product] = await Promise.all([
+    getRequestLocale(),
+    productService.getProductBySlug(slug),
+  ]);
+  const dictionary = getDictionary(locale);
+
+  if (!product) {
+    return { title: dictionary.product.notFound, robots: { index: false, follow: false } };
+  }
+
+  const description = product.shortDescription || product.description.slice(0, 155);
+  const previewUrl = safeResourceImageUrl(product.thumbnailUrl);
+  const thumbnailUrl = previewUrl?.startsWith("/")
+    ? new URL(previewUrl, config.NEXT_PUBLIC_APP_URL).href
+    : previewUrl;
+
+  return {
+    title: product.title,
+    description,
+    alternates: { canonical: `/market/${product.slug}` },
+    openGraph: {
+      title: product.title,
+      description,
+      type: "website",
+      images: thumbnailUrl ? [{ url: thumbnailUrl }] : undefined,
+    },
+  };
+}
+
 export async function ProductDetailPage({
   params,
   searchParams,
@@ -106,28 +153,35 @@ export async function ProductDetailPage({
     searchParams ?? Promise.resolve({} as { qa?: string | string[] }),
   ]);
   const initialQaThreadId = readQaThreadId(query.qa);
+  let sessionFailed = false;
   const [locale, user] = await Promise.all([
     getRequestLocale(),
     cookies().then((cookieStore) =>
-      authService.getSession(cookieStore.get("nexus_session")?.value),
+      authService.getSession(cookieStore.get("nexus_session")?.value).catch(() => {
+        sessionFailed = true;
+        return null;
+      }),
     ),
   ]);
   const dictionary = getDictionary(locale);
   const copy = dictionary.product;
+  const packageCopy = buildPackageCopy(locale);
   const commerceCopy = getResourceCommerceCopy(locale);
   const watchCopy = resourceReleaseWatchesCopy(locale);
   const reviewCopy = resourceReviewCopy(locale);
   let detail: Awaited<ReturnType<typeof productService.getProductDetailAccessBySlug>>;
   try {
+    // Session probe failure must not invent a guest for access checks — treat as anonymous
+    // for entitlement only, then surface identity ErrorState on interactive controls below.
     detail = await productService.getProductDetailAccessBySlug(slug, user);
   } catch {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellStack10}>
         <ErrorState
           title={copy.detailUnavailable}
           description={copy.detailUnavailableDescription}
           action={
-            <Link href={`/market/${encodeURIComponent(slug)}`} className={actionLinkClass}>
+            <Link href={`/market/${encodeURIComponent(slug)}`} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -196,13 +250,21 @@ export async function ProductDetailPage({
       : Promise.resolve(null),
   ]);
   const hasAccess = isPublic && (canManageProduct || isLicensed || isAdmin);
-  const saveInitial = {
-    authenticated: Boolean(user),
-    actorId: user?.id ?? null,
-    following: Array.isArray(savedFollowIds) ? savedFollowIds.includes(product.id) : false,
-    error: savedFollowIds === null,
-    ...(productMute ? { muted: productMute.muted, mutedUntil: productMute.mutedUntil } : {}),
-  };
+  const saveInitial = sessionFailed
+    ? {
+        // Session probe failure ≠ guest — keep FollowButton off guest CTAs.
+        authenticated: null,
+        actorId: null,
+        following: false,
+        error: true,
+      }
+    : {
+        authenticated: Boolean(user),
+        actorId: user?.id ?? null,
+        following: Array.isArray(savedFollowIds) ? savedFollowIds.includes(product.id) : false,
+        error: savedFollowIds === null,
+        ...(productMute ? { muted: productMute.muted, mutedUntil: productMute.mutedUntil } : {}),
+      };
   // Download aside only shows provenance for the published current version; never invent clean.
   const downloadBuild = hasAccess
     ? (builds.find(
@@ -238,7 +300,7 @@ export async function ProductDetailPage({
   const formattedPrice = product.price === 0 ? copy.free : dictionary.checkout.paidUnavailable;
 
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellStack10}>
       {!isPublic ? (
         <ErrorState
           id="market-private-preview"
@@ -267,7 +329,7 @@ export async function ProductDetailPage({
             <span className="text-muted">{copy.publisher}: </span>
             <Link
               href={`/organizations/${encodeURIComponent(attribution.organization.slug)}`}
-              className="font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentTightSemiboldHover}
             >
               {attribution.organization.name}
             </Link>
@@ -276,16 +338,17 @@ export async function ProductDetailPage({
         {attribution?.author ? (
           <p className="min-w-0">
             <span className="text-muted">{copy.author}: </span>
-            <Link
-              href={attribution.author.href}
-              className="font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={attribution.author.href} className={linkAccentTightSemiboldHover}>
               {attribution.author.displayName}
             </Link>
           </p>
         ) : null}
         {!attribution?.organization && !attribution?.author ? (
-          <ErrorState id="market-publisher-unavailable" title={copy.publisherUnavailable} />
+          <ErrorState
+            id="market-publisher-unavailable"
+            title={copy.publisherUnavailable}
+            description={copy.publisherUnavailableHint}
+          />
         ) : null}
       </div>
 
@@ -295,8 +358,8 @@ export async function ProductDetailPage({
         <aside className="space-y-6 lg:order-2" data-testid="resource-acquisition-panel">
           <div className="nexus-panel sticky top-24 space-y-6 p-6 shadow-nexus-sm">
             <div>
-              <div className="text-3xl font-black text-primary">{formattedPrice}</div>
-              <div className="mt-1 text-xs text-muted">
+              <div className={type3xlBlackPrimary}>{formattedPrice}</div>
+              <div className={typeMt1XsMuted}>
                 {copy.licenseModel}: <span>{licenseModelLabel(locale, product.licenseModel)}</span>
               </div>
             </div>
@@ -318,7 +381,8 @@ export async function ProductDetailPage({
                     targetType="product"
                     targetId={product.id}
                     locale={locale}
-                    authenticated={Boolean(user)}
+                    authenticated={sessionFailed ? null : Boolean(user)}
+                    retryHref={detailReturnPath}
                     loginHref={authEntryHref("login", detailReturnPath)}
                     registerHref={authEntryHref("register", detailReturnPath)}
                   />
@@ -426,6 +490,7 @@ export async function ProductDetailPage({
                 <ErrorState
                   id="market-paid-disabled"
                   title={isPublic ? dictionary.checkout.paidDisabled : copy.notPublic}
+                  description={isPublic ? dictionary.checkout.paidDisabledHint : copy.notPublicHint}
                 />
               )}
             </div>
@@ -435,7 +500,7 @@ export async function ProductDetailPage({
               <div className="space-y-2">
                 <div className="flex justify-between gap-4 border-b border-base py-1">
                   <span className="text-muted">{copy.mtaVersion}</span>
-                  <span className="font-mono text-secondary">
+                  <span className={typeMonoSecondary}>
                     {product.compatibility.mtaMinVersion
                       ? `>= ${product.compatibility.mtaMinVersion}`
                       : copy.notDeclared}
@@ -451,7 +516,7 @@ export async function ProductDetailPage({
                 </div>
                 <div className="flex justify-between gap-4 border-b border-base py-1">
                   <span className="text-muted">{copy.libraryAdditions}</span>
-                  <span className="font-mono text-secondary">{product.salesCount}</span>
+                  <span className={typeMonoSecondary}>{product.salesCount}</span>
                 </div>
                 <div className="flex justify-between gap-4 border-b border-base py-1">
                   <span className="text-muted">{copy.rating}</span>
@@ -492,7 +557,7 @@ export async function ProductDetailPage({
 
           <ResourceGallery items={gallery} title={product.title} locale={locale} />
 
-          <section className="nexus-panel space-y-4 p-6">
+          <section className={panelSpace4P6}>
             <h2 className="border-b border-base pb-3 text-base font-bold text-primary">
               {copy.overview}
             </h2>
@@ -514,16 +579,16 @@ export async function ProductDetailPage({
 
           <ResourceVersionHelpSection projection={versionHelp} locale={locale} />
 
-          <section className="nexus-panel space-y-4 p-6">
+          <section className={panelSpace4P6}>
             <div className="flex flex-col justify-between gap-2 border-b border-base pb-3 sm:flex-row sm:items-center">
               <h2 className="flex items-center gap-2 text-base font-bold text-primary">
-                <Layers className="h-4 w-4 text-accent" aria-hidden="true" />
+                <Layers className={typeIconAccent} aria-hidden="true" />
                 <span>{copy.releaseHistory}</span>
               </h2>
-              <span className="font-numeric text-[11px] text-faint">{copy.shaRecorded}</span>
+              <span className={typeNumericElevenFaint}>{copy.shaRecorded}</span>
             </div>
 
-            <p className="text-xs leading-relaxed text-muted">{copy.latestBuildNotice}</p>
+            <p className={typeXsLeadingMuted}>{copy.latestBuildNotice}</p>
             {isPublic && (
               <Link
                 href={releaseHistoryHref(product.slug)}
@@ -534,14 +599,14 @@ export async function ProductDetailPage({
             )}
 
             {builds.length > 0 ? (
-              <div className="min-w-0 space-y-4 overflow-x-clip">
+              <div className={pageShellStack4}>
                 {builds.map((build) => (
                   <article
                     key={build.id}
                     className="min-w-0 space-y-3 overflow-x-clip rounded-lg border border-base bg-inset p-4"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
-                      <div className="flex flex-wrap items-center gap-2">
+                      <div className={typeFlexWrapCenterGap2}>
                         <span className="font-mono font-bold text-primary">
                           {copy.version} {build.version}
                         </span>
@@ -557,8 +622,8 @@ export async function ProductDetailPage({
                           {formatBuildStatus(build.status, copy)}
                         </span>
                       </div>
-                      <span className="font-numeric text-[11px] text-faint">
-                        SHA-256: {build.sha256Hash.slice(0, 16)}…
+                      <span className={typeNumericElevenFaint}>
+                        {packageCopy.sha256Label}: {build.sha256Hash.slice(0, 16)}…
                       </span>
                     </div>
 
@@ -570,7 +635,7 @@ export async function ProductDetailPage({
                         {copy.size}: {formatFileSize(build.fileSizeBytes)}
                       </span>
                       <span>
-                        MTA:{" "}
+                        {copy.mtaVersion}:{" "}
                         {build.mtaVersionTarget ? `>= ${build.mtaVersionTarget}` : copy.notDeclared}
                       </span>
                       <span>{build.isSigned ? copy.signaturePresent : copy.signatureMissing}</span>
@@ -608,14 +673,14 @@ export async function ProductDetailPage({
             )}
           </section>
 
-          <section className="nexus-panel space-y-4 p-6">
+          <section className={panelSpace4P6}>
             <h2 className="border-b border-base pb-3 text-base font-bold text-primary">
               {copy.usedBy}
             </h2>
             <ReverseDependencyList summary={reverseDependencySummary} locale={locale} />
           </section>
 
-          <section className="nexus-panel space-y-4 p-6">
+          <section className={panelSpace4P6}>
             <h2 className="flex items-center gap-2 border-b border-base pb-3 text-base font-bold text-primary">
               <MessageSquare className="h-4 w-4 text-warning" aria-hidden="true" />
               <span>{copy.reviews}</span>
@@ -628,7 +693,7 @@ export async function ProductDetailPage({
                 action={
                   <Link
                     href={`/market/${encodeURIComponent(product.slug)}`}
-                    className={actionLinkClass}
+                    className={linkAccentSmRounded}
                   >
                     {dictionary.errors.retry}
                   </Link>
@@ -647,7 +712,7 @@ export async function ProductDetailPage({
             {reviewPage && (
               <Link
                 href={`/market/${encodeURIComponent(product.slug)}/reviews`}
-                className={actionLinkClass}
+                className={linkAccentSmRounded}
               >
                 {reviewCopy.all} ({reviewPage.total})
               </Link>
@@ -655,7 +720,7 @@ export async function ProductDetailPage({
             {reviewPage && user && (
               <Link
                 href={`/workspace/library/review/${encodeURIComponent(product.id)}`}
-                className={`${actionLinkClass} ml-4`}
+                className={`${linkAccentSmRounded} ml-4`}
               >
                 {reviewCopy.write}
               </Link>
@@ -667,7 +732,7 @@ export async function ProductDetailPage({
               <ResourceQaPanel
                 productId={product.id}
                 locale={locale}
-                authenticated={Boolean(user)}
+                authenticated={sessionFailed ? null : Boolean(user)}
                 canManage={canManageProduct || isAdmin}
                 initial={qaPage}
                 initialThreadId={initialQaThreadId}

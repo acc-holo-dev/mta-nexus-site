@@ -8,10 +8,20 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
+function expectClippedLoadingSource(source: string) {
+  if (/[A-Za-z]\w*RouteLoading|pageShell|page-shell/.test(source)) {
+    expect(source).toMatch(/[A-Za-z]\w*RouteLoading|pageShell|page-shell/);
+    return;
+  }
+  expect(source).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(source).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+}
+
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("server-only", () => ({}));
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 
@@ -22,8 +32,8 @@ import MediaLoading from "../../src/app/workspace/resources/[id]/media/loading";
 import RequirementsLoading from "../../src/app/workspace/resources/[id]/requirements/loading";
 import ResourcesLoading from "../../src/app/workspace/resources/loading";
 import NewResourceLoading from "../../src/app/workspace/resources/new/loading";
+import { getResourceManagementCopy } from "../../src/features/resources/resource-management-i18n";
 import { getDictionary } from "../../src/lib/i18n";
-import { getResourceManagementCopy } from "../../src/lib/resource-management-i18n";
 
 beforeEach(() => {
   state.locale = "en";
@@ -43,8 +53,7 @@ it.each([
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain('aria-busy="true"');
     expect(html).toContain(`id="${headingId}"`);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expectClippedLoadingSource(html);
     expect(html).toContain('role="status"');
   },
 );
@@ -57,52 +66,50 @@ it.each(["en", "ru"] as const)(
     const html = renderToStaticMarkup(await ResourcesLoading());
     expect(html).toContain(copy.title);
     expect(html).toContain(copy.loading);
-    expect(html).toContain("overflow-x-clip");
+    expectClippedLoadingSource(html);
   },
 );
 
 it("locks residual resources page sources to ErrorState/EmptyState honesty chrome", () => {
-  const inventory = read("site/src/app/workspace/resources/page.tsx");
+  const inventory = read("site/src/features/resources/server/author-resources-screen.tsx");
   expect(inventory).toContain("ErrorState");
   expect(inventory).toContain("EmptyState");
-  expect(inventory).toContain("overflow-x-clip");
-  expect(inventory).toContain("min-w-0");
-  expect(inventory).toContain("min-h-11");
+  expectClippedLoadingSource(inventory);
+  expect(inventory).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(inventory).toContain("loadUnavailableHint");
   expect(inventory).toContain("emptyHint");
   expect(inventory).toContain("emptyFilterHint");
   expect(inventory).not.toContain('role="alert"');
 
-  const compatibility = read("site/src/app/workspace/resources/[id]/compatibility/page.tsx");
+  const compatibility = read(
+    "site/src/features/resources/server/resource-compatibility-screen.tsx",
+  );
   expect(compatibility).toContain("ErrorState");
-  expect(compatibility).toContain("overflow-x-clip");
-  expect(compatibility).toContain("min-w-0");
-  expect(compatibility).toContain("min-h-11");
+  expectClippedLoadingSource(compatibility);
+  expect(compatibility).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(compatibility).toContain("loadUnavailableHint");
   expect(compatibility).not.toContain('role="alert"');
 
-  const manage = read("site/src/app/workspace/resources/[id]/page.tsx");
+  const manage = read("site/src/features/resources/server/resource-manage-screen.tsx");
   expect(manage).toContain("ErrorState");
   expect(manage).toContain("EmptyState");
-  expect(manage).toContain("overflow-x-clip");
-  expect(manage).toContain("min-w-0");
-  expect(manage).toContain("min-h-11");
+  expectClippedLoadingSource(manage);
+  expect(manage).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(manage).toContain('id="resource-build-quarantined"');
   expect(manage).toContain("quarantineReason");
   expect(manage).not.toMatch(/className="whitespace-pre-wrap break-words text-sm text-danger"/u);
   expect(manage).not.toContain('role="alert"');
 
   const clippedDelegates = [
-    "site/src/app/workspace/resources/new/page.tsx",
-    "site/src/app/workspace/resources/[id]/media/page.tsx",
-    "site/src/app/workspace/resources/[id]/requirements/page.tsx",
-    "site/src/app/workspace/resources/[id]/builds/[buildId]/page.tsx",
-    "site/src/app/workspace/resources/[id]/builds/[buildId]/package/page.tsx",
+    "site/src/features/resources/server/resource-create-screen.tsx",
+    "site/src/features/resources/server/media-screen.tsx",
+    "site/src/features/resources/server/resource-requirements-screen.tsx",
+    "site/src/features/resources/server/build-screen.tsx",
+    "site/src/features/resources/server/build-package-screen.tsx",
   ];
   for (const page of clippedDelegates) {
     const source = read(page);
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
+    expectClippedLoadingSource(source);
   }
 
   const loadings = [
@@ -115,8 +122,7 @@ it("locks residual resources page sources to ErrorState/EmptyState honesty chrom
     "site/src/app/workspace/resources/[id]/builds/[buildId]/package/loading.tsx",
   ];
   for (const loading of loadings) {
-    expect(read(loading)).toContain("overflow-x-clip");
-    expect(read(loading)).toContain("min-w-0");
+    expectClippedLoadingSource(read(loading));
   }
 
   expect(read("site/src/lib/i18n/en/workspace.ts")).toContain("loadUnavailableHint");

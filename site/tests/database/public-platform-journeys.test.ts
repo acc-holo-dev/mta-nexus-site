@@ -10,7 +10,7 @@ import {
 } from "@nexus/db";
 import type { Product, User } from "@nexus/domain";
 import { beforeAll, describe, expect, it } from "vitest";
-import { commerceService } from "../../src/lib/services/commerce-service";
+import { commerceService } from "../../src/lib/services/commerce/commerce-service";
 import { setNotificationPreferencesForTest } from "../helpers/notification-preferences-fixture";
 
 describe("Nexus 1.2 Public Platform Journeys", () => {
@@ -99,7 +99,7 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
     const notification = await notificationRepository.create({
       id: `not_${Date.now()}`,
       recipientId: devUser.id,
-      title: "New Follower",
+      title: "New Follower / Новый подписчик",
       message: `@${playerUser.username} followed your updates.`,
       type: "system",
       link: `/users/${playerUser.username}`,

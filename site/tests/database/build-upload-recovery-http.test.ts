@@ -2,11 +2,11 @@ import { createHash } from "node:crypto";
 import { AppError, ForbiddenError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import packageFixtures from "../fixtures/build-packages.json";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../helpers/browser-mutation-headers";
-import packageFixtures from "../fixtures/build-packages.json";
 
 const mocks = vi.hoisted(() => ({
   authorize: vi.fn(),
@@ -16,19 +16,19 @@ const mocks = vi.hoisted(() => ({
   remove: vi.fn(),
   scan: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => ({ id: "usr_author", role: "developer" })),
   },
 }));
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: {
     assertCanReleaseBuild: mocks.authorize,
     releaseBuild: mocks.release,
     recoverPendingBuildUpload: mocks.recover,
   },
 }));
-vi.mock("../../src/lib/services/build-scanner-service", () => ({
+vi.mock("../../src/lib/services/resources/build-scanner-service", () => ({
   buildScannerService: { scan: mocks.scan },
 }));
 vi.mock("@nexus/storage", () => ({

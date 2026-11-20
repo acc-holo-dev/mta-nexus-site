@@ -14,7 +14,7 @@ const changePassword = vi.hoisted(() =>
 );
 const consumeRateLimit = vi.hoisted(() => vi.fn(async () => ({ success: state.allowed })));
 
-vi.mock("../../../../lib/services/auth-service", () => ({
+vi.mock("../../../../lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
     changePassword,

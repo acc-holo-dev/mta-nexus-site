@@ -1,0 +1,71 @@
+{
+  "allowlist": [
+    {
+      "id": "shell.meta.title-template",
+      "kind": "template",
+      "path": "site/src/features/shell/server/root-layout-metadata.tsx",
+      "text": "%s | MTA NEXUS"
+    }
+  ],
+  "findings": [
+    {
+      "allowlist_id": "shell.meta.title-template",
+      "kind": "template",
+      "line": 12,
+      "path": "site/src/features/shell/server/root-layout-metadata.tsx",
+      "text": "%s | MTA NEXUS"
+    }
+  ],
+  "scan_roots": [
+    "site/src/features/accounts/server",
+    "site/src/features/commerce/server",
+    "site/src/features/community/server",
+    "site/src/features/discovery/server",
+    "site/src/features/library/server",
+    "site/src/features/moderation/server",
+    "site/src/features/notifications/server",
+    "site/src/features/organizations/server",
+    "site/src/features/resources/server",
+    "site/src/features/servers/server",
+    "site/src/features/shell/server",
+    "site/src/features/support/server",
+    "site/src/features/trust/server",
+    "site/src/features/community/components/community-report-groups.tsx",
+    "site/src/features/community/components/community-report-history.tsx",
+    "site/src/features/community/components/discussion-comment-actions.tsx",
+    "site/src/features/community/components/object-mute-controls.tsx",
+    "site/src/features/community/components/report-evidence-links.tsx",
+    "site/src/features/resources/components/admin-resource-qa-report-actions.tsx",
+    "site/src/features/resources/components/author-resource-forms.tsx",
+    "site/src/features/resources/components/build-package-evidence.tsx",
+    "site/src/features/resources/components/mta-meta-inspector-panel.tsx",
+    "site/src/features/resources/components/resource-cart-review-evidence.tsx",
+    "site/src/features/resources/components/resource-copy-metadata.tsx",
+    "site/src/features/resources/components/resource-moderation-controls.tsx",
+    "site/src/features/resources/components/resource-publication-readiness-panel.tsx",
+    "site/src/features/resources/components/resource-publisher-filters.tsx",
+    "site/src/features/resources/components/resource-publisher-workspace-nav.tsx",
+    "site/src/features/resources/components/resource-qa-report-form.tsx",
+    "site/src/features/resources/components/resource-release-watch-batch-controls.tsx",
+    "site/src/features/resources/components/resource-requirements-report-body.tsx",
+    "site/src/features/resources/components/resource-submission-success.tsx",
+    "site/src/features/resources/components/resource-variants-form.tsx",
+    "site/src/features/servers/components/server-claim-control-panel.tsx",
+    "site/src/features/servers/components/server-observation-period-controls.tsx",
+    "site/src/features/servers/components/server-review-panel.tsx",
+    "site/src/features/servers/components/server-statistics-export-button.tsx",
+    "site/src/features/servers/components/server-workspace-nav.tsx",
+    "site/src/features/support/components/support-case-actions.tsx",
+    "site/src/features/support/components/support-status-history.tsx",
+    "site/src/features/trust/components/public-user-trust.tsx"
+  ],
+  "scope": "Git-tracked feature server/ RSC screens plus residual interactive components not covered by shell-home / public-guest / workspace-member inventories — hard-coded member/staff-facing literals + locale copy ternaries.",
+  "source_sha": "e6479fde148fddb81b5877fea8c15bd4a52a7e1e",
+  "summary": {
+    "allowlisted": 1,
+    "findings": 1,
+    "locale_copy_ternaries": 0,
+    "scanned_files": 286,
+    "unallowlisted": 0
+  }
+}

@@ -1,14 +1,14 @@
 import { setTimeout as delay } from "node:timers/promises";
 import { closeDatabaseConnection } from "@nexus/db";
-import { notifyDiscussionReplies } from "../src/lib/services/discussion-follow-notification-service";
+import { notifyDiscussionReplies } from "../src/lib/services/community/discussion-follow-notification-service";
 import {
   type ReplayCheckpoint,
   replayDiscussionNotifications,
-} from "../src/lib/services/discussion-notification-replay";
+} from "../src/lib/services/community/discussion-notification-replay";
 import {
   DiscussionReplayPermanentError,
   runDiscussionReplayWorker,
-} from "../src/lib/services/discussion-replay-worker";
+} from "../src/lib/services/community/discussion-replay-worker";
 import {
   assertDiscussionReplayClosedWindow,
   previewDiscussionReplay,

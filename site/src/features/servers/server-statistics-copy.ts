@@ -1,0 +1,181 @@
+import type { Locale } from "../../lib/i18n";
+
+const en = {
+  title: "Server statistics",
+  open: "Detailed statistics",
+  loading: "Loading server statistics…",
+  back: "Back to server",
+  management: "Back to server management",
+  description: "Explore saved MTA master-list observations and compare consecutive periods.",
+  scope:
+    "Counts and averages describe recorded observations. Averages are per observation, not weighted by duration; gaps are unknown and never represent downtime.",
+  lifetime:
+    "History follows this listing across address changes. Earlier observations cannot be assigned to a specific endpoint revision.",
+  private: "Available to current server managers and platform administrators.",
+  paused:
+    "This listing is currently excluded from collection. Previously stored observations may remain available.",
+  pausedHint:
+    "Stored samples may still appear below. This is a collection block, not an empty statistics period.",
+  current: "Selected period",
+  previous: "Previous equal-length period",
+  comparison: "Period comparison",
+  samples: "Observations",
+  known: "With player counts",
+  peak: "Peak players",
+  average: "Average players",
+  change: "Change in observed average",
+  unknown: "Unknown",
+  yes: "Yes",
+  no: "No",
+  empty: "No stored observations in this period.",
+  emptyHint: "Choose another period or check that the existing collector is running.",
+  observations: "Recorded observations",
+  observationsScope:
+    "Newest first, 25 per page. Period totals and chart include all matching records.",
+  time: "Observed at (UTC)",
+  players: "Players",
+  capacity: "Capacity",
+  mode: "Game mode",
+  map: "Map",
+  version: "MTA version",
+  password: "Password required",
+  responding: "Responding",
+  earlier: "Earlier observations",
+  latest: "Newest observations in this period",
+  refresh: "Refresh period",
+  windows: "Observation period",
+  endUtc: "Period ends at (UTC)",
+  choosePeriod: "Open this period",
+  periodScope:
+    "Choose an end within the last 90 days. The selected duration is counted back from this UTC time.",
+  adjacent: "Adjacent observation periods",
+  previousPeriod: "Previous period",
+  nextPeriod: "Next period",
+  period24h: "24 hours",
+  period7d: "7 days",
+  period30d: "30 days",
+  chart: "Observed player peaks by interval",
+  chartScope:
+    "Missing intervals have no player value. The table preserves zero-player observations.",
+  export: "Download interval CSV",
+  exportSamples: "Download this observation page as CSV",
+  downloading: "Preparing download…",
+  endOfPage: "No earlier recorded observations in this period.",
+  endOfPageHint: "Return to the newest observations or choose another period end.",
+  exportScope:
+    "Interval CSV includes the entire selected period, including empty intervals. Observation CSV contains only the displayed page. Exports retain the displayed period end.",
+  snapshot: "Period end",
+  snapshotScope:
+    "Period boundaries stay fixed across pages. Later saved observations may change the results.",
+  unavailable: "Statistics are temporarily unavailable. Retry this period.",
+  unavailableHint:
+    "This does not invent observations. Retry the selected period after the statistics service recovers.",
+  retry: "Retry",
+  invalid: "Invalid period or page link. Open the latest period to continue.",
+  invalidHint:
+    "Open the latest statistics period. An invalid link is not an empty traffic period and does not change server visibility.",
+  expired: "This observation page is no longer available. Return to the newest observations.",
+  signIn: "Sign in to view statistics",
+  signInAction: "Sign in",
+  navigation: "Observation pages",
+  notFound: "Server not found",
+  limit: "Too many statistics requests. Try again shortly.",
+  forbidden: "You no longer have access to this server.",
+  exportErrorHint: "No file was downloaded. Retry keeps the same period and page selection.",
+};
+const ru: typeof en = {
+  title: "Статистика сервера",
+  open: "Подробная статистика",
+  loading: "Загрузка статистики сервера…",
+  back: "Назад к серверу",
+  management: "Назад к управлению сервером",
+  description:
+    "Просматривайте сохранённые наблюдения MTA master-list и сравнивайте соседние периоды.",
+  scope:
+    "Количество и средние значения относятся к сохранённым наблюдениям. Среднее рассчитано по наблюдениям, без взвешивания по времени; пропуски неизвестны и не означают простой.",
+  lifetime:
+    "История сохраняется за карточкой при смене адреса. Более ранние наблюдения нельзя отнести к определённой версии адреса.",
+  private: "Доступно текущим управляющим сервера и администраторам платформы.",
+  paused:
+    "Сейчас эта карточка исключена из сбора данных. Ранее сохранённые наблюдения могут оставаться доступными.",
+  pausedHint:
+    "Сохранённые выборки могут по-прежнему отображаться ниже. Это блокировка сбора, а не пустой период статистики.",
+  current: "Выбранный период",
+  previous: "Предыдущий период той же длины",
+  comparison: "Сравнение периодов",
+  samples: "Наблюдения",
+  known: "С числом игроков",
+  peak: "Пик игроков",
+  average: "Среднее число игроков",
+  change: "Изменение наблюдаемого среднего",
+  unknown: "Неизвестно",
+  yes: "Да",
+  no: "Нет",
+  empty: "В этом периоде нет сохранённых наблюдений.",
+  emptyHint: "Выберите другой период или проверьте работу существующего сборщика.",
+  observations: "Сохранённые наблюдения",
+  observationsScope:
+    "Сначала новые, по 25 на странице. Итоги и график учитывают все записи периода.",
+  time: "Время наблюдения (UTC)",
+  players: "Игроки",
+  capacity: "Вместимость",
+  mode: "Игровой режим",
+  map: "Карта",
+  version: "Версия MTA",
+  password: "Нужен пароль",
+  responding: "Отвечает",
+  earlier: "Более ранние наблюдения",
+  latest: "Новые наблюдения этого периода",
+  refresh: "Обновить период",
+  windows: "Период наблюдений",
+  endUtc: "Конец периода (UTC)",
+  choosePeriod: "Открыть этот период",
+  periodScope:
+    "Выберите конец за последние 90 дней. Длительность отсчитывается назад от этого времени UTC.",
+  adjacent: "Соседние периоды наблюдений",
+  previousPeriod: "Предыдущий период",
+  nextPeriod: "Следующий период",
+  period24h: "24 часа",
+  period7d: "7 дней",
+  period30d: "30 дней",
+  chart: "Наблюдаемые пики игроков по интервалам",
+  chartScope:
+    "У пропущенных интервалов нет значения числа игроков. Наблюдения с нулём игроков сохраняются в таблице.",
+  export: "Скачать CSV интервалов",
+  exportSamples: "Скачать эту страницу наблюдений в CSV",
+  downloading: "Подготовка загрузки…",
+  endOfPage: "В этом периоде больше нет более ранних наблюдений.",
+  endOfPageHint: "Вернитесь к новым наблюдениям или выберите другой конец периода.",
+  exportScope:
+    "CSV интервалов включает весь выбранный период, в том числе пустые интервалы. CSV наблюдений содержит только показанную страницу. Выгрузки сохраняют отображаемый конец периода.",
+  snapshot: "Конец периода",
+  snapshotScope:
+    "Границы периода сохраняются при переходе между страницами. Позже сохранённые наблюдения могут изменить результат.",
+  unavailable: "Статистика временно недоступна. Повторите загрузку этого периода.",
+  unavailableHint:
+    "Это не создаёт наблюдения. Повторите выбранный период после восстановления сервиса статистики.",
+  retry: "Повторить",
+  invalid: "Некорректная ссылка на период или страницу. Откройте последний период для продолжения.",
+  invalidHint:
+    "Откройте последний период статистики. Некорректная ссылка — не пустой период трафика и не смена видимости сервера.",
+  expired: "Эта страница наблюдений больше недоступна. Вернитесь к новым наблюдениям.",
+  signIn: "Войдите, чтобы открыть статистику",
+  signInAction: "Войти",
+  navigation: "Страницы наблюдений",
+  notFound: "Сервер не найден",
+  limit: "Слишком много запросов статистики. Повторите позже.",
+  forbidden: "У вас больше нет доступа к этому серверу.",
+  exportErrorHint: "Файл не скачан. Повтор сохраняет тот же период и выбранную страницу.",
+};
+export const serverStatisticsCopy = (locale: Locale) => (locale === "ru" ? ru : en);
+export function serverStatisticsError(locale: Locale, code: unknown) {
+  const copy = serverStatisticsCopy(locale);
+  if (code === "UNAUTHORIZED" || code === "ACTOR_ID_REQUIRED") return copy.signIn;
+  if (code === "ACTOR_CHANGED" || code === "CONFLICT") return copy.unavailable;
+  if (code === "NOT_FOUND") return copy.notFound;
+  if (code === "FORBIDDEN") return copy.forbidden;
+  if (code === "RATE_LIMITED" || code === "RATE_LIMIT_EXCEEDED") return copy.limit;
+  if (code === "VALIDATION_ERROR") return copy.invalid;
+  if (code === "SERVER_OBSERVATION_PAGE_EXPIRED") return copy.expired;
+  return copy.unavailable;
+}

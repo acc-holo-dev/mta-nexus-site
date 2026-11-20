@@ -12,7 +12,8 @@ describe("public search hardening", () => {
     expect(route).not.toContain("getClientIp(request.headers)");
     expect(route).toContain("MAX_QUERY_LENGTH");
     expect(route).toContain("SEARCH_TYPES");
-    expect(route).toContain("Unknown search type");
+    expect(route).toContain("discoverySearchApiCopy");
+    expect(route).toContain("copy.unknownType");
     expect(route).toMatch(
       /Math\.min\(\s*Math\.max\(\s*Math\.floor\(requestedLimit\),\s*1,?\s*\),\s*DEFAULT_LIMIT,?\s*\)/u,
     );
@@ -21,7 +22,7 @@ describe("public search hardening", () => {
 
   it("bounds every discovery source and the final result set", () => {
     const service = readFileSync(
-      resolve(process.cwd(), "site/src/lib/services/discovery-service.ts"),
+      resolve(process.cwd(), "site/src/lib/services/discovery/discovery-service.ts"),
       "utf8",
     );
 

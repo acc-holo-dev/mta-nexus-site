@@ -92,13 +92,18 @@ describe("mainline repository policy", () => {
       "server-packs.md",
     ]);
     expect(readdirSync(resolve(process.cwd(), "docs/current")).sort()).toEqual([
+      "code-topology.md",
+      "design-direction.md",
       "development.md",
       "domains",
       "quality.md",
       "system.md",
     ]);
     expect(readdirSync(resolve(process.cwd(), "docs/current/domains")).sort()).toEqual([
-      ".gitkeep",
+      "COMMUNITY.md",
+      "RESOURCES.md",
+      "SERVERS-ORGS.md",
+      "TRUST-STAFF.md",
     ]);
     expect(readdirSync(resolve(process.cwd(), "docs/issues")).sort()).toEqual(["constraints.md"]);
     expect(readdirSync(resolve(process.cwd(), "docs/archive")).sort()).toEqual([
@@ -115,8 +120,8 @@ describe("mainline repository policy", () => {
     const readme = read("README.md");
     expect(readme).toContain("docs/AGENT.md");
     expect(readme).toContain("docs/DECISIONS.md");
-    expect(readme).toContain("docs/RESOURCES.md");
-    expect(readme).toContain("docs/TRUST-STAFF.md");
+    expect(readme).toContain("docs/current/domains/RESOURCES.md");
+    expect(readme).toContain("docs/current/domains/TRUST-STAFF.md");
     expect(readme).toContain("docs/handbook/00-README.md");
     expect(readme).toContain("docs/handbook/13-DECISION-REGISTER.md");
     expect(readme).toContain("docs/OPERATIONS.md");

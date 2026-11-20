@@ -1,13 +1,27 @@
 import { PRODUCT_TYPES, type ProductType } from "@nexus/domain";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { ChevronLeft, ChevronRight, Search, ShoppingBag } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { ProductCard } from "../view";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { formatUnknown } from "../../../lib/i18n/unknown";
+import { productService } from "../../../lib/services/commerce/product-service";
+import { linkAccentSm } from "../../shell/link-shell";
+import { pageShellStack6 } from "../../shell/page-shell";
+import {
+  typeFlexMinCenterGap25Display,
+  typeFlexWrapCenterJustifyGap3,
+  typeFlexWrapGap2,
+  typeIcon6Accent,
+  typeMinBreakWords,
+  typeMt05CaptionMuted,
+  typeSemiboldPrimary,
+  typeSmMuted,
+} from "../../shell/type-shell";
 import { MARKET_PAGE_SIZE, MAX_MARKET_PAGE, marketHref, parseMarketQuery } from "../model";
-import { PRODUCT_CATEGORY_KEYS } from "../../../lib/product-type-labels";
-import { productService } from "../../../lib/services/product-service";
+import { PRODUCT_CATEGORY_KEYS } from "../product-type-labels";
+import { ProductCard } from "../view";
 
 const CATEGORIES = [
   { id: "all", key: "all" },
@@ -20,8 +34,11 @@ const SORTS = [
   { id: "rating", key: "rating" },
 ] as const;
 
-const actionLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+export async function marketMetadata(): Promise<Metadata> {
+  return {
+    title: `${getDictionary(await getRequestLocale()).product.market} | MTA NEXUS`,
+  };
+}
 
 export async function MarketPage({
   searchParams,
@@ -76,21 +93,21 @@ export async function MarketPage({
   const activeQueryLabel = query ? `${dictionary.market.searchLabel}: ${query}` : null;
 
   return (
-    <div className="min-w-0 space-y-6 overflow-x-clip">
+    <div className={pageShellStack6}>
       <div className="flex min-w-0 flex-col justify-between gap-3 pb-1 md:flex-row md:items-center">
         <div className="min-w-0">
-          <h1 className="flex min-w-0 items-center gap-2.5 font-display text-primary">
-            <ShoppingBag className="h-6 w-6 shrink-0 text-accent" />
-            <span className="min-w-0 break-words">{dictionary.market.title}</span>
+          <h1 className={typeFlexMinCenterGap25Display}>
+            <ShoppingBag className={typeIcon6Accent} />
+            <span className={typeMinBreakWords}>{dictionary.market.title}</span>
           </h1>
-          <p className="mt-0.5 font-caption text-muted">
-            {dictionary.market.showing} {catalog?.products.length ?? "—"}
+          <p className={typeMt05CaptionMuted}>
+            {dictionary.market.showing} {formatUnknown(locale, catalog?.products.length)}
           </p>
         </div>
       </div>
 
       <search aria-label={dictionary.market.searchLabel}>
-        <form action="/market" method="get" className="flex flex-wrap gap-2">
+        <form action="/market" method="get" className={typeFlexWrapGap2}>
           <input type="hidden" name="type" value={type} />
           <input type="hidden" name="sort" value={sort} />
           <label htmlFor="market-query" className="sr-only">
@@ -110,7 +127,7 @@ export async function MarketPage({
             {dictionary.market.searchButton}
           </Button>
           {query ? (
-            <Link href={buildHref(type, sort, "")} className={actionLinkClass}>
+            <Link href={buildHref(type, sort, "")} className={linkAccentSm}>
               {dictionary.market.clearQuery}
             </Link>
           ) : null}
@@ -166,8 +183,9 @@ export async function MarketPage({
       {!catalog ? (
         <ErrorState
           title={dictionary.market.loadUnavailable}
+          description={dictionary.market.loadUnavailableHint}
           action={
-            <Link href={catalogHref} className={actionLinkClass}>
+            <Link href={catalogHref} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -203,7 +221,7 @@ export async function MarketPage({
             <div className="mx-auto max-w-lg space-y-4">
               {filtersActive ? (
                 <div className="space-y-2 text-left text-sm text-secondary">
-                  <p className="font-semibold text-primary">{dictionary.market.activeFilters}</p>
+                  <p className={typeSemiboldPrimary}>{dictionary.market.activeFilters}</p>
                   <ul className="list-inside list-disc space-y-1">
                     {activeCategoryLabel ? <li>{activeCategoryLabel}</li> : null}
                     {activeSortLabel ? <li>{activeSortLabel}</li> : null}
@@ -216,7 +234,7 @@ export async function MarketPage({
                   </ul>
                 </div>
               ) : null}
-              <div className="flex flex-wrap items-center justify-center gap-3">
+              <div className={typeFlexWrapCenterJustifyGap3}>
                 {page > 1 ? (
                   <Link
                     href={buildHref(type, sort, query)}
@@ -226,16 +244,16 @@ export async function MarketPage({
                   </Link>
                 ) : null}
                 {query ? (
-                  <Link href={buildHref(type, sort, "")} className={actionLinkClass}>
+                  <Link href={buildHref(type, sort, "")} className={linkAccentSm}>
                     {dictionary.market.clearQuery}
                   </Link>
                 ) : null}
                 {type !== "all" ? (
-                  <Link href={buildHref("all", sort, query)} className={actionLinkClass}>
+                  <Link href={buildHref("all", sort, query)} className={linkAccentSm}>
                     {dictionary.market.clearCategory}
                   </Link>
                 ) : null}
-                <Link href="/market" className={actionLinkClass}>
+                <Link href="/market" className={linkAccentSm}>
                   {dictionary.market.clear}
                 </Link>
               </div>
@@ -260,7 +278,7 @@ export async function MarketPage({
           ) : (
             <span />
           )}
-          <span className="text-sm text-muted">
+          <span className={typeSmMuted}>
             {dictionary.market.pageLabel} {page}
           </span>
           {catalog.hasMore && page < MAX_MARKET_PAGE ? (

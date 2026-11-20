@@ -1,3 +1,3 @@
 import "server-only";
 
-export { PublicResourceVersionsPage } from "./server/versions-page";
+export { PublicResourceVersionsPage, publicResourceVersionsMetadata } from "./server/versions-page";

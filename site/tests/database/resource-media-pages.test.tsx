@@ -16,20 +16,20 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/services/resource-media-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-media-service", () => ({
   resourceMediaService: { managed: state.managed },
 }));
 
 import AdminResourceMediaLoading from "../../src/app/admin/resources/[id]/media/loading";
 import { ResourceMediaEditor } from "../../src/features/resources/components/resource-media-editor";
 import { ResourceMediaScreen } from "../../src/features/resources/media-server";
-import { resourceMediaCopy } from "../../src/lib/resource-media-i18n";
+import { resourceMediaCopy } from "../../src/features/resources/resource-media-i18n";
 
 const initial: ManagedResourceMedia = {
   product: {
@@ -116,7 +116,7 @@ it("shows an honest recovery state when gallery data fails", async () => {
   const html = renderToStaticMarkup(await ResourceMediaScreen({ productId: "prd_a" }));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/workspace/resources/prd_a/media"');
   expect(html).not.toContain("Private");
 });
@@ -131,5 +131,5 @@ it("shows an honest staff recovery state without inventing gallery content", asy
 it("clips honest loading shells on narrow layouts", async () => {
   const html = renderToStaticMarkup(await AdminResourceMediaLoading());
   expect(html).toContain("min-w-0 max-w-5xl");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });

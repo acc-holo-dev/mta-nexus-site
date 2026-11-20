@@ -1,17 +1,17 @@
 import { collectionCommandItemResults, LIBRARY_COLLECTION_BATCH_LIMIT } from "@nexus/domain";
 import { expect, it } from "vitest";
-import { confirmedCollectionCommand } from "../../src/lib/library-collections-confirmation";
+import { libraryCollectionCommandSchema } from "../../packages/validation/src/library-collections";
+import { confirmedCollectionCommand } from "../../src/features/library/library-collections-confirmation";
 import {
   libraryCollectionError,
   libraryCollectionsCopy,
-} from "../../src/lib/library-collections-i18n";
+} from "../../src/features/library/library-collections-i18n";
 import {
   collectionHref,
   collectionId,
   collectionPageParams,
   collectionsQuery,
-} from "../../src/lib/library-collections-query";
-import { libraryCollectionCommandSchema } from "../../packages/validation/src/library-collections";
+} from "../../src/features/library/library-collections-query";
 import {
   libraryCollectionsContractCreate as create,
   libraryCollectionsContractCurrent as current,

@@ -1,12 +1,12 @@
 import { Buffer } from "node:buffer";
 import { createECDH, createPublicKey, verify as verifySignature } from "node:crypto";
-import { describe, expect, it } from "vitest";
 import type { WebPushVapidConfig } from "@nexus/config";
 import { WebPushPermanentPayloadError, WebPushPermanentSubscriptionError } from "@nexus/db";
+import { describe, expect, it } from "vitest";
 import {
   createVapidAuthorization,
   encryptWebPushMessage,
-} from "../../src/lib/services/web-push-crypto";
+} from "../../src/lib/services/notifications/web-push-crypto";
 
 function decode(value: string) {
   return Buffer.from(value, "base64url");

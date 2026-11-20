@@ -1,12 +1,21 @@
 "use client";
 import { Button, ErrorState } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
-import type { DiscussionPage } from "../../../lib/content-discussion-contract";
-import { discussionMutationError, getDiscussionCopy } from "../../../lib/content-discussion-copy";
-import { confirmsDiscussionMutation } from "../../../lib/discussion-mutation-confirmation";
 import type { Locale } from "../../../lib/i18n";
-import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
+import { linkAccentSm } from "../../shell/link-shell";
+import {
+  typeFlexWrapGap3,
+  typeMinH11Xs,
+  typeSmSecondary,
+  typeXsMuted,
+  typeXsSuccess,
+} from "../../shell/type-shell";
+import type { DiscussionPage } from "../content-discussion-contract";
+import { discussionMutationError, getDiscussionCopy } from "../content-discussion-copy";
+import { confirmsDiscussionMutation } from "../discussion-mutation-confirmation";
+import { platformFieldClass, platformRequest } from "../user-platform-client";
+import { getUserPlatformCopy } from "../user-platform-copy";
 export function DiscussionCommentActions({
   comment,
   own,
@@ -33,6 +42,12 @@ export function DiscussionCommentActions({
   editable?: boolean;
 }) {
   const copy = getDiscussionCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(text)
+      ? text
+      : fallback;
+  }
   const [mode, setMode] = useState<"edit" | "remove" | null>(null),
     [text, setText] = useState(comment.text);
   // A refresh may replace the row while a draft/confirmation is open.
@@ -91,7 +106,7 @@ export function DiscussionCommentActions({
     } catch (failure) {
       if (alive.current) {
         setBlocked(true);
-        setError(failure instanceof Error ? failure.message : copy.writeUnavailable);
+        setError(safeMessage(failure, copy.writeUnavailable));
       }
     } finally {
       busy.current = false;
@@ -148,11 +163,11 @@ export function DiscussionCommentActions({
   return (
     <div className="space-y-3" aria-busy={pending}>
       {!mode ? (
-        <div className="flex flex-wrap gap-3">
+        <div className={typeFlexWrapGap3}>
           {own && editable && (
             <Button
               type="button"
-              className="min-h-11 text-xs"
+              className={typeMinH11Xs}
               disabled={disabled || blocked}
               onClick={() => {
                 setText(comment.text);
@@ -168,7 +183,7 @@ export function DiscussionCommentActions({
           )}
           <Button
             type="button"
-            className="min-h-11 text-xs"
+            className={typeMinH11Xs}
             disabled={disabled || blocked}
             onClick={() => {
               if (own) {
@@ -209,7 +224,7 @@ export function DiscussionCommentActions({
             </label>
           ) : (
             <>
-              <p className="text-sm text-secondary">{copy.moderateRemoveNote}</p>
+              <p className={typeSmSecondary}>{copy.moderateRemoveNote}</p>
               <label className="block space-y-1 text-xs text-secondary">
                 {copy.reason}
                 <textarea
@@ -224,10 +239,10 @@ export function DiscussionCommentActions({
               </label>
             </>
           )}
-          <div className="flex flex-wrap gap-3">
+          <div className={typeFlexWrapGap3}>
             <Button
               type="submit"
-              className="min-h-11 text-xs"
+              className={typeMinH11Xs}
               disabled={pending || disabled || stale || blocked}
               variant="outline"
             >
@@ -235,7 +250,7 @@ export function DiscussionCommentActions({
             </Button>
             <Button
               type="button"
-              className="min-h-11 text-xs"
+              className={typeMinH11Xs}
               disabled={pending}
               onClick={() => setMode(null)}
               variant="outline"
@@ -256,7 +271,7 @@ export function DiscussionCommentActions({
                   recoveryHref ??
                   `/articles/${encodeURIComponent(slug)}?comment=${encodeURIComponent(comment.id)}#comment-${encodeURIComponent(comment.id)}`
                 }
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentSm}
               >
                 {copy.reloadSaved}
               </a>
@@ -266,17 +281,17 @@ export function DiscussionCommentActions({
       ) : null}
       {(stale || blocked) && mode === "edit" && (
         <div className="space-y-2">
-          <p className="text-xs text-muted">{copy.draftKept}</p>
+          <p className={typeXsMuted}>{copy.draftKept}</p>
           <Button
             type="button"
-            className="min-h-11 text-xs"
+            className={typeMinH11Xs}
             variant="outline"
             onClick={() => void copyDraft()}
           >
             {copy.copyDraft}
           </Button>
           {draftNotice && (
-            <p role="status" className="text-xs text-success">
+            <p role="status" className={typeXsSuccess}>
               {draftNotice}
             </p>
           )}

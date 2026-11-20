@@ -3,9 +3,15 @@
 import { Button, ErrorState } from "@nexus/ui";
 import { BellRing } from "lucide-react";
 import { useEffect, useId, useState } from "react";
-import { notificationInboxCopy } from "../../../lib/notification-inbox-copy";
-import { confirmAction } from "../../../components/confirm-action";
-import { useNexusLocale } from "../../../components/locale-context";
+import { confirmAction } from "../../shell/confirm-action";
+import { useNexusLocale } from "../../shell/locale";
+import {
+  typeFlexCenterGap2SmSemiboldPrimary,
+  typeIconAccent,
+  typeMt1XsMuted,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import { notificationInboxCopy } from "../notification-inbox-copy";
 
 type PushStatus =
   | "loading"
@@ -425,20 +431,21 @@ export function WebPushSettings({ expectedIdentity }: { expectedIdentity: PushId
         aria-describedby={openBetaNoteId}
         className="mt-4 flex flex-col gap-3 rounded-lg border border-base bg-inset p-4"
       >
-        <h3 id={titleId} className="flex items-center gap-2 text-sm font-semibold text-primary">
-          <BellRing className="h-4 w-4 text-accent" aria-hidden="true" />
+        <h3 id={titleId} className={typeFlexCenterGap2SmSemiboldPrimary}>
+          <BellRing className={typeIconAccent} aria-hidden="true" />
           <span>{copy.webPush}</span>
         </h3>
         <ErrorState
           id="web-push-settings-status"
           title={copy.webPushError}
+          description={copy.webPushErrorHint}
           action={
             <Button type="button" size="touch" variant="outline" onClick={retryLoad}>
               {copy.retry}
             </Button>
           }
         />
-        <p id={openBetaNoteId} className="text-xs text-muted">
+        <p id={openBetaNoteId} className={typeXsMuted}>
           {openBetaNote}
         </p>
       </section>
@@ -452,18 +459,18 @@ export function WebPushSettings({ expectedIdentity }: { expectedIdentity: PushId
       className="mt-4 flex flex-col gap-3 rounded-lg border border-base bg-inset p-4 sm:flex-row sm:items-center sm:justify-between"
     >
       <div className="min-w-0">
-        <h3 id={titleId} className="flex items-center gap-2 text-sm font-semibold text-primary">
-          <BellRing className="h-4 w-4 text-accent" aria-hidden="true" />
+        <h3 id={titleId} className={typeFlexCenterGap2SmSemiboldPrimary}>
+          <BellRing className={typeIconAccent} aria-hidden="true" />
           <span>{copy.webPush}</span>
         </h3>
-        <p id={descriptionId} className="mt-1 text-xs text-muted">
+        <p id={descriptionId} className={typeMt1XsMuted}>
           {description}
         </p>
-        <p id={openBetaNoteId} className="mt-1 text-xs text-muted">
+        <p id={openBetaNoteId} className={typeMt1XsMuted}>
           {openBetaNote}
         </p>
         {shownStatus === "disabled" && unregisteredLocal && (
-          <p className="mt-1 text-xs text-muted">{copy.webPushCleanupHint}</p>
+          <p className={typeMt1XsMuted}>{copy.webPushCleanupHint}</p>
         )}
         <span role="status" aria-live="polite" aria-atomic="true" className="sr-only">
           {description}
@@ -491,7 +498,7 @@ export function WebPushSettings({ expectedIdentity }: { expectedIdentity: PushId
           {copy.webPushEnable}
         </Button>
       ) : shownStatus === "loading" ? (
-        <span aria-hidden="true" className="text-xs text-muted">
+        <span aria-hidden="true" className={typeXsMuted}>
           {copy.webPushLoading}
         </span>
       ) : null}

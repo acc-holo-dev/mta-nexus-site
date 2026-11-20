@@ -4,7 +4,16 @@ import { Button, ErrorState, fieldControlClass } from "@nexus/ui";
 import { MailCheck } from "lucide-react";
 import type { FormEvent } from "react";
 import type { getDictionary } from "../../../lib/i18n";
-import type { SettingsRecoveryEmail } from "../../../lib/settings-client-api";
+import { panelSpace4P5Shadow } from "../../shell/panel-shell";
+import {
+  typeBlockSmPrimary,
+  typeFlexCenterGap2,
+  typeIconAccent,
+  typeSmMuted,
+  typeSmSemiboldPrimary,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import type { SettingsRecoveryEmail } from "../settings-client-api";
 
 type SettingsCopy = ReturnType<typeof getDictionary>["settings"];
 
@@ -28,13 +37,10 @@ export function SettingsRecoveryEmailSection({
   onSubmit,
 }: Props) {
   return (
-    <section
-      aria-labelledby="recovery-email-heading"
-      className="nexus-panel space-y-4 p-5 shadow-nexus-sm"
-    >
-      <div className="flex items-center gap-2">
-        <MailCheck className="h-4 w-4 text-accent" aria-hidden="true" />
-        <h2 id="recovery-email-heading" className="text-sm font-semibold text-primary">
+    <section aria-labelledby="recovery-email-heading" className={panelSpace4P5Shadow}>
+      <div className={typeFlexCenterGap2}>
+        <MailCheck className={typeIconAccent} aria-hidden="true" />
+        <h2 id="recovery-email-heading" className={typeSmSemiboldPrimary}>
           {copy.recoveryEmail}
         </h2>
       </div>
@@ -44,7 +50,7 @@ export function SettingsRecoveryEmailSection({
           <div className="rounded-md border border-base bg-inset px-3 py-3 space-y-2">
             <div className="break-all text-sm text-primary">{recoveryEmail.email}</div>
             {recoveryEmail.verified ? (
-              <div className="text-xs text-muted">
+              <div className={typeXsMuted}>
                 {`${copy.verifiedForRecovery}${
                   recoveryEmail.verifiedAt
                     ? ` ${copy.verifiedOn} ${new Date(recoveryEmail.verifiedAt).toLocaleString(
@@ -54,20 +60,28 @@ export function SettingsRecoveryEmailSection({
                 }.`}
               </div>
             ) : recoveryEmail.eligible ? (
-              <ErrorState id="settings-recovery-not-verified" title={copy.recoveryNotVerified} />
+              <ErrorState
+                id="settings-recovery-not-verified"
+                title={copy.recoveryNotVerified}
+                description={copy.recoveryNotVerifiedHint}
+              />
             ) : (
-              <ErrorState id="settings-recovery-unavailable" title={copy.recoveryUnavailable} />
+              <ErrorState
+                id="settings-recovery-unavailable"
+                title={copy.recoveryUnavailable}
+                description={copy.recoveryUnavailableHint}
+              />
             )}
           </div>
 
           {!recoveryEmail.verified && recoveryEmail.eligible && (
             <form onSubmit={onSubmit} aria-label={copy.verifyRecoveryEmail} className="space-y-3">
-              <p id="recovery-email-policy" className="text-sm text-muted">
+              <p id="recovery-email-policy" className={typeSmMuted}>
                 {copy.recoveryPolicy}
               </p>
 
               <div className="max-w-sm space-y-1">
-                <label htmlFor="recovery-current-password" className="block text-sm text-primary">
+                <label htmlFor="recovery-current-password" className={typeBlockSmPrimary}>
                   {copy.recoveryPassword}
                 </label>
                 <input

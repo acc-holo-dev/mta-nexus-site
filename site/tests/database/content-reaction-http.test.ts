@@ -1,10 +1,11 @@
-import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../helpers/browser-mutation-headers";
-import { AppError } from "@nexus/domain";
+
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
   state: vi.fn(),
@@ -14,10 +15,10 @@ const mocks = vi.hoisted(() => ({
   trust: vi.fn(),
   rate: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../../src/lib/services/content-reaction-service", () => ({
+vi.mock("../../src/lib/services/community/content-reaction-service", () => ({
   contentReactionService: {
     state: mocks.state,
     set: mocks.set,
@@ -25,17 +26,19 @@ vi.mock("../../src/lib/services/content-reaction-service", () => ({
     remove: mocks.remove,
   },
 }));
-vi.mock("../../src/lib/services/public-user-trust-service", () => ({
+vi.mock("../../src/lib/services/trust/public-user-trust-service", () => ({
   publicUserTrustService: { get: mocks.trust },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
-vi.mock("../../src/lib/request-client-ip", () => ({
+vi.mock("../../src/features/shell/request-client-ip", () => ({
   getTrustedRequestIp: () => "trusted-ip",
 }));
-import { GET as state, PUT } from "../../src/app/api/content/[slug]/reactions/route";
-import { GET as page } from "../../src/app/api/workspace/reactions/route";
-import { DELETE } from "../../src/app/api/workspace/reactions/[id]/route";
+
+import { PUT, GET as state } from "../../src/app/api/content/[slug]/reactions/route";
 import { GET as trust } from "../../src/app/api/users/[username]/trust/route";
+import { DELETE } from "../../src/app/api/workspace/reactions/[id]/route";
+import { GET as page } from "../../src/app/api/workspace/reactions/route";
+
 const actor = { id: "actor", role: "user" },
   publication = { params: Promise.resolve({ slug: "guide" }) },
   cleanup = { params: Promise.resolve({ id: "content" }) },

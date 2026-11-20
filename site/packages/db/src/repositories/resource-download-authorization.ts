@@ -1,7 +1,7 @@
+import { AppError, type Build, ForbiddenError, NotFoundError } from "@nexus/domain";
 import { eq } from "drizzle-orm";
-import { AppError, ForbiddenError, NotFoundError, type Build } from "@nexus/domain";
 import { db } from "../client";
-import { auditEvents, builds, products, users, resourceDeliveryReceipts } from "../schema";
+import { auditEvents, builds, products, resourceDeliveryReceipts, users } from "../schema";
 import { lockUserDownloadAccess } from "./entitlements";
 import { lockInitiatingSession } from "./initiating-session";
 import { assertProductMutationAuthority } from "./product-mutation-authority";

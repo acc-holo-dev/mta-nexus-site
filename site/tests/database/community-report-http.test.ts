@@ -14,10 +14,10 @@ const mocks = vi.hoisted(() => ({
   decide: vi.fn(),
   rate: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../../src/lib/services/community-report-service", () => ({
+vi.mock("../../src/lib/services/community/community-report-service", () => ({
   communityReportService: mocks,
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));

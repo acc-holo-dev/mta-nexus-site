@@ -1,10 +1,10 @@
 import { AppError, UnauthorizedError, ValidationError } from "@nexus/domain";
 import { licenseOwnerCommandSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
-import { readBoundedJson } from "../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
-import { licenseControlService } from "../../../../../lib/services/license-control-service";
+import { resourceCommerceRequest } from "../../../../../features/resources/resource-commerce-http";
+import { readBoundedJson } from "../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
+import { licenseControlService } from "../../../../../lib/services/commerce/license-control-service";
 
 export const POST = withBrowserMutation(
   (request: NextRequest, context: { params: Promise<{ id: string }> }) => {

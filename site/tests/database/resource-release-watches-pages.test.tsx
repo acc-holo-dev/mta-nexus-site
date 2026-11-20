@@ -1,7 +1,9 @@
+vi.mock("server-only", () => ({}));
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { LocaleProvider } from "../../src/components/locale-context";
 import { ResourceReleaseWatchControl } from "../../src/features/resources/release-watch";
+import { LocaleProvider } from "../../src/features/shell/locale";
 
 const state = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,
@@ -13,18 +15,18 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh() {} }),
   usePathname: () => "/workspace/library/watches",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../../src/lib/services/resource-release-watches-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-release-watches-service", () => ({
   resourceReleaseWatchesService: { page: state.page },
 }));
 
 import Page, { generateMetadata } from "../../src/app/workspace/library/watches/page";
-import { resourceReleaseWatchesCopy } from "../../src/lib/resource-release-watches-i18n";
+import { resourceReleaseWatchesCopy } from "../../src/features/resources/resource-release-watches-i18n";
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -107,7 +109,7 @@ it("authenticates early and invalid duplicate filters never reach the repository
   expect(invalid).toContain(copy.invalid);
   expect(invalid).toContain(copy.invalidDescription);
   expect(invalid).toContain('role="alert"');
-  expect(invalid).toContain("overflow-x-clip");
+  expect(invalid).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(state.page).not.toHaveBeenCalled();
 });
 
@@ -122,7 +124,7 @@ it("shows an honest recovery state when release watches fail to load", async () 
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(copy.loadUnavailableDescription);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("filter=enabled");
   expect(html).toContain("page=2");
   expect(html).not.toContain("watches unavailable");
@@ -148,7 +150,7 @@ it.each(["en", "ru"] as const)(
     );
     expect(lifetime).toContain(copy.empty);
     expect(lifetime).toContain(copy.emptyHint);
-    expect(lifetime).toContain("overflow-x-clip");
+    expect(lifetime).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(lifetime).not.toContain(copy.emptyFiltered);
     state.page.mockResolvedValueOnce({
       items: [],

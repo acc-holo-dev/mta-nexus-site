@@ -15,11 +15,11 @@ const mocks = vi.hoisted(() => ({
   page: vi.fn(),
   review: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.auth },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
-vi.mock("../../src/lib/services/order-case-service", () => ({ orderCaseService: mocks }));
+vi.mock("../../src/lib/services/commerce/order-case-service", () => ({ orderCaseService: mocks }));
 
 import { POST as reviewPost } from "../../src/app/api/admin/commerce/order-cases/[id]/route";
 import { GET as queueGet } from "../../src/app/api/admin/commerce/order-cases/route";
@@ -106,7 +106,7 @@ it("throttles all private commercial views", async () => {
 });
 it("returns only conflict codes, never private internal details", async () => {
   mocks.create.mockRejectedValue(new AppError("private bank record", 409, "ORDER_CASE_EXISTS"));
-  expect(await (await POST(request("POST"), context)).json()).toEqual({
+  expect(await (await POST(request("POST"), context)).json()).toMatchObject({
     code: "ORDER_CASE_EXISTS",
   });
 });

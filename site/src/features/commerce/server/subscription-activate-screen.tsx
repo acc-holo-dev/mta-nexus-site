@@ -1,0 +1,140 @@
+import { AppError } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { subscriptionsService } from "../../../lib/services/commerce/subscriptions-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax5xl } from "../../shell/page-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import { typeFlexWrapGap4 } from "../../shell/type-shell";
+import { PlanReviewTerms } from "../plan-reviews-workspace";
+import { SubscriptionControls } from "../subscription-controls";
+import { subscriptionNavLinkClass } from "../subscription-workspace";
+import { subscriptionError, subscriptionsCopy } from "../subscriptions-i18n";
+import { subscriptionActivationQuery, subscriptionPageParams } from "../subscriptions-query";
+export async function subscriptionActivateMetadata(): Promise<Metadata> {
+  return {
+    title: `${subscriptionsCopy(await getRequestLocale()).activate} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
+export async function SubscriptionActivateScreen({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const [store, locale, raw] = await Promise.all([cookies(), getRequestLocale(), searchParams]),
+    c = subscriptionsCopy(locale),
+    dictionary = getDictionary(locale);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={c.loadUnavailable}
+        retryHref={"/workspace/subscriptions/activate"}
+      />
+    );
+  }
+
+  if (!actor) {
+    const params = subscriptionPageParams(raw);
+    return (
+      <PlatformSignIn
+        locale={locale}
+        returnPath={`/workspace/subscriptions/activate${params.size ? `?${params}` : ""}`}
+      />
+    );
+  }
+  let recoveryRetry = "/workspace/subscriptions/activate";
+  try {
+    const pageParams = subscriptionPageParams(raw);
+    recoveryRetry = `/workspace/subscriptions/activate${pageParams.size ? `?${pageParams}` : ""}`;
+    const query = subscriptionActivationQuery(pageParams),
+      plan = await subscriptionsService.plan(query.planId);
+    if (!plan || plan.revision !== query.revision)
+      throw new AppError("Plan changed", 409, "SUBSCRIPTION_PLAN_CHANGED");
+    if (plan.price !== 0)
+      throw new AppError("Payment required", 409, "SUBSCRIPTION_PAYMENT_REQUIRED");
+    const scopes =
+      plan.scope === "organization"
+        ? await subscriptionsService.scopes(actor, query.scopePage)
+        : { scopes: [], page: 1, totalPages: 1 };
+    const href = (page: number) =>
+      `/workspace/subscriptions/activate?${new URLSearchParams({ planId: plan.id, revision: String(plan.revision), scopePage: String(page) })}`;
+    return (
+      <section className={pageShellMax5xl}>
+        <Link href="/subscriptions" className={subscriptionNavLinkClass}>
+          {c.catalog}
+        </Link>
+        <h1 className="font-display">{c.activate}</h1>
+        <PlanReviewTerms terms={plan} locale={locale} />
+        <p>
+          {c.revision}: {plan.revision} · {plan.scope === "user" ? c.personal : c.organization}
+        </p>
+        <SubscriptionControls
+          action="activate"
+          actorId={actor.id}
+          planId={plan.id}
+          planRevision={plan.revision}
+          terms={plan}
+          scope={plan.scope}
+          scopes={scopes.scopes}
+        />
+        <nav className={typeFlexWrapGap4} aria-label={c.organization}>
+          {scopes.page > 1 && (
+            <Link href={href(scopes.page - 1)} className={subscriptionNavLinkClass}>
+              {c.previous}
+            </Link>
+          )}
+          {scopes.page < scopes.totalPages && (
+            <Link href={href(scopes.page + 1)} className={subscriptionNavLinkClass}>
+              {c.scopeMore}
+            </Link>
+          )}
+        </nav>
+      </section>
+    );
+  } catch (error) {
+    if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
+    if (error instanceof AppError && [400, 409].includes(error.statusCode))
+      return (
+        <section className={pageShellMax5xl}>
+          <ErrorState
+            title={subscriptionError(locale, error.code)}
+            description={c.selectionRecoverHint}
+            action={
+              <Link href="/subscriptions" className={subscriptionNavLinkClass}>
+                {dictionary.errors.retry}
+              </Link>
+            }
+          />
+        </section>
+      );
+    return (
+      <section className={pageShellMax5xl}>
+        <Link href="/subscriptions" className={subscriptionNavLinkClass}>
+          {c.catalog}
+        </Link>
+        <ErrorState
+          title={c.loadUnavailable}
+          description={c.loadUnavailableHint}
+          action={
+            <Link href={recoveryRetry} className={subscriptionNavLinkClass}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </section>
+    );
+  }
+}

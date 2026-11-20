@@ -2,19 +2,20 @@
 import { Button, ErrorState } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { moderationCopy } from "../../../lib/community-moderation-copy";
 import type { Locale } from "../../../lib/i18n";
+import { confirmAction } from "../../shell/confirm-action";
+import { linkAccentSm } from "../../shell/link-shell";
+import { surfaceSpace3P4 } from "../../shell/surface-shell";
+import { typeSmSuccess } from "../../shell/type-shell";
+import { moderationCopy } from "../community-moderation-copy";
 import {
   confirmsModeratedDiscussionRemoval,
   moderatedDiscussionHref,
   moderatedDiscussionRemoveSchema,
-} from "../../../lib/moderated-discussion-contract";
-import {
-  moderatedDiscussionCopy,
-  moderatedDiscussionError,
-} from "../../../lib/moderated-discussion-copy";
-import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
-import { confirmAction } from "../../../components/confirm-action";
+} from "../moderated-discussion-contract";
+import { moderatedDiscussionCopy, moderatedDiscussionError } from "../moderated-discussion-copy";
+import { platformFieldClass, platformRequest } from "../user-platform-client";
+import { getUserPlatformCopy } from "../user-platform-copy";
 export function ModeratedDiscussionRemoval({
   contentId,
   commentId,
@@ -37,6 +38,16 @@ export function ModeratedDiscussionRemoval({
     router = useRouter(),
     copy = moderatedDiscussionCopy(locale),
     general = moderationCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [
+      ...Object.values(copy),
+      ...Object.values(general),
+      ...Object.values(getUserPlatformCopy(locale)),
+    ].includes(text)
+      ? text
+      : fallback;
+  }
   useEffect(() => {
     alive.current = true;
     return () => {
@@ -86,7 +97,7 @@ export function ModeratedDiscussionRemoval({
     } catch (failure) {
       if (alive.current) {
         setBlocked(true);
-        setError(failure instanceof Error ? failure.message : general.uncertain);
+        setError(safeMessage(failure, general.uncertain));
       }
     } finally {
       guard.current = false;
@@ -94,7 +105,7 @@ export function ModeratedDiscussionRemoval({
     }
   }
   return (
-    <section className="space-y-3 rounded-lg border border-base p-4" aria-busy={pending}>
+    <section className={surfaceSpace3P4} aria-busy={pending}>
       <label className="block space-y-2 text-sm text-primary">
         <span>{copy.reason}</span>
         <textarea
@@ -126,7 +137,7 @@ export function ModeratedDiscussionRemoval({
           action={
             blocked ? (
               <a
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentSm}
                 href={moderatedDiscussionHref(contentId, undefined, undefined, commentId)}
               >
                 {general.reload}
@@ -136,13 +147,13 @@ export function ModeratedDiscussionRemoval({
         />
       ) : null}
       {message && (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {message}
         </p>
       )}
       {blocked && !error ? (
         <a
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentSm}
           href={moderatedDiscussionHref(contentId, undefined, undefined, commentId)}
         >
           {general.reload}

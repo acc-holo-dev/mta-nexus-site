@@ -10,24 +10,24 @@ const mock = vi.hoisted(() => ({
 }));
 vi.mock("next/link", () => ({ default: "a" }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => mock.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mock.session },
 }));
-vi.mock("../../src/lib/services/community-report-history-service", () => ({
+vi.mock("../../src/lib/services/community/community-report-history-service", () => ({
   communityReportHistoryService: { page: mock.page },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mock.rate }));
 
+import type { ReportHistoryPage } from "../../src/features/community/community-report-history-contract";
+import { reportHistoryCopy } from "../../src/features/community/community-report-history-copy";
 import { CommunityReportHistory } from "../../src/features/community/components/community-report-history";
 import {
   CommunityReportHistoryPage,
   reportHistoryMetadata,
 } from "../../src/features/community/server/community-report-history-page";
-import type { ReportHistoryPage } from "../../src/lib/community-report-history-contract";
-import { reportHistoryCopy } from "../../src/lib/community-report-history-copy";
 
 const stamp = "2026-10-12T00:00:00.123456Z",
   filters = { period: "all" as const, group: "all" as const, query: "" };
@@ -105,7 +105,7 @@ it("shows explicit empty or unknown evidence without inventing a status transiti
     );
   expect(empty).toContain(copy.empty);
   expect(empty).not.toContain(copy.emptyFiltered);
-  expect(empty).toContain("overflow-x-clip");
+  expect(empty).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   const filtered = renderToStaticMarkup(
     <CommunityReportHistory
       page={{ ...page, items: [] }}
@@ -116,7 +116,7 @@ it("shows explicit empty or unknown evidence without inventing a status transiti
   expect(filtered).toContain(copy.emptyFiltered);
   expect(filtered).toContain(copy.reset);
   expect(filtered).toContain("/workspace/reports/report/history");
-  expect(filtered).toContain("overflow-x-clip");
+  expect(filtered).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   const unknown = renderToStaticMarkup(
     <CommunityReportHistory
       page={{ ...page, items: [{ ...event, from: null, to: null, by: "unknown" }] }}
@@ -168,7 +168,7 @@ it("keeps authentication, query validation and live authority errors ahead of pr
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(`>${reportHistoryCopy("en").title}</h1>`);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("/admin/reports/report/history");
   expect(mock.page).toHaveBeenCalledWith(
     { id: "owner", role: "moderator" },

@@ -1,8 +1,10 @@
 import Link from "next/link";
-import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
-import { collectionHref } from "../../../lib/library-collections-query";
-import { libraryCollectionsService as service } from "../../../lib/services/library-collections-service";
+import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
+import { pageShellMax2xlStandard } from "../../shell/page-shell";
+import { typeSmMuted, typeSmSecondary } from "../../shell/type-shell";
 import { LibraryCollectionCommandForm } from "../collection-command";
+import { libraryCollectionsCopy } from "../library-collections-i18n";
+import { collectionHref } from "../library-collections-query";
 import {
   type LibraryCollectionsActor,
   libraryCollectionsLinkClass,
@@ -20,7 +22,7 @@ export async function LibraryCollectionsCopyView({
   const c = libraryCollectionsCopy(locale);
   const preview = await service.copyPreview(actor, id);
   return (
-    <div className="mx-auto max-w-2xl space-y-6 py-8">
+    <div className={pageShellMax2xlStandard}>
       <Link href={collectionHref(id)} className={libraryCollectionsLinkClass}>
         {c.back}
       </Link>
@@ -32,10 +34,10 @@ export async function LibraryCollectionsCopyView({
         {c[preview.source.status]} · {c.revision}: {preview.source.revision} · {c.items}:{" "}
         {preview.itemCount}
       </p>
-      <p role="note" className="text-sm text-secondary">
+      <p role="note" className={typeSmSecondary}>
         {c.copyNote}
       </p>
-      <p className="text-sm text-muted">{c.limit}</p>
+      <p className={typeSmMuted}>{c.limit}</p>
       <LibraryCollectionCommandForm
         key={`copy:${actor.id}:${id}:${preview.source.revision}:${preview.sourceDigest}`}
         actorId={actor.id}

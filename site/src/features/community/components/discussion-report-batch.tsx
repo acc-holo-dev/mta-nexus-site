@@ -4,25 +4,41 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { z } from "zod";
-import { communityReportCopy } from "../../../lib/community-report-copy";
-import { reportGroupsCopy } from "../../../lib/community-report-groups-copy";
-import type { discussionReportsPageSchema } from "../../../lib/discussion-reports-contract";
-import { discussionReportsCopy } from "../../../lib/discussion-reports-copy";
 import type { Locale } from "../../../lib/i18n";
 import {
   confirmsReportBatchCommand,
   confirmsReportBatchPreview,
   type ReportBatchPreview,
   reportBatchPreviewInput,
-} from "../../../lib/report-batch-contract";
-import { reportBatchCopy, reportBatchError } from "../../../lib/report-batch-copy";
-import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
+} from "../../moderation/report-batch-contract";
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
-} from "../../../components/action-confirm-checkbox";
-import { confirmAction } from "../../../components/confirm-action";
+} from "../../shell/action-confirm-checkbox";
+import { confirmAction } from "../../shell/confirm-action";
+import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
+import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
+import {
+  typeFlexMinH11CenterGap3SmPrimary,
+  typeFlexWrapGap3,
+  typeGrid2Gap4,
+  typeLgSemiboldPrimary,
+  typePrewrapSmPrimary,
+  typeSemiboldPrimary,
+  typeSmMuted,
+  typeSmPrimary,
+  typeSmSemiboldPrimary,
+  typeSmSuccess,
+  typeSpace1SmPrimary,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import { communityReportCopy } from "../community-report-copy";
+import { reportGroupsCopy } from "../community-report-groups-copy";
+import type { discussionReportsPageSchema } from "../discussion-reports-contract";
+import { discussionReportsCopy } from "../discussion-reports-copy";
+import { reportBatchCopy, reportBatchError } from "../report-batch-copy";
+import { platformFieldClass, platformRequest } from "../user-platform-client";
+import { getUserPlatformCopy } from "../user-platform-copy";
 
 type Input = z.infer<typeof reportBatchPreviewInput>;
 export function DiscussionReportBatch({
@@ -200,22 +216,20 @@ export function DiscussionReportBatch({
   return (
     <section className="space-y-4" aria-busy={busy}>
       {allowActions && available.length > 0 && (
-        <div className="nexus-panel space-y-4 p-5">
-          <h2 className="text-lg font-semibold text-primary">{copy.title}</h2>
-          <p className="text-sm text-muted">
-            {commentId === null ? copy.publicationHelp : copy.help}
-          </p>
-          <p className="text-xs text-muted">
+        <div className={panelSpace4P5}>
+          <h2 className={typeLgSemiboldPrimary}>{copy.title}</h2>
+          <p className={typeSmMuted}>{commentId === null ? copy.publicationHelp : copy.help}</p>
+          <p className={typeXsMuted}>
             {commentId === null ? copy.publicationActionHint : copy.noRemoval}
           </p>
           <fieldset disabled={busy || !!preview || blocked} className="space-y-4">
-            <legend className="text-sm text-primary">
+            <legend className={typeSmPrimary}>
               {copy.selected}: {selected.length}
             </legend>
-            <div className="flex flex-wrap gap-3">
+            <div className={typeFlexWrapGap3}>
               <Button
                 type="button"
-                className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkGhostAccentSm}
                 onClick={() => {
                   resetReview();
                   setSelected(available.map((item) => item.id));
@@ -226,7 +240,7 @@ export function DiscussionReportBatch({
               </Button>
               <Button
                 type="button"
-                className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkGhostAccentSm}
                 onClick={() => {
                   resetReview();
                   setSelected([]);
@@ -236,8 +250,8 @@ export function DiscussionReportBatch({
                 {copy.clear}
               </Button>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <label className="space-y-1 text-sm text-primary">
+            <div className={typeGrid2Gap4}>
+              <label className={typeSpace1SmPrimary}>
                 <span>{copy.action}</span>
                 <select
                   className={platformFieldClass}
@@ -261,7 +275,7 @@ export function DiscussionReportBatch({
                   ))}
                 </select>
               </label>
-              <label className="space-y-1 text-sm text-primary">
+              <label className={typeSpace1SmPrimary}>
                 <span>{copy.notes}</span>
                 <textarea
                   className={platformFieldClass}
@@ -289,7 +303,7 @@ export function DiscussionReportBatch({
         </div>
       )}
       {busy && (
-        <p role="status" className="text-sm text-muted">
+        <p role="status" className={typeSmMuted}>
           {copy.busy}
         </p>
       )}
@@ -301,7 +315,7 @@ export function DiscussionReportBatch({
             blocked && !busy ? (
               <Button
                 type="button"
-                className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkGhostAccentSm}
                 onClick={() => router.refresh()}
                 variant="ghost"
               >
@@ -312,14 +326,14 @@ export function DiscussionReportBatch({
         />
       ) : null}
       {saved && (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {copy.saved}
         </p>
       )}
       {blocked && !busy && !error ? (
         <Button
           type="button"
-          className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkGhostAccentSm}
           onClick={() => router.refresh()}
           variant="ghost"
         >
@@ -327,13 +341,13 @@ export function DiscussionReportBatch({
         </Button>
       ) : null}
       {preview && (
-        <div className="nexus-panel space-y-4 p-5">
-          <h3 className="font-semibold text-primary">{copy.previewTitle}</h3>
+        <div className={panelSpace4P5}>
+          <h3 className={typeSemiboldPrimary}>{copy.previewTitle}</h3>
           <p className="break-words text-sm text-primary">{preview.publication.title}</p>
-          <p className="text-sm font-semibold text-primary">
+          <p className={typeSmSemiboldPrimary}>
             {commentId === null ? copy.publication : copy.comment}
           </p>
-          <p className="whitespace-pre-wrap break-words text-sm text-primary">
+          <p className={typePrewrapSmPrimary}>
             {preview.commentId === null && "text" in preview.publication
               ? preview.publication.text
               : (preview.comment?.text ?? copy.removed)}
@@ -341,10 +355,8 @@ export function DiscussionReportBatch({
           {(preview.comment?.truncated ||
             (preview.commentId === null &&
               "truncated" in preview.publication &&
-              preview.publication.truncated)) && (
-            <p className="text-xs text-muted">{copy.truncated}</p>
-          )}
-          <p className="whitespace-pre-wrap break-words text-sm text-primary">
+              preview.publication.truncated)) && <p className={typeXsMuted}>{copy.truncated}</p>}
+          <p className={typePrewrapSmPrimary}>
             {copy.notes}: {preview.notes}
           </p>
           <ol className="space-y-3">
@@ -356,10 +368,8 @@ export function DiscussionReportBatch({
                 >
                   {labels[item.type]} · {item.id}
                 </Link>
-                <p className="whitespace-pre-wrap break-words text-sm text-primary">
-                  {item.reason}
-                </p>
-                <p className="text-xs text-muted">
+                <p className={typePrewrapSmPrimary}>{item.reason}</p>
+                <p className={typeXsMuted}>
                   {copy.transition}: {labels[item.before]} → {labels[item.after]}
                 </p>
               </li>
@@ -375,7 +385,7 @@ export function DiscussionReportBatch({
           >
             {copy.commitConfirm}
           </ActionConfirmCheckbox>
-          <div className="flex flex-wrap gap-3">
+          <div className={typeFlexWrapGap3}>
             <Button
               type="button"
               disabled={busy || blocked || !commitAcknowledged}
@@ -388,7 +398,7 @@ export function DiscussionReportBatch({
             <Button
               type="button"
               disabled={busy || blocked}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
               onClick={() => resetReview()}
               variant="ghost"
             >
@@ -400,9 +410,9 @@ export function DiscussionReportBatch({
       {items.length ? (
         <ul className="space-y-3">
           {items.map((item) => (
-            <li key={item.id} className="nexus-panel space-y-3 p-5">
+            <li key={item.id} className={panelSpace3P5}>
               {allowActions && ["open", "under_review"].includes(item.status) && (
-                <label className="flex min-h-11 items-center gap-3 text-sm text-primary">
+                <label className={typeFlexMinH11CenterGap3SmPrimary}>
                   <input
                     type="checkbox"
                     checked={selected.includes(item.id)}
@@ -414,11 +424,11 @@ export function DiscussionReportBatch({
                   </span>
                 </label>
               )}
-              <p className="text-sm font-semibold text-primary">
+              <p className={typeSmSemiboldPrimary}>
                 {labels[item.type]} · {labels[item.status]}
               </p>
-              <p className="whitespace-pre-wrap break-words text-sm text-primary">{item.reason}</p>
-              <time dateTime={item.createdAt} className="text-xs text-muted">
+              <p className={typePrewrapSmPrimary}>{item.reason}</p>
+              <time dateTime={item.createdAt} className={typeXsMuted}>
                 {new Date(item.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                   timeZone: "UTC",
                   timeZoneName: "short",
@@ -434,7 +444,7 @@ export function DiscussionReportBatch({
           ))}
         </ul>
       ) : (
-        <div className="nexus-panel space-y-3 p-5">
+        <div className={panelSpace3P5}>
           <p className="text-muted">
             {commentId === null
               ? reportGroupsCopy(locale).publicationEmpty
@@ -446,7 +456,7 @@ export function DiscussionReportBatch({
                 ? `/admin/community/${encodeURIComponent(contentId)}/reports`
                 : `/admin/community/${encodeURIComponent(contentId)}/discussion/${encodeURIComponent(commentId)}/reports`
             }
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentSm}
           >
             {commentId === null
               ? reportGroupsCopy(locale).reset

@@ -3,10 +3,18 @@
 import { Button, ErrorState } from "@nexus/ui";
 import { createReportSchema } from "@nexus/validation";
 import { type FormEvent, useRef, useState } from "react";
-import type { Locale } from "../../../lib/i18n";
-import { privateApiRequest } from "../../../lib/private-api-request";
-import { resourceQaCopy, resourceQaError } from "../../../lib/resource-qa-i18n";
-import { GuestAuthLinks } from "../../../components/guest-auth-links";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
+import { getDictionary, type Locale } from "../../../lib/i18n";
+import { GuestAuthLinks } from "../../shell/guest-auth";
+import { linkGhostAccentSmBare } from "../../shell/link-shell";
+import { surfaceMinSpace2BgP3 } from "../../shell/surface-shell";
+import {
+  typeBlockMinSpace1XsMuted,
+  typeFlexWrapGap2,
+  typeXsMuted,
+  typeXsSuccess,
+} from "../../shell/type-shell";
+import { resourceQaCopy, resourceQaError } from "../resource-qa-i18n";
 
 const REPORT_TYPES = createReportSchema.shape.type.options;
 
@@ -19,7 +27,8 @@ export function ResourceQaReportForm({
 }: {
   threadId: string;
   locale: Locale;
-  authenticated: boolean;
+  /** `null` = session probe failed (not a guest). */
+  authenticated: boolean | null;
   loginHref: string;
   registerHref: string;
 }) {
@@ -94,10 +103,20 @@ export function ResourceQaReportForm({
     }
   }
 
+  if (authenticated === null) {
+    return (
+      <ErrorState
+        id="resource-qa-report-identity-unavailable"
+        title={copy.identityUnavailable}
+        description={copy.identityUnavailableDescription}
+      />
+    );
+  }
+
   if (!authenticated) {
     return (
       <div className="space-y-1">
-        <p className="text-xs text-muted">{copy.reportSignIn}</p>
+        <p className={typeXsMuted}>{copy.reportSignIn}</p>
         <GuestAuthLinks
           loginHref={loginHref}
           registerHref={registerHref}
@@ -109,7 +128,7 @@ export function ResourceQaReportForm({
   }
 
   if (resultId) {
-    return <p className="text-xs text-success">{copy.reportSubmitted}</p>;
+    return <p className={typeXsSuccess}>{copy.reportSubmitted}</p>;
   }
 
   if (!open) {
@@ -118,7 +137,7 @@ export function ResourceQaReportForm({
         type="button"
         variant="ghost"
         size="sm"
-        className="min-h-11 px-0 text-sm text-accent underline"
+        className={linkGhostAccentSmBare}
         onClick={() => setOpen(true)}
       >
         {copy.report}
@@ -127,12 +146,9 @@ export function ResourceQaReportForm({
   }
 
   return (
-    <form
-      className="min-w-0 space-y-2 rounded-lg border border-base bg-surface p-3"
-      onSubmit={onSubmit}
-    >
-      <p className="text-xs text-muted">{copy.reportHelp}</p>
-      <label className="block min-w-0 space-y-1 text-xs text-muted">
+    <form className={surfaceMinSpace2BgP3} onSubmit={onSubmit}>
+      <p className={typeXsMuted}>{copy.reportHelp}</p>
+      <label className={typeBlockMinSpace1XsMuted}>
         <span>{copy.reportType}</span>
         <select
           className="min-h-11 w-full rounded-lg border border-base bg-page px-3 py-2 text-sm text-secondary"
@@ -147,7 +163,7 @@ export function ResourceQaReportForm({
           ))}
         </select>
       </label>
-      <label className="block min-w-0 space-y-1 text-xs text-muted">
+      <label className={typeBlockMinSpace1XsMuted}>
         <span>{copy.reportReason}</span>
         <textarea
           className="min-h-24 w-full rounded-lg border border-base bg-page px-3 py-2 text-sm text-secondary"
@@ -158,8 +174,14 @@ export function ResourceQaReportForm({
           placeholder={copy.reportReasonPlaceholder}
         />
       </label>
-      {error ? <ErrorState id="resource-qa-report-failed" title={error} /> : null}
-      <div className="flex flex-wrap gap-2">
+      {error ? (
+        <ErrorState
+          id="resource-qa-report-failed"
+          title={error}
+          description={getDictionary(locale).errors.formErrorHint}
+        />
+      ) : null}
+      <div className={typeFlexWrapGap2}>
         <Button
           type="submit"
           size="sm"

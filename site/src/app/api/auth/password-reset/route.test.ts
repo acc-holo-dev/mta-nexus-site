@@ -7,18 +7,20 @@ const confirmPasswordReset = vi.hoisted(() => vi.fn(async () => ({ revokedSessio
 const waitForPasswordResetFloor = vi.hoisted(() => vi.fn(async () => undefined));
 const passwordResetTargetMs = vi.hoisted(() => vi.fn(() => 0));
 
-vi.mock("../../../../lib/services/auth-service", () => ({
+vi.mock("../../../../lib/services/accounts/auth-service", () => ({
   authService: {
     requestPasswordReset,
     confirmPasswordReset,
   },
 }));
-vi.mock("../../../../lib/request-client-ip", () => ({
+vi.mock("../../../../features/shell/request-client-ip", () => ({
   getTrustedRequestIp: () => "203.0.113.50",
 }));
-vi.mock("../../../../lib/account-recovery-request-policy", async (importOriginal) => {
+vi.mock("../../../../features/accounts/account-recovery-request-policy", async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import("../../../../lib/account-recovery-request-policy")>();
+    await importOriginal<
+      typeof import("../../../../features/accounts/account-recovery-request-policy")
+    >();
   return {
     ...actual,
     waitForPasswordResetFloor,

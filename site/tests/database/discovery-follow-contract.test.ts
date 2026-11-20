@@ -1,17 +1,17 @@
 import { expect, it } from "vitest";
 import {
-  discoverHref,
-  parseDiscoverApiQuery,
-  parseDiscoverQuery,
-} from "../../src/lib/discover-query";
-import { discoveryCopy } from "../../src/lib/discovery-copy";
-import {
   followCommandSchema,
   followPageSchema,
   parseFollowQuery,
-} from "../../src/lib/follow-workspace-contract";
-import { followCopy } from "../../src/lib/follow-workspace-copy";
-import { formatNotification } from "../../src/lib/notification-copy";
+} from "../../src/features/community/follow-workspace-contract";
+import { followCopy } from "../../src/features/community/follow-workspace-copy";
+import {
+  discoverHref,
+  parseDiscoverApiQuery,
+  parseDiscoverQuery,
+} from "../../src/features/discovery/discover-query";
+import { discoveryCopy } from "../../src/features/discovery/discovery-copy";
+import { formatNotification } from "../../src/features/notifications/notification-copy";
 
 it("preserves all active server filters across canonical page links", () => {
   const state = parseDiscoverQuery({
@@ -93,7 +93,7 @@ it("provides matching RU/EN actions, filters and errors", () => {
 it("localizes persisted follower notifications without interpreting arbitrary messages", () => {
   const copy = { approved: "", rejected: "", version: "", notes: "" };
   const notice = {
-    title: "New Follower",
+    title: "New Follower / Новый подписчик",
     message: "@member started following your activity.",
     data: null,
   };
@@ -143,14 +143,25 @@ it("checks paired latest-comment selectors in paged saved discussions", () => {
 it.each(["follow", "participant"])(
   "localizes fixed generic %s reply notifications in RU/EN",
   (kind) => {
-    const message =
+    const stored =
+      kind === "follow"
+        ? "A publication you follow has a new reply. / В публикации, на которую вы подписаны, появился новый ответ."
+        : "A discussion you participate in has a new reply. / В обсуждении, в котором вы участвуете, появился новый ответ.";
+    const enMessage =
       kind === "follow"
         ? "A publication you follow has a new reply."
         : "A discussion you participate in has a new reply.";
-    const notice = { title: "New discussion reply", message, data: null };
+    const notice = {
+      title: "New discussion reply / Новый ответ в обсуждении",
+      message: stored,
+      data: null,
+    };
     const copy = { approved: "", rejected: "", version: "", notes: "" };
-    expect(formatNotification(notice, copy, "en")).toEqual({ title: notice.title, message });
+    expect(formatNotification(notice, copy, "en")).toEqual({
+      title: "New discussion reply",
+      message: enMessage,
+    });
     expect(formatNotification(notice, copy, "ru").title).toBe("Новый ответ в обсуждении");
-    expect(formatNotification(notice, copy, "ru").message).not.toBe(message);
+    expect(formatNotification(notice, copy, "ru").message).not.toBe(enMessage);
   },
 );

@@ -8,13 +8,13 @@ const mocks = vi.hoisted(() => ({
   directory: vi.fn(),
 }));
 
-vi.mock("../../lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../../lib/i18n/server", () => ({ getRequestLocale: async () => mocks.locale }));
 vi.mock("../../features/discovery/directory-server", () => ({
   DirectoryFilters: () => <form aria-label="filters" />,
   DirectoryResults: mocks.directory,
 }));
 
-import { discoveryCopy } from "../../lib/discovery-copy";
+import { discoveryCopy } from "../../features/discovery/discovery-copy";
 import OrganizationsLoading from "./loading";
 import OrganizationsPage from "./page";
 

@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { expect, it } from "vitest";
-import { formatNotification } from "../../src/lib/notification-copy";
+import { formatNotification } from "../../src/features/notifications/notification-copy";
 
 const reviewCopy = { approved: "", rejected: "", version: "", notes: "" };
 
@@ -22,16 +22,19 @@ it.each(["en", "ru"] as const)(
   (locale) => {
     const staff = formatNotification(
       {
-        title: "Server ownership proof requires review",
-        message: "A verified server control proof is awaiting review.",
+        title:
+          "Server ownership proof requires review / Доказательство контроля сервера требует проверки",
+        message:
+          "A verified server control proof is awaiting review. / Проверенное доказательство контроля сервера ожидает рассмотрения.",
       },
       reviewCopy,
       locale,
     );
     const approved = formatNotification(
       {
-        title: "Verification approved",
-        message: "Server ownership verification was approved.",
+        title: "Verification approved / Верификация одобрена",
+        message:
+          "Server ownership verification was approved. / Подтверждение контроля сервера одобрено.",
       },
       reviewCopy,
       locale,

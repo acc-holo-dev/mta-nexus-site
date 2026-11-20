@@ -1,8 +1,9 @@
 import { expect, it } from "vitest";
 import {
-  libraryCollectionManifestSchema,
   libraryCollectionImportPreviewSchema,
+  libraryCollectionManifestSchema,
 } from "../../packages/validation/src/library-collections";
+
 const collection = { id: "lcol_a", name: "Core", status: "active", revision: 1 },
   date = "2026-10-12T00:00:00.000Z";
 const manifest = {

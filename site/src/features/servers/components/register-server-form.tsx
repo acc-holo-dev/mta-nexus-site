@@ -3,20 +3,31 @@
 import { normalizeMtaAddress } from "@nexus/domain";
 import { Button, ErrorState, fieldControlClass, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { privateApiRequest } from "../../../lib/private-api-request";
-import { confirmedCreatedServer } from "../../../lib/server-mutation-confirmation";
-import { serverMutationErrorMessage } from "../../../lib/server-mutation-errors";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
+import { useNexusLocale } from "../../shell/locale";
+import { pageShellMax2xlPadded } from "../../shell/page-shell";
+import { panelGridClipShadow } from "../../shell/panel-shell";
+import {
+  typeDisplayPrimary,
+  typeItemsStretchPy4,
+  typeLabelBlockUpperSecondary,
+  typeMaxXlSmLeadingMuted,
+  typeSmColSpan2,
+  typeSpace15SmCol2,
+} from "../../shell/type-shell";
+import { confirmedCreatedServer } from "../server-mutation-confirmation";
+import { serverMutationErrorMessage } from "../server-mutation-errors";
 import {
   parseServerOrganizations,
   type ServerOrganizationOption,
-} from "../../../lib/server-organization-options";
-import { useNexusLocale } from "../../../components/locale-context";
-
-const nativeLabelClass = "block font-label uppercase text-secondary";
-
+} from "../server-organization-options";
 export function RegisterServerForm({ actorId }: { actorId: string }) {
-  const { locale, dictionary } = useNexusLocale();
+  const { dictionary } = useNexusLocale();
   const copy = dictionary.serverRegistration;
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return Object.values(copy).includes(text) ? text : fallback;
+  }
   const [organizationsLoading, setOrganizationsLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [verified, setVerified] = useState(false);
@@ -27,7 +38,6 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
   const formRef = useRef<HTMLFormElement>(null);
   const busyRef = useRef(false);
   const slot = `nexus:server-registration:v1:${actorId}`;
-  const message = (ru: string, en: string) => (locale === "ru" ? ru : en);
   useEffect(() => {
     let alive = true;
     async function verify() {
@@ -53,19 +63,14 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
         }
         if (alive) setVerified(true);
       } catch {
-        if (alive)
-          setRecoveryMessage(
-            locale === "ru"
-              ? "Не удалось проверить сессию или восстановить черновик. Обновите страницу и войдите в исходный аккаунт."
-              : "Could not verify your session or restore the draft. Refresh and sign in to the original account.",
-          );
+        if (alive) setRecoveryMessage(copy.restoreFailed);
       }
     }
     void verify();
     return () => {
       alive = false;
     };
-  }, [actorId, slot, locale]);
+  }, [actorId, slot, copy.restoreFailed]);
   useEffect(() => {
     if (!pending || !verified || !formRef.current || organizationsLoading) return;
     for (const [name, value] of Object.entries(pending.fields)) {
@@ -91,20 +96,9 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
       const result = await response.json();
       if (response.status === 401 || result?.code === "ACTOR_CHANGED") {
         setVerified(false);
-        throw new Error(
-          message(
-            "Сессия изменилась. Войдите в исходный аккаунт.",
-            "The session changed. Sign in to the original account.",
-          ),
-        );
+        throw new Error(copy.sessionChanged);
       }
-      if (!response.ok)
-        throw new Error(
-          message(
-            "Не удалось проверить результат. Попробуйте ещё раз.",
-            "Could not check the result. Try again.",
-          ),
-        );
+      if (!response.ok) throw new Error(copy.resultCheckFailed);
       if (
         typeof result?.server?.id === "string" &&
         /^[A-Za-z0-9_-]{1,128}$/u.test(result.server.id)
@@ -113,18 +107,9 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
         window.location.assign(`/workspace/servers/${encodeURIComponent(result.server.id)}`);
         return;
       }
-      setRecoveryMessage(
-        message(
-          "Запись пока не подтверждена. Запрос ещё может завершиться; повторное создание заблокировано. Проверьте список серверов позже.",
-          "The listing is not confirmed yet. The request may still complete; creating another is blocked. Check your server list later.",
-        ),
-      );
+      setRecoveryMessage(copy.listingNotConfirmed);
     } catch (error) {
-      setRecoveryMessage(
-        error instanceof Error
-          ? error.message
-          : message("Не удалось проверить результат.", "Could not check the result."),
-      );
+      setRecoveryMessage(safeMessage(error, copy.resultCheckFailedShort));
     } finally {
       busyRef.current = false;
       setLoading(false);
@@ -242,6 +227,11 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
               SERVER_SLUG_TAKEN: copy.slugTaken,
               SERVER_ENDPOINT_TAKEN: copy.endpointTaken,
               FORBIDDEN: copy.organizationForbidden,
+              UNAUTHORIZED: copy.sessionChanged,
+              ACTOR_ID_REQUIRED: copy.sessionChanged,
+              ACTOR_CHANGED: copy.sessionChanged,
+              VALIDATION_ERROR: copy.createError,
+              CONFLICT: copy.endpointTaken,
               REQUEST_BODY_TOO_LARGE: copy.bodyTooLarge,
               REQUEST_BODY_TIMEOUT: copy.bodyTimedOut,
             },
@@ -252,41 +242,35 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
       window.addEventListener("pagehide", () => sessionStorage.removeItem(slot), { once: true });
       window.location.assign(`/workspace/servers/${encodeURIComponent(serverId)}`);
     } catch (caught) {
-      setError(caught instanceof Error && caught.message ? caught.message : copy.unexpectedError);
+      setError(safeMessage(caught, copy.unexpectedError));
       setLoading(false);
       busyRef.current = false;
     }
   }
 
   return (
-    <div className="mx-auto min-w-0 max-w-2xl space-y-6 overflow-x-clip px-4 py-8 sm:px-0">
+    <div className={pageShellMax2xlPadded}>
       <div className="space-y-1.5">
-        <h1 className="font-display text-primary">{copy.title}</h1>
-        <p className="max-w-xl text-sm leading-relaxed text-muted">{copy.description}</p>
+        <h1 className={typeDisplayPrimary}>{copy.title}</h1>
+        <p className={typeMaxXlSmLeadingMuted}>{copy.description}</p>
       </div>
 
-      {error ? (
-        <ErrorState
-          title={error}
-          description={message(
-            "Результат создания мог остаться неподтверждённым. Проверьте его перед дальнейшими действиями.",
-            "The result may be unconfirmed. Check it before taking further action.",
-          )}
-        />
-      ) : null}
+      {error ? <ErrorState title={error} description={copy.errorMayBeUnconfirmed} /> : null}
       {recoveryMessage ? (
-        <ErrorState id="register-server-session-recovery" title={recoveryMessage} />
+        <ErrorState
+          id="register-server-session-recovery"
+          title={recoveryMessage}
+          description={copy.sessionRecoveryHint}
+        />
       ) : null}
       {verified && pending ? (
         <ErrorState
           id="register-server-create-inconclusive"
-          title={message(
-            "Результат создания неизвестен. Черновик сохранён, повторное создание заблокировано.",
-            "The creation result is unknown. Your draft is saved and creating another is blocked.",
-          )}
+          title={copy.creationResultUnknown}
+          description={copy.listingNotConfirmed}
           action={
             <Button type="button" disabled={loading} onClick={recover}>
-              {message("Проверить результат", "Check result")}
+              {copy.checkResult}
             </Button>
           }
         />
@@ -298,10 +282,10 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
         style={!verified ? { display: "none" } : undefined}
         onSubmit={submit}
         aria-busy={loading}
-        className="nexus-panel grid min-w-0 grid-cols-1 gap-4 overflow-x-clip p-5 shadow-nexus-sm sm:grid-cols-2 sm:p-6"
+        className={panelGridClipShadow}
       >
-        <div className="space-y-1.5 sm:col-span-2">
-          <label htmlFor="server-organization" className={nativeLabelClass}>
+        <div className={typeSpace15SmCol2}>
+          <label htmlFor="server-organization" className={typeLabelBlockUpperSecondary}>
             {copy.ownerScope}
           </label>
           <select
@@ -327,7 +311,8 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
           {organizationsFailed ? (
             <ErrorState
               title={copy.organizationsUnavailable}
-              className="items-stretch py-4"
+              description={copy.organizationsUnavailableHint}
+              className={typeItemsStretchPy4}
               action={
                 <Button
                   type="button"
@@ -368,8 +353,8 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
           readOnly={!!pending}
         />
 
-        <div className="space-y-1.5 sm:col-span-2">
-          <label htmlFor="server-description" className={nativeLabelClass}>
+        <div className={typeSpace15SmCol2}>
+          <label htmlFor="server-description" className={typeLabelBlockUpperSecondary}>
             {copy.descriptionLabel}
           </label>
           <textarea
@@ -391,7 +376,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
           name="websiteUrl"
           type="url"
           label={copy.websiteUrl}
-          placeholder="https://..."
+          placeholder={copy.websiteUrlPlaceholder}
           disabled={loading}
           readOnly={!!pending}
         />
@@ -401,7 +386,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
           name="discordUrl"
           type="url"
           label={copy.discordUrl}
-          placeholder="https://discord.gg/..."
+          placeholder={copy.discordUrlPlaceholder}
           disabled={loading}
           readOnly={!!pending}
         />
@@ -411,7 +396,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
           name="rulesUrl"
           type="url"
           label={copy.rulesUrl}
-          placeholder="https://..."
+          placeholder={copy.rulesUrlPlaceholder}
           disabled={loading}
           readOnly={!!pending}
         />
@@ -421,7 +406,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
           name="language"
           label={copy.language}
           maxLength={64}
-          defaultValue={locale === "ru" ? "Русский" : "English"}
+          defaultValue={copy.languageDefault}
           disabled={loading}
           readOnly={!!pending}
         />
@@ -431,25 +416,25 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
           name="region"
           label={copy.region}
           maxLength={64}
-          placeholder={locale === "ru" ? "Европа" : "Europe"}
+          placeholder={copy.regionPlaceholder}
           disabled={loading}
           readOnly={!!pending}
         />
 
-        <div className="sm:col-span-2">
+        <div className={typeSmColSpan2}>
           <Input
             id="server-gameplay-tags"
             name="gameplayTags"
             label={copy.gameplayTags}
             maxLength={500}
-            placeholder="roleplay, economy, freeroam"
+            placeholder={copy.gameplayTagsPlaceholder}
             disabled={loading}
             readOnly={!!pending}
           />
         </div>
 
-        <div className="space-y-1.5 sm:col-span-2">
-          <label htmlFor="server-media-urls" className={nativeLabelClass}>
+        <div className={typeSpace15SmCol2}>
+          <label htmlFor="server-media-urls" className={typeLabelBlockUpperSecondary}>
             {copy.mediaUrls}
           </label>
           <textarea
@@ -457,7 +442,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
             name="mediaUrls"
             rows={3}
             maxLength={3000}
-            placeholder="https://..."
+            placeholder={copy.mediaUrlsPlaceholder}
             disabled={loading}
             readOnly={!!pending}
             className={fieldControlClass({
@@ -534,7 +519,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
         />
 
         <div className="space-y-1.5">
-          <label htmlFor="server-visibility" className={nativeLabelClass}>
+          <label htmlFor="server-visibility" className={typeLabelBlockUpperSecondary}>
             {copy.visibility}
           </label>
           <select

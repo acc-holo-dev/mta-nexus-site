@@ -1,27 +1,40 @@
 import { AppError } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { History } from "lucide-react";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { buildPackageCopy } from "../../../lib/build-package-i18n";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { getResourceBuildWorkspaceCopy } from "../../../lib/resource-build-workspace-i18n";
-import { resourceMediaCopy } from "../../../lib/resource-media-i18n";
-import { getResourcePublisherCopy } from "../../../lib/resource-publisher-i18n";
-import { resourceRequirementsCopy } from "../../../lib/resource-requirements-i18n";
-import { authService } from "../../../lib/services/auth-service";
-import { resourceBuildWorkspaceService } from "../../../lib/services/resource-build-workspace-service";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { formatUnknown } from "../../../lib/i18n/unknown";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { resourceBuildWorkspaceService } from "../../../lib/services/resources/resource-build-workspace-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccent } from "../../shell/link-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import { surfaceP4 } from "../../shell/surface-shell";
+import {
+  typeBreakSmSecondary,
+  typeDisplayPrimary,
+  typePrewrapBreakSecondary,
+  typeSemiboldPrimary,
+  typeSmMuted,
+  typeSmSecondary,
+  typeXlPrimary,
+  typeXlSemiboldPrimary,
+} from "../../shell/type-shell";
+import { buildPackageCopy } from "../build-package-i18n";
 import { BuildModerationControls } from "../components/build-moderation-controls";
-import { BuildPackageEvidencePanel } from "../evidence";
-import { BuildProvenanceDetails } from "../evidence";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
 import { ResourceBuildControls } from "../components/resource-build-controls";
-
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+import { BuildPackageEvidencePanel, BuildProvenanceDetails } from "../evidence";
+import { getResourceBuildWorkspaceCopy } from "../resource-build-workspace-i18n";
+import { getResourceManagementCopy } from "../resource-management-i18n";
+import { resourceMediaCopy } from "../resource-media-i18n";
+import { getResourcePublisherCopy } from "../resource-publisher-i18n";
+import { resourceRequirementsCopy } from "../resource-requirements-i18n";
 
 function buildAccessError(error: unknown): "missing" | "failed" {
   if (error instanceof AppError && [403, 404].includes(error.statusCode)) return "missing";
@@ -42,20 +55,28 @@ function ResourceBuildLoadError({
   const copy = getResourceBuildWorkspaceCopy(locale),
     dictionary = getDictionary(locale);
   return (
-    <section className={pageShellClass}>
-      <Link href={backHref} className={navLinkClass}>
+    <section className={pageShellMax5xl}>
+      <Link href={backHref} className={linkAccent}>
         {backLabel}
       </Link>
       <ErrorState
         title={copy.loadUnavailable}
+        description={copy.loadUnavailableHint}
         action={
-          <Link href={retryHref} className={navLinkClass}>
+          <Link href={retryHref} className={linkAccent}>
             {dictionary.errors.retry}
           </Link>
         }
       />
     </section>
   );
+}
+
+export async function resourceBuildMetadata(): Promise<Metadata> {
+  return {
+    title: `${getResourceBuildWorkspaceCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
 }
 
 export async function ResourceBuildScreen({
@@ -69,7 +90,20 @@ export async function ResourceBuildScreen({
 }) {
   const locale = await getRequestLocale(),
     copy = getResourceBuildWorkspaceCopy(locale);
-  const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={"/"}
+      />
+    );
+  }
+
   const returnPath = `/${staff ? "admin/resources" : "workspace/resources"}/${encodeURIComponent(productId)}/builds/${encodeURIComponent(buildId)}`;
   if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   let detail: Awaited<ReturnType<typeof resourceBuildWorkspaceService.detail>> | null = null;
@@ -88,15 +122,16 @@ export async function ResourceBuildScreen({
   }
   const { product, build, history } = detail;
   const publisherCopy = getResourcePublisherCopy(locale);
+  const managementCopy = getResourceManagementCopy(locale);
   const trustedScan =
     build.scanStatus === "clean" && Boolean(build.scanner?.trim() && build.scannedAt);
   return (
-    <div className={pageShellClass}>
-      <Link href={staff ? "/admin" : `/workspace/resources/${productId}`} className={navLinkClass}>
+    <div className={pageShellMax5xl}>
+      <Link href={staff ? "/admin" : `/workspace/resources/${productId}`} className={linkAccent}>
         {staff ? copy.reviewBack : copy.back}
       </Link>
       <header className="space-y-2">
-        <h1 className="font-display text-primary">
+        <h1 className={typeDisplayPrimary}>
           {product.title} · {build.version}
         </h1>
         <p className="text-secondary">
@@ -105,37 +140,39 @@ export async function ResourceBuildScreen({
       </header>
       <Link
         href={`${staff ? "/admin/resources" : "/workspace/resources"}/${encodeURIComponent(productId)}/requirements?buildId=${encodeURIComponent(buildId)}`}
-        className={navLinkClass}
+        className={linkAccent}
       >
         {resourceRequirementsCopy(locale).title}
       </Link>
       {product.metadataReviewRequired ? (
-        <ErrorState id="resource-metadata-review-required" title={publisherCopy.reviewRequired} />
+        <ErrorState
+          id="resource-metadata-review-required"
+          title={publisherCopy.reviewRequired}
+          description={publisherCopy.reviewRequiredHint}
+        />
       ) : null}
       {staff && (
         <Link
           href={`/admin/resources/${encodeURIComponent(productId)}/media`}
-          className={navLinkClass}
+          className={linkAccent}
         >
           {resourceMediaCopy(locale).title}
         </Link>
       )}
       {staff && (
-        <section className="nexus-panel space-y-3 p-5" aria-label={publisherCopy.description}>
-          <p className="text-sm text-muted">{publisherCopy.reviewNote}</p>
-          <h2 className="text-xl font-semibold text-primary">{publisherCopy.description}</h2>
+        <section className={panelSpace3P5} aria-label={publisherCopy.description}>
+          <p className={typeSmMuted}>{publisherCopy.reviewNote}</p>
+          <h2 className={typeXlSemiboldPrimary}>{publisherCopy.description}</h2>
           {product.shortDescription && (
-            <p className="whitespace-pre-wrap break-words text-secondary">
-              {product.shortDescription}
-            </p>
+            <p className={typePrewrapBreakSecondary}>{product.shortDescription}</p>
           )}
-          <p className="whitespace-pre-wrap break-words text-secondary">{product.description}</p>
-          <p className="break-words text-sm text-secondary">
-            {publisherCopy.tags}: {(product.tags ?? []).join(", ") || "—"}
+          <p className={typePrewrapBreakSecondary}>{product.description}</p>
+          <p className={typeBreakSmSecondary}>
+            {publisherCopy.tags}: {formatUnknown(locale, (product.tags ?? []).join(", "))}
           </p>
-          <h3 className="font-semibold text-primary">{publisherCopy.requirements}</h3>
-          <p className="text-sm text-secondary">
-            MTA: {product.compatibility?.mtaMinVersion || "—"}
+          <h3 className={typeSemiboldPrimary}>{publisherCopy.requirements}</h3>
+          <p className={typeSmSecondary}>
+            {managementCopy.mta}: {formatUnknown(locale, product.compatibility?.mtaMinVersion)}
           </p>
           <ul className="list-inside list-disc text-sm text-secondary">
             {(product.compatibility?.dependencies ?? []).map((slug) => (
@@ -164,13 +201,13 @@ export async function ResourceBuildScreen({
       />
       {build.releaseNotes && (
         <section className="space-y-2">
-          <h2 className="text-xl text-primary">{copy.notes}</h2>
-          <p className="whitespace-pre-wrap break-words text-secondary">{build.releaseNotes}</p>
+          <h2 className={typeXlPrimary}>{copy.notes}</h2>
+          <p className={typePrewrapBreakSecondary}>{build.releaseNotes}</p>
         </section>
       )}
       <Link
         href={`/${staff ? "admin/resources" : "workspace/resources"}/${encodeURIComponent(productId)}/builds/${encodeURIComponent(buildId)}/package`}
-        className={navLinkClass}
+        className={linkAccent}
       >
         {buildPackageCopy(locale).inventory}
       </Link>
@@ -208,7 +245,7 @@ export async function ResourceBuildScreen({
         />
       )}
       <section className="space-y-3">
-        <h2 className="text-xl text-primary">{copy.history}</h2>
+        <h2 className={typeXlPrimary}>{copy.history}</h2>
         {history.length === 0 ? (
           <EmptyState
             title={copy.noHistory}
@@ -218,15 +255,10 @@ export async function ResourceBuildScreen({
         ) : (
           <ol className="space-y-3">
             {history.map((event) => (
-              <li key={event.id} className="rounded-lg border border-base p-4">
+              <li key={event.id} className={surfaceP4}>
                 <p>{copy.actions[event.action as keyof typeof copy.actions] ?? event.action}</p>
-                {event.reason && (
-                  <p className="whitespace-pre-wrap break-words text-secondary">{event.reason}</p>
-                )}
-                <time
-                  dateTime={new Date(event.createdAt).toISOString()}
-                  className="text-sm text-muted"
-                >
+                {event.reason && <p className={typePrewrapBreakSecondary}>{event.reason}</p>}
+                <time dateTime={new Date(event.createdAt).toISOString()} className={typeSmMuted}>
                   {new Date(event.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-GB")}
                 </time>
               </li>
@@ -236,4 +268,22 @@ export async function ResourceBuildScreen({
       </section>
     </div>
   );
+}
+
+export async function WorkspaceResourceBuildPage({
+  params,
+}: {
+  params: Promise<{ id: string; buildId: string }>;
+}) {
+  const { id, buildId } = await params;
+  return ResourceBuildScreen({ productId: id, buildId });
+}
+
+export async function StaffResourceBuildPage({
+  params,
+}: {
+  params: Promise<{ id: string; buildId: string }>;
+}) {
+  const { id, buildId } = await params;
+  return ResourceBuildScreen({ productId: id, buildId, staff: true });
 }

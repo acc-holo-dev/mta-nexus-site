@@ -1,13 +1,20 @@
 "use client";
 import { Button, ErrorState } from "@nexus/ui";
-
 import { CheckCircle2, LoaderCircle, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { confirmsAdminAction } from "../../../lib/admin-action-confirmation";
-import { communityReportCopy } from "../../../lib/community-report-copy";
-import { confirmAction } from "../../../components/confirm-action";
-import { useNexusLocale } from "../../../components/locale-context";
+import { communityReportCopy } from "../../community/community-report-copy";
+import { confirmAction } from "../../shell/confirm-action";
+import { useNexusLocale } from "../../shell/locale";
+import { skelH4W4Spin } from "../../shell/skeleton-shell";
+import {
+  typeFlexWrapGap2,
+  typeLabelUpperMuted,
+  typeTenFaint,
+  typeWFullMaxSmSpace2Md80,
+} from "../../shell/type-shell";
+import { adminActionClientError } from "../admin-action-client-error";
+import { confirmsAdminAction } from "../admin-action-confirmation";
 
 export function ReportModerationControls({ reportId }: { reportId: string }) {
   const router = useRouter();
@@ -51,7 +58,7 @@ export function ReportModerationControls({ reportId }: { reportId: string }) {
       });
       const data = await response.json().catch(() => null);
       if (!confirmsAdminAction(response.status, data, reportId, action)) {
-        setError(data?.error || copy.reportDecisionFailed);
+        setError(adminActionClientError(locale, data?.code, copy.reportDecisionFailed));
         return;
       }
       setNotes("");
@@ -64,9 +71,9 @@ export function ReportModerationControls({ reportId }: { reportId: string }) {
   }
 
   return (
-    <div className="w-full max-w-sm space-y-2 md:w-80" aria-busy={pending !== null}>
+    <div className={typeWFullMaxSmSpace2Md80} aria-busy={pending !== null}>
       <label className="block space-y-1">
-        <span className="font-label uppercase text-muted">{copy.reviewNote}</span>
+        <span className={typeLabelUpperMuted}>{copy.reviewNote}</span>
         <textarea
           value={notes}
           onChange={(event) => setNotes(event.target.value)}
@@ -77,7 +84,7 @@ export function ReportModerationControls({ reportId }: { reportId: string }) {
           className="w-full resize-y rounded-md border border-base bg-inset px-2.5 py-2 text-xs text-primary outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]"
         />
       </label>
-      <div className="flex flex-wrap gap-2">
+      <div className={typeFlexWrapGap2}>
         <Button
           type="button"
           disabled={!ready || pending !== null}
@@ -86,7 +93,7 @@ export function ReportModerationControls({ reportId }: { reportId: string }) {
           variant="outline"
         >
           {pending === "resolve" ? (
-            <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
+            <LoaderCircle className={skelH4W4Spin} aria-hidden="true" />
           ) : (
             <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
           )}
@@ -100,14 +107,14 @@ export function ReportModerationControls({ reportId }: { reportId: string }) {
           variant="outline"
         >
           {pending === "dismiss" ? (
-            <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
+            <LoaderCircle className={skelH4W4Spin} aria-hidden="true" />
           ) : (
             <XCircle className="h-4 w-4" aria-hidden="true" />
           )}
           {copy.dismissReport}
         </Button>
       </div>
-      {!ready && <p className="text-[10px] text-faint">{copy.reviewNoteHint}</p>}
+      {!ready && <p className={typeTenFaint}>{copy.reviewNoteHint}</p>}
       {error ? (
         <ErrorState title={error} description={copy.reportDecisionFailedDescription} />
       ) : null}

@@ -1,13 +1,13 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
+import { buildModerationUiState } from "../../src/features/resources/build-moderation-ui";
 import { getDictionary } from "../../src/lib/i18n";
-import { buildModerationUiState } from "../../src/lib/build-moderation-ui";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn() }),
 }));
 
-vi.mock("../../src/components/locale-context", () => ({
+vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({
     locale: "en",
     dictionary: getDictionary("en"),

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { expect, it, vi } from "vitest";
+import { getDictionary } from "../../src/lib/i18n";
 import {
   createDiscussionWatchInteractionHelpers,
   initial,
@@ -15,14 +16,14 @@ const harness = vi.hoisted(() => ({
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ usePathname: () => "/articles/article" }));
-vi.mock("../../src/components/locale-context", () => ({
-  useNexusLocale: () => ({ locale: "en" }),
+vi.mock("../../src/features/shell/locale", () => ({
+  useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }),
   LocaleProvider: ({ children }: { children: ReactNode }) => children,
 }));
-vi.mock("../../src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../../src/features/shell/confirm-action", () => ({ confirmAction }));
 
-import { FollowButton } from "../../src/components/follow-button";
-import { followActionCopy, followCopy } from "../../src/lib/follow-workspace-copy";
+import { FollowButton } from "../../src/features/community/follow";
+import { followActionCopy, followCopy } from "../../src/features/community/follow-workspace-copy";
 
 const { render, toggle } = createDiscussionWatchInteractionHelpers(
   harness,

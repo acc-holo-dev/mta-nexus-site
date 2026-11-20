@@ -1,5 +1,5 @@
-import { expect, it } from "vitest";
 import { createServerSchema, updateServerSchema } from "@nexus/validation";
+import { expect, it } from "vitest";
 
 it("keeps all missing registration fields absent from an empty or description-only edit", () => {
   expect(updateServerSchema.parse({})).toEqual({});

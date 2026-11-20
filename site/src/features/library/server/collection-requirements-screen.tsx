@@ -1,23 +1,30 @@
 import { AppError } from "@nexus/domain";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { collectionRequirementsCopy } from "../../../lib/collection-requirements-i18n";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { collectionId, collectionPageParams } from "../../../lib/library-collections-query";
-import { resourceRequirementsCopy } from "../../../lib/resource-requirements-i18n";
-import { resourceRequirementsQuery } from "../../../lib/resource-requirements-query";
-import { authService } from "../../../lib/services/auth-service";
-import { resourceRequirementsService } from "../../../lib/services/resource-requirements-service";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { PlatformSessionError } from "../../../components/platform-session-error";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { resourceRequirementsService } from "../../../lib/services/resources/resource-requirements-service";
 import { ResourceRequirementsReportBody } from "../../resources/requirements-view";
-
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+import { resourceRequirementsCopy } from "../../resources/resource-requirements-i18n";
+import { resourceRequirementsQuery } from "../../resources/resource-requirements-query";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccent } from "../../shell/link-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import { typeItemsStretchPy4 } from "../../shell/type-shell";
+import { collectionRequirementsCopy } from "../collection-requirements-i18n";
+import { collectionId, collectionPageParams } from "../library-collections-query";
+export async function collectionRequirementsMetadata(): Promise<Metadata> {
+  return {
+    title: `${collectionRequirementsCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 
 export async function CollectionRequirementsScreen({
   params,
@@ -76,18 +83,19 @@ export async function CollectionRequirementsScreen({
     });
   if (!result) {
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax5xl}>
         <Link
           href={`/workspace/library/collections/${encodeURIComponent(path.id)}`}
-          className={navLinkClass}
+          className={linkAccent}
         >
           {c.back}
         </Link>
         <h1 className="font-display">{c.title}</h1>
         <ErrorState
           title={c.loadUnavailable}
+          description={c.loadUnavailableDescription}
           action={
-            <Link href={`${requirementsBase}${retrySuffix}`} className={navLinkClass}>
+            <Link href={`${requirementsBase}${retrySuffix}`} className={linkAccent}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -98,10 +106,10 @@ export async function CollectionRequirementsScreen({
   const copy = resourceRequirementsCopy(locale);
   const suffix = query.targetMta ? `?${new URLSearchParams({ targetMta: query.targetMta })}` : "";
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xl}>
       <Link
         href={`/workspace/library/collections/${encodeURIComponent(path.id)}`}
-        className={navLinkClass}
+        className={linkAccent}
       >
         {c.back}
       </Link>
@@ -113,13 +121,13 @@ export async function CollectionRequirementsScreen({
       <p className="text-secondary">{c.note}</p>
       <p className="text-secondary">{copy.note}</p>
       {result.collection.status === "archived" && <p role="note">{c.archived}</p>}
-      <form className="nexus-panel flex flex-wrap items-end gap-3 p-4">
+      <form className={panelFlexWrapEndP4}>
         <label className="grid gap-1">
           {copy.target}
           <input
             name="targetMta"
             maxLength={64}
-            placeholder="1.6.0-9.22279.0"
+            placeholder={copy.targetPlaceholder}
             defaultValue={query.targetMta}
             className="border border-base bg-inset p-2"
             required
@@ -148,7 +156,7 @@ export async function CollectionRequirementsScreen({
         <ErrorState
           title={`${c.unavailable}: ${result.unavailableItemCount}`}
           description={c.withheld}
-          className="items-stretch py-4"
+          className={typeItemsStretchPy4}
         />
       )}
       <ResourceRequirementsReportBody

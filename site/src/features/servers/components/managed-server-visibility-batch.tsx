@@ -3,21 +3,35 @@ import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useRef, useState } from "react";
-import type { Locale } from "../../../lib/i18n";
-import { getManagedServerCopy } from "../../../lib/managed-server-copy";
+import { getDictionary, type Locale } from "../../../lib/i18n";
+import { platformFieldClass, platformRequest } from "../../community/user-platform-client";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
+import {
+  ActionConfirmCheckbox,
+  actionConfirmCheckboxFocusClass,
+} from "../../shell/action-confirm-checkbox";
+import { confirmAction } from "../../shell/confirm-action";
+import { linkGhostAccentSm, linkMinHAccentSemibold } from "../../shell/link-shell";
+import { pageShellStack4 } from "../../shell/page-shell";
+import { panelSpace4P5 } from "../../shell/panel-shell";
+import { surfaceSpace2P4 } from "../../shell/surface-shell";
+import {
+  typeFlexMinH11CenterGap3SmPrimary,
+  typeFlexWrapGap3,
+  typeLgSemiboldPrimary,
+  typeSemiboldPrimary,
+  typeSmMuted,
+  typeSmPrimary,
+  typeSmSuccess,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import { getManagedServerCopy } from "../managed-server-copy";
 import {
   confirmsServerVisibilityCommand,
   confirmsServerVisibilityPreview,
   type ServerVisibilityPreview,
-} from "../../../lib/server-workspace-contract";
-import { serverWorkspaceCopy, serverWorkspaceError } from "../../../lib/server-workspace-copy";
-import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
-import {
-  ActionConfirmCheckbox,
-  actionConfirmCheckboxFocusClass,
-} from "../../../components/action-confirm-checkbox";
-import { confirmAction } from "../../../components/confirm-action";
+} from "../server-workspace-contract";
+import { serverWorkspaceCopy, serverWorkspaceError } from "../server-workspace-copy";
 export function ManagedServerVisibilityBatch({
   items,
   locale,
@@ -48,7 +62,7 @@ export function ManagedServerVisibilityBatch({
     };
   }, []);
   const path = "/api/workspace/servers/visibility";
-  function message(failure: unknown, fallback: string) {
+  function safeMessage(failure: unknown, fallback: string) {
     const text = failure instanceof Error ? failure.message : "";
     return [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(text)
       ? text
@@ -98,7 +112,7 @@ export function ManagedServerVisibilityBatch({
       setCommitAcknowledged(false);
     } catch (failure) {
       if (mounted.current) {
-        const result = message(failure, copy.unavailable);
+        const result = safeMessage(failure, copy.unavailable);
         setError(result);
         if (result === copy.changed || result === copy.forbidden) {
           locked.current = true;
@@ -165,7 +179,7 @@ export function ManagedServerVisibilityBatch({
     } catch (failure) {
       if (mounted.current) {
         setPreview(null);
-        const result = message(failure, copy.uncertain);
+        const result = safeMessage(failure, copy.uncertain);
         setError(
           [
             copy.unavailable,
@@ -182,19 +196,19 @@ export function ManagedServerVisibilityBatch({
     }
   }
   return (
-    <section className="min-w-0 space-y-4 overflow-x-clip" aria-busy={busy}>
-      <div className="nexus-panel space-y-4 p-5">
-        <h2 className="text-lg font-semibold text-primary">{copy.batchTitle}</h2>
-        <p className="text-sm text-muted">{copy.batchHelp}</p>
+    <section className={pageShellStack4} aria-busy={busy}>
+      <div className={panelSpace4P5}>
+        <h2 className={typeLgSemiboldPrimary}>{copy.batchTitle}</h2>
+        <p className={typeSmMuted}>{copy.batchHelp}</p>
         <fieldset disabled={busy || blocked || !!preview} className="space-y-4">
-          <legend className="text-sm text-primary">
+          <legend className={typeSmPrimary}>
             {copy.selected}: {selected.length}
           </legend>
-          <div className="flex flex-wrap gap-3">
+          <div className={typeFlexWrapGap3}>
             <Button
               type="button"
               variant="ghost"
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
               onClick={() => changeSelection(items.map((item) => item.id))}
             >
               {copy.selectAll}
@@ -202,7 +216,7 @@ export function ManagedServerVisibilityBatch({
             <Button
               type="button"
               variant="ghost"
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
               onClick={() => changeSelection([])}
             >
               {copy.clear}
@@ -227,11 +241,11 @@ export function ManagedServerVisibilityBatch({
               ))}
             </select>
           </label>
-          <p className="text-sm text-muted">{copy[`${visibility}Help`]}</p>
+          <p className={typeSmMuted}>{copy[`${visibility}Help`]}</p>
           <Button
             type="button"
             variant="outline"
-            className="min-h-11 font-semibold text-accent"
+            className={linkMinHAccentSemibold}
             disabled={!selected.length}
             onClick={() => void review()}
           >
@@ -240,13 +254,15 @@ export function ManagedServerVisibilityBatch({
         </fieldset>
       </div>
       {busy && (
-        <p role="status" className="text-sm text-muted">
+        <p role="status" className={typeSmMuted}>
           {copy.busy}
         </p>
       )}
-      {error ? <ErrorState title={error} /> : null}
+      {error ? (
+        <ErrorState title={error} description={getDictionary(locale).errors.formErrorHint} />
+      ) : null}
       {saved && (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {copy.saved}
         </p>
       )}
@@ -254,31 +270,31 @@ export function ManagedServerVisibilityBatch({
         <Button
           type="button"
           variant="ghost"
-          className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkGhostAccentSm}
           onClick={() => router.refresh()}
         >
           {copy.reload}
         </Button>
       )}
       {preview && (
-        <div className="nexus-panel space-y-4 p-5">
-          <h3 className="font-semibold text-primary">{copy.previewTitle}</h3>
-          <p className="text-sm text-muted">{copy[`${preview.visibility}Help`]}</p>
-          <p className="text-xs text-muted">{copy.notes}</p>
+        <div className={panelSpace4P5}>
+          <h3 className={typeSemiboldPrimary}>{copy.previewTitle}</h3>
+          <p className={typeSmMuted}>{copy[`${preview.visibility}Help`]}</p>
+          <p className={typeXsMuted}>{copy.notes}</p>
           <ol className="space-y-3">
             {preview.items.map((item) => (
-              <li key={item.id} className="space-y-2 rounded-lg border border-base p-4">
+              <li key={item.id} className={surfaceSpace2P4}>
                 <Link
                   href={`/workspace/servers/${encodeURIComponent(item.id)}`}
                   className="inline-flex min-h-11 break-words text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {item.name}
                 </Link>
-                <p className="text-xs text-muted">
+                <p className={typeXsMuted}>
                   {item.organization ? labels.organization : labels.personal} ·{" "}
                   {labels[item.status]}
                 </p>
-                <p className="text-sm text-primary">
+                <p className={typeSmPrimary}>
                   {copy.transition}: {labels[item.before]} → {labels[item.after]}
                 </p>
                 <Link
@@ -291,7 +307,7 @@ export function ManagedServerVisibilityBatch({
             ))}
           </ol>
           {!preview.items.some((item) => item.changed) && (
-            <p role="status" className="text-sm text-muted">
+            <p role="status" className={typeSmMuted}>
               {copy.noChanges}
             </p>
           )}
@@ -305,7 +321,7 @@ export function ManagedServerVisibilityBatch({
           >
             {copy.commitConfirm}
           </ActionConfirmCheckbox>
-          <div className="flex flex-wrap gap-3">
+          <div className={typeFlexWrapGap3}>
             <Button
               type="button"
               variant="outline"
@@ -315,7 +331,7 @@ export function ManagedServerVisibilityBatch({
                 !preview.items.some((item) => item.changed) ||
                 !commitAcknowledged
               }
-              className="min-h-11 font-semibold text-accent"
+              className={linkMinHAccentSemibold}
               onClick={() => void commit()}
             >
               {copy.confirm}
@@ -324,7 +340,7 @@ export function ManagedServerVisibilityBatch({
               type="button"
               variant="ghost"
               disabled={busy || blocked}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
               onClick={() => {
                 setPreview(null);
                 setCommitAcknowledged(false);
@@ -338,7 +354,7 @@ export function ManagedServerVisibilityBatch({
       <ul className="space-y-4">
         {items.map((item) => (
           <li key={item.id} className="space-y-2">
-            <label className="flex min-h-11 items-center gap-3 text-sm text-primary">
+            <label className={typeFlexMinH11CenterGap3SmPrimary}>
               <input
                 type="checkbox"
                 checked={selected.includes(item.id)}

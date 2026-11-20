@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { ServerEndpointAuditCollector } from "@nexus/domain";
+import { describe, expect, it } from "vitest";
 
 describe("read-only MTA endpoint audit", () => {
   it("detects canonical DNS and IPv6 aliases without merging identities", () => {

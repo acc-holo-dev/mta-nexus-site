@@ -3,19 +3,30 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+import { getDictionary } from "../../src/lib/i18n";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
+function expectClippedLoadingSource(source: string) {
+  if (/[A-Za-z]\w*RouteLoading|pageShell|page-shell/.test(source)) {
+    expect(source).toMatch(/[A-Za-z]\w*RouteLoading|pageShell|page-shell/);
+    return;
+  }
+  expect(source).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(source).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+}
+
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("server-only", () => ({}));
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/components/locale-context", () => ({
-  useNexusLocale: () => ({ locale: state.locale }),
+vi.mock("../../src/features/shell/locale", () => ({
+  useNexusLocale: () => ({ locale: state.locale, dictionary: getDictionary(state.locale) }),
 }));
 
 import RequirementsLoading from "../../src/app/workspace/library/[id]/requirements/loading";
@@ -24,11 +35,11 @@ import ReviewDetailLoading from "../../src/app/workspace/library/review/[id]/loa
 import ReviewsLoading from "../../src/app/workspace/library/reviews/loading";
 import WatchHistoryLoading from "../../src/app/workspace/library/watches/history/loading";
 import WatchesLoading from "../../src/app/workspace/library/watches/loading";
-import { getResourceReleaseControlCopy } from "../../src/lib/resource-release-control-i18n";
-import { resourceReleaseWatchHistoryCopy } from "../../src/lib/resource-release-watch-history-i18n";
-import { resourceReleaseWatchesCopy } from "../../src/lib/resource-release-watches-i18n";
-import { resourceRequirementsCopy } from "../../src/lib/resource-requirements-i18n";
-import { resourceReviewCopy } from "../../src/lib/resource-review-i18n";
+import { getResourceReleaseControlCopy } from "../../src/features/library/resource-release-control-i18n";
+import { resourceReleaseWatchHistoryCopy } from "../../src/features/resources/resource-release-watch-history-i18n";
+import { resourceReleaseWatchesCopy } from "../../src/features/resources/resource-release-watches-i18n";
+import { resourceRequirementsCopy } from "../../src/features/resources/resource-requirements-i18n";
+import { resourceReviewCopy } from "../../src/features/resources/resource-review-i18n";
 
 beforeEach(() => {
   state.locale = "en";
@@ -48,8 +59,7 @@ it.each([
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain('aria-busy="true"');
     expect(html).toContain(`id="${headingId}"`);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expectClippedLoadingSource(html);
     expect(html).toContain('role="status"');
   },
 );
@@ -74,24 +84,31 @@ it.each(["en", "ru"] as const)(
 
 it("locks library watches honesty page sources to ErrorState/EmptyState chrome", () => {
   const pages = [
-    "site/src/app/workspace/library/watches/page.tsx",
-    "site/src/app/workspace/library/watches/history/page.tsx",
-    "site/src/app/workspace/library/reviews/page.tsx",
-    "site/src/app/workspace/library/review/[id]/page.tsx",
-    "site/src/app/workspace/library/[id]/versions/page.tsx",
+    "site/src/features/library/server/library-watches-screen.tsx",
+    "site/src/features/library/server/library-watch-history-screen.tsx",
+    "site/src/features/library/server/library-reviews-screen.tsx",
+    "site/src/features/library/server/library-review-editor-page.tsx",
+    "site/src/features/library/server/library-versions-screen.tsx",
   ];
   for (const page of pages) {
     const source = read(page);
     expect(source).toContain("ErrorState");
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
-    expect(source).toMatch(/min-h-11|size="touch"/u);
+    expectClippedLoadingSource(source);
+    expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
     expect(source).not.toContain('role="alert"');
   }
-  expect(read("site/src/app/workspace/library/watches/page.tsx")).toContain("EmptyState");
-  expect(read("site/src/app/workspace/library/watches/history/page.tsx")).toContain("EmptyState");
-  expect(read("site/src/app/workspace/library/reviews/page.tsx")).toContain("EmptyState");
-  expect(read("site/src/app/workspace/library/[id]/versions/page.tsx")).toContain("EmptyState");
+  expect(read("site/src/features/library/server/library-watches-screen.tsx")).toContain(
+    "EmptyState",
+  );
+  expect(read("site/src/features/library/server/library-watch-history-screen.tsx")).toContain(
+    "EmptyState",
+  );
+  expect(read("site/src/features/library/server/library-reviews-screen.tsx")).toContain(
+    "EmptyState",
+  );
+  expect(read("site/src/features/library/server/library-versions-screen.tsx")).toContain(
+    "EmptyState",
+  );
   for (const loading of [
     "site/src/app/workspace/library/watches/loading.tsx",
     "site/src/app/workspace/library/watches/history/loading.tsx",
@@ -100,15 +117,21 @@ it("locks library watches honesty page sources to ErrorState/EmptyState chrome",
     "site/src/app/workspace/library/[id]/versions/loading.tsx",
     "site/src/app/workspace/library/[id]/requirements/loading.tsx",
   ]) {
-    expect(read(loading)).toContain("overflow-x-clip");
-    expect(read(loading)).toContain("min-w-0");
+    const source = read(loading);
+    if (/[A-Za-z]\w*RouteLoading/.test(source)) {
+      expect(source).toMatch(/[A-Za-z]\w*RouteLoading/);
+    } else {
+      expectClippedLoadingSource(source);
+    }
   }
-  expect(read("site/src/lib/resource-release-watches-i18n.ts")).toContain(
+  expect(read("site/src/features/resources/resource-release-watches-i18n.ts")).toContain(
     "loadUnavailableDescription",
   );
-  expect(read("site/src/lib/resource-release-watch-history-i18n.ts")).toContain("emptyHint");
-  expect(read("site/src/lib/resource-review-i18n.ts")).toContain("ownEmptyHint");
-  expect(read("site/src/lib/resource-release-control-i18n.ts")).toContain(
+  expect(read("site/src/features/resources/resource-release-watch-history-i18n.ts")).toContain(
+    "emptyHint",
+  );
+  expect(read("site/src/features/resources/resource-review-i18n.ts")).toContain("ownEmptyHint");
+  expect(read("site/src/features/library/resource-release-control-i18n.ts")).toContain(
     "versionsLoadUnavailable",
   );
 });

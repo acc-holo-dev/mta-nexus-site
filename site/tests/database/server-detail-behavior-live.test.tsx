@@ -1,6 +1,9 @@
+vi.mock("server-only", () => ({}));
+
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
+import { unknownMarker } from "../../src/lib/i18n/unknown";
 import {
   deferred,
   mocks,
@@ -9,7 +12,7 @@ import {
 } from "../helpers/server-detail-behavior-harness";
 
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("../../src/lib/services/auth-service", async () => {
+vi.mock("../../src/lib/services/accounts/auth-service", async () => {
   const { mocks: harnessMocks } = await import("../helpers/server-detail-behavior-harness");
   return {
     authService: { getSession: harnessMocks.session },
@@ -49,7 +52,7 @@ vi.mock("@nexus/ui", async () => {
   };
 });
 
-vi.mock("../../src/lib/services/server-service", async () => {
+vi.mock("../../src/lib/services/servers/server-service", async () => {
   const { mocks: harnessMocks } = await import("../helpers/server-detail-behavior-harness");
   return {
     serverService: {
@@ -58,7 +61,7 @@ vi.mock("../../src/lib/services/server-service", async () => {
   };
 });
 
-vi.mock("../../src/lib/services/mta-master-directory-service", async () => {
+vi.mock("../../src/lib/services/servers/mta-master-directory-service", async () => {
   const { mocks: harnessMocks } = await import("../helpers/server-detail-behavior-harness");
   return {
     mtaMasterDirectoryService: {
@@ -69,7 +72,7 @@ vi.mock("../../src/lib/services/mta-master-directory-service", async () => {
   };
 });
 
-vi.mock("../../src/lib/services/server-history-service", async () => {
+vi.mock("../../src/lib/services/servers/server-history-service", async () => {
   const { mocks: harnessMocks } = await import("../helpers/server-detail-behavior-harness");
   return {
     serverHistoryService: {
@@ -78,7 +81,7 @@ vi.mock("../../src/lib/services/server-history-service", async () => {
   };
 });
 
-vi.mock("../../src/lib/services/content-service", async () => {
+vi.mock("../../src/lib/services/community/content-service", async () => {
   const { mocks: harnessMocks } = await import("../helpers/server-detail-behavior-harness");
   return {
     contentService: {
@@ -87,7 +90,7 @@ vi.mock("../../src/lib/services/content-service", async () => {
   };
 });
 
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
   getRequestCookieStore: vi.fn(async () => ({ get: () => ({ value: "session" }) })),
 }));
@@ -176,7 +179,7 @@ vi.mock("../../src/features/servers/review-controls", async () => {
   };
 });
 
-vi.mock("../../src/lib/services/server-review-service", () => ({
+vi.mock("../../src/lib/services/servers/server-review-service", () => ({
   serverReviewService: {
     publicPage: vi.fn(async () => ({
       reviews: [],
@@ -255,7 +258,7 @@ describe("server detail live directory and history", () => {
       }),
     );
 
-    expect(html).toMatch(/>—\s*</u);
+    expect(html).toMatch(new RegExp(`>${unknownMarker("en")}\\s*<`, "u"));
     expect(html).toContain('style="width:0%"');
     expect(html).toContain("Open in MTA");
     expect(html).toContain("203.0.113.50:22003");

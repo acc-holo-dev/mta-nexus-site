@@ -2,18 +2,24 @@ import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { loginSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
-import { readAuthJson } from "../../../../lib/auth-request-body";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
+import { authAppErrorText } from "../../../../features/accounts/auth-app-error";
+import { authLoginApiCopy } from "../../../../features/accounts/auth-login-api-copy";
+import {
+  SESSION_COOKIE_NAME,
+  sessionCookieOptions,
+} from "../../../../features/accounts/session-cookie";
+import { getTrustedRequestIp } from "../../../../features/shell/request-client-ip";
+import { SESSION_LIFETIME_SECONDS } from "../../../../features/shell/session-policy";
+import { readAuthJson } from "../../../../lib/http/auth-request-body";
+import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { resolveLocale } from "../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
-} from "../../../../lib/observability";
-import { getTrustedRequestIp } from "../../../../lib/request-client-ip";
-import { authService } from "../../../../lib/services/auth-service";
-import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../../../lib/session-cookie";
-import { SESSION_LIFETIME_SECONDS } from "../../../../lib/session-policy";
+} from "../../../../lib/platform/observability";
+import { authService } from "../../../../lib/services/accounts/auth-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -29,6 +35,7 @@ function json(context: RequestLogContext, body: unknown, status = 200) {
 
 export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
+  const copy = authLoginApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
   try {
     const ip = getTrustedRequestIp(request);
     const rl = await consumeRateLimit("authLogin", ip);
@@ -42,7 +49,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: "Too many login attempts. Please try again in a few minutes.",
+          error: copy.rate,
         },
         429,
       );
@@ -55,7 +62,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: "Invalid login credentials",
+          error: copy.invalidCredentials,
           details: parsed.error.format(),
         },
         400,
@@ -73,7 +80,17 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     return response;
   } catch (error: unknown) {
     if (error instanceof AppError) {
-      return json(context, { error: error.message, code: error.code }, error.statusCode);
+      return json(
+        context,
+        {
+          error: authAppErrorText(error, {
+            unauthorized: copy.unauthorized,
+            failed: copy.failed,
+          }),
+          code: error.code,
+        },
+        error.statusCode,
+      );
     }
 
     logRequestEvent({
@@ -83,6 +100,6 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       status: 500,
       error,
     });
-    return json(context, { error: "Failed to log in" }, 500);
+    return json(context, { error: copy.failed }, 500);
   }
 });

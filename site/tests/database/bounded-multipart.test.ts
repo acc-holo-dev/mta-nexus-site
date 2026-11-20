@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   MultipartBodyTooLargeError,
   parseMultipartFormDataWithLimit,
-} from "../../src/lib/bounded-multipart";
+} from "../../src/lib/http/bounded-multipart";
 
 function multipartRequest(body: string): Request {
   const encoder = new TextEncoder();

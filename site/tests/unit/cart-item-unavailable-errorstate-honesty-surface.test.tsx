@@ -14,8 +14,13 @@ it("locks cart item unavailable title to ErrorState", () => {
   const source = read(surface);
   expect(source).toContain("ErrorState");
   expect(source).toContain('id="resource-cart-item-unavailable"');
-  expect(source).toMatch(
-    /<ErrorState id="resource-cart-item-unavailable" title=\{copy\.unavailable\}/,
+  expect(source).toContain("title={copy.unavailable}");
+  expect(source).toContain("description={copy.itemUnavailableHint}");
+  expect(source).toContain('id="resource-cart-unavailable"');
+  expect(source).toContain("title={copy.unavailableNote}");
+  expect(source).toContain("description={copy.unavailableNoteHint}");
+  expect(read("site/src/features/resources/resource-commerce-i18n.ts")).toContain(
+    "itemUnavailableHint:",
   );
   expect(source).not.toContain('className="text-danger">{copy.unavailable}</p>');
 });

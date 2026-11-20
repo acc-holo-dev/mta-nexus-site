@@ -1,10 +1,8 @@
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
-import {
-  libraryCollectionError,
-  libraryCollectionsCopy,
-} from "../../../lib/library-collections-i18n";
-import { collectionHref } from "../../../lib/library-collections-query";
+import { pageShellMaxXl } from "../../shell/page-shell";
+import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
+import { collectionHref } from "../library-collections-query";
 import { libraryCollectionsLinkClass } from "./library-collections-screen-shared";
 
 const recoveryLinkClass = `${libraryCollectionsLinkClass} inline-flex min-h-11 items-center`;
@@ -20,7 +18,7 @@ export function LibraryCollectionsErrorPanel({
 }) {
   const c = libraryCollectionsCopy(locale);
   return (
-    <section className="mx-auto min-w-0 max-w-xl space-y-4 overflow-x-clip py-16">
+    <section className={pageShellMaxXl}>
       <ErrorState
         title={libraryCollectionError(locale, code)}
         description={

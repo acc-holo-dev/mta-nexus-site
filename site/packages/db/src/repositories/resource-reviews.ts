@@ -1,4 +1,3 @@
-import { and, asc, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import {
   AppError,
   ForbiddenError,
@@ -7,21 +6,22 @@ import {
   type ResourceReviewDecision,
   type ResourceReviewView,
 } from "@nexus/domain";
+import { and, asc, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   auditEvents,
   builds,
   comments,
-  organizations,
   organizationMembers,
+  organizations,
   products,
   reports,
   users,
 } from "../schema";
-import { lockUserDownloadAccess, type ResourceTransaction } from "./entitlements";
 import { safePublishedBuildCondition } from "./build-safety";
-import { assertBuildModerationAuthority } from "./product-mutation-authority";
+import { lockUserDownloadAccess, type ResourceTransaction } from "./entitlements";
 import { historyPageBounds } from "./history-pagination";
+import { assertBuildModerationAuthority } from "./product-mutation-authority";
 
 const conflict = () => new AppError("Review changed; reload it", 409, "REVIEW_CHANGED");
 const target = (productId: string) =>

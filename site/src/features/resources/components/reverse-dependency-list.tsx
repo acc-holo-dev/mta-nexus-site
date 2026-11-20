@@ -2,7 +2,8 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import { GitBranch } from "lucide-react";
 import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
-import type { ReverseDependencySummary } from "../../../lib/reverse-dependency-summary";
+import { typeFlexWrapGap2, typeTenFaint } from "../../shell/type-shell";
+import type { ReverseDependencySummary } from "../reverse-dependency-summary";
 
 export function ReverseDependencyList({
   summary,
@@ -14,7 +15,7 @@ export function ReverseDependencyList({
   const copy = getDictionary(locale).dependencyUi;
 
   if (!summary) {
-    return <ErrorState title={copy.reverseUnavailable} />;
+    return <ErrorState title={copy.reverseUnavailable} description={copy.reverseUnavailableHint} />;
   }
 
   if (summary.products.length === 0) {
@@ -29,7 +30,7 @@ export function ReverseDependencyList({
 
   return (
     <div className="space-y-2">
-      <div className="flex flex-wrap gap-2">
+      <div className={typeFlexWrapGap2}>
         {summary.products.map((product) => (
           <Link
             key={product.id}
@@ -42,9 +43,13 @@ export function ReverseDependencyList({
         ))}
       </div>
       {summary.limitReached ? (
-        <ErrorState id="reverse-deps-limit-reached" title={copy.limitReached} />
+        <ErrorState
+          id="reverse-deps-limit-reached"
+          title={copy.limitReached}
+          description={copy.limitReachedHint}
+        />
       ) : null}
-      <p className="text-[10px] text-faint">{copy.reverseNotice}</p>
+      <p className={typeTenFaint}>{copy.reverseNotice}</p>
     </div>
   );
 }

@@ -5,10 +5,13 @@ import { resourceCopyCommandSchema } from "@nexus/validation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
-import { privateApiRequest } from "../../../lib/private-api-request";
-import { confirmedResourceCopy } from "../../../lib/resource-copy-confirmation";
-import { resourceCopyCopy, resourceCopyError } from "../../../lib/resource-copy-i18n";
-import { useNexusLocale } from "../../../components/locale-context";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
+import { linkAccentRounded } from "../../shell/link-shell";
+import { useNexusLocale } from "../../shell/locale";
+import { panelGrid2P5 } from "../../shell/panel-shell";
+import { typeFlexWrapGap4, typeSmSecondary } from "../../shell/type-shell";
+import { confirmedResourceCopy } from "../resource-copy-confirmation";
+import { resourceCopyCopy, resourceCopyError } from "../resource-copy-i18n";
 import { ResourceCopyMetadataView } from "./resource-copy-metadata";
 export function ResourceCopyForm({
   preview,
@@ -72,7 +75,7 @@ export function ResourceCopyForm({
   }
   return (
     <form onSubmit={submit} aria-busy={busy} className="space-y-5">
-      <p role="note" className="text-sm text-secondary">
+      <p role="note" className={typeSmSecondary}>
         {c.notice}
       </p>
       <p>
@@ -80,7 +83,7 @@ export function ResourceCopyForm({
         {preview.source.scope === "organization" ? c.organization : c.personal}
       </p>
       <ResourceCopyMetadataView metadata={preview.metadata} locale={locale} />
-      <fieldset disabled={busy || frozen} className="nexus-panel grid gap-4 p-5 sm:grid-cols-2">
+      <fieldset disabled={busy || frozen} className={panelGrid2P5}>
         <Input
           id={`${field}-title`}
           label={c.name}
@@ -101,19 +104,17 @@ export function ResourceCopyForm({
           onChange={(e) => setSlug(e.target.value)}
         />
       </fieldset>
-      {frozen && (
-        <p role="note" className="text-sm text-secondary">
-          {c.frozen}
-        </p>
-      )}
+      {frozen ? (
+        <ErrorState id="resource-copy-form-frozen" title={c.frozen} description={c.retry} />
+      ) : null}
       {error ? <ErrorState title={error} description={c.errorDescription} /> : null}
-      <div className="flex flex-wrap gap-4">
+      <div className={typeFlexWrapGap4}>
         <Button type="submit" isLoading={busy} className="min-h-11">
           {busy ? c.busy : c.create}
         </Button>
         <Link
           href={`/workspace/resources/${encodeURIComponent(preview.source.id)}/copies`}
-          className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentRounded}
         >
           {c.history}
         </Link>

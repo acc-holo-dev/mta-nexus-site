@@ -1,30 +1,30 @@
-import { afterEach, describe, it } from "vitest";
 import assert from "node:assert/strict";
-import { randomBytes, randomUUID } from "node:crypto";
 import { fork } from "node:child_process";
+import { randomBytes, randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
+import { generateId, generateSessionToken } from "@nexus/security";
 import { eq, inArray, sql } from "drizzle-orm";
-import { db, auditEvents, sessions, users } from "../client";
+import { afterEach, describe, it } from "vitest";
+import { authService } from "../../../../src/lib/services/accounts/auth-service";
+import { accountMailOutbox } from "../account-mail-schema";
 import {
   accountAuthState,
   accountRecoveryBindings,
   authChallenges,
 } from "../account-recovery-schema";
-import { accountMailOutbox } from "../account-mail-schema";
-import { accountChallengeRepository as proofs, digestAccountChallenge } from "./account-challenges";
+import { auditEvents, db, sessions, users } from "../client";
+import { digestAccountChallenge, accountChallengeRepository as proofs } from "./account-challenges";
 import { AccountMailCipher, AccountMailKeyUnavailableError } from "./account-mail-crypto";
 import { accountMailOutboxRepository as queue } from "./account-mail-outbox";
+import type { MailLease } from "./account-mail-worker";
 import {
   AccountMailWorkerRepository,
   accountMailWorkerRepository as worker,
 } from "./account-mail-worker";
-import type { MailLease } from "./account-mail-worker";
-import { userRepository } from "./users";
 import { digestSessionToken } from "./sessions";
-import { authService } from "../../../../src/lib/services/auth-service";
-import { generateId, generateSessionToken } from "@nexus/security";
+import { userRepository } from "./users";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 const key = randomBytes(32);

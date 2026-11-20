@@ -1,8 +1,8 @@
+import type { Payment } from "@nexus/domain";
+import { AppError } from "@nexus/domain";
 import { and, desc, eq } from "drizzle-orm";
 import { db } from "../client";
 import { orders, payments } from "../schema";
-import type { Payment } from "@nexus/domain";
-import { AppError } from "@nexus/domain";
 
 export class PaymentRepository {
   async findByOrderId(orderId: string): Promise<Payment | null> {

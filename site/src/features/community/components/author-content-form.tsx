@@ -3,27 +3,40 @@ import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { authorPublicationDeskCopy } from "../../../lib/author-publication-desk-copy";
-import type { Locale } from "../../../lib/i18n";
+import { getDictionary, type Locale } from "../../../lib/i18n";
 import {
   organizationContentCopy,
   organizationContentMutationError,
-} from "../../../lib/organization-content-copy";
-import { serverContentCopy, serverContentMutationError } from "../../../lib/server-content-copy";
-import { publicationSupportHref } from "../../../lib/support-workspace-contract";
+} from "../../organizations/organization-content-copy";
+import { serverContentCopy, serverContentMutationError } from "../../servers/server-content-copy";
+import { confirmAction } from "../../shell/confirm-action";
+import {
+  linkAccentRounded,
+  linkAccentSmRounded,
+  linkGhostAccentSmRounded,
+} from "../../shell/link-shell";
+import { pageShellStack4 } from "../../shell/page-shell";
+import { panelMinSpace3P5 } from "../../shell/panel-shell";
+import { surfaceInsetP4TextSmMuted } from "../../shell/surface-shell";
+import {
+  typeFlexWrapCenterGap4Sm,
+  typeFlexWrapGap3,
+  typeGrid2Gap4,
+  typePrewrapBreak,
+  typeSmMuted,
+  typeSmSecondary,
+  typeSmSuccess,
+} from "../../shell/type-shell";
+import { publicationSupportHref } from "../../support/support-workspace-contract";
+import { authorPublicationDeskCopy } from "../author-publication-desk-copy";
 import {
   type EditableContent,
   parseEditableContent,
   platformFieldClass,
   platformRequest,
-} from "../../../lib/user-platform-client";
-import {
-  contentFieldsSchema,
-  editorialTypes,
-  writerTypes,
-} from "../../../lib/user-platform-contract";
-import { getUserPlatformCopy, userPlatformError } from "../../../lib/user-platform-copy";
-import { confirmAction } from "../../../components/confirm-action";
+} from "../user-platform-client";
+import { contentFieldsSchema, editorialTypes, writerTypes } from "../user-platform-contract";
+import { getUserPlatformCopy, userPlatformError } from "../user-platform-copy";
 
 export function AuthorContentForm({
   locale,
@@ -37,6 +50,18 @@ export function AuthorContentForm({
   server?: { id: string; name: string };
 }) {
   const copy = getUserPlatformCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [
+      ...Object.values(copy),
+      ...Object.values(authorPublicationDeskCopy(locale)),
+      ...Object.values(organizationContentCopy(locale)),
+      ...Object.values(serverContentCopy(locale)),
+    ].includes(text)
+      ? text
+      : fallback;
+  }
+  const formErrorHint = getDictionary(locale).errors.formErrorHint;
   const router = useRouter();
   const [saved, setSaved] = useState(initial);
   const [busy, setBusy] = useState(false);
@@ -157,7 +182,7 @@ export function AuthorContentForm({
       setNotice({ text: copy.saved, error: false });
       setPreview(null);
     } catch (error) {
-      setNotice({ text: error instanceof Error ? error.message : copy.unavailable, error: true });
+      setNotice({ text: safeMessage(error, copy.unavailable), error: true });
     } finally {
       pending.current = false;
       setBusy(false);
@@ -194,7 +219,7 @@ export function AuthorContentForm({
         throw new Error(copy.UNCONFIRMED);
       setLatest(next);
     } catch (error) {
-      setNotice({ text: error instanceof Error ? error.message : copy.unavailable, error: true });
+      setNotice({ text: safeMessage(error, copy.unavailable), error: true });
     } finally {
       pending.current = false;
       setBusy(false);
@@ -252,34 +277,32 @@ export function AuthorContentForm({
       setNotice({ text: copy.archivedNote, error: false });
       router.refresh();
     } catch (error) {
-      setNotice({ text: error instanceof Error ? error.message : copy.unavailable, error: true });
+      setNotice({ text: safeMessage(error, copy.unavailable), error: true });
     } finally {
       pending.current = false;
       setBusy(false);
     }
   }
   return (
-    <div className="min-w-0 space-y-4 overflow-x-clip">
+    <div className={pageShellStack4}>
       {server && (
-        <p className="text-sm text-secondary">
+        <p className={typeSmSecondary}>
           {serverContentCopy(locale).context}: <strong>{server.name}</strong>
         </p>
       )}
       {organization && (
-        <p className="text-sm text-secondary">
+        <p className={typeSmSecondary}>
           {organizationContentCopy(locale).context}: <strong>{organization.name}</strong>
         </p>
       )}
-      <p className="rounded-lg border border-base bg-inset p-4 text-sm text-muted">
-        {archived ? copy.archivedNote : copy.reviewNote}
-      </p>
+      <p className={surfaceInsetP4TextSmMuted}>{archived ? copy.archivedNote : copy.reviewNote}</p>
       {saved && (
-        <div className="flex flex-wrap items-center gap-4 text-sm">
+        <div className={typeFlexWrapCenterGap4Sm}>
           {!server && !organization && (
             <Link
               prefetch={false}
               href={`/workspace/content/${encodeURIComponent(saved.id)}/history`}
-              className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentRounded}
             >
               {authorPublicationDeskCopy(locale).history}
             </Link>
@@ -288,18 +311,12 @@ export function AuthorContentForm({
             {copy.status}: {copy[saved.status]}
           </span>
           {saved.status === "published" && (
-            <Link
-              href={`/articles/${saved.slug}`}
-              className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={`/articles/${saved.slug}`} className={linkAccentRounded}>
               {copy.publicView}
             </Link>
           )}
           {archived && (
-            <Link
-              href={publicationSupportHref(saved.title)}
-              className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={publicationSupportHref(saved.title)} className={linkAccentRounded}>
               {copy.archivedNote}
             </Link>
           )}
@@ -307,47 +324,44 @@ export function AuthorContentForm({
       )}
       {notice?.error ? (
         <div className="space-y-2">
-          <ErrorState title={notice.text} />
+          <ErrorState title={notice.text} description={formErrorHint} />
           {saved && (
             <Button
               type="button"
               variant="ghost"
               disabled={busy}
               onClick={() => void checkSavedVersion()}
-              className="h-auto min-h-11 rounded px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSmRounded}
             >
               {copy.checkLatestContent}
             </Button>
           )}
           {(organization || server) && !saved && (
-            <Link
-              href={workspacePath}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={workspacePath} className={linkAccentSmRounded}>
               {server ? serverContentCopy(locale).title : organizationContentCopy(locale).title}
             </Link>
           )}
         </div>
       ) : null}
       {notice && !notice.error ? (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {notice.text}
         </p>
       ) : null}
       {latest && (
-        <section className="nexus-panel min-w-0 space-y-3 p-5" aria-label={copy.latestContent}>
+        <section className={panelMinSpace3P5} aria-label={copy.latestContent}>
           <h2 className="font-semibold">{copy.latestContent}</h2>
-          <p className="text-sm text-muted">{copy.latestContentHelp}</p>
+          <p className={typeSmMuted}>{copy.latestContentHelp}</p>
           <p>
             {copy.status}: {copy[latest.status]}
           </p>
           <p>
             {copy.title}: {latest.title}
           </p>
-          <p className="whitespace-pre-wrap break-words">
+          <p className={typePrewrapBreak}>
             {copy.excerpt}: {latest.excerpt}
           </p>
-          <p className="whitespace-pre-wrap break-words">
+          <p className={typePrewrapBreak}>
             {copy.body}: {latest.body}
           </p>
           <p className="break-words">
@@ -381,7 +395,7 @@ export function AuthorContentForm({
       >
         <fieldset disabled={busy || archived} className="space-y-4">
           {!saved && (
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className={typeGrid2Gap4}>
               <label className="block space-y-1 text-sm text-secondary">
                 <span>{copy.type}</span>
                 <select name="type" className={platformFieldClass}>
@@ -438,7 +452,7 @@ export function AuthorContentForm({
               className={platformFieldClass}
             />
           </label>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className={typeGrid2Gap4}>
             <label className="block space-y-1 text-sm text-secondary">
               <span>{copy.tags}</span>
               <input
@@ -459,14 +473,14 @@ export function AuthorContentForm({
               />
             </label>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className={typeFlexWrapGap3}>
             <Button type="submit" isLoading={busy} disabled={Boolean(latest)} className="min-h-11">
               {saved ? copy.save : copy.submit}
             </Button>
             <Button
               type="button"
               variant="ghost"
-              className="h-auto min-h-11 rounded px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSmRounded}
               onClick={() =>
                 setPreview(
                   preview === null

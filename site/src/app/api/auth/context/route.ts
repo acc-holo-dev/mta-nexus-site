@@ -1,17 +1,19 @@
-import { organizationRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
-import { readAuthJson } from "../../../../lib/auth-request-body";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
+import { authAppErrorText } from "../../../../features/accounts/auth-app-error";
+import { authContextApiCopy } from "../../../../features/accounts/auth-context-api-copy";
+import { readAuthJson } from "../../../../lib/http/auth-request-body";
+import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { resolveLocale } from "../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
-} from "../../../../lib/observability";
-import { authService } from "../../../../lib/services/auth-service";
+} from "../../../../lib/platform/observability";
+import { authService } from "../../../../lib/services/accounts/auth-service";
 
 const contextSchema = z
   .object({
@@ -38,18 +40,19 @@ function json(context: RequestLogContext, body: unknown, status = 200) {
 
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
+  const copy = authContextApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
 
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
 
     if (!user) {
-      return json(context, { error: "Authentication required" }, 401);
+      return json(context, { error: copy.authenticationRequired }, 401);
     }
 
     const [ownedOrganizations, memberships] = await Promise.all([
-      organizationRepository.listOwnedByUser(user.id, 50),
-      organizationRepository.listUserMemberships(user.id),
+      authService.listOwnedOrganizations(user.id, 50),
+      authService.listUserMemberships(user.id),
     ]);
 
     const contextsById = new Map<
@@ -78,7 +81,7 @@ export async function GET(request: NextRequest) {
       .slice(0, Math.max(0, 50 - contextsById.size));
 
     const memberOrganizations = remainingMemberships.length
-      ? await organizationRepository.findSummariesByIds(
+      ? await authService.findOrganizationSummariesByIds(
           remainingMemberships.map((membership) => membership.organizationId),
         )
       : [];
@@ -101,7 +104,7 @@ export async function GET(request: NextRequest) {
 
     const requestedActiveContextId = user.activeContextId ?? "personal";
     if (requestedActiveContextId !== "personal" && !contextsById.has(requestedActiveContextId)) {
-      const active = await organizationRepository.findUserContext(
+      const active = await authService.findUserOrganizationContext(
         requestedActiveContextId,
         user.id,
       );
@@ -145,7 +148,7 @@ export async function GET(request: NextRequest) {
     return json(
       context,
       {
-        error: "Account contexts are temporarily unavailable.",
+        error: copy.listUnavailable,
       },
       503,
     );
@@ -154,12 +157,13 @@ export async function GET(request: NextRequest) {
 
 export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
+  const copy = authContextApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const authenticated = await authService.getSessionIdentity(token);
 
     if (!authenticated || !token) {
-      return json(context, { error: "Authentication required" }, 401);
+      return json(context, { error: copy.authenticationRequired }, 401);
     }
 
     const { user } = authenticated;
@@ -168,7 +172,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: "Too many context switches. Please try again shortly.",
+          error: copy.rate,
         },
         429,
       );
@@ -179,7 +183,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: "Invalid context",
+          error: copy.invalidContext,
           details: parsed.error.format(),
         },
         400,
@@ -187,11 +191,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     }
 
     if (parsed.data.expectedActorId !== user.id) {
-      return json(
-        context,
-        { error: "Account changed. Reload contexts.", code: "ACTOR_CHANGED" },
-        409,
-      );
+      return json(context, { error: copy.accountChanged, code: "ACTOR_CHANGED" }, 409);
     }
 
     const updated = await authService.switchContext(user.id, parsed.data.contextId, token);
@@ -207,7 +207,11 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: error.message,
+          error: authAppErrorText(error, {
+            unauthorized: copy.authenticationRequired,
+            conflict: copy.accountChanged,
+            failed: copy.switchFailed,
+          }),
           code: error.code,
         },
         error.statusCode,
@@ -221,6 +225,6 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       status: 500,
       error,
     });
-    return json(context, { error: "Failed to switch context" }, 500);
+    return json(context, { error: copy.switchFailed }, 500);
   }
 });

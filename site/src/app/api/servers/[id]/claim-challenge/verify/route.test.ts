@@ -33,7 +33,7 @@ const verifyChallenge = vi.hoisted(() =>
   }),
 );
 
-vi.mock("../../../../../../lib/services/auth-service", () => ({
+vi.mock("../../../../../../lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () =>
       state.authenticated
@@ -46,7 +46,7 @@ vi.mock("../../../../../../lib/services/auth-service", () => ({
   },
 }));
 
-vi.mock("../../../../../../lib/services/server-claim-service", () => ({
+vi.mock("../../../../../../lib/services/servers/server-claim-service", () => ({
   serverClaimService: {
     verifyChallenge,
   },

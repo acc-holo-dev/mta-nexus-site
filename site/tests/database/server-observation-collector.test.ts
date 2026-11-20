@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, expect, it } from "vitest";
-import { buildMasterObservationCandidates } from "../../src/lib/services/server-observation-matching";
+import { buildMasterObservationCandidates } from "../../src/lib/services/servers/server-observation-matching";
 
 describe("server observation collector", () => {
   it("matches known endpoints once and records only confirmed listings", () => {

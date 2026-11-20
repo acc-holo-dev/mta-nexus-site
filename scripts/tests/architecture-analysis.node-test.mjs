@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
-import { createRequire } from "node:module";
 import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import test from "node:test";
@@ -11,9 +11,10 @@ const require = createRequire(import.meta.url);
 const cruiserConfig = require(resolve(root, ".dependency-cruiser.cjs"));
 const cruiserExceptions = require(resolve(root, ".dependency-cruiser.exceptions.cjs"));
 
-test("HTTP→db exception lists stay non-empty and disjoint by category", () => {
+test("HTTP→db exception lists stay disjoint; read/health allowlist stays non-empty", () => {
   assert.ok(cruiserExceptions.HTTP_DB_ALLOWED_READ_HEALTH.length > 0);
-  assert.ok(cruiserExceptions.HTTP_DB_SERVICE_REQUIRED.length > 0);
+  // SERVICE_REQUIRED may be empty after the HTTP→service burn-down; do not reintroduce paths here.
+  assert.ok(Array.isArray(cruiserExceptions.HTTP_DB_SERVICE_REQUIRED));
   const overlap = cruiserExceptions.HTTP_DB_ALLOWED_READ_HEALTH.filter((pattern) =>
     cruiserExceptions.HTTP_DB_SERVICE_REQUIRED.includes(pattern),
   );

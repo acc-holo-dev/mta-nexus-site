@@ -14,8 +14,11 @@ export const publishing = {
     type: "Тип",
     tags: "Теги через запятую",
     version: "Версия",
+    versionPlaceholder: "1.1.0",
     minMtaVersion: "Минимальная версия MTA",
+    minMtaVersionPlaceholder: "1.6.0",
     dependencies: "Зависимости ресурса, slug через запятую",
+    dependenciesPlaceholder: "core-ui, vehicle-pack",
     buildArchive: "Архив сборки",
     buildFileRequirements: "ZIP, RAR, 7z или Lua. Максимальный размер: {maxFileSize} МБ.",
     buildFileTooLarge: "Выберите файл размером не более {maxFileSize} МБ.",
@@ -59,6 +62,20 @@ export const publishing = {
       "Не удалось сохранить ресурс. Данные остались в форме — попробуйте снова.",
     chooseArchive: "Выберите архив сборки",
     unexpectedError: "Непредвиденная ошибка публикации",
+    restoreFailed:
+      "Не удалось проверить сессию или восстановить отправку. Войдите в исходный аккаунт и обновите страницу.",
+    recoverySaveFailed: "Не удалось сохранить данные для восстановления. Отправка не началась.",
+    sameFileRequired: "Выберите тот же файл: содержимое или имя не совпадает с исходной отправкой.",
+    checkSubmissionFields: "Проверьте поля отправки.",
+    creationUnconfirmed:
+      "Не удалось подтвердить исходное создание. Проверьте черновики и повторите исходную отправку позже.",
+    buildUnconfirmed:
+      "Не удалось подтвердить исходную сборку. Проверьте версии ресурса и повторите исходную отправку позже.",
+    resultMayBeUnknown:
+      "Результат может быть неизвестен. Для безопасного повтора выберите тот же файл; исходные данные сохранены.",
+    errorMayHaveCompleted:
+      "Отправка могла завершиться. Повтор использует исходные данные и тот же файл.",
+    retryOriginal: "Повторить исходную отправку",
     typeScript: "Скрипт",
     typeMap: "Карта",
     typeVehicle: "Транспорт",
@@ -76,6 +93,8 @@ export const publishing = {
     organizationsLoading: "Проверяем доступные организации...",
     organizationsUnavailable:
       "Организации временно недоступны. Личный сервер всё ещё можно зарегистрировать.",
+    organizationsUnavailableHint:
+      "Повтор обновляет только список организаций. Временный сбой загрузки не отменяет регистрацию личного сервера.",
     organizationSelectionUnavailable:
       "Выбранная организация больше недоступна. Обновите страницу и повторите попытку.",
     slugTaken: "Этот адрес карточки уже занят. Выберите другой slug.",
@@ -89,12 +108,19 @@ export const publishing = {
     slug: "Slug",
     descriptionLabel: "Описание",
     websiteUrl: "Сайт",
+    websiteUrlPlaceholder: "https://...",
     discordUrl: "Discord",
+    discordUrlPlaceholder: "https://discord.gg/...",
     rulesUrl: "Правила",
+    rulesUrlPlaceholder: "https://...",
     language: "Язык",
+    languageDefault: "Русский",
     region: "Регион",
+    regionPlaceholder: "Европа",
     gameplayTags: "Теги режима",
+    gameplayTagsPlaceholder: "roleplay, economy, freeroam",
     mediaUrls: "Медиа-ссылки (по одной на строку)",
+    mediaUrlsPlaceholder: "https://...",
     ipAddress: "IP-адрес или hostname",
     gameMode: "Игровой режим",
     gamePort: "Игровой порт",
@@ -111,6 +137,20 @@ export const publishing = {
     unexpectedError: "Непредвиденная ошибка регистрации",
     formErrorHint:
       "Карточка сервера не создана. Исправьте поля выше и отправьте ту же форму снова.",
+    restoreFailed:
+      "Не удалось проверить сессию или восстановить черновик. Обновите страницу и войдите в исходный аккаунт.",
+    sessionRecoveryHint:
+      "После обновления повтор проверяет только сессию этой регистрации. Временный сбой восстановления — не созданная карточка сервера.",
+    sessionChanged: "Сессия изменилась. Войдите в исходный аккаунт.",
+    resultCheckFailed: "Не удалось проверить результат. Попробуйте ещё раз.",
+    resultCheckFailedShort: "Не удалось проверить результат.",
+    listingNotConfirmed:
+      "Запись пока не подтверждена. Запрос ещё может завершиться; повторное создание заблокировано. Проверьте список серверов позже.",
+    errorMayBeUnconfirmed:
+      "Результат создания мог остаться неподтверждённым. Проверьте его перед дальнейшими действиями.",
+    creationResultUnknown:
+      "Результат создания неизвестен. Черновик сохранён, повторное создание заблокировано.",
+    checkResult: "Проверить результат",
   },
   articles: {
     title: "Инженерный центр MTA и статьи",
@@ -158,5 +198,7 @@ export const publishing = {
       "Опубликованные бесплатные ресурсы этого автора появятся здесь, когда будут доступны. Пустой список — не сбой загрузки.",
     loadUnavailable:
       "Профиль автора временно недоступен. Это не значит, что публичных релизов нет.",
+    loadUnavailableHint:
+      "Повтор обновляет только этот профиль автора. Временный сбой загрузки — не пустой список публичных релизов.",
   },
 };

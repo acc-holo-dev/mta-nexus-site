@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("../../src/lib/services/auth-service", async () => {
+vi.mock("../../src/lib/services/accounts/auth-service", async () => {
   const { createContextSwitchingAuthMock } = await import("../helpers/context-switching-harness");
   return createContextSwitchingAuthMock();
 });

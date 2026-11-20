@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { getTableColumns } from "drizzle-orm";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][],
@@ -35,8 +36,10 @@ vi.mock("../../packages/db/src/repositories/initiating-session", () => ({
 vi.mock("../../packages/db/src/repositories/entitlements", () => ({
   lockUserDownloadAccess: state.access,
 }));
+
 import { LibrarySelectionBatchesRepository } from "../../packages/db/src/repositories/library-selection-batches";
 import { librarySelectionBatchReceipts } from "../../packages/db/src/schema";
+
 const repo = new LibrarySelectionBatchesRepository(),
   date = "2026-10-12T00:00:00.000Z",
   choice = { mode: "fixed" as const, productIds: ["prd_a"] };

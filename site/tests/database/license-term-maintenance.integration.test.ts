@@ -1,12 +1,12 @@
 import { randomBytes, randomUUID } from "node:crypto";
+import { db, userRepository, licenseMaintenanceRepository as worker } from "@nexus/db";
 import { and, count, eq, sql } from "drizzle-orm";
 import { expect, it } from "vitest";
-import { db, licenseMaintenanceRepository as worker, userRepository } from "@nexus/db";
 import {
   licenses,
   licenseTermEvents,
-  notifications,
   notificationPreferences,
+  notifications,
   products,
 } from "../../packages/db/src/schema";
 

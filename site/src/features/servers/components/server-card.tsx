@@ -6,6 +6,19 @@ import { Copy, Gamepad2, Users } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
+import { formatUnknown } from "../../../lib/i18n/unknown";
+import { panelFlexColGap3P5, panelGroupHoverCol } from "../../shell/panel-shell";
+import {
+  typeClamp1XsHeadingPrimary,
+  typeClamp2CaptionMuted,
+  typeCoverHoverScale,
+  typeFlex1ColGap2P35,
+  typeFlexBetweenCaption,
+  typeFlexWrapGap2,
+  typeH35W35Shrink,
+  typeMinSpace1,
+  typeSmSemiboldSuccess,
+} from "../../shell/type-shell";
 import { type MtaMasterServer, mtaLiveStatus } from "../model/mta-master-directory-shared";
 
 function playerCountLabel(
@@ -75,7 +88,11 @@ function CopyAddressControl({
         {copying ? copy.copying : copy.copyAddress}
       </Button>
       {copyMessage === copy.copyUnavailable ? (
-        <ErrorState id="server-card-copy-unavailable" title={copy.copyUnavailable} />
+        <ErrorState
+          id="server-card-copy-unavailable"
+          title={copy.copyUnavailable}
+          description={copy.copyUnavailableHint}
+        />
       ) : (
         <p role="status" className="text-[11px] text-secondary [overflow-wrap:anywhere]">
           {copyMessage}
@@ -125,7 +142,7 @@ export function ServerCard({
   const address = `${server.ipAddress}:${server.port}`;
 
   return (
-    <article className="group flex flex-col overflow-hidden nexus-panel transition-all hover:border-strong hover:shadow-nexus">
+    <article className={panelGroupHoverCol}>
       <Link
         href={profileHref}
         className="relative block h-28 w-full overflow-hidden bg-inset"
@@ -141,7 +158,7 @@ export function ServerCard({
               height={224}
               loading="lazy"
               decoding="async"
-              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              className={typeCoverHoverScale}
             />
           </>
         ) : (
@@ -165,8 +182,8 @@ export function ServerCard({
         )}
       </Link>
 
-      <div className="flex flex-1 flex-col gap-2 p-3.5">
-        <h3 className="line-clamp-1 text-xs font-heading text-primary">
+      <div className={typeFlex1ColGap2P35}>
+        <h3 className={typeClamp1XsHeadingPrimary}>
           <Link
             href={profileHref}
             className="transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -176,14 +193,14 @@ export function ServerCard({
         </h3>
 
         <div className="flex items-center gap-2 font-caption text-muted">
-          <Gamepad2 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+          <Gamepad2 className={typeH35W35Shrink} aria-hidden="true" />
           <span className="truncate">{server.gameMode || copy.freeroam}</span>
         </div>
 
-        <p className="line-clamp-2 flex-1 font-caption text-muted">{server.description}</p>
+        <p className={typeClamp2CaptionMuted}>{server.description}</p>
 
         <div className="space-y-1.5 border-t border-base pt-2.5">
-          <div className="flex items-center justify-between font-caption">
+          <div className={typeFlexBetweenCaption}>
             <span className="flex items-center gap-1 font-medium text-secondary">
               <Users className="h-3.5 w-3.5" aria-hidden="true" />
               <span className="font-numeric">
@@ -191,7 +208,9 @@ export function ServerCard({
               </span>
             </span>
             <span className="font-numeric text-faint">
-              {occupancyPercent == null ? "—" : `${occupancyPercent}%`}
+              {occupancyPercent == null
+                ? formatUnknown(locale, occupancyPercent)
+                : `${occupancyPercent}%`}
             </span>
           </div>
           <div className="h-1 w-full overflow-hidden rounded-full bg-inset">
@@ -249,20 +268,20 @@ export function HomeNetworkServerCard({
     : playerCountLabel(observation.players, observation.maxPlayers, copy.playersUnknown);
 
   return (
-    <article aria-label={name} className="nexus-panel flex flex-col gap-3 p-5">
-      <div className="min-w-0 space-y-1">
+    <article aria-label={name} className={panelFlexColGap3P5}>
+      <div className={typeMinSpace1}>
         <h3 className="truncate text-sm font-bold text-primary">{name}</h3>
         <p className="truncate text-xs text-muted">
           {[observation.gameMode, observation.mapName].filter(Boolean).join(" · ") || address}
         </p>
       </div>
 
-      <p className="text-sm font-semibold text-success">
+      <p className={typeSmSemiboldSuccess}>
         {playersLabel}
         {!isStale && observation.players != null ? ` ${home.players}` : null}
       </p>
 
-      <div className="flex flex-wrap gap-2">
+      <div className={typeFlexWrapGap2}>
         <a
           href={connectUri}
           aria-label={`${copy.connect}: ${name}`}

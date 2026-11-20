@@ -1,6 +1,6 @@
 # Архитектура MTA NEXUS
 
-Навигация по путям и командам: [карта проекта](PROJECT-MAP.md). Предметные контракты: [RESOURCES](RESOURCES.md), [COMMUNITY](COMMUNITY.md), [SERVERS-ORGS](SERVERS-ORGS.md), [TRUST-STAFF](TRUST-STAFF.md), [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md). Операторские команды остаются в [OPERATIONS](OPERATIONS.md).
+Навигация по путям и командам: [карта проекта](PROJECT-MAP.md). Предметные контракты: [RESOURCES](current/domains/RESOURCES.md), [COMMUNITY](current/domains/COMMUNITY.md), [SERVERS-ORGS](current/domains/SERVERS-ORGS.md), [TRUST-STAFF](current/domains/TRUST-STAFF.md), [COMMERCIAL-FUTURE](COMMERCIAL-FUTURE.md). Операторские команды остаются в [OPERATIONS](OPERATIONS.md).
 
 Доменная модель и правила storage/scanner объединены здесь и в предметных контрактах. Исторические главы доступны в Git; карта переноса — в [DOCS-MIGRATION](DOCS-MIGRATION.md).
 
@@ -103,11 +103,14 @@ UI; карточка остаётся в `view`. Pure gallery/provenance helpers
 
 [Support](../site/src/features/support/README.md) содержит UI обращений и server-only
 композиции переписки. [Moderation](../site/src/features/moderation/README.md)
-содержит UI жалоб и верификации, а также серверные экраны жалоб.
+содержит UI жалоб и верификации, серверные экраны жалоб, порт `admin-home` для staff dashboard `/admin` и порт `storage-maintenance` для `/admin/storage`.
 [Accounts](../site/src/features/accounts/README.md) объединяет UI входа, аккаунта и
 настроек; [Discovery](../site/src/features/discovery/README.md) — общую серверную
-композицию каталогов. Входы отделены от внутренних модулей, границы проверяются
-анализатором и тестами. Права, сервисы, repositories и workers остаются в своих слоях.
+композицию каталогов; [Commerce](../site/src/features/commerce/README.md) — общий
+shell списков покупок, лицензий и продаж в workspace, license control/detail/archive UI.
+Входы отделены от внутренних
+модулей, границы проверяются анализатором и тестами. Права, сервисы, repositories и
+workers остаются в своих слоях.
 
 ### HTTP → service → repository
 
@@ -115,10 +118,10 @@ UI; карточка остаётся в `view`. Pure gallery/provenance helpers
 
 `dependency-cruiser` правило `http-handlers-use-services-for-db` запрещает новым `site/src/app/api/**` маршрутам импортировать `site/packages/db`, кроме явного списка исключений в `.dependency-cruiser.exceptions.cjs`:
 
-| Категория           | Смысл                                                                   | Примеры                                                                                                                                                                                                   |
-| ------------------- | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Allowed read/health | Простое чтение или health без оркестрации сценария                      | `api/health`, GET inbox `api/notifications/route.ts`, finance statements/scopes, support activity history, workspace server-organizations, admin commerce reconciliation GET, license check/check-release |
-| Service-required    | Изменение состояния или сложная выдача; при правке переносить в service | `api/admin/actions`, mark-read/preferences/push, content/follow/reports/support/verification POST, auth context switch, product/admin build download, workspace content create                            |
+| Категория           | Смысл                                                                   | Примеры                                                                                                                                                                        |
+| ------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Allowed read/health | Простое чтение или health без оркестрации сценария                      | `api/health`, finance statements/scopes, admin commerce reconciliation GET, license check/check-release                                                                        |
+| Service-required    | Изменение состояния или сложная выдача; при правке переносить в service | `api/admin/actions`, mark-read/preferences/push, content/follow/reports/support/verification POST, auth context switch, product/admin build download, workspace content create |
 
 Новый прямой импорт `@nexus/db` в API-маршруте вне этих списков должен падать на `pnpm analyze:architecture`. RSC-страницы (`app/**/page.tsx`) этим правилом не покрываются; для них сохраняется тот же смысловой контракт при появлении составных команд.
 
@@ -145,7 +148,7 @@ UI; карточка остаётся в `view`. Pure gallery/provenance helpers
 
 Ключевые сущности и связи: Account/Identity; Server (master-list observation vs managed profile); Organization; Resource/Product + Build/Version + scan evidence; Library/Collection (не server pack); Content/Discussion; Notification inbox; Support/Staff case; будущие Order/License/Entitlement без активации платежей в free beta. Схемы и миграции — `site/packages/db`; факты runtime — код.
 
-Цели и границы storage, scanner, observability и production mounts — в [OPERATIONS](OPERATIONS.md); Security Center и quarantine admin — в [TRUST-STAFF](TRUST-STAFF.md).
+Цели и границы storage, scanner, observability и production mounts — в [OPERATIONS](OPERATIONS.md); Security Center и quarantine admin — в [TRUST-STAFF](current/domains/TRUST-STAFF.md).
 
 ## Граница продукта
 

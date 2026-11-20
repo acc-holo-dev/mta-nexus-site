@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
-import { AdminReportsSection } from "../../src/components/admin/admin-reports-section";
+import { AdminReportsSection } from "../../src/features/moderation/components/admin-reports-section";
 import { getDictionary } from "../../src/lib/i18n";
 
 vi.mock("next/link", async () => {
@@ -35,7 +35,7 @@ vi.mock("../../src/features/resources/qa-report-actions", () => ({
   ),
 }));
 
-vi.mock("../../src/components/report-evidence-links", () => ({
+vi.mock("../../src/features/community/report-evidence-links", () => ({
   ReportEvidenceLinks: () => null,
 }));
 

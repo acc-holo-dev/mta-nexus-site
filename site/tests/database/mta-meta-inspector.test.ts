@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
-  MetaInspectionInputError,
   inspectMtaMetaXml,
+  MetaInspectionInputError,
   metaInspectionLimits,
-} from "../../src/lib/mta-meta-inspector";
+} from "../../src/features/resources/mta-meta-inspector";
 
 describe("MTA meta.xml inspector", () => {
   it("extracts documented resource structure without inventing security verdicts", () => {

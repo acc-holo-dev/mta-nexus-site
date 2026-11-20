@@ -1,11 +1,10 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
 import { ContentFollowControls } from "../../src/features/community/components/content-follow-controls";
-import { FollowButton } from "../../src/components/follow-button";
-import { FollowWorkspace } from "../../src/components/follow-workspace";
-import { LocaleProvider } from "../../src/components/locale-context";
-import type { FollowPage } from "../../src/lib/follow-workspace-contract";
-import { followActionCopy, followCopy } from "../../src/lib/follow-workspace-copy";
+import { FollowButton, FollowWorkspace } from "../../src/features/community/follow";
+import type { FollowPage } from "../../src/features/community/follow-workspace-contract";
+import { followActionCopy, followCopy } from "../../src/features/community/follow-workspace-copy";
+import { LocaleProvider } from "../../src/features/shell/locale";
 import { getDictionary } from "../../src/lib/i18n";
 import { followWorkspaceItemBase } from "../helpers/discovery-follow-surface-harness";
 

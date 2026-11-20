@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { extractSpec, makeFixture, assertNamedDataMount } from "../check-postgres-persistence.mjs";
+import { assertNamedDataMount, extractSpec, makeFixture } from "../check-postgres-persistence.mjs";
 
 const config = (target = "/var/lib/postgresql") => ({
   services: {

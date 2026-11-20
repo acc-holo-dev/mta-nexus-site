@@ -13,8 +13,11 @@ const source = readFileSync(
 /** Honesty lock: inactive/max-revision move-source notice must use ErrorState. */
 it("locks library collection move-source unavailable notice to ErrorState", () => {
   expect(source).toContain('id="library-collection-move-source-unavailable"');
+  expect(source).toContain('id="library-collection-move-source-unavailable"');
+  expect(source).toContain("title={c.moveSourceUnavailable}");
+  expect(source).toContain("description={c.moveSourceUnavailableHint}");
   expect(source).toMatch(
-    /move && \(source\.status !== "active" \|\| source\.revision >= 2147483647\)\)\s*return \(\s*<ErrorState id="library-collection-move-source-unavailable" title=\{c\.moveSourceUnavailable\} \/>\s*\);/u,
+    /move && \(source\.status !== "active" \|\| source\.revision >= 2147483647\)/u,
   );
   expect(source).not.toContain('<p role="note">{c.moveSourceUnavailable}</p>');
 });

@@ -1,6 +1,4 @@
 import { randomBytes } from "node:crypto";
-import { count, inArray, sql } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
 import {
   db,
   notificationRepository,
@@ -11,6 +9,8 @@ import {
   webPushOutboxRepository,
   webPushSubscriptionRepository,
 } from "@nexus/db";
+import { count, inArray, sql } from "drizzle-orm";
+import { describe, expect, it } from "vitest";
 
 describe("Web Push outbox capacity gate", () => {
   it("serializes concurrent enqueue at capacity without rolling back inbox rows", async () => {

@@ -3,19 +3,28 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { Flag } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import type { Locale } from "../../../lib/i18n";
+import { linkFocusRing, linkGhostAccentSm, linkMuted } from "../../shell/link-shell";
+import { pageShellStack5 } from "../../shell/page-shell";
+import { panelFlexMinWrapEndP4, panelMinSpace2P4 } from "../../shell/panel-shell";
+import {
+  typeFlexMinWrapGap3,
+  typeFlexWrapCenterGap4Sm,
+  typeMinSpace3,
+  typeMinW40Flex1Space1SmSecondary,
+  typePrewrapSmSecondary,
+  typeXsMuted,
+  typeXsSecondary,
+} from "../../shell/type-shell";
 import {
   type CommunityReportPage,
   type CommunityReportQuery,
   communityReportPageSchema,
   REPORT_TYPES,
-} from "../../../lib/community-report-contract";
-import { communityReportCopy, communityReportError } from "../../../lib/community-report-copy";
-import type { Locale } from "../../../lib/i18n";
-import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
-
-const filterNavLinkClass =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+} from "../community-report-contract";
+import { communityReportCopy, communityReportError } from "../community-report-copy";
+import { platformFieldClass, platformRequest } from "../user-platform-client";
+import { getUserPlatformCopy } from "../user-platform-copy";
 export function CommunityReportList({
   initial,
   filters,
@@ -29,6 +38,12 @@ export function CommunityReportList({
 }) {
   const copy = communityReportCopy(locale),
     path = staff ? "/admin/reports" : "/workspace/reports";
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(text)
+      ? text
+      : fallback;
+  }
   const [page, setPage] = useState(initial),
     [pending, setPending] = useState(false),
     [error, setError] = useState(initial ? "" : copy.unavailable);
@@ -65,32 +80,28 @@ export function CommunityReportList({
         throw new Error(copy.unavailable);
       setPage(result.data);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : copy.unavailable);
+      setError(safeMessage(caught, copy.unavailable));
     } finally {
       guard.current = false;
       setPending(false);
     }
   }
   return (
-    <div className="min-w-0 space-y-5 overflow-x-clip" aria-busy={pending}>
-      <nav className="flex min-w-0 flex-wrap gap-3" aria-label={copy.status}>
+    <div className={pageShellStack5} aria-busy={pending}>
+      <nav className={typeFlexMinWrapGap3} aria-label={copy.status}>
         {(["pending", "history"] as const).map((view) => (
           <Link
             key={view}
             href={href({ view, page: 1 })}
             aria-current={filters.view === view ? "page" : undefined}
-            className={`inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-sm ${filterNavLinkClass} ${filters.view === view ? "bg-accent-soft text-accent" : "text-secondary"}`}
+            className={`inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-sm ${linkFocusRing} ${filters.view === view ? "bg-accent-soft text-accent" : "text-secondary"}`}
           >
             {copy[view]}
           </Link>
         ))}
       </nav>
       <search aria-label={copy.textSearch}>
-        <form
-          method="GET"
-          action={path}
-          className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
-        >
+        <form method="GET" action={path} className={panelFlexMinWrapEndP4}>
           <input type="hidden" name="view" value={filters.view} />
           <label className="min-w-0 basis-full space-y-1 text-sm text-secondary">
             <span>{copy.textSearch}</span>
@@ -106,7 +117,7 @@ export function CommunityReportList({
               {copy.searchHint}
             </span>
           </label>
-          <label className="min-w-40 flex-1 space-y-1 text-sm text-secondary">
+          <label className={typeMinW40Flex1Space1SmSecondary}>
             <span>{copy.target}</span>
             <select
               name="target"
@@ -118,7 +129,7 @@ export function CommunityReportList({
               <option value="comment">{copy.comment}</option>
             </select>
           </label>
-          <label className="min-w-40 flex-1 space-y-1 text-sm text-secondary">
+          <label className={typeMinW40Flex1Space1SmSecondary}>
             <span>{copy.category}</span>
             <select name="type" defaultValue={filters.type ?? ""} className={platformFieldClass}>
               <option value="">{copy.all}</option>
@@ -133,7 +144,7 @@ export function CommunityReportList({
             {copy.search}
           </Button>
           <Link
-            className={`inline-flex min-h-11 items-center text-sm text-accent underline ${filterNavLinkClass}`}
+            className={`inline-flex min-h-11 items-center text-sm text-accent underline ${linkFocusRing}`}
             href={path}
           >
             {copy.reset}
@@ -143,13 +154,14 @@ export function CommunityReportList({
       {error ? (
         <ErrorState
           title={error}
+          description={copy.unavailableHint}
           action={
             <Button
               type="button"
               variant="ghost"
               disabled={pending}
               onClick={() => void reload()}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
             >
               {pending ? copy.loading : copy.reload}
             </Button>
@@ -175,7 +187,7 @@ export function CommunityReportList({
             filtersActive ? (
               <Link
                 href={path}
-                className={`inline-flex min-h-11 items-center text-accent underline ${filterNavLinkClass}`}
+                className={`inline-flex min-h-11 items-center text-accent underline ${linkFocusRing}`}
               >
                 {copy.reset}
               </Link>
@@ -183,23 +195,21 @@ export function CommunityReportList({
           }
         />
       ) : null}
-      <div className="min-w-0 space-y-3">
+      <div className={typeMinSpace3}>
         {!error
           ? page?.items.map((report) => (
-              <article key={report.id} className="nexus-panel min-w-0 space-y-2 p-4">
+              <article key={report.id} className={panelMinSpace2P4}>
                 <div className="flex min-w-0 flex-wrap justify-between gap-2">
                   <Link
-                    className={`break-words text-sm font-semibold text-accent underline ${filterNavLinkClass}`}
+                    className={`break-words text-sm font-semibold text-accent underline ${linkFocusRing}`}
                     href={`${path}/${encodeURIComponent(report.id)}`}
                   >
                     {copy[report.targetType]} · {copy[report.type]}
                   </Link>
-                  <span className="text-xs text-secondary">{copy[report.status]}</span>
+                  <span className={typeXsSecondary}>{copy[report.status]}</span>
                 </div>
-                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                  {report.reason}
-                </p>
-                <p className="text-xs text-muted">
+                <p className={typePrewrapSmSecondary}>{report.reason}</p>
+                <p className={typeXsMuted}>
                   {copy.created}:{" "}
                   <time dateTime={report.createdAt}>
                     {new Date(report.createdAt).toLocaleString(
@@ -216,21 +226,21 @@ export function CommunityReportList({
           : null}
       </div>
       {!error ? (
-        <nav className="flex flex-wrap items-center gap-4 text-sm" aria-label={copy.page}>
+        <nav className={typeFlexWrapCenterGap4Sm} aria-label={copy.page}>
           {filters.page > 1 && (
             <Link
-              className={`inline-flex min-h-11 items-center text-accent underline ${filterNavLinkClass}`}
+              className={`inline-flex min-h-11 items-center text-accent underline ${linkFocusRing}`}
               href={href({ page: filters.page - 1 })}
             >
               {copy.previous}
             </Link>
           )}
-          <span className="inline-flex min-h-11 items-center text-muted">
+          <span className={linkMuted}>
             {copy.page} {filters.page}
           </span>
           {page?.hasMore && filters.page < 9999 && (
             <Link
-              className={`inline-flex min-h-11 items-center text-accent underline ${filterNavLinkClass}`}
+              className={`inline-flex min-h-11 items-center text-accent underline ${linkFocusRing}`}
               href={href({ page: filters.page + 1 })}
             >
               {copy.next}

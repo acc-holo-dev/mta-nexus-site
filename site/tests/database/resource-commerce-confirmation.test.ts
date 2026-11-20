@@ -1,11 +1,11 @@
-import { expect, it } from "vitest";
 import { canTransitionResource } from "@nexus/domain";
+import { expect, it } from "vitest";
 import {
   confirmedCartAcquisition,
   confirmedResourceCart,
   confirmedResourceClaim,
-} from "../../src/lib/resource-commerce-confirmation";
-import { resourceCommerceError } from "../../src/lib/resource-commerce-i18n";
+} from "../../src/features/resources/resource-commerce-confirmation";
+import { resourceCommerceError } from "../../src/features/resources/resource-commerce-i18n";
 
 it("accepts only a confirmed acquisition of the exact selected resources", () => {
   const result = {

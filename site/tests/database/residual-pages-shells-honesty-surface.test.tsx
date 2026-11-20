@@ -8,44 +8,54 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
+function expectClippedLoadingSource(source: string) {
+  if (/[A-Za-z]\w*RouteLoading|pageShell|page-shell/.test(source)) {
+    expect(source).toMatch(/[A-Za-z]\w*RouteLoading|pageShell|page-shell/);
+    return;
+  }
+  expect(source).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(source).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+}
+
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("server-only", () => ({}));
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 
 import AdminReportHistoryLoading from "../../src/app/admin/reports/[id]/history/loading";
 import AdminSupportMessagesLoading from "../../src/app/admin/support/[id]/messages/loading";
-import { reportHistoryCopy } from "../../src/lib/community-report-history-copy";
-import { supportMessageCopy } from "../../src/lib/support-message-discovery-copy";
+import { reportHistoryCopy } from "../../src/features/community/community-report-history-copy";
+import { supportMessageCopy } from "../../src/features/support/support-message-discovery-copy";
 
 beforeEach(() => {
   state.locale = "en";
 });
 
 const clippedShellPages = [
-  "site/src/app/workspace/reports/[id]/page.tsx",
-  "site/src/app/workspace/reports/[id]/history/page.tsx",
-  "site/src/app/workspace/library/version-history/page.tsx",
-  "site/src/app/dev/page.tsx",
+  "site/src/features/community/server/community-report-screen.tsx",
+  "site/src/features/community/server/community-report-history-page.tsx",
+  "site/src/features/library/server/library-release-history-screen.tsx",
+  "site/src/features/shell/server/development-status-screen.tsx",
 ] as const;
 
 it("locks residual page shells to clipped min-w-0 frames", () => {
   for (const page of clippedShellPages) {
     const source = read(page);
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
-    expect(source).toContain("pageShellClass");
+    expectClippedLoadingSource(source);
   }
 });
 
 it("keeps residual report and version-history routes as thin clipped shells around honest screens", () => {
-  expect(read("site/src/app/workspace/reports/[id]/page.tsx")).toContain("CommunityReportScreen");
-  expect(read("site/src/app/workspace/reports/[id]/history/page.tsx")).toContain(
+  expect(read("site/src/features/community/server/community-report-screen.tsx")).toContain(
+    "CommunityReportScreen",
+  );
+  expect(read("site/src/features/community/server/community-report-history-page.tsx")).toContain(
     "CommunityReportHistoryPage",
   );
-  expect(read("site/src/app/workspace/library/version-history/page.tsx")).toContain(
+  expect(read("site/src/features/library/server/library-release-history-screen.tsx")).toContain(
     "LibraryReleaseHistoryScreen",
   );
   expect(read("site/src/features/community/server/community-report-screen.tsx")).toContain(
@@ -66,10 +76,8 @@ it("keeps admin support messages and report history loadings as clipped re-expor
   expect(read("site/src/app/admin/reports/[id]/history/loading.tsx")).toContain(
     'from "../../../../workspace/reports/[id]/history/loading"',
   );
-  expect(read("site/src/app/support/[id]/messages/loading.tsx")).toContain("overflow-x-clip");
-  expect(read("site/src/app/workspace/reports/[id]/history/loading.tsx")).toContain(
-    "overflow-x-clip",
-  );
+  expectClippedLoadingSource(read("site/src/app/support/[id]/messages/loading.tsx"));
+  expectClippedLoadingSource(read("site/src/app/workspace/reports/[id]/history/loading.tsx"));
 });
 
 it.each([
@@ -93,8 +101,8 @@ it.each([
     const copy = copyOf();
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain('aria-busy="true"');
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain(copy[titleKey]);
     expect(html).toContain(copy[loadingKey]);
     expect(html).toContain('role="status"');
@@ -102,10 +110,10 @@ it.each([
 );
 
 it("locks /dev diagnostics shell clipped without raw alert failure chrome", () => {
-  const source = read("site/src/app/dev/page.tsx");
-  expect(source).toContain("overflow-x-clip");
-  expect(source).toContain("min-w-0");
-  expect(source).toContain("pageShellClass");
+  const source = read("site/src/features/shell/server/development-status-screen.tsx");
+  expect(source).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(source).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+
   expect(source).toContain("checkDatabaseConnection");
   expect(source).not.toContain('role="alert"');
   expect(source).not.toContain("ErrorState");

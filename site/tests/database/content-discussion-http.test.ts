@@ -26,10 +26,10 @@ vi.mock("next/server", async () => ({
     state.after.push(callback);
   },
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/services/content-service", () => ({
+vi.mock("../../src/lib/services/community/content-service", () => ({
   contentService: {
     getArticleBySlug: mocks.article,
     pageDiscussion: mocks.page,
@@ -37,7 +37,7 @@ vi.mock("../../src/lib/services/content-service", () => ({
     commentAuthor: mocks.parent,
   },
 }));
-vi.mock("../../src/lib/services/discussion-follow-notification-service", () => ({
+vi.mock("../../src/lib/services/community/discussion-follow-notification-service", () => ({
   notifyDiscussionReplies: mocks.notify,
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));

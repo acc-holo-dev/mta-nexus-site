@@ -13,6 +13,7 @@ export const workspace = {
     loadUnavailableHint:
       "A load failure is not an empty inventory. Retry to fetch the latest private publisher state.",
     back: "Back to my resources",
+    manageDocumentTitle: "Manage resource",
     edit: "Resource details",
     save: "Save details",
     saving: "Saving…",
@@ -123,11 +124,15 @@ export const workspace = {
     emptyLibraryHint:
       "Free resources and active grants appear here after you add them to your account.",
     libraryUnavailable: "Your resource library preview is temporarily unavailable.",
+    libraryUnavailableHint:
+      "Retry reloads this workspace library preview only. A temporary load failure is not an empty library.",
     serversDescription: "Only servers owned by your account",
     manage: "Manage",
     noServers: "You have not registered a server yet.",
     noServersHint: "Register a personal server to manage it from this workspace.",
     serversUnavailable: "Your managed servers preview is temporarily unavailable.",
+    serversUnavailableHint:
+      "Retry reloads this managed-servers preview only. A temporary load failure is not an empty server list.",
   },
   servers: {
     title: "Multi Theft Auto servers",
@@ -138,6 +143,8 @@ export const workspace = {
     network: "MTA Network",
     loading: "Loading servers...",
     unavailable: "Server list unavailable.",
+    unavailableHint:
+      "Retry reloads this directory panel only. A temporary load failure is not an empty public server list.",
     updated: "Updated",
     updateUnknown: "Update time unknown.",
     search: "Search servers",
@@ -148,6 +155,8 @@ export const workspace = {
       "Open in MTA launches the mtasa:// protocol when your browser and client allow it. That click is a connect intent only — NEXUS does not verify play. You can also copy the address for manual Quick Connect.",
     stale:
       "Updates are delayed. Showing the last available snapshot; player counts may have changed.",
+    staleHint:
+      "The list below uses the last successful snapshot. Delayed counts are not a directory fetch failure.",
     tryAgain: "Try again",
     resetFilters: "Reset filters",
     noMatch: "No public MTA servers match these filters.",
@@ -166,6 +175,8 @@ export const workspace = {
     copying: "Copying...",
     copied: "Address copied",
     copyUnavailable: "Copy is unavailable. The address is selected; copy it manually.",
+    copyUnavailableHint:
+      "Clipboard access failed; the address field is selected for manual copy. This is not a directory or server load failure.",
     noDetails: "No additional server details",
     passwordRequired: "Password required",
     playersUnknown: "Player count unknown",

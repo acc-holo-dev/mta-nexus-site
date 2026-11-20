@@ -1,48 +1,65 @@
 import { AppError } from "@nexus/domain";
 import { can } from "@nexus/security";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { moderationCopy } from "../../../lib/community-moderation-copy";
-import { REPORT_TYPES } from "../../../lib/community-report-contract";
-import { communityReportCopy } from "../../../lib/community-report-copy";
+import type { Locale } from "../../../lib/i18n";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { communityModerationService } from "../../../lib/services/community/community-moderation-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
+import { pageShellMax5xlBare, pageShellMax5xlTight } from "../../shell/page-shell";
+import { panelGrid2P5, panelSpace3P5 } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import {
+  type2xlBoldPrimary,
+  typeBreakPrimary,
+  typeFlexWrapGap4,
+  typeSmMuted,
+  typeSpace1SmPrimary,
+  typeXlBoldPrimary,
+} from "../../shell/type-shell";
+import { moderationCopy } from "../community-moderation-copy";
+import { REPORT_TYPES } from "../community-report-contract";
+import { communityReportCopy } from "../community-report-copy";
+import { DiscussionReportBatch } from "../components/discussion-report-batch";
 import {
   discussionReportsHref,
   discussionReportsPageSchema,
   parseDiscussionReportsQuery,
-} from "../../../lib/discussion-reports-contract";
-import { discussionReportsCopy } from "../../../lib/discussion-reports-copy";
-import type { Locale } from "../../../lib/i18n";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { moderatedDiscussionHref } from "../../../lib/moderated-discussion-contract";
-import { authService } from "../../../lib/services/auth-service";
-import { communityModerationService } from "../../../lib/services/community-moderation-service";
-import { platformFieldClass } from "../../../lib/user-platform-client";
-import { DiscussionReportBatch } from "../components/discussion-report-batch";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip";
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+} from "../discussion-reports-contract";
+import { discussionReportsCopy } from "../discussion-reports-copy";
+import { moderatedDiscussionHref } from "../moderated-discussion-contract";
+import { platformFieldClass } from "../user-platform-client";
 
 function DiscussionReportsLoadError({ locale, retryHref }: { locale: Locale; retryHref: string }) {
   const copy = discussionReportsCopy(locale),
     dictionary = getDictionary(locale);
   return (
-    <section className={`nexus-panel space-y-3 p-5 ${pageShellClass}`}>
-      <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
+    <section className={`${panelSpace3P5} ${pageShellMax5xlTight}`}>
+      <h1 className={typeXlBoldPrimary}>{copy.title}</h1>
       <ErrorState
         title={copy.loadUnavailable}
+        description={copy.loadUnavailableHint}
         action={
-          <Link href={retryHref} className={navLinkClass}>
+          <Link href={retryHref} className={linkAccentSm}>
             {dictionary.errors.retry}
           </Link>
         }
       />
     </section>
   );
+}
+
+export async function discussionReportsMetadata(): Promise<Metadata> {
+  return {
+    title: discussionReportsCopy(await getRequestLocale()).title,
+    robots: { index: false, follow: false },
+  };
 }
 
 export async function DiscussionReportsScreen({
@@ -62,16 +79,20 @@ export async function DiscussionReportsScreen({
   for (const [key, value] of Object.entries((await searchParams) ?? {}))
     if (value !== undefined)
       for (const item of Array.isArray(value) ? value : [value]) params.append(key, item);
-  const path = `/admin/community/${encodeURIComponent(id)}/discussion/${encodeURIComponent(commentId)}/reports${params.size ? `?${params}` : ""}`;
-  let sessionFailed = false;
-  const actor = await authService
-    .getSession((await cookies()).get("nexus_session")?.value)
-    .catch(() => {
-      sessionFailed = true;
-      return null;
-    });
-  if (sessionFailed) {
-    return <DiscussionReportsLoadError locale={locale} retryHref={path} />;
+  const stablePath = `/admin/community/${encodeURIComponent(id)}/discussion/${encodeURIComponent(commentId)}/reports`;
+  const path = `${stablePath}${params.size ? `?${params}` : ""}`;
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={stablePath}
+      />
+    );
   }
   if (!actor) {
     return <PlatformSignIn locale={locale} returnPath={path} />;
@@ -79,11 +100,12 @@ export async function DiscussionReportsScreen({
   if (!can(actor, "admin.moderation")) {
     const dictionary = getDictionary(locale);
     return (
-      <div className="mx-auto min-w-0 max-w-5xl overflow-x-clip">
+      <div className={pageShellMax5xlBare}>
         <ErrorState
           title={general.denied}
+          description={general.deniedHint}
           action={
-            <Link href="/admin" className={navLinkClass}>
+            <Link href="/admin" className={linkAccentSm}>
               {dictionary.admin.title}
             </Link>
           }
@@ -117,11 +139,12 @@ export async function DiscussionReportsScreen({
       return <DiscussionReportsLoadError locale={locale} retryHref={path} />;
     }
     return (
-      <div className="mx-auto min-w-0 max-w-5xl overflow-x-clip">
+      <div className={pageShellMax5xlBare}>
         <ErrorState
           title={failure || copy.unavailable}
+          description={copy.loadUnavailableHint}
           action={
-            <a href={path} className={navLinkClass}>
+            <a href={path} className={linkAccentSm}>
               {general.reload}
             </a>
           }
@@ -134,16 +157,16 @@ export async function DiscussionReportsScreen({
     filters && (filters.query || filters.type || filters.view === "history" || filters.cursor),
   );
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xlTight}>
       <header className="space-y-3">
-        <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
-        <p className="text-sm text-muted">{copy.description}</p>
-        <p className="break-words text-primary">
+        <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
+        <p className={typeSmMuted}>{copy.description}</p>
+        <p className={typeBreakPrimary}>
           {data.publication.title} · {general[data.publication.status]}
         </p>
         <Link
           href={moderatedDiscussionHref(id, undefined, undefined, commentId)}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentSm}
         >
           {copy.back}
         </Link>
@@ -154,8 +177,8 @@ export async function DiscussionReportsScreen({
         </p>
       )}
       <search aria-label={copy.search}>
-        <form action={path} className="nexus-panel grid gap-4 p-5 sm:grid-cols-2">
-          <label className="space-y-1 text-sm text-primary">
+        <form action={path} className={panelGrid2P5}>
+          <label className={typeSpace1SmPrimary}>
             <span>{copy.search}</span>
             <input
               className={platformFieldClass}
@@ -165,14 +188,14 @@ export async function DiscussionReportsScreen({
               defaultValue={filters?.query}
             />
           </label>
-          <label className="space-y-1 text-sm text-primary">
+          <label className={typeSpace1SmPrimary}>
             <span>{copy.view}</span>
             <select className={platformFieldClass} name="view" defaultValue={filters?.view}>
               <option value="pending">{copy.pending}</option>
               <option value="history">{copy.history}</option>
             </select>
           </label>
-          <label className="space-y-1 text-sm text-primary">
+          <label className={typeSpace1SmPrimary}>
             <span>{copy.type}</span>
             <select className={platformFieldClass} name="type" defaultValue={filters?.type ?? ""}>
               <option value="">{copy.all}</option>
@@ -187,10 +210,7 @@ export async function DiscussionReportsScreen({
             <Button className="min-h-11" type="submit">
               {copy.apply}
             </Button>
-            <Link
-              href={path}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={path} className={linkAccentSm}>
               {copy.clear}
             </Link>
           </div>
@@ -202,7 +222,7 @@ export async function DiscussionReportsScreen({
           description={emptyFiltered ? copy.emptyFilteredDescription : copy.emptyDescription}
           action={
             emptyFiltered ? (
-              <Link href={discussionReportsHref(id, commentId)} className={navLinkClass}>
+              <Link href={discussionReportsHref(id, commentId)} className={linkAccentSm}>
                 {copy.clear}
               </Link>
             ) : undefined
@@ -218,11 +238,11 @@ export async function DiscussionReportsScreen({
           allowActions={filters?.view === "pending"}
         />
       )}
-      <nav className="flex flex-wrap gap-4" aria-label={copy.title}>
+      <nav className={typeFlexWrapGap4} aria-label={copy.title}>
         <Link
           prefetch={false}
           href={discussionReportsHref(id, commentId, filters ?? undefined)}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentSm}
         >
           {general.latest}
         </Link>
@@ -230,7 +250,7 @@ export async function DiscussionReportsScreen({
           <Link
             prefetch={false}
             href={discussionReportsHref(id, commentId, filters ?? undefined, data.nextCursor)}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentSm}
           >
             {general.older}
           </Link>
@@ -238,4 +258,15 @@ export async function DiscussionReportsScreen({
       </nav>
     </div>
   );
+}
+
+export async function AdminDiscussionReportsPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string; commentId: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const { id, commentId } = await params;
+  return DiscussionReportsScreen({ id, commentId, searchParams });
 }

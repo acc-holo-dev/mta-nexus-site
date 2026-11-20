@@ -4,18 +4,21 @@ import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../helpers/browser-mutation-headers";
+
 const calls = vi.hoisted(() => ({ set: vi.fn(), user: { id: "actor_b" } }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: vi.fn(async () => calls.user) },
 }));
-vi.mock("../../src/lib/services/follow-workspace-service", () => ({
+vi.mock("../../src/lib/services/community/follow-workspace-service", () => ({
   followWorkspaceService: { setObjectMute: calls.set },
 }));
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
   generateId: () => "omi_test",
 }));
+
 import { POST } from "../../src/app/api/object-mute/route";
+
 beforeEach(() => {
   vi.clearAllMocks();
   stubBrowserMutationOrigin();

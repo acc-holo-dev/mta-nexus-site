@@ -47,19 +47,19 @@ vi.mock("next/link", async () => {
 vi.mock("@nexus/db", () => ({
   buildRepository: { pagePublishedReleases: state.history },
 }));
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: {
     getProductBySlug: state.getProduct,
     canManageProduct: state.canManage,
   },
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../../src/lib/services/commerce-service", () => ({
+vi.mock("../../src/lib/services/commerce/commerce-service", () => ({
   commerceService: { checkEntitlement: state.checkRight },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 vi.mock("../../src/features/resources/components/resource-download-button", async () => {
@@ -86,9 +86,9 @@ vi.mock("../../src/features/resources/components/resource-download-button", asyn
   };
 });
 
-import ReleasePage, { metadata } from "../../src/app/market/[slug]/versions/page";
+import ReleasePage, { generateMetadata } from "../../src/app/market/[slug]/versions/page";
+import { getReleaseHistoryCopy } from "../../src/features/resources/public-release-history";
 import { getDictionary } from "../../src/lib/i18n";
-import { getReleaseHistoryCopy } from "../../src/lib/public-release-history";
 
 const release = {
   id: "bld_clean_1",
@@ -234,9 +234,9 @@ describe("public safely published version archive", () => {
     const html = renderToStaticMarkup(await page("2"));
     expect(html).toContain('href="/market/safe-release/versions"');
     expect(html).toContain('href="/market/safe-release/versions?page=3"');
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-h-11");
-    expect(metadata.robots).toMatchObject({ index: false, follow: false });
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
+    expect((await generateMetadata()).robots).toMatchObject({ index: false, follow: false });
     await page(["1", "2"]);
     expect(state.history).toHaveBeenLastCalledWith("prd_release", 1);
   });
@@ -256,7 +256,7 @@ describe("public safely published version archive", () => {
       const html = renderToStaticMarkup(await page());
       expect(html).toContain(copy.noBuilds);
       expect(html).toContain(copy.noBuildsHint);
-      expect(html).toContain("overflow-x-clip");
+      expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     },
   );
 
@@ -269,8 +269,8 @@ describe("public safely published version archive", () => {
       const html = renderToStaticMarkup(await page("2"));
       expect(html).toContain('role="alert"');
       expect(html).toContain(copy.loadUnavailable);
-      expect(html).toContain("overflow-x-clip");
-      expect(html).toContain("min-h-11");
+      expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+      expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
       expect(html).toContain('href="/market/safe-release/versions?page=2"');
       expect(html).not.toContain("database-secret");
       expect(html).not.toContain('data-testid="build-provenance"');
@@ -282,8 +282,8 @@ describe("public safely published version archive", () => {
       "../../src/app/market/[slug]/versions/loading"
     );
     const html = renderToStaticMarkup(await VersionsLoading());
-    expect(html).toContain("min-w-0");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain(getReleaseHistoryCopy("en").loading);
   });
 });

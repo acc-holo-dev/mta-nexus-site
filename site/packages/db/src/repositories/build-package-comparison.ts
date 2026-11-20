@@ -1,18 +1,19 @@
-import { and, asc, desc, eq, ne, sql } from "drizzle-orm";
 import {
   AppError,
-  NotFoundError,
   type BuildPackageChange,
   type BuildPackageFilter,
+  NotFoundError,
 } from "@nexus/domain";
+import { and, asc, desc, eq, ne, sql } from "drizzle-orm";
 import { db } from "../client";
 import { builds, products } from "../schema";
+import { safePublishedBuildCondition } from "./build-safety";
+import { historyPageBounds } from "./history-pagination";
 import {
   assertBuildModerationAuthority,
   assertProductMutationAuthority,
 } from "./product-mutation-authority";
-import { safePublishedBuildCondition } from "./build-safety";
-import { historyPageBounds } from "./history-pagination";
+
 const buildSelection = {
   id: builds.id,
   version: builds.version,

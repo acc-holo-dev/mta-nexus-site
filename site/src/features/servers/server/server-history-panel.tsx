@@ -2,16 +2,28 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import { Activity, BarChart3 } from "lucide-react";
 import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
+import { formatUnknown } from "../../../lib/i18n/unknown";
+import type { ServerHistoryResult } from "../../../lib/services/servers/server-history-service";
+import { linkAccentSmRounded } from "../../shell/link-shell";
+import { pageShellStack3 } from "../../shell/page-shell";
+import {
+  typeFlexCenterGap2,
+  typeFlexMinWrapGap2,
+  typeIconAccent,
+  typeLabelUpperFaint,
+  typeMinSpace1,
+  typeMinSpace3,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import {
   formatHistoryIntervalUtc,
   serverHistoryBarPercent,
   serverHistoryChartSlots,
-} from "../../../lib/server-history-presentation";
-import { serverStatisticsCopy } from "../../../lib/server-statistics-copy";
-import type { ServerHistoryResult } from "../../../lib/services/server-history-service";
+} from "../server-history-presentation";
+import { serverStatisticsCopy } from "../server-statistics-copy";
 
-function metric(value: number | null) {
-  return value == null ? "—" : String(value);
+function metric(locale: Locale, value: number | null) {
+  return formatUnknown(locale, value);
 }
 
 const periodLinkClass =
@@ -31,7 +43,7 @@ export function ServerHistoryPanel({
 
   if (!history) {
     return (
-      <section aria-labelledby="server-history-title" className="min-w-0 space-y-3 overflow-x-clip">
+      <section aria-labelledby="server-history-title" className={pageShellStack3}>
         <h2
           id="server-history-title"
           className="text-sm font-bold uppercase tracking-wider text-primary"
@@ -40,12 +52,10 @@ export function ServerHistoryPanel({
         </h2>
         <ErrorState
           title={copy.unavailable}
+          description={copy.unavailableHint}
           action={
             retryHref ? (
-              <Link
-                href={retryHref}
-                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={retryHref} className={linkAccentSmRounded}>
                 {dictionary.errors.retry}
               </Link>
             ) : undefined
@@ -69,9 +79,9 @@ export function ServerHistoryPanel({
       aria-labelledby="server-history-title"
     >
       <div className="flex min-w-0 flex-col gap-3 md:flex-row md:items-start md:justify-between">
-        <div className="min-w-0 space-y-1">
-          <div className="flex items-center gap-2">
-            <BarChart3 className="h-4 w-4 text-accent" aria-hidden="true" />
+        <div className={typeMinSpace1}>
+          <div className={typeFlexCenterGap2}>
+            <BarChart3 className={typeIconAccent} aria-hidden="true" />
             <h2
               id="server-history-title"
               className="text-sm font-bold uppercase tracking-wider text-primary"
@@ -86,7 +96,7 @@ export function ServerHistoryPanel({
         </span>
       </div>
 
-      <nav aria-label={copy.chooseWindow} className="flex min-w-0 flex-wrap gap-2">
+      <nav aria-label={copy.chooseWindow} className={typeFlexMinWrapGap2}>
         {(
           [
             ["24h", copy.period24h],
@@ -110,17 +120,17 @@ export function ServerHistoryPanel({
           {serverStatisticsCopy(locale).open}
         </Link>
       </nav>
-      <p className="text-xs text-muted">{copy.summaryScope}</p>
+      <p className={typeXsMuted}>{copy.summaryScope}</p>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {[
           [copy.samples, history.summary.observationCount],
-          [copy.peakPlayers, metric(history.summary.peakPlayers)],
-          [copy.averagePlayers, metric(history.summary.averagePlayers)],
-          [copy.latestStored, metric(history.summary.latestPlayers)],
+          [copy.peakPlayers, metric(locale, history.summary.peakPlayers)],
+          [copy.averagePlayers, metric(locale, history.summary.averagePlayers)],
+          [copy.latestStored, metric(locale, history.summary.latestPlayers)],
         ].map(([label, value]) => (
           <div key={String(label)} className="min-w-0 rounded-lg border border-base bg-inset p-3">
-            <div className="font-label uppercase text-faint">{label}</div>
+            <div className={typeLabelUpperFaint}>{label}</div>
             <div className="mt-1 break-words text-xl font-black text-primary">{value}</div>
           </div>
         ))}
@@ -129,7 +139,7 @@ export function ServerHistoryPanel({
       {history.summary.observationCount === 0 || points.length === 0 ? (
         <EmptyState title={copy.empty} description={copy.emptyHint} />
       ) : (
-        <div className="min-w-0 space-y-3">
+        <div className={typeMinSpace3}>
           <div className="flex items-center justify-between text-[11px] text-faint">
             <span>
               {copy.window}:{" "}
@@ -139,7 +149,7 @@ export function ServerHistoryPanel({
                   ? copy.intervalSixHours
                   : copy.intervalDay}
             </span>
-            <span>UTC</span>
+            <span>{copy.timezoneUtc}</span>
           </div>
           <ol
             className="flex h-32 items-end gap-1 overflow-x-auto rounded-lg border border-base bg-inset px-3 pb-2 pt-4"
@@ -147,7 +157,7 @@ export function ServerHistoryPanel({
           >
             {points.map((point) => {
               const percent = serverHistoryBarPercent(point.peakPlayers, peak);
-              const label = formatHistoryIntervalUtc(point.bucketAt);
+              const label = formatHistoryIntervalUtc(point.bucketAt, locale);
               return (
                 <li key={point.bucketAt} className="flex h-full min-w-0 flex-1 items-end">
                   <div className="flex h-full w-full items-end">
@@ -180,8 +190,8 @@ export function ServerHistoryPanel({
       )}
       {points.length > 0 && history.summary.observationCount > 0 && (
         <p className="flex flex-wrap justify-between gap-2 text-[11px] text-faint">
-          <span>{formatHistoryIntervalUtc(history.windowStart)}</span>
-          <span>{formatHistoryIntervalUtc(history.windowEnd)}</span>
+          <span>{formatHistoryIntervalUtc(history.windowStart, locale)}</span>
+          <span>{formatHistoryIntervalUtc(history.windowEnd, locale)}</span>
         </p>
       )}
     </section>

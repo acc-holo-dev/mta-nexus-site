@@ -5,13 +5,16 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/components/order-case-forms.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/commerce/components/order-case-forms.tsx"),
+  "utf8",
+);
 
 /** Honesty lock for order-case refund recommendation blocked notice. */
 it("locks recommendationBlocked notice to ErrorState without soft secondary text", () => {
   expect(source).toContain('import { Button, ErrorState, fieldClassBlock } from "@nexus/ui"');
   expect(source).toMatch(
-    /canRecommendRefund && monetary && !recommendationEligible && \(\s*<ErrorState id="order-case-recommendation-blocked" title=\{copy\.recommendationBlocked\} \/>\s*\)/u,
+    /canRecommendRefund && monetary && !recommendationEligible && \(\s*<ErrorState[\s\S]*?id="order-case-recommendation-blocked"[\s\S]*?title=\{copy\.recommendationBlocked\}[\s\S]*?description=\{copy\.recommendationBlockedHint\}/u,
   );
   expect(source).not.toContain(
     'className="text-sm text-secondary">{copy.recommendationBlocked}</p>',

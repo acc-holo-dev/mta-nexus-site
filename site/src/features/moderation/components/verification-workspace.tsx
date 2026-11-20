@@ -10,8 +10,33 @@ import {
   PlatformRequestError,
   platformFieldClass,
   platformRequest,
-} from "../../../lib/user-platform-client";
-import { verificationApplicationsCopy } from "../../../lib/verification-applications-copy";
+} from "../../community/user-platform-client";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
+import { linkFocusRing, linkGhostAccentSm, linkMuted } from "../../shell/link-shell";
+import { pageShellStack6 } from "../../shell/page-shell";
+import { panelMinSpace3P5, panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
+import {
+  typeBreakAllXsMuted,
+  typeBreakSmSecondary,
+  typeFlexMinWrapEndGap3,
+  typeFlexWrapBetweenGap3,
+  typeFlexWrapGap3,
+  typeFlexWrapGap4,
+  typeFlexWrapGap4Sm,
+  typeHeadingPrimary,
+  typeMinBreakSmSemiboldPrimary,
+  typeMinSpace1,
+  typeMinSpace3,
+  typeMinSpace4,
+  typeMinW40Flex1Space1SmSecondary,
+  typePrewrapSmSecondary,
+  typeSmMuted,
+  typeSmSecondary,
+  typeSmSemiboldPrimary,
+  typeSmSuccess,
+  typeXsMuted,
+  typeXsSecondary,
+} from "../../shell/type-shell";
 import {
   VERIFICATION_TYPES,
   type VerificationOverview,
@@ -20,19 +45,16 @@ import {
   verificationApplicationSchema,
   verificationOverviewSchema,
   verificationTargetsSchema,
-} from "../../../lib/verification-workspace-contract";
+} from "../../trust/verification-workspace-contract";
 import {
   verificationCopy,
   verificationError,
   verificationMutationError,
-} from "../../../lib/verification-workspace-copy";
+} from "../../trust/verification-workspace-copy";
+import { verificationApplicationsCopy } from "../verification-applications-copy";
 
 type Target = { type: "user" | "developer" | "organization"; id: string; name: string };
-
-const filterNavLinkClass =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-const accentLinkClass = `inline-flex min-h-11 items-center rounded text-sm text-accent underline ${filterNavLinkClass}`;
-const pageShellClass = "min-w-0 space-y-6 overflow-x-clip";
+const accentLinkClass = `inline-flex min-h-11 items-center rounded text-sm text-accent underline ${linkFocusRing}`;
 
 export function VerificationWorkspace({
   actorId,
@@ -51,6 +73,12 @@ export function VerificationWorkspace({
 }) {
   const copy = verificationCopy(locale),
     dictionary = getDictionary(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(text)
+      ? text
+      : fallback;
+  }
   const [overview, setOverview] = useState(initial),
     [teams, setTeams] = useState(initialTeams);
   const [target, setTarget] = useState<Target | null>(null),
@@ -130,12 +158,7 @@ export function VerificationWorkspace({
           setVerifiedKey(identityKey);
         }
       } catch {
-        if (alive)
-          setWriteError(
-            localeRef.current === "ru"
-              ? "Не удалось проверить аккаунт или восстановить заявку."
-              : "Could not verify the account or restore the application.",
-          );
+        if (alive) setWriteError(verificationCopy(localeRef.current).restoreFailed);
       }
     }
     void restore();
@@ -198,7 +221,7 @@ export function VerificationWorkspace({
     try {
       await read();
     } catch (caught) {
-      setReadError(caught instanceof Error ? caught.message : copy.unavailable);
+      setReadError(safeMessage(caught, copy.unavailable));
     } finally {
       guard.current = false;
       setPending(false);
@@ -237,11 +260,7 @@ export function VerificationWorkspace({
         );
       } catch {
         setVerifiedKey("");
-        setWriteError(
-          locale === "ru"
-            ? "Не удалось сохранить данные восстановления. Заявка не отправлена."
-            : "Could not save recovery data. The application was not sent.",
-        );
+        setWriteError(copy.recoverySaveFailed);
         return;
       }
       intentRef.current = parsed.data;
@@ -326,6 +345,7 @@ export function VerificationWorkspace({
           "UNAUTHORIZED",
           "FORBIDDEN",
           "RATE_LIMIT_EXCEEDED",
+          "RATE_LIMITED",
           "VERIFICATION_PENDING",
           "REQUEST_BODY_TOO_LARGE",
           "UNSUPPORTED_MEDIA_TYPE",
@@ -340,26 +360,28 @@ export function VerificationWorkspace({
         }
       }
       if (caught instanceof PlatformRequestError && caught.code === "VERIFICATION_PENDING") {
-        setWriteError(
-          locale === "ru"
-            ? "Для этой цели уже есть заявка. Её автор и содержание не подтверждены."
-            : "An application already exists for this target. Its author and contents are unconfirmed.",
-        );
+        setWriteError(copy.pendingExists);
         return;
       }
-      setWriteError(caught instanceof Error ? caught.message : copy.mutationUnavailable);
+      setWriteError(safeMessage(caught, copy.mutationUnavailable));
     } finally {
       guard.current = false;
       setPending(false);
     }
   }
   if (visibleKey !== identityKey)
-    return <ErrorState id="verification-workspace-unavailable" title={copy.unavailable} />;
+    return (
+      <ErrorState
+        id="verification-workspace-unavailable"
+        title={copy.unavailable}
+        description={copy.unavailableHint}
+      />
+    );
   const profile = overview?.profile,
     developer = !!profile && ["developer", "admin"].includes(profile.role);
   return (
-    <div className={pageShellClass} aria-busy={pending}>
-      <div className="flex flex-wrap gap-4">
+    <div className={pageShellStack6} aria-busy={pending}>
+      <div className={typeFlexWrapGap4}>
         <Button
           type="button"
           variant="secondary"
@@ -384,12 +406,13 @@ export function VerificationWorkspace({
         <ErrorState
           id="verification-workspace-unavailable"
           title={readError}
+          description={copy.unavailableHint}
           action={
             <Button
               type="button"
               variant="ghost"
               disabled={pending}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
               onClick={() => void reload()}
             >
               {dictionary.errors.retry}
@@ -398,12 +421,16 @@ export function VerificationWorkspace({
         />
       ) : null}
       {verifiedKey !== identityKey && writeError ? (
-        <ErrorState id="verification-workspace-write-failed" title={writeError} />
+        <ErrorState
+          id="verification-workspace-write-failed"
+          title={writeError}
+          description={copy.mutationUnavailable}
+        />
       ) : null}
       {profile && (
-        <section className="nexus-panel space-y-3 p-5">
-          <h2 className="font-heading text-primary">{copy.current}</h2>
-          <p className="text-sm text-secondary">
+        <section className={panelSpace3P5}>
+          <h2 className={typeHeadingPrimary}>{copy.current}</h2>
+          <p className={typeSmSecondary}>
             {copy.user}:{" "}
             {profile.identityVerified
               ? copy.verified
@@ -411,7 +438,7 @@ export function VerificationWorkspace({
                 ? copy.pending
                 : copy.unverified}
           </p>
-          <p className="text-xs text-muted">{copy.identityHint}</p>
+          <p className={typeXsMuted}>{copy.identityHint}</p>
           <Button
             type="button"
             variant="secondary"
@@ -429,7 +456,7 @@ export function VerificationWorkspace({
           </Button>
           {developer ? (
             <>
-              <p className="text-sm text-secondary">
+              <p className={typeSmSecondary}>
                 {copy.developer}:{" "}
                 {profile.experienceVerified
                   ? copy.verified
@@ -438,7 +465,7 @@ export function VerificationWorkspace({
                     : copy.unverified}
               </p>
               {!profile.hasSpecialties ? (
-                <p className="text-xs text-muted">{copy.requiresProfile}</p>
+                <p className={typeXsMuted}>{copy.requiresProfile}</p>
               ) : null}
               <Button
                 type="button"
@@ -460,17 +487,13 @@ export function VerificationWorkspace({
           ) : null}
         </section>
       )}
-      <section className="nexus-panel space-y-4 p-5">
-        <h2 className="font-heading text-primary">{copy.manage}</h2>
-        <form
-          method="GET"
-          action="/workspace/verification"
-          className="flex min-w-0 flex-wrap items-end gap-3"
-        >
+      <section className={panelSpace4P5}>
+        <h2 className={typeHeadingPrimary}>{copy.manage}</h2>
+        <form method="GET" action="/workspace/verification" className={typeFlexMinWrapEndGap3}>
           <input type="hidden" name="view" value={filters.view} />
           <input type="hidden" name="page" value={filters.page} />
           {filters.type ? <input type="hidden" name="type" value={filters.type} /> : null}
-          <label className="min-w-40 flex-1 space-y-1 text-sm text-secondary">
+          <label className={typeMinW40Flex1Space1SmSecondary}>
             <span>{copy.query}</span>
             <input
               className={`${platformFieldClass} min-h-11`}
@@ -496,20 +519,20 @@ export function VerificationWorkspace({
             }
           />
         ) : null}
-        <div className="min-w-0 space-y-3">
+        <div className={typeMinSpace3}>
           {teams?.items.map((team) => (
             <div
               key={team.id}
               className="flex min-w-0 flex-wrap items-center justify-between gap-3 rounded-lg border border-base p-3"
             >
-              <div className="min-w-0 space-y-1">
+              <div className={typeMinSpace1}>
                 <Link
                   className={accentLinkClass}
                   href={`/organizations/${encodeURIComponent(team.slug)}`}
                 >
                   {team.name}
                 </Link>
-                <p className="text-xs text-muted">
+                <p className={typeXsMuted}>
                   {team.verified
                     ? copy.alreadyVerified
                     : team.pending
@@ -535,13 +558,13 @@ export function VerificationWorkspace({
             </div>
           ))}
         </div>
-        <nav className="flex flex-wrap gap-4 text-sm" aria-label={copy.manage}>
+        <nav className={typeFlexWrapGap4Sm} aria-label={copy.manage}>
           {teamFilters.page > 1 ? (
             <Link className={accentLinkClass} href={href({ teamsPage: teamFilters.page - 1 })}>
               {copy.previous}
             </Link>
           ) : null}
-          <span className="inline-flex min-h-11 items-center text-muted">
+          <span className={linkMuted}>
             {copy.page} {teamFilters.page}
           </span>
           {teams?.hasMore && teamFilters.page < 9999 ? (
@@ -552,14 +575,14 @@ export function VerificationWorkspace({
         </nav>
       </section>
       {target && (
-        <section className="nexus-panel space-y-4 p-5">
-          <h2 className="font-heading text-primary">{copy.apply}</h2>
-          <p className="break-words text-sm text-secondary">
+        <section className={panelSpace4P5}>
+          <h2 className={typeHeadingPrimary}>{copy.apply}</h2>
+          <p className={typeBreakSmSecondary}>
             {copy[target.type]} · {target.name}
           </p>
           {savedId ? (
             <div className="space-y-2">
-              <p role="status" className="text-sm text-success">
+              <p role="status" className={typeSmSuccess}>
                 {copy.submitted}
               </p>
               <Link
@@ -571,7 +594,7 @@ export function VerificationWorkspace({
             </div>
           ) : (
             <form className="space-y-3" onSubmit={submit}>
-              <p className="text-xs text-muted">{copy.proofPrivacy}</p>
+              <p className={typeXsMuted}>{copy.proofPrivacy}</p>
               <label className="block space-y-1 text-sm text-secondary">
                 <span>{copy.proof}</span>
                 <input
@@ -613,23 +636,24 @@ export function VerificationWorkspace({
                 {copy.submit}
               </Button>
               {writeError ? (
-                <ErrorState id="verification-workspace-write-failed" title={writeError} />
+                <ErrorState
+                  id="verification-workspace-write-failed"
+                  title={writeError}
+                  description={copy.mutationUnavailable}
+                />
               ) : null}
               {intent ? (
                 <ErrorState
                   id="verification-workspace-submit-unconfirmed"
-                  title={
-                    locale === "ru"
-                      ? "Результат отправки не подтверждён. Доступен только точный повтор исходной заявки."
-                      : "The submission result is unconfirmed. Only an exact retry of the original application is available."
-                  }
+                  title={copy.submissionUnconfirmed}
+                  description={dictionary.errors.formErrorHint}
                 />
               ) : null}
             </form>
           )}
           <Button
             type="button"
-            className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkGhostAccentSm}
             variant="ghost"
             disabled={pending || Boolean(intent)}
             onClick={() => setTarget(null)}
@@ -638,17 +662,17 @@ export function VerificationWorkspace({
           </Button>
         </section>
       )}
-      <section className="nexus-panel min-w-0 space-y-3 p-5">
-        <p className="text-sm text-muted">{copy.serverHint}</p>
+      <section className={panelMinSpace3P5}>
+        <p className={typeSmMuted}>{copy.serverHint}</p>
         <Link href="/workspace/servers" className={accentLinkClass}>
           {copy.servers}
         </Link>
       </section>
-      <section className="min-w-0 space-y-4">
-        <nav className="flex flex-wrap gap-3" aria-label={copy.title}>
+      <section className={typeMinSpace4}>
+        <nav className={typeFlexWrapGap3} aria-label={copy.title}>
           <Link
             href="/workspace/verification/history"
-            className={`inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-sm text-accent ${filterNavLinkClass}`}
+            className={`inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-sm text-accent ${linkFocusRing}`}
           >
             {verificationApplicationsCopy(locale).title}
           </Link>
@@ -657,20 +681,16 @@ export function VerificationWorkspace({
               key={view}
               href={href({ view, page: 1 })}
               aria-current={filters.view === view ? "page" : undefined}
-              className={`inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-sm text-accent ${filterNavLinkClass}`}
+              className={`inline-flex min-h-11 items-center rounded-md border border-base px-3 py-2 text-sm text-accent ${linkFocusRing}`}
             >
               {copy[view]}
             </Link>
           ))}
         </nav>
-        <form
-          method="GET"
-          action="/workspace/verification"
-          className="flex min-w-0 flex-wrap items-end gap-3"
-        >
+        <form method="GET" action="/workspace/verification" className={typeFlexMinWrapEndGap3}>
           <input type="hidden" name="view" value={filters.view} />
           <input type="hidden" name="teamsQ" value={teamFilters.query} />
-          <label className="min-w-40 flex-1 space-y-1 text-sm text-secondary">
+          <label className={typeMinW40Flex1Space1SmSecondary}>
             <span>{copy.type}</span>
             <select
               className={`${platformFieldClass} min-h-11`}
@@ -726,13 +746,11 @@ export function VerificationWorkspace({
             id={`verification-${application.id}`}
             className="nexus-panel min-w-0 scroll-mt-20 space-y-3 p-5"
           >
-            <div className="flex flex-wrap justify-between gap-3">
-              <h3 className="min-w-0 break-words text-sm font-semibold text-primary">
-                {copy[application.targetType]}
-              </h3>
-              <span className="text-xs text-secondary">{copy[application.status]}</span>
+            <div className={typeFlexWrapBetweenGap3}>
+              <h3 className={typeMinBreakSmSemiboldPrimary}>{copy[application.targetType]}</h3>
+              <span className={typeXsSecondary}>{copy[application.status]}</span>
             </div>
-            <p className="break-all text-xs text-muted">{application.targetId}</p>
+            <p className={typeBreakAllXsMuted}>{application.targetId}</p>
             <Link
               prefetch={false}
               href={`/workspace/verification/${encodeURIComponent(application.id)}`}
@@ -740,9 +758,7 @@ export function VerificationWorkspace({
             >
               {verificationApplicationsCopy(locale).open}
             </Link>
-            <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-              {application.notes}
-            </p>
+            <p className={typePrewrapSmSecondary}>{application.notes}</p>
             {safeExternalWebUrl(application.proofUrl) ? (
               <a
                 className={accentLinkClass}
@@ -755,13 +771,11 @@ export function VerificationWorkspace({
             ) : null}
             {application.reviewNotes ? (
               <div className="space-y-1">
-                <h4 className="text-sm font-semibold text-primary">{copy.reviewNotes}</h4>
-                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                  {application.reviewNotes}
-                </p>
+                <h4 className={typeSmSemiboldPrimary}>{copy.reviewNotes}</h4>
+                <p className={typePrewrapSmSecondary}>{application.reviewNotes}</p>
               </div>
             ) : null}
-            <p className="text-xs text-muted">
+            <p className={typeXsMuted}>
               {copy.submittedAt}:{" "}
               <time dateTime={application.createdAt}>
                 {new Date(application.createdAt).toLocaleString(
@@ -772,7 +786,7 @@ export function VerificationWorkspace({
               </time>
             </p>
             {application.resolvedAt ? (
-              <p className="text-xs text-muted">
+              <p className={typeXsMuted}>
                 {copy.decidedAt}:{" "}
                 <time dateTime={application.resolvedAt}>
                   {new Date(application.resolvedAt).toLocaleString(
@@ -785,13 +799,13 @@ export function VerificationWorkspace({
             ) : null}
           </article>
         ))}
-        <nav className="flex flex-wrap gap-4 text-sm" aria-label={copy.title}>
+        <nav className={typeFlexWrapGap4Sm} aria-label={copy.title}>
           {filters.page > 1 ? (
             <Link className={accentLinkClass} href={href({ page: filters.page - 1 })}>
               {copy.previous}
             </Link>
           ) : null}
-          <span className="inline-flex min-h-11 items-center text-muted">
+          <span className={linkMuted}>
             {copy.page} {filters.page}
           </span>
           {overview?.history.hasMore && filters.page < 9999 ? (

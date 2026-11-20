@@ -13,7 +13,9 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
+
 import { NotificationRepository } from "../../packages/db/src/repositories/notifications";
+
 const repository = new NotificationRepository();
 beforeEach(() => {
   state.queries = [];

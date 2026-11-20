@@ -1,11 +1,12 @@
 import { createHash } from "node:crypto";
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { productBuildsApiCopy } from "../../src/features/resources/product-builds-api-copy";
+import packageFixtures from "../fixtures/build-packages.json";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../helpers/browser-mutation-headers";
-import packageFixtures from "../fixtures/build-packages.json";
 
 const scan = vi.hoisted(() => vi.fn());
 const uploadAsset = vi.hoisted(() => vi.fn());
@@ -13,7 +14,7 @@ const deleteAsset = vi.hoisted(() => vi.fn());
 const preflight = vi.hoisted(() => vi.fn());
 const releaseBuild = vi.hoisted(() => vi.fn());
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => ({
       id: "usr_scanner_author",
@@ -25,11 +26,11 @@ vi.mock("../../src/lib/services/auth-service", () => ({
   },
 }));
 
-vi.mock("../../src/lib/services/build-scanner-service", () => ({
+vi.mock("../../src/lib/services/resources/build-scanner-service", () => ({
   buildScannerService: { scan },
 }));
 
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: {
     assertCanReleaseBuild: preflight,
     releaseBuild,
@@ -157,7 +158,7 @@ describe("build upload scanner HTTP behavior", () => {
 
     expect(response.status).toBe(422);
     expect(await response.json()).toMatchObject({
-      error: "Build was rejected by the malware scanner",
+      error: productBuildsApiCopy("en").malwareDetected,
       code: "BUILD_MALWARE_DETECTED",
       scanner: "clamav",
     });
@@ -180,8 +181,7 @@ describe("build upload scanner HTTP behavior", () => {
     expect(response.headers.get("Retry-After")).toBe("30");
     expect(response.headers.get("X-Request-Id")).toBeTruthy();
     expect(await response.json()).toEqual({
-      error:
-        "Malware scanning is temporarily unavailable. No build was stored; retry the upload later.",
+      error: productBuildsApiCopy("en").scannerUnavailable,
       code: "BUILD_SCANNER_UNAVAILABLE",
     });
     expect(uploadAsset).not.toHaveBeenCalled();
@@ -201,7 +201,7 @@ describe("build upload scanner HTTP behavior", () => {
 
     expect(response.status).toBe(422);
     expect(await response.json()).toMatchObject({
-      error: expect.stringContaining("could not be fully checked"),
+      error: productBuildsApiCopy("en").scanLimitExceeded,
       code: "BUILD_SCAN_LIMIT_EXCEEDED",
       scanner: "clamav",
     });

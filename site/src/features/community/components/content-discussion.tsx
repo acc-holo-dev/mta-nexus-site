@@ -5,43 +5,61 @@ import { MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
+import { getDictionary, type Locale } from "../../../lib/i18n";
+import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
+import { GuestAuthLinks } from "../../shell/guest-auth";
+import {
+  linkAccentSm,
+  linkAccentTight,
+  linkAccentTightSmPlain,
+  linkAccentXs,
+  linkGhostAccentSm,
+} from "../../shell/link-shell";
+import { panelClipSpace3P4, panelClipSpace5P5Sm } from "../../shell/panel-shell";
+import {
+  typeFlexMinWrapEndGap3,
+  typeFlexWrapCenterGap3,
+  typeFlexWrapCenterJustifyGap3,
+  typeFlexWrapGap3,
+  typeFlexWrapGap4,
+  typeMinBreakWords,
+  typeMinFlex1Space1SmSecondary,
+  typeMinSpace3,
+  typeMlAutoXsMuted,
+  typeMt2XsMuted,
+  typePrewrapSmLeadingSecondary,
+  typeSmMuted,
+  typeSmSecondary,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import {
   ContentCommentSubmitError,
   createCommentIntentKey,
   parseCommentIntentKey,
   submitContentCommentRequest,
-} from "../../../lib/content-comment-client";
-import {
-  type DiscussionPage,
-  discussionPageSchema,
-} from "../../../lib/content-discussion-contract";
+} from "../content-comment-client";
+import { type DiscussionPage, discussionPageSchema } from "../content-discussion-contract";
 import {
   discussionError,
   discussionWriteNeedsSignIn,
   getDiscussionCopy,
-} from "../../../lib/content-discussion-copy";
+} from "../content-discussion-copy";
 import {
   clearDiscussionComposeDraft,
   readDiscussionComposeDraft,
   writeDiscussionComposeDraft,
-} from "../../../lib/discussion-compose-draft";
-import { ownDiscussionCopy } from "../../../lib/discussion-workspace-copy";
-import { followCopy } from "../../../lib/follow-workspace-copy";
-import { getDictionary, type Locale } from "../../../lib/i18n";
-import { privateApiRequest } from "../../../lib/private-api-request";
-import { platformFieldClass } from "../../../lib/user-platform-client";
-import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
+} from "../discussion-compose-draft";
+import { ownDiscussionCopy } from "../discussion-workspace-copy";
+import { followCopy } from "../follow-workspace-copy";
+import { platformFieldClass } from "../user-platform-client";
+import { getUserPlatformCopy } from "../user-platform-copy";
 import { CommunityReportForm } from "./community-report-form";
 import { DiscussionComposeWriteFeedback } from "./content-discussion-compose-feedback";
 import { ContentFollowControls } from "./content-follow-controls";
 import { DiscussionCommentActions } from "./discussion-comment-actions";
-import { GuestAuthLinks } from "../../../components/guest-auth-links";
 
-const shellClass = "nexus-panel min-w-0 space-y-5 overflow-x-clip p-5 sm:p-6";
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-const ghostActionClass =
-  "h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+const shellClass = panelClipSpace5P5Sm;
 
 function readScopedDiscussionDraft(contentId: string, actorId: string | null) {
   const own = readDiscussionComposeDraft(contentId, { actorId });
@@ -67,6 +85,7 @@ export function ContentDiscussion({
   initialQuery = "",
   initialFocus,
   initialError = "",
+  identityUnavailable = false,
 }: {
   slug: string;
   title?: string;
@@ -75,9 +94,12 @@ export function ContentDiscussion({
   count: number;
   initial: DiscussionPage | null;
   viewer?: { id: string; canModerate: boolean } | null;
+  /** Session probe failed — not a guest. Keep discussion readable; block guest-lie CTAs. */
+  identityUnavailable?: boolean;
   /** SSR/API-hydrated follow+mute so controls do not flash unmuted after Save. */
   followInitial?: {
-    authenticated: boolean;
+    /** `null` = session probe failed (not a guest). */
+    authenticated: boolean | null;
     actorId?: string | null;
     following: boolean;
     notifyComments: boolean;
@@ -90,6 +112,12 @@ export function ContentDiscussion({
   initialError?: string;
 }) {
   const copy = getDiscussionCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(text)
+      ? text
+      : fallback;
+  }
   const workspaceCopy = getDictionary(locale).workspace;
   const pathname = usePathname();
   const [page, setPage] = useState<DiscussionPage | null>(initial);
@@ -280,7 +308,7 @@ export function ContentDiscussion({
       return true;
     } catch (caught) {
       if (alive.current && !controller.signal.aborted) {
-        setReadError(caught instanceof Error ? caught.message : copy.unavailable);
+        setReadError(safeMessage(caught, copy.unavailable));
         if (focusId) setFocusedId(focusId);
       }
       return false;
@@ -307,6 +335,11 @@ export function ContentDiscussion({
       setWriteError(copy.invalid);
       return;
     }
+    if (identityUnavailable) {
+      setWriteError(copy.identityUnavailable);
+      setWriteNeedsSignIn(false);
+      return;
+    }
     if (!actorId) {
       persistComposeDraft(normalized, reply);
       setWriteError(copy.signIn);
@@ -331,11 +364,7 @@ export function ContentDiscussion({
       if (firstAttempt) pendingIntent.current = null;
       writeGuard.current = false;
       setSubmitting(false);
-      setWriteError(
-        locale === "ru"
-          ? "Не удалось сохранить черновик для восстановления. Комментарий не отправлен."
-          : "Could not save recovery data. The comment was not sent.",
-      );
+      setWriteError(copy.recoverySaveFailed);
       return;
     }
     setPendingWrite(true);
@@ -371,6 +400,7 @@ export function ContentDiscussion({
           "COMMENT_PARENT_NOT_FOUND",
           "ACTOR_ID_REQUIRED",
           "RATE_LIMIT_EXCEEDED",
+          "RATE_LIMITED",
         ].includes(String(caught.code))
       ) {
         pendingIntent.current = null;
@@ -379,7 +409,7 @@ export function ContentDiscussion({
       // Keep draft + frozen intent so a lost-response retry reuses one key.
       // Guest 401 / auth return must keep text for the author without auto-publish.
       persistComposeDraft(normalized, reply);
-      setWriteError(caught instanceof Error ? caught.message : copy.unavailable);
+      setWriteError(safeMessage(caught, copy.unavailable));
       setWriteNeedsSignIn(
         caught instanceof ContentCommentSubmitError && discussionWriteNeedsSignIn(caught.code),
       );
@@ -391,39 +421,46 @@ export function ContentDiscussion({
   const emptyFiltered = Boolean(activeQuery.current);
   return (
     <section id="discussion" className={shellClass}>
-      <div className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-4">
+      <div className={panelClipSpace3P4}>
         <ContentFollowControls
           contentId={contentId}
           title={title ?? slug}
           locale={locale}
           initial={
             followInitial ??
-            (viewer
-              ? undefined
-              : {
-                  authenticated: false,
+            (identityUnavailable
+              ? {
+                  // Session unresolved ≠ guest — do not invent signed-out follow seed.
+                  authenticated: null,
                   following: false,
                   notifyComments: false,
                   muted: false,
                   mutedUntil: null,
-                })
+                  error: true,
+                }
+              : viewer
+                ? undefined
+                : {
+                    authenticated: false,
+                    following: false,
+                    notifyComments: false,
+                    muted: false,
+                    mutedUntil: null,
+                  })
           }
         />
-        <div className="flex flex-wrap gap-4">
-          <Link href="/workspace/saved?type=content" className={navLinkClass}>
+        <div className={typeFlexWrapGap4}>
+          <Link href="/workspace/saved?type=content" className={linkAccentXs}>
             {followCopy(locale).content}
           </Link>
-          <Link href="/settings#notification-heading" className={navLinkClass}>
+          <Link href="/settings#notification-heading" className={linkAccentXs}>
             {followCopy(locale).notificationSettings}
           </Link>
         </div>
       </div>
 
       {viewer && (
-        <Link
-          href="/workspace/discussions"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/discussions" className={linkAccentSm}>
           {ownDiscussionCopy(locale).title}
         </Link>
       )}
@@ -432,7 +469,11 @@ export function ContentDiscussion({
         {displayCount !== null ? (
           ` (${displayCount})`
         ) : (
-          <ErrorState id="discussion-count-unavailable" title={copy.countUnavailable} />
+          <ErrorState
+            id="discussion-count-unavailable"
+            title={copy.countUnavailable}
+            description={copy.countUnavailableHint}
+          />
         )}
       </h2>
       <search aria-label={copy.search}>
@@ -442,9 +483,9 @@ export function ContentDiscussion({
             // Search refreshes the list only; the compose draft stays in React state.
             void load(false, search.trim());
           }}
-          className="flex min-w-0 flex-wrap items-end gap-3"
+          className={typeFlexMinWrapEndGap3}
         >
-          <label className="min-w-0 flex-1 space-y-1 text-sm text-secondary">
+          <label className={typeMinFlex1Space1SmSecondary}>
             <span>{copy.search}</span>
             <input
               type="search"
@@ -464,23 +505,21 @@ export function ContentDiscussion({
             {copy.applySearch}
           </Button>
         </form>
-        {text.trim().length > 0 && (
-          <p className="mt-2 text-xs text-muted">{copy.searchKeepsDraft}</p>
-        )}
+        {text.trim().length > 0 && <p className={typeMt2XsMuted}>{copy.searchKeepsDraft}</p>}
       </search>
-      <form onSubmit={submit} className="min-w-0 space-y-3" aria-busy={submitting}>
+      <form onSubmit={submit} className={typeMinSpace3} aria-busy={submitting}>
         {draftRestoreNotice ? (
-          <p role="status" aria-live="polite" className="text-sm text-secondary">
+          <p role="status" aria-live="polite" className={typeSmSecondary}>
             {workspaceCopy.draftRestored}
           </p>
         ) : null}
         {reply && (
           <div className="flex min-w-0 flex-wrap items-center gap-3 rounded-lg bg-accent-soft p-3 text-sm text-secondary">
-            <span className="min-w-0 break-words">
+            <span className={typeMinBreakWords}>
               {copy.replying} {reply.name}
             </span>
             <Button
-              className={ghostActionClass}
+              className={linkGhostAccentSm}
               variant="ghost"
               type="button"
               disabled={submitting || pendingWrite}
@@ -512,12 +551,12 @@ export function ContentDiscussion({
             }}
           />
         </label>
-        <div className="flex flex-wrap items-center gap-3">
+        <div className={typeFlexWrapCenterGap3}>
           <Button
             type="submit"
             isLoading={submitting}
             className="min-h-11"
-            disabled={text.trim().length < 2 || loading || !!managingId}
+            disabled={identityUnavailable || text.trim().length < 2 || loading || !!managingId}
           >
             {submitting
               ? viewer && draftRestoreNotice
@@ -527,8 +566,19 @@ export function ContentDiscussion({
                 ? copy.publishRestoredDraft
                 : copy.publish}
           </Button>
-          <span className="text-xs text-muted">{text.length}/5000</span>
-          {!viewer && (
+          <span className={typeXsMuted}>{text.length}/5000</span>
+          {identityUnavailable ? (
+            <ErrorState
+              id="discussion-identity-unavailable"
+              title={copy.identityUnavailable}
+              description={copy.identityUnavailableDescription}
+              action={
+                <Link href={`#discussion`} className={linkAccentXs}>
+                  {copy.retry}
+                </Link>
+              }
+            />
+          ) : !viewer ? (
             <GuestAuthLinks
               loginHref={loginHref}
               registerHref={registerHref}
@@ -538,7 +588,7 @@ export function ContentDiscussion({
               onLoginClick={() => persistComposeDraft()}
               onRegisterClick={() => persistComposeDraft()}
             />
-          )}
+          ) : null}
         </div>
         <DiscussionComposeWriteFeedback
           error={writeError}
@@ -551,27 +601,19 @@ export function ContentDiscussion({
           locale={locale}
         />
         {published && (
-          <p
-            role="status"
-            aria-live="polite"
-            className="text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <p role="status" aria-live="polite" className={linkAccentTightSmPlain}>
             {copy.saved}
           </p>
         )}
       </form>
       {managementSuccess && (
-        <p
-          role="status"
-          aria-live="polite"
-          className="text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <p role="status" aria-live="polite" className={linkAccentTightSmPlain}>
           {managementSuccess}
         </p>
       )}
       <div className="space-y-3">
         {loading ? (
-          <p role="status" aria-live="polite" aria-busy="true" className="text-sm text-muted">
+          <p role="status" aria-live="polite" aria-busy="true" className={typeSmMuted}>
             {copy.loading}
           </p>
         ) : null}
@@ -582,7 +624,7 @@ export function ContentDiscussion({
             aria-label={comment.id === focusedId ? copy.focused : undefined}
             className={`scroll-mt-20 space-y-3 rounded-lg border bg-inset p-4 ${comment.id === focusedId ? "border-[var(--nexus-accent)]" : "border-base"}`}
           >
-            <header className="flex flex-wrap items-center gap-3">
+            <header className={typeFlexWrapCenterGap3}>
               <Avatar
                 src={comment.author?.avatarUrl ?? undefined}
                 alt={comment.author?.displayName ?? copy.anonymous}
@@ -596,9 +638,9 @@ export function ContentDiscussion({
                   {comment.author.displayName} (@{comment.author.username})
                 </Link>
               ) : (
-                <span className="text-sm text-muted">{copy.anonymous}</span>
+                <span className={typeSmMuted}>{copy.anonymous}</span>
               )}
-              <time dateTime={comment.createdAt} className="ml-auto text-xs text-muted">
+              <time dateTime={comment.createdAt} className={typeMlAutoXsMuted}>
                 {new Date(comment.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                   timeZone: "UTC",
                   timeZoneName: "short",
@@ -608,7 +650,7 @@ export function ContentDiscussion({
             {comment.parentId && (
               <blockquote className="border-l-2 border-base pl-3 text-xs text-muted">
                 <Link
-                  className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={linkAccentTight}
                   href={`/articles/${encodeURIComponent(slug)}?comment=${encodeURIComponent(comment.parentId)}#comment-${encodeURIComponent(comment.parentId)}`}
                 >
                   {copy.parent}{" "}
@@ -617,25 +659,29 @@ export function ContentDiscussion({
                 {comment.parent && <p className="mt-1 break-words">{comment.parent.text}</p>}
               </blockquote>
             )}
-            <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-secondary">
-              {comment.text}
-            </p>
+            <p className={typePrewrapSmLeadingSecondary}>{comment.text}</p>
             <Link
-              className={navLinkClass}
+              className={linkAccentXs}
               href={`/articles/${encodeURIComponent(slug)}?comment=${encodeURIComponent(comment.id)}#comment-${encodeURIComponent(comment.id)}`}
             >
               {copy.permalink}
             </Link>
-            {viewer?.id !== comment.author?.id && (
+            {identityUnavailable ? (
+              <ErrorState
+                id={`discussion-comment-identity-${comment.id}`}
+                title={copy.identityUnavailable}
+                description={copy.identityUnavailableDescription}
+              />
+            ) : viewer?.id !== comment.author?.id ? (
               <CommunityReportForm
                 targetType="comment"
                 targetId={comment.id}
                 locale={locale}
                 actorId={viewer?.id ?? null}
               />
-            )}
+            ) : null}
             <Button
-              className={ghostActionClass}
+              className={linkGhostAccentSm}
               variant="ghost"
               type="button"
               disabled={submitting || !!managingId || pendingWrite}
@@ -723,7 +769,7 @@ export function ContentDiscussion({
               <Button
                 type="button"
                 variant="ghost"
-                className={ghostActionClass}
+                className={linkGhostAccentSm}
                 disabled={loading || submitting || !!managingId}
                 onClick={() => {
                   setSearch("");
@@ -741,12 +787,12 @@ export function ContentDiscussion({
           title={readError}
           description={readError === copy.unavailable ? copy.unavailableDescription : undefined}
           action={
-            <div className="flex flex-wrap items-center justify-center gap-3">
+            <div className={typeFlexWrapCenterJustifyGap3}>
               {(readError === copy.focusMissing || focusedId) && (
                 <Button
                   type="button"
                   variant="ghost"
-                  className={ghostActionClass}
+                  className={linkGhostAccentSm}
                   disabled={loading || submitting || !!managingId}
                   onClick={returnToDiscussion}
                 >
@@ -756,7 +802,7 @@ export function ContentDiscussion({
               <Button
                 type="button"
                 variant="ghost"
-                className={ghostActionClass}
+                className={linkGhostAccentSm}
                 disabled={loading || submitting || !!managingId}
                 onClick={() => void load(false, activeQuery.current)}
               >
@@ -766,7 +812,7 @@ export function ContentDiscussion({
           }
         />
       ) : null}
-      <div className="flex flex-wrap gap-3">
+      <div className={typeFlexWrapGap3}>
         {page?.hasMore && (
           <Button
             type="button"
@@ -783,7 +829,7 @@ export function ContentDiscussion({
             type="button"
             variant="ghost"
             disabled={loading || submitting || !!managingId}
-            className={ghostActionClass}
+            className={linkGhostAccentSm}
             onClick={() => void load(false, "")}
           >
             {!page ? copy.retry : copy.latest}

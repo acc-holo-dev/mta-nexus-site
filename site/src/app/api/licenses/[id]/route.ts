@@ -1,7 +1,7 @@
 import { NotFoundError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
-import { resourceCommerceRequest } from "../../../../lib/resource-commerce-http";
-import { licenseControlService } from "../../../../lib/services/license-control-service";
+import { resourceCommerceRequest } from "../../../../features/resources/resource-commerce-http";
+import { licenseControlService } from "../../../../lib/services/commerce/license-control-service";
 
 export function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, false, async (user) => {

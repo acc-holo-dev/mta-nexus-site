@@ -1,19 +1,22 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({ page: vi.fn(), read: vi.fn() }));
 vi.mock("@nexus/db", () => ({
   serverObservationRepository: { pageObservations: state.page, readStatistics: state.read },
 }));
-import { serverStatisticsService } from "../../src/lib/services/server-statistics-service";
-import { parseServerStatisticsQuery } from "../../src/lib/server-statistics-contract";
+
 import {
   parseServerObservationBrowserQuery,
   serverObservationBrowserHref,
-} from "../../src/lib/server-observation-browser-contract";
-import { serverObservationBrowserCsv } from "../../src/lib/server-statistics-export";
+} from "../../src/features/servers/server-observation-browser-contract";
 import {
   serverObservationBrowserCopy,
   serverObservationBrowserError,
-} from "../../src/lib/server-observation-browser-copy";
+} from "../../src/features/servers/server-observation-browser-copy";
+import { parseServerStatisticsQuery } from "../../src/features/servers/server-statistics-contract";
+import { serverObservationBrowserCsv } from "../../src/features/servers/server-statistics-export";
+import { serverStatisticsService } from "../../src/lib/services/servers/server-statistics-service";
+
 const end = "2026-10-11T00:00:00.000Z",
   exact = "2026-10-10T23:59:00.123456Z",
   context = "a".repeat(64);

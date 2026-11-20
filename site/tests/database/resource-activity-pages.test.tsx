@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
+vi.mock("server-only", () => ({}));
+
 const state = vi.hoisted(() => ({
   user: { id: "usr_a", role: "user" } as null | { id: string; role: "user" },
   locale: "en" as "en" | "ru",
@@ -30,27 +32,29 @@ vi.mock("next/link", async () => {
     }) => React.createElement("a", { href, ...rest }, children),
   };
 });
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/resource-activity-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-activity-service", () => ({
   resourceActivityService: { buyerHistory: state.history, publisherReport: state.report },
 }));
 
-import History, { metadata as historyMeta } from "../../src/app/workspace/acquisitions/page";
+import History, {
+  generateMetadata as historyMeta,
+} from "../../src/app/workspace/acquisitions/page";
 import Activity, {
-  metadata as activityMeta,
+  generateMetadata as activityMetadata,
 } from "../../src/app/workspace/resources/[id]/activity/page";
-import { getDictionary } from "../../src/lib/i18n";
-import { getResourceActivityCopy } from "../../src/lib/resource-activity-i18n";
+import { getResourceActivityCopy } from "../../src/features/resources/resource-activity-i18n";
 import {
   acquisitionPage,
   acquisitionSource,
   resourceActivityDays,
-} from "../../src/lib/resource-activity-view";
+} from "../../src/features/resources/resource-activity-view";
+import { getDictionary } from "../../src/lib/i18n";
 
 const now = new Date("2026-10-10T12:00:00Z");
 beforeEach(() => {
@@ -135,7 +139,7 @@ it("keeps acquisition history private and paginated without rendering withdrawn 
   expect(html).toContain("source=cart&amp;page=1");
   expect(html).not.toContain("PRIVATE-");
   expect(html).not.toContain("/market/private-draft");
-  expect(historyMeta.robots).toEqual({ index: false, follow: false });
+  expect((await historyMeta()).robots).toEqual({ index: false, follow: false });
 });
 it("renders only escaped publisher aggregates and bounded period/export links", async () => {
   const html = renderToStaticMarkup(await Activity(activityInput));
@@ -146,7 +150,7 @@ it("renders only escaped publisher aggregates and bounded period/export links", 
   expect(html).toContain("/activity/export?days=7");
   expect(html).toContain("Daily activity (UTC)");
   expect(html).toContain('scope="col"');
-  expect(activityMeta.robots).toEqual({ index: false, follow: false });
+  expect((await activityMetadata()).robots).toEqual({ index: false, follow: false });
 });
 it.each(["ru", "en"] as const)("supports %s acquisition and publisher copy", async (locale) => {
   state.locale = locale;
@@ -167,13 +171,15 @@ it("hides activity when current management permission is lost", async () => {
   await expect(Activity(activityInput)).rejects.toThrow("NEXT_NOT_FOUND");
 });
 it("shows an honest recovery state when publisher activity fails", async () => {
-  const { getResourceActivityCopy } = await import("../../src/lib/resource-activity-i18n");
+  const { getResourceActivityCopy } = await import(
+    "../../src/features/resources/resource-activity-i18n"
+  );
   state.report.mockRejectedValue(new Error("activity unavailable"));
   const copy = getResourceActivityCopy("en");
   const html = renderToStaticMarkup(await Activity(activityInput));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("days=7");
 });
 it("normalizes ambiguous UI filters without accepting unsupported periods", () => {

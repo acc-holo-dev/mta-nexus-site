@@ -1,4 +1,5 @@
 import { expect, it, vi } from "vitest";
+import { getDictionary } from "../../src/lib/i18n";
 import {
   build,
   createResourceBuildControlsConfirmInteractionHelpers,
@@ -13,17 +14,17 @@ const harness = vi.hoisted(() => ({
   refresh: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../../src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../../src/features/shell/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: harness.refresh }),
 }));
-vi.mock("../../src/components/locale-context", () => ({
-  useNexusLocale: () => ({ locale: "en" as const }),
+vi.mock("../../src/features/shell/locale", () => ({
+  useNexusLocale: () => ({ locale: "en" as const, dictionary: getDictionary("en") }),
 }));
 
 import { ResourceBuildControls } from "../../src/features/resources/components/resource-build-controls";
-import { getResourceBuildWorkspaceCopy } from "../../src/lib/resource-build-workspace-i18n";
+import { getResourceBuildWorkspaceCopy } from "../../src/features/resources/resource-build-workspace-i18n";
 
 const { render, control, reason } = createResourceBuildControlsConfirmInteractionHelpers(
   harness,

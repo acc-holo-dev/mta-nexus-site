@@ -1,18 +1,23 @@
 "use client";
 import type { LibraryCollectionCommand, LibraryCollectionSnapshot } from "@nexus/domain";
 import { LIBRARY_COLLECTION_BATCH_LIMIT, LIBRARY_COLLECTION_ITEM_LIMIT } from "@nexus/domain";
-import { Button, ErrorState } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { libraryCollectionCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { confirmedCollectionCommand } from "../../../lib/library-collections-confirmation";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
+import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
+import { linkAccentTightRounded, linkGhostAccentRounded } from "../../shell/link-shell";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import {
-  libraryCollectionError,
-  libraryCollectionsCopy,
-} from "../../../lib/library-collections-i18n";
-import { collectionHref } from "../../../lib/library-collections-query";
-import { privateApiRequest } from "../../../lib/private-api-request";
-import { ActionConfirmCheckbox } from "../../../components/action-confirm-checkbox";
+  typeBreakAllXs,
+  typeBreakSm,
+  typeFlexStartGap3,
+  typeSmSecondary,
+} from "../../shell/type-shell";
+import { confirmedCollectionCommand } from "../library-collections-confirmation";
+import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
+import { collectionHref } from "../library-collections-query";
 
 type CopyCommand = Extract<LibraryCollectionCommand, { action: "copy-items" | "move-items" }>;
 type Destination = LibraryCollectionSnapshot & { itemCount: number; presentProductIds: string[] };
@@ -164,11 +169,23 @@ export function LibraryCollectionItemCopyForm({
   }
   if (!frozen && move && (source.status !== "active" || source.revision >= 2147483647))
     return (
-      <ErrorState id="library-collection-move-source-unavailable" title={c.moveSourceUnavailable} />
+      <ErrorState
+        id="library-collection-move-source-unavailable"
+        title={c.moveSourceUnavailable}
+        description={c.moveSourceUnavailableHint}
+      />
     );
   if (!destinations.length && !pending.current)
-    return <ErrorState id="library-collection-no-destination" title={c.noDestination} />;
-  if (!items.length && !pending.current) return <p>{c.emptyItems}</p>;
+    return (
+      <ErrorState
+        id="library-collection-no-destination"
+        title={c.noDestination}
+        description={c.noDestinationHint}
+      />
+    );
+  if (!items.length && !pending.current) {
+    return <EmptyState title={c.emptyItems} description={c.emptyItemsHint} />;
+  }
   const shownMove = pending.current ? pending.current.command.action === "move-items" : move;
   const shownItems = pending.current
     ? pending.current.command.productIds.map(
@@ -178,8 +195,8 @@ export function LibraryCollectionItemCopyForm({
     : items;
   const shownDestinations = pending.current ? [pending.current.destination] : destinations;
   return (
-    <form onSubmit={submit} className="nexus-panel space-y-4 p-5">
-      <p role="note" className="text-sm text-secondary">
+    <form onSubmit={submit} className={panelSpace4P5}>
+      <p role="note" className={typeSmSecondary}>
         {shownMove ? c.moveItemsNote : c.copyItemsNote}
       </p>
       <fieldset disabled={busy || frozen || saved} className="space-y-4">
@@ -210,7 +227,7 @@ export function LibraryCollectionItemCopyForm({
         <ul className="space-y-3">
           {shownItems.map((item) => (
             <li key={item.productId}>
-              <label className="flex items-start gap-3">
+              <label className={typeFlexStartGap3}>
                 <input
                   type="checkbox"
                   checked={ids.includes(item.productId)}
@@ -230,9 +247,7 @@ export function LibraryCollectionItemCopyForm({
                 />
                 <span className="break-words">
                   {item.title ?? c.unavailable}
-                  {item.title === null && (
-                    <code className="block break-all text-xs">{item.productId}</code>
-                  )}
+                  {item.title === null && <code className={typeBreakAllXs}>{item.productId}</code>}
                 </span>
               </label>
             </li>
@@ -273,18 +288,20 @@ export function LibraryCollectionItemCopyForm({
       )}
       {frozen && !saved && (
         <div className="space-y-2">
-          <p className="break-words text-sm">
+          <p className={typeBreakSm}>
             {c.source}: {pending.current?.source.name} · {c.revision}{" "}
             {pending.current?.source.revision}
           </p>
-          <p role="note" className="text-sm text-muted">
-            {c.frozen}
-          </p>
+          <ErrorState
+            id="library-collection-item-copy-frozen"
+            title={c.frozen}
+            description={c.retry}
+          />
           <Button
             type="button"
             disabled={busy}
             onClick={() => router.refresh()}
-            className="h-auto min-h-11 rounded px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkGhostAccentRounded}
             variant="ghost"
           >
             {c.reload}
@@ -301,7 +318,7 @@ export function LibraryCollectionItemCopyForm({
                 type="button"
                 disabled={busy}
                 onClick={() => router.refresh()}
-                className="h-auto min-h-11 rounded px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkGhostAccentRounded}
                 variant="ghost"
               >
                 {c.reload}
@@ -314,17 +331,11 @@ export function LibraryCollectionItemCopyForm({
         <div className="space-y-2">
           <p role="status">{c.saved}</p>
           {shownMove && (
-            <a
-              href={collectionHref(savedSourceId)}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <a href={collectionHref(savedSourceId)} className={linkAccentTightRounded}>
               {c.back}
             </a>
           )}
-          <a
-            href={collectionHref(savedDestinationId)}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <a href={collectionHref(savedDestinationId)} className={linkAccentTightRounded}>
             {c.openDestination}
           </a>
         </div>

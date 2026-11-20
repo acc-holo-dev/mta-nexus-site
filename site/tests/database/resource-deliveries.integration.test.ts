@@ -1,21 +1,22 @@
 import { randomBytes } from "node:crypto";
+import {
+  resourceDownloadAuthorizationRepository as authorization,
+  buildRepository,
+  db,
+  productRepository,
+  resourceDeliveriesRepository as receipts,
+  sessionRepository,
+  userRepository,
+} from "@nexus/db";
 import { and, count, eq, sql } from "drizzle-orm";
 import { expect, it } from "vitest";
-import {
-  db,
-  userRepository,
-  productRepository,
-  buildRepository,
-  sessionRepository,
-  resourceDownloadAuthorizationRepository as authorization,
-  resourceDeliveriesRepository as receipts,
-} from "@nexus/db";
 import {
   auditEvents,
   products,
   resourceDeliveryReceipts,
   users,
 } from "../../packages/db/src/schema";
+
 // Requires disposable PostgreSQL migrated through 0056; never run against an
 // operator's database. No payment, license issuance or subscription activation.
 function present<T>(value: T | null | undefined): T {

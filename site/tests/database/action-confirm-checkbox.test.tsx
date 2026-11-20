@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { ActionConfirmCheckbox } from "../../src/components/action-confirm-checkbox";
+import { ActionConfirmCheckbox } from "../../src/features/shell/action-confirm-checkbox";
 
 describe("ActionConfirmCheckbox", () => {
   it("wires label htmlFor to the checkbox id", () => {

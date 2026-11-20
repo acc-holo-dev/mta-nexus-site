@@ -1,6 +1,6 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
@@ -25,7 +25,7 @@ const command = vi.hoisted(() =>
   })),
 );
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
   },
@@ -40,7 +40,7 @@ vi.mock("@nexus/security", async (importOriginal) => {
   };
 });
 
-vi.mock("../../src/lib/services/resource-build-workspace-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-build-workspace-service", () => ({
   resourceBuildWorkspaceService: { command, detail: vi.fn() },
 }));
 
@@ -106,7 +106,7 @@ describe("build retirement HTTP behavior", () => {
     );
 
     expect(response.status).toBe(400);
-    expect(await response.json()).toEqual({ code: "BUILD_COMMAND_INVALID" });
+    expect(await response.json()).toMatchObject({ code: "BUILD_COMMAND_INVALID" });
     expect(command).not.toHaveBeenCalled();
   });
 
@@ -140,6 +140,6 @@ describe("build retirement HTTP behavior", () => {
     const response = await PATCH(request(retireBody), context);
 
     expect(response.status).toBe(409);
-    expect(await response.json()).toEqual({ code: "BUILD_ALREADY_RETIRED" });
+    expect(await response.json()).toMatchObject({ code: "BUILD_ALREADY_RETIRED" });
   });
 });

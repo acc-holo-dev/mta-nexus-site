@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { productsApiCopy } from "../../src/features/resources/products-api-copy";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
@@ -12,11 +13,11 @@ const mocks = vi.hoisted(() => ({
   consumeRateLimit: vi.fn(),
 }));
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.getSession },
 }));
 
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: {
     createProduct: mocks.createProduct,
     findCreatedDraftForReplay: mocks.findCreatedDraftForReplay,
@@ -149,7 +150,7 @@ describe("resource creation HTTP errors", () => {
     expect(response.status).toBe(409);
     expectPrivate(response);
     expect(await response.json()).toEqual({
-      error: "A resource with this slug already exists",
+      error: productsApiCopy("en").slugExists,
       code: "PRODUCT_SLUG_EXISTS",
     });
   });
@@ -239,7 +240,7 @@ describe("resource creation HTTP errors", () => {
 
       expect(response.status).toBe(500);
       expect(await response.json()).toEqual({
-        error: "Could not create resource",
+        error: productsApiCopy("en").createFailed,
         code: "RESOURCE_CREATION_FAILED",
       });
     } finally {

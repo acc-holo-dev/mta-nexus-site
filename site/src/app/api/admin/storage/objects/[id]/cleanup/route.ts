@@ -1,13 +1,13 @@
 import { AppError, UnauthorizedError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
-import { readBoundedJson } from "../../../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../../../lib/browser-route-adapter";
-import { resourceCommerceRequest } from "../../../../../../../lib/resource-commerce-http";
-import { storageMaintenanceService } from "../../../../../../../lib/services/storage-maintenance-service";
 import {
   storageCleanupSchema,
   storageParse,
-} from "../../../../../../../lib/storage-maintenance-query";
+} from "../../../../../../../features/moderation/storage-maintenance-query";
+import { resourceCommerceRequest } from "../../../../../../../features/resources/resource-commerce-http";
+import { readBoundedJson } from "../../../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../../../lib/http/browser-route-adapter";
+import { storageMaintenanceService } from "../../../../../../../lib/services/moderation/storage-maintenance-service";
 export const POST = withBrowserMutation(
   (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     return resourceCommerceRequest(request, true, async (actor) => {

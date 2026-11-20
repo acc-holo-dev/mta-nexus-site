@@ -3,29 +3,41 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
+  ActionConfirmCheckbox,
+  actionConfirmCheckboxFocusClass,
+} from "../../shell/action-confirm-checkbox";
+import { confirmAction } from "../../shell/confirm-action";
+import {
+  linkAccent,
+  linkAccentSm,
+  linkGhostAccentSm,
+  linkMinHAccent,
+  linkMinHAccentFocus,
+} from "../../shell/link-shell";
+import { useNexusLocale } from "../../shell/locale";
+import { panelSpace2P4 } from "../../shell/panel-shell";
+import {
+  typeFlexStartGap3,
+  typeFlexWrapGap4,
+  typePrewrapSmSecondary,
+  typeSmMuted,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import {
   confirmedNotificationInboxCommand,
   NOTIFICATION_INBOX_SELECTION_LIMIT,
   type NotificationInboxPage,
   type NotificationInboxQuery,
   notificationInboxHref,
   notificationInboxPageSchema,
-} from "../../../lib/notification-inbox-contract";
-import {
-  notificationInboxCopy,
-  notificationInboxError,
-} from "../../../lib/notification-inbox-copy";
-import { announceNotificationInboxChange } from "../../../lib/notification-inbox-events";
+} from "../notification-inbox-contract";
+import { notificationInboxCopy, notificationInboxError } from "../notification-inbox-copy";
+import { announceNotificationInboxChange } from "../notification-inbox-events";
 import {
   fetchNotificationInboxExport,
   INBOX_EXPORT_FILE_NAME,
   NotificationInboxExportError,
-} from "../../../lib/notification-inbox-export-client";
-import {
-  ActionConfirmCheckbox,
-  actionConfirmCheckboxFocusClass,
-} from "../../../components/action-confirm-checkbox";
-import { confirmAction } from "../../../components/confirm-action";
-import { useNexusLocale } from "../../../components/locale-context";
+} from "../notification-inbox-export-client";
 export function NotificationInbox({
   initialPage,
   filters,
@@ -37,6 +49,10 @@ export function NotificationInbox({
 }) {
   const { locale } = useNexusLocale(),
     copy = notificationInboxCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return Object.values(copy).includes(text) ? text : fallback;
+  }
   const [page, setPage] = useState(initialPage),
     [selected, setSelected] = useState<string[]>([]),
     [busy, setBusy] = useState(false),
@@ -149,8 +165,7 @@ export function NotificationInbox({
       setBlocked(false);
     } catch (failure) {
       if (mounted.current) {
-        const message = failure instanceof Error ? failure.message : "";
-        setError(Object.values(copy).includes(message) ? message : copy.unavailable);
+        setError(safeMessage(failure, copy.unavailable));
         setBlocked(true);
       }
     } finally {
@@ -241,9 +256,9 @@ export function NotificationInbox({
       if (mounted.current) {
         // Keep last confirmed unreadCount; do not present a false zero after a failed write.
         setSelected([]);
-        const message = failure instanceof Error ? failure.message : "";
+        const message = safeMessage(failure, "");
         setError(
-          !confirmed && Object.values(copy).includes(message) && message !== copy.uncertain
+          !confirmed && message && message !== copy.uncertain
             ? `${message} ${copy.uncertain}`
             : copy.uncertain,
         );
@@ -269,20 +284,20 @@ export function NotificationInbox({
     }).format(new Date(value));
   return (
     <section className="space-y-4" aria-label={copy.title}>
-      <p className="text-sm text-muted">
+      <p className={typeSmMuted}>
         {copy.totalUnread}: <strong className="text-primary">{page.unreadCount}</strong>
       </p>
-      <p className="text-xs text-muted">{copy.live}</p>
+      <p className={typeXsMuted}>{copy.live}</p>
       {page.window && (
-        <p className="text-xs text-muted">
+        <p className={typeXsMuted}>
           {copy.window}: <time dateTime={page.window.from}>{displayDate(page.window.from)}</time>
           {" — "}
           <time dateTime={page.window.until}>{displayDate(page.window.until)}</time>
         </p>
       )}
-      <div className="nexus-panel space-y-2 p-4">
+      <div className={panelSpace2P4}>
         {busy || blocked ? (
-          <span aria-disabled="true" className="text-sm text-muted">
+          <span aria-disabled="true" className={typeSmMuted}>
             {copy.export}
           </span>
         ) : (
@@ -297,15 +312,15 @@ export function NotificationInbox({
               event.preventDefault();
               void exportPage();
             }}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentSm}
           >
             {copy.export}
           </a>
         )}
-        <p className="text-xs text-muted">{copy.exportHelp}</p>
+        <p className={typeXsMuted}>{copy.exportHelp}</p>
       </div>
       {busy && (
-        <p role="status" aria-live="polite" aria-busy="true" className="text-sm text-muted">
+        <p role="status" aria-live="polite" aria-busy="true" className={typeSmMuted}>
           {exporting ? copy.exportLoading : copy.loading}
         </p>
       )}
@@ -324,7 +339,7 @@ export function NotificationInbox({
               variant="ghost"
               disabled={busy}
               onClick={() => void refresh()}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
             >
               {copy.retry}
             </Button>
@@ -338,7 +353,7 @@ export function NotificationInbox({
             variant="outline"
             disabled={disabled}
             onClick={() => void mark(true, [], true)}
-            className="min-h-11 text-accent"
+            className={linkMinHAccent}
           >
             {copy.markAllRead}
           </Button>
@@ -356,7 +371,7 @@ export function NotificationInbox({
           />
           {copy.selectPage}
         </label>
-        <span className="text-xs text-muted">
+        <span className={typeXsMuted}>
           {copy.selected}: {selected.length}
         </span>
         <ActionConfirmCheckbox
@@ -374,7 +389,7 @@ export function NotificationInbox({
           variant="outline"
           disabled={disabled || !selected.length || !selectionAcknowledged}
           onClick={() => void mark(true, selected, false, true)}
-          className="min-h-11 text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkMinHAccentFocus}
         >
           {copy.markRead}
         </Button>
@@ -383,7 +398,7 @@ export function NotificationInbox({
           variant="outline"
           disabled={disabled || !selected.length || !selectionAcknowledged}
           onClick={() => void mark(false, selected, false, true)}
-          className="min-h-11 text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkMinHAccentFocus}
         >
           {copy.markUnread}
         </Button>
@@ -403,11 +418,7 @@ export function NotificationInbox({
           description={emptyFiltered ? copy.emptyFilteredDescription : copy.emptyDescription}
           action={
             emptyFiltered ? (
-              <Link
-                prefetch={false}
-                href="/notifications"
-                className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link prefetch={false} href="/notifications" className={linkAccent}>
                 {copy.reset}
               </Link>
             ) : undefined
@@ -420,7 +431,7 @@ export function NotificationInbox({
             <article
               className={`rounded-xl border p-4 ${item.isRead ? "border-base bg-surface" : "border-[color:var(--nexus-accent)]/25 bg-accent-soft"}`}
             >
-              <div className="flex items-start gap-3">
+              <div className={typeFlexStartGap3}>
                 <label className="inline-flex min-h-11 min-w-6 items-center">
                   <span className="sr-only">
                     {copy.select}: {item.title}
@@ -444,9 +455,7 @@ export function NotificationInbox({
                 </label>
                 <div className="min-w-0 flex-1 space-y-2">
                   <h2 className="break-words text-sm font-bold text-primary">{item.title}</h2>
-                  <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                    {item.message}
-                  </p>
+                  <p className={typePrewrapSmSecondary}>{item.message}</p>
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
                     <span>{copy[item.category]}</span>
                     <span>{item.isRead ? copy.read : copy.unread}</span>
@@ -458,15 +467,11 @@ export function NotificationInbox({
                       UTC
                     </time>
                   </div>
-                  {item.truncated && <p className="text-xs text-muted">{copy.truncated}</p>}
+                  {item.truncated && <p className={typeXsMuted}>{copy.truncated}</p>}
                   <div className="flex flex-wrap items-center gap-4">
                     {item.link && (
                       // Destination navigation alone does not change isRead; use the explicit mark controls.
-                      <Link
-                        prefetch={false}
-                        href={item.link}
-                        className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                      >
+                      <Link prefetch={false} href={item.link} className={linkAccentSm}>
                         {copy.view}
                       </Link>
                     )}
@@ -475,7 +480,7 @@ export function NotificationInbox({
                       variant="ghost"
                       disabled={disabled}
                       onClick={() => void mark(!item.isRead, [item.id])}
-                      className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                      className={linkGhostAccentSm}
                     >
                       {item.isRead ? copy.markOneUnread : copy.markOneRead}
                     </Button>
@@ -486,12 +491,12 @@ export function NotificationInbox({
           </li>
         ))}
       </ul>
-      <nav aria-label={copy.pageNavigation} className="flex flex-wrap gap-4">
+      <nav aria-label={copy.pageNavigation} className={typeFlexWrapGap4}>
         {page.newerCursor && (
           <Link
             prefetch={false}
             href={notificationInboxHref("/notifications", filters, page.newerCursor)}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentSm}
           >
             {copy.newer}
           </Link>
@@ -500,7 +505,7 @@ export function NotificationInbox({
           <Link
             prefetch={false}
             href={notificationInboxHref("/notifications", filters, page.olderCursor)}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentSm}
           >
             {copy.older}
           </Link>

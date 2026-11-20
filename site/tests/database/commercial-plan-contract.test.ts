@@ -1,21 +1,21 @@
-import { expect, it } from "vitest";
 import { commercialFeeEstimate, commercialPlanTransition } from "@nexus/domain";
 import {
   commercialPlanCommandSchema,
   commercialPlanTermsSchema,
   orderCancellationCommandSchema,
 } from "@nexus/validation";
+import { expect, it } from "vitest";
 import {
   confirmedCommercialEstimate,
   confirmedCommercialPlan,
   confirmedOrderCancellation,
   parseCommercialAmount,
-} from "../../src/lib/commercial-confirmation";
+} from "../../src/features/commerce/commercial-confirmation";
 import {
   commercialAdminQuery,
   commercialCatalogQuery,
   commercialQuoteQuery,
-} from "../../src/lib/commercial-plan-query";
+} from "../../src/features/commerce/commercial-plan-query";
 
 const terms = {
   titleRu: "Тариф",

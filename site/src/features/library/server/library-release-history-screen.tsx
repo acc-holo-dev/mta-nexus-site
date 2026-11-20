@@ -1,17 +1,33 @@
 import { AppError, LIBRARY_RELEASE_HISTORY_DAYS } from "@nexus/domain";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { collectionPageParams } from "../../../lib/library-collections-query";
-import { libraryReleaseHistoryCopy } from "../../../lib/library-release-history-i18n";
-import { libraryReleaseHistoryQuery } from "../../../lib/library-release-history-query";
-import { authService } from "../../../lib/services/auth-service";
-import { libraryReleaseService } from "../../../lib/services/resource-release-control-service";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { PlatformSessionError } from "../../../components/platform-session-error";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { libraryReleaseService } from "../../../lib/services/resources/resource-release-control-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import {
+  linkAccentSmRounded,
+  linkAccentTightRounded,
+  linkAccentTightSmMedium,
+} from "../../shell/link-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import { typeBreakAllXs, typeBreakSemibold, typeFlexWrapEndGap3 } from "../../shell/type-shell";
+import { collectionPageParams } from "../library-collections-query";
+import { libraryReleaseHistoryCopy } from "../library-release-history-i18n";
+import { libraryReleaseHistoryQuery } from "../library-release-history-query";
+export async function libraryReleaseHistoryMetadata(): Promise<Metadata> {
+  return {
+    title: `${libraryReleaseHistoryCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
 export async function LibraryReleaseHistoryScreen({
   searchParams,
 }: {
@@ -62,21 +78,16 @@ export async function LibraryReleaseHistoryScreen({
   });
   if (!result) {
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
-        <Link
-          href="/workspace/library"
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+      <div className={pageShellMax5xl}>
+        <Link href="/workspace/library" className={linkAccentTightRounded}>
           {c.back}
         </Link>
         <h1 className="font-display">{c.title}</h1>
         <ErrorState
           title={c.loadUnavailable}
+          description={c.loadUnavailableDescription}
           action={
-            <Link
-              href={retryHref}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={retryHref} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -92,16 +103,13 @@ export async function LibraryReleaseHistoryScreen({
     }).toString();
   const href = (page: number) => `/workspace/library/version-history?${suffix(page)}`;
   return (
-    <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
-      <Link
-        href="/workspace/library"
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellMax5xl}>
+      <Link href="/workspace/library" className={linkAccentTightRounded}>
         {c.back}
       </Link>
       <h1 className="font-display">{c.title}</h1>
       <p className="text-secondary">{c.note}</p>
-      <form method="get" className="flex flex-wrap items-end gap-3">
+      <form method="get" className={typeFlexWrapEndGap3}>
         <label className="grid gap-1">
           {c.days}
           <select name="days" defaultValue={result.days}>
@@ -128,7 +136,7 @@ export async function LibraryReleaseHistoryScreen({
       {result.productId && (
         <Link
           href={`/workspace/library/version-history?days=${result.days}`}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentTightRounded}
         >
           {c.clear}
         </Link>
@@ -141,7 +149,7 @@ export async function LibraryReleaseHistoryScreen({
             result.productId ? (
               <Link
                 href={`/workspace/library/version-history?days=${result.days}`}
-                className="text-sm font-medium text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentTightSmMedium}
               >
                 {c.clear}
               </Link>
@@ -151,13 +159,13 @@ export async function LibraryReleaseHistoryScreen({
       )}
       <ol className="space-y-4">
         {result.items.map((item) => (
-          <li key={item.id} className="nexus-panel space-y-3 p-5">
+          <li key={item.id} className={panelSpace3P5}>
             {item.currentTitle && (
-              <h2 className="break-words font-semibold">
+              <h2 className={typeBreakSemibold}>
                 {c.current}: {item.currentTitle}
               </h2>
             )}
-            <code className="block break-all text-xs">{item.productId}</code>
+            <code className={typeBreakAllXs}>{item.productId}</code>
             <p>{c[item.source]}</p>
             {item.selection && (
               <>
@@ -181,7 +189,7 @@ export async function LibraryReleaseHistoryScreen({
             {item.hasCurrentAccess && (
               <Link
                 href={`/workspace/library/${encodeURIComponent(item.productId)}/versions`}
-                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentTightRounded}
               >
                 {c.manage}
               </Link>
@@ -198,7 +206,7 @@ export async function LibraryReleaseHistoryScreen({
       </nav>
       <a
         href={`/api/library/releases/history/export?${suffix(result.page)}`}
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className={linkAccentTightRounded}
       >
         {c.export}
       </a>

@@ -21,6 +21,7 @@ export const supportRouteMocks = {
   addIdempotentMessage: vi.fn(),
   findMutationReplay: vi.fn(),
   updateStatus: vi.fn(),
+  activityHistory: vi.fn(),
   moderatorIds: vi.fn(),
   dispatch: vi.fn(),
 };
@@ -53,6 +54,9 @@ export function createSupportRouteDbMock() {
       addIdempotentMessage: supportRouteMocks.addIdempotentMessage,
       findMutationReplay: supportRouteMocks.findMutationReplay,
       updateStatus: supportRouteMocks.updateStatus,
+    },
+    supportActivityRepository: {
+      history: supportRouteMocks.activityHistory,
     },
     userRepository: { listModeratorIds: supportRouteMocks.moderatorIds },
   };
@@ -128,6 +132,10 @@ function resetSupportRouteMocks() {
     requesterId: "usr_member",
     subject: "Account help",
     status: "resolved",
+  });
+  supportRouteMocks.activityHistory.mockResolvedValue({
+    items: [],
+    nextCursor: null,
   });
   supportRouteMocks.moderatorIds.mockResolvedValue(["usr_mod"]);
   supportRouteMocks.dispatch.mockResolvedValue({

@@ -1,20 +1,23 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const h = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
   rate: vi.fn(),
   history: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => h.actor },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: h.rate }));
-vi.mock("../../src/lib/services/resource-release-control-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-release-control-service", () => ({
   libraryReleaseService: { history: h.history },
 }));
-import { GET } from "../../src/app/api/library/releases/history/route";
+
 import { GET as download } from "../../src/app/api/library/releases/history/export/route";
+import { GET } from "../../src/app/api/library/releases/history/route";
+
 const request = (query = "") =>
   new NextRequest(`https://nexus.test/api/library/releases/history${query}`);
 beforeEach(() => {

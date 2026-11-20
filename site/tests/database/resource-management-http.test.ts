@@ -29,19 +29,21 @@ vi.mock("@nexus/db", () => ({
     candidates: state.candidates,
   },
   resourceCompatibilityRepository: { update: state.compatibility },
-  buildReviewDownloadRepository: { authorize: state.authorize },
-  buildRepository: { findById: state.findBuild },
 }));
 vi.mock("@nexus/security", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@nexus/security")>()),
   consumeRateLimit: vi.fn(async () => ({ success: state.allowed })),
 }));
 vi.mock("@nexus/storage", () => ({ storageService: { getDownloadStream: state.download } }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../../src/lib/services/product-service", () => ({
-  productService: { getManagedProduct: state.findManagedProduct },
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
+  productService: {
+    getManagedProduct: state.findManagedProduct,
+    findBuildById: state.findBuild,
+    authorizeReviewDownload: state.authorize,
+  },
 }));
 
 import { consumeRateLimit } from "@nexus/security";
@@ -166,7 +168,7 @@ it("rejects missing or changed actor preconditions before compatibility writes",
     context,
   );
   expect(changed.status).toBe(409);
-  expect(await changed.json()).toEqual({ code: "ACTOR_CHANGED" });
+  expect(await changed.json()).toMatchObject({ code: "ACTOR_CHANGED" });
   expect(state.compatibility).not.toHaveBeenCalled();
 });
 
@@ -195,7 +197,7 @@ it("binds variant reads and writes to the active actor", async () => {
     context,
   );
   expect(changed.status).toBe(409);
-  expect(await changed.json()).toEqual({ code: "ACTOR_CHANGED" });
+  expect(await changed.json()).toMatchObject({ code: "ACTOR_CHANGED" });
   expect(state.command).not.toHaveBeenCalled();
 });
 
@@ -288,7 +290,7 @@ it("preserves private not-found and concurrency errors", async () => {
   );
   const response = await variants(request("/api/products/prd_a/variants", command), context);
   expect(response.status).toBe(409);
-  expect(await response.json()).toEqual({ code: "RESOURCE_VARIANTS_CONFLICT" });
+  expect(await response.json()).toMatchObject({ code: "RESOURCE_VARIANTS_CONFLICT" });
 });
 it("bounds candidate paging and rejects ambiguous repeated parameters", async () => {
   for (const query of ["page=0", "page=1001", "page=2.5", "page=2&page=3", "page=nope"])

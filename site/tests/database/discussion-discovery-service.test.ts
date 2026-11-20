@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const page = vi.hoisted(() => vi.fn());
 vi.mock("@nexus/db", () => ({
   contentRepository: {},
@@ -9,7 +10,9 @@ vi.mock("@nexus/db", () => ({
   contentDiscussionRepository: { page },
   discussionRevision: () => "a".repeat(64),
 }));
-import { contentService } from "../../src/lib/services/content-service";
+
+import { contentService } from "../../src/lib/services/community/content-service";
+
 const cursor = { createdAt: "2026-10-11T00:00:00.000123Z", id: "last" };
 beforeEach(() => {
   vi.clearAllMocks();

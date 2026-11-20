@@ -1,17 +1,1 @@
-import Link from "next/link";
-import { getRequestLocale } from "../../../../lib/i18n-server";
-import { libraryCollectionsCopy } from "../../../../lib/library-collections-i18n";
-export default async function NotFound() {
-  const c = libraryCollectionsCopy(await getRequestLocale());
-  return (
-    <section className="mx-auto max-w-xl space-y-4 py-16">
-      <h1>{c.notFound}</h1>
-      <Link
-        href="/workspace/library/collections"
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
-        {c.title}
-      </Link>
-    </section>
-  );
-}
+export { LibraryCollectionsNotFound as default } from "../../../../features/library/library-collections-not-found-server";

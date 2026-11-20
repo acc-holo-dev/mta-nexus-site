@@ -1,5 +1,5 @@
-import { beforeAll, describe, expect, it } from "vitest";
 import { contentRepository, serverRepository, userRepository } from "@nexus/db";
+import { beforeAll, describe, expect, it } from "vitest";
 
 describe("published server update repository integration", () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`;

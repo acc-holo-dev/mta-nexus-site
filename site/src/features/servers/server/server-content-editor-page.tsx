@@ -1,21 +1,29 @@
 import { AppError } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { serverContentId } from "../../../lib/server-content-api";
-import { serverContentCopy } from "../../../lib/server-content-copy";
-import { serverPublicationHistoryCopy } from "../../../lib/server-publication-history-copy";
-import { authService } from "../../../lib/services/auth-service";
-import { serverContentService } from "../../../lib/services/server-content-service";
-import { parseEditableContent } from "../../../lib/user-platform-client";
-import { getUserPlatformCopy, userPlatformError } from "../../../lib/user-platform-copy";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { serverContentService } from "../../../lib/services/servers/server-content-service";
 import { AuthorContentForm } from "../../community/author-content-form";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-
-const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8";
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+import { parseEditableContent } from "../../community/user-platform-client";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
+import { pageShellMax3xl } from "../../shell/page-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary } from "../../shell/type-shell";
+import { serverContentId } from "../server-content-api";
+import { serverContentCopy, serverContentMutationError } from "../server-content-copy";
+import { serverPublicationHistoryCopy } from "../server-publication-history-copy";
+export async function serverContentEditorMetadata(): Promise<Metadata> {
+  return {
+    title: getUserPlatformCopy(await getRequestLocale()).edit,
+    robots: { index: false, follow: false },
+  };
+}
 
 export async function ServerContentEditorPage({
   id,
@@ -27,7 +35,20 @@ export async function ServerContentEditorPage({
   const locale = await getRequestLocale(),
     copy = getUserPlatformCopy(locale),
     team = serverContentCopy(locale);
-  const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.unavailable}
+        retryHref={"/workspace/servers/"}
+      />
+    );
+  }
+
   const returnPath = contentId
     ? `/workspace/servers/${encodeURIComponent(id)}/content/${encodeURIComponent(contentId)}`
     : `/workspace/servers/${encodeURIComponent(id)}/content/new`;
@@ -44,23 +65,25 @@ export async function ServerContentEditorPage({
     })
     .catch((error: unknown) => {
       failure =
-        error instanceof AppError ? userPlatformError(locale, error.code) : copy.unavailable;
+        error instanceof AppError
+          ? serverContentMutationError(locale, error.code)
+          : copy.unavailable;
       return null;
     });
   const initial = result?.content ? parseEditableContent(result.content) : null;
   const path = `/workspace/servers/${encodeURIComponent(id)}/content`;
   return (
-    <div className={pageShellClass}>
-      <Link href={path} className={navLinkClass}>
+    <div className={pageShellMax3xl}>
+      <Link href={path} className={linkAccentSm}>
         {team.title}
       </Link>
-      <h1 className="font-display text-primary">{contentId ? copy.edit : team.new}</h1>
+      <h1 className={typeDisplayPrimary}>{contentId ? copy.edit : team.new}</h1>
       {result && (!contentId || (initial && initial.serverId === id)) ? (
         <>
           {contentId && (
             <Link
               href={`${path}/${encodeURIComponent(contentId)}/history`}
-              className={navLinkClass}
+              className={linkAccentSm}
             >
               {serverPublicationHistoryCopy(locale).history}
             </Link>
@@ -75,10 +98,11 @@ export async function ServerContentEditorPage({
       ) : (
         <ErrorState
           title={failure}
+          description={team.loadUnavailableHint}
           action={
             <Link
               href={contentId ? `${path}/${encodeURIComponent(contentId)}` : `${path}/new`}
-              className={navLinkClass}
+              className={linkAccentSm}
             >
               {copy.retry}
             </Link>
@@ -87,4 +111,16 @@ export async function ServerContentEditorPage({
       )}
     </div>
   );
+}
+
+export async function ServerContentNewRoutePage({ params }: { params: Promise<{ id: string }> }) {
+  return ServerContentEditorPage(await params);
+}
+
+export async function ServerContentEditRoutePage({
+  params,
+}: {
+  params: Promise<{ id: string; contentId: string }>;
+}) {
+  return ServerContentEditorPage(await params);
 }

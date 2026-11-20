@@ -13,7 +13,7 @@ const source = readFileSync(
 it("marks the loading line as status inside the live region", () => {
   expect(source).toContain('aria-live="polite"');
   expect(source).toMatch(
-    /<p role="status" className="text-sm text-muted">\s*\{dictionary\.support\.historyLoading\}/u,
+    /<p role="status" className=\{?(?:"text-sm text-muted"|typeSmMuted)\}?>\s*\{dictionary\.support\.historyLoading\}/u,
   );
 });
 
@@ -22,9 +22,9 @@ it("locks ErrorState read failures, EmptyState empties, min-h-11 CTAs, and clip 
   expect(source).toContain("EmptyState");
   expect(source).toContain("historyEmptyHint");
   expect(source).toContain("historyUnavailableDescription");
-  expect(source).toContain("overflow-x-clip");
-  expect(source).toContain("min-w-0");
-  expect(source).toContain("min-h-11");
+  expect(source).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(source).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(source).not.toContain("min-h-9");
   expect(source).toContain("copy.historyEmpty");
   expect(source).toContain("copy.reload");

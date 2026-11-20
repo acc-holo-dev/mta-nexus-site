@@ -20,7 +20,7 @@ const addComment = vi.hoisted(() =>
   })),
 );
 
-vi.mock("../../../../../lib/services/auth-service", () => ({
+vi.mock("../../../../../lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => ({
       id: "usr_commenter",
@@ -29,7 +29,7 @@ vi.mock("../../../../../lib/services/auth-service", () => ({
   },
 }));
 
-vi.mock("../../../../../lib/services/content-service", () => ({
+vi.mock("../../../../../lib/services/community/content-service", () => ({
   contentService: {
     getArticleBySlug: getArticle,
     addComment,

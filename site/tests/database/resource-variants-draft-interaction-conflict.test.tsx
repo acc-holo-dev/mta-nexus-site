@@ -1,4 +1,5 @@
 import { expect, it, vi } from "vitest";
+import { getDictionary } from "../../src/lib/i18n";
 import { findTestButton } from "../helpers/flatten-react-test-tree";
 import {
   actor,
@@ -15,12 +16,12 @@ const harness = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
-vi.mock("../../src/components/locale-context", () => ({
-  useNexusLocale: () => ({ locale: harness.locale }),
+vi.mock("../../src/features/shell/locale", () => ({
+  useNexusLocale: () => ({ locale: harness.locale, dictionary: getDictionary(harness.locale) }),
 }));
 
 import { ResourceVariantsForm } from "../../src/features/resources/components/resource-variants-form";
-import { getResourceManagementCopy } from "../../src/lib/resource-management-i18n";
+import { getResourceManagementCopy } from "../../src/features/resources/resource-management-i18n";
 
 const { render, edit, submit } = createResourceVariantsDraftInteractionHelpers(
   harness,

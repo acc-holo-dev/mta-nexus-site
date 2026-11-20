@@ -7,14 +7,30 @@ import {
 import { Button, EmptyState } from "@nexus/ui";
 import { Clock3 } from "lucide-react";
 import Link from "next/link";
-import { communityReportCopy } from "../../../lib/community-report-copy";
-import type { ReportHistoryPage } from "../../../lib/community-report-history-contract";
-import { reportHistoryCopy } from "../../../lib/community-report-history-copy";
 import type { Locale } from "../../../lib/i18n";
-import { privateChangeHistoryCopy } from "../../../lib/private-change-history-copy";
-import { changeHistoryHref } from "../../../lib/private-change-history-query";
-import { platformFieldClass } from "../../../lib/user-platform-client";
-import { PrivateChangeHistoryCutoff } from "../../../components/private-change-history-controls";
+import { PrivateChangeHistoryCutoff } from "../../accounts/change-history";
+import { privateChangeHistoryCopy } from "../../accounts/private-change-history-copy";
+import { changeHistoryHref } from "../../accounts/private-change-history-query";
+import { linkAccent, linkAccentRounded, linkAccentSmRounded } from "../../shell/link-shell";
+import { pageShellMax4xlCompactTight } from "../../shell/page-shell";
+import { panelFlexMinWrapEndP4, panelMinSpace2P4 } from "../../shell/panel-shell";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapBetweenGap2,
+  typeMinSpace2,
+  typeMinSpace3,
+  typeMinW40Flex1Space1SmSecondary,
+  typePrewrapSmSecondary,
+  typeSmMuted,
+  typeSmSecondary,
+  typeSmSemiboldPrimary,
+  typeXsMuted,
+  typeXsSecondary,
+} from "../../shell/type-shell";
+import { communityReportCopy } from "../community-report-copy";
+import type { ReportHistoryPage } from "../community-report-history-contract";
+import { reportHistoryCopy } from "../community-report-history-copy";
+import { platformFieldClass } from "../user-platform-client";
 export function CommunityReportHistory({
   page,
   filters,
@@ -35,30 +51,21 @@ export function CommunityReportHistory({
       !!filters.cursor ||
       !!filters.until;
   return (
-    <div className="mx-auto min-w-0 max-w-4xl space-y-5 overflow-x-clip">
-      <Link
-        href={base}
-        className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellMax4xlCompactTight}>
+      <Link href={base} className={linkAccentSmRounded}>
         {copy.back}
       </Link>
-      <header className="min-w-0 space-y-2">
-        <h1 className="font-display text-primary">{copy.title}</h1>
-        <p className="text-sm text-secondary">
+      <header className={typeMinSpace2}>
+        <h1 className={typeDisplayPrimary}>{copy.title}</h1>
+        <p className={typeSmSecondary}>
           {reportCopy[page.report.targetType]} · {reportCopy[page.report.type]} ·{" "}
           {reportCopy[page.report.status]}
         </p>
-        <p className="text-sm text-muted">{copy.description}</p>
-        <p className="text-xs text-muted">
-          {page.audience === "staff" ? copy.staffHint : copy.ownHint}
-        </p>
+        <p className={typeSmMuted}>{copy.description}</p>
+        <p className={typeXsMuted}>{page.audience === "staff" ? copy.staffHint : copy.ownHint}</p>
       </header>
-      <form
-        method="get"
-        action={path}
-        className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
-      >
-        <label className="min-w-40 flex-1 space-y-1 text-sm text-secondary">
+      <form method="get" action={path} className={panelFlexMinWrapEndP4}>
+        <label className={typeMinW40Flex1Space1SmSecondary}>
           <span>{copy.period}</span>
           <select name="period" defaultValue={filters.period} className={platformFieldClass}>
             {CHANGE_HISTORY_PERIODS.map((period) => (
@@ -68,7 +75,7 @@ export function CommunityReportHistory({
             ))}
           </select>
         </label>
-        <label className="min-w-40 flex-1 space-y-1 text-sm text-secondary">
+        <label className={typeMinW40Flex1Space1SmSecondary}>
           <span>{copy.group}</span>
           <select name="group" defaultValue={filters.group} className={platformFieldClass}>
             {REPORT_HISTORY_GROUPS.map((group) => (
@@ -81,28 +88,25 @@ export function CommunityReportHistory({
         <Button type="submit" className="min-h-11" variant="outline">
           {copy.apply}
         </Button>
-        <Link
-          href={path}
-          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={path} className={linkAccentSmRounded}>
           {copy.reset}
         </Link>
       </form>
       <div className="flex min-w-0 flex-wrap justify-between gap-3 text-sm">
         <Link
           href={changeHistoryHref(path, filters, { fresh: true })}
-          className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentRounded}
         >
           {copy.latest}
         </Link>
         <a
           href={changeHistoryHref(`/api${base}/history/export`, filters, { until: page.until })}
-          className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentRounded}
         >
           {copy.download}
         </a>
       </div>
-      <p className="text-xs text-muted">{copy.exportHint}</p>
+      <p className={typeXsMuted}>{copy.exportHint}</p>
       <PrivateChangeHistoryCutoff until={page.until} locale={locale} />
       {page.items.length === 0 ? (
         <EmptyState
@@ -111,44 +115,39 @@ export function CommunityReportHistory({
           icon={<Clock3 className="h-6 w-6" aria-hidden="true" />}
           action={
             filtered ? (
-              <Link
-                href={path}
-                className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={path} className={linkAccent}>
                 {copy.reset}
               </Link>
             ) : undefined
           }
         />
       ) : (
-        <ol className="min-w-0 space-y-3" aria-label={copy.title}>
+        <ol className={typeMinSpace3} aria-label={copy.title}>
           {page.items.map((event) => (
-            <li key={event.id} className="nexus-panel min-w-0 space-y-2 p-4">
-              <div className="flex flex-wrap justify-between gap-2">
-                <h2 className="text-sm font-semibold text-primary">{copy.actions[event.action]}</h2>
-                <time dateTime={event.createdAt} className="text-xs text-muted">
+            <li key={event.id} className={panelMinSpace2P4}>
+              <div className={typeFlexWrapBetweenGap2}>
+                <h2 className={typeSmSemiboldPrimary}>{copy.actions[event.action]}</h2>
+                <time dateTime={event.createdAt} className={typeXsMuted}>
                   {new Date(event.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                     timeZone: "UTC",
                   })}{" "}
                   UTC
                 </time>
               </div>
-              <p className="text-xs text-secondary">{copy.by[event.by]}</p>
-              <p className="text-sm text-secondary">
+              <p className={typeXsSecondary}>{copy.by[event.by]}</p>
+              <p className={typeSmSecondary}>
                 {event.from && `${reportCopy[event.from]} → `}
                 {event.to ? reportCopy[event.to] : copy.unknown}
               </p>
-              {event.removed && <p className="text-xs text-muted">{copy.removed}</p>}
+              {event.removed && <p className={typeXsMuted}>{copy.removed}</p>}
               {page.audience === "staff" && "notes" in event && event.notes && (
                 <div>
                   <h3 className="text-xs font-semibold text-primary">{copy.notes}</h3>
-                  <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                    {event.notes}
-                  </p>
+                  <p className={typePrewrapSmSecondary}>{event.notes}</p>
                 </div>
               )}
               {page.audience === "staff" && "batchSize" in event && event.batchSize !== null && (
-                <p className="text-xs text-muted">
+                <p className={typeXsMuted}>
                   {copy.batch}: {event.batchSize}
                 </p>
               )}
@@ -159,7 +158,7 @@ export function CommunityReportHistory({
       {page.nextCursor && (
         <Link
           href={changeHistoryHref(path, filters, { cursor: page.nextCursor, until: page.until })}
-          className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentSmRounded}
         >
           {copy.older}
         </Link>

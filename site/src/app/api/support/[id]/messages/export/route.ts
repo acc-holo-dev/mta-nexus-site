@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
+import { privateChangeHistoryDownload } from "../../../../../../features/accounts/private-change-history-download";
+import { supportMessageCopy } from "../../../../../../features/support/support-message-discovery-copy";
 import { resolveLocale } from "../../../../../../lib/i18n";
-import { privateChangeHistoryDownload } from "../../../../../../lib/private-change-history-download";
-import { supportMessageCopy } from "../../../../../../lib/support-message-discovery-copy";
 import { GET as read } from "../route";
 export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   return privateChangeHistoryDownload(

@@ -1,14 +1,14 @@
-import { expect, it } from "vitest";
 import {
   SERVER_ACTIVITY_ACTIONS,
   SERVER_ACTIVITY_FIELDS,
   serverActivityCursor,
 } from "@nexus/domain";
+import { expect, it } from "vitest";
 import {
   getServerActivityCopy,
   parseServerActivityCursor,
   serverActivityHref,
-} from "../../src/lib/server-activity-view";
+} from "../../src/features/servers/server-activity-view";
 
 it.each([undefined, null, [], ["aud_1"], "", " ", "a/b", "<script>", "a".repeat(129), 123])(
   "rejects invalid or ambiguous URL cursor %j",

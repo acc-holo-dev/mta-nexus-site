@@ -1,30 +1,47 @@
 "use client";
 import { Button, EmptyState, ErrorState, Input } from "@nexus/ui";
-
 import { LifeBuoy, MessageSquareText, Plus } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { platformFieldClass } from "../../community/user-platform-client";
+import { currentBrowserReturnPath } from "../../shell/auth-return";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccent, linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
+import { useNexusLocale } from "../../shell/locale";
+import { pageShellMax5xlLooseTight } from "../../shell/page-shell";
+import { panelSpace4P5 } from "../../shell/panel-shell";
+import { surfaceInsetP3TextSmSecondary } from "../../shell/surface-shell";
+import {
+  typeFlexCenterBetweenGap3,
+  typeFlexCenterGap2,
+  typeFlexMinCenterGap25Display,
+  typeFlexWrapStartBetweenGap3,
+  typeHeadingPrimary,
+  typeIcon6Accent,
+  typeIconAccent,
+  typeLabelSecondary,
+  typeLabelUpperMuted,
+  typeMt1XsMuted,
+  typeSmMuted,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import {
   confirmSupportCaseCreated,
   parseSupportCasePage,
   type SupportCaseStatus,
   type SupportCaseSummary,
-} from "../../../lib/support-response";
+} from "../support-response";
 import {
   clearSupportRetry,
   reserveSupportCaseRetry,
   resolveSupportRetryActorScope,
-} from "../../../lib/support-retry";
-import { type SupportQuery, supportHref } from "../../../lib/support-workspace-contract";
+} from "../support-retry";
+import { type SupportQuery, supportHref } from "../support-workspace-contract";
 import {
   SupportClientFailure,
   supportWorkspaceCopy,
   supportWorkspaceError,
-} from "../../../lib/support-workspace-copy";
-import { platformFieldClass } from "../../../lib/user-platform-client";
-import { currentBrowserReturnPath } from "../../../components/auth-return-path";
-import { useNexusLocale } from "../../../components/locale-context";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+} from "../support-workspace-copy";
 
 const SUPPORT_OBJECT_CONTEXT_KEY = "nexus.support.objectContext";
 
@@ -101,6 +118,10 @@ export function SupportCenter({
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.support,
     workspaceCopy = supportWorkspaceCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return Object.values(workspaceCopy).includes(text) ? text : fallback;
+  }
   const [cases, setCases] = useState<SupportCaseSummary[]>([]);
   const [page, setPage] = useState(initialFilters.page);
   const [totalPages, setTotalPages] = useState(1);
@@ -274,9 +295,7 @@ export function SupportCenter({
       if (!(await loadCases())) setFormError(workspaceCopy.savedRefresh);
     } catch (caught) {
       // Keep subject/message/context so a lost response can retry with the same intent.
-      setFormError(
-        caught instanceof SupportClientFailure ? caught.message : workspaceCopy.uncertain,
-      );
+      setFormError(safeMessage(caught, workspaceCopy.uncertain));
     } finally {
       creatingRef.current = false;
       setCreating(false);
@@ -298,17 +317,21 @@ export function SupportCenter({
   );
 
   return (
-    <div className="mx-auto min-w-0 max-w-5xl space-y-8 overflow-x-clip">
+    <div className={pageShellMax5xlLooseTight}>
       <header className="space-y-2 border-b border-base pb-6">
-        <h1 className="flex min-w-0 items-center gap-2.5 font-display text-primary">
-          <LifeBuoy className="h-6 w-6 shrink-0 text-accent" aria-hidden="true" />
+        <h1 className={typeFlexMinCenterGap25Display}>
+          <LifeBuoy className={typeIcon6Accent} aria-hidden="true" />
           <span>{staffMode ? copy.staffQueue : copy.title}</span>
         </h1>
         <p className="max-w-3xl text-sm text-muted">
           {staffMode ? copy.staffDescription : copy.description}
         </p>
         {!staffMode ? (
-          <ErrorState id="support-no-guaranteed-sla" title={copy.noGuaranteedSla} />
+          <ErrorState
+            id="support-no-guaranteed-sla"
+            title={copy.noGuaranteedSla}
+            description={copy.noGuaranteedSlaHint}
+          />
         ) : null}
       </header>
 
@@ -316,15 +339,15 @@ export function SupportCenter({
         <form
           onSubmit={(event) => void createCase(event)}
           aria-busy={creating}
-          className="nexus-panel space-y-4 p-5"
+          className={panelSpace4P5}
         >
-          <div className="flex items-center gap-2">
-            <Plus className="h-4 w-4 text-accent" aria-hidden="true" />
-            <h2 className="font-heading text-primary">{copy.newCase}</h2>
+          <div className={typeFlexCenterGap2}>
+            <Plus className={typeIconAccent} aria-hidden="true" />
+            <h2 className={typeHeadingPrimary}>{copy.newCase}</h2>
           </div>
 
           <label className="block space-y-1.5">
-            <span className="font-label text-secondary">{copy.category}</span>
+            <span className={typeLabelSecondary}>{copy.category}</span>
             <select
               value={category}
               disabled={creating}
@@ -345,11 +368,8 @@ export function SupportCenter({
           </label>
 
           {objectContext ? (
-            <div
-              role="note"
-              className="rounded-lg border border-base bg-inset p-3 text-sm text-secondary"
-            >
-              <p className="font-label uppercase text-muted">{copy.attachedContext}</p>
+            <div role="note" className={surfaceInsetP3TextSmSecondary}>
+              <p className={typeLabelUpperMuted}>{copy.attachedContext}</p>
               <p className="mt-1 break-all">
                 {copy.contextResource}: {objectContext.productId}
               </p>
@@ -390,7 +410,7 @@ export function SupportCenter({
           />
 
           <label className="block space-y-1.5">
-            <span className="font-label text-secondary">{copy.message}</span>
+            <span className={typeLabelSecondary}>{copy.message}</span>
             <textarea
               value={message}
               disabled={creating}
@@ -431,11 +451,12 @@ export function SupportCenter({
       {formError ? (
         <ErrorState
           title={formError}
+          description={copy.loadErrorHint}
           action={
             <Button
               type="button"
               onClick={() => void loadCases()}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
               variant="ghost"
             >
               {workspaceCopy.reload}
@@ -448,7 +469,7 @@ export function SupportCenter({
         <form action={basePath} method="get">
           <fieldset className="nexus-panel grid min-w-0 gap-4 p-4 sm:grid-cols-2">
             <label className="block min-w-0 space-y-1.5 sm:col-span-2">
-              <span className="font-label text-secondary">{workspaceCopy.search}</span>
+              <span className={typeLabelSecondary}>{workspaceCopy.search}</span>
               <input
                 type="search"
                 name="q"
@@ -458,7 +479,7 @@ export function SupportCenter({
               />
             </label>
             <label className="block space-y-1.5">
-              <span className="font-label text-secondary">{copy.filterStatus}</span>
+              <span className={typeLabelSecondary}>{copy.filterStatus}</span>
               <select
                 name="status"
                 value={staffStatus}
@@ -474,7 +495,7 @@ export function SupportCenter({
               </select>
             </label>
             <label className="block space-y-1.5">
-              <span className="font-label text-secondary">{copy.category}</span>
+              <span className={typeLabelSecondary}>{copy.category}</span>
               <select
                 name="category"
                 value={staffCategory}
@@ -507,13 +528,11 @@ export function SupportCenter({
       </search>
 
       <section className="space-y-3" aria-busy={loading}>
-        <h2 className="font-heading text-primary">
-          {staffMode ? copy.staffQueue : copy.yourCases}
-        </h2>
+        <h2 className={typeHeadingPrimary}>{staffMode ? copy.staffQueue : copy.yourCases}</h2>
 
         {loading ? (
           <div role="status" aria-live="polite" className="space-y-3">
-            <p className="text-sm text-muted">{copy.loading}</p>
+            <p className={typeSmMuted}>{copy.loading}</p>
             <div className="animate-pulse space-y-3" aria-hidden="true">
               {[1, 2, 3].map((key) => (
                 <div key={key} className="nexus-panel h-24 p-4">
@@ -526,11 +545,12 @@ export function SupportCenter({
         ) : listError ? (
           <ErrorState
             title={listError}
+            description={copy.loadErrorHint}
             action={
               <Button
                 type="button"
                 onClick={() => void loadCases()}
-                className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkGhostAccentSm}
                 variant="ghost"
               >
                 {workspaceCopy.reload}
@@ -544,10 +564,7 @@ export function SupportCenter({
             icon={<LifeBuoy className="h-6 w-6" aria-hidden="true" />}
             action={
               filtersActive ? (
-                <Link
-                  href={basePath}
-                  className="inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
+                <Link href={basePath} className={linkAccent}>
                   {workspaceCopy.reset}
                 </Link>
               ) : undefined
@@ -560,13 +577,13 @@ export function SupportCenter({
               href={`${basePath}/${encodeURIComponent(supportCase.id)}`}
               className="nexus-panel block min-w-0 space-y-2 p-4 transition-colors hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
-              <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className={typeFlexWrapStartBetweenGap3}>
                 <div className="min-w-0">
                   <h3 className="break-words text-sm font-bold text-primary">
                     {supportCase.subject}
                   </h3>
                   {staffMode && supportCase.requesterUsername && (
-                    <p className="mt-1 text-xs text-muted">
+                    <p className={typeMt1XsMuted}>
                       {copy.requester}: @{supportCase.requesterUsername}
                     </p>
                   )}
@@ -587,28 +604,19 @@ export function SupportCenter({
       </section>
 
       {totalPages > 1 && (
-        <nav
-          aria-label={dictionary.market.paginationLabel}
-          className="flex items-center justify-between gap-3"
-        >
+        <nav aria-label={dictionary.market.paginationLabel} className={typeFlexCenterBetweenGap3}>
           {page > 1 ? (
-            <Link
-              href={supportHref(basePath, initialFilters, page - 1)}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={supportHref(basePath, initialFilters, page - 1)} className={linkAccentSm}>
               {dictionary.market.previousPage}
             </Link>
           ) : (
             <span />
           )}
-          <span className="text-sm text-secondary">
+          <span className={typeSmSecondary}>
             {dictionary.market.pageLabel} {page} / {totalPages}
           </span>
           {page < totalPages ? (
-            <Link
-              href={supportHref(basePath, initialFilters, page + 1)}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={supportHref(basePath, initialFilters, page + 1)} className={linkAccentSm}>
               {dictionary.market.nextPage}
             </Link>
           ) : (

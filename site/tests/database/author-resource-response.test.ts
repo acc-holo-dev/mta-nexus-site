@@ -3,12 +3,12 @@ import {
   authorBuildRetireRequest,
   authorBuildUploadRequest,
   authorDetailsMutationRequest,
-} from "../../src/lib/author-resource-requests";
+} from "../../src/features/resources/author-resource-requests";
 import {
   confirmedAuthorBuild,
   confirmedAuthorDetails,
   confirmedRetiredBuild,
-} from "../../src/lib/author-resource-response";
+} from "../../src/features/resources/author-resource-response";
 
 const details = {
   title: "A resource",

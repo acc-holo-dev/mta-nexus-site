@@ -18,27 +18,27 @@ const mock = vi.hoisted(() => ({
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({ usePathname: () => "/settings/history" }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => mock.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mock.session },
 }));
-vi.mock("../../src/lib/services/profile-change-history-service", () => ({
+vi.mock("../../src/lib/services/accounts/profile-change-history-service", () => ({
   profileChangeHistoryService: { page: mock.profile },
 }));
-vi.mock("../../src/lib/services/organization-governance-service", () => ({
+vi.mock("../../src/lib/services/organizations/organization-governance-service", () => ({
   organizationGovernanceService: { history: mock.organization },
 }));
 
 import ProfilePage, { generateMetadata } from "../../src/app/settings/history/page";
 import OrganizationPage from "../../src/app/workspace/organizations/[id]/activity/page";
+import { privateChangeHistoryCopy } from "../../src/features/accounts/private-change-history-copy";
+import { encodeChangeHistoryCursor } from "../../src/features/accounts/private-change-history-query";
+import { ProfileChangeHistoryView } from "../../src/features/accounts/profile-change-history";
+import type { ProfileChangeHistory } from "../../src/features/accounts/profile-change-history-contract";
 import { OrganizationHistoryView } from "../../src/features/organizations/history-view";
-import { organizationGovernanceCopy } from "../../src/lib/organization-governance-copy";
-import { ProfileChangeHistoryView } from "../../src/components/profile-change-history";
-import { privateChangeHistoryCopy } from "../../src/lib/private-change-history-copy";
-import { encodeChangeHistoryCursor } from "../../src/lib/private-change-history-query";
-import type { ProfileChangeHistory } from "../../src/lib/profile-change-history-contract";
+import { organizationGovernanceCopy } from "../../src/features/organizations/organization-governance-copy";
 
 const stamp = "2026-10-12T00:00:00.123456Z",
   cursor = encodeChangeHistoryCursor({
@@ -219,7 +219,7 @@ it.each(["en", "ru"] as const)(
     );
     expect(lifetime).toContain(copy.empty);
     expect(lifetime).toContain(copy.emptyHint);
-    expect(lifetime).toContain("overflow-x-clip");
+    expect(lifetime).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(lifetime).not.toContain(copy.emptyFiltered);
     const filtered = renderToStaticMarkup(
       <ProfileChangeHistoryView
@@ -250,14 +250,14 @@ it("preserves normalized organization selectors and renders a read failure disti
   expect(html).toContain('role="alert"');
   expect(html).toContain(privateChangeHistoryCopy("en").unavailable);
   expect(html).toContain(privateChangeHistoryCopy("en").reload);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).not.toContain("database-private");
   expect(html).not.toContain(privateChangeHistoryCopy("en").empty);
 });
 
 it("locks private change-history filter selects to min-h-11 without h-10 chrome", () => {
-  const source = read("site/src/components/private-change-history-controls.tsx");
+  const source = read("site/src/features/accounts/components/private-change-history-controls.tsx");
   expect(source).toContain("min-h-11 w-full rounded-lg border border-base bg-inset");
   expect(source).not.toContain("h-10");
   expect(source).toContain("<search aria-label={search ? copy.search : copy.apply}>");

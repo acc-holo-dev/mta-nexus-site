@@ -16,20 +16,20 @@ const harness = vi.hoisted(() => ({
   reload: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../../src/components/confirm-action", () => ({
+vi.mock("../../src/features/shell/confirm-action", () => ({
   confirmAction,
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
-vi.mock("../../src/components/locale-context", async () => {
+vi.mock("../../src/features/shell/locale", async () => {
   const { getDictionary } = await import("../../src/lib/i18n");
   return { useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }) };
 });
 
 import { VerificationApplicationAmend } from "../../src/features/moderation/verification-amend";
+import { verificationApplicationsCopy } from "../../src/features/moderation/verification-applications-copy";
 import { VerificationModerationControls } from "../../src/features/moderation/verification-controls";
-import { verificationApplicationsCopy } from "../../src/lib/verification-applications-copy";
-import { verificationCopy } from "../../src/lib/verification-workspace-copy";
+import { verificationCopy } from "../../src/features/trust/verification-workspace-copy";
 import { flatTreeHasErrorText } from "../helpers/flatten-react-test-tree";
 
 const { render, submit, amendErrorState } = createVerificationApplicationsInteractionHelpers(

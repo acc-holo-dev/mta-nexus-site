@@ -3,18 +3,28 @@ import { Button, ErrorState } from "@nexus/ui";
 import { Bell, BellOff, Bookmark, BookmarkCheck, LoaderCircle } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { confirmsFollowMutation } from "../../../lib/follow-confirmation";
-import type { ObjectMuteDuration } from "../../../lib/follow-workspace-contract";
-import { followCopy, followError } from "../../../lib/follow-workspace-copy";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { getDictionary, type Locale } from "../../../lib/i18n";
-import { privateApiRequest } from "../../../lib/private-api-request";
-import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
-import { confirmAction } from "../../../components/confirm-action";
-import { GuestAuthLinks } from "../../../components/guest-auth-links";
-import { LocaleProvider, useNexusLocale } from "../../../components/locale-context";
+import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
+import { confirmAction } from "../../shell/confirm-action";
+import { GuestAuthLinks } from "../../shell/guest-auth";
+import { LocaleProvider, useNexusLocale } from "../../shell/locale";
+import { skelH4W4Spin } from "../../shell/skeleton-shell";
+import {
+  typeFlexWrapGap2,
+  typeItemsStretchPy4,
+  typeMaxSmXsSuccess,
+  typeMinH11Xs,
+  typeXsMuted,
+  typeXsSecondary,
+} from "../../shell/type-shell";
+import { confirmsFollowMutation } from "../follow-confirmation";
+import type { ObjectMuteDuration } from "../follow-workspace-contract";
+import { followCopy, followError } from "../follow-workspace-copy";
 
 type ContentFollowState = {
-  authenticated: boolean;
+  /** `null` = session probe failed (not a guest). */
+  authenticated: boolean | null;
   actorId?: string | null;
   following: boolean;
   notifyComments: boolean;
@@ -57,14 +67,16 @@ function ContentFollowControl({
     setLoginHref(authEntryHref("login", path));
     setRegisterHref(authEntryHref("register", path));
   }, [pathname]);
-  const [authenticated, setAuthenticated] = useState(initial?.authenticated ?? false);
+  const [authenticated, setAuthenticated] = useState<boolean | null>(
+    initial ? initial.authenticated : false,
+  );
   const [actorId, setActorId] = useState(initial?.actorId ?? null);
   const [following, setFollowing] = useState(initial?.following ?? false);
   const [notifyComments, setNotifyComments] = useState(initial?.notifyComments ?? false);
   const [muted, setMuted] = useState(initial?.muted ?? false);
   const [mutedUntil, setMutedUntil] = useState<string | null>(initial?.mutedUntil ?? null);
-  const [ready, setReady] = useState(!!initial && !initial.error);
-  const [failed, setFailed] = useState(!!initial?.error);
+  const [ready, setReady] = useState(!!initial && !initial.error && initial.authenticated !== null);
+  const [failed, setFailed] = useState(!!initial?.error || initial?.authenticated === null);
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
   const [attempt, setAttempt] = useState(0);
@@ -81,7 +93,13 @@ function ContentFollowControl({
   }, []);
 
   useEffect(() => {
-    if (initial && attempt === 0 && !initial.error && (!initial.authenticated || initial.actorId))
+    if (
+      initial &&
+      attempt === 0 &&
+      !initial.error &&
+      initial.authenticated !== null &&
+      (!initial.authenticated || initial.actorId)
+    )
       return;
     let active = true;
     const controller = new AbortController();
@@ -249,7 +267,30 @@ function ContentFollowControl({
       <ErrorState
         title={message || copy.error}
         description={copy.errorHint}
-        className="items-stretch py-4"
+        className={typeItemsStretchPy4}
+        action={
+          <Button
+            type="button"
+            variant="outline"
+            className="min-h-11"
+            onClick={() => {
+              setMessage("");
+              setAttempt((value) => value + 1);
+            }}
+          >
+            {copy.retry}
+          </Button>
+        }
+      />
+    );
+  }
+
+  if (authenticated === null) {
+    return (
+      <ErrorState
+        title={message || copy.error}
+        description={copy.errorHint}
+        className={typeItemsStretchPy4}
         action={
           <Button
             type="button"
@@ -283,7 +324,7 @@ function ContentFollowControl({
 
   return (
     <div className="space-y-3" aria-busy={loading}>
-      <div className="flex flex-wrap gap-2">
+      <div className={typeFlexWrapGap2}>
         <Button
           type="button"
           variant="outline"
@@ -294,7 +335,7 @@ function ContentFollowControl({
           onClick={() => void mutateFollow(!following, following ? notifyComments : false)}
         >
           {pending || !ready ? (
-            <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
+            <LoaderCircle className={skelH4W4Spin} aria-hidden="true" />
           ) : following ? (
             <BookmarkCheck className="h-4 w-4" aria-hidden="true" />
           ) : (
@@ -312,7 +353,7 @@ function ContentFollowControl({
           onClick={() => void mutateFollow(true, !notifyComments)}
         >
           {pending || !ready ? (
-            <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
+            <LoaderCircle className={skelH4W4Spin} aria-hidden="true" />
           ) : notifyComments ? (
             <Bell className="h-4 w-4" aria-hidden="true" />
           ) : (
@@ -325,20 +366,20 @@ function ContentFollowControl({
         {notifyComments ? copy.watchingHint : following ? copy.quietSaveHint : copy.discussionHelp}
       </p>
       <div className="space-y-2">
-        <p className="text-xs text-muted">{copy.muteHelp}</p>
+        <p className={typeXsMuted}>{copy.muteHelp}</p>
         {muted && mutedUntil && (
-          <p role="status" className="text-xs text-secondary">
+          <p role="status" className={typeXsSecondary}>
             {copy.mutedUntil}:{" "}
             {new Date(mutedUntil).toLocaleString(locale === "ru" ? "ru-RU" : "en-US")}
           </p>
         )}
-        <div className="flex flex-wrap gap-2">
+        <div className={typeFlexWrapGap2}>
           {(["24h", "7d", "30d"] as const).map((duration) => (
             <Button
               key={duration}
               type="button"
               variant="outline"
-              className="min-h-11 text-xs"
+              className={typeMinH11Xs}
               disabled={pending || !ready}
               onClick={() => void mutateMute(duration)}
             >
@@ -349,7 +390,7 @@ function ContentFollowControl({
             <Button
               type="button"
               variant="outline"
-              className="min-h-11 text-xs"
+              className={typeMinH11Xs}
               disabled={pending || !ready}
               onClick={() => void mutateMute(null)}
             >
@@ -359,7 +400,7 @@ function ContentFollowControl({
         </div>
       </div>
       {message ? (
-        <p role="status" className="max-w-sm text-xs text-success">
+        <p role="status" className={typeMaxSmXsSuccess}>
           {message}
         </p>
       ) : null}

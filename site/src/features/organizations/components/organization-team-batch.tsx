@@ -7,21 +7,32 @@ import {
 import { Button } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
+import { platformFieldClass } from "../../community/user-platform-client";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
+import {
+  ActionConfirmCheckbox,
+  actionConfirmCheckboxFocusClass,
+} from "../../shell/action-confirm-checkbox";
+import { confirmAction } from "../../shell/confirm-action";
+import { linkGhostAccentSm } from "../../shell/link-shell";
+import {
+  typeFlexMinH11CenterGap3SmPrimary,
+  typeFlexWrapGap3,
+  typeLgSemiboldPrimary,
+  typeSemiboldPrimary,
+  typeSmMuted,
+  typeSmPrimary,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import {
   confirmsOrganizationBatchCommand,
   confirmsOrganizationBatchPreview,
   type OrganizationBatchPreview,
-} from "../../../lib/organization-batch-contract";
-import { organizationBatchCopy } from "../../../lib/organization-batch-copy";
-import type { OrganizationTeamPage } from "../../../lib/organization-team-contract";
-import { organizationRequest } from "../../../lib/organization-workspace-client";
-import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
-import { platformFieldClass } from "../../../lib/user-platform-client";
-import {
-  ActionConfirmCheckbox,
-  actionConfirmCheckboxFocusClass,
-} from "../../../components/action-confirm-checkbox";
-import { confirmAction } from "../../../components/confirm-action";
+} from "../organization-batch-contract";
+import { organizationBatchCopy } from "../organization-batch-copy";
+import type { OrganizationTeamPage } from "../organization-team-contract";
+import { organizationRequest } from "../organization-workspace-client";
+import { getOrganizationCopy } from "../organization-workspace-copy";
 export function OrganizationTeamBatch({
   data,
   actorId,
@@ -56,6 +67,16 @@ export function OrganizationTeamBatch({
     guard = useRef(false),
     copy = organizationBatchCopy(locale),
     team = getOrganizationCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [
+      ...Object.values(copy),
+      ...Object.values(team),
+      ...Object.values(getUserPlatformCopy(locale)),
+    ].includes(text)
+      ? text
+      : fallback;
+  }
   useEffect(() => {
     alive.current = true;
     return () => {
@@ -126,7 +147,7 @@ export function OrganizationTeamBatch({
         }
       }
     } catch (failure) {
-      if (alive.current) onFailure(failure instanceof Error ? failure.message : copy.uncertain);
+      if (alive.current) onFailure(safeMessage(failure, copy.uncertain));
     } finally {
       guard.current = false;
       if (alive.current) setStage("idle");
@@ -144,17 +165,17 @@ export function OrganizationTeamBatch({
   );
   return (
     <section className="space-y-4 rounded-lg border border-base p-4" aria-busy={stage !== "idle"}>
-      <h2 className="text-lg font-semibold text-primary">{copy.title}</h2>
-      <p className="text-sm text-muted">{copy.help}</p>
+      <h2 className={typeLgSemiboldPrimary}>{copy.title}</h2>
+      <p className={typeSmMuted}>{copy.help}</p>
       <fieldset disabled={disabled || preview !== null} className="space-y-3">
-        <legend className="text-sm text-primary">
+        <legend className={typeSmPrimary}>
           {copy.selected}: {selected.length} / 20
         </legend>
-        <div className="flex flex-wrap gap-3">
+        <div className={typeFlexWrapGap3}>
           <Button
             type="button"
             variant="ghost"
-            className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkGhostAccentSm}
             onClick={() => setSelected(eligible.map((member) => member.id))}
           >
             {copy.all}
@@ -162,7 +183,7 @@ export function OrganizationTeamBatch({
           <Button
             type="button"
             variant="ghost"
-            className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkGhostAccentSm}
             onClick={() => setSelected([])}
           >
             {copy.clear}
@@ -224,7 +245,7 @@ export function OrganizationTeamBatch({
           </label>
         )}
         {action === "server_access" && (
-          <label className="flex min-h-11 items-center gap-3 text-sm text-primary">
+          <label className={typeFlexMinH11CenterGap3SmPrimary}>
             <input
               type="checkbox"
               className={actionConfirmCheckboxFocusClass}
@@ -235,7 +256,7 @@ export function OrganizationTeamBatch({
           </label>
         )}
       </fieldset>
-      <p className="text-xs text-muted">{copy.warning}</p>
+      <p className={typeXsMuted}>{copy.warning}</p>
       {!preview ? (
         <Button
           type="button"
@@ -247,7 +268,7 @@ export function OrganizationTeamBatch({
         </Button>
       ) : (
         <div className="space-y-3">
-          <h3 className="font-semibold text-primary">
+          <h3 className={typeSemiboldPrimary}>
             {copy.review} ({preview.changedCount})
           </h3>
           <ul className="space-y-3">
@@ -270,7 +291,7 @@ export function OrganizationTeamBatch({
             ))}
           </ul>
           {!preview.changedCount && (
-            <p role="status" className="text-sm text-muted">
+            <p role="status" className={typeSmMuted}>
               {copy.noChanges}
             </p>
           )}
@@ -284,7 +305,7 @@ export function OrganizationTeamBatch({
           >
             {copy.commitConfirm}
           </ActionConfirmCheckbox>
-          <div className="flex flex-wrap gap-3">
+          <div className={typeFlexWrapGap3}>
             <Button
               type="button"
               className="min-h-11"
@@ -296,7 +317,7 @@ export function OrganizationTeamBatch({
             <Button
               type="button"
               variant="ghost"
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
               disabled={disabled}
               onClick={() => {
                 setPreview(null);

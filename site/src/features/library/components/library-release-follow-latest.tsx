@@ -1,9 +1,9 @@
 "use client";
 
 import { Button } from "@nexus/ui";
-import { getResourceReleaseControlCopy } from "../../../lib/resource-release-control-i18n";
+import { useNexusLocale } from "../../shell/locale";
+import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
 import { LibraryReleaseCommandStatus, useLibraryReleaseCommand } from "./library-release-command";
-import { useNexusLocale } from "../../../components/locale-context";
 
 /** Compact control for library updates cards: switch a pinned preference to latest. */
 export function LibraryReleaseFollowLatest({

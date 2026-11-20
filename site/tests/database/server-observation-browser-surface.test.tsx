@@ -4,6 +4,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { observationBrowserFixture } from "../helpers/server-observation-browser-fixture";
 
 const state = vi.hoisted(() => ({ locale: "ru" as "ru" | "en", session: vi.fn(), read: vi.fn() }));
+vi.mock("server-only", () => ({}));
 vi.mock("next/link", () => ({
   default: ({ href, children, ...props }: { href: string; children: React.ReactNode }) => (
     <a href={href} {...props}>
@@ -18,22 +19,22 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/servers/server/observations",
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../../src/lib/services/server-statistics-service", () => ({
+vi.mock("../../src/lib/services/servers/server-statistics-service", () => ({
   serverStatisticsService: { observations: state.read },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 
+import { ServerObservationPeriodControls } from "../../src/features/servers/components/server-observation-period-controls";
 import {
   ServerObservationBrowserLoading,
   ServerObservationBrowserPage,
   serverObservationBrowserMetadata,
 } from "../../src/features/servers/server/server-observation-browser-page";
-import { ServerObservationPeriodControls } from "../../src/features/servers/components/server-observation-period-controls";
 import { getDictionary } from "../../src/lib/i18n";
 
 beforeEach(() => {

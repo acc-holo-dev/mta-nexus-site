@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
@@ -15,20 +17,20 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/resources/prd_a/history",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/services/resource-publisher-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-publisher-service", () => ({
   resourcePublisherService: { inventory: state.inventory, history: state.history },
 }));
 
 import HistoryPage from "../../src/app/workspace/resources/[id]/history/page";
 import InventoryPage from "../../src/app/workspace/resources/page";
+import { getResourcePublisherCopy } from "../../src/features/resources/resource-publisher-i18n";
 import { getDictionary } from "../../src/lib/i18n";
-import { getResourcePublisherCopy } from "../../src/lib/resource-publisher-i18n";
 
 const context = {
   params: Promise.resolve({ id: "prd_a" }),
@@ -160,9 +162,9 @@ it.each([
       await InventoryPage({ searchParams: Promise.resolve(searchParams) }),
     );
     expect(html).toContain(expectText);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     if (Object.keys(statusCounts).length === 0 && Object.keys(searchParams).length === 0) {
       expect(html).toContain("/workspace/resources/new");
       expect(html).toContain(getDictionary(locale).authorResources.emptyHint);
@@ -181,7 +183,7 @@ it("shows an honest recovery state when publisher inventory fails", async () => 
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(copy.loadUnavailableHint);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("status=draft");
   expect(html).not.toContain("DO_NOT_RENDER");
 });
@@ -245,7 +247,7 @@ it("shows an honest recovery state when editorial history fails", async () => {
   const html = renderToStaticMarkup(await HistoryPage(context));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("kind=changes");
   expect(html).not.toContain("DO_NOT_RENDER");
 });

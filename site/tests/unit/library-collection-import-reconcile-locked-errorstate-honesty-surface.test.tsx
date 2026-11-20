@@ -14,9 +14,9 @@ const reconcileSource = read("site/src/features/library/server/collection-reconc
 it("locks collection import revisionLocked to ErrorState", () => {
   expect(importSource).toContain('import { ErrorState } from "@nexus/ui"');
   expect(importSource).toContain('id="library-collection-import-revision-locked"');
-  expect(importSource).toContain(
-    '<ErrorState id="library-collection-import-revision-locked" title={c.revisionLocked} />',
-  );
+  expect(importSource).toContain('id="library-collection-import-revision-locked"');
+  expect(importSource).toContain("title={c.revisionLocked}");
+  expect(importSource).toContain("description={c.revisionLockedHint}");
   expect(importSource).not.toContain(
     "{collection.revision >= 2147483647 && <p>{c.revisionLocked}</p>}",
   );
@@ -26,9 +26,9 @@ it("locks collection import revisionLocked to ErrorState", () => {
 it("locks collection reconcile revisionLocked to ErrorState", () => {
   expect(reconcileSource).toContain('import { ErrorState } from "@nexus/ui"');
   expect(reconcileSource).toContain('id="library-collection-reconcile-revision-locked"');
-  expect(reconcileSource).toContain(
-    '<ErrorState id="library-collection-reconcile-revision-locked" title={c.revisionLocked} />',
-  );
+  expect(reconcileSource).toContain('id="library-collection-reconcile-revision-locked"');
+  expect(reconcileSource).toContain("title={c.revisionLocked}");
+  expect(reconcileSource).toContain("description={c.revisionLockedHint}");
   expect(reconcileSource).not.toContain(
     "{collection.revision >= 2147483647 && <p>{c.revisionLocked}</p>}",
   );

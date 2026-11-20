@@ -16,20 +16,20 @@ const harness = vi.hoisted(() => ({
   request: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../../src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../../src/features/shell/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/link", () => ({
   default: ({ children, ...props }: { children: ReactNode; href: string }) => (
     <a {...props}>{children}</a>
   ),
 }));
-vi.mock("../../src/lib/organization-workspace-client", () => ({
+vi.mock("../../src/features/organizations/organization-workspace-client", () => ({
   organizationRequest: harness.request,
 }));
 
+import { organizationBatchCopy } from "../../src/features/organizations/organization-batch-copy";
+import { getOrganizationCopy } from "../../src/features/organizations/organization-workspace-copy";
 import { OrganizationTeamDirectory } from "../../src/features/organizations/team";
-import { organizationBatchCopy } from "../../src/lib/organization-batch-copy";
-import { getOrganizationCopy } from "../../src/lib/organization-workspace-copy";
 
 const { render, memberEditor } = createOrganizationTeamDirectoryConfirmInteractionHelpers(
   harness,

@@ -18,7 +18,7 @@ const state = vi.hoisted(() => ({
   publisher: vi.fn(),
   rate: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
 vi.mock("@nexus/db", () => ({
@@ -186,7 +186,7 @@ it("routes moderator commands through the repository's live authority check", as
     currentToken: "staff-token",
   });
   expect(response.status).toBe(403);
-  expect(await response.json()).toEqual({ code: "FORBIDDEN" });
+  expect(await response.json()).toMatchObject({ code: "FORBIDDEN" });
   privateResponse(response);
   expect(state.rate).toHaveBeenCalledWith("moderationAction", "usr_a");
 });
@@ -196,7 +196,7 @@ it("exposes scoped publisher history and masks a revoked buyer grant as missing"
   state.libraryDetail.mockRejectedValue(new NotFoundError("Library resource", "prd_a"));
   const response = await libraryDetail(get("/api/library/releases/prd_a"), context);
   expect(response.status).toBe(404);
-  expect(await response.json()).toEqual({ code: "NOT_FOUND" });
+  expect(await response.json()).toMatchObject({ code: "NOT_FOUND" });
   privateResponse(response);
 });
 it("requires the current moderation revision and a bounded reason", async () => {

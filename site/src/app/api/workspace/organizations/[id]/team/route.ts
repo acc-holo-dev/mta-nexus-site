@@ -1,11 +1,11 @@
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
-import { parseOrganizationTeamQuery } from "../../../../../../lib/organization-team-contract";
-import { organizationTeamError } from "../../../../../../lib/organization-team-copy";
-import { organizationTeamService } from "../../../../../../lib/services/organization-team-service";
-import { userPlatformApi } from "../../../../../../lib/user-platform-api";
-import { organizationCheckReadActor } from "../../../../../../lib/organization-workspace-api";
+import { userPlatformApi } from "../../../../../../features/accounts/user-platform-api";
+import { parseOrganizationTeamQuery } from "../../../../../../features/organizations/organization-team-contract";
+import { organizationTeamError } from "../../../../../../features/organizations/organization-team-copy";
+import { organizationCheckReadActor } from "../../../../../../features/organizations/organization-workspace-api";
+import { organizationTeamService } from "../../../../../../lib/services/organizations/organization-team-service";
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return userPlatformApi(
     request,

@@ -5,15 +5,15 @@ import {
   communityReportPageQuery,
   confirmsReportDecision,
   parseCommunityReportQuery,
-} from "../../src/lib/community-report-contract";
+} from "../../src/features/community/community-report-contract";
 import {
   communityReportCopy,
   communityReportDecisionError,
   communityReportError,
   communityReportMutationError,
-} from "../../src/lib/community-report-copy";
+} from "../../src/features/community/community-report-copy";
+import { formatNotification } from "../../src/features/notifications/notification-copy";
 import { getDictionary } from "../../src/lib/i18n";
-import { formatNotification } from "../../src/lib/notification-copy";
 
 const report = {
   targetType: "comment",
@@ -108,14 +108,20 @@ it.each(["en", "ru"] as const)(
     expect(communityReportMutationError(locale, "UNCONFIRMED")).toBe(copy.mutationUnavailable);
     expect(communityReportDecisionError(locale, "INTERNAL_ERROR")).toBe(copy.decisionUnavailable);
     const notice = formatNotification(
-      { title: "Community report status", message: "Report status: resolved." },
+      {
+        title: "Community report status / Статус жалобы",
+        message: "Report status: resolved. / Жалоба решена.",
+      },
       getDictionary(locale).buildReviewNotifications,
       locale,
     );
     expect(notice.message).toBe(locale === "ru" ? "Жалоба решена." : "Report status: resolved.");
     expect(
       formatNotification(
-        { title: "New community report", message: "A community report is awaiting review." },
+        {
+          title: "New community report / Новая жалоба сообщества",
+          message: "A community report is awaiting review.",
+        },
         getDictionary(locale).buildReviewNotifications,
         locale,
       ).title,

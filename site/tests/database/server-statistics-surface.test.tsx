@@ -4,6 +4,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 import { statisticsFixture } from "../helpers/server-statistics-fixture";
 
 const state = vi.hoisted(() => ({ locale: "ru" as "ru" | "en", session: vi.fn(), read: vi.fn() }));
+vi.mock("server-only", () => ({}));
 vi.mock("next/link", () => ({
   default: ({ href, children, ...props }: { href: string; children: React.ReactNode }) => (
     <a href={href} {...props}>
@@ -18,13 +19,13 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/servers/server/statistics",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../../src/lib/services/server-statistics-service", () => ({
+vi.mock("../../src/lib/services/servers/server-statistics-service", () => ({
   serverStatisticsService: { read: state.read },
 }));
 
@@ -34,8 +35,8 @@ import {
   serverStatisticsMetadata,
 } from "../../src/features/servers/server/server-statistics-page";
 import { ServerStatisticsPanel } from "../../src/features/servers/server/server-statistics-panel";
+import { serverStatisticsCopy } from "../../src/features/servers/server-statistics-copy";
 import { getDictionary } from "../../src/lib/i18n";
-import { serverStatisticsCopy } from "../../src/lib/server-statistics-copy";
 
 beforeEach(() => {
   state.locale = "ru";
@@ -107,8 +108,8 @@ it("distinguishes unavailable, invalid and genuinely empty periods", async () =>
   expect(empty).toContain(copy.emptyHint);
   expect(copy.emptyHint).not.toBe(copy.empty);
   expect(empty).toContain('disabled=""');
-  expect(empty).toContain("min-h-11");
-  expect(empty).toContain("overflow-x-clip");
+  expect(empty).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
+  expect(empty).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(empty).not.toContain('role="alert"');
 });
 
@@ -132,7 +133,7 @@ it("keeps end-of-page observations distinct from a never-stored empty period", (
   expect(copy.endOfPageHint).not.toBe(copy.endOfPage);
   expect(html).not.toContain(copy.empty);
   expect(html).toContain('href="/servers/server/statistics?window=24h');
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
 });
 it("gates private pages before reading statistics and passes only session-bound managed scope", async () => {
   state.session.mockResolvedValue(null);

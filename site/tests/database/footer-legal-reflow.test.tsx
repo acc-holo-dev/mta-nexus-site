@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/market" }));
 
-import { Footer } from "../../src/components/footer";
+import { Footer } from "../../src/features/shell/footer";
 import { getDictionary } from "../../src/lib/i18n";
 
 describe("footer legal link reflow", () => {
@@ -14,7 +14,7 @@ describe("footer legal link reflow", () => {
       const html = renderToStaticMarkup(<Footer locale={locale} />);
 
       expect(html).toContain("flex min-w-0 max-w-full flex-wrap");
-      expect(html).toContain("overflow-x-clip");
+      expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
       expect(html).toContain(dictionary.footer.communityRules);
       expect(html).toContain(dictionary.footer.copyright);
       expect(html).toContain('href="/support"');

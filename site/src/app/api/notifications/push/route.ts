@@ -1,20 +1,23 @@
 import { createHash } from "node:crypto";
 import { readWebPushVapidConfig } from "@nexus/config";
-import { webPushSubscriptionRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit, generateId } from "@nexus/security";
 import type { NextRequest } from "next/server";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
+import { authAppErrorText } from "../../../../features/accounts/auth-app-error";
+import { notificationPushApiCopy } from "../../../../features/notifications/notification-push-api-copy";
+import { parseWebPushSubscription } from "../../../../features/notifications/web-push-subscription";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { resolveLocale } from "../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
-} from "../../../../lib/observability";
-import { authService } from "../../../../lib/services/auth-service";
-import { parseWebPushEndpoint } from "../../../../lib/services/web-push-endpoint-policy";
-import { parseWebPushSubscription } from "../../../../lib/web-push-subscription";
+} from "../../../../lib/platform/observability";
+import { authService } from "../../../../lib/services/accounts/auth-service";
+import { notificationInboxService } from "../../../../lib/services/notifications/notification-inbox-service";
+import { parseWebPushEndpoint } from "../../../../lib/services/notifications/web-push-endpoint-policy";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -62,11 +65,12 @@ function checkExpectedIdentity(
 
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
+  const copy = notificationPushApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
 
   try {
     const authenticated = await requireSession(request);
     if (!authenticated) {
-      return json(context, { error: "Authentication required" }, 401);
+      return json(context, { error: copy.authenticationRequired }, 401);
     }
 
     const endpointHash = request.nextUrl.searchParams.get("endpointHash")?.trim() ?? "";
@@ -74,7 +78,7 @@ export async function GET(request: NextRequest) {
       return json(
         context,
         {
-          error: "Invalid Web Push endpoint fingerprint",
+          error: copy.invalidEndpointFingerprint,
         },
         400,
       );
@@ -83,7 +87,7 @@ export async function GET(request: NextRequest) {
     const key = publicKey();
     let subscribed = false;
     if (endpointHash) {
-      const active = await webPushSubscriptionRepository.listForSession(
+      const active = await notificationInboxService.listWebPushForSession(
         authenticated.user.id,
         authenticated.sessionId,
       );
@@ -111,7 +115,7 @@ export async function GET(request: NextRequest) {
     return json(
       context,
       {
-        error: "Failed to read Web Push state",
+        error: copy.readStateFailed,
       },
       500,
     );
@@ -120,14 +124,15 @@ export async function GET(request: NextRequest) {
 
 export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
+  const copy = notificationPushApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
 
   try {
     const authenticated = await requireSession(request);
     if (!authenticated) {
-      return json(context, { error: "Authentication required" }, 401);
+      return json(context, { error: copy.authenticationRequired }, 401);
     }
     if (!publicKey()) {
-      return json(context, { error: "Web Push is not configured" }, 503);
+      return json(context, { error: copy.notConfigured }, 503);
     }
 
     requireServerJsonContentType(request);
@@ -136,7 +141,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: "Too many notification updates. Please try again shortly.",
+          error: copy.rate,
         },
         429,
       );
@@ -148,10 +153,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error:
-            identity === "changed"
-              ? "Account or session changed. Reload settings."
-              : "Invalid Web Push identity",
+          error: identity === "changed" ? copy.identityChanged : copy.invalidIdentity,
           code: identity === "changed" ? "PUSH_IDENTITY_CHANGED" : "INVALID_PUSH_IDENTITY",
         },
         identity === "changed" ? 409 : 400,
@@ -161,13 +163,13 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: "Invalid Web Push subscription",
+          error: copy.invalidSubscription,
         },
         400,
       );
     }
 
-    const stored = await webPushSubscriptionRepository.upsertAuthenticated(
+    const stored = await notificationInboxService.upsertWebPushAuthenticated(
       {
         id: generateId("wps"),
         userId: authenticated.user.id,
@@ -186,9 +188,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: endpointConflict
-            ? "Web Push endpoint is already bound to another session"
-            : "Too many Web Push subscriptions for this session",
+          error: endpointConflict ? copy.endpointConflict : copy.sessionLimit,
           code: endpointConflict ? "WEB_PUSH_ENDPOINT_CONFLICT" : "WEB_PUSH_SESSION_LIMIT",
         },
         409,
@@ -212,7 +212,18 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         "UNAUTHORIZED",
       ].includes(error.code)
     ) {
-      return json(context, { error: error.message, code: error.code }, error.statusCode);
+      return json(
+        context,
+        {
+          error: authAppErrorText(error, {
+            unauthorized: copy.authenticationRequired,
+            conflict: copy.identityChanged,
+            failed: copy.registerFailed,
+          }),
+          code: error.code,
+        },
+        error.statusCode,
+      );
     }
     logRequestEvent({
       level: "error",
@@ -224,7 +235,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     return json(
       context,
       {
-        error: "Failed to register Web Push subscription",
+        error: copy.registerFailed,
       },
       500,
     );
@@ -233,11 +244,12 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
 
 export const DELETE = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
+  const copy = notificationPushApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
 
   try {
     const authenticated = await requireSession(request);
     if (!authenticated) {
-      return json(context, { error: "Authentication required" }, 401);
+      return json(context, { error: copy.authenticationRequired }, 401);
     }
 
     requireServerJsonContentType(request);
@@ -246,7 +258,7 @@ export const DELETE = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: "Too many notification updates. Please try again shortly.",
+          error: copy.rate,
         },
         429,
       );
@@ -258,10 +270,7 @@ export const DELETE = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error:
-            identity === "changed"
-              ? "Account or session changed. Reload settings."
-              : "Invalid Web Push identity",
+          error: identity === "changed" ? copy.identityChanged : copy.invalidIdentity,
           code: identity === "changed" ? "PUSH_IDENTITY_CHANGED" : "INVALID_PUSH_IDENTITY",
         },
         identity === "changed" ? 409 : 400,
@@ -274,17 +283,17 @@ export const DELETE = withBrowserMutation(async (request: NextRequest) => {
         ? String((body as Record<string, unknown>).endpoint).trim()
         : "";
     if (!endpoint || endpoint.length > 2048) {
-      return json(context, { error: "Invalid Web Push endpoint" }, 400);
+      return json(context, { error: copy.invalidEndpoint }, 400);
     }
 
     let normalizedEndpoint: string;
     try {
       normalizedEndpoint = parseWebPushEndpoint(endpoint).toString();
     } catch {
-      return json(context, { error: "Invalid Web Push endpoint" }, 400);
+      return json(context, { error: copy.invalidEndpoint }, 400);
     }
 
-    const removed = await webPushSubscriptionRepository.removeAuthenticated(
+    const removed = await notificationInboxService.removeWebPushAuthenticated(
       authenticated.user.id,
       authenticated.sessionId,
       authenticated.token,
@@ -308,7 +317,18 @@ export const DELETE = withBrowserMutation(async (request: NextRequest) => {
         "UNAUTHORIZED",
       ].includes(error.code)
     ) {
-      return json(context, { error: error.message, code: error.code }, error.statusCode);
+      return json(
+        context,
+        {
+          error: authAppErrorText(error, {
+            unauthorized: copy.authenticationRequired,
+            conflict: copy.identityChanged,
+            failed: copy.removeFailed,
+          }),
+          code: error.code,
+        },
+        error.statusCode,
+      );
     }
     logRequestEvent({
       level: "error",
@@ -320,7 +340,7 @@ export const DELETE = withBrowserMutation(async (request: NextRequest) => {
     return json(
       context,
       {
-        error: "Failed to remove Web Push subscription",
+        error: copy.removeFailed,
       },
       500,
     );

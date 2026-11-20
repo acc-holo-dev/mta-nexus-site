@@ -5,18 +5,19 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { Bell, CheckCheck, ExternalLink, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { formatNotification } from "../../../lib/notification-copy";
-import { notificationInboxCopy } from "../../../lib/notification-inbox-copy";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
+import { confirmAction } from "../../shell/confirm-action";
+import { linkGhostAccentSm } from "../../shell/link-shell";
+import { useNexusLocale } from "../../shell/locale";
+import { clickedDialogBackdrop, useModalDialog } from "../../shell/modal-dialog";
+import { typeCaptionFaint } from "../../shell/type-shell";
+import { formatNotification } from "../notification-copy";
+import { notificationInboxCopy } from "../notification-inbox-copy";
 import {
   announceNotificationInboxChange,
   observeNotificationInboxChange,
-} from "../../../lib/notification-inbox-events";
-import { privateApiRequest } from "../../../lib/private-api-request";
-import { startVisiblePolling } from "../../../lib/visible-polling";
-import { confirmAction } from "../../../components/confirm-action";
-import { useNexusLocale } from "../../../components/locale-context";
-import { clickedDialogBackdrop, useModalDialog } from "../../../components/use-modal-dialog";
-
+} from "../notification-inbox-events";
+import { startVisiblePolling } from "../visible-polling";
 export function NotificationBell() {
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.notificationBell;
@@ -304,7 +305,7 @@ export function NotificationBell() {
                     setError(null);
                     setAttempt((value) => value + 1);
                   }}
-                  className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={linkGhostAccentSm}
                 >
                   {copy.retry}
                 </Button>
@@ -376,7 +377,7 @@ export function NotificationBell() {
           </section>
 
           <div className="space-y-1.5 border-t border-base px-3 py-2 text-center">
-            <p className="font-caption text-faint">{copy.previewFootnote}</p>
+            <p className={typeCaptionFaint}>{copy.previewFootnote}</p>
             <Link
               href="/notifications"
               onClick={() => setIsOpen(false)}

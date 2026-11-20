@@ -1,12 +1,12 @@
-import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import {
   AppError,
-  NotFoundError,
   canTransitionResource,
+  NotFoundError,
   type Product,
   type ResourceLifecycleAction,
   type User,
 } from "@nexus/domain";
+import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, builds, products } from "../schema";
 import { trustedCleanScanCondition } from "./build-safety";

@@ -1,5 +1,5 @@
-import { and, eq } from "drizzle-orm";
 import { AppError, grantsServerManagement } from "@nexus/domain";
+import { and, eq } from "drizzle-orm";
 import type { db } from "../client";
 import { organizationMembers, organizations, users } from "../schema";
 

@@ -1,7 +1,8 @@
 import "server-only";
 
 export {
-  ServerObservationBrowserPage,
+  ManagedServerObservationsRoutePage,
+  PublicServerObservationsRoutePage,
   ServerObservationBrowserLoading,
   serverObservationBrowserMetadata,
 } from "./server/server-observation-browser-page";

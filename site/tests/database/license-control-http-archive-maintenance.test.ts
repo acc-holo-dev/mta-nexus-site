@@ -14,13 +14,13 @@ vi.mock("@nexus/security", async (importOriginal) => {
     consumeRateLimit: vi.fn(async () => ({ success: licenseControlHttpState.allowed })),
   };
 });
-vi.mock("../../src/lib/services/auth-service", async () => {
+vi.mock("../../src/lib/services/accounts/auth-service", async () => {
   const { licenseControlHttpState } = await import("../helpers/license-control-http-harness");
   return {
     authService: { getSession: async () => licenseControlHttpState.user },
   };
 });
-vi.mock("../../src/lib/request-client-ip", () => ({
+vi.mock("../../src/features/shell/request-client-ip", () => ({
   getTrustedRequestIp: () => "unknown",
 }));
 

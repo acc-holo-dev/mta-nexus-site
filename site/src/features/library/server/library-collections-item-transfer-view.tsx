@@ -1,13 +1,15 @@
 import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
-import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
+import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
+import { pageShellMax4xl } from "../../shell/page-shell";
+import { typeFlexWrapEndGap3 } from "../../shell/type-shell";
+import { LibraryCollectionItemCopyForm } from "../collection-item-copy";
+import { libraryCollectionsCopy } from "../library-collections-i18n";
 import {
   collectionHref,
   collectionPageParams,
   collectionsQuery,
-} from "../../../lib/library-collections-query";
-import { libraryCollectionsService as service } from "../../../lib/services/library-collections-service";
-import { LibraryCollectionItemCopyForm } from "../collection-item-copy";
+} from "../library-collections-query";
 import {
   type LibraryCollectionsActor,
   LibraryCollectionsPagination,
@@ -34,7 +36,7 @@ export async function LibraryCollectionsItemTransferView({
   const query = collectionsQuery(collectionPageParams(queryValues), "detail");
   const result = await service.copyItemsPage(actor, id, query);
   return (
-    <div className="mx-auto max-w-4xl space-y-6 py-8">
+    <div className={pageShellMax4xl}>
       <Link href={collectionHref(id)} className={libraryCollectionsLinkClass}>
         {c.back}
       </Link>
@@ -44,7 +46,7 @@ export async function LibraryCollectionsItemTransferView({
         {result.source.revision}
       </p>
       <search aria-label={c.search}>
-        <form method="get" className="flex flex-wrap items-end gap-3">
+        <form method="get" className={typeFlexWrapEndGap3}>
           <label className="grid gap-1">
             {c.search}
             <input

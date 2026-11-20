@@ -15,7 +15,7 @@ it("locks missing saved revision to ErrorState alert", () => {
   expect(source).toContain("ErrorState");
   expect(source).toContain('id="server-details-missing-revision"');
   expect(source).toMatch(
-    /!lastSavedAt \? \(\s*<ErrorState id="server-details-missing-revision" title=\{copy\.missingRevision\} \/>\s*\) : null/u,
+    /!lastSavedAt \? \(\s*<ErrorState\s+id="server-details-missing-revision"\s+title=\{copy\.missingRevision\}\s+description=\{formErrorHint\}\s*\/>\s*\) : null/u,
   );
   expect(source).not.toContain('className="text-sm text-muted">{copy.missingRevision}</p>');
 });

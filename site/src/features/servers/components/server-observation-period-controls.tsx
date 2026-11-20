@@ -1,13 +1,12 @@
 import { Button, fieldClassBlock as platformFieldClass } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
-import { type ServerHistoryWindow, serverHistoryWindows } from "../../../lib/server-history-window";
-import { serverStatisticsHref } from "../../../lib/server-statistics-contract";
-import { serverStatisticsCopy } from "../../../lib/server-statistics-copy";
-
-const filterNavLinkClass =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkAccentSm, linkFocusRing } from "../../shell/link-shell";
+import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
+import { typeFlexWrapGap2, typeFlexWrapGap4, typeMinH11Semibold } from "../../shell/type-shell";
+import { type ServerHistoryWindow, serverHistoryWindows } from "../server-history-window";
+import { serverStatisticsHref } from "../server-statistics-contract";
+import { serverStatisticsCopy } from "../server-statistics-copy";
 export function ServerObservationPeriodControls({
   path,
   window,
@@ -35,7 +34,7 @@ export function ServerObservationPeriodControls({
   const utc = (date: number) => new Date(date).toISOString().slice(0, 23);
   return (
     <div className="space-y-3">
-      <nav aria-label={copy.windows} className="flex flex-wrap gap-2">
+      <nav aria-label={copy.windows} className={typeFlexWrapGap2}>
         {(
           [
             ["24h", copy.period24h],
@@ -48,7 +47,7 @@ export function ServerObservationPeriodControls({
             prefetch={false}
             href={href(period, end)}
             aria-current={window === period ? "page" : undefined}
-            className={`inline-flex min-h-11 items-center rounded-lg border border-base px-3 text-sm ${filterNavLinkClass} ${window === period ? "bg-accent-soft text-accent" : "text-secondary"}`}
+            className={`inline-flex min-h-11 items-center rounded-lg border border-base px-3 text-sm ${linkFocusRing} ${window === period ? "bg-accent-soft text-accent" : "text-secondary"}`}
           >
             {label}
           </Link>
@@ -60,7 +59,7 @@ export function ServerObservationPeriodControls({
           {copy.refresh}
         </a>
       </nav>
-      <form method="get" action={path} className="nexus-panel flex flex-wrap items-end gap-3 p-4">
+      <form method="get" action={path} className={panelFlexWrapEndP4}>
         <input type="hidden" name="window" value={window} />
         {Object.entries(filters)
           .filter(([, value]) => value)
@@ -80,17 +79,17 @@ export function ServerObservationPeriodControls({
             className={`${platformFieldClass} min-h-11`}
           />
         </label>
-        <Button type="submit" className="min-h-11 font-semibold">
+        <Button type="submit" className={typeMinH11Semibold}>
           {copy.choosePeriod}
         </Button>
         <p className="w-full text-xs text-muted">{copy.periodScope}</p>
       </form>
-      <nav aria-label={copy.adjacent} className="flex flex-wrap gap-4">
+      <nav aria-label={copy.adjacent} className={typeFlexWrapGap4}>
         {time - width >= minimum && (
           <Link
             prefetch={false}
             href={href(window, new Date(time - width).toISOString())}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentSm}
           >
             {copy.previousPeriod}
           </Link>
@@ -99,7 +98,7 @@ export function ServerObservationPeriodControls({
           <Link
             prefetch={false}
             href={href(window, new Date(time + width).toISOString())}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentSm}
           >
             {copy.nextPeriod}
           </Link>

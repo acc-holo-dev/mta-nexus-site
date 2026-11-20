@@ -1,0 +1,65 @@
+const en = {
+  title: "Collection command history",
+  note: "Inspect your recorded collection changes. Filters match whole operations; collection IDs match destinations and recorded copy/move sources. Resource filters match explicitly recorded IDs, so full collection copies are excluded. Labels describe current access; receipts describe the recorded result.",
+  days: "Days",
+  action: "Operation",
+  collectionId: "Collection ID",
+  productId: "Resource ID",
+  filter: "Apply filters",
+  clear: "Clear filters",
+  export: "Download this JSON page",
+  empty: "No matching collection operations.",
+  emptyHint:
+    "An empty history is not a load failure. Recorded collection commands appear here after they commit.",
+  loadUnavailable: "Collection command history is temporarily unavailable. Please try again.",
+  loadUnavailableDescription:
+    "A load failure is not an empty history. Retry to fetch the latest recorded collection operations.",
+  unknown: "The recorded operation could not be verified.",
+  unknownHint:
+    "An unverified operation is not a load failure. Open another history entry or retry if loading failed.",
+  current: "Current collection",
+  recorded: "Recorded collection",
+  sourceCurrent: "Current source collection",
+  unavailable: "Current resource unavailable",
+  fullCopy:
+    "Full copy receipt stores a count and digest; individual resource IDs are not recorded.",
+  noCurrent: "Current collection unavailable",
+  noCurrentHint:
+    "The collection ID in the receipt no longer resolves with your access. That gap is not a missing history row.",
+  time: "Time (UTC)",
+  loading: "Loading collection command history…",
+};
+const ru: typeof en = {
+  title: "История команд коллекций",
+  note: "Ваши записанные изменения коллекций. Фильтры выбирают операции целиком; ID коллекции совпадает с назначением или записанным источником копирования/переноса. Фильтр ресурса ищет явно записанные ID, поэтому полные копии коллекций не включаются. Названия отражают текущий доступ, квитанции — записанный результат.",
+  days: "Дней",
+  action: "Операция",
+  collectionId: "ID коллекции",
+  productId: "ID ресурса",
+  filter: "Применить фильтры",
+  clear: "Сбросить фильтры",
+  export: "Скачать эту страницу JSON",
+  empty: "Подходящих операций с коллекциями нет.",
+  emptyHint:
+    "Пустая история — не ошибка загрузки. Записанные команды коллекций появятся здесь после сохранения.",
+  loadUnavailable: "История команд коллекций временно недоступна. Попробуйте ещё раз.",
+  loadUnavailableDescription:
+    "Ошибка загрузки — это не пустая история. Повторите запрос, чтобы получить актуальные операции.",
+  unknown: "Записанную операцию не удалось проверить.",
+  unknownHint:
+    "Непроверенная операция — не ошибка загрузки. Откройте другую запись истории или повторите запрос при сбое загрузки.",
+  current: "Текущая коллекция",
+  recorded: "Записанная коллекция",
+  sourceCurrent: "Текущая исходная коллекция",
+  unavailable: "Ресурс сейчас недоступен",
+  fullCopy:
+    "Квитанция полной копии хранит количество и хэш состава; отдельные ID ресурсов не записаны.",
+  noCurrent: "Текущая коллекция недоступна",
+  noCurrentHint:
+    "ID коллекции в квитанции больше не совпадает с вашим доступом. Это не пропуск строки в истории.",
+  time: "Время (UTC)",
+  loading: "Загружаем историю команд коллекций…",
+};
+export function libraryCollectionHistoryCopy(locale: "ru" | "en") {
+  return locale === "ru" ? ru : en;
+}

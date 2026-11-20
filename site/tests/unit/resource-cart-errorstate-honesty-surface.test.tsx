@@ -12,10 +12,12 @@ const source = readFileSync(
 
 it("locks cart uncertain pending and unavailable notices to ErrorState", () => {
   expect(source).toContain('import { Button, EmptyState, ErrorState } from "@nexus/ui"');
-  expect(source).toContain("<ErrorState title={receiptCopy.pending} />");
+  expect(source).toContain(
+    "<ErrorState title={receiptCopy.pending} description={receiptCopy.pendingHint} />",
+  );
   expect(source).toContain('id="resource-cart-unavailable"');
   expect(source).toMatch(
-    /unavailable \? \(\s*<ErrorState id="resource-cart-unavailable" title=\{copy\.unavailableNote\} \/>\s*\) : null/u,
+    /unavailable \? \(\s*<ErrorState\s+id="resource-cart-unavailable"\s+title=\{copy\.unavailableNote\}\s+description=\{copy\.unavailableNoteHint\}\s*\/>\s*\) : null/u,
   );
   expect(source).toContain('data-cart-state="pending"');
   expect(source).not.toContain('className="text-sm text-warning"');

@@ -8,39 +8,44 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { LibraryReleaseFollowLatest } from "../release-follow";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { PlatformSessionError } from "../../../components/platform-session-error";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { ResourceDownloadButton } from "../../resources/download";
 import { ResourceReleaseWatchControl } from "../../resources/release-watch";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { libraryCollectionInventoryCopy } from "../../../lib/library-collection-inventory-i18n";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeBreakAllXs,
+  typeBreakSemibold,
+  typeFlexWrapEndGap3,
+  typeFlexWrapGap4,
+  typeSmSecondary,
+  typeSpace2BorderTPt3,
+  typeSurfaceBorderP2,
+} from "../../shell/type-shell";
+import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
 import {
   collectionInventoryHref,
   libraryCollectionInventoryQuery,
   libraryCollectionInventorySuffix,
-} from "../../../lib/library-collection-inventory-query";
-import {
-  libraryCollectionError,
-  libraryCollectionsCopy,
-} from "../../../lib/library-collections-i18n";
-import { collectionHref, collectionPageParams } from "../../../lib/library-collections-query";
-import { getResourceReleaseControlCopy } from "../../../lib/resource-release-control-i18n";
-import { authService } from "../../../lib/services/auth-service";
-import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
+} from "../library-collection-inventory-query";
+import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
+import { collectionHref, collectionPageParams } from "../library-collections-query";
+import { LibraryReleaseFollowLatest } from "../release-follow";
+import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
 
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
-export async function generateMetadata(): Promise<Metadata> {
+export async function collectionInventoryMetadata(): Promise<Metadata> {
   return {
     title: `${libraryCollectionInventoryCopy(await getRequestLocale()).title} | MTA NEXUS`,
     robots: { index: false, follow: false },
   };
 }
-export default async function Page({
+export async function CollectionInventoryPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -78,17 +83,18 @@ export default async function Page({
     });
     if (!report) {
       return (
-        <div className={pageShellClass}>
+        <div className={pageShellMax5xl}>
           <h1 className="font-display">{v.title}</h1>
-          <Link href={collectionHref()} className={navLinkClass}>
+          <Link href={collectionHref()} className={linkAccentSmRounded}>
             {c.title}
           </Link>
           <ErrorState
             title={v.loadUnavailable}
+            description={v.loadUnavailableDescription}
             action={
               <Link
                 href={`${collectionInventoryHref()}?${libraryCollectionInventorySuffix(query)}`}
-                className={navLinkClass}
+                className={linkAccentSmRounded}
               >
                 {dictionary.errors.retry}
               </Link>
@@ -99,34 +105,36 @@ export default async function Page({
     }
     const suffix = (page: number) => libraryCollectionInventorySuffix({ ...query, page });
     return (
-      <div className={pageShellClass}>
-        <nav className="flex flex-wrap gap-4">
-          <Link href={collectionHref()} className={navLinkClass}>
+      <div className={pageShellMax5xl}>
+        <nav className={typeFlexWrapGap4}>
+          <Link href={collectionHref()} className={linkAccentSmRounded}>
             {c.title}
           </Link>
-          <Link href="/workspace/library" className={navLinkClass}>
+          <Link href="/workspace/library" className={linkAccentSmRounded}>
             {c.library}
           </Link>
         </nav>
         <h1>{v.title}</h1>
         <p className="text-secondary">{v.note}</p>
-        <p className="text-sm text-secondary">{v.watchNote}</p>
+        <p className={typeSmSecondary}>{v.watchNote}</p>
         {report.collectionId ? (
-          <nav className="flex flex-wrap gap-4" aria-label={v.collection}>
-            <Link href={collectionHref(report.collectionId, "releases")} className={navLinkClass}>
+          <nav className={typeFlexWrapGap4} aria-label={v.collection}>
+            <Link
+              href={collectionHref(report.collectionId, "releases")}
+              className={linkAccentSmRounded}
+            >
               {v.collectionReleases}
             </Link>
-            <Link href={collectionHref(report.collectionId, "watches")} className={navLinkClass}>
+            <Link
+              href={collectionHref(report.collectionId, "watches")}
+              className={linkAccentSmRounded}
+            >
               {v.collectionWatches}
             </Link>
           </nav>
         ) : null}
         <search aria-label={v.search}>
-          <form
-            method="get"
-            action={collectionInventoryHref()}
-            className="flex flex-wrap items-end gap-3"
-          >
+          <form method="get" action={collectionInventoryHref()} className={typeFlexWrapEndGap3}>
             <label className="grid gap-1">
               {v.search}
               <input
@@ -138,11 +146,7 @@ export default async function Page({
             </label>
             <label className="grid gap-1">
               {v.status}
-              <select
-                name="status"
-                defaultValue={report.status}
-                className="rounded border border-base bg-surface p-2"
-              >
+              <select name="status" defaultValue={report.status} className={typeSurfaceBorderP2}>
                 {(["all", "active", "archived"] as const).map((status) => (
                   <option key={status} value={status}>
                     {c[status]}
@@ -155,7 +159,7 @@ export default async function Page({
               <select
                 name="collectionId"
                 defaultValue={report.collectionId ?? ""}
-                className="rounded border border-base bg-surface p-2"
+                className={typeSurfaceBorderP2}
               >
                 <option value="">{c.all}</option>
                 {report.collections.map((collection) => (
@@ -167,11 +171,7 @@ export default async function Page({
             </label>
             <label className="grid gap-1">
               {v.filter}
-              <select
-                name="filter"
-                defaultValue={report.filter}
-                className="rounded border border-base bg-surface p-2"
-              >
+              <select name="filter" defaultValue={report.filter} className={typeSurfaceBorderP2}>
                 {LIBRARY_COLLECTION_INVENTORY_FILTERS.map((filter) => (
                   <option key={filter} value={filter}>
                     {v[filter]}
@@ -181,11 +181,7 @@ export default async function Page({
             </label>
             <label className="grid gap-1">
               {v.releaseFilter}
-              <select
-                name="release"
-                defaultValue={report.release}
-                className="rounded border border-base bg-surface p-2"
-              >
+              <select name="release" defaultValue={report.release} className={typeSurfaceBorderP2}>
                 {LIBRARY_COLLECTION_INVENTORY_RELEASE_FILTERS.map((release) => (
                   <option key={release} value={release}>
                     {v.releaseFilters[release]}
@@ -196,7 +192,7 @@ export default async function Page({
             <Button type="submit" variant="outline" className="min-h-11 px-3">
               {v.apply}
             </Button>
-            <Link href={collectionInventoryHref()} className={navLinkClass}>
+            <Link href={collectionInventoryHref()} className={linkAccentSmRounded}>
               {v.clear}
             </Link>
           </form>
@@ -211,15 +207,15 @@ export default async function Page({
             ),
           )}
         </dl>
-        <p className="text-sm text-secondary">{v.countNote}</p>
-        <nav aria-label={v.releaseFilter} className="flex flex-wrap gap-4">
+        <p className={typeSmSecondary}>{v.countNote}</p>
+        <nav aria-label={v.releaseFilter} className={typeFlexWrapGap4}>
           {(["attention", "updates", "pinned", "selection-unavailable", "latest"] as const).map(
             (release) => (
               <Link
                 key={release}
                 href={`${collectionInventoryHref()}?${libraryCollectionInventorySuffix({ ...query, page: 1, release })}`}
                 aria-current={release === report.release ? "page" : undefined}
-                className={navLinkClass}
+                className={linkAccentSmRounded}
               >
                 {v.releaseFilters[release]} (
                 {
@@ -238,17 +234,17 @@ export default async function Page({
         </p>
         <a
           href={`/api/library/collections/resources/export?${suffix(report.page)}`}
-          className={navLinkClass}
+          className={linkAccentSmRounded}
         >
           {v.export}
         </a>
-        <p className="text-sm text-secondary">{v.snapshotNote}</p>
+        <p className={typeSmSecondary}>{v.snapshotNote}</p>
         {!report.items.length ? (
           <EmptyState
             title={v.empty}
             description={v.emptyHint}
             action={
-              <Link href={collectionInventoryHref()} className={navLinkClass}>
+              <Link href={collectionInventoryHref()} className={linkAccentSmRounded}>
                 {v.clear}
               </Link>
             }
@@ -261,20 +257,17 @@ export default async function Page({
               resourceHref = `/workspace/library/${encodeURIComponent(item.productId)}`,
               release = item.available ? item.release : null;
             return (
-              <li key={item.productId} className="nexus-panel space-y-3 p-5">
-                <h2 className="break-words font-semibold">
+              <li key={item.productId} className={panelSpace3P5}>
+                <h2 className={typeBreakSemibold}>
                   {item.available ? (item.title ?? c.unavailable) : c.unavailable}
                 </h2>
-                <code className="block break-all text-xs">{item.productId}</code>
+                <code className={typeBreakAllXs}>{item.productId}</code>
                 <p>
                   {item.available ? v.available : v.unavailable} · {v.memberships}:{" "}
                   {item.memberships.length}
                 </p>
                 {release && (
-                  <section
-                    className="space-y-2 border-t border-base pt-3"
-                    aria-label={v.releaseFilter}
-                  >
+                  <section className={typeSpace2BorderTPt3} aria-label={v.releaseFilter}>
                     <p className="font-semibold">{v.releaseStates[release.state]}</p>
                     <p>
                       {v.latestVersion}: <span className="break-all">{release.latest.version}</span>
@@ -291,7 +284,7 @@ export default async function Page({
                         {release.canReviewRequirements && (
                           <Link
                             href={`${resourceHref}/requirements?${new URLSearchParams({ previewBuildId: release.effective.buildId })}`}
-                            className={navLinkClass}
+                            className={linkAccentSmRounded}
                           >
                             {v.preparation}
                           </Link>
@@ -299,7 +292,7 @@ export default async function Page({
                         {release.effective.buildId !== release.latest.buildId && (
                           <Link
                             href={`${resourceHref}/versions/compare?${new URLSearchParams({ from: release.effective.buildId, to: release.latest.buildId })}`}
-                            className={`block ${navLinkClass}`}
+                            className={`block ${linkAccentSmRounded}`}
                           >
                             {v.compareVersions}
                           </Link>
@@ -323,6 +316,7 @@ export default async function Page({
                       <ErrorState
                         id="library-collection-resources-selection-missing"
                         title={v.selectionMissing}
+                        description={v.selectionMissingHint}
                       />
                     )}
                   </section>
@@ -339,27 +333,27 @@ export default async function Page({
                     available={item.available}
                   />
                 ) : null}
-                <div className="flex flex-wrap gap-4">
+                <div className={typeFlexWrapGap4}>
                   {item.slug ? (
                     <Link
                       href={`/market/${encodeURIComponent(item.slug)}`}
-                      className={navLinkClass}
+                      className={linkAccentSmRounded}
                     >
                       {getResourceReleaseControlCopy(locale).open}
                     </Link>
                   ) : null}
-                  <Link href={`${resourceHref}/collections`} className={navLinkClass}>
+                  <Link href={`${resourceHref}/collections`} className={linkAccentSmRounded}>
                     {v.manage}
                   </Link>
                   {item.available && (
-                    <Link href={`${resourceHref}/versions`} className={navLinkClass}>
+                    <Link href={`${resourceHref}/versions`} className={linkAccentSmRounded}>
                       {c.versions}
                     </Link>
                   )}
                   {first && second && (
                     <Link
                       href={collectionHref(first.id, "compare", { to: second.id })}
-                      className={navLinkClass}
+                      className={linkAccentSmRounded}
                     >
                       {v.compare}
                     </Link>
@@ -370,7 +364,7 @@ export default async function Page({
                     <li key={membership.id} className="border-t border-base pt-2">
                       <Link
                         href={collectionHref(membership.id)}
-                        className={`break-words ${navLinkClass}`}
+                        className={`break-words ${linkAccentSmRounded}`}
                       >
                         {membership.name}
                       </Link>{" "}
@@ -386,22 +380,22 @@ export default async function Page({
           })}
         </ol>
         {report.totalPages > 1 && (
-          <nav aria-label={c.page} className="flex flex-wrap gap-4">
+          <nav aria-label={c.page} className={typeFlexWrapGap4}>
             {report.page > 1 && (
               <Link
                 href={`${collectionInventoryHref()}?${suffix(report.page - 1)}`}
-                className={navLinkClass}
+                className={linkAccentSmRounded}
               >
                 {c.previous}
               </Link>
             )}
-            <span className="inline-flex min-h-11 items-center">
+            <span className={linkMinH}>
               {c.page} {report.page} {c.of} {report.totalPages}
             </span>
             {report.page < report.totalPages && (
               <Link
                 href={`${collectionInventoryHref()}?${suffix(report.page + 1)}`}
-                className={navLinkClass}
+                className={linkAccentSmRounded}
               >
                 {c.next}
               </Link>
@@ -413,12 +407,24 @@ export default async function Page({
   } catch (error) {
     if (!(error instanceof AppError)) throw error;
     if (error.statusCode === 404) notFound();
+    const title = libraryCollectionError(locale, error.code);
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax5xl}>
         <ErrorState
-          title={libraryCollectionError(locale, error.code)}
+          title={title}
+          description={
+            title === c.retry
+              ? v.loadUnavailableDescription
+              : title === c.signInRequired
+                ? dictionary.errors.sessionRetryHint
+                : title.startsWith(c.fullCollection) || title.startsWith(c.quota)
+                  ? c.capacityErrorDescription
+                  : title === c.invalid
+                    ? dictionary.errors.formErrorHint
+                    : c.actionErrorDescription
+          }
           action={
-            <Link href={collectionInventoryHref()} className={navLinkClass}>
+            <Link href={collectionInventoryHref()} className={linkAccentSmRounded}>
               {c.reload}
             </Link>
           }

@@ -1,0 +1,49 @@
+import type { User } from "@nexus/domain";
+import { AppError, UnauthorizedError } from "@nexus/domain";
+import type { NextRequest } from "next/server";
+import { type Locale, resolveLocale } from "../../lib/i18n";
+import {
+  createRequestLogContext,
+  jsonWithRequestId,
+  logRequestEvent,
+} from "../../lib/platform/observability";
+import { authService } from "../../lib/services/accounts/auth-service";
+import { userPlatformError } from "../community/user-platform-copy";
+
+export async function userPlatformApi(
+  request: NextRequest,
+  action: (user: User) => Promise<unknown>,
+  status = 200,
+  translateError: (locale: Locale, code: unknown) => string = userPlatformError,
+) {
+  const context = createRequestLogContext(request);
+  const headers = { "Cache-Control": "private, no-store", Vary: "Cookie" };
+  try {
+    const user = await authService.getSession(request.cookies.get("nexus_session")?.value);
+    if (!user) throw new UnauthorizedError();
+    if (request.method !== "GET" && request.headers.get("sec-fetch-site") === "cross-site") {
+      throw new AppError("Cross-site mutation is forbidden", 403, "FORBIDDEN");
+    }
+    return jsonWithRequestId(context, await action(user), { status, headers });
+  } catch (error) {
+    const known = error instanceof AppError;
+    const code = known ? error.code : "INTERNAL_ERROR";
+    const statusCode = known ? error.statusCode : 503;
+    if (!known)
+      logRequestEvent({
+        level: "error",
+        event: "user_platform.request_failed",
+        context,
+        status: statusCode,
+        error,
+      });
+    return jsonWithRequestId(
+      context,
+      {
+        error: translateError(resolveLocale(request.cookies.get("nexus_locale")?.value), code),
+        code,
+      },
+      { status: statusCode, headers },
+    );
+  }
+}

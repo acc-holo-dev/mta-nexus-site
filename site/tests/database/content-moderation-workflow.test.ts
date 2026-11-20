@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Content, User } from "@nexus/domain";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   findById: vi.fn(),
@@ -26,7 +26,7 @@ vi.mock("@nexus/security", () => ({
   generateId: vi.fn((prefix: string) => `${prefix}_test`),
 }));
 
-import { ContentService } from "../../src/lib/services/content-service";
+import { ContentService } from "../../src/lib/services/community/content-service";
 
 const moderator = {
   id: "usr_mod",

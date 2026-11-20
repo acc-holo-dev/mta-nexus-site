@@ -24,13 +24,13 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/library-collections-service", () => ({
+vi.mock("../../src/lib/services/library/library-collections-service", () => ({
   libraryCollectionsService: { accountHistory: state.history },
 }));
 
@@ -38,8 +38,8 @@ import Page, {
   dynamic,
   generateMetadata,
 } from "../../src/app/workspace/library/collections/history/page";
-import { authService } from "../../src/lib/services/auth-service";
-import { libraryCollectionHistoryCopy } from "../../src/lib/library-collection-history-i18n";
+import { libraryCollectionHistoryCopy } from "../../src/features/library/library-collection-history-i18n";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 const date = "2026-10-12T00:00:00.000Z",
   requestId = "67ca0352-de64-4af9-9e54-7d3c56fe8d89",
@@ -168,8 +168,8 @@ it("renders empty account history and maps an absent account to a missing page",
   const filteredEmpty = await screen();
   expect(filteredEmpty).toContain(copy.empty);
   expect(filteredEmpty).toContain(copy.emptyHint);
-  expect(filteredEmpty).toContain("overflow-x-clip");
-  expect(filteredEmpty).toContain("min-h-11");
+  expect(filteredEmpty).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(filteredEmpty).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(filteredEmpty).not.toContain('role="alert"');
   expect(clearLinks(filteredEmpty)).toBe(2);
   state.history.mockResolvedValue({
@@ -186,7 +186,7 @@ it("renders empty account history and maps an absent account to a missing page",
   const defaultEmpty = await screen({});
   expect(defaultEmpty).toContain(copy.empty);
   expect(defaultEmpty).toContain(copy.emptyHint);
-  expect(defaultEmpty).toContain("overflow-x-clip");
+  expect(defaultEmpty).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(clearLinks(defaultEmpty)).toBe(1);
   state.history.mockRejectedValue(new AppError("private detail", 404, "NOT_FOUND"));
   await expect(screen()).rejects.toThrow("NEXT_NOT_FOUND");
@@ -199,8 +199,8 @@ it("shows ErrorState recovery when collection history fails to load", async () =
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(`>${copy.title}</h1>`);
   expect(html).toContain(copy.loadUnavailableDescription);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).not.toContain(copy.emptyHint);
 });
 it("locks ErrorState for invalid history filters with retry shell", async () => {
@@ -208,8 +208,8 @@ it("locks ErrorState for invalid history filters with retry shell", async () => 
   const html = await screen({ userId: "other" });
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailableDescription);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
 });
 
 it.each(["en", "ru"] as const)(

@@ -1,23 +1,26 @@
 import { AppError } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { Flag } from "lucide-react";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Locale } from "../../../lib/i18n";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { resourceReviewCopy, resourceReviewState } from "../../../lib/resource-review-i18n";
-import { resourceReviewPageQuery } from "../../../lib/resource-review-query";
-import { authService } from "../../../lib/services/auth-service";
-import { resourceReviewService } from "../../../lib/services/resource-review-service";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { formatUnknown } from "../../../lib/i18n/unknown";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { resourceReviewService } from "../../../lib/services/resources/resource-review-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccent } from "../../shell/link-shell";
+import { pageShellMax4xlCompact } from "../../shell/page-shell";
+import { panelMinSpace2P4, panelSpace3P5 } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import { typeFlexWrapGap4, typePrewrapBreakSm } from "../../shell/type-shell";
+import { resourceReviewCopy, resourceReviewState } from "../resource-review-i18n";
+import { resourceReviewPageQuery } from "../resource-review-query";
 import { ResourceReviewDecisionForm } from "../review-controls";
 import { ResourceReviewPager } from "../reviews-view";
-
-const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-5 overflow-x-clip py-8";
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 function reportAccessError(error: unknown): "missing" | "failed" {
   if (error instanceof AppError && [403, 404].includes(error.statusCode)) return "missing";
@@ -40,8 +43,8 @@ function ResourceReviewLoadError({
   const copy = resourceReviewCopy(locale),
     dictionary = getDictionary(locale);
   return (
-    <section className={pageShellClass}>
-      <Link href={backHref} className={navLinkClass}>
+    <section className={pageShellMax4xlCompact}>
+      <Link href={backHref} className={linkAccent}>
         {backLabel}
       </Link>
       <h1 className="font-display">{staff ? copy.queue : copy.reports}</h1>
@@ -49,13 +52,20 @@ function ResourceReviewLoadError({
         title={copy.loadUnavailable}
         description={copy.loadUnavailableHint}
         action={
-          <Link href={retryHref} className={navLinkClass}>
+          <Link href={retryHref} className={linkAccent}>
             {dictionary.errors.retry}
           </Link>
         }
       />
     </section>
   );
+}
+
+export async function resourceReviewReportMetadata(): Promise<Metadata> {
+  return {
+    title: `${resourceReviewCopy(await getRequestLocale()).queue} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
 }
 
 export async function ResourceReviewReportScreen({
@@ -86,12 +96,11 @@ export async function ResourceReviewReportScreen({
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   } catch {
     return (
-      <ResourceReviewLoadError
+      <PlatformSessionError
         locale={locale}
-        backHref={id ? base : listBackHref}
-        backLabel={copy.back}
+        title={copy.reports}
+        message={copy.loadUnavailable}
         retryHref={loginReturn}
-        staff={staff}
       />
     );
   }
@@ -115,24 +124,28 @@ export async function ResourceReviewReportScreen({
       );
     }
     return (
-      <section className={pageShellClass}>
-        <Link href={base} className={navLinkClass}>
+      <section className={pageShellMax4xlCompact}>
+        <Link href={base} className={linkAccent}>
           {copy.back}
         </Link>
         <h1 className="font-display">{staff ? copy.queue : copy.reports}</h1>
         <p>{resourceReviewState(locale, report.status)}</p>
-        <p className="whitespace-pre-wrap break-words text-sm">{report.reason}</p>
+        <p className={typePrewrapBreakSm}>{report.reason}</p>
         {report.review ? (
-          <article className="nexus-panel space-y-3 p-5">
+          <article className={panelSpace3P5}>
             <p>{report.review.title}</p>
             <p>
               {resourceReviewState(locale, report.review.status)} · {copy.rating}:{" "}
-              {report.review.rating ?? "—"}/5
+              {formatUnknown(locale, report.review.rating)}/5
             </p>
-            <p className="whitespace-pre-wrap break-words text-sm">{report.review.text}</p>
+            <p className={typePrewrapBreakSm}>{report.review.text}</p>
           </article>
         ) : (
-          <ErrorState id="resource-review-report-unavailable" title={copy.unavailable} />
+          <ErrorState
+            id="resource-review-report-unavailable"
+            title={copy.reportReviewUnavailable}
+            description={copy.reportReviewUnavailableHint}
+          />
         )}
         {staff && "moderatorNotes" in report && report.moderatorNotes && (
           <p className="whitespace-pre-wrap text-sm">
@@ -171,18 +184,18 @@ export async function ResourceReviewReportScreen({
   }
   const alternateView = result.view === "history" ? "pending" : "history";
   return (
-    <section className={pageShellClass}>
-      <Link href={listBackHref} className={navLinkClass}>
+    <section className={pageShellMax4xlCompact}>
+      <Link href={listBackHref} className={linkAccent}>
         {copy.back}
       </Link>
       <h1 className="font-display">{staff ? copy.queue : copy.reports}</h1>
-      <nav aria-label={copy.reports} className="flex flex-wrap gap-4">
+      <nav aria-label={copy.reports} className={typeFlexWrapGap4}>
         {(["pending", "history"] as const).map((view) => (
           <Link
             key={view}
             href={`${base}?view=${view}`}
             aria-current={view === result.view ? "page" : undefined}
-            className={navLinkClass}
+            className={linkAccent}
           >
             {copy[view]}
           </Link>
@@ -190,8 +203,8 @@ export async function ResourceReviewReportScreen({
       </nav>
       {result.items.length ? (
         result.items.map((report) => (
-          <article key={report.id} className="nexus-panel min-w-0 space-y-2 p-4">
-            <Link href={`${base}/${encodeURIComponent(report.id)}`} className={navLinkClass}>
+          <article key={report.id} className={panelMinSpace2P4}>
+            <Link href={`${base}/${encodeURIComponent(report.id)}`} className={linkAccent}>
               {copy.detail} · {resourceReviewState(locale, report.status)}
             </Link>
             <p className="line-clamp-3 whitespace-pre-wrap break-words text-sm">{report.reason}</p>
@@ -203,7 +216,7 @@ export async function ResourceReviewReportScreen({
           description={copy[alternateView]}
           icon={<Flag className="h-6 w-6" aria-hidden="true" />}
           action={
-            <Link href={`${base}?view=${alternateView}`} className={navLinkClass}>
+            <Link href={`${base}?view=${alternateView}`} className={linkAccent}>
               {copy[alternateView]}
             </Link>
           }
@@ -218,4 +231,36 @@ export async function ResourceReviewReportScreen({
       />
     </section>
   );
+}
+
+export async function StaffResourceReviewReportsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return ResourceReviewReportScreen({ staff: true, query: await searchParams });
+}
+
+export async function WorkspaceResourceReviewReportsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return ResourceReviewReportScreen({ staff: false, query: await searchParams });
+}
+
+export async function StaffResourceReviewReportDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return ResourceReviewReportScreen({ staff: true, id: (await params).id });
+}
+
+export async function WorkspaceResourceReviewReportDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return ResourceReviewReportScreen({ staff: false, id: (await params).id });
 }

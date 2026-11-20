@@ -45,17 +45,17 @@ vi.mock("next/link", async () => {
   };
 });
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
   },
 }));
 
-vi.mock("../../src/lib/services/server-service", () => ({
+vi.mock("../../src/lib/services/servers/server-service", () => ({
   serverService,
 }));
 
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 
@@ -78,7 +78,7 @@ vi.mock("../../src/features/servers/components/server-claim-control-panel", asyn
 
 import ServerWorkspaceLayout from "../../src/app/workspace/servers/[id]/layout";
 import ServerManagementPage from "../../src/app/workspace/servers/[id]/page";
-import { getServerWorkspaceNavCopy } from "../../src/lib/server-workspace-nav-i18n";
+import { getServerWorkspaceNavCopy } from "../../src/features/servers/server-workspace-nav-i18n";
 
 async function renderManagedServer(id = "srv_managed") {
   const params = Promise.resolve({ id });

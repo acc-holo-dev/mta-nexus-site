@@ -1,21 +1,30 @@
 "use client";
-import { Button, ErrorState, Input } from "@nexus/ui";
+import { Button, EmptyState, ErrorState, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { z } from "zod";
 import type { Locale } from "../../../lib/i18n";
+import { platformFieldClass, platformRequest } from "../../community/user-platform-client";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
+import { confirmAction } from "../../shell/confirm-action";
+import { linkGhostAccentSm } from "../../shell/link-shell";
+import {
+  typeFlexWrapGap3,
+  typeHeadingPrimary,
+  typeSmMuted,
+  typeSmSecondary,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import {
   confirmOwnershipTransfer,
   type ownershipTransferResultSchema,
   ownershipTransferSchema,
-} from "../../../lib/organization-governance-contract";
+} from "../organization-governance-contract";
 import {
   organizationGovernanceCopy,
   organizationGovernanceMutationError,
-} from "../../../lib/organization-governance-copy";
-import type { OrganizationWorkspace } from "../../../lib/organization-workspace-contract";
-import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
-import { platformFieldClass, platformRequest } from "../../../lib/user-platform-client";
-import { confirmAction } from "../../../components/confirm-action";
+} from "../organization-governance-copy";
+import type { OrganizationWorkspace } from "../organization-workspace-contract";
+import { getOrganizationCopy } from "../organization-workspace-copy";
 export function OrganizationOwnershipTransfer({
   data,
   target,
@@ -39,6 +48,16 @@ export function OrganizationOwnershipTransfer({
 }) {
   const copy = organizationGovernanceCopy(locale),
     teamCopy = getOrganizationCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [
+      ...Object.values(copy),
+      ...Object.values(teamCopy),
+      ...Object.values(getUserPlatformCopy(locale)),
+    ].includes(text)
+      ? text
+      : fallback;
+  }
   const [slug, setSlug] = useState(""),
     [currentPassword, setCurrentPassword] = useState(""),
     [formerRole, setFormerRole] = useState<"member" | "admin">("member"),
@@ -98,7 +117,7 @@ export function OrganizationOwnershipTransfer({
       onSaved(result);
     } catch (caught) {
       setCurrentPassword("");
-      setError(caught instanceof Error ? caught.message : copy.mutationUnavailable);
+      setError(safeMessage(caught, copy.mutationUnavailable));
     } finally {
       guard.current = false;
       onBusyChange(false);
@@ -110,11 +129,11 @@ export function OrganizationOwnershipTransfer({
       className="nexus-panel min-w-0 scroll-mt-20 space-y-4 overflow-x-clip border border-danger/30 p-5"
       aria-busy={busy}
     >
-      <h2 className="font-heading text-primary">{copy.transfer}</h2>
-      <p className="text-sm text-muted">{copy.description}</p>
-      <p className="text-sm text-secondary">{copy.consequence}</p>
+      <h2 className={typeHeadingPrimary}>{copy.transfer}</h2>
+      <p className={typeSmMuted}>{copy.description}</p>
+      <p className={typeSmSecondary}>{copy.consequence}</p>
       {!target ? (
-        <p className="text-sm text-muted">{copy.noSelection}</p>
+        <EmptyState title={copy.noSelection} description={copy.noSelectionHint} />
       ) : (
         <form onSubmit={submit} className="space-y-4">
           <p className="break-words text-sm font-semibold text-primary">
@@ -161,11 +180,11 @@ export function OrganizationOwnershipTransfer({
               onChange={(event) => setCurrentPassword(event.target.value)}
               aria-describedby="organization-ownership-password-hint"
             />
-            <p id="organization-ownership-password-hint" className="text-xs text-muted">
+            <p id="organization-ownership-password-hint" className={typeXsMuted}>
               {copy.currentPasswordHelp}
             </p>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className={typeFlexWrapGap3}>
             <Button
               type="submit"
               variant="danger"
@@ -197,7 +216,7 @@ export function OrganizationOwnershipTransfer({
               variant="ghost"
               disabled={busy}
               onClick={onReload}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
             >
               {copy.reload}
             </Button>

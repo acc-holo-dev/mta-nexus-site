@@ -1,3 +1,7 @@
 import "server-only";
 
-export { PlatformReportsScreen } from "./server/platform-reports-screen";
+export {
+  platformReportsMetadata,
+  WorkspacePlatformReportDetailPage,
+  WorkspacePlatformReportsListPage,
+} from "./server/platform-reports-screen";

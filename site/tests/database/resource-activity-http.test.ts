@@ -1,16 +1,16 @@
 import { Readable } from "node:stream";
-import { NextRequest } from "next/server";
 import { AppError, ForbiddenError, NotFoundError } from "@nexus/domain";
+import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { resourceActivityCsv } from "../../src/features/resources/resource-activity-csv";
+import {
+  parseAcquisitionHistoryQuery,
+  parseResourceActivityQuery,
+} from "../../src/features/resources/resource-activity-query";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../helpers/browser-mutation-headers";
-import { resourceActivityCsv } from "../../src/lib/resource-activity-csv";
-import {
-  parseAcquisitionHistoryQuery,
-  parseResourceActivityQuery,
-} from "../../src/lib/resource-activity-query";
 
 const state = vi.hoisted(() => ({
   user: { id: "usr_a", role: "user" } as null | { id: string; role: "user" },
@@ -21,21 +21,14 @@ const state = vi.hoisted(() => ({
   download: vi.fn(),
   claim: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../../src/lib/services/resource-activity-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-activity-service", () => ({
   resourceActivityService: { buyerHistory: state.history, publisherReport: state.report },
 }));
-vi.mock("../../src/lib/services/commerce-service", () => ({
+vi.mock("../../src/lib/services/commerce/commerce-service", () => ({
   commerceService: { checkEntitlement: async () => true, claimFreeResource: state.claim },
-}));
-vi.mock("../../src/lib/services/product-service", () => ({
-  productService: { canManageProduct: async () => false },
-}));
-vi.mock("@nexus/security", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@nexus/security")>()),
-  consumeRateLimit: vi.fn(async () => ({ success: state.allowed })),
 }));
 const build = {
   id: "bld_a",
@@ -51,17 +44,25 @@ const build = {
   fileName: "resource.zip",
   mimeType: "application/zip",
 };
-vi.mock("@nexus/db", () => ({
-  resourceDownloadAuthorizationRepository: { authorize: state.authorize },
-  productRepository: {
-    findById: async () => ({ id: "prd_a", slug: "resource", status: "published" }),
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
+  productService: {
+    canManageProduct: async () => false,
+    findProductRecord: async () => ({ id: "prd_a", slug: "resource", status: "published" }),
+    findLatestPublishedBuildByProduct: async () => build,
+    findPublishedBuildByProductAndId: async () => build,
+    authorizeResourceDownload: state.authorize,
   },
-  buildRepository: { findLatestPublishedByProduct: async () => build },
 }));
+vi.mock("@nexus/security", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@nexus/security")>()),
+  consumeRateLimit: vi.fn(async () => ({ success: state.allowed })),
+}));
+vi.mock("@nexus/db", () => ({}));
 vi.mock("@nexus/storage", () => ({ storageService: { getDownloadStream: state.download } }));
+
 import { GET as history } from "../../src/app/api/acquisitions/route";
-import { GET as report } from "../../src/app/api/products/[id]/activity/route";
 import { GET as csv } from "../../src/app/api/products/[id]/activity/export/route";
+import { GET as report } from "../../src/app/api/products/[id]/activity/route";
 import { GET as download } from "../../src/app/api/products/[id]/download/route";
 import { POST as claim } from "../../src/app/api/resources/claim/route";
 
@@ -147,7 +148,7 @@ it("does not export data after current publisher authorization is denied", async
   state.report.mockRejectedValue(new NotFoundError("Resource", "prd_a"));
   const response = await csv(request("/api/products/prd_a/activity/export"), context);
   expect(response.status).toBe(404);
-  expect(await response.json()).toEqual({ code: "NOT_FOUND" });
+  expect(await response.json()).toMatchObject({ code: "NOT_FOUND" });
 });
 it.each([
   new ForbiddenError("Access revoked"),

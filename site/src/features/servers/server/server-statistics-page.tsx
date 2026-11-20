@@ -5,24 +5,22 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import {
-  parseServerStatisticsQuery,
-  serverStatisticsHref,
-} from "../../../lib/server-statistics-contract";
-import { serverStatisticsCopy, serverStatisticsError } from "../../../lib/server-statistics-copy";
-import { authService } from "../../../lib/services/auth-service";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
 import {
   type ServerStatisticsResult,
   serverStatisticsService,
-} from "../../../lib/services/server-statistics-service";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+} from "../../../lib/services/servers/server-statistics-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
+import { pageShellMax6xl, pageShellMax6xlDense } from "../../shell/page-shell";
+import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { PlatformSessionError } from "../../shell/session-error";
+import { typeXlBoldPrimary } from "../../shell/type-shell";
+import { parseServerStatisticsQuery, serverStatisticsHref } from "../server-statistics-contract";
+import { serverStatisticsCopy, serverStatisticsError } from "../server-statistics-copy";
 import { ServerStatisticsPanel } from "./server-statistics-panel";
-
-const pageShellClass = "mx-auto min-w-0 max-w-6xl space-y-6 overflow-x-clip py-8";
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
 export async function serverStatisticsMetadata(): Promise<Metadata> {
   const copy = serverStatisticsCopy(await getRequestLocale());
   return {
@@ -56,17 +54,12 @@ export async function ServerStatisticsPage({
       : null;
   } catch {
     return (
-      <div className={pageShellClass}>
-        <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
-        <ErrorState
-          title={copy.unavailable}
-          action={
-            <a href={path} className={navLinkClass}>
-              {copy.retry}
-            </a>
-          }
-        />
-      </div>
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.unavailable}
+        retryHref={path}
+      />
     );
   }
   if (managed && !user) {
@@ -85,11 +78,12 @@ export async function ServerStatisticsPage({
   const query = parseServerStatisticsQuery(params);
   if (!query)
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellMax6xl}>
         <ErrorState
           title={copy.invalid}
+          description={copy.invalidHint}
           action={
-            <Link href={path} className={navLinkClass}>
+            <Link href={path} className={linkAccentSm}>
               {copy.refresh}
             </Link>
           }
@@ -105,19 +99,21 @@ export async function ServerStatisticsPage({
     );
   } catch (error) {
     const code = error instanceof AppError ? error.code : "INTERNAL_ERROR";
+    const title = serverStatisticsError(locale, code);
     return (
-      <div className={pageShellClass}>
-        <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
+      <div className={pageShellMax6xl}>
+        <h1 className={typeXlBoldPrimary}>{copy.title}</h1>
         <ErrorState
-          title={serverStatisticsError(locale, code)}
+          title={title}
+          description={title === copy.unavailable ? copy.unavailableHint : undefined}
           action={
             <nav className="flex flex-wrap justify-center gap-4 text-sm">
-              <Link href={serverStatisticsHref(path, query)} className={navLinkClass}>
+              <Link href={serverStatisticsHref(path, query)} className={linkAccentSm}>
                 {copy.retry}
               </Link>
               <Link
                 href={serverStatisticsHref(path, { window: query.window })}
-                className={navLinkClass}
+                className={linkAccentSm}
               >
                 {copy.refresh}
               </Link>
@@ -129,7 +125,7 @@ export async function ServerStatisticsPage({
   }
   if (!report) notFound();
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax6xl}>
       <ServerStatisticsPanel
         report={report}
         locale={locale}
@@ -142,22 +138,45 @@ export async function ServerStatisticsPage({
 }
 
 export async function ServerStatisticsLoading() {
-  const copy = serverStatisticsCopy(await getRequestLocale());
-  return (
-    <section
-      className="mx-auto min-w-0 max-w-6xl space-y-4 overflow-x-clip py-8"
-      aria-busy="true"
-      aria-labelledby="server-statistics-loading-heading"
-    >
-      <header className="space-y-2">
-        <h1 id="server-statistics-loading-heading" className="font-display text-primary">
-          {copy.title}
-        </h1>
-        <p role="status" aria-live="polite" className="text-sm text-muted">
-          {copy.loading}
-        </p>
-      </header>
-      <div className="h-40 animate-pulse rounded-lg bg-inset" aria-hidden="true" />
-    </section>
-  );
+  return LocaleCopyRouteLoading({
+    headingId: "server-statistics-loading-heading",
+    className: pageShellMax6xlDense,
+    rows: 0,
+    leading: <div className="h-40 rounded-lg bg-inset" />,
+    load: (locale) => {
+      const copy = serverStatisticsCopy(locale);
+      return {
+        title: copy.title,
+        loading: copy.loading,
+      };
+    },
+  });
+}
+
+export async function PublicServerStatisticsRoutePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return ServerStatisticsPage({
+    target: { slug: (await params).slug },
+    managed: false,
+    searchParams: await searchParams,
+  });
+}
+
+export async function ManagedServerStatisticsRoutePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return ServerStatisticsPage({
+    target: { id: (await params).id },
+    managed: true,
+    searchParams: await searchParams,
+  });
 }

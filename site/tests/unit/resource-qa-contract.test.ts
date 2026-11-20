@@ -1,10 +1,10 @@
-import { expect, it } from "vitest";
 import {
   resourceQaAnswerSchema,
   resourceQaAskSchema,
   resourceQaFollowSchema,
   resourceQaResolveSchema,
 } from "@nexus/validation";
+import { expect, it } from "vitest";
 
 it("accepts ask bodies without rating fields", () => {
   expect(resourceQaAskSchema.parse({ body: "How do I install this?" })).toEqual({

@@ -2,7 +2,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import {
   announceNotificationInboxChange,
   observeNotificationInboxChange,
-} from "../../src/lib/notification-inbox-events";
+} from "../../src/features/notifications/notification-inbox-events";
 
 const channels: Channel[] = [];
 class Channel {

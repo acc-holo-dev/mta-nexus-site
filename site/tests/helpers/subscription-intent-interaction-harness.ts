@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, expect, type Mock, vi } from "vitest";
-import { terms } from "./subscriptions-fixtures";
 import { flattenReactTestTree } from "./flatten-react-test-tree";
+import { terms } from "./subscriptions-fixtures";
 
 export type SubscriptionIntentInteractionHarness = {
   slots: unknown[];

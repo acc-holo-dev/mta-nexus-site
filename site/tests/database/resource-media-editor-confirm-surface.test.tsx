@@ -1,15 +1,15 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { expect, it } from "vitest";
-import { resourceMediaCopy } from "../../src/lib/resource-media-i18n";
+import { resourceMediaCopy } from "../../src/features/resources/resource-media-i18n";
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
 it("gates gallery image removal behind confirmAction with localized copy", () => {
   const source = read("site/src/features/resources/components/resource-media-editor.tsx");
-  const i18n = read("site/src/lib/resource-media-i18n.ts");
+  const i18n = read("site/src/features/resources/resource-media-i18n.ts");
 
-  expect(source).toContain('import { confirmAction } from "../../../components/confirm-action"');
+  expect(source).toContain('import { confirmAction } from "../../shell/confirm-action"');
   expect(source).toContain("copy.removeConfirmTitle");
   expect(source).toContain("copy.removeConfirm");
   expect(source).toContain("danger: true");

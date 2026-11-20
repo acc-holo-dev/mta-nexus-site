@@ -1,10 +1,10 @@
-import { describe, expect, it } from "vitest";
 import { WebPushPermanentSubscriptionError } from "@nexus/db";
+import { describe, expect, it } from "vitest";
 import {
   isPublicWebPushAddress,
   parseWebPushEndpoint,
   resolveWebPushTarget,
-} from "../../src/lib/services/web-push-endpoint-policy";
+} from "../../src/lib/services/notifications/web-push-endpoint-policy";
 
 describe("Web Push endpoint policy", () => {
   it("accepts an ordinary HTTPS push-service endpoint", () => {

@@ -37,8 +37,8 @@ it("resumes concurrent pages with stable IDs, preserved reads and generic conten
     recipientId: recipients[0],
     type: "system",
     category: "system",
-    title: "New support case",
-    message: "A support case is awaiting review.",
+    title: "New support case / Новое обращение",
+    message: "A support case is awaiting review. / Обращение ожидает рассмотрения.",
     isRead: true,
     createdAt: originalTime,
   });
@@ -56,8 +56,8 @@ it("resumes concurrent pages with stable IDs, preserved reads and generic conten
   expect(stored[0]).toMatchObject({ isRead: true, createdAt: originalTime });
   for (const row of stored.slice(1)) {
     expect(row).toMatchObject({
-      title: "New support case",
-      message: "A support case is awaiting review.",
+      title: "New support case / Новое обращение",
+      message: "A support case is awaiting review. / Обращение ожидает рассмотрения.",
       link: staffCaseLink(f.caseId),
       category: "system",
     });
@@ -148,8 +148,9 @@ it("uses current roles and the fixed horizon, excluding the requester on replies
   expect(await notices(r.messageId)).toMatchObject([
     {
       recipientId: promoted,
-      title: "Support case updated",
-      message: "A support case has a new requester message.",
+      title: "Support case updated / Новое сообщение в обращении",
+      message:
+        "A support case has a new requester message. / Пользователь добавил сообщение в обращение.",
       link: staffCaseLink(f.caseId),
     },
   ]);

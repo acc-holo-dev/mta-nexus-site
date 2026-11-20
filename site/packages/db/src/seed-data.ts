@@ -1,4 +1,4 @@
-import type { users, organizations, servers, products, builds, licenses, content } from "./schema";
+import type { builds, content, licenses, organizations, products, servers, users } from "./schema";
 import type { ensureSeedArchives } from "./seed-archive";
 
 export function createSeedData(

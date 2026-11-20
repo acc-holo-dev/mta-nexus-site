@@ -1,7 +1,7 @@
-import { describe, it, expect } from "vitest";
 import { sessionRepository } from "@nexus/db";
 import { generateId, generateSessionToken } from "@nexus/security";
-import { authService } from "../../src/lib/services/auth-service";
+import { describe, expect, it } from "vitest";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 describe("Real Auth & Session Engine", () => {
   const testUser = {

@@ -224,10 +224,10 @@ it("delivers direct and follower notices with generic copy and current eligibili
     .orderBy(asc(notifications.recipientId));
   expect(stored.map((row) => row.recipientId).sort()).toEqual([followerId, ownerId].sort());
   for (const row of stored) {
-    expect(row.title).toBe("New discussion reply");
+    expect(row.title).toBe("New discussion reply / Новый ответ в обсуждении");
     expect([
-      "A publication you follow has a new reply.",
-      "A discussion you participate in has a new reply.",
+      "A publication you follow has a new reply. / В публикации, на которую вы подписаны, появился новый ответ.",
+      "A discussion you participate in has a new reply. / В обсуждении, в котором вы участвуете, появился новый ответ.",
     ]).toContain(row.message);
     expect(JSON.stringify(row)).not.toContain("PRIVATE_");
     expect(JSON.stringify(row)).not.toContain(commenterId);

@@ -3,7 +3,6 @@ import { randomBytes } from "node:crypto";
 import { generateId } from "@nexus/security";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { afterEach } from "vitest";
-import { authService } from "../../src/lib/services/auth-service";
 import { accountMailOutbox, accountMailQueueGate } from "../../packages/db/src/account-mail-schema";
 import { authChallenges } from "../../packages/db/src/account-recovery-schema";
 import { auditEvents, db, users } from "../../packages/db/src/client";
@@ -18,6 +17,7 @@ import {
   accountMailOutboxRepository as queue,
 } from "../../packages/db/src/repositories/account-mail-outbox";
 import { userRepository } from "../../packages/db/src/repositories/users";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 export const key = randomBytes(32);
 export const cipher = new AccountMailCipher("d2_test", { d2_test: key });

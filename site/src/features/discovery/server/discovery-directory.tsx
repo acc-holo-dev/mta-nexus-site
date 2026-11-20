@@ -5,31 +5,39 @@ import { ShieldCheck } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { cache } from "react";
-import {
-  DISCOVER_CONTENT_TYPES,
-  type DiscoverQuery,
-  discoverHref,
-} from "../../../lib/discover-query";
-import { discoveryCopy } from "../../../lib/discovery-copy";
-import {
-  type DiscoveryStreamQuery,
-  discoveryStreamHref,
-} from "../../../lib/discovery-stream-contract";
-import { discoveryStreamCopy, discoveryStreamError } from "../../../lib/discovery-stream-copy";
 import { getDictionary, type Locale } from "../../../lib/i18n";
-import type { PublicResourceAttribution } from "../../../lib/public-resource-attribution";
-import { authService } from "../../../lib/services/auth-service";
-import { discoveryService } from "../../../lib/services/discovery-service";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { productService } from "../../../lib/services/commerce/product-service";
+import { discoveryService } from "../../../lib/services/discovery/discovery-service";
 import {
   indexMtaObservations,
   type MtaMasterServer,
   mtaMasterDirectoryService,
-} from "../../../lib/services/mta-master-directory-service";
-import { productService } from "../../../lib/services/product-service";
+} from "../../../lib/services/servers/mta-master-directory-service";
 import { ArticleCard } from "../../community/article-view";
-import { FollowButton } from "../../../components/follow-button";
+import { FollowButton } from "../../community/follow";
+import type { PublicResourceAttribution } from "../../resources/public-resource-attribution";
 import { ProductCard } from "../../resources/view";
 import { ServerCard } from "../../servers/client";
+import {
+  linkAccentRounded,
+  linkAccentSm,
+  linkAccentTightRounded,
+  linkMinHContentAccentSmPlain,
+  linkMinHContentAccentSmRounded,
+} from "../../shell/link-shell";
+import {
+  typeFlexWrapEndGap3,
+  typeMinH11Semibold,
+  typeSemiboldPrimary,
+  typeSmMuted,
+  typeSpace1XsSecondary,
+  typeTruncateXsFaint,
+} from "../../shell/type-shell";
+import { DISCOVER_CONTENT_TYPES, type DiscoverQuery, discoverHref } from "../discover-query";
+import { discoveryCopy } from "../discovery-copy";
+import { type DiscoveryStreamQuery, discoveryStreamHref } from "../discovery-stream-contract";
+import { discoveryStreamCopy, discoveryStreamError } from "../discovery-stream-copy";
 
 const observationLookupForSnapshot = cache((servers: readonly MtaMasterServer[]) =>
   indexMtaObservations(servers),
@@ -55,7 +63,7 @@ export function DirectoryFilters({
   return (
     <FilterBar key={discoverHref(state, path)} action={path} label={copy.filter} layout="stacked">
       {(path === "/discover" || stream) && <input type="hidden" name="type" value={state.type} />}
-      <div className="flex flex-wrap items-end gap-3">
+      <div className={typeFlexWrapEndGap3}>
         <div className="min-w-0 flex-1 sm:min-w-48">
           <SearchField
             className={field}
@@ -67,7 +75,7 @@ export function DirectoryFilters({
           />
         </div>
         {names && !stream && (
-          <label className="space-y-1 text-xs text-secondary">
+          <label className={typeSpace1XsSecondary}>
             {copy.sort}
             <select name="sort" defaultValue={state.sort} className={field}>
               <option value="newest">{copy.newest}</option>
@@ -76,7 +84,7 @@ export function DirectoryFilters({
           </label>
         )}
         {state.type === "content" && (
-          <label className="space-y-1 text-xs text-secondary">
+          <label className={typeSpace1XsSecondary}>
             {copy.contentType}
             <select name="contentType" defaultValue={state.contentType} className={field}>
               <option value="">{copy.any}</option>
@@ -88,7 +96,7 @@ export function DirectoryFilters({
             </select>
           </label>
         )}
-        <Button type="submit" className="min-h-11 font-semibold">
+        <Button type="submit" className={typeMinH11Semibold}>
           {dictionary.searchButton}
         </Button>
         {state.query ? (
@@ -105,7 +113,7 @@ export function DirectoryFilters({
                   })
                 : discoverHref({ ...state, query: "", page: 1 }, path)
             }
-            className="min-h-11 content-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkMinHContentAccentSmRounded}
           >
             {copy.clearQuery}
           </Link>
@@ -113,7 +121,7 @@ export function DirectoryFilters({
         {hasActiveDiscoverFilters(state) ? (
           <Link
             href={stream ? `${path}?type=${state.type}` : discoverHref({ type: state.type }, path)}
-            className="min-h-11 content-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkMinHContentAccentSmRounded}
           >
             {copy.reset}
           </Link>
@@ -122,7 +130,7 @@ export function DirectoryFilters({
       {state.type === "servers" && (
         <div className="grid gap-3 sm:grid-cols-3">
           {(["language", "region", "gameMode"] as const).map((key) => (
-            <label key={key} className="space-y-1 text-xs text-secondary">
+            <label key={key} className={typeSpace1XsSecondary}>
               {copy[key]}
               <input name={key} defaultValue={state[key]} maxLength={60} className={field} />
             </label>
@@ -160,7 +168,7 @@ export async function DirectoryResults({
     const code = failure instanceof AppError ? failure.code : "INTERNAL_ERROR";
     loadError = stream
       ? discoveryStreamError(locale, code)
-      : code === "RATE_LIMIT_EXCEEDED"
+      : code === "RATE_LIMIT_EXCEEDED" || code === "RATE_LIMITED"
         ? copy.rate
         : code === "INVALID_CURSOR" || code === "VALIDATION_ERROR"
           ? copy.invalid
@@ -171,9 +179,10 @@ export async function DirectoryResults({
     return (
       <ErrorState
         title={loadError}
+        description={copy.unavailableHint}
         action={
           <Link
-            className="inline-flex min-h-11 items-center rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentRounded}
             href={stream ? discoveryStreamHref(stream) : discoverHref({ ...state, page: 1 }, path)}
           >
             {getDictionary(locale).errors.retry}
@@ -251,12 +260,9 @@ export async function DirectoryResults({
   return (
     <div className="space-y-5">
       {state.type === "servers" && (
-        <p className="text-sm text-muted">
+        <p className={typeSmMuted}>
           {copy.serversHint}{" "}
-          <Link
-            href="/servers"
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href="/servers" className={linkAccentTightRounded}>
             {copy.master}
           </Link>
         </p>
@@ -268,17 +274,11 @@ export async function DirectoryResults({
             description={hasActiveDiscoverFilters(state) ? copy.emptyFiltered : copy.emptyHint}
             action={
               hasActiveDiscoverFilters(state) ? (
-                <Link
-                  href={discoverHref({ type: state.type }, path)}
-                  className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
+                <Link href={discoverHref({ type: state.type }, path)} className={linkAccentSm}>
                   {copy.reset}
                 </Link>
               ) : (
-                <Link
-                  href="/market?maxPrice=0"
-                  className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
+                <Link href="/market?maxPrice=0" className={linkAccentSm}>
                   {getDictionary(locale).home.browseResources}
                 </Link>
               )
@@ -286,9 +286,13 @@ export async function DirectoryResults({
           />
           {hasActiveDiscoverFilters(state) && (
             <div className="nexus-panel space-y-2 p-4 text-sm text-secondary">
-              <p className="font-semibold text-primary">{copy.activeFilters}</p>
+              <p className={typeSemiboldPrimary}>{copy.activeFilters}</p>
               <ul className="list-inside list-disc space-y-1">
-                {state.query ? <li>q: {state.query}</li> : null}
+                {state.query ? (
+                  <li>
+                    {copy.query}: {state.query}
+                  </li>
+                ) : null}
                 {state.verified ? <li>{copy.verified}</li> : null}
                 {state.sort === "name" ? <li>{copy.name}</li> : null}
                 {state.language ? (
@@ -320,14 +324,14 @@ export async function DirectoryResults({
               <div className="flex flex-wrap gap-3 pt-1">
                 {state.query ? (
                   <Link
-                    className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={linkAccentTightRounded}
                     href={discoverHref({ ...state, query: "", page: 1 }, path)}
                   >
                     {copy.clearQuery}
                   </Link>
                 ) : null}
                 <Link
-                  className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={linkAccentTightRounded}
                   href={discoverHref({ type: state.type }, path)}
                 >
                   {copy.reset}
@@ -399,17 +403,14 @@ export async function DirectoryResults({
       )}
       {stream && "nextCursor" in result ? (
         <nav aria-label={copy.pages} className="flex flex-wrap gap-4 border-t border-base pt-4">
-          <a
-            href={discoveryStreamHref(stream)}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <a href={discoveryStreamHref(stream)} className={linkAccentSm}>
             {discoveryStreamCopy(locale).latest}
           </a>
           {"previousCursor" in result && typeof result.previousCursor === "string" && (
             <Link
               prefetch={false}
               href={discoveryStreamHref(stream, result.previousCursor)}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentSm}
             >
               {discoveryStreamCopy(locale).newer}
             </Link>
@@ -418,7 +419,7 @@ export async function DirectoryResults({
             <Link
               prefetch={false}
               href={discoveryStreamHref(stream, result.nextCursor)}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentSm}
             >
               {discoveryStreamCopy(locale).older}
             </Link>
@@ -432,7 +433,7 @@ export async function DirectoryResults({
           >
             {result.page > 1 ? (
               <Link
-                className="min-h-11 content-center text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkMinHContentAccentSmPlain}
                 href={discoverHref({ ...state, page: result.page - 1 }, path)}
               >
                 {copy.previous}
@@ -440,12 +441,12 @@ export async function DirectoryResults({
             ) : (
               <span />
             )}
-            <span className="text-sm text-muted">
+            <span className={typeSmMuted}>
               {copy.page} {result.page}
             </span>
             {result.hasMore ? (
               <Link
-                className="min-h-11 content-center text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkMinHContentAccentSmPlain}
                 href={discoverHref({ ...state, page: result.page + 1 }, path)}
               >
                 {copy.next}
@@ -504,7 +505,7 @@ function DirectoryIdentity({
             />
           )}
         </h2>
-        <p className="truncate text-xs text-faint">{subtitle}</p>
+        <p className={typeTruncateXsFaint}>{subtitle}</p>
         <p className="mt-2 line-clamp-3 text-sm text-muted">{description}</p>
       </div>
     </Link>

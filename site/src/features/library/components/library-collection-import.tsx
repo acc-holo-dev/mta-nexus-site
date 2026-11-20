@@ -5,21 +5,20 @@ import {
   type LibraryCollectionReconcilePreview,
   type LibraryCollectionSnapshot,
 } from "@nexus/domain";
-import { Button, ErrorState } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import {
   libraryCollectionImportPreviewSchema,
   libraryCollectionManifestSchema,
   libraryCollectionReconcilePreviewSchema,
 } from "@nexus/validation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { libraryCollectionManifestsCopy } from "../../../lib/library-collection-manifests-i18n";
-import {
-  libraryCollectionError,
-  libraryCollectionsCopy,
-} from "../../../lib/library-collections-i18n";
-import { collectionHref } from "../../../lib/library-collections-query";
-import { privateApiRequest } from "../../../lib/private-api-request";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
+import { panelSpace4P5 } from "../../shell/panel-shell";
+import { typeBreakAllXs } from "../../shell/type-shell";
 import { LibraryCollectionBatchForm } from "../collection-batch";
+import { libraryCollectionManifestsCopy } from "../library-collection-manifests-i18n";
+import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
+import { collectionHref } from "../library-collections-query";
 import { LibraryCollectionReconcileForm } from "./library-collection-reconcile";
 export function LibraryCollectionImport({
   collection,
@@ -149,7 +148,7 @@ export function LibraryCollectionImport({
   return (
     <div className="space-y-6">
       <p>{mode ? m.reconcileNote : m.note}</p>
-      <form onSubmit={inspect} className="nexus-panel space-y-4 p-5">
+      <form onSubmit={inspect} className={panelSpace4P5}>
         <fieldset disabled={frozen} className="space-y-3">
           <label className="grid gap-1">
             {m.choose}
@@ -201,7 +200,9 @@ export function LibraryCollectionImport({
           />
         ) : null}
       </form>
-      {frozen && <p role="note">{m.frozen}</p>}
+      {frozen ? (
+        <ErrorState id="library-collection-import-frozen" title={m.frozen} description={c.retry} />
+      ) : null}
       {preview && (
         <section className="space-y-4" aria-label={m.result}>
           <h2>{m.result}</h2>
@@ -209,7 +210,7 @@ export function LibraryCollectionImport({
             {m.current}: {preview.collection.name} · {c[preview.collection.status]} · {c.revision}{" "}
             {preview.collection.revision}
           </p>
-          <code className="block break-all text-xs">{preview.collection.id}</code>
+          <code className={typeBreakAllXs}>{preview.collection.id}</code>
           <p>
             {c.items}: {preview.itemCount} / {preview.itemLimit} · {m.capacity}:{" "}
             {preview.itemLimit - preview.itemCount}
@@ -217,12 +218,12 @@ export function LibraryCollectionImport({
           <p>
             <time dateTime={preview.generatedAt}>{preview.generatedAt}</time>
           </p>
-          {!preview.items.length && <p>{m.empty}</p>}
+          {!preview.items.length ? <EmptyState title={m.empty} description={m.emptyHint} /> : null}
           <ul className="space-y-2">
             {preview.items.map((item) => (
               <li key={item.productId} className="break-words border-t border-base pt-2">
                 <p>{item.available ? (item.title ?? c.unavailable) : c.unavailable}</p>
-                <code className="block break-all text-xs">{item.productId}</code>
+                <code className={typeBreakAllXs}>{item.productId}</code>
                 <p>
                   {mode && "canRemove" in item && item.canRemove
                     ? m.removeCandidate

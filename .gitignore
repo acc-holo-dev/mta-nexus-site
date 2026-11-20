@@ -39,3 +39,8 @@ artifacts/
 # Local agent scratch and private ops panel (not product)
 scripts/_agent_*
 .dsh-ops/
+
+# Post site/ migration leftovers — not workspace members (canonical: site/, site/packages/*)
+/packages/
+/apps/
+**/__pycache__/

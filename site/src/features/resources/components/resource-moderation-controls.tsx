@@ -10,19 +10,27 @@ import { resourceModerationCommandSchema } from "@nexus/validation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
-import { privateApiRequest } from "../../../lib/private-api-request";
-import { confirmedResourceModeration } from "../../../lib/resource-release-control-confirmation";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
+import { confirmedResourceModeration } from "../../library/resource-release-control-confirmation";
 import {
   getResourceReleaseControlCopy,
   resourceReleaseControlError,
-} from "../../../lib/resource-release-control-i18n";
-import { confirmAction } from "../../../components/confirm-action";
-import { useNexusLocale } from "../../../components/locale-context";
+} from "../../library/resource-release-control-i18n";
+import { confirmAction } from "../../shell/confirm-action";
+import { useNexusLocale } from "../../shell/locale";
+import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
+import { surfaceInsetP3TextSmSecondary } from "../../shell/surface-shell";
+import {
+  typeGridGap2SmSecondarySm2,
+  typeLabelBlockUpperSecondary,
+  typeLabelUpperMuted,
+  typeSmSecondary,
+  typeSmSuccess,
+} from "../../shell/type-shell";
 import { stashSupportObjectContext } from "../../support/center";
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
-const nativeLabelClass = "block font-label uppercase text-secondary";
 export function ResourceModerationControls({
   product,
   selectedBuild = null,
@@ -122,56 +130,44 @@ export function ResourceModerationControls({
 
   if (allowed.length === 0) {
     return (
-      <div className="nexus-panel space-y-3 p-5">
-        <p role="note" className="text-sm text-secondary">
+      <div className={panelSpace3P5}>
+        <p role="note" className={typeSmSecondary}>
           {copy.moderationNote}
         </p>
         <ErrorState
-          title={
-            locale === "ru"
-              ? "Для текущего статуса нет разрешённого moderation-перехода."
-              : "No moderation transition is allowed for the current status."
-          }
+          title={copy.noTransitionAllowed}
+          description={copy.errors.actionErrorDescription}
         />
       </div>
     );
   }
 
   return (
-    <form onSubmit={send} className="nexus-panel space-y-4 p-5">
-      <p role="note" className="text-sm text-secondary">
+    <form onSubmit={send} className={panelSpace4P5}>
+      <p role="note" className={typeSmSecondary}>
         {copy.moderationNote}
       </p>
-      <dl className="grid gap-2 text-sm text-secondary sm:grid-cols-2">
+      <dl className={typeGridGap2SmSecondarySm2}>
         <div>
-          <dt className="font-label uppercase text-muted">
-            {locale === "ru" ? "Статус ресурса" : "Resource status"}
-          </dt>
+          <dt className={typeLabelUpperMuted}>{copy.resourceStatus}</dt>
           <dd className="text-primary">{product.status}</dd>
         </div>
         <div>
-          <dt className="font-label uppercase text-muted">
-            {locale === "ru" ? "Разрешённое действие" : "Allowed action"}
-          </dt>
+          <dt className={typeLabelUpperMuted}>{copy.allowedAction}</dt>
           <dd className="text-primary">{release ? copy.release : copy.suspend}</dd>
         </div>
       </dl>
       {release ? (
         <ErrorState
           id="resource-moderation-release-draft"
-          title={
-            locale === "ru"
-              ? "Снятие ограничения возвращает черновик и требует новой проверки. Автоматической публикации нет."
-              : "Release returns a draft and requires a new review. Nothing is auto-published."
-          }
+          title={copy.releaseDraftWarning}
+          description={copy.errors.actionErrorDescription}
         />
       ) : null}
       {selectedBuild && selectedBuild.status !== "published" ? (
-        <div className="rounded-lg border border-base bg-inset p-3 text-sm text-secondary">
+        <div className={surfaceInsetP3TextSmSecondary}>
           <p>
-            {locale === "ru"
-              ? `Сборка ${selectedBuild.version ?? selectedBuild.id} сейчас ${selectedBuild.status}.`
-              : `Build ${selectedBuild.version ?? selectedBuild.id} is currently ${selectedBuild.status}.`}
+            {copy.buildStatusLine(selectedBuild.version ?? selectedBuild.id, selectedBuild.status)}
           </p>
           <Link
             href={unavailableBuildSupportHref()}
@@ -180,13 +176,13 @@ export function ResourceModerationControls({
               stashSupportObjectContext({ productId: product.id, buildId: selectedBuild.id })
             }
           >
-            {locale === "ru" ? "Контекст для поддержки" : "Support context"}
+            {copy.supportContext}
           </Link>
         </div>
       ) : null}
       <fieldset disabled={busy || saved} className="space-y-4">
         <div className="space-y-1.5">
-          <label htmlFor={`${field}-reason`} className={nativeLabelClass}>
+          <label htmlFor={`${field}-reason`} className={typeLabelBlockUpperSecondary}>
             {copy.reason}
           </label>
           <textarea
@@ -203,13 +199,9 @@ export function ResourceModerationControls({
       </fieldset>
       {error ? <ErrorState title={error} description={copy.actionFailedDescription} /> : null}
       {saved ? (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {copy.saved}
-          {release
-            ? locale === "ru"
-              ? " Следующий шаг автора — отправка черновика на проверку."
-              : " Next author step: submit the draft for review."
-            : ""}
+          {release ? copy.releaseNextAuthorStep : ""}
         </p>
       ) : null}
       <Button type="submit" isLoading={busy} disabled={saved} className="min-h-11">

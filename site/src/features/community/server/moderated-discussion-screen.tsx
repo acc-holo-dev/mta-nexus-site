@@ -1,32 +1,45 @@
 import { AppError } from "@nexus/domain";
 import { can } from "@nexus/security";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { parseModerationDetailQuery } from "../../../lib/community-moderation-contract";
-import { moderationCopy } from "../../../lib/community-moderation-copy";
-import { discussionReportsHref } from "../../../lib/discussion-reports-contract";
-import { discussionReportsCopy } from "../../../lib/discussion-reports-copy";
 import type { Locale } from "../../../lib/i18n";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { communityModerationService } from "../../../lib/services/community/community-moderation-service";
+import { parseModerationDetailQuery } from "../../moderation/community-moderation-contract";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
+import { pageShellMax5xlBare, pageShellMax5xlTight } from "../../shell/page-shell";
+import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import {
+  type2xlBoldPrimary,
+  typeBreakSemiboldPrimary,
+  typeFlexWrapGap4,
+  typePrewrapBreak,
+  typePrewrapSmPrimary,
+  typeSemiboldPrimary,
+  typeSmMuted,
+  typeSpace1SmPrimary,
+  typeXlBoldPrimary,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import { moderationCopy } from "../community-moderation-copy";
+import { ModeratedDiscussionRemoval } from "../components/moderated-discussion-removal";
+import { discussionReportsHref } from "../discussion-reports-contract";
+import { discussionReportsCopy } from "../discussion-reports-copy";
 import {
   moderatedDiscussionDetailSchema,
   moderatedDiscussionHref,
   moderatedDiscussionPageSchema,
   parseModeratedDiscussionQuery,
-} from "../../../lib/moderated-discussion-contract";
-import { moderatedDiscussionCopy } from "../../../lib/moderated-discussion-copy";
-import { authService } from "../../../lib/services/auth-service";
-import { communityModerationService } from "../../../lib/services/community-moderation-service";
-import { platformFieldClass } from "../../../lib/user-platform-client";
-import { ModeratedDiscussionRemoval } from "../components/moderated-discussion-removal";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip";
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+} from "../moderated-discussion-contract";
+import { moderatedDiscussionCopy } from "../moderated-discussion-copy";
+import { platformFieldClass } from "../user-platform-client";
 
 function ModeratedDiscussionLoadError({
   locale,
@@ -38,18 +51,26 @@ function ModeratedDiscussionLoadError({
   const copy = moderatedDiscussionCopy(locale),
     dictionary = getDictionary(locale);
   return (
-    <section className={`nexus-panel space-y-3 p-5 ${pageShellClass}`}>
-      <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
+    <section className={`${panelSpace3P5} ${pageShellMax5xlTight}`}>
+      <h1 className={typeXlBoldPrimary}>{copy.title}</h1>
       <ErrorState
         title={copy.loadUnavailable}
+        description={copy.loadUnavailableHint}
         action={
-          <Link href={retryHref} className={navLinkClass}>
+          <Link href={retryHref} className={linkAccentSm}>
             {dictionary.errors.retry}
           </Link>
         }
       />
     </section>
   );
+}
+
+export async function moderatedDiscussionMetadata(): Promise<Metadata> {
+  return {
+    title: moderatedDiscussionCopy(await getRequestLocale()).title,
+    robots: { index: false, follow: false },
+  };
 }
 
 export async function ModeratedDiscussionScreen({
@@ -68,16 +89,20 @@ export async function ModeratedDiscussionScreen({
   for (const [key, value] of Object.entries((await searchParams) ?? {}))
     if (value !== undefined)
       for (const item of Array.isArray(value) ? value : [value]) params.append(key, item);
-  const href = `/admin/community/${encodeURIComponent(id)}/discussion${commentId ? `/${encodeURIComponent(commentId)}` : ""}${params.size ? `?${params}` : ""}`;
-  let sessionFailed = false;
-  const actor = await authService
-    .getSession((await cookies()).get("nexus_session")?.value)
-    .catch(() => {
-      sessionFailed = true;
-      return null;
-    });
-  if (sessionFailed) {
-    return <ModeratedDiscussionLoadError locale={locale} retryHref={href} />;
+  const stableHref = `/admin/community/${encodeURIComponent(id)}/discussion${commentId ? `/${encodeURIComponent(commentId)}` : ""}`;
+  const href = `${stableHref}${params.size ? `?${params}` : ""}`;
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={stableHref}
+      />
+    );
   }
   if (!actor) {
     return <PlatformSignIn locale={locale} returnPath={href} />;
@@ -85,11 +110,12 @@ export async function ModeratedDiscussionScreen({
   if (!can(actor, "admin.moderation")) {
     const dictionary = getDictionary(locale);
     return (
-      <div className="mx-auto min-w-0 max-w-5xl overflow-x-clip">
+      <div className={pageShellMax5xlBare}>
         <ErrorState
           title={general.denied}
+          description={general.deniedHint}
           action={
-            <Link href="/admin" className={navLinkClass}>
+            <Link href="/admin" className={linkAccentSm}>
               {dictionary.admin.title}
             </Link>
           }
@@ -132,15 +158,16 @@ export async function ModeratedDiscussionScreen({
       return <ModeratedDiscussionLoadError locale={locale} retryHref={href} />;
     }
     return (
-      <div className="mx-auto min-w-0 max-w-5xl overflow-x-clip">
+      <div className={pageShellMax5xlBare}>
         <ErrorState
           title={failure || general.unavailable}
+          description={copy.loadUnavailableHint}
           action={
             <div className="flex flex-wrap justify-center gap-4">
-              <a href={href} className={navLinkClass}>
+              <a href={href} className={linkAccentSm}>
                 {general.reload}
               </a>
-              <Link href={moderatedDiscussionHref(id)} className={navLinkClass}>
+              <Link href={moderatedDiscussionHref(id)} className={linkAccentSm}>
                 {copy.back}
               </Link>
             </div>
@@ -178,33 +205,24 @@ export async function ModeratedDiscussionScreen({
       <span>{copy.unknown}</span>
     );
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xlTight}>
       <header className="space-y-3">
-        <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
-        <p className="text-sm text-muted">{copy.description}</p>
-        <p className="break-words font-semibold text-primary">
+        <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
+        <p className={typeSmMuted}>{copy.description}</p>
+        <p className={typeBreakSemiboldPrimary}>
           {publication.title} · {general[publication.status]}
         </p>
-        <nav className="flex flex-wrap gap-4">
-          <Link
-            href={`/admin/community/${encodeURIComponent(id)}`}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+        <nav className={typeFlexWrapGap4}>
+          <Link href={`/admin/community/${encodeURIComponent(id)}`} className={linkAccentSm}>
             {copy.publication}
           </Link>
           {commentId && (
-            <Link
-              href={moderatedDiscussionHref(id)}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={moderatedDiscussionHref(id)} className={linkAccentSm}>
               {copy.back}
             </Link>
           )}
           {commentId && (
-            <Link
-              href={discussionReportsHref(id, commentId)}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={discussionReportsHref(id, commentId)} className={linkAccentSm}>
               {discussionReportsCopy(locale).open}
             </Link>
           )}
@@ -217,7 +235,7 @@ export async function ModeratedDiscussionScreen({
               action={moderatedDiscussionHref(id)}
               className="nexus-panel grid gap-3 p-5 sm:grid-cols-2"
             >
-              <label className="space-y-1 text-sm text-primary">
+              <label className={typeSpace1SmPrimary}>
                 <span>{general.search}</span>
                 <input
                   className={platformFieldClass}
@@ -227,7 +245,7 @@ export async function ModeratedDiscussionScreen({
                   defaultValue={params.get("q") ?? ""}
                 />
               </label>
-              <label className="space-y-1 text-sm text-primary">
+              <label className={typeSpace1SmPrimary}>
                 <span>{general.author}</span>
                 <input
                   className={platformFieldClass}
@@ -239,10 +257,7 @@ export async function ModeratedDiscussionScreen({
               <Button className="min-h-11" type="submit">
                 {general.apply}
               </Button>
-              <Link
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                href={moderatedDiscussionHref(id)}
-              >
+              <Link className={linkAccentSm} href={moderatedDiscussionHref(id)}>
                 {general.reset}
               </Link>
             </form>
@@ -250,16 +265,14 @@ export async function ModeratedDiscussionScreen({
           {data.items.length ? (
             <ul className="space-y-3">
               {data.items.map((item) => (
-                <li key={item.id} className="nexus-panel space-y-3 p-5">
-                  <p className="text-sm text-muted">
+                <li key={item.id} className={panelSpace3P5}>
+                  <p className={typeSmMuted}>
                     {identity(item.author)} · {date(item.createdAt)}
                   </p>
-                  <p className="whitespace-pre-wrap break-words text-sm text-primary">
-                    {item.text}
-                  </p>
+                  <p className={typePrewrapSmPrimary}>{item.text}</p>
                   <Link
                     href={moderatedDiscussionHref(id, undefined, undefined, item.id)}
-                    className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={linkAccentSm}
                   >
                     {copy.review}
                   </Link>
@@ -272,7 +285,7 @@ export async function ModeratedDiscussionScreen({
               description={emptyFiltered ? copy.emptyFilteredDescription : copy.emptyDescription}
               action={
                 emptyFiltered ? (
-                  <Link href={moderatedDiscussionHref(id)} className={navLinkClass}>
+                  <Link href={moderatedDiscussionHref(id)} className={linkAccentSm}>
                     {general.reset}
                   </Link>
                 ) : undefined
@@ -282,22 +295,22 @@ export async function ModeratedDiscussionScreen({
         </>
       ) : (
         <>
-          <section className="nexus-panel space-y-4 p-5">
+          <section className={panelSpace4P5}>
             {data.comment ? (
               <>
-                <h2 className="font-semibold text-primary">{copy.body}</h2>
-                <p className="text-sm text-muted">
+                <h2 className={typeSemiboldPrimary}>{copy.body}</h2>
+                <p className={typeSmMuted}>
                   {identity(data.comment.author)} · {date(data.comment.createdAt)}
                 </p>
                 {data.comment.parent && (
                   <blockquote className="space-y-2 border-l-2 border-base pl-3 text-sm text-muted">
                     <p>{copy.parent}</p>
-                    <p className="whitespace-pre-wrap break-words">{data.comment.parent}</p>
+                    <p className={typePrewrapBreak}>{data.comment.parent}</p>
                   </blockquote>
                 )}
                 <p className="whitespace-pre-wrap break-words text-primary">{data.comment.text}</p>
                 {data.comment.truncated && (
-                  <p role="status" className="text-sm text-muted">
+                  <p role="status" className={typeSmMuted}>
                     {copy.truncated}
                   </p>
                 )}
@@ -310,14 +323,14 @@ export async function ModeratedDiscussionScreen({
                 />
               </>
             ) : (
-              <p role="status" className="text-sm text-muted">
+              <p role="status" className={typeSmMuted}>
                 {copy.removed}
               </p>
             )}
           </section>
-          <section className="nexus-panel space-y-4 p-5">
-            <h2 className="font-semibold text-primary">{copy.history}</h2>
-            <p className="text-xs text-muted">{copy.historyHelp}</p>
+          <section className={panelSpace4P5}>
+            <h2 className={typeSemiboldPrimary}>{copy.history}</h2>
+            <p className={typeXsMuted}>{copy.historyHelp}</p>
             {data.history.length ? (
               <ul className="space-y-3">
                 {data.history.map((event) => (
@@ -329,10 +342,8 @@ export async function ModeratedDiscussionScreen({
                       {event.action === "content.comment_edited" ? copy.edited : copy.deleted} ·{" "}
                       {event.moderator ? copy.moderator : copy.owner}
                     </p>
-                    <p className="text-xs text-muted">{date(event.createdAt)}</p>
-                    {event.reason && (
-                      <p className="whitespace-pre-wrap break-words">{event.reason}</p>
-                    )}
+                    <p className={typeXsMuted}>{date(event.createdAt)}</p>
+                    {event.reason && <p className={typePrewrapBreak}>{event.reason}</p>}
                   </li>
                 ))}
               </ul>
@@ -342,7 +353,7 @@ export async function ModeratedDiscussionScreen({
           </section>
         </>
       )}
-      <nav aria-label={copy.title} className="flex flex-wrap gap-4">
+      <nav aria-label={copy.title} className={typeFlexWrapGap4}>
         <Link
           prefetch={false}
           href={moderatedDiscussionHref(
@@ -353,7 +364,7 @@ export async function ModeratedDiscussionScreen({
             undefined,
             commentId,
           )}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentSm}
         >
           {general.latest}
         </Link>
@@ -368,7 +379,7 @@ export async function ModeratedDiscussionScreen({
               data.nextCursor,
               commentId,
             )}
-            className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentSm}
           >
             {general.older}
           </Link>
@@ -376,4 +387,25 @@ export async function ModeratedDiscussionScreen({
       </nav>
     </div>
   );
+}
+
+export async function AdminModeratedDiscussionPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return ModeratedDiscussionScreen({ id: (await params).id, searchParams });
+}
+
+export async function AdminModeratedDiscussionCommentPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string; commentId: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const { id, commentId } = await params;
+  return ModeratedDiscussionScreen({ id, commentId, searchParams });
 }

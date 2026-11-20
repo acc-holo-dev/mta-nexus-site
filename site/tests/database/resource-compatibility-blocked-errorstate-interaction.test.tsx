@@ -15,12 +15,20 @@ const harness = vi.hoisted(() => ({
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
-vi.mock("../../src/components/locale-context", () => ({
-  useNexusLocale: () => ({ locale: harness.locale }),
-}));
+vi.mock("../../src/features/shell/locale", async () => {
+  const { getDictionary } = await import("../../src/lib/i18n");
+  return {
+    useNexusLocale: () => ({
+      locale: harness.locale,
+      dictionary: getDictionary(harness.locale),
+    }),
+  };
+});
 
 import { ResourceCompatibilityForm } from "../../src/features/resources/components/resource-compatibility-form";
-import { getResourceManagementCopy } from "../../src/lib/resource-management-i18n";
+import { getResourceManagementCopy } from "../../src/features/resources/resource-management-i18n";
+import { getResourcePublisherCopy } from "../../src/features/resources/resource-publisher-i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 const { render } = createResourceCompatibilityDraftInteractionHelpers(
   harness,
@@ -32,22 +40,25 @@ it.each(["en", "ru"] as const)(
   (locale) => {
     harness.locale = locale;
     const copy = getResourceManagementCopy(locale);
+    const readonly = getResourcePublisherCopy(locale).readonly;
+    const formErrorHint = getDictionary(locale).errors.formErrorHint;
     const nodes = render(suspended);
-    expect(nodes.some((node) => node.props.title === copy.errors.PRODUCT_STATE_CHANGED)).toBe(true);
+    expect(nodes.some((node) => node.props.title === readonly)).toBe(true);
     expect(
       nodes.some((node) => node.props.id === "resource-compatibility-suspended-readonly"),
     ).toBe(true);
     expect(
       nodes.some(
         (node) =>
-          node.props.title === copy.errors.PRODUCT_STATE_CHANGED &&
-          node.props.description !== undefined,
+          node.props.id === "resource-compatibility-suspended-readonly" &&
+          node.props.description === formErrorHint,
       ),
-    ).toBe(false);
+    ).toBe(true);
     expect(
       nodes.some(
         (node) =>
-          node.props.title === copy.errors.PRODUCT_STATE_CHANGED && node.props.action != null,
+          node.props.id === "resource-compatibility-suspended-readonly" &&
+          node.props.action != null,
       ),
     ).toBe(false);
     expect(findTestButton(nodes, copy.save).props.disabled).toBe(true);

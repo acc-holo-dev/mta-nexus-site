@@ -1,20 +1,17 @@
 import type { User } from "@nexus/domain";
-import { ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import Link from "next/link";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax5xl } from "../../shell/page-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import { type2xlBoldPrimary, typeMt2SmMuted } from "../../shell/type-shell";
 import { PublicationFeed } from "../publication-feed";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { publicationCopy } from "../../../lib/publication-feed-copy";
-import { publicationFeedView } from "../../../lib/publication-feed-view";
-import { authService } from "../../../lib/services/auth-service";
+import { publicationCopy } from "../publication-feed-copy";
+import { publicationFeedView } from "../publication-feed-view";
 
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
-const retryLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
-export async function generateMetadata(): Promise<Metadata> {
+export async function followingFeedMetadata(): Promise<Metadata> {
   const copy = publicationCopy(await getRequestLocale());
   return {
     title: copy.title,
@@ -22,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
     robots: { index: false, follow: false },
   };
 }
-export default async function FollowingFeedPage({
+export async function FollowingFeedPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -41,20 +38,12 @@ export default async function FollowingFeedPage({
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   } catch {
     return (
-      <div className={pageShellClass}>
-        <header>
-          <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
-          <p className="mt-2 text-sm text-muted">{copy.description}</p>
-        </header>
-        <ErrorState
-          title={copy.error}
-          action={
-            <Link href={returnPath} className={retryLinkClass}>
-              {copy.retry}
-            </Link>
-          }
-        />
-      </div>
+      <PlatformSessionError
+        locale={locale}
+        title={copy.title}
+        message={copy.error}
+        retryHref={returnPath}
+      />
     );
   }
   if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
@@ -63,12 +52,12 @@ export default async function FollowingFeedPage({
     await searchParams,
   );
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xl}>
       <header>
-        <h1 id="following-feed-heading" className="text-2xl font-bold text-primary">
+        <h1 id="following-feed-heading" className={type2xlBoldPrimary}>
           {copy.title}
         </h1>
-        <p className="mt-2 text-sm text-muted">{copy.description}</p>
+        <p className={typeMt2SmMuted}>{copy.description}</p>
       </header>
       <PublicationFeed
         key={`${actor.id}:${JSON.stringify(filters)}`}

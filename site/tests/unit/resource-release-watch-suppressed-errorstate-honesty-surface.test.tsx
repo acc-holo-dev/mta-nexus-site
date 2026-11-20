@@ -12,13 +12,17 @@ const source = readFileSync(
 
 it("locks suppressed/disabled release-watch notices to ErrorState and keeps success as status", () => {
   expect(source).toContain('import { Button, ErrorState } from "@nexus/ui"');
-  expect(source).toContain("{!commerceEnabled ? <ErrorState title={copy.suppressed} /> : null}");
-  expect(source).toContain("{disabledReason ? <ErrorState title={disabledReason} /> : null}");
+  expect(source).toContain("description={copy.suppressedHint}");
+  expect(source).toContain("description={copy.blockedHint}");
   expect(source).toContain(
     "{error ? <ErrorState title={error} description={copy.failedDescription} /> : null}",
   );
+  expect(source).toContain('id="resource-release-watch-pending"');
+  expect(source).toContain("title={copy.pendingNote}");
+  expect(source).toContain("description={copy.failedDescription}");
   expect(source).toContain('role="status"');
   expect(source).toContain("{copy.saved}");
+  expect(source).not.toContain('role="note" className="text-sm text-muted"');
   expect(source).not.toContain('role="note" className="text-sm text-warning"');
   expect(source).not.toContain('className="text-sm text-warning"');
   expect(source).not.toContain('role="alert"');

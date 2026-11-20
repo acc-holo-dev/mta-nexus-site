@@ -1,25 +1,25 @@
+import { createHash } from "node:crypto";
+import {
+  AppError,
+  type Order,
+  type OrderItem,
+  readOrderLineTerms,
+  validatePendingOrder,
+} from "@nexus/domain";
 import { and, asc, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
-  orders,
-  orderItems,
-  products,
+  auditEvents,
   builds,
   entitlements,
   licenses,
+  orderItems,
+  orders,
+  products,
   users,
-  auditEvents,
 } from "../schema";
-import {
-  AppError,
-  readOrderLineTerms,
-  validatePendingOrder,
-  type Order,
-  type OrderItem,
-} from "@nexus/domain";
-import { createHash } from "node:crypto";
-import { historyPageBounds } from "./history-pagination";
 import { safePublishedBuildCondition, trustedCleanScanCondition } from "./build-safety";
+import { historyPageBounds } from "./history-pagination";
 
 export class OrderRepository {
   /** Buyer-scoped receipt: historical line prices and current access are separate. */

@@ -24,19 +24,19 @@ const h = vi.hoisted(() => ({
   })),
 }));
 vi.mock("react", (original) => mockReactHooks(h)(original));
-vi.mock("../../src/components/locale-context", async () => {
+vi.mock("../../src/features/shell/locale", async () => {
   const { getDictionary } = await import("../../src/lib/i18n");
   return { useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }) };
 });
-vi.mock("../../src/lib/support-retry", () => ({
+vi.mock("../../src/features/support/support-retry", () => ({
   resolveSupportRetryActorScope: h.scope,
   reserveSupportCaseRetry: h.caseReserve,
   reserveSupportReplyRetry: h.replyReserve,
   clearSupportRetry: h.clear,
 }));
 
-import { SupportCaseThread } from "../../src/features/support/thread";
 import { SupportCenter } from "../../src/features/support/center";
+import { SupportCaseThread } from "../../src/features/support/thread";
 
 const { render, renderThread, fillCaseForm, caseForm, loadOpenThread, fillReply, replyForm } =
   createSupportActorBindingInteractionHelpers(h, SupportCenter, SupportCaseThread);

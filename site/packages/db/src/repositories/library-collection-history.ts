@@ -1,27 +1,27 @@
-import { recordedCollectionReceipt } from "./library-collection-receipt-proof";
 import {
   AppError,
   collectionCommandProductIds,
-  NotFoundError,
   LIBRARY_COLLECTION_HISTORY_ACTIONS,
   LIBRARY_COLLECTION_HISTORY_DAYS,
-  type LibraryCollectionHistoryQuery,
   type LibraryCollectionHistoryPage,
+  type LibraryCollectionHistoryQuery,
   type LibraryCollectionReceipt,
+  NotFoundError,
 } from "@nexus/domain";
 import { libraryCollectionIdSchema } from "@nexus/validation";
 import { and, count, desc, eq, gte, inArray, lte, or, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
-  libraryCollectionReceipts as receipts,
-  libraryCollections as collections,
-  users,
-  products,
   builds,
+  libraryCollections as collections,
+  products,
+  libraryCollectionReceipts as receipts,
+  users,
 } from "../schema";
-import { historyPageBounds } from "./history-pagination";
-import { effectiveUserDownloadSources } from "./user-library";
 import { safePublishedBuildCondition } from "./build-safety";
+import { historyPageBounds } from "./history-pagination";
+import { recordedCollectionReceipt } from "./library-collection-receipt-proof";
+import { effectiveUserDownloadSources } from "./user-library";
 
 function validateLibraryCollectionHistoryQuery(query: LibraryCollectionHistoryQuery) {
   if (

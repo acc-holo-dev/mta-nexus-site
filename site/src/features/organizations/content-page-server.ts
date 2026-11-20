@@ -1,3 +1,3 @@
 import "server-only";
 
-export { default, generateMetadata } from "./server/content-page";
+export { OrganizationPublications, organizationPublicationsMetadata } from "./server/content-page";

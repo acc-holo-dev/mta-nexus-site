@@ -9,29 +9,43 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const formComponents = [
   "site/src/features/accounts/components/account-controls.tsx",
-  "site/src/components/subscription-controls.tsx",
-  "site/src/components/subscription-fee-estimator.tsx",
-  "site/src/components/commercial-fee-calculator.tsx",
-  "site/src/components/commercial-plan-form.tsx",
-  "site/src/components/plan-review-form.tsx",
-  "site/src/components/order-case-forms.tsx",
-  "site/src/components/order-cancellation-form.tsx",
+  "site/src/features/commerce/components/subscription-controls.tsx",
+  "site/src/features/commerce/components/subscription-fee-estimator.tsx",
+  "site/src/features/commerce/components/commercial-fee-calculator.tsx",
+  "site/src/features/commerce/components/commercial-plan-form.tsx",
+  "site/src/features/commerce/components/plan-review-form.tsx",
+  "site/src/features/commerce/components/order-case-forms.tsx",
+  "site/src/features/commerce/components/order-cancellation-form.tsx",
   "site/src/features/resources/components/resource-cart-controls.tsx",
   "site/src/features/resources/components/resource-download-button.tsx",
-  "site/src/components/license-control-panel.tsx",
-  "site/src/components/license-runtime-probe.tsx",
+  "site/src/features/commerce/components/license-control-panel.tsx",
+  "site/src/features/commerce/components/license-runtime-probe.tsx",
   "site/src/features/organizations/components/organization-ownership-transfer.tsx",
   "site/src/features/servers/components/register-server-form.tsx",
-  "site/src/components/storage-maintenance-controls.tsx",
+  "site/src/features/moderation/components/storage-maintenance-controls.tsx",
 ] as const;
 
 it("locks commerce and account form failures to ErrorState with touch CTAs", () => {
   for (const path of formComponents) {
     const source = read(path);
     expect(source, path).toContain("ErrorState");
-    expect(source, path).toMatch(/min-h-11|size="touch"/u);
+    expect(source, path).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
     expect(source, path).not.toContain('role="alert"');
   }
+});
+
+it("locks subscription and plan-review frozen recovery to ErrorState", () => {
+  const subscription = read("site/src/features/commerce/components/subscription-controls.tsx");
+  expect(subscription).toContain('id="subscription-controls-frozen"');
+  expect(subscription).toContain("title={c.frozen}");
+  expect(subscription).toContain("description={c.retry}");
+  expect(subscription).not.toMatch(/frozen && ready === scope && \(\s*<p role="note"/u);
+
+  const planReview = read("site/src/features/commerce/components/plan-review-form.tsx");
+  expect(planReview).toContain('id="plan-review-form-frozen"');
+  expect(planReview).toContain("title={c.frozen}");
+  expect(planReview).toContain("description={c.retry}");
+  expect(planReview).not.toMatch(/frozen \? \(\s*<p role="note"/u);
 });
 
 it("locks register server native controls to fieldControlClass without h-10 chrome", () => {
@@ -46,14 +60,18 @@ it("locks register server native controls to fieldControlClass without h-10 chro
 it("keeps additive formErrorHint / errorHint copy for commerce and account honesty", () => {
   expect(read("site/src/lib/i18n/en/chrome.ts")).toContain("errorHint:");
   expect(read("site/src/lib/i18n/ru/chrome.ts")).toContain("errorHint:");
-  expect(read("site/src/lib/subscriptions-i18n.ts")).toContain("formErrorHint:");
-  expect(read("site/src/lib/commercial-i18n.ts")).toContain("formErrorHint:");
-  expect(read("site/src/lib/order-case-i18n.ts")).toContain("formErrorHint:");
-  expect(read("site/src/lib/plan-reviews-i18n.ts")).toContain("formErrorHint:");
-  expect(read("site/src/lib/resource-commerce-i18n.ts")).toContain("formErrorHint:");
-  expect(read("site/src/lib/license-control-i18n.ts")).toContain("formErrorHint:");
-  expect(read("site/src/lib/organization-governance-copy.ts")).toContain("formErrorHint:");
-  expect(read("site/src/lib/storage-maintenance-i18n.ts")).toContain("formErrorHint:");
+  expect(read("site/src/features/commerce/subscriptions-i18n.ts")).toContain("formErrorHint:");
+  expect(read("site/src/features/commerce/commercial-i18n.ts")).toContain("formErrorHint:");
+  expect(read("site/src/features/commerce/order-case-i18n.ts")).toContain("formErrorHint:");
+  expect(read("site/src/features/commerce/plan-reviews-i18n.ts")).toContain("formErrorHint:");
+  expect(read("site/src/features/resources/resource-commerce-i18n.ts")).toContain("formErrorHint:");
+  expect(read("site/src/features/commerce/license-control-i18n.ts")).toContain("formErrorHint:");
+  expect(read("site/src/features/organizations/organization-governance-copy.ts")).toContain(
+    "formErrorHint:",
+  );
+  expect(read("site/src/features/moderation/storage-maintenance-i18n.ts")).toContain(
+    "formErrorHint:",
+  );
   expect(read("site/src/lib/i18n/en/publishing.ts")).toContain("formErrorHint:");
   expect(read("site/src/lib/i18n/ru/publishing.ts")).toContain("formErrorHint:");
   expect(read("site/src/lib/i18n/en/product.ts")).toContain("downloadErrorHint:");
@@ -61,20 +79,28 @@ it("keeps additive formErrorHint / errorHint copy for commerce and account hones
 });
 
 it("locks license bind noServers empty to EmptyState with honesty hint copy", () => {
-  const panel = read("site/src/components/license-control-panel.tsx");
+  const panel = read("site/src/features/commerce/components/license-control-panel.tsx");
   expect(panel).toContain("EmptyState");
   expect(panel).toContain("copy.noServers");
   expect(panel).toContain("copy.noServersHint");
   expect(panel).not.toMatch(/<p className="text-sm text-muted">\{copy\.noServers\}<\/p>/u);
 
-  const i18n = read("site/src/lib/license-control-i18n.ts");
+  const i18n = read("site/src/features/commerce/license-control-i18n.ts");
   expect(i18n).toContain("noServers:");
   expect(i18n).toContain("noServersHint:");
   expect(i18n.match(/noServersHint:/gu)?.length).toBe(2);
 });
 
+it("locks license runtime releaseEmpty to EmptyState with formErrorHint", () => {
+  const probe = read("site/src/features/commerce/components/license-runtime-probe.tsx");
+  expect(probe).toContain("EmptyState");
+  expect(probe).toContain("title={copy.releaseEmpty}");
+  expect(probe).toContain("description={copy.formErrorHint}");
+  expect(probe).not.toContain('<p className="text-sm text-muted">{copy.releaseEmpty}</p>');
+});
+
 it("locks license control ghost pagination and token CTAs to size=touch", () => {
-  const panel = read("site/src/components/license-control-panel.tsx");
+  const panel = read("site/src/features/commerce/components/license-control-panel.tsx");
   expect(panel).toContain('size="touch"');
   expect(panel).not.toContain('size="sm"');
   expect(panel.match(/size="touch"/gu)?.length ?? 0).toBeGreaterThanOrEqual(6);

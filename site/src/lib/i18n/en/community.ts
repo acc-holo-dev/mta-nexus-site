@@ -41,6 +41,14 @@ export const community = {
     topicOpenSaved: "Open saved topic in workspace",
     topicActorChanged:
       "The signed-in account changed. The previous account's pending submission is hidden.",
+    topicValidationError: "Check the title, message, and tags, then try again.",
+    topicForbidden: "You do not have permission to create a topic.",
+    topicConflict: "A similar topic already exists. Change the title and retry.",
+    topicRateLimited: "Too many attempts. Wait a moment and retry.",
+    topicRequestTimeout:
+      "The server did not confirm publication in time. The topic may not exist yet — check the list and retry if needed.",
+    topicPublishSignIn: "Sign in to publish a topic.",
+    topicServerNotFound: "The linked server was not found.",
   },
   explore: {
     title: "Explore the MTA ecosystem",
@@ -83,6 +91,8 @@ export const community = {
     profileDescription: "MTA Nexus profile of",
     loading: "Loading profile…",
     loadUnavailable: "This profile is temporarily unavailable. Please try again.",
+    loadUnavailableHint:
+      "Retry reloads this profile only. A temporary load failure is not an empty profile or missing resources.",
     verifiedMember: "Verified member",
     memberFallback: "MTA community member and platform explorer.",
     joined: "Joined",
@@ -98,6 +108,8 @@ export const community = {
     loading: "Loading organization…",
     loadUnavailable:
       "This organization is temporarily unavailable. This does not mean the team has no public work.",
+    loadUnavailableHint:
+      "Retry reloads this organization profile only. A temporary load failure is not an empty portfolio.",
     fallback: "MTA community, creator collective, or resource publisher.",
     releases: "Releases",
     marketplaceReleases: "Marketplace releases",
@@ -112,6 +124,8 @@ export const community = {
       "Open and track NEXUS support cases in one place. Cases keep their context and message history.",
     noGuaranteedSla:
       "Open free beta: response times are not guaranteed yet. Critical security incidents are prioritized.",
+    noGuaranteedSlaHint:
+      "This notice does not open or change a support case. Staff triage critical security incidents first.",
     staffQueue: "Support queue",
     staffFilters: "Filter support cases",
     filterStatus: "Status",
@@ -128,6 +142,8 @@ export const community = {
     create: "Create case",
     creating: "Creating...",
     loadError: "Could not load support cases.",
+    loadErrorHint:
+      "Retry reloads this support case list only. A temporary load failure is not an empty support inbox.",
     createError: "Could not create the support case.",
     authRequired: "Sign in to create and track support cases.",
     signIn: "Sign in",
@@ -135,6 +151,8 @@ export const community = {
     loading: "Loading support cases...",
     caseLoading: "Loading this support case...",
     caseLoadError: "Could not load this support case.",
+    caseLoadErrorHint:
+      "Retry reloads this support case thread only. A temporary load failure is not a closed or empty case.",
     historyLoading: "Loading status history...",
     empty: "No support cases yet.",
     open: "Open",

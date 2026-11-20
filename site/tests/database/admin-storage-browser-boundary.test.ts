@@ -1,14 +1,14 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
 }));
-vi.mock("../../src/lib/services/storage-maintenance-service", () => ({
+vi.mock("../../src/lib/services/moderation/storage-maintenance-service", () => ({
   storageMaintenanceService: { discover: vi.fn(), cleanup: vi.fn() },
 }));
 

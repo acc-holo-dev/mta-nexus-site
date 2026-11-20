@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => ({ id: "usr_owner" })),
@@ -17,27 +17,26 @@ const authService = vi.hoisted(() => ({
   confirmPasswordReset: vi.fn(),
 }));
 const consumeRateLimit = vi.hoisted(() => vi.fn(async () => ({ success: true })));
-vi.mock("../../src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit }));
-vi.mock("@nexus/db", () => ({ organizationRepository: {} }));
-vi.mock("../../src/lib/request-client-ip", () => ({
+vi.mock("../../src/features/shell/request-client-ip", () => ({
   getTrustedRequestIp: () => "unknown",
 }));
 
+import { POST as context } from "../../src/app/api/auth/context/route";
+import {
+  PATCH as emailConfirm,
+  POST as emailRequest,
+} from "../../src/app/api/auth/email-verification/route";
 import { POST as login } from "../../src/app/api/auth/login/route";
+import { POST as password } from "../../src/app/api/auth/password/route";
+import {
+  PATCH as resetConfirm,
+  POST as resetRequest,
+} from "../../src/app/api/auth/password-reset/route";
 import { POST as register } from "../../src/app/api/auth/register/route";
 import { DELETE as logout } from "../../src/app/api/auth/session/route";
 import { DELETE as revoke } from "../../src/app/api/auth/sessions/route";
-import { POST as password } from "../../src/app/api/auth/password/route";
-import { POST as context } from "../../src/app/api/auth/context/route";
-import {
-  POST as emailRequest,
-  PATCH as emailConfirm,
-} from "../../src/app/api/auth/email-verification/route";
-import {
-  POST as resetRequest,
-  PATCH as resetConfirm,
-} from "../../src/app/api/auth/password-reset/route";
 import { proxy } from "../../src/proxy";
 
 const mutations = [

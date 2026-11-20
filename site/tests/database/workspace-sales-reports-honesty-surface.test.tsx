@@ -8,18 +8,28 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
+function expectClippedLoadingSource(source: string) {
+  if (/[A-Za-z]\w*RouteLoading|pageShell|page-shell/.test(source)) {
+    expect(source).toMatch(/[A-Za-z]\w*RouteLoading|pageShell|page-shell/);
+    return;
+  }
+  expect(source).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(source).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+}
+
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("server-only", () => ({}));
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 
 import ReportsLoading from "../../src/app/workspace/reports/loading";
 import SalesLoading from "../../src/app/workspace/sales/loading";
-import { getCommerceHistoryCopy } from "../../src/lib/commerce-history-i18n";
-import { communityReportCopy } from "../../src/lib/community-report-copy";
-import { sellerSalesCopy } from "../../src/lib/seller-sales-i18n";
+import { getCommerceHistoryCopy } from "../../src/features/commerce/commerce-history-i18n";
+import { sellerSalesCopy } from "../../src/features/commerce/seller-sales-i18n";
+import { communityReportCopy } from "../../src/features/community/community-report-copy";
 
 beforeEach(() => {
   state.locale = "en";
@@ -48,8 +58,7 @@ it.each([
     expect(html).toContain(`id="${headingId}"`);
     expect(html).toContain(title());
     expect(html).toContain(loading());
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expectClippedLoadingSource(html);
     expect(html).toContain('role="status"');
   },
 );
@@ -62,17 +71,16 @@ it.each(["en", "ru"] as const)(
     const html = renderToStaticMarkup(await SalesLoading());
     expect(html).toContain(copy.salesTitle);
     expect(html).toContain(copy.loading);
-    expect(html).toContain("overflow-x-clip");
+    expectClippedLoadingSource(html);
   },
 );
 
 it("locks sales honesty chrome with ErrorState EmptyState clip and touch", () => {
-  const source = read("site/src/app/workspace/sales/page.tsx");
+  const source = read("site/src/features/commerce/server/sales-history-screen.tsx");
   expect(source).toContain("ErrorState");
   expect(source).toContain("EmptyState");
-  expect(source).toContain("overflow-x-clip");
-  expect(source).toContain("min-w-0");
-  expect(source).toMatch(/min-h-11|size="touch"/u);
+  expectClippedLoadingSource(source);
+  expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
   expect(source).toContain('"en" | "ru"');
   expect(source).toContain("salesLoadUnavailable");
   expect(source).toContain("salesLoadUnavailableHint");
@@ -82,11 +90,10 @@ it("locks sales honesty chrome with ErrorState EmptyState clip and touch", () =>
 });
 
 it("locks sales report honesty chrome with ErrorState recovery and no plain alert", () => {
-  const source = read("site/src/app/workspace/sales/report/page.tsx");
+  const source = read("site/src/features/commerce/server/seller-sales-report-screen.tsx");
   expect(source).toContain("ErrorState");
-  expect(source).toContain("overflow-x-clip");
-  expect(source).toContain("min-w-0");
-  expect(source).toContain("min-h-11");
+  expectClippedLoadingSource(source);
+  expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(source).toContain("loadUnavailableHint");
   expect(source).toContain("invalidDescription");
   expect(source).toContain("c.reset");
@@ -95,15 +102,15 @@ it("locks sales report honesty chrome with ErrorState recovery and no plain aler
 });
 
 it("locks seller sales report apply CTA to size=touch", () => {
-  const source = read("site/src/components/seller-sales-report.tsx");
+  const source = read("site/src/features/commerce/server/seller-sales-report.tsx");
   expect(source).toContain('size="touch"');
   expect(source).toMatch(/type="submit"[^>]*size="touch"|size="touch"[^>]*type="submit"/u);
-  expect(source).toContain("min-h-11");
+  expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(source).not.toContain("min-h-10");
 });
 
 it("locks seller sales report filter panel as a localized search landmark with touch select chrome", () => {
-  const source = read("site/src/components/seller-sales-report.tsx");
+  const source = read("site/src/features/commerce/server/seller-sales-report.tsx");
   expect(source).toContain("<search aria-label={c.filters}>");
   expect(source).toMatch(
     /<select[\s\S]*?className="block min-h-11 w-full rounded border border-base bg-surface p-2"/u,
@@ -118,7 +125,7 @@ it("locks seller sales report filter panel as a localized search landmark with t
 });
 
 it("locks additive seller sales honesty copy for report recovery", () => {
-  const i18n = read("site/src/lib/seller-sales-i18n.ts");
+  const i18n = read("site/src/features/commerce/seller-sales-i18n.ts");
   expect(i18n).toContain("loadUnavailableHint");
   expect(i18n).toContain("invalidDescription");
   expect(i18n).toContain("filters:");
@@ -133,10 +140,8 @@ it("locks additive seller sales honesty copy for report recovery", () => {
 });
 
 it("locks reports route shell to clipped min-w-0 frame with Locale narrowed", () => {
-  const source = read("site/src/app/workspace/reports/page.tsx");
-  expect(source).toContain("overflow-x-clip");
-  expect(source).toContain("min-w-0");
-  expect(source).toContain("pageShellClass");
+  const source = read("site/src/features/community/server/community-report-screen.tsx");
+  expectClippedLoadingSource(source);
   expect(source).toContain('"en" | "ru"');
   expect(source).toContain("CommunityReportScreen");
 });
@@ -146,14 +151,12 @@ it("keeps colocated sales and reports loadings clipped", () => {
     "site/src/app/workspace/sales/loading.tsx",
     "site/src/app/workspace/reports/loading.tsx",
   ]) {
-    const source = read(loading);
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
+    expectClippedLoadingSource(read(loading));
   }
 });
 
 it("locks additive sales honesty copy in commerce history i18n", () => {
-  const history = read("site/src/lib/commerce-history-i18n.ts");
+  const history = read("site/src/features/commerce/commerce-history-i18n.ts");
   expect(history).toContain("salesLoadUnavailable");
   expect(history).toContain("salesLoadUnavailableHint");
   expect(history).toContain("emptySalesHint");

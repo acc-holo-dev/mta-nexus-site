@@ -15,7 +15,7 @@ it("locks resource compatibility suspended readonly notice to ErrorState without
   expect(source).toContain('import { Button, ErrorState, Input } from "@nexus/ui"');
   expect(source).toContain('id="resource-compatibility-suspended-readonly"');
   expect(source).toContain(
-    '<ErrorState\n          id="resource-compatibility-suspended-readonly"\n          title={getResourcePublisherCopy(locale).readonly}\n        />',
+    '<ErrorState\n          id="resource-compatibility-suspended-readonly"\n          title={getResourcePublisherCopy(locale).readonly}\n          description={dictionary.errors.formErrorHint}\n        />',
   );
   expect(source).not.toMatch(
     /product\.suspended\s*\?\s*getResourcePublisherCopy\(locale\)\.readonly\s*:\s*getResourcePublisherCopy\(locale\)\.editNote/u,

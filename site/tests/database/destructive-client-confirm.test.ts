@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { getDiscussionCopy } from "../../src/lib/content-discussion-copy";
-import { reactionCopy } from "../../src/lib/content-reaction-copy";
+import { getDiscussionCopy } from "../../src/features/community/content-discussion-copy";
+import { reactionCopy } from "../../src/features/community/content-reaction-copy";
+import { getResourceCommerceCopy } from "../../src/features/resources/resource-commerce-i18n";
+import { resourceMediaCopy } from "../../src/features/resources/resource-media-i18n";
 import { getDictionary } from "../../src/lib/i18n";
-import { getResourceCommerceCopy } from "../../src/lib/resource-commerce-i18n";
-import { resourceMediaCopy } from "../../src/lib/resource-media-i18n";
 
 const locales = ["en", "ru"] as const;
 

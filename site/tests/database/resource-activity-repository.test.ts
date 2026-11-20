@@ -1,6 +1,6 @@
+import type { Build } from "@nexus/domain";
 import { getTableColumns } from "drizzle-orm";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import type { Build } from "@nexus/domain";
 
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
@@ -27,11 +27,12 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
+
+import { db } from "../../packages/db/src/client";
+import { claimFreeResourceInTransaction } from "../../packages/db/src/repositories/entitlements";
+import { OrderRepository } from "../../packages/db/src/repositories/orders";
 import { ResourceActivityRepository } from "../../packages/db/src/repositories/resource-activity";
 import { ResourceDownloadAuthorizationRepository } from "../../packages/db/src/repositories/resource-download-authorization";
-import { OrderRepository } from "../../packages/db/src/repositories/orders";
-import { claimFreeResourceInTransaction } from "../../packages/db/src/repositories/entitlements";
-import { db } from "../../packages/db/src/client";
 import { builds, entitlements } from "../../packages/db/src/schema";
 
 const activity = new ResourceActivityRepository(),

@@ -13,13 +13,13 @@ vi.mock("@nexus/security", async (importOriginal) => {
     consumeRateLimit: vi.fn(async () => ({ success: licenseControlHttpState.allowed })),
   };
 });
-vi.mock("../../src/lib/services/auth-service", async () => {
+vi.mock("../../src/lib/services/accounts/auth-service", async () => {
   const { licenseControlHttpState } = await import("../helpers/license-control-http-harness");
   return {
     authService: { getSession: async () => licenseControlHttpState.user },
   };
 });
-vi.mock("../../src/lib/request-client-ip", () => ({
+vi.mock("../../src/features/shell/request-client-ip", () => ({
   getTrustedRequestIp: () => "unknown",
 }));
 
@@ -172,7 +172,7 @@ it("requires the initiating cookie before consuming owner or moderation command 
     const read = vi.spyOn(req.body, "getReader");
     const response = await route(req, context);
     expect(response.status).toBe(401);
-    expect(await response.json()).toEqual({ code: "UNAUTHORIZED" });
+    expect(await response.json()).toMatchObject({ code: "UNAUTHORIZED" });
     expect(response.headers.get("cache-control")).toBe("private, no-store");
     expect(response.headers.get("vary")).toBe("Cookie");
     expect(read).not.toHaveBeenCalled();

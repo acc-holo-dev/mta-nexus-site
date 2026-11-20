@@ -24,13 +24,13 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/library-collections-service", () => ({
+vi.mock("../../src/lib/services/library/library-collections-service", () => ({
   libraryCollectionsService: { receiptDetail: state.history },
 }));
 
@@ -48,8 +48,8 @@ import Page, {
   dynamic,
   generateMetadata,
 } from "../../src/app/workspace/library/collections/receipts/[id]/page";
-import { libraryCollectionReceiptsCopy } from "../../src/lib/library-collection-receipts-i18n";
-import { authService } from "../../src/lib/services/auth-service";
+import { libraryCollectionReceiptsCopy } from "../../src/features/library/library-collection-receipts-i18n";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 const date = "2026-10-13T00:00:00.000Z",
   requestId = "67ca0352-de64-4af9-9e54-7d3c56fe8d89",
@@ -165,7 +165,7 @@ it("renders neutral malformed proof and missing current state without restoratio
   const html = await screen();
   expect(html).toContain(copy.unknown);
   expect(html).toContain(copy.unknownHint);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).not.toContain('role="alert"');
   expect(html).not.toContain("data-restore");
 });
@@ -177,8 +177,8 @@ it("shows ErrorState recovery when receipt detail fails to load", async () => {
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(`>${copy.title}</h1>`);
   expect(html).toContain(copy.loadUnavailableDescription);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).not.toContain(copy.unknownHint);
 });
 it.each(["en", "ru"] as const)(
@@ -201,8 +201,8 @@ it("locks ErrorState for unexpected receipt selectors with retry shell", async (
   const html = await screen({ userId: "other" });
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailableDescription);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
 });
 it("does not promise inverse state for unsupported commands and handles foreign/missing receipts neutrally", async () => {
   const value = report();

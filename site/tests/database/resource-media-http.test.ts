@@ -3,11 +3,11 @@ import { Readable } from "node:stream";
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import images from "../fixtures/resource-images.json";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../helpers/browser-mutation-headers";
-import images from "../fixtures/resource-images.json";
 
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a" } as { id: string } | null,
@@ -21,18 +21,18 @@ const state = vi.hoisted(() => ({
 vi.mock("@nexus/db", () => ({ resourceMediaRepository: { authorizeImage: state.authorize } }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
 vi.mock("@nexus/storage", () => ({ storageService: { getDownloadStream: state.storage } }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/services/resource-media-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-media-service", () => ({
   resourceMediaService: { managed: state.managed, upload: state.upload, command: state.command },
 }));
-vi.mock("../../src/lib/request-client-ip", () => ({
+vi.mock("../../src/features/shell/request-client-ip", () => ({
   getTrustedRequestIp: () => "trusted-ip",
 }));
 
 import { GET, PATCH, POST } from "../../src/app/api/products/[id]/media/route";
-import { resourceMediaImage } from "../../src/lib/resource-media-image-http";
+import { resourceMediaImage } from "../../src/features/resources/resource-media-image-http";
 
 const stamp = "2026-10-11T00:00:00.000Z",
   context = { params: Promise.resolve({ id: "prd_a" }) };

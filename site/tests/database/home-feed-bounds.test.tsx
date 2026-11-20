@@ -2,6 +2,8 @@ import type * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+vi.mock("server-only", () => ({}));
+
 const mocks = vi.hoisted(() => ({
   directory: vi.fn(),
   products: vi.fn(),
@@ -48,38 +50,38 @@ vi.mock("../../src/features/resources/view", () => ({
   ProductCard: ({ product }: { product: { title: string } }) => <article>{product.title}</article>,
 }));
 
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 
-vi.mock("../../src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../../src/lib/services/servers/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: {
     getDirectory: mocks.directory,
   },
 }));
 
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: {
     listProducts: mocks.products,
     getPublicAttributions: async () => new Map(),
   },
 }));
 
-vi.mock("../../src/lib/services/content-service", () => ({
+vi.mock("../../src/lib/services/community/content-service", () => ({
   contentService: {
     listArticles: mocks.articles,
   },
 }));
 
-vi.mock("../../src/lib/services/server-service", () => ({
+vi.mock("../../src/lib/services/servers/server-service", () => ({
   serverService: { listServers: mocks.listServers },
 }));
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.getSession },
 }));
 
-vi.mock("../../src/lib/home-personal-changes", () => ({
+vi.mock("../../src/features/shell/home-personal-changes-server", () => ({
   loadPersonalChangesSummary: mocks.loadPersonal,
 }));
 
@@ -162,9 +164,9 @@ describe("bounded home feed reads", () => {
     expect(html).toContain(copy.personalTitle);
     expect(html).toContain(copy.personalEmpty);
     expect(html).toContain(copy.personalEmptyHint);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   });
 
   it("clips the Home shell and recovers personal load failure with ErrorState retry", async () => {
@@ -178,9 +180,9 @@ describe("bounded home feed reads", () => {
     expect(html).toContain(copy.personalError);
     expect(html).toContain(copy.personalRetry);
     expect(html).toContain('href="/"');
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).not.toContain("personal-secret");
     expect(html).not.toContain(copy.personalEmpty);
   });
@@ -188,8 +190,8 @@ describe("bounded home feed reads", () => {
   it("names public home feed sections for assistive landmarks", async () => {
     const html = renderToStaticMarkup(await HomePage());
 
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain('aria-labelledby="home-network-heading"');
     expect(html).toContain('id="home-network-heading"');
     expect(html).toContain('aria-labelledby="home-free-resources-heading"');

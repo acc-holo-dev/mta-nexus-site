@@ -1,11 +1,11 @@
-import { and, eq, isNull, sql } from "drizzle-orm";
 import {
   AppError,
-  NotFoundError,
-  UnauthorizedError,
   type AuditEvent,
   type Comment,
+  NotFoundError,
+  UnauthorizedError,
 } from "@nexus/domain";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, comments, content, discussionNotificationDeliveries, users } from "../schema";
 import { lockInitiatingSession } from "./initiating-session";

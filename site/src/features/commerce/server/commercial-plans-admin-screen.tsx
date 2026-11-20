@@ -1,0 +1,196 @@
+import { AppError } from "@nexus/domain";
+import { EmptyState, ErrorState } from "@nexus/ui";
+import { CreditCard } from "lucide-react";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { commercialPlanService } from "../../../lib/services/commerce/commercial-plan-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm, linkMinH } from "../../shell/link-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelMinSpace2P5 } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapCenterBetweenGap3,
+  typeFlexWrapGap3,
+  typeFlexWrapGap4Sm,
+  typeSmPrimary,
+  typeSmSecondary,
+} from "../../shell/type-shell";
+import { formatHistoryAmount, parseHistoryPage } from "../commerce-history-format";
+import { getCommercialCopy } from "../commercial-i18n";
+
+export async function commercialPlansAdminMetadata(): Promise<Metadata> {
+  return {
+    title: `${getCommercialCopy(await getRequestLocale()).admin} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
+export async function CommercialPlansAdminScreen({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string | string[]; page?: string | string[] }>;
+}) {
+  const [locale, store, query] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
+  const copy = getCommercialCopy(locale);
+  const dictionary = getDictionary(locale);
+  let user: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    user = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={dictionary.errors.title}
+        message={copy.loadUnavailable}
+        retryHref={"/admin/commerce/plans"}
+      />
+    );
+  }
+
+  if (!user) return <PlatformSignIn locale={locale} returnPath="/admin/commerce/plans" />;
+  if (user.role !== "admin") notFound();
+  const status = (["draft", "published", "archived"] as const).find(
+    (value) => value === query.status,
+  );
+  const pageNumber = Math.min(parseHistoryPage(query.page), 1000);
+  const filtersActive = Boolean(status);
+  const returnHref = (() => {
+    const params = new URLSearchParams({
+      ...(status ? { status } : {}),
+      ...(pageNumber > 1 ? { page: String(pageNumber) } : {}),
+    });
+    return params.size ? `/admin/commerce/plans?${params}` : "/admin/commerce/plans";
+  })();
+  let forbidden = false;
+  const result = await commercialPlanService.adminPage(user, pageNumber, status).catch((error) => {
+    if (error instanceof AppError && error.statusCode === 403) {
+      forbidden = true;
+      return null;
+    }
+    return null;
+  });
+  if (forbidden) notFound();
+  const href = (page: number) =>
+    `?${new URLSearchParams({ ...(status ? { status } : {}), page: String(page) })}`;
+
+  if (!result) {
+    return (
+      <div className={pageShellMax5xl}>
+        <Link href="/admin" className={linkAccentSm}>
+          {copy.adminBack}
+        </Link>
+        <ErrorState
+          title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
+          action={
+            <Link href={returnHref} className={linkAccentSm}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className={pageShellMax5xl}>
+      <Link href="/admin" className={linkAccentSm}>
+        {copy.adminBack}
+      </Link>
+      <header className={typeFlexWrapCenterBetweenGap3}>
+        <h1 className={typeDisplayPrimary}>{copy.admin}</h1>
+        <Link
+          href="/admin/commerce/plans/new"
+          className="inline-flex min-h-11 items-center justify-center rounded-lg bg-accent px-4 text-sm font-medium text-white shadow-nexus-sm transition-colors hover:bg-[var(--nexus-accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]"
+        >
+          {copy.newPlan}
+        </Link>
+      </header>
+      <p role="note" className={typeSmSecondary}>
+        {copy.planNote}
+      </p>
+      <nav aria-label={copy.status} className={typeFlexWrapGap3}>
+        <Link
+          href="/admin/commerce/plans"
+          aria-current={!status ? "page" : undefined}
+          className={linkAccentSm}
+        >
+          {copy.all}
+        </Link>
+        {(["draft", "published", "archived"] as const).map((value) => (
+          <Link
+            key={value}
+            href={`?status=${value}`}
+            aria-current={status === value ? "page" : undefined}
+            className={linkAccentSm}
+          >
+            {copy[value]}
+          </Link>
+        ))}
+        {filtersActive ? (
+          <Link href="/admin/commerce/plans" className={linkAccentSm}>
+            {copy.clearFilters}
+          </Link>
+        ) : null}
+      </nav>
+      {result.plans.length ? (
+        <ul className="space-y-3">
+          {result.plans.map((plan) => (
+            <li key={plan.id} className={panelMinSpace2P5}>
+              <Link
+                href={`/admin/commerce/plans/${encodeURIComponent(plan.id)}`}
+                className={`break-words font-semibold ${linkAccentSm}`}
+              >
+                {locale === "ru" ? plan.titleRu : plan.titleEn}
+              </Link>
+              <p className={typeSmSecondary}>
+                {copy[plan.status]} · {copy[plan.scope]} · {copy.revision} {plan.revision}
+              </p>
+              <p className={typeSmPrimary}>
+                {formatHistoryAmount(plan.price, plan.currency, locale)} · {plan.durationDays}{" "}
+                {copy.days} · {(plan.commissionBps / 100).toLocaleString(locale)}%
+              </p>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <EmptyState
+          title={copy.empty}
+          description={filtersActive ? copy.clearFilters : copy.planNote}
+          icon={<CreditCard className="h-6 w-6" aria-hidden="true" />}
+          action={
+            filtersActive ? (
+              <Link href="/admin/commerce/plans" className={linkAccentSm}>
+                {copy.clearFilters}
+              </Link>
+            ) : undefined
+          }
+        />
+      )}
+      {result.totalPages > 1 ? (
+        <nav aria-label={copy.page} className={typeFlexWrapGap4Sm}>
+          {result.page > 1 ? (
+            <Link href={href(result.page - 1)} className={linkAccentSm}>
+              {copy.previous}
+            </Link>
+          ) : null}
+          <span className={linkMinH}>
+            {copy.page} {result.page} {copy.of} {result.totalPages}
+          </span>
+          {result.page < result.totalPages ? (
+            <Link href={href(result.page + 1)} className={linkAccentSm}>
+              {copy.next}
+            </Link>
+          ) : null}
+        </nav>
+      ) : null}
+    </div>
+  );
+}

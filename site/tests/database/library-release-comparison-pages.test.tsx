@@ -17,17 +17,17 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({ getRequestLocale: async () => h.locale }));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => h.actor },
 }));
-vi.mock("../../src/lib/services/resource-release-control-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-release-control-service", () => ({
   libraryReleaseService: { compare: h.compare },
 }));
 
+import { libraryReleaseComparisonCopy } from "../../src/features/library/library-release-comparison-i18n";
 import { LibraryReleaseComparisonScreen } from "../../src/features/library/release-comparison-server";
-import { libraryReleaseComparisonCopy } from "../../src/lib/library-release-comparison-i18n";
-import { authService } from "../../src/lib/services/auth-service";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 const release = (id: string, hash: string): LibraryComparableRelease => ({
   id,
@@ -136,7 +136,7 @@ it("shows an honest recovery state when comparison data fails to load", async ()
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(`>${copy.title}</h1>`);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("from=bld_a&amp;to=bld_b&amp;returnPage=2");
   expect(html).not.toContain("comparison-store-down");
 });

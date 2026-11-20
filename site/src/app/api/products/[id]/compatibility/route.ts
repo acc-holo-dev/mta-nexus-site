@@ -1,11 +1,11 @@
 import { AppError, NotFoundError } from "@nexus/domain";
 import { resourceCompatibilitySchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
-import { readBoundedJson } from "../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
-import { productService } from "../../../../../lib/services/product-service";
-import { resourceManagementService } from "../../../../../lib/services/resource-management-service";
+import { resourceCommerceRequest } from "../../../../../features/resources/resource-commerce-http";
+import { readBoundedJson } from "../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
+import { productService } from "../../../../../lib/services/commerce/product-service";
+import { resourceManagementService } from "../../../../../lib/services/resources/resource-management-service";
 
 export const GET = (request: NextRequest, { params }: { params: Promise<{ id: string }> }) =>
   resourceCommerceRequest(request, false, async (actor) => {

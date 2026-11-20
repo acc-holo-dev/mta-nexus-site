@@ -5,10 +5,12 @@ import { Button, ErrorState, Field, fieldControlClass, Input } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { z } from "zod";
-import { privateApiRequest } from "../../../lib/private-api-request";
-import { confirmedUpdatedServer } from "../../../lib/server-mutation-confirmation";
-import { serverMutationErrorMessage } from "../../../lib/server-mutation-errors";
-import { useNexusLocale } from "../../../components/locale-context";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
+import { useNexusLocale } from "../../shell/locale";
+import { surfaceSpace2P4TextSm } from "../../shell/surface-shell";
+import { typePrewrapBreak, typeSmColSpan2, typeXsSuccess } from "../../shell/type-shell";
+import { confirmedUpdatedServer } from "../server-mutation-confirmation";
+import { serverMutationErrorMessage } from "../server-mutation-errors";
 
 type EditableServer = {
   id: string;
@@ -100,8 +102,13 @@ export function ServerDetailsForm({
   actorId: string;
 }) {
   const router = useRouter();
-  const { locale, dictionary } = useNexusLocale();
+  const { dictionary } = useNexusLocale();
   const copy = dictionary.serverManagement;
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return Object.values(copy).includes(text) ? text : fallback;
+  }
+  const formErrorHint = dictionary.errors.formErrorHint;
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<Notice | null>(null);
   const [lastSavedAt, setLastSavedAt] = useState(() => revisionToken(server.updatedAt));
@@ -277,8 +284,13 @@ export function ServerDetailsForm({
             data,
             {
               SERVER_METADATA_CONFLICT: copy.concurrentEdit,
+              CONFLICT: copy.concurrentEdit,
               SERVER_ENDPOINT_TAKEN: copy.endpointTaken,
               FORBIDDEN: copy.forbiddenEdit,
+              UNAUTHORIZED: copy.saveError,
+              ACTOR_ID_REQUIRED: copy.saveError,
+              ACTOR_CHANGED: copy.saveError,
+              VALIDATION_ERROR: copy.saveError,
               REQUEST_BODY_TOO_LARGE: copy.bodyTooLarge,
               REQUEST_BODY_TIMEOUT: copy.bodyTimedOut,
             },
@@ -296,8 +308,7 @@ export function ServerDetailsForm({
         if (!responseReceived) setNeedsCheck(true);
         setNotice({
           error: true,
-          text:
-            caught instanceof Error && caught.message ? caught.message : copy.unexpectedSaveError,
+          text: safeMessage(caught, copy.unexpectedSaveError),
         });
       }
     } finally {
@@ -319,9 +330,7 @@ export function ServerDetailsForm({
         >
           {loading && (
             <p role="status" className="text-xs text-muted sm:col-span-2">
-              {locale === "ru"
-                ? "Сохранение выполняется. Поля временно недоступны."
-                : "Saving. Fields are temporarily locked."}
+              {copy.savingLocked}
             </p>
           )}
           <Input
@@ -357,7 +366,7 @@ export function ServerDetailsForm({
             id="manage-server-description"
             label={copy.description}
             pending={loading}
-            className="sm:col-span-2"
+            className={typeSmColSpan2}
           >
             {(control) => (
               <textarea
@@ -383,7 +392,7 @@ export function ServerDetailsForm({
             type="url"
             label={copy.websiteUrl}
             defaultValue={displayServer.websiteUrl || ""}
-            placeholder="https://..."
+            placeholder={copy.websiteUrlPlaceholder}
             disabled={loading}
             pending={loading}
           />
@@ -393,7 +402,7 @@ export function ServerDetailsForm({
             type="url"
             label={copy.discordUrl}
             defaultValue={displayServer.discordUrl || ""}
-            placeholder="https://discord.gg/..."
+            placeholder={copy.discordUrlPlaceholder}
             disabled={loading}
             pending={loading}
           />
@@ -403,7 +412,7 @@ export function ServerDetailsForm({
             type="url"
             label={copy.rulesUrl}
             defaultValue={displayServer.rulesUrl || ""}
-            placeholder="https://..."
+            placeholder={copy.rulesUrlPlaceholder}
             disabled={loading}
             pending={loading}
           />
@@ -426,14 +435,14 @@ export function ServerDetailsForm({
             pending={loading}
           />
 
-          <div className="sm:col-span-2">
+          <div className={typeSmColSpan2}>
             <Input
               id="manage-server-gameplay-tags"
               name="gameplayTags"
               label={copy.gameplayTags}
               maxLength={500}
               defaultValue={(displayServer.gameplayTags || []).join(", ")}
-              placeholder="roleplay, economy, freeroam"
+              placeholder={copy.gameplayTagsPlaceholder}
               disabled={loading}
               pending={loading}
             />
@@ -443,7 +452,7 @@ export function ServerDetailsForm({
             id="manage-server-media-urls"
             label={copy.mediaUrls}
             pending={loading}
-            className="sm:col-span-2"
+            className={typeSmColSpan2}
           >
             {(control) => (
               <textarea
@@ -452,7 +461,7 @@ export function ServerDetailsForm({
                 maxLength={4007}
                 defaultValue={(displayServer.mediaUrls || []).join("\n")}
                 rows={3}
-                placeholder="https://..."
+                placeholder={copy.mediaUrlsPlaceholder}
                 disabled={loading}
                 aria-describedby={control.describedBy}
                 className={fieldControlClass({
@@ -538,20 +547,34 @@ export function ServerDetailsForm({
               {loading ? copy.saving : copy.save}
             </Button>
             {notice && !notice.error && (
-              <span role="status" className="text-xs text-success">
+              <span role="status" className={typeXsSuccess}>
                 {notice.text}
               </span>
             )}
           </div>
-          {notice?.error ? <ErrorState title={notice.text} className="sm:col-span-2" /> : null}
+          {notice?.error ? (
+            <ErrorState
+              title={notice.text}
+              description={formErrorHint}
+              className={typeSmColSpan2}
+            />
+          ) : null}
         </form>
       )}
-      {!identityVerified && notice?.error && <ErrorState title={notice.text} />}
-      {foreignActor && notice?.error && <ErrorState title={notice.text} />}
+      {!identityVerified && notice?.error && (
+        <ErrorState title={notice.text} description={formErrorHint} />
+      )}
+      {foreignActor && notice?.error && (
+        <ErrorState title={notice.text} description={formErrorHint} />
+      )}
       {needsCheck && !foreignActor && (
         <div className="space-y-2">
           {!lastSavedAt ? (
-            <ErrorState id="server-details-missing-revision" title={copy.missingRevision} />
+            <ErrorState
+              id="server-details-missing-revision"
+              title={copy.missingRevision}
+              description={formErrorHint}
+            />
           ) : null}
           <Button
             type="button"
@@ -564,10 +587,7 @@ export function ServerDetailsForm({
         </div>
       )}
       {!foreignActor && identityVerified && newest && (
-        <section
-          aria-label={copy.latestDetails}
-          className="space-y-2 rounded-lg border border-base p-4 text-sm"
-        >
+        <section aria-label={copy.latestDetails} className={surfaceSpace2P4TextSm}>
           <h3 className="font-semibold">{copy.latestDetails}</h3>
           <p>{copy.compareHelp}</p>
           <p>
@@ -576,7 +596,7 @@ export function ServerDetailsForm({
           <p>
             {copy.visibility}: {copy[newest.visibility]}
           </p>
-          <p className="whitespace-pre-wrap break-words">
+          <p className={typePrewrapBreak}>
             {copy.description}: {newest.description}
           </p>
           <p className="break-words">
@@ -588,7 +608,7 @@ export function ServerDetailsForm({
           <p className="break-words">
             {copy.rulesUrl}: {newest.rulesUrl}
           </p>
-          <p className="whitespace-pre-wrap break-words">
+          <p className={typePrewrapBreak}>
             {copy.mediaUrls}: {newest.mediaUrls.join("\n")}
           </p>
           <p>

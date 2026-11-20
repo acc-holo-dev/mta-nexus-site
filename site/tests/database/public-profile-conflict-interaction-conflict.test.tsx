@@ -18,16 +18,22 @@ const harness = vi.hoisted(() => ({
 vi.mock("react", (originalModule) => mockReactHooks(harness)(originalModule));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
 vi.mock("next/link", () => ({ default: "a" }));
-vi.mock("../../src/components/locale-context", () => ({
-  useNexusLocale: () => ({ locale: harness.locale }),
-}));
-vi.mock("../../src/lib/user-platform-client", async (originalModule) => ({
-  ...(await originalModule<typeof import("../../src/lib/user-platform-client")>()),
+vi.mock("../../src/features/shell/locale", async () => {
+  const { getDictionary } = await import("../../src/lib/i18n");
+  return {
+    useNexusLocale: () => ({
+      locale: harness.locale,
+      dictionary: getDictionary(harness.locale),
+    }),
+  };
+});
+vi.mock("../../src/features/community/user-platform-client", async (originalModule) => ({
+  ...(await originalModule<typeof import("../../src/features/community/user-platform-client")>()),
   platformRequest: harness.request,
 }));
 
-import { PublicProfileForm } from "../../src/components/public-profile-form";
-import { getUserPlatformCopy } from "../../src/lib/user-platform-copy";
+import { PublicProfileForm } from "../../src/features/accounts/profile";
+import { getUserPlatformCopy } from "../../src/features/community/user-platform-copy";
 
 const { render, load, save } = createPublicProfileConflictInteractionHelpers(
   harness,

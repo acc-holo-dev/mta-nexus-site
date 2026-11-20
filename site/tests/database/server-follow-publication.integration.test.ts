@@ -9,7 +9,7 @@ import {
   userRepository,
 } from "@nexus/db";
 import { beforeAll, describe, expect, it } from "vitest";
-import { drainPublicationNotificationDelivery } from "../../src/lib/services/server-follow-notification-service";
+import { drainPublicationNotificationDelivery } from "../../src/lib/services/notifications/server-follow-notification-service";
 import { setNotificationPreferencesForTest } from "../helpers/notification-preferences-fixture";
 
 describe("server follower publication notification integration", () => {
@@ -118,8 +118,9 @@ describe("server follower publication notification integration", () => {
     expect(enabledNotifications[0]).toMatchObject({
       type: "server",
       category: "server",
-      title: "New server update",
-      message: "Notification Integration Server: Integration update",
+      title: "New server update / Новость сервера",
+      message:
+        "Notification Integration Server: Integration update / Notification Integration Server: Integration update",
       link: `/articles/server-update-${suffix}`,
     });
     expect(disabledNotifications).toHaveLength(0);

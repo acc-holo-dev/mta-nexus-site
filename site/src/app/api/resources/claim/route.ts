@@ -2,17 +2,20 @@ import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { claimResourceSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
+import { resourceClaimApiCopy } from "../../../../features/resources/resource-claim-api-copy";
+import { getTrustedRequestIp } from "../../../../features/shell/request-client-ip";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { localeAppErrorText } from "../../../../lib/http/locale-app-error";
+import { resolveLocale } from "../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
-} from "../../../../lib/observability";
-import { getTrustedRequestIp } from "../../../../lib/request-client-ip";
-import { authService } from "../../../../lib/services/auth-service";
-import { commerceService } from "../../../../lib/services/commerce-service";
+} from "../../../../lib/platform/observability";
+import { authService } from "../../../../lib/services/accounts/auth-service";
+import { commerceService } from "../../../../lib/services/commerce/commerce-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -28,6 +31,7 @@ function json(context: RequestLogContext, body: unknown, status = 200) {
 
 export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
+  const copy = resourceClaimApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
 
   try {
     const ip = getTrustedRequestIp(request);
@@ -36,7 +40,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: "Too many resource claims. Please try again later.",
+          error: copy.rate,
         },
         429,
       );
@@ -45,7 +49,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
     if (!user || !token) {
-      return json(context, { error: "Authentication required" }, 401);
+      return json(context, { error: copy.authenticationRequired }, 401);
     }
 
     requireServerJsonContentType(request);
@@ -56,7 +60,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: "Invalid resource claim",
+          error: copy.invalidClaim,
           details: parsed.error.format(),
         },
         400,
@@ -71,12 +75,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
 
     return json(context, result, result.alreadyClaimed ? 200 : 201);
   } catch (error: unknown) {
-    const appError =
-      error instanceof Error && "statusCode" in error
-        ? (error as Error & {
-            statusCode: number;
-          })
-        : null;
+    const appError = error instanceof AppError ? error : null;
     logRequestEvent({
       level: "error",
       event: "resource.claim_failed",
@@ -87,7 +86,23 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     return json(
       context,
       {
-        error: appError?.message || "Resource claim failed",
+        error: appError
+          ? localeAppErrorText(
+              appError,
+              {
+                unauthorized: copy.authenticationRequired,
+                forbidden: copy.forbidden,
+                notFound: copy.notFound,
+                unsupportedMediaType: copy.unsupportedMediaType,
+                requestBodyTooLarge: copy.requestBodyTooLarge,
+                invalidBodyLength: copy.invalidBodyLength,
+                requestBodyTimeout: copy.requestBodyTimeout,
+                failed: copy.claimFailed,
+              },
+              { VALIDATION_ERROR: copy.invalidClaim },
+            )
+          : copy.claimFailed,
+        ...(appError ? { code: appError.code } : {}),
       },
       appError?.statusCode || 500,
     );

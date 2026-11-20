@@ -1,7 +1,7 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { ShellAuthSession } from "../../src/components/shell-destination-policy";
+import type { ShellAuthSession } from "../../src/features/shell/session";
 import { getDictionary } from "../../src/lib/i18n";
 
 const nav = vi.hoisted(() => ({ pathname: "/market" }));
@@ -28,7 +28,7 @@ vi.mock("next/link", async () => {
   };
 });
 
-vi.mock("../../src/components/use-auth-session", () => ({
+vi.mock("../../src/features/shell/auth-session", () => ({
   useAuthSession: () => auth.session,
 }));
 
@@ -39,10 +39,17 @@ vi.mock("../../src/features/accounts/controls", async () => {
   };
 });
 
-vi.mock("../../src/components/locale-switcher", async () => {
+vi.mock("../../src/features/shell/components/locale-switcher", async () => {
   const ReactModule = await import("react");
   return {
     LocaleSwitcher: () => ReactModule.createElement("span", { "data-mock": "locale" }),
+  };
+});
+
+vi.mock("../../src/features/shell/components/theme-toggle", async () => {
+  const ReactModule = await import("react");
+  return {
+    ThemeToggle: () => ReactModule.createElement("span", { "data-mock": "theme" }),
   };
 });
 
@@ -53,16 +60,8 @@ vi.mock("../../src/features/notifications/bell", async () => {
   };
 });
 
-vi.mock("../../src/components/theme-toggle", async () => {
-  const ReactModule = await import("react");
-  return {
-    ThemeToggle: () => ReactModule.createElement("span", { "data-mock": "theme" }),
-  };
-});
-
-import { MobileNav } from "../../src/components/mobile-nav";
-import { NexusShell } from "../../src/components/nexus-shell";
-import { Sidebar } from "../../src/components/sidebar";
+import { NexusShell } from "../../src/features/shell/shell";
+import { MobileNav, Sidebar } from "../../src/features/shell/sidebar";
 
 describe("pre-release shell accessibility behavior", () => {
   beforeEach(() => {

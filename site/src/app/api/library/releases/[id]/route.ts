@@ -1,11 +1,11 @@
 import { AppError, UnauthorizedError } from "@nexus/domain";
 import { libraryReleaseCommandSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
-import { readBoundedJson } from "../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
-import { resourceControlPageQuery } from "../../../../../lib/resource-release-control-query";
-import { libraryReleaseService } from "../../../../../lib/services/resource-release-control-service";
+import { resourceCommerceRequest } from "../../../../../features/resources/resource-commerce-http";
+import { resourceControlPageQuery } from "../../../../../features/resources/resource-release-control-query";
+import { readBoundedJson } from "../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
+import { libraryReleaseService } from "../../../../../lib/services/resources/resource-release-control-service";
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, false, async (actor) =>
     libraryReleaseService.detail(

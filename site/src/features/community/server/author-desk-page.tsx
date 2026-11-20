@@ -3,29 +3,41 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { platformSignInFocusClass } from "../../../components/guest-auth-links";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { authorContentService } from "../../../lib/services/organizations/author-content-service";
+import { PlatformSignIn, platformSignInFocusClass } from "../../shell/guest-auth";
+import { linkAccentSm, linkAccentXsBreak } from "../../shell/link-shell";
+import { pageShellMax5xlTight } from "../../shell/page-shell";
+import { panelFlexMinWrapEndP4, panelMinSpace3P5 } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import {
+  type2xlExtraboldPrimary,
+  typeFlexWrapGap4,
+  typeFlexWrapStartBetweenGap3,
+  typeFlexWrapStartBetweenGap4,
+  typeMinBreakSemiboldPrimary,
+  typeMinH11Semibold,
+  typeMinSpace3,
+  typeMinW40Flex1Space1XsMuted,
+  typeMt2SmMuted,
+  typePrewrapSmSecondary,
+  typeSpace1XsMuted,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import {
   authorPublicationDeskHref,
   parseAuthorPublicationDeskQuery,
-} from "../../../lib/author-publication-desk-contract";
+} from "../author-publication-desk-contract";
 import {
   authorPublicationDeskCopy,
   authorPublicationDeskError,
-} from "../../../lib/author-publication-desk-copy";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
-import { authorContentService } from "../../../lib/services/author-content-service";
-import { platformFieldClass } from "../../../lib/user-platform-client";
-import { writerTypes } from "../../../lib/user-platform-contract";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
-
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip";
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
-export async function generateMetadata(): Promise<Metadata> {
+} from "../author-publication-desk-copy";
+import { platformFieldClass } from "../user-platform-client";
+import { writerTypes } from "../user-platform-contract";
+import { getUserPlatformCopy } from "../user-platform-copy";
+export async function authorContentMetadata(): Promise<Metadata> {
   const copy = authorPublicationDeskCopy(await getRequestLocale());
   return {
     title: copy.title,
@@ -34,7 +46,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function AuthorContentPage({
+export async function AuthorContentPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -50,12 +62,20 @@ export default async function AuthorContentPage({
       for (const part of Array.isArray(value) ? value : [value]) params.append(key, part);
   const filters = parseAuthorPublicationDeskQuery(params);
   const returnPath = params.size ? `/workspace/content?${params}` : "/workspace/content";
-  const sessionActor = await authService
-    .getSession((await cookies()).get("nexus_session")?.value)
-    .catch(() => null);
-  if (!sessionActor) {
-    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+  let sessionActor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    sessionActor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={copy.title}
+        message={copy.unavailable}
+        retryHref={returnPath}
+      />
+    );
   }
+  if (!sessionActor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   let error = filters ? "" : copy.invalid;
   const report = await (async () => {
     try {
@@ -79,11 +99,11 @@ export default async function AuthorContentPage({
   );
   const retryHref = filters ? returnPath : "/workspace/content";
   return (
-    <div className={pageShellClass}>
-      <header className="flex flex-wrap items-start justify-between gap-4">
+    <div className={pageShellMax5xlTight}>
+      <header className={typeFlexWrapStartBetweenGap4}>
         <div className="min-w-0">
-          <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
-          <p className="mt-2 text-sm text-muted">{copy.description}</p>
+          <h1 className={type2xlExtraboldPrimary}>{copy.title}</h1>
+          <p className={typeMt2SmMuted}>{copy.description}</p>
         </div>
         <Link
           href="/workspace/content/new"
@@ -93,12 +113,8 @@ export default async function AuthorContentPage({
         </Link>
       </header>
       <search aria-label={copy.filters}>
-        <form
-          action="/workspace/content"
-          method="get"
-          className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
-        >
-          <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
+        <form action="/workspace/content" method="get" className={panelFlexMinWrapEndP4}>
+          <label className={typeMinW40Flex1Space1XsMuted}>
             {copy.query}
             <input
               type="search"
@@ -108,7 +124,7 @@ export default async function AuthorContentPage({
               className={`${platformFieldClass} block min-h-11`}
             />
           </label>
-          <label className="space-y-1 text-xs text-muted">
+          <label className={typeSpace1XsMuted}>
             {labels.status}
             <select
               name="status"
@@ -122,7 +138,7 @@ export default async function AuthorContentPage({
               ))}
             </select>
           </label>
-          <label className="space-y-1 text-xs text-muted">
+          <label className={typeSpace1XsMuted}>
             {labels.type}
             <select
               name="type"
@@ -137,7 +153,7 @@ export default async function AuthorContentPage({
               ))}
             </select>
           </label>
-          <label className="space-y-1 text-xs text-muted">
+          <label className={typeSpace1XsMuted}>
             {copy.source}
             <select
               name="source"
@@ -151,7 +167,7 @@ export default async function AuthorContentPage({
               ))}
             </select>
           </label>
-          <label className="space-y-1 text-xs text-muted">
+          <label className={typeSpace1XsMuted}>
             {copy.tag}
             <input
               name="tag"
@@ -160,27 +176,28 @@ export default async function AuthorContentPage({
               className={`${platformFieldClass} block min-h-11`}
             />
           </label>
-          <Button type="submit" className="min-h-11 font-semibold">
+          <Button type="submit" className={typeMinH11Semibold}>
             {copy.search}
           </Button>
-          <Link href="/workspace/content" className={navLinkClass}>
+          <Link href="/workspace/content" className={linkAccentSm}>
             {copy.reset}
           </Link>
         </form>
       </search>
-      <p className="text-xs text-muted">{copy.live}</p>
+      <p className={typeXsMuted}>{copy.live}</p>
       <Link
         prefetch={false}
         href={filters ? authorPublicationDeskHref(filters) : "/workspace/content"}
-        className={navLinkClass}
+        className={linkAccentSm}
       >
         {copy.latest}
       </Link>
       {error && (
         <ErrorState
           title={error}
+          description={copy.unavailableHint}
           action={
-            <Link href={retryHref} className={navLinkClass}>
+            <Link href={retryHref} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -192,7 +209,7 @@ export default async function AuthorContentPage({
           description={filteredEmpty ? copy.emptyFilteredHint : copy.emptyHint}
           action={
             filteredEmpty ? (
-              <Link href="/workspace/content" className={navLinkClass}>
+              <Link href="/workspace/content" className={linkAccentSm}>
                 {copy.reset}
               </Link>
             ) : (
@@ -206,13 +223,13 @@ export default async function AuthorContentPage({
           }
         />
       )}
-      <ul className="min-w-0 space-y-3">
+      <ul className={typeMinSpace3}>
         {filters &&
           report?.items.map((item) => (
             <li key={item.id}>
-              <article className="nexus-panel min-w-0 space-y-3 p-5">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <h2 className="min-w-0 break-words font-semibold text-primary">
+              <article className={panelMinSpace3P5}>
+                <div className={typeFlexWrapStartBetweenGap3}>
+                  <h2 className={typeMinBreakSemiboldPrimary}>
                     <Link
                       prefetch={false}
                       href={`/workspace/content/${encodeURIComponent(item.id)}`}
@@ -220,11 +237,9 @@ export default async function AuthorContentPage({
                       {item.title}
                     </Link>
                   </h2>
-                  <span className="text-xs text-muted">{labels[item.status]}</span>
+                  <span className={typeXsMuted}>{labels[item.status]}</span>
                 </div>
-                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                  {item.excerpt}
-                </p>
+                <p className={typePrewrapSmSecondary}>{item.excerpt}</p>
                 <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
                   <span>{labels[item.type]}</span>
                   <span>{copy[item.source]}</span>
@@ -238,14 +253,14 @@ export default async function AuthorContentPage({
                     {labels.comments}: {item.commentCount}
                   </span>
                 </div>
-                <div className="flex flex-wrap gap-4">
+                <div className={typeFlexWrapGap4}>
                   {[item.organization, item.server].map((context) =>
                     context ? (
                       <Link
                         key={context.href}
                         prefetch={false}
                         href={context.href}
-                        className="inline-flex min-h-11 items-center break-words text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                        className={linkAccentXsBreak}
                       >
                         {context.name}
                       </Link>
@@ -256,24 +271,24 @@ export default async function AuthorContentPage({
                       key={tag}
                       prefetch={false}
                       href={authorPublicationDeskHref({ ...filters, tag, cursor: undefined })}
-                      className="inline-flex min-h-11 items-center break-words text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                      className={linkAccentXsBreak}
                     >
                       #{tag}
                     </Link>
                   ))}
                 </div>
-                <div className="flex flex-wrap gap-4">
+                <div className={typeFlexWrapGap4}>
                   <Link
                     prefetch={false}
                     href={`/workspace/content/${encodeURIComponent(item.id)}`}
-                    className={navLinkClass}
+                    className={linkAccentSm}
                   >
                     {labels.edit}
                   </Link>
                   <Link
                     prefetch={false}
                     href={`/workspace/content/${encodeURIComponent(item.id)}/history`}
-                    className={navLinkClass}
+                    className={linkAccentSm}
                   >
                     {copy.history}
                   </Link>
@@ -281,7 +296,7 @@ export default async function AuthorContentPage({
                     <Link
                       prefetch={false}
                       href={`/articles/${encodeURIComponent(item.slug)}`}
-                      className={navLinkClass}
+                      className={linkAccentSm}
                     >
                       {labels.publicView}
                     </Link>
@@ -292,12 +307,12 @@ export default async function AuthorContentPage({
           ))}
       </ul>
       {report && filters && (
-        <nav aria-label={copy.title} className="flex flex-wrap gap-4">
+        <nav aria-label={copy.title} className={typeFlexWrapGap4}>
           {report.newerCursor && (
             <Link
               prefetch={false}
               href={authorPublicationDeskHref(filters, report.newerCursor)}
-              className={navLinkClass}
+              className={linkAccentSm}
             >
               {copy.newer}
             </Link>
@@ -306,7 +321,7 @@ export default async function AuthorContentPage({
             <Link
               prefetch={false}
               href={authorPublicationDeskHref(filters, report.olderCursor)}
-              className={navLinkClass}
+              className={linkAccentSm}
             >
               {copy.older}
             </Link>

@@ -3,18 +3,25 @@ import { type ManagedResourceVariants, RESOURCE_VARIANT_LIMIT } from "@nexus/dom
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { resourceVariantCommandSchema } from "@nexus/validation";
 import { type FormEvent, useId, useRef, useState } from "react";
-import { privateApiRequest } from "../../../lib/private-api-request";
-import { confirmedVariantCommand } from "../../../lib/resource-management-confirmation";
-import {
-  getResourceManagementCopy,
-  resourceManagementError,
-} from "../../../lib/resource-management-i18n";
-import { parseEditableProfile } from "../../../lib/user-platform-client";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
+import { parseEditableProfile } from "../../community/user-platform-client";
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
-} from "../../../components/action-confirm-checkbox";
-import { useNexusLocale } from "../../../components/locale-context";
+} from "../../shell/action-confirm-checkbox";
+import { linkGhostAccentSmDisabled, linkGhostAccentXsDisabled } from "../../shell/link-shell";
+import { useNexusLocale } from "../../shell/locale";
+import { panelSpace2P4TextSm, panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
+import { surfaceP4 } from "../../shell/surface-shell";
+import {
+  typeBreakSmSecondary,
+  typeSemiboldPrimary,
+  typeSmSecondary,
+  typeSmSuccess,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import { confirmedVariantCommand } from "../resource-management-confirmation";
+import { getResourceManagementCopy, resourceManagementError } from "../resource-management-i18n";
 
 type Candidate = { productId: string; title: string; slug: string; status: string };
 type CandidatePage = { candidates: Candidate[]; page: number; hasMore: boolean };
@@ -298,8 +305,8 @@ export function ResourceVariantsForm({
   }
   return (
     <section className="space-y-6">
-      <form onSubmit={(event) => submit(event, "save")} className="nexus-panel space-y-4 p-5">
-        <p className="text-sm text-secondary">{copy.variantNote}</p>
+      <form onSubmit={(event) => submit(event, "save")} className={panelSpace4P5}>
+        <p className={typeSmSecondary}>{copy.variantNote}</p>
         <label htmlFor={`${field}-title`} className="block text-sm text-secondary">
           {copy.title}
         </label>
@@ -316,12 +323,12 @@ export function ResourceVariantsForm({
           }}
           className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-primary"
         />
-        <h2 className="font-semibold text-primary">
+        <h2 className={typeSemiboldPrimary}>
           {copy.selected} · {selected.length}/{RESOURCE_VARIANT_LIMIT}
         </h2>
         <ol className="space-y-3">
           {selected.map((row, index) => (
-            <li key={row.productId} className="rounded-lg border border-base p-4">
+            <li key={row.productId} className={surfaceP4}>
               <p className="mb-2 break-words text-sm text-primary">{row.title}</p>
               <label
                 htmlFor={`${field}-label-${row.productId}`}
@@ -356,7 +363,7 @@ export function ResourceVariantsForm({
                   disabled={disabled || index === 0}
                   aria-label={`${copy.up}: ${row.title}`}
                   onClick={() => move(index, -1)}
-                  className="h-auto min-h-11 px-0 text-xs text-accent disabled:opacity-40"
+                  className={linkGhostAccentXsDisabled}
                 >
                   {copy.up}
                 </Button>
@@ -367,7 +374,7 @@ export function ResourceVariantsForm({
                   disabled={disabled || index === selected.length - 1}
                   aria-label={`${copy.down}: ${row.title}`}
                   onClick={() => move(index, 1)}
-                  className="h-auto min-h-11 px-0 text-xs text-accent disabled:opacity-40"
+                  className={linkGhostAccentXsDisabled}
                 >
                   {copy.down}
                 </Button>
@@ -383,7 +390,7 @@ export function ResourceVariantsForm({
                       rows.filter((value) => value.productId !== row.productId),
                     );
                   }}
-                  className="h-auto min-h-11 px-0 text-xs text-accent disabled:opacity-40"
+                  className={linkGhostAccentXsDisabled}
                 >
                   {copy.remove}
                 </Button>
@@ -412,8 +419,8 @@ export function ResourceVariantsForm({
           {busy ? copy.working : copy.save}
         </Button>
       </form>
-      <section className="nexus-panel space-y-3 p-5" aria-labelledby={`${field}-candidates`}>
-        <h2 id={`${field}-candidates`} className="font-semibold text-primary">
+      <section className={panelSpace3P5} aria-labelledby={`${field}-candidates`}>
+        <h2 id={`${field}-candidates`} className={typeSemiboldPrimary}>
           {copy.candidates}
         </h2>
         <ul className="space-y-2">
@@ -422,7 +429,7 @@ export function ResourceVariantsForm({
               key={row.productId}
               className="flex items-center justify-between gap-4 rounded border border-base p-3"
             >
-              <span className="break-words text-sm text-secondary">
+              <span className={typeBreakSmSecondary}>
                 {row.title}
                 <span className="block text-xs text-muted">{row.slug}</span>
               </span>
@@ -442,7 +449,7 @@ export function ResourceVariantsForm({
                     { productId: row.productId, title: row.title, label: "" },
                   ]);
                 }}
-                className="h-auto min-h-11 px-0 text-sm text-accent disabled:opacity-40"
+                className={linkGhostAccentSmDisabled}
               >
                 {copy.add}
               </Button>
@@ -458,7 +465,7 @@ export function ResourceVariantsForm({
             variant="ghost"
             disabled={disabled || loading || candidates.page <= 1}
             onClick={() => changePage(candidates.page - 1)}
-            className="h-auto min-h-11 px-0 text-sm text-accent disabled:opacity-40"
+            className={linkGhostAccentSmDisabled}
           >
             {copy.previous}
           </Button>
@@ -470,17 +477,17 @@ export function ResourceVariantsForm({
             variant="ghost"
             disabled={disabled || loading || !candidates.hasMore || candidates.page >= 1000}
             onClick={() => changePage(candidates.page + 1)}
-            className="h-auto min-h-11 px-0 text-sm text-accent disabled:opacity-40"
+            className={linkGhostAccentSmDisabled}
           >
             {copy.next}
           </Button>
         </nav>
       </section>
       {base.group && (
-        <form onSubmit={(event) => submit(event, "remove")} className="nexus-panel space-y-3 p-5">
-          <h2 className="font-semibold text-primary">{copy.dissolve}</h2>
-          <p className="text-sm text-secondary">{copy.dissolveNote}</p>
-          <p className="text-xs text-muted">{copy.reason}</p>
+        <form onSubmit={(event) => submit(event, "remove")} className={panelSpace3P5}>
+          <h2 className={typeSemiboldPrimary}>{copy.dissolve}</h2>
+          <p className={typeSmSecondary}>{copy.dissolveNote}</p>
+          <p className={typeXsMuted}>{copy.reason}</p>
           <label htmlFor={`${field}-remove-reason`} className="block text-sm text-secondary">
             {copy.reason}
           </label>
@@ -520,7 +527,7 @@ export function ResourceVariantsForm({
         </form>
       )}
       {newest && (
-        <section aria-label={copy.variantsLatest} className="nexus-panel space-y-2 p-4 text-sm">
+        <section aria-label={copy.variantsLatest} className={panelSpace2P4TextSm}>
           <p>{copy.variantsChanged}</p>
           <p>{copy.variantsDraftHelp}</p>
           {newest.group ? (
@@ -578,7 +585,7 @@ export function ResourceVariantsForm({
       )}
       {error ? <ErrorState title={error} description={copy.actionFailedDescription} /> : null}
       {saved && (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {copy.saved}
         </p>
       )}

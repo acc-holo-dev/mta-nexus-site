@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { describe, expect, it } from "vitest";
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
@@ -29,16 +29,14 @@ describe("current-dev build upload reconciliation", () => {
     const route = read("site/src/app/api/products/[id]/builds/route.ts");
 
     expect(route).toContain('event: "resource.build.scanner_unavailable"');
-    expect(route).toContain(
-      '"Malware scanning is temporarily unavailable. No build was stored; retry the upload later."',
-    );
+    expect(route).toContain("copy.scannerUnavailable");
     expect(route).toContain('{ status: 503, headers: { "Retry-After": "30" } }');
     expect(route).not.toContain("NextResponse.json(");
     expect(route).toContain("jsonWithRequestId(");
   });
 
   it("keeps releaseBuild authoritative with the same preflight helper", () => {
-    const service = read("site/src/lib/services/product-service.ts");
+    const service = read("site/src/lib/services/commerce/product-service.ts");
 
     expect(service).toContain("async assertCanReleaseBuild(");
     expect(service).toContain('this.canManageProduct(product, actor, "build.release")');

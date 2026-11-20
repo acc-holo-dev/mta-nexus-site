@@ -1,14 +1,20 @@
 import { createSupportMessageSchema, updateSupportCaseStatusSchema } from "@nexus/validation";
 import { expect, it } from "vitest";
-import { formatNotification } from "../../src/lib/notification-copy";
-import { confirmSupportStatusChanged, parseSupportThread } from "../../src/lib/support-response";
+import { formatNotification } from "../../src/features/notifications/notification-copy";
+import {
+  confirmSupportStatusChanged,
+  parseSupportThread,
+} from "../../src/features/support/support-response";
 import {
   publicationSupportHref,
   supportActivitySchema,
   supportHref,
   supportQuery,
-} from "../../src/lib/support-workspace-contract";
-import { supportWorkspaceCopy, supportWorkspaceError } from "../../src/lib/support-workspace-copy";
+} from "../../src/features/support/support-workspace-contract";
+import {
+  supportWorkspaceCopy,
+  supportWorkspaceError,
+} from "../../src/features/support/support-workspace-copy";
 
 const id = `sup_${"a".repeat(24)}`,
   time = "2026-10-11T00:00:00.000Z";
@@ -132,7 +138,11 @@ it.each(["ru", "en"] as const)(
     );
     const copy = { approved: "", rejected: "", version: "", notes: "" };
     const legacy = formatNotification(
-      { title: "Support case activity", message: `Support case ${id}: reply.`, data: undefined },
+      {
+        title: "Support case activity / Обновление обращения",
+        message: `Support case ${id}: reply.`,
+        data: undefined,
+      },
       copy,
       locale,
     );
@@ -143,7 +153,7 @@ it.each(["ru", "en"] as const)(
     ).toBe(true);
     const structured = formatNotification(
       {
-        title: "Support case activity",
+        title: "Support case activity / Обновление обращения",
         message: "stored",
         data: {
           kind: "support_requester",

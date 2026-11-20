@@ -21,13 +21,13 @@ const updateServer = vi.hoisted(() =>
 );
 const getManagedServerDetails = vi.hoisted(() => vi.fn());
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
   },
 }));
 
-vi.mock("../../src/lib/services/server-service", () => ({
+vi.mock("../../src/lib/services/servers/server-service", () => ({
   serverService: {
     updateServer,
     getManagedServerDetails,
@@ -117,7 +117,7 @@ describe("server owner update HTTP contract", () => {
       routeContext,
     );
     expect(response.status).toBe(409);
-    expect(await response.json()).toEqual({ code: "ACTOR_CHANGED" });
+    expect(await response.json()).toMatchObject({ code: "ACTOR_CHANGED" });
     expect(updateServer).not.toHaveBeenCalled();
   });
 

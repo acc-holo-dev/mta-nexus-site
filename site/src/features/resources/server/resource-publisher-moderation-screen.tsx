@@ -1,0 +1,151 @@
+import { AppError } from "@nexus/domain";
+import { EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { productService } from "../../../lib/services/commerce/product-service";
+import { resourceModerationService } from "../../../lib/services/resources/resource-release-control-service";
+import { formatHistoryDate, parseHistoryPage } from "../../commerce/commerce-history-format";
+import {
+  getResourceReleaseControlCopy,
+  resourceModerationLabel,
+} from "../../library/resource-release-control-i18n";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm, linkMinH } from "../../shell/link-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeBreakXlPrimary,
+  typeDisplayPrimary,
+  typeFlexWrapGap4Sm,
+  typePrewrapSmSecondary,
+  typeSemiboldPrimary,
+  typeXsMuted,
+} from "../../shell/type-shell";
+
+export async function resourcePublisherModerationMetadata(): Promise<Metadata> {
+  return {
+    title: `${getResourceReleaseControlCopy(await getRequestLocale()).moderationHistory} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
+export async function ResourcePublisherModerationScreen({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ page?: string | string[] }>;
+}) {
+  const [locale, store, { id }, query] = await Promise.all([
+    getRequestLocale(),
+    cookies(),
+    params,
+    searchParams,
+  ]);
+  const copy = getResourceReleaseControlCopy(locale),
+    dictionary = getDictionary(locale),
+    returnParams = new URLSearchParams();
+  if (query.page !== undefined) {
+    for (const part of Array.isArray(query.page) ? query.page : [query.page])
+      returnParams.append("page", part);
+  }
+  const basePath = `/workspace/resources/${encodeURIComponent(id)}/moderation`;
+  const returnQuery = returnParams.toString();
+  const returnPath = returnQuery ? `${basePath}?${returnQuery}` : basePath;
+  let user: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    user = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={returnPath}
+      />
+    );
+  }
+
+  if (!user) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+  const product = await productService.getManagedProduct(id, user);
+  if (!product) notFound();
+  const result = await resourceModerationService
+    .publisherHistory(user, id, Math.min(parseHistoryPage(query.page), 1000))
+    .catch((error) => {
+      if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
+      return null;
+    });
+  if (!result) {
+    return (
+      <div className={pageShellMax4xl}>
+        <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccentSm}>
+          {copy.back}
+        </Link>
+        <ErrorState
+          title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
+          action={
+            <Link href={returnPath} className={linkAccentSm}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
+  return (
+    <div className={pageShellMax4xl}>
+      <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={linkAccentSm}>
+        {copy.back}
+      </Link>
+      <h1 className={typeDisplayPrimary}>{copy.moderationHistory}</h1>
+      <h2 className={typeBreakXlPrimary}>{product.title}</h2>
+      <p className="text-secondary">{copy[product.status]}</p>
+      {product.status === "suspended" ? (
+        <p role="note" className="rounded-md border border-base p-4 text-sm text-secondary">
+          {copy.publisherNote}
+        </p>
+      ) : null}
+      {result.events.length ? (
+        <ol className="space-y-3">
+          {result.events.map((event) => (
+            <li key={event.id} className={panelSpace3P5}>
+              <h3 className={typeSemiboldPrimary}>
+                {resourceModerationLabel(locale, event.action)}
+              </h3>
+              <time dateTime={event.createdAt.toISOString()} className={typeXsMuted}>
+                {formatHistoryDate(event.createdAt, locale)}
+              </time>
+              {event.reason ? <p className={typePrewrapSmSecondary}>{event.reason}</p> : null}
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <EmptyState title={copy.moderationHistoryEmpty} description={copy.emptyHint} />
+      )}
+      {result.totalPages > 1 ? (
+        <nav aria-label={copy.page} className={typeFlexWrapGap4Sm}>
+          {result.page > 1 ? (
+            <Link href={`?page=${result.page - 1}`} className={linkAccentSm}>
+              {copy.previous}
+            </Link>
+          ) : null}
+          <span className={linkMinH}>
+            {copy.page} {result.page} {copy.of} {result.totalPages}
+          </span>
+          {result.page < result.totalPages ? (
+            <Link href={`?page=${result.page + 1}`} className={linkAccentSm}>
+              {copy.next}
+            </Link>
+          ) : null}
+        </nav>
+      ) : null}
+    </div>
+  );
+}

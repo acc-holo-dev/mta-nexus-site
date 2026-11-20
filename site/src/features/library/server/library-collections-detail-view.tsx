@@ -1,22 +1,34 @@
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
-import { collectionReleasesCopy } from "../../../lib/collection-releases-i18n";
-import { collectionRequirementsCopy } from "../../../lib/collection-requirements-i18n";
-import { libraryCollectionComparisonCopy } from "../../../lib/library-collection-comparison-i18n";
-import { libraryCollectionInventoryCopy } from "../../../lib/library-collection-inventory-i18n";
-import { collectionInventoryHref } from "../../../lib/library-collection-inventory-query";
-import { libraryCollectionManifestsCopy } from "../../../lib/library-collection-manifests-i18n";
-import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
+import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
+import { ResourceDownloadButton } from "../../resources/download";
+import { resourceReleaseWatchesCopy } from "../../resources/resource-release-watches-i18n";
+import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
+import {
+  typeBreakDisplayPrimary,
+  typeBreakSemibold,
+  typeFlexWrapEndGap3,
+  typeFlexWrapGap4Sm,
+  typeGridGap4Md2,
+  typeSmMuted,
+  typeSmSecondary,
+} from "../../shell/type-shell";
+import { LibraryCollectionBatchForm } from "../collection-batch";
+import { LibraryCollectionCommandForm } from "../collection-command";
+import { collectionReleasesCopy } from "../collection-releases-i18n";
+import { collectionRequirementsCopy } from "../collection-requirements-i18n";
+import { libraryCollectionComparisonCopy } from "../library-collection-comparison-i18n";
+import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
+import { collectionInventoryHref } from "../library-collection-inventory-query";
+import { libraryCollectionManifestsCopy } from "../library-collection-manifests-i18n";
+import { libraryCollectionsCopy } from "../library-collections-i18n";
 import {
   collectionHref,
   collectionPageParams,
   collectionsQuery,
-} from "../../../lib/library-collections-query";
-import { librarySelectionBatchesCopy } from "../../../lib/library-selection-batches-i18n";
-import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
-import { libraryCollectionsService as service } from "../../../lib/services/library-collections-service";
-import { LibraryCollectionBatchForm } from "../collection-batch";
-import { LibraryCollectionCommandForm } from "../collection-command";
+} from "../library-collections-query";
+import { librarySelectionBatchesCopy } from "../library-selection-batches-i18n";
 import {
   type LibraryCollectionsActor,
   LibraryCollectionsPagination,
@@ -24,7 +36,6 @@ import {
   libraryCollectionsLinkClass,
   libraryCollectionsSearchFieldClass,
 } from "./library-collections-screen-shared";
-import { ResourceDownloadButton } from "../../resources/download";
 
 export async function LibraryCollectionsDetailView({
   locale,
@@ -55,21 +66,21 @@ export async function LibraryCollectionsDetailView({
       ...(result.q ? { q: result.q } : {}),
     });
   return (
-    <div className="mx-auto max-w-5xl space-y-6 py-8">
+    <div className={pageShellMax5xl}>
       <Link
         href={adding ? collectionHref(id) : collectionHref()}
         className={libraryCollectionsLinkClass}
       >
         {adding ? c.back : c.title}
       </Link>
-      <h1 className="break-words font-display text-primary">
+      <h1 className={typeBreakDisplayPrimary}>
         {collection.name}
         {adding ? ` · ${c.candidates}` : ""}
       </h1>
       <p className="text-sm">
         {c[collection.status]} · {c.revision} {collection.revision}
       </p>
-      <p role="note" className="text-sm text-secondary">
+      <p role="note" className={typeSmSecondary}>
         {c.subtitle}
       </p>
       {collection.status === "archived" && (
@@ -79,7 +90,7 @@ export async function LibraryCollectionsDetailView({
       )}
       {!adding && (
         <>
-          <p role="note" className="text-sm text-muted">
+          <p role="note" className={typeSmMuted}>
             {c.watchesIndependentNote}
           </p>
           <Link
@@ -133,7 +144,7 @@ export async function LibraryCollectionsDetailView({
           )}
         </section>
       )}
-      <nav className="flex flex-wrap gap-4 text-sm" aria-label={c.title}>
+      <nav className={typeFlexWrapGap4Sm} aria-label={c.title}>
         <a
           href={`/api/library/collections/${encodeURIComponent(id)}/export`}
           className={libraryCollectionsLinkClass}
@@ -176,7 +187,7 @@ export async function LibraryCollectionsDetailView({
         <form
           method="get"
           action={collectionHref(id, adding ? "add" : "")}
-          className="flex flex-wrap items-end gap-3"
+          className={typeFlexWrapEndGap3}
         >
           <label className="space-y-1">
             <span className="block text-sm">{c.search}</span>
@@ -228,10 +239,10 @@ export async function LibraryCollectionsDetailView({
           items={result.items.filter((item) => !adding || !item.inCollection)}
         />
       )}
-      <ol className="grid gap-4 md:grid-cols-2">
+      <ol className={typeGridGap4Md2}>
         {result.items.map((item) => (
-          <li key={item.productId} className="nexus-panel space-y-3 p-5">
-            <h2 className="break-words font-semibold">{item.title ?? c.unavailable}</h2>
+          <li key={item.productId} className={panelSpace3P5}>
+            <h2 className={typeBreakSemibold}>{item.title ?? c.unavailable}</h2>
             {item.downloadable && item.version ? (
               <ResourceDownloadButton
                 productId={item.productId}
@@ -239,9 +250,13 @@ export async function LibraryCollectionsDetailView({
                 buildId={item.buildId ?? undefined}
               />
             ) : (
-              <ErrorState id="library-collection-item-unavailable" title={c.unavailableNote} />
+              <ErrorState
+                id="library-collection-item-unavailable"
+                title={c.unavailableNote}
+                description={c.itemUnavailableHint}
+              />
             )}
-            <div className="flex flex-wrap gap-4 text-sm">
+            <div className={typeFlexWrapGap4Sm}>
               <Link
                 href={`/workspace/library/${encodeURIComponent(item.productId)}/collections`}
                 className={libraryCollectionsLinkClass}
@@ -267,7 +282,7 @@ export async function LibraryCollectionsDetailView({
             </div>
             {collection.status === "active" &&
               (adding && item.inCollection ? (
-                <p role="status" className="text-sm text-muted">
+                <p role="status" className={typeSmMuted}>
                   {c.inCollection}
                 </p>
               ) : (

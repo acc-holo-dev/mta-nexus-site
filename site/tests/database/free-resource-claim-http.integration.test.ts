@@ -1,9 +1,3 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
-import {
-  browserMutationHeaders,
-  stubBrowserMutationOrigin,
-} from "../helpers/browser-mutation-headers";
 import {
   buildRepository,
   entitlementRepository,
@@ -11,7 +5,13 @@ import {
   sessionRepository,
   userRepository,
 } from "@nexus/db";
+import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { POST as claimResource } from "../../src/app/api/resources/claim/route";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
 
 describe("free resource claim HTTP integration", () => {
   beforeEach(() => {

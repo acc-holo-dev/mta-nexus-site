@@ -1,4 +1,5 @@
 import { expect, it, vi } from "vitest";
+import { getDictionary } from "../../src/lib/i18n";
 import {
   createCommercialPlanFormConfirmInteractionHelpers,
   mockReactHooks,
@@ -14,14 +15,14 @@ const h = vi.hoisted(() => ({
   actor: "usr_a",
   confirm: vi.fn(async () => true),
 }));
-vi.mock("../../src/components/confirm-action", () => ({ confirmAction: h.confirm }));
+vi.mock("../../src/features/shell/confirm-action", () => ({ confirmAction: h.confirm }));
 vi.mock("react", (original) => mockReactHooks(h)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: h.push, refresh: h.refresh }) }));
-vi.mock("../../src/components/locale-context", () => ({
-  useNexusLocale: () => ({ locale: "en" }),
+vi.mock("../../src/features/shell/locale", () => ({
+  useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }),
 }));
 
-import { CommercialPlanForm } from "../../src/components/commercial-plan-form";
+import { CommercialPlanForm } from "../../src/features/commerce/commercial-plans";
 
 const { mount, prepare, submit, planPosts, acknowledgementButton } =
   createCommercialPlanFormConfirmInteractionHelpers(h, CommercialPlanForm);

@@ -5,6 +5,16 @@ import { ChevronLeft, ChevronRight, Copy, Users } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
+import { panelSpace3P4 } from "../../shell/panel-shell";
+import {
+  typeFlexWrapCenterBetweenGap3,
+  typeFlexWrapGap2,
+  typeLgBoldPrimary,
+  typeMinFlex1,
+  typeMinSpace4,
+  typeXsSecondary,
+  typeXsSecondaryAnywhere,
+} from "../../shell/type-shell";
 import { mtaEndpointKey } from "../model/mta-listing-profile-map";
 import type { MtaMasterServer } from "../model/mta-master-directory-shared";
 
@@ -65,7 +75,7 @@ function ServerCard({
       <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <h3 className="font-semibold text-primary [overflow-wrap:anywhere]">{name}</h3>
-          <p className="text-xs text-secondary [overflow-wrap:anywhere]">
+          <p className={typeXsSecondaryAnywhere}>
             {[server.gameMode, server.mapName, server.version].filter(Boolean).join(" / ") ||
               copy.noDetails}
           </p>
@@ -96,7 +106,7 @@ function ServerCard({
             className={`${controlClass} mt-1 w-full font-mono`}
           />
         </label>
-        <div className="flex flex-wrap gap-2">
+        <div className={typeFlexWrapGap2}>
           <a
             href={`mtasa://${server.address}:${server.port}`}
             aria-label={`${copy.connect}: ${name}`}
@@ -128,9 +138,13 @@ function ServerCard({
         </div>
       </div>
       {copyMessage === copy.copyUnavailable ? (
-        <ErrorState id="mta-master-directory-copy-unavailable" title={copy.copyUnavailable} />
+        <ErrorState
+          id="mta-master-directory-copy-unavailable"
+          title={copy.copyUnavailable}
+          description={copy.copyUnavailableHint}
+        />
       ) : (
-        <p role="status" className="text-xs text-secondary [overflow-wrap:anywhere]">
+        <p role="status" className={typeXsSecondaryAnywhere}>
           {copyMessage}
         </p>
       )}
@@ -235,10 +249,10 @@ export function MtaMasterServerDirectory({
   }
 
   return (
-    <section aria-label={copy.directory} aria-busy={loading} className="min-w-0 space-y-4">
-      <div className="nexus-panel space-y-3 p-4">
+    <section aria-label={copy.directory} aria-busy={loading} className={typeMinSpace4}>
+      <div className={panelSpace3P4}>
         <div>
-          <h2 className="text-lg font-bold text-primary">{copy.network}</h2>
+          <h2 className={typeLgBoldPrimary}>{copy.network}</h2>
           {loading ? (
             <p role="status" aria-live="polite" className="mt-1 text-xs text-secondary">
               {copy.loading}
@@ -258,18 +272,18 @@ export function MtaMasterServerDirectory({
                 copy.updateUnknown
               )}
             </p>
-          ) : error ? (
-            <p role="status" aria-live="polite" className="mt-1 text-xs text-secondary">
-              {copy.unavailable}
-            </p>
-          ) : (
-            <ErrorState id="mta-master-directory-unavailable" title={copy.unavailable} />
+          ) : error ? null : (
+            <ErrorState
+              id="mta-master-directory-unavailable"
+              title={copy.unavailable}
+              description={copy.unavailableHint}
+            />
           )}
         </div>
 
         <search aria-label={copy.search}>
           <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-end">
-            <div className="min-w-0 flex-1">
+            <div className={typeMinFlex1}>
               <SearchField
                 label={copy.search}
                 value={query}
@@ -280,7 +294,7 @@ export function MtaMasterServerDirectory({
               />
             </div>
 
-            <label className="text-xs text-secondary">
+            <label className={typeXsSecondary}>
               {copy.minimumPlayers}
               <select
                 value={minimumPlayers}
@@ -296,16 +310,21 @@ export function MtaMasterServerDirectory({
             </label>
           </div>
         </search>
-        <p className="text-xs text-secondary">{copy.connectHint}</p>
+        <p className={typeXsSecondary}>{copy.connectHint}</p>
       </div>
 
       {directory?.isStale && !loading ? (
-        <ErrorState id="mta-master-directory-stale" title={copy.stale} />
+        <ErrorState
+          id="mta-master-directory-stale"
+          title={copy.stale}
+          description={copy.staleHint}
+        />
       ) : null}
 
       {error && (
         <ErrorState
           title={error}
+          description={copy.unavailableHint}
           action={
             <Button
               type="button"
@@ -355,10 +374,7 @@ export function MtaMasterServerDirectory({
       )}
 
       {!error && !loading && directory && directory.total > PAGE_SIZE && (
-        <nav
-          className="flex flex-wrap items-center justify-between gap-3"
-          aria-label={copy.directory}
-        >
+        <nav className={typeFlexWrapCenterBetweenGap3} aria-label={copy.directory}>
           <Button
             type="button"
             variant="secondary"
@@ -370,7 +386,7 @@ export function MtaMasterServerDirectory({
             <ChevronLeft className="h-4 w-4" aria-hidden="true" />
             {copy.previous}
           </Button>
-          <span className="text-xs text-secondary">
+          <span className={typeXsSecondary}>
             {copy.page} {page + 1} {copy.of} {totalPages}
           </span>
           <Button

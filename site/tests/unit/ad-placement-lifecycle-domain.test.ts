@@ -1,4 +1,3 @@
-import { describe, expect, it } from "vitest";
 import {
   adPlacementHoldsCapacity,
   adPlacementIsServeable,
@@ -6,6 +5,7 @@ import {
   adTargetIsEligible,
   assertAdPlacementTransition,
 } from "@nexus/domain";
+import { describe, expect, it } from "vitest";
 
 const t = new Date("2026-12-01T12:00:00Z");
 

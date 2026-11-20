@@ -17,13 +17,13 @@ vi.mock("next/navigation", () => ({
     throw Error("NEXT_NOT_FOUND");
   },
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../../src/lib/services/server-workspace-history-service", () => ({
+vi.mock("../../src/lib/services/servers/server-workspace-history-service", () => ({
   serverWorkspaceHistoryService: { page: state.page },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 
@@ -93,10 +93,11 @@ it("does not read server activity for an anonymous visitor", async () => {
   expect(await render()).toContain("Sign in");
   expect(state.page).not.toHaveBeenCalled();
 });
-it("routes session lookup failures to sign-in instead of an orphan error panel", async () => {
+it("routes session lookup failures to an honest recovery panel instead of guest sign-in", async () => {
   state.session.mockRejectedValueOnce(new Error("private session"));
   const html = await render();
-  expect(html).toContain("Sign in");
+  expect(html).toContain('role="alert"');
+  expect(html).not.toContain("Sign in");
   expect(html).not.toContain("private session");
   expect(state.page).not.toHaveBeenCalled();
 });

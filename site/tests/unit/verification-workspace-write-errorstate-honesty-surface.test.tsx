@@ -9,22 +9,30 @@ const source = readFileSync(
   join(root, "site/src/features/moderation/components/verification-workspace.tsx"),
   "utf8",
 );
+const copy = readFileSync(
+  join(root, "site/src/features/trust/verification-workspace-copy.ts"),
+  "utf8",
+);
 
 /** Honesty lock: verification workspace write/intent notices → ErrorState with stable ids. */
 it("locks verification workspace write and unconfirmed-submit notices to ErrorState with stable ids", () => {
   expect(source).toContain('import { Button, EmptyState, ErrorState } from "@nexus/ui"');
   expect(source).toContain('id="verification-workspace-write-failed"');
   expect(source).toContain('id="verification-workspace-submit-unconfirmed"');
+  expect(source).toContain("copy.submissionUnconfirmed");
+  expect(source).toContain("copy.mutationUnavailable");
+  expect(source).toContain("dictionary.errors.formErrorHint");
+  expect(copy).toContain("submissionUnconfirmed:");
   expect(source).toMatch(
-    /verifiedKey !== identityKey && writeError \? \(\s*<ErrorState\s+id="verification-workspace-write-failed"\s+title=\{writeError\}\s*\/>/u,
+    /verifiedKey !== identityKey && writeError \? \(\s*<ErrorState\s+id="verification-workspace-write-failed"\s+title=\{writeError\}\s+description=\{copy\.mutationUnavailable\}\s*\/>/u,
   );
   expect(source).toMatch(
-    /writeError \? \(\s*<ErrorState\s+id="verification-workspace-write-failed"\s+title=\{writeError\}\s*\/>/u,
+    /writeError \? \(\s*<ErrorState\s+id="verification-workspace-write-failed"\s+title=\{writeError\}\s+description=\{copy\.mutationUnavailable\}\s*\/>/u,
   );
   expect(source).toMatch(
-    /intent \? \(\s*<ErrorState\s+id="verification-workspace-submit-unconfirmed"\s+title=\{\s*locale === "ru"/u,
+    /intent \? \(\s*<ErrorState\s+id="verification-workspace-submit-unconfirmed"\s+title=\{copy\.submissionUnconfirmed\}\s+description=\{dictionary\.errors\.formErrorHint\}\s*\/>/u,
   );
-  expect(source).toContain(
+  expect(source).not.toContain(
     "The submission result is unconfirmed. Only an exact retry of the original application is available.",
   );
   expect(source).not.toContain('role="alert"');

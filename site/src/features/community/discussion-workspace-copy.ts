@@ -1,0 +1,98 @@
+import type { Locale } from "../../lib/i18n";
+import { discussionMutationError } from "./content-discussion-copy";
+
+const en = {
+  title: "My comments",
+  description:
+    "Find your comments in publications and manage their saved text. Resource purchase reviews are in their separate workspace.",
+  query: "Search your text or public publication titles",
+  filters: "Comment filters",
+  availability: "Publication availability",
+  all: "All publications",
+  available: "Public",
+  unavailable: "Unavailable",
+  search: "Search",
+  reset: "Clear filters",
+  latest: "Latest comments",
+  next: "Older comments",
+  empty: "You have not commented on publications yet.",
+  emptyDescription: "Comments you leave on publications appear here for private management.",
+  emptyFiltered: "No comments match this page or its filters.",
+  emptyFilteredDescription: "Clear the filters or open the latest comments page to continue.",
+  hidden: "Publication unavailable",
+  hiddenNote:
+    "The publication is no longer public. Its details are hidden; you can still remove your own comment.",
+  hiddenPublicationHint:
+    "The publication is hidden, not deleted. You can still remove your own comment from this private view.",
+  open: "Manage comment",
+  back: "Back to my comments",
+  workspace: "Back to workspace",
+  discussion: "Open in discussion",
+  loading: "Loading your comments…",
+  failed: "Your comments could not be loaded. Try again.",
+  loadUnavailableHint:
+    "Retry reloads your comments list only. A temporary load failure is not an empty comment history.",
+  invalid: "Invalid comment page. Open the latest page to continue.",
+  signIn: "Sign in to manage your comments",
+  removed: "Your comment was removed. Replies remain.",
+  edited: "Your comment changes were saved.",
+  reload: "Reload saved state",
+  readOnly: "This comment can be removed, but cannot be edited here.",
+  readOnlyHint:
+    "Removal still works on this page. Editing is only available where the publication allows it.",
+  privacy: "This list is private. Only your own publication comments appear here.",
+  changed: "This comment changed or became unavailable. Reload its saved state before continuing.",
+};
+const ru: Record<keyof typeof en, string> = {
+  title: "Мои комментарии",
+  description:
+    "Находите свои комментарии к публикациям и управляйте сохранённым текстом. Отзывы о приобретённых ресурсах находятся в отдельном кабинете.",
+  query: "Поиск по своему тексту и названиям публичных публикаций",
+  filters: "Фильтры комментариев",
+  availability: "Доступность публикации",
+  all: "Все публикации",
+  available: "Публичные",
+  unavailable: "Недоступные",
+  search: "Найти",
+  reset: "Сбросить фильтры",
+  latest: "Новые комментарии",
+  next: "Старые комментарии",
+  empty: "Вы пока не комментировали публикации.",
+  emptyDescription:
+    "Комментарии, которые вы оставляете к публикациям, появляются здесь для личного управления.",
+  emptyFiltered: "На этой странице нет комментариев по выбранным фильтрам.",
+  emptyFilteredDescription:
+    "Сбросьте фильтры или откройте страницу новых комментариев, чтобы продолжить.",
+  hidden: "Публикация недоступна",
+  hiddenNote:
+    "Публикация больше не публичная. Её данные скрыты; свой комментарий по-прежнему можно удалить.",
+  hiddenPublicationHint:
+    "Публикация скрыта, но не удалена. Свой комментарий по-прежнему можно убрать в этом личном просмотре.",
+  open: "Управление комментарием",
+  back: "К моим комментариям",
+  workspace: "К кабинету",
+  discussion: "Открыть в обсуждении",
+  loading: "Загрузка ваших комментариев…",
+  failed: "Не удалось загрузить ваши комментарии. Попробуйте ещё раз.",
+  loadUnavailableHint:
+    "Повтор обновляет только список ваших комментариев. Временный сбой загрузки — не пустая история комментариев.",
+  invalid: "Некорректная страница комментариев. Откройте страницу новых комментариев.",
+  signIn: "Войдите для управления своими комментариями",
+  removed: "Ваш комментарий удалён. Ответы сохранены.",
+  edited: "Изменения комментария сохранены.",
+  reload: "Загрузить сохранённое состояние",
+  readOnly: "Этот комментарий можно удалить, но нельзя редактировать здесь.",
+  readOnlyHint:
+    "Удаление по-прежнему доступно на этой странице. Редактирование возможно только там, где публикация это разрешает.",
+  privacy: "Это личный список. Здесь только ваши комментарии к публикациям.",
+  changed:
+    "Комментарий изменился или стал недоступен. Загрузите сохранённое состояние перед продолжением.",
+};
+export const ownDiscussionCopy = (locale: Locale) => (locale === "ru" ? ru : en);
+export function ownDiscussionError(locale: Locale, code: unknown) {
+  if (code === "INVALID_CURSOR" || code === "VALIDATION_ERROR")
+    return ownDiscussionCopy(locale).invalid;
+  if (code === "DISCUSSION_UNAVAILABLE") return ownDiscussionCopy(locale).changed;
+  if (code === "INTERNAL_ERROR") return ownDiscussionCopy(locale).failed;
+  return discussionMutationError(locale, code);
+}

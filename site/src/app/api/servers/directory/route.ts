@@ -4,12 +4,14 @@ import {
   mtaDirectoryHttpCacheControl,
   selectMtaDirectoryPage,
 } from "../../../../features/servers/model";
+import { serversDirectoryApiCopy } from "../../../../features/servers/servers-directory-api-copy";
+import { resolveLocale } from "../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-} from "../../../../lib/observability";
-import { mtaMasterDirectoryService } from "../../../../lib/services/mta-master-directory-service";
+} from "../../../../lib/platform/observability";
+import { mtaMasterDirectoryService } from "../../../../lib/services/servers/mta-master-directory-service";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +28,7 @@ const errorHeaders = {
 
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
+  const copy = serversDirectoryApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
   const parsedQuery = directoryQuerySchema.safeParse(
     Object.fromEntries(request.nextUrl.searchParams),
   );
@@ -34,7 +37,7 @@ export async function GET(request: NextRequest) {
     return jsonWithRequestId(
       context,
       {
-        error: "Invalid directory query",
+        error: copy.invalidQuery,
         details: parsedQuery.error.flatten(),
       },
       {
@@ -82,7 +85,7 @@ export async function GET(request: NextRequest) {
     return jsonWithRequestId(
       context,
       {
-        error: "The official MTA server directory is temporarily unavailable",
+        error: copy.unavailable,
       },
       {
         status: 503,

@@ -13,8 +13,10 @@ const source = readFileSync(
 /** Honesty lock for missing resource-review report review notice. */
 it("locks resource-review report unavailable notice to ErrorState", () => {
   expect(source).toContain('id="resource-review-report-unavailable"');
+  expect(source).toContain("title={copy.reportReviewUnavailable}");
+  expect(source).toContain("description={copy.reportReviewUnavailableHint}");
   expect(source).toMatch(
-    /report\.review \? \([\s\S]*?\) : \(\s*<ErrorState id="resource-review-report-unavailable" title=\{copy\.unavailable\} \/>\s*\)/u,
+    /report\.review \? \([\s\S]*?\) : \(\s*<ErrorState[\s\S]*?id="resource-review-report-unavailable"/u,
   );
   expect(source).not.toContain("<p>{copy.unavailable}</p>");
 });

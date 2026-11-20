@@ -4,12 +4,14 @@ import { Button, ErrorState } from "@nexus/ui";
 import { LoaderCircle, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { confirmsAdminAction } from "../../../lib/admin-action-confirmation";
-import { communityReportCopy } from "../../../lib/community-report-copy";
-import { privateApiRequest } from "../../../lib/private-api-request";
-import { resourceQaCopy, resourceQaError } from "../../../lib/resource-qa-i18n";
-import { confirmAction } from "../../../components/confirm-action";
-import { useNexusLocale } from "../../../components/locale-context";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
+import { communityReportCopy } from "../../community/community-report-copy";
+import { adminActionClientError } from "../../moderation/admin-action-client-error";
+import { confirmsAdminAction } from "../../moderation/admin-action-confirmation";
+import { confirmAction } from "../../shell/confirm-action";
+import { useNexusLocale } from "../../shell/locale";
+import { skelH4W4Spin } from "../../shell/skeleton-shell";
+import { resourceQaCopy, resourceQaError } from "../resource-qa-i18n";
 
 /**
  * Staff bridge: remove the reported Q&A thread, then resolve the report record.
@@ -93,7 +95,7 @@ export function AdminResourceQaReportActions({
       });
       const decidePayload = await decideResponse.json().catch(() => null);
       if (!confirmsAdminAction(decideResponse.status, decidePayload, reportId, "resolve")) {
-        setError(decidePayload?.error || admin.reportDecisionFailed);
+        setError(adminActionClientError(locale, decidePayload?.code, admin.reportDecisionFailed));
         return;
       }
       router.refresh();
@@ -115,7 +117,7 @@ export function AdminResourceQaReportActions({
         onClick={() => void removeAndResolve()}
       >
         {pending ? (
-          <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
+          <LoaderCircle className={skelH4W4Spin} aria-hidden="true" />
         ) : (
           <Trash2 className="h-4 w-4" aria-hidden="true" />
         )}

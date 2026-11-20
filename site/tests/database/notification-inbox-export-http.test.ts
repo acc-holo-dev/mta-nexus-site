@@ -3,10 +3,10 @@ import { NextRequest } from "next/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({ session: vi.fn(), exportPage: vi.fn(), rate: vi.fn() }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../../src/lib/services/notification-inbox-service", () => ({
+vi.mock("../../src/lib/services/notifications/notification-inbox-service", () => ({
   notificationInboxService: { exportPage: state.exportPage },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));

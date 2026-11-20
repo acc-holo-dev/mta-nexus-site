@@ -3,17 +3,18 @@ import { consumeRateLimit } from "@nexus/security";
 import { ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
-import { supportMessageDiscoveryService } from "../../../lib/services/support-message-discovery-service";
-import { parseSupportMessageQuery } from "../../../lib/support-message-discovery-contract";
-import {
-  supportMessageCopy,
-  supportMessageError,
-} from "../../../lib/support-message-discovery-copy";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { supportMessageDiscoveryService } from "../../../lib/services/support/support-message-discovery-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
+import { pageShellMax4xlDenseTight } from "../../shell/page-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary } from "../../shell/type-shell";
 import { SupportMessageBrowser } from "../components/support-message-browser";
+import { parseSupportMessageQuery } from "../support-message-discovery-contract";
+import { supportMessageCopy, supportMessageError } from "../support-message-discovery-copy";
+import { supportWorkspaceCopy } from "../support-workspace-copy";
 
 export async function supportMessageMetadata() {
   return {
@@ -43,6 +44,7 @@ export async function SupportMessagePage({
     if (Array.isArray(value)) for (const item of value) query.append(key, item);
     else if (value !== undefined) query.append(key, value);
   }
+  const returnPath = validId && query.size ? `${path}?${query}` : path;
   let token: string | undefined;
   let actor: Awaited<ReturnType<typeof authService.getSession>>;
   try {
@@ -50,23 +52,15 @@ export async function SupportMessagePage({
     actor = await authService.getSession(token);
   } catch {
     return (
-      <div className="mx-auto min-w-0 max-w-4xl space-y-4 overflow-x-clip">
-        <h1 className="font-display text-primary">{copy.title}</h1>
-        <ErrorState
-          title={copy.unavailable}
-          action={
-            <Link
-              href={validId && query.size ? `${path}?${query}` : path}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {getDictionary(locale).errors.retry}
-            </Link>
-          }
-        />
-      </div>
+      <PlatformSessionError
+        locale={locale}
+        title={copy.title}
+        message={copy.unavailable}
+        retryHref={returnPath}
+      />
     );
   }
-  if (!actor) return <PlatformSignIn locale={locale} returnPath={path} />;
+  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   try {
     if (!validId) throw new AppError("Support case not found", 404, "NOT_FOUND");
     const filters = parseSupportMessageQuery(query);
@@ -82,19 +76,20 @@ export async function SupportMessagePage({
     );
     return <SupportMessageBrowser page={page} filters={filters} locale={locale} staff={staff} />;
   } catch (error) {
+    const title = supportMessageError(
+      locale,
+      error instanceof AppError ? error.code : "INTERNAL_ERROR",
+    );
     return (
-      <div className="mx-auto min-w-0 max-w-4xl space-y-4 overflow-x-clip">
-        <h1 className="font-display text-primary">{copy.title}</h1>
+      <div className={pageShellMax4xlDenseTight}>
+        <h1 className={typeDisplayPrimary}>{copy.title}</h1>
         <ErrorState
-          title={supportMessageError(
-            locale,
-            error instanceof AppError ? error.code : "INTERNAL_ERROR",
-          )}
+          title={title}
+          description={
+            title === supportWorkspaceCopy(locale).unavailable ? copy.unavailableHint : undefined
+          }
           action={
-            <Link
-              href={path}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={path} className={linkAccentSmRounded}>
               {copy.reset}
             </Link>
           }
@@ -102,4 +97,24 @@ export async function SupportMessagePage({
       </div>
     );
   }
+}
+
+export async function MemberSupportMessagesPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return SupportMessagePage({ id: (await params).id, searchParams });
+}
+
+export async function AdminSupportMessagesPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return SupportMessagePage({ id: (await params).id, searchParams, staff: true });
 }

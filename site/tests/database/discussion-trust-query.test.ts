@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
@@ -32,12 +33,14 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
-import { discussionWorkspaceRepository as own } from "../../packages/db/src/repositories/discussion-workspace";
+
 import {
-  discussionManagementRepository as management,
   discussionRevision,
+  discussionManagementRepository as management,
 } from "../../packages/db/src/repositories/discussion-management";
+import { discussionWorkspaceRepository as own } from "../../packages/db/src/repositories/discussion-workspace";
 import { publicVerificationHistoryRepository as approvals } from "../../packages/db/src/repositories/public-verification-history";
+
 const time = "2026-10-11T00:00:00.123456Z";
 const context = (subject = "subject", type = "") =>
   createHash("sha256")

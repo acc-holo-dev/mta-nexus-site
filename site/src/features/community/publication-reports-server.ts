@@ -1,6 +1,6 @@
 import "server-only";
 
 export {
-  PublicationReportsPage,
+  AdminPublicationReportsRoutePage,
   publicationReportsMetadata,
 } from "./server/publication-reports-page";

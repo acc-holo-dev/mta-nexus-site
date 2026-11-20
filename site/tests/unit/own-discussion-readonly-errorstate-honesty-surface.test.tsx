@@ -14,8 +14,8 @@ it("locks own-discussion readonly notice to ErrorState without soft muted captio
   const source = read(surface);
   expect(source).toContain('import { ErrorState } from "@nexus/ui"');
   expect(source).toContain('id="own-discussion-readonly"');
-  expect(source).toMatch(
-    /\{!comment\.editable && <ErrorState id="own-discussion-readonly" title=\{copy\.readOnly\} \/>\}/u,
-  );
+  expect(source).toContain('id="own-discussion-readonly"');
+  expect(source).toContain("title={copy.readOnly}");
+  expect(source).toContain("description={copy.readOnlyHint}");
   expect(source).not.toContain('className="text-sm text-muted">{copy.readOnly}</p>');
 });

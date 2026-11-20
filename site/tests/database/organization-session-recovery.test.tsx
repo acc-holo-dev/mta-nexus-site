@@ -15,18 +15,20 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/workspace/organizations",
   useRouter: () => ({ refresh: vi.fn() }),
 }));
-vi.mock("../../src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
+  getRequestLocale: async () => state.locale,
+}));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../../src/lib/services/organization-workspace-service", () => ({
+vi.mock("../../src/lib/services/organizations/organization-workspace-service", () => ({
   organizationWorkspaceService: { list: state.list, get: state.get },
 }));
 
-import Directory from "../../src/features/organizations/server/directory-page";
-import Workspace from "../../src/features/organizations/server/workspace-page";
 import NewOrganization from "../../src/app/workspace/organizations/new/page";
-import { getOrganizationCopy } from "../../src/lib/organization-workspace-copy";
+import { getOrganizationCopy } from "../../src/features/organizations/organization-workspace-copy";
+import { OrganizationsPage as Directory } from "../../src/features/organizations/server/directory-page";
+import { OrganizationPage as Workspace } from "../../src/features/organizations/server/workspace-page";
 
 beforeEach(() => {
   vi.resetAllMocks();

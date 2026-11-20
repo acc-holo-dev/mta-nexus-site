@@ -1,22 +1,27 @@
 "use client";
-import { Button, ErrorState } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Locale } from "../../../lib/i18n";
+import { formatUnknown } from "../../../lib/i18n/unknown";
+import { confirmAction } from "../../shell/confirm-action";
+import { linkAccentTight } from "../../shell/link-shell";
+import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
+import { surfaceSpace2P3TextSm } from "../../shell/surface-shell";
+import { typePrewrapBreak, typePrewrapBreakSm, typeSmSecondary } from "../../shell/type-shell";
 import {
   confirmedReview,
   confirmedReviewDecision,
   confirmedReviewReport,
-} from "../../../lib/resource-review-confirmation";
+} from "../resource-review-confirmation";
 import {
   type ResourceReviewEligibilityReason,
   resourceReviewCopy,
   resourceReviewEligibilityCopy,
   resourceReviewError,
   resourceReviewState,
-} from "../../../lib/resource-review-i18n";
-import { confirmAction } from "../../../components/confirm-action";
+} from "../resource-review-i18n";
 
 const nativeFieldClass =
   "rounded border border-base bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
@@ -138,14 +143,18 @@ export function ResourceReviewEditor({
     void submit("withdraw");
   }
   return (
-    <section className="nexus-panel space-y-4 p-5">
-      <p className="text-sm text-secondary">{copy.access}</p>
+    <section className={panelSpace4P5}>
+      <p className={typeSmSecondary}>{copy.access}</p>
       {eligibilityNote ? (
-        <ErrorState id="resource-review-eligibility" title={eligibilityNote} />
+        <ErrorState
+          id="resource-review-eligibility"
+          title={eligibilityNote}
+          description={copy.eligibilityHint}
+        />
       ) : null}
       {review && <p>{resourceReviewState(locale, review.status)}</p>}
       {review?.moderationReason && (
-        <p className="text-sm text-secondary">
+        <p className={typeSmSecondary}>
           {copy.reason}: {review.moderationReason}
         </p>
       )}
@@ -212,7 +221,7 @@ export function ResourceReviewEditor({
         </form>
       ) : (
         review && (
-          <p className="whitespace-pre-wrap break-words text-sm" data-review-copyable="true">
+          <p className={typePrewrapBreakSm} data-review-copyable="true">
             {review.text}
           </p>
         )
@@ -229,15 +238,15 @@ export function ResourceReviewEditor({
         </label>
       )}
       {changed && (
-        <div className="space-y-2 rounded-lg border border-base p-3 text-sm">
+        <div className={surfaceSpace2P3TextSm}>
           <p role="status">{copy.draftChanged}</p>
           <p className="font-semibold">{copy.latestReview}</p>
           {review ? (
-            <p className="whitespace-pre-wrap break-words">
-              {copy.rating}: {review.rating ?? "—"}/5 · {review.text}
+            <p className={typePrewrapBreak}>
+              {copy.rating}: {formatUnknown(locale, review.rating)}/5 · {review.text}
             </p>
           ) : (
-            <p>{copy.noLatestReview}</p>
+            <EmptyState title={copy.noLatestReview} description={copy.noLatestReviewHint} />
           )}
           {canReview && !confirmed && (
             <Button
@@ -266,7 +275,13 @@ export function ResourceReviewEditor({
           {copy.withdraw}
         </Button>
       )}
-      {notice?.error ? <ErrorState id="resource-review-editor-error" title={notice.text} /> : null}
+      {notice?.error ? (
+        <ErrorState
+          id="resource-review-editor-error"
+          title={notice.text}
+          description={copy.noticeErrorDescription}
+        />
+      ) : null}
       {notice && !notice.error ? (
         <p role="status" className="text-sm">
           {notice.text}
@@ -350,20 +365,23 @@ export function ResourceReviewReportForm({
           {busy ? copy.busy : copy.send}
         </Button>
       </form>
-      {notice?.error ? <ErrorState id="resource-review-report-error" title={notice.text} /> : null}
+      {notice?.error ? (
+        <ErrorState
+          id="resource-review-report-error"
+          title={notice.text}
+          description={copy.noticeErrorDescription}
+        />
+      ) : null}
       {notice && !notice.error ? <p role="status">{notice.text}</p> : null}
       {id ? (
         <Link
           href={`/workspace/review-reports/${encodeURIComponent(id)}`}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentTight}
         >
           {copy.detail}
         </Link>
       ) : (
-        <Link
-          href="/workspace/review-reports"
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/review-reports" className={linkAccentTight}>
           {copy.reports}
         </Link>
       )}
@@ -432,7 +450,7 @@ export function ResourceReviewDecisionForm({
   if (status !== "open" && status !== "under_review") return null;
   return (
     <form
-      className="nexus-panel space-y-3 p-5"
+      className={panelSpace3P5}
       aria-busy={busy || undefined}
       onSubmit={(event) => {
         event.preventDefault();
@@ -477,7 +495,11 @@ export function ResourceReviewDecisionForm({
         {busy ? copy.busy : copy.decide}
       </Button>
       {notice?.error ? (
-        <ErrorState id="resource-review-decision-error" title={notice.text} />
+        <ErrorState
+          id="resource-review-decision-error"
+          title={notice.text}
+          description={copy.noticeErrorDescription}
+        />
       ) : null}
       {notice && !notice.error ? <p role="status">{notice.text}</p> : null}
       <Recovery locale={locale} />

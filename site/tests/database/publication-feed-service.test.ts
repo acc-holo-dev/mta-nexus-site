@@ -1,9 +1,12 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const mocks = vi.hoisted(() => ({ page: vi.fn(), resolve: vi.fn() }));
 vi.mock("@nexus/db", () => ({
   publicationFeedRepository: { page: mocks.page, resolvePublicScope: mocks.resolve },
 }));
-import { publicationFeedService as service } from "../../src/lib/services/publication-feed-service";
+
+import { publicationFeedService as service } from "../../src/lib/services/discovery/publication-feed-service";
+
 beforeEach(() => vi.clearAllMocks());
 it("projects bounded public DTOs, sanitizes media and preserves microsecond cursors", async () => {
   const row = {

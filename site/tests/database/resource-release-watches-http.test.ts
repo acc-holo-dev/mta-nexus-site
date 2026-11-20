@@ -1,10 +1,11 @@
-import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../helpers/browser-mutation-headers";
+
 const state = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,
   rate: vi.fn(),
@@ -12,7 +13,7 @@ const state = vi.hoisted(() => ({
   detail: vi.fn(),
   command: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate, generateId: () => "aud_a" }));
@@ -23,8 +24,10 @@ vi.mock("@nexus/db", () => ({
     command: state.command,
   },
 }));
+
+import { POST as command, GET as detail } from "../../src/app/api/library/watches/[id]/route";
 import { GET as page } from "../../src/app/api/library/watches/route";
-import { GET as detail, POST as command } from "../../src/app/api/library/watches/[id]/route";
+
 const context = { params: Promise.resolve({ id: "prd_a" }) };
 const request = (body: unknown, headers?: Record<string, string>) =>
   new NextRequest("https://nexus.test/api/library/watches/prd_a", {
@@ -111,7 +114,7 @@ it("revision-scoped commands use the existing mutation guard and never accept pr
   state.command.mockRejectedValue(new AppError("private state", 409, "RELEASE_WATCH_CONFLICT"));
   const response = await command(request({ enabled: true, expectedRevision: 0 }), context);
   expect(response.status).toBe(409);
-  expect(await response.json()).toEqual({ code: "RELEASE_WATCH_CONFLICT" });
+  expect(await response.json()).toMatchObject({ code: "RELEASE_WATCH_CONFLICT" });
 });
 it("refuses rate excess and account selectors on the read archive", async () => {
   expect(

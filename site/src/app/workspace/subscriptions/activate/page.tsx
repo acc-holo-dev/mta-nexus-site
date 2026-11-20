@@ -1,127 +1,14 @@
-import { AppError } from "@nexus/domain";
-import { ErrorState } from "@nexus/ui";
-import type { Metadata } from "next";
-import { cookies } from "next/headers";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { PlanReviewTerms } from "../../../../components/plan-review-terms";
-import { PlatformSignIn } from "../../../../components/platform-sign-in";
-import { SubscriptionControls } from "../../../../components/subscription-controls";
-import { subscriptionNavLinkClass } from "../../../../components/subscription-workspace-recovery";
-import { getDictionary } from "../../../../lib/i18n";
-import { getRequestLocale } from "../../../../lib/i18n-server";
-import { authService } from "../../../../lib/services/auth-service";
-import { subscriptionsService } from "../../../../lib/services/subscriptions-service";
-import { subscriptionError, subscriptionsCopy } from "../../../../lib/subscriptions-i18n";
 import {
-  subscriptionActivationQuery,
-  subscriptionPageParams,
-} from "../../../../lib/subscriptions-query";
+  SubscriptionActivateScreen,
+  subscriptionActivateMetadata,
+} from "../../../../features/commerce/subscription-activate-server";
 
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
-  title: "Activate free subscription | MTA NEXUS",
-  robots: { index: false, follow: false },
-};
-export default async function SubscriptionActivationPage({
-  searchParams,
-}: {
+
+export const generateMetadata = subscriptionActivateMetadata;
+
+export default async function Page(props: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [store, locale, raw] = await Promise.all([cookies(), getRequestLocale(), searchParams]),
-    c = subscriptionsCopy(locale),
-    dictionary = getDictionary(locale),
-    actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) {
-    const params = subscriptionPageParams(raw);
-    return (
-      <PlatformSignIn
-        locale={locale}
-        returnPath={`/workspace/subscriptions/activate${params.size ? `?${params}` : ""}`}
-      />
-    );
-  }
-  let recoveryRetry = "/workspace/subscriptions/activate";
-  try {
-    const pageParams = subscriptionPageParams(raw);
-    recoveryRetry = `/workspace/subscriptions/activate${pageParams.size ? `?${pageParams}` : ""}`;
-    const query = subscriptionActivationQuery(pageParams),
-      plan = await subscriptionsService.plan(query.planId);
-    if (!plan || plan.revision !== query.revision)
-      throw new AppError("Plan changed", 409, "SUBSCRIPTION_PLAN_CHANGED");
-    if (plan.price !== 0)
-      throw new AppError("Payment required", 409, "SUBSCRIPTION_PAYMENT_REQUIRED");
-    const scopes =
-      plan.scope === "organization"
-        ? await subscriptionsService.scopes(actor, query.scopePage)
-        : { scopes: [], page: 1, totalPages: 1 };
-    const href = (page: number) =>
-      `/workspace/subscriptions/activate?${new URLSearchParams({ planId: plan.id, revision: String(plan.revision), scopePage: String(page) })}`;
-    return (
-      <section className={pageShellClass}>
-        <Link href="/subscriptions" className={subscriptionNavLinkClass}>
-          {c.catalog}
-        </Link>
-        <h1 className="font-display">{c.activate}</h1>
-        <PlanReviewTerms terms={plan} locale={locale} />
-        <p>
-          {c.revision}: {plan.revision} · {plan.scope === "user" ? c.personal : c.organization}
-        </p>
-        <SubscriptionControls
-          action="activate"
-          actorId={actor.id}
-          planId={plan.id}
-          planRevision={plan.revision}
-          terms={plan}
-          scope={plan.scope}
-          scopes={scopes.scopes}
-        />
-        <nav className="flex flex-wrap gap-4" aria-label={c.organization}>
-          {scopes.page > 1 && (
-            <Link href={href(scopes.page - 1)} className={subscriptionNavLinkClass}>
-              {c.previous}
-            </Link>
-          )}
-          {scopes.page < scopes.totalPages && (
-            <Link href={href(scopes.page + 1)} className={subscriptionNavLinkClass}>
-              {c.scopeMore}
-            </Link>
-          )}
-        </nav>
-      </section>
-    );
-  } catch (error) {
-    if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
-    if (error instanceof AppError && [400, 409].includes(error.statusCode))
-      return (
-        <section className={pageShellClass}>
-          <ErrorState
-            title={subscriptionError(locale, error.code)}
-            description={c.selectionRecoverHint}
-            action={
-              <Link href="/subscriptions" className={subscriptionNavLinkClass}>
-                {dictionary.errors.retry}
-              </Link>
-            }
-          />
-        </section>
-      );
-    return (
-      <section className={pageShellClass}>
-        <Link href="/subscriptions" className={subscriptionNavLinkClass}>
-          {c.catalog}
-        </Link>
-        <ErrorState
-          title={c.loadUnavailable}
-          description={c.loadUnavailableHint}
-          action={
-            <Link href={recoveryRetry} className={subscriptionNavLinkClass}>
-              {dictionary.errors.retry}
-            </Link>
-          }
-        />
-      </section>
-    );
-  }
+  return SubscriptionActivateScreen(props);
 }

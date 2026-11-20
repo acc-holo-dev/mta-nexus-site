@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
 import { ObjectReportForm } from "../../src/features/moderation/object-report";
-import { platformReportCopy } from "../../src/lib/platform-report-i18n";
+import { platformReportCopy } from "../../src/features/moderation/platform-report-i18n";
 
 vi.mock("@nexus/ui", async () => {
   const React = await import("react");
@@ -29,7 +29,7 @@ it.each(["en", "ru"] as const)(
         registerHref="/auth/register"
       />,
     );
-    expect(html).toContain(platformReportCopy(locale).unavailable);
+    expect(html).toContain(platformReportCopy(locale).identityUnavailable);
     expect(html).toContain(platformReportCopy(locale).retry);
     expect(html).toContain('href="/users/alice"');
     expect(html).not.toContain("/auth/login");
@@ -37,7 +37,7 @@ it.each(["en", "ru"] as const)(
   },
 );
 
-vi.mock("../../src/components/guest-auth-links", () => ({
+vi.mock("../../src/features/shell/guest-auth", () => ({
   GuestAuthLinks: ({ signInLabel }: { signInLabel: string }) => (
     <a href="/auth/login">{signInLabel}</a>
   ),

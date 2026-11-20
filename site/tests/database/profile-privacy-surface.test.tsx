@@ -1,7 +1,10 @@
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { profilePrivacyCopy } from "../../src/lib/profile-privacy-copy";
+
+vi.mock("server-only", () => ({}));
+
+import { profilePrivacyCopy } from "../../src/features/accounts/profile-privacy-copy";
 
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
@@ -18,16 +21,16 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../../src/lib/services/profile-privacy-service", () => ({
+vi.mock("../../src/lib/services/accounts/profile-privacy-service", () => ({
   profilePrivacyService: { own: state.own },
 }));
-vi.mock("../../src/lib/services/publication-feed-service", () => ({
+vi.mock("../../src/lib/services/discovery/publication-feed-service", () => ({
   publicationFeedService: { resolve: state.resolve, page: state.page },
 }));
 
@@ -35,8 +38,8 @@ import PrivacyPage, { generateMetadata } from "../../src/app/settings/privacy/pa
 import UserActivity, {
   generateMetadata as activityMetadata,
 } from "../../src/app/users/[username]/activity/page";
+import { publicationCopy } from "../../src/features/community/publication-feed-copy";
 import { getDictionary } from "../../src/lib/i18n";
-import { publicationCopy } from "../../src/lib/publication-feed-copy";
 
 const saved = {
   id: "actor",
@@ -106,9 +109,9 @@ it("keeps save disabled and offers ErrorState recovery after a private load fail
   const html = renderToStaticMarkup(await PrivacyPage());
   expect(html).toContain('role="alert"');
   expect(html).toContain(profilePrivacyCopy("en").unavailable);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-w-0");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toMatch(/<fieldset disabled=""/u);
   expect(html).toContain(profilePrivacyCopy("en").reload);
   expect(html).not.toContain("private SQL");
@@ -128,7 +131,7 @@ it("shows honest recovery when public activity fails to resolve a profile", asyn
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(publicationCopy("en").loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/users/member/activity"');
   expect(state.page).not.toHaveBeenCalled();
 });

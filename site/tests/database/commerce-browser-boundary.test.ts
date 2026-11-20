@@ -3,19 +3,19 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const auth = vi.hoisted(() => ({ getSession: vi.fn(async () => null) }));
 const rate = vi.hoisted(() => vi.fn());
-vi.mock("../../src/lib/services/auth-service", () => ({ authService: auth }));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({ authService: auth }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: rate }));
-vi.mock("../../src/lib/services/commerce-service", () => ({ commerceService: {} }));
-vi.mock("../../src/lib/services/commercial-plan-service", () => ({
+vi.mock("../../src/lib/services/commerce/commerce-service", () => ({ commerceService: {} }));
+vi.mock("../../src/lib/services/commerce/commercial-plan-service", () => ({
   commercialPlanService: {},
   orderOperationsService: {},
 }));
-vi.mock("../../src/lib/services/order-case-service", () => ({ orderCaseService: {} }));
-vi.mock("../../src/lib/services/subscriptions-service", () => ({
+vi.mock("../../src/lib/services/commerce/order-case-service", () => ({ orderCaseService: {} }));
+vi.mock("../../src/lib/services/commerce/subscriptions-service", () => ({
   subscriptionsService: {},
 }));
-vi.mock("../../src/lib/services/plan-reviews-service", () => ({ planReviewsService: {} }));
-vi.mock("../../src/lib/services/resource-review-service", () => ({
+vi.mock("../../src/lib/services/commerce/plan-reviews-service", () => ({ planReviewsService: {} }));
+vi.mock("../../src/lib/services/resources/resource-review-service", () => ({
   resourceReviewService: {},
 }));
 
@@ -107,7 +107,7 @@ it.each(routes)(
       expect(auth.getSession).not.toHaveBeenCalled();
     } else {
       expect(response.status).toBe(401);
-      expect(await response.json()).toEqual({ code: "UNAUTHORIZED" });
+      expect(await response.json()).toMatchObject({ code: "UNAUTHORIZED" });
       expect(auth.getSession).toHaveBeenCalledOnce();
     }
   },

@@ -1,6 +1,7 @@
 import type { ResourceCartReviewItem } from "@nexus/domain";
 import type { Locale } from "../../../lib/i18n";
-import { resourceCartReceiptsCopy } from "../../../lib/resource-cart-receipts-i18n";
+import { typeBreakAllMonoXs, typeSpace2SmSecondary } from "../../shell/type-shell";
+import { resourceCartReceiptsCopy } from "../resource-cart-receipts-i18n";
 export function ResourceCartReviewEvidence({
   item,
   locale,
@@ -13,7 +14,7 @@ export function ResourceCartReviewEvidence({
 }) {
   const copy = resourceCartReceiptsCopy(locale);
   return (
-    <dl className="space-y-2 text-sm text-secondary">
+    <dl className={typeSpace2SmSecondary}>
       <div>
         <dt>{copy.version}</dt>
         <dd>{item.version}</dd>
@@ -24,7 +25,7 @@ export function ResourceCartReviewEvidence({
       </div>
       <div>
         <dt>{copy.hash}</dt>
-        <dd className="break-all font-mono text-xs">{item.sha256Hash}</dd>
+        <dd className={typeBreakAllMonoXs}>{item.sha256Hash}</dd>
       </div>
       <div>
         <dt>{copy.minimum}</dt>

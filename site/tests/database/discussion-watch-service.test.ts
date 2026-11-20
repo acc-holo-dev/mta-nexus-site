@@ -9,7 +9,7 @@ vi.mock("@nexus/db", () => ({
   notificationRepository: { createDiscussionReplyWithPush: mocks.store },
 }));
 
-import { notifyDiscussionReplies } from "../../src/lib/services/discussion-follow-notification-service";
+import { notifyDiscussionReplies } from "../../src/lib/services/community/discussion-follow-notification-service";
 
 const stamp = "2026-10-12T00:00:00.000123Z";
 beforeEach(() => {

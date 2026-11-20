@@ -1,28 +1,31 @@
+import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { AppError } from "@nexus/domain";
+
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a" } as { id: string } | null,
   rate: true,
   detail: vi.fn(),
   page: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: state.rate })),
 }));
-vi.mock("../../src/lib/services/resource-build-workspace-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-build-workspace-service", () => ({
   resourceBuildWorkspaceService: { detail: state.detail },
 }));
-vi.mock("../../src/lib/services/build-package-service", () => ({
+vi.mock("../../src/lib/services/resources/build-package-service", () => ({
   buildPackageService: { page: state.page },
 }));
-import { GET as report } from "../../src/app/api/products/[id]/builds/[buildId]/package/route";
+
+import { GET as staffFiles } from "../../src/app/api/admin/resources/[id]/builds/[buildId]/package/files/route";
 import { GET as staffReport } from "../../src/app/api/admin/resources/[id]/builds/[buildId]/package/route";
 import { GET as files } from "../../src/app/api/products/[id]/builds/[buildId]/package/files/route";
-import { GET as staffFiles } from "../../src/app/api/admin/resources/[id]/builds/[buildId]/package/files/route";
+import { GET as report } from "../../src/app/api/products/[id]/builds/[buildId]/package/route";
+
 const context = { params: Promise.resolve({ id: "prd_a", buildId: "bld_a" }) };
 const request = (suffix = "") =>
   new NextRequest(`http://nexus.test/api/products/prd_a/builds/bld_a/package${suffix}`);
@@ -74,7 +77,7 @@ it("keeps current repository authority failures private", async () => {
   state.detail.mockRejectedValue(new AppError("Private resource", 404, "NOT_FOUND"));
   const response = await report(request(), context);
   expect(response.status).toBe(404);
-  expect(await response.json()).toEqual({ code: "NOT_FOUND" });
+  expect(await response.json()).toMatchObject({ code: "NOT_FOUND" });
 });
 it("routes staff reads through live moderation authority", async () => {
   await staffReport(

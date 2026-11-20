@@ -6,6 +6,8 @@ export const admin = {
     title: "Administration",
     loading: "Loading administration…",
     hubUnavailable: "Administration queues are temporarily unavailable. Please try again.",
+    hubUnavailableHint:
+      "Retry reloads this administration hub only. A temporary load failure is not an empty moderation queue.",
     supportQueue: "Support queue",
     reportsQueue: "Reports queue",
     description: "Platform moderation, verification queue, resource review, and audit trail.",
@@ -28,6 +30,7 @@ export const admin = {
       "Control proof matches the current server endpoint and ownership scope.",
     verificationProofStale:
       "Control proof no longer matches the current server endpoint or ownership scope.",
+    verificationProofStaleHint: "Reject or request an updated proof before approving this claim.",
     noVerificationHistory: "No verification decisions yet.",
     pendingRequests: "pending requests",
     requester: "Requester",
@@ -43,6 +46,7 @@ export const admin = {
     scan: "Scan",
     scanProvenance: "Scan source and time",
     noBuilds: "No resource builds are waiting for review.",
+    versionDecisionHistory: "Version and decision history",
     quarantineQueue: "Build quarantine",
     quarantinePages: "Build quarantine pages",
     buildsQuarantined: "builds currently quarantined",
@@ -124,6 +128,8 @@ export const admin = {
     reject: "Reject",
     reviewArtifact: "Review artifact",
     artifactRequiresCleanScan: "Artifact download requires a trusted clean scan",
+    artifactRequiresCleanScanHint:
+      "Approve and reject stay disabled until a trusted clean scan is recorded. Download opens only after scan provenance exists.",
     approveBuildConfirm: "Approve this clean build for publication?",
     rejectBuildConfirm: "Reject this build?",
     buildFailed: "Build moderation failed.",
@@ -167,7 +173,11 @@ export const admin = {
     recovery: "Recovery email",
     recoveryVerified: "Verified for account recovery",
     recoveryNeedsVerification: "Recovery email still needs verification",
+    recoveryNeedsVerificationHint:
+      "Recovery email verification is not complete. Open security settings to send the verification email.",
     recoveryUnavailable: "Recovery status is unavailable",
+    recoveryUnavailableHint:
+      "Recovery status could not be confirmed here. Open security settings to check the recovery email again.",
     sessions: "Active sessions",
     sessionsDescription: "Only active, unexpired sessions owned by this account are shown.",
     currentSession: "Current session",
@@ -299,6 +309,8 @@ export const admin = {
     webPushDenied:
       "Browser notification permission is blocked for this site. Open your browser site settings, allow notifications, then return here and enable push. Inbox and watches are unaffected.",
     webPushError: "Web Push state could not be confirmed. Try checking again.",
+    webPushErrorHint:
+      "Retry rechecks this browser push probe only. A temporary check failure is not a disabled inbox or watch preference.",
     webPushLoading: "Checking browser push...",
     webPushCleanupHint:
       "This browser has a push subscription not registered for this session. To remove it, enable push and then disable it, or manage notification permissions in your browser settings.",
@@ -306,7 +318,11 @@ export const admin = {
     recoveryAccountChanged:
       "The signed-in account changed. Reload settings before checking recovery email.",
     recoveryNotVerified: "Not verified for recovery yet.",
+    recoveryNotVerifiedHint:
+      "Recovery email verification is not complete. Enter your current password below and send the verification email.",
     recoveryUnavailable: "Recovery email verification is unavailable for this account.",
+    recoveryUnavailableHint:
+      "Verification cannot be started from here. Reload settings to check the status again.",
     recoveryPassword: "Current password for recovery email",
     verifyRecoveryEmail: "Verify recovery email",
     recoveryAlreadyVerified: "This recovery email is already verified.",
@@ -341,12 +357,16 @@ export const admin = {
     unconfirmedSessionRevocation: "Unconfirmed session revocation",
     sessionEnded: "Session ended. That sign-in can no longer access your account.",
     sessionUnavailable: "The session list is unavailable. Reload settings to check it.",
+    sessionUnavailableHint:
+      "Retry reloads the session list only. A temporary load failure is not an empty sessions page and does not sign you out.",
     noSessions: "No active sessions found. Reload settings to confirm your sign-in.",
     preferenceSaved: "Notification preference saved.",
     backendUnavailable: "Account settings are temporarily unavailable.",
     unreadableResponse: "The server returned an unreadable response.",
     invalidResponse: "Invalid settings response",
     loadFailed: "Could not load account settings. Your sign-in status has not been confirmed.",
+    loadFailedHint:
+      "Retry reloads account settings only. This is not a guest state and does not change your password or sessions.",
     authRequired: "Authentication required",
     requestUnconfirmed: "The request could not be confirmed. Reload settings before retrying.",
     invalidSessionResponse: "Invalid session response",

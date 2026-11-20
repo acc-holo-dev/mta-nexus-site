@@ -6,19 +6,27 @@ import {
 import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
-import type { OrganizationHistory } from "../../../lib/organization-governance-contract";
-import { organizationGovernanceCopy } from "../../../lib/organization-governance-copy";
-import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
-import { privateChangeHistoryCopy } from "../../../lib/private-change-history-copy";
-import { changeHistoryHref } from "../../../lib/private-change-history-query";
 import {
   PrivateChangeHistoryCutoff,
   PrivateChangeHistoryFilters,
-} from "../../../components/private-change-history-controls";
-
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-5 overflow-x-clip py-8";
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+} from "../../accounts/change-history";
+import { privateChangeHistoryCopy } from "../../accounts/private-change-history-copy";
+import { changeHistoryHref } from "../../accounts/private-change-history-query";
+import { linkAccentSm, linkAccentTight } from "../../shell/link-shell";
+import { pageShellMax5xlCompact } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
+import {
+  typeBreakDisplayPrimary,
+  typeFlexWrapBetweenGap3,
+  typeFlexWrapGap4Sm,
+  typeSmMuted,
+  typeSmSecondary,
+  typeSmSemiboldPrimary,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import type { OrganizationHistory } from "../organization-governance-contract";
+import { organizationGovernanceCopy } from "../organization-governance-copy";
+import { getOrganizationCopy } from "../organization-workspace-copy";
 export function OrganizationHistoryView({
   data,
   id,
@@ -45,16 +53,16 @@ export function OrganizationHistoryView({
     teamCopy = getOrganizationCopy(locale),
     path = `/workspace/organizations/${encodeURIComponent(id)}/activity`;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellMax5xlCompact}>
       <header className="space-y-2">
-        <h1 className="break-words font-display text-primary">
+        <h1 className={typeBreakDisplayPrimary}>
           {copy.history}
           {data ? ` · ${data.organization.name}` : ""}
         </h1>
-        <p className="text-sm text-muted">{copy.historyDescription}</p>
-        <p className="text-xs text-muted">{copy.privacy}</p>
+        <p className={typeSmMuted}>{copy.historyDescription}</p>
+        <p className={typeXsMuted}>{copy.privacy}</p>
       </header>
-      <Link className={navLinkClass} href={`/workspace/organizations/${encodeURIComponent(id)}`}>
+      <Link className={linkAccentSm} href={`/workspace/organizations/${encodeURIComponent(id)}`}>
         {copy.back}
       </Link>
       <PrivateChangeHistoryFilters
@@ -73,18 +81,19 @@ export function OrganizationHistoryView({
               filters,
               { until: data.until },
             )}
-            className={navLinkClass}
+            className={linkAccentSm}
           >
             {journal.export}
           </a>
-          <p className="text-xs text-muted">{journal.exportHelp}</p>
+          <p className={typeXsMuted}>{journal.exportHelp}</p>
         </div>
       )}
       {!data && (
         <ErrorState
           title={error ?? copy.unavailable}
+          description={copy.unavailableHint}
           action={
-            <Link href={path} className={navLinkClass}>
+            <Link href={path} className={linkAccentSm}>
               {copy.reload}
             </Link>
           }
@@ -96,7 +105,7 @@ export function OrganizationHistoryView({
           description={filtered ? copy.emptyFilteredHint : copy.emptyHint}
           action={
             filtered ? (
-              <Link href={path} className={navLinkClass}>
+              <Link href={path} className={linkAccentSm}>
                 {journal.reset}
               </Link>
             ) : undefined
@@ -104,21 +113,21 @@ export function OrganizationHistoryView({
         />
       )}
       {data?.items.map((item) => (
-        <article className="nexus-panel space-y-3 p-5" key={item.id}>
-          <div className="flex flex-wrap justify-between gap-3">
-            <h2 className="text-sm font-semibold text-primary">{copy.actions[item.action]}</h2>
-            <time className="text-xs text-muted" dateTime={item.createdAt}>
+        <article className={panelSpace3P5} key={item.id}>
+          <div className={typeFlexWrapBetweenGap3}>
+            <h2 className={typeSmSemiboldPrimary}>{copy.actions[item.action]}</h2>
+            <time className={typeXsMuted} dateTime={item.createdAt}>
               {new Date(item.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                 timeZone: "UTC",
               })}{" "}
               UTC
             </time>
           </div>
-          <p className="text-sm text-secondary">
+          <p className={typeSmSecondary}>
             {copy.by}:{" "}
             {item.actorUsername ? (
               <Link
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentTight}
                 href={`/users/${encodeURIComponent(item.actorUsername)}`}
               >
                 {item.actorName} (@{item.actorUsername})
@@ -128,10 +137,10 @@ export function OrganizationHistoryView({
             )}
           </p>
           {item.subjectUsername && (
-            <p className="text-sm text-secondary">
+            <p className={typeSmSecondary}>
               {copy.subject}:{" "}
               <Link
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentTight}
                 href={`/users/${encodeURIComponent(item.subjectUsername)}`}
               >
                 {item.subjectName} (@{item.subjectUsername})
@@ -139,7 +148,7 @@ export function OrganizationHistoryView({
             </p>
           )}
           {(item.fromRole || item.toRole) && (
-            <p className="text-xs text-muted">
+            <p className={typeXsMuted}>
               {copy.role}:{" "}
               {[
                 item.fromRole ? teamCopy[item.fromRole] : null,
@@ -150,27 +159,27 @@ export function OrganizationHistoryView({
             </p>
           )}
           {item.managesServers !== null && (
-            <p className="text-xs text-muted">
+            <p className={typeXsMuted}>
               {copy.serverAccess}: {item.managesServers ? copy.enabled : copy.disabled}
             </p>
           )}
           {item.fields.length > 0 && (
-            <p className="text-xs text-muted">
+            <p className={typeXsMuted}>
               {copy.fields}:{" "}
               {[...new Set(item.fields)].map((field) => copy.fieldNames[field]).join(", ")}
             </p>
           )}
         </article>
       ))}
-      <nav className="flex flex-wrap gap-4 text-sm" aria-label={copy.history}>
+      <nav className={typeFlexWrapGap4Sm} aria-label={copy.history}>
         {(before || filters.cursor || filters.until || !data) && (
-          <Link className={navLinkClass} href={changeHistoryHref(path, filters, { fresh: true })}>
+          <Link className={linkAccentSm} href={changeHistoryHref(path, filters, { fresh: true })}>
             {copy.latest}
           </Link>
         )}
         {data?.hasMore && data.nextCursor && (
           <Link
-            className={navLinkClass}
+            className={linkAccentSm}
             href={
               data.until
                 ? changeHistoryHref(path, filters, { cursor: data.nextCursor })

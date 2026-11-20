@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   formatHistoryIntervalUtc,
-  serverHistoryChartSlots,
   serverHistoryBarPercent,
-} from "../../src/lib/server-history-presentation";
+  serverHistoryChartSlots,
+} from "../../src/features/servers/server-history-presentation";
 
 describe("complete-window history chart", () => {
   it("keeps missing intervals unknown and preserves a measured zero", () => {
@@ -56,7 +56,8 @@ describe("complete-window history chart", () => {
     expect(serverHistoryBarPercent(5, null)).toBe(0);
   });
   it("includes dates in interval labels for multi-day histories", () => {
-    expect(formatHistoryIntervalUtc("2026-09-25T07:05:00Z")).toBe("2026-09-25 07:05 UTC");
-    expect(formatHistoryIntervalUtc("invalid")).toBe("Unknown time");
+    expect(formatHistoryIntervalUtc("2026-09-25T07:05:00Z", "en")).toBe("2026-09-25 07:05 UTC");
+    expect(formatHistoryIntervalUtc("invalid", "en")).toBe("—");
+    expect(formatHistoryIntervalUtc("invalid", "ru")).toBe("—");
   });
 });

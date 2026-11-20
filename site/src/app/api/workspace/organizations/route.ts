@@ -1,9 +1,12 @@
 import { AppError, UnauthorizedError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { organizationApi, organizationInput } from "../../../../lib/organization-workspace-api";
-import { parseOrganizationPage } from "../../../../lib/organization-workspace-contract";
-import { organizationWorkspaceService } from "../../../../lib/services/organization-workspace-service";
+import {
+  organizationApi,
+  organizationInput,
+} from "../../../../features/organizations/organization-workspace-api";
+import { parseOrganizationPage } from "../../../../features/organizations/organization-workspace-contract";
+import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { organizationWorkspaceService } from "../../../../lib/services/organizations/organization-workspace-service";
 export function GET(request: NextRequest) {
   return organizationApi(request, async (user) => {
     const filters = parseOrganizationPage(request.nextUrl.searchParams);

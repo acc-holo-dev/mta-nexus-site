@@ -1,24 +1,20 @@
 import { createHash } from "node:crypto";
 import type { OrganizationAccessChange, OrganizationAccessNotificationData } from "@nexus/domain";
+import {
+  noticeStoredMessages,
+  noticeStoredTitles,
+  withBilingualParenthetical,
+} from "@nexus/domain";
 import type { db } from "../client";
 import { notifications } from "../schema";
 import { enqueueWebPushWithRecoveryWithin } from "./web-push-admission-recovery";
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
-const ACCESS_MESSAGE_EN: Record<OrganizationAccessChange, string> = {
-  added: "You were added to the team.",
-  updated: "Your role or delegated access changed.",
-  removed: "Your team access was revoked.",
-  left: "You left the team.",
-  ownership_gained: "Organization ownership was transferred to you.",
-  ownership_transferred: "You transferred organization ownership.",
-};
-
-function withOrganizationName(message: string, name: string) {
-  const trimmed = name.trim().slice(0, 200);
-  if (!trimmed) return message;
-  return `${message} (${trimmed})`;
+function accessMessage(change: OrganizationAccessChange, name: string) {
+  const base = noticeStoredMessages.organizationAccess[change];
+  const [en, ru] = base.split(" / ");
+  return withBilingualParenthetical(en, ru, name);
 }
 
 /** Inbox is part of the authoritative write. Push degradation is isolated by a savepoint. */
@@ -42,8 +38,8 @@ export async function storeOrganizationAccessNotice(
   await tx.insert(notifications).values({
     id,
     recipientId,
-    title: "Organization access changed",
-    message: withOrganizationName(ACCESS_MESSAGE_EN[change], organization.name),
+    title: noticeStoredTitles.organizationAccessChanged,
+    message: accessMessage(change, organization.name),
     link:
       change === "removed" || change === "left"
         ? `/organizations/${encodeURIComponent(organization.slug)}`

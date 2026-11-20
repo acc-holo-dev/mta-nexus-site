@@ -20,15 +20,15 @@ import {
 } from "@nexus/db";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { afterEach, expect, it } from "vitest";
+import { discussionPushReceipt } from "../../packages/db/src/repositories/discussion-push-receipt";
 import {
   previewDiscussionReplay,
   readDiscussionReplayPage,
   resolveDiscussionReplayDatabaseIdentity,
 } from "../../scripts/discussion-replay-database";
 import { withDiscussionReplayCheckpoint } from "../../scripts/discussion-replay-storage";
-import { notifyDiscussionReplies } from "../../src/lib/services/discussion-follow-notification-service";
-import { replayDiscussionNotifications } from "../../src/lib/services/discussion-notification-replay";
-import { discussionPushReceipt } from "../../packages/db/src/repositories/discussion-push-receipt";
+import { notifyDiscussionReplies } from "../../src/lib/services/community/discussion-follow-notification-service";
+import { replayDiscussionNotifications } from "../../src/lib/services/community/discussion-notification-replay";
 import { setNotificationPreferencesForTest } from "../helpers/notification-preferences-fixture";
 
 const actors: string[] = [];

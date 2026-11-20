@@ -1,16 +1,16 @@
 import { AppError, NotFoundError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
+import { parsePublicationQuery } from "../../../../../features/community/publication-feed-contract";
+import { publicationError } from "../../../../../features/community/publication-feed-copy";
+import { getTrustedRequestIp } from "../../../../../features/shell/request-client-ip";
 import { resolveLocale } from "../../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-} from "../../../../../lib/observability";
-import { parsePublicationQuery } from "../../../../../lib/publication-feed-contract";
-import { publicationError } from "../../../../../lib/publication-feed-copy";
-import { getTrustedRequestIp } from "../../../../../lib/request-client-ip";
-import { publicationFeedService } from "../../../../../lib/services/publication-feed-service";
+} from "../../../../../lib/platform/observability";
+import { publicationFeedService } from "../../../../../lib/services/discovery/publication-feed-service";
 export const dynamic = "force-dynamic";
 export async function GET(
   request: NextRequest,

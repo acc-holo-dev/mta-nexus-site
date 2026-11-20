@@ -15,7 +15,7 @@ vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
 
 import { LibraryCollectionReconcileForm } from "../../src/features/library/components/library-collection-reconcile";
-import { libraryCollectionManifestsCopy } from "../../src/lib/library-collection-manifests-i18n";
+import { libraryCollectionManifestsCopy } from "../../src/features/library/library-collection-manifests-i18n";
 
 const { collection, fixture, state, render, check, submit } =
   createLibraryCollectionReconcileInteractionHelpers(harness, LibraryCollectionReconcileForm);
@@ -44,7 +44,10 @@ it("caps combined selected changes at twenty and makes archived previews read on
   check(0, false);
   expect(render().filter((n) => n.type === "input")[20]?.props.disabled).toBe(false);
   state.report = { ...state.report, collection: { ...collection, status: "archived" }, items: [] };
+  const copy = libraryCollectionManifestsCopy("en");
   expect(
-    render().some((n) => n.props.children === libraryCollectionManifestsCopy("en").noChanges),
+    render().some(
+      (n) => n.props.title === copy.noChanges && n.props.description === copy.noChangesHint,
+    ),
   ).toBe(true);
 });

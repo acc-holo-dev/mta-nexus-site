@@ -2,14 +2,14 @@ import { randomUUID } from "node:crypto";
 import { eq, inArray, sql } from "drizzle-orm";
 import { db } from "./client";
 import {
-  users,
-  organizations,
-  servers,
-  products,
-  builds,
-  licenses,
-  content,
   auditEvents,
+  builds,
+  content,
+  licenses,
+  organizations,
+  products,
+  servers,
+  users,
 } from "./schema";
 import type { SeedData } from "./seed-data";
 

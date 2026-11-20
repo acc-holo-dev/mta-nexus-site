@@ -9,6 +9,7 @@ import { storageService } from "@nexus/storage";
 import { NextRequest } from "next/server";
 import { describe, expect, it } from "vitest";
 import { GET } from "../../src/app/api/products/[id]/download/route";
+import { productDownloadApiCopy } from "../../src/features/resources/product-download-api-copy";
 
 function downloadRequest(token: string, productId: string, buildId?: string) {
   const url = new URL(`http://nexus.test/api/products/${productId}/download`);
@@ -137,7 +138,7 @@ describe("resource download route integration", () => {
       });
       expect(denied.status).toBe(403);
       expect(await denied.json()).toEqual({
-        error: "Add this resource to your library before downloading it",
+        error: productDownloadApiCopy("en").libraryRequired,
       });
 
       const pendingBuildId = `bld_dl_pending_${suffix}`;
@@ -162,7 +163,7 @@ describe("resource download route integration", () => {
       });
       expect(privatePin.status).toBe(404);
       expect(await privatePin.json()).toEqual({
-        error: "No published build is available",
+        error: productDownloadApiCopy("en").noPublishedBuild,
       });
       const stillLatest = await GET(downloadRequest(entitledToken, productId), {
         params: Promise.resolve({ id: productId }),
@@ -176,7 +177,7 @@ describe("resource download route integration", () => {
       });
       expect(unpublished.status).toBe(404);
       expect(await unpublished.json()).toEqual({
-        error: "Resource not found",
+        error: productDownloadApiCopy("en").notFound,
       });
 
       await productRepository.update(productId, { status: "published" });
@@ -186,7 +187,7 @@ describe("resource download route integration", () => {
       });
       expect(retired.status).toBe(404);
       expect(await retired.json()).toEqual({
-        error: "No published build is available",
+        error: productDownloadApiCopy("en").noPublishedBuild,
       });
     } finally {
       await storageService.deleteAsset(asset.key);

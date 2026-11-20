@@ -1,10 +1,17 @@
 import type { ResourceRequirementsReport, ResourceRequirementsScope } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
-import { resourceRequirementsCopy } from "../../../lib/resource-requirements-i18n";
-import { AddResourceToCart } from "./resource-cart-controls";
+import { linkAccentTightRounded } from "../../shell/link-shell";
+import { panelSpace3P4 } from "../../shell/panel-shell";
+import {
+  typeBreakAllXsOnly,
+  typeBreakSemibold,
+  typeFlexWrapGap4,
+  typeSmMuted,
+} from "../../shell/type-shell";
 import { ResourceDownloadButton } from "../download";
-
+import { resourceRequirementsCopy } from "../resource-requirements-i18n";
+import { AddResourceToCart } from "./resource-cart-controls";
 export function ResourceRequirementsReportBody({
   report,
   scope,
@@ -43,11 +50,13 @@ export function ResourceRequirementsReportBody({
                 ? `${report.issues[0].slug} · ${copy.codes[report.issues[0].code]}`
                 : report.cycles[0]
                   ? report.cycles[0].join(" → ")
-                  : undefined
+                  : report.state === "blocked"
+                    ? copy.stateBlockedHint
+                    : copy.stateReviewHint
             }
           />
         ))}
-      <p className="text-sm text-muted">
+      <p className={typeSmMuted}>
         {copy.snapshot}: {report.generatedAt}
       </p>
       {scope === "library" && (
@@ -55,14 +64,11 @@ export function ResourceRequirementsReportBody({
           {copy.size}: {report.downloadableBytes}
         </p>
       )}
-      <a
-        href={exportHref}
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <a href={exportHref} className={linkAccentTightRounded}>
         {copy.export}
       </a>
       {(report.issues.length > 0 || !suppressEmptyIssues) && (
-        <section className="nexus-panel space-y-3 p-4">
+        <section className={panelSpace3P4}>
           <h2>{copy.issues}</h2>
           {report.issues.length ? (
             <ul className="space-y-2">
@@ -80,6 +86,7 @@ export function ResourceRequirementsReportBody({
               key={cycle.join(":")}
               id={`resource-requirements-cycle-${cycle.join("-")}`}
               title={cycle.join(" → ")}
+              description={copy.cycleHint}
             />
           ))}
         </section>
@@ -87,7 +94,7 @@ export function ResourceRequirementsReportBody({
       {report.order.length > 0 && (
         <section className="space-y-2">
           <h2>{copy.order}</h2>
-          <p className="text-sm text-muted">{copy.orderNote}</p>
+          <p className={typeSmMuted}>{copy.orderNote}</p>
           <ol className="list-inside list-decimal">
             {report.order.map((slug) => (
               <li key={slug} className="break-words">
@@ -99,8 +106,8 @@ export function ResourceRequirementsReportBody({
       )}
       <ul className="space-y-4">
         {report.nodes.map((node) => (
-          <li key={node.id} className="nexus-panel space-y-3 p-4">
-            <h3 className="break-words font-semibold">{node.title}</h3>
+          <li key={node.id} className={panelSpace3P4}>
+            <h3 className={typeBreakSemibold}>{node.title}</h3>
             <code>{node.slug}</code>
             <p>
               {copy.selection}: {copy.modes[node.selection]} · {copy.version}:{" "}
@@ -116,15 +123,15 @@ export function ResourceRequirementsReportBody({
               </p>
             )}
             {node.build && (
-              <p className="break-all text-xs">
+              <p className={typeBreakAllXsOnly}>
                 {copy.hash}: {node.build.sha256Hash}
               </p>
             )}
-            <div className="flex flex-wrap gap-4">
+            <div className={typeFlexWrapGap4}>
               {node.published && (
                 <Link
                   href={`/market/${encodeURIComponent(node.slug)}`}
-                  className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={linkAccentTightRounded}
                 >
                   {copy.catalog}
                 </Link>
@@ -135,7 +142,7 @@ export function ResourceRequirementsReportBody({
               {scope === "library" && node.accessible && (
                 <Link
                   href={`/workspace/library/${encodeURIComponent(node.id)}/versions`}
-                  className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={linkAccentTightRounded}
                 >
                   {copy.inspect}
                 </Link>

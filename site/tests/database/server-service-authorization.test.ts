@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Server, User } from "@nexus/domain";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   organization: vi.fn(),
@@ -21,7 +21,7 @@ vi.mock("@nexus/security", async () => {
   return { can, generateId: vi.fn((prefix: string) => `${prefix}_test`) };
 });
 
-import { serverService } from "../../src/lib/services/server-service";
+import { serverService } from "../../src/lib/services/servers/server-service";
 
 const actor = (id: string, role: User["role"] = "user") =>
   ({

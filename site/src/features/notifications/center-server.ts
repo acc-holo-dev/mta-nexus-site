@@ -1,3 +1,3 @@
 import "server-only";
 
-export { default, generateMetadata } from "./server/center-page";
+export { NotificationCenterPage, notificationCenterMetadata } from "./server/center-page";

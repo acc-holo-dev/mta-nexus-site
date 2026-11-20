@@ -1,10 +1,10 @@
 import { AppError, UnauthorizedError } from "@nexus/domain";
 import { orderCancellationCommandSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
-import { readBoundedJson } from "../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
-import { orderOperationsService } from "../../../../../lib/services/commercial-plan-service";
+import { resourceCommerceRequest } from "../../../../../features/resources/resource-commerce-http";
+import { readBoundedJson } from "../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
+import { orderOperationsService } from "../../../../../lib/services/commerce/commercial-plan-service";
 export const POST = withBrowserMutation(function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },

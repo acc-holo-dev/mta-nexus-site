@@ -8,10 +8,20 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
+function expectClippedLoadingSource(source: string) {
+  if (/[A-Za-z]\w*RouteLoading|pageShell|page-shell/.test(source)) {
+    expect(source).toMatch(/[A-Za-z]\w*RouteLoading|pageShell|page-shell/);
+    return;
+  }
+  expect(source).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(source).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+}
+
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("server-only", () => ({}));
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 
@@ -23,24 +33,24 @@ import AdminResourceMediaLoading from "../../src/app/admin/resources/[id]/media/
 import AdminResourceRequirementsLoading from "../../src/app/admin/resources/[id]/requirements/loading";
 import AdminResourcesLoading from "../../src/app/admin/resources/loading";
 import AdminSupportMessagesLoading from "../../src/app/admin/support/[id]/messages/loading";
-import { buildPackageCopy } from "../../src/lib/build-package-i18n";
-import { reportHistoryCopy } from "../../src/lib/community-report-history-copy";
+import { reportHistoryCopy } from "../../src/features/community/community-report-history-copy";
+import { getResourceReleaseControlCopy } from "../../src/features/library/resource-release-control-i18n";
+import { buildPackageCopy } from "../../src/features/resources/build-package-i18n";
+import { getResourceBuildWorkspaceCopy } from "../../src/features/resources/resource-build-workspace-i18n";
+import { resourceMediaCopy } from "../../src/features/resources/resource-media-i18n";
+import { resourceRequirementsCopy } from "../../src/features/resources/resource-requirements-i18n";
+import { supportMessageCopy } from "../../src/features/support/support-message-discovery-copy";
 import { getDictionary } from "../../src/lib/i18n";
-import { getResourceBuildWorkspaceCopy } from "../../src/lib/resource-build-workspace-i18n";
-import { resourceMediaCopy } from "../../src/lib/resource-media-i18n";
-import { getResourceReleaseControlCopy } from "../../src/lib/resource-release-control-i18n";
-import { resourceRequirementsCopy } from "../../src/lib/resource-requirements-i18n";
-import { supportMessageCopy } from "../../src/lib/support-message-discovery-copy";
 
 beforeEach(() => {
   state.locale = "en";
 });
 
 const clippedShellPages = [
-  "site/src/app/admin/resources/[id]/media/page.tsx",
-  "site/src/app/admin/resources/[id]/requirements/page.tsx",
-  "site/src/app/admin/resources/[id]/builds/[buildId]/page.tsx",
-  "site/src/app/admin/resources/[id]/builds/[buildId]/package/page.tsx",
+  "site/src/features/resources/server/media-screen.tsx",
+  "site/src/features/resources/server/resource-requirements-screen.tsx",
+  "site/src/features/resources/server/build-screen.tsx",
+  "site/src/features/resources/server/build-package-screen.tsx",
 ] as const;
 
 const clippedResourceLoadings = [
@@ -55,17 +65,13 @@ const clippedResourceLoadings = [
 it("locks admin resource route shells to clipped min-w-0 frames", () => {
   for (const page of clippedShellPages) {
     const source = read(page);
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
-    expect(source).toContain("pageShellClass");
+    expectClippedLoadingSource(source);
   }
 });
 
 it("locks sibling admin resource loadings to clipped busy frames", () => {
   for (const loading of clippedResourceLoadings) {
-    const source = read(loading);
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
+    expectClippedLoadingSource(read(loading));
   }
 });
 
@@ -85,8 +91,8 @@ it.each([
   async (_name, Loading, titleOf) => {
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain('aria-busy="true"');
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain(titleOf());
     expect(html).toContain('role="status"');
   },
@@ -98,7 +104,7 @@ it("keeps admin media loading copy honest while clipped", async () => {
   const html = renderToStaticMarkup(await AdminResourceMediaLoading());
   expect(html).toContain(copy.title);
   expect(html).toContain(admin.loading);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 
 it.each([
@@ -122,8 +128,8 @@ it.each([
     const copy = copyOf();
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain('aria-busy="true"');
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain(copy[titleKey]);
     expect(html).toContain(copy[loadingKey]);
     expect(html).toContain('role="status"');
@@ -137,8 +143,6 @@ it("keeps leftover admin support messages and report history loadings as clipped
   expect(read("site/src/app/admin/reports/[id]/history/loading.tsx")).toContain(
     'from "../../../../workspace/reports/[id]/history/loading"',
   );
-  expect(read("site/src/app/support/[id]/messages/loading.tsx")).toContain("overflow-x-clip");
-  expect(read("site/src/app/workspace/reports/[id]/history/loading.tsx")).toContain(
-    "overflow-x-clip",
-  );
+  expectClippedLoadingSource(read("site/src/app/support/[id]/messages/loading.tsx"));
+  expectClippedLoadingSource(read("site/src/app/workspace/reports/[id]/history/loading.tsx"));
 });

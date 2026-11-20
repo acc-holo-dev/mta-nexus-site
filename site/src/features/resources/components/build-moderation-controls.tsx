@@ -1,16 +1,23 @@
 "use client";
 import { Button, ErrorState } from "@nexus/ui";
-
 import { Download, LoaderCircle, ShieldCheck, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { confirmsAdminAction } from "../../../lib/admin-action-confirmation";
-import { buildModerationUiState } from "../../../lib/build-moderation-ui";
-import { getResourceBuildWorkspaceCopy } from "../../../lib/resource-build-workspace-i18n";
-import { verificationCopy } from "../../../lib/verification-workspace-copy";
-import { confirmAction } from "../../../components/confirm-action";
-import { useNexusLocale } from "../../../components/locale-context";
-
+import { adminActionClientError } from "../../moderation/admin-action-client-error";
+import { confirmsAdminAction } from "../../moderation/admin-action-confirmation";
+import { confirmAction } from "../../shell/confirm-action";
+import { linkGhostAccentSm } from "../../shell/link-shell";
+import { useNexusLocale } from "../../shell/locale";
+import { skelH35W35Spin } from "../../shell/skeleton-shell";
+import {
+  typeFlexWrapGap2,
+  typeLabelUpperMuted,
+  typeTenFaint,
+  typeWFullMaxSmSpace2Md80,
+} from "../../shell/type-shell";
+import { verificationCopy } from "../../trust/verification-workspace-copy";
+import { buildModerationUiState } from "../build-moderation-ui";
+import { getResourceBuildWorkspaceCopy } from "../resource-build-workspace-i18n";
 export function BuildModerationControls({
   buildId,
   scanStatus,
@@ -87,7 +94,19 @@ export function BuildModerationControls({
       });
       const data = await response.json().catch(() => null);
       if (!confirmsAdminAction(response.status, data, buildId, action)) {
-        setError(response.status === 409 ? versionCopy.conflict : copy.buildFailed);
+        setError(
+          adminActionClientError(
+            locale,
+            typeof data?.code === "string"
+              ? data.code
+              : response.status === 409
+                ? "CONFLICT"
+                : response.status === 429
+                  ? "RATE_LIMIT_EXCEEDED"
+                  : undefined,
+            response.status === 409 ? versionCopy.conflict : copy.buildFailed,
+          ),
+        );
         if (response.status !== 429) setUncertain(true);
         return;
       }
@@ -104,9 +123,9 @@ export function BuildModerationControls({
   }
 
   return (
-    <div className="w-full max-w-sm space-y-2 md:w-80" aria-busy={pending !== null}>
+    <div className={typeWFullMaxSmSpace2Md80} aria-busy={pending !== null}>
       <label className="block space-y-1">
-        <span className="font-label uppercase text-muted">{copy.reviewNote}</span>
+        <span className={typeLabelUpperMuted}>{copy.reviewNote}</span>
         <textarea
           value={notes}
           onChange={(event) => setNotes(event.target.value)}
@@ -122,10 +141,11 @@ export function BuildModerationControls({
         <ErrorState
           id="build-moderation-artifact-clean-scan"
           title={copy.artifactRequiresCleanScan}
+          description={copy.artifactRequiresCleanScanHint}
         />
       ) : null}
 
-      <div className="flex flex-wrap gap-2">
+      <div className={typeFlexWrapGap2}>
         {hasTrustedCleanScan ? (
           <a
             href={`/api/admin/builds/${encodeURIComponent(buildId)}/download`}
@@ -144,7 +164,7 @@ export function BuildModerationControls({
           variant="outline"
         >
           {pending === "approve" ? (
-            <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+            <LoaderCircle className={skelH35W35Spin} aria-hidden="true" />
           ) : (
             <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
           )}
@@ -159,7 +179,7 @@ export function BuildModerationControls({
           variant="outline"
         >
           {pending === "reject" ? (
-            <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+            <LoaderCircle className={skelH35W35Spin} aria-hidden="true" />
           ) : (
             <XCircle className="h-3.5 w-3.5" aria-hidden="true" />
           )}
@@ -176,7 +196,7 @@ export function BuildModerationControls({
               <Button
                 type="button"
                 onClick={() => router.refresh()}
-                className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkGhostAccentSm}
                 variant="ghost"
               >
                 {versionCopy.reload}
@@ -186,7 +206,7 @@ export function BuildModerationControls({
         />
       ) : null}
       {!hasNotes && (
-        <p className="text-[10px] text-faint" aria-live="polite">
+        <p className={typeTenFaint} aria-live="polite">
           {copy.reviewNoteHint}
         </p>
       )}

@@ -4,28 +4,52 @@ import {
   LIBRARY_MEMBERSHIP_HISTORY_OPERATIONS,
 } from "@nexus/domain";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { libraryCollectionHistoryCopy } from "../../../lib/library-collection-history-i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
 import {
-  libraryCollectionError,
-  libraryCollectionsCopy,
-} from "../../../lib/library-collections-i18n";
-import { collectionHref, collectionPageParams } from "../../../lib/library-collections-query";
-import { libraryMembershipHistoryCopy } from "../../../lib/library-membership-history-i18n";
+  linkAccentSm,
+  linkAccentSmMedium,
+  linkAccentSmRounded,
+  linkAccentTight,
+} from "../../shell/link-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeFlexWrapEndGap3,
+  typeFlexWrapGap4Sm,
+  typeSurfaceBorderP2,
+} from "../../shell/type-shell";
+import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
+import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
+import { collectionHref, collectionPageParams } from "../library-collections-query";
+import { libraryMembershipHistoryCopy } from "../library-membership-history-i18n";
 import {
   libraryMembershipHistoryQuery,
   libraryMembershipHistorySuffix,
   membershipHistoryHref,
-} from "../../../lib/library-membership-history-query";
-import { authService } from "../../../lib/services/auth-service";
-import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
+} from "../library-membership-history-query";
 import { LibraryMembershipHistoryEntry } from "./library-membership-history-item";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { PlatformSessionError } from "../../../components/platform-session-error";
+export async function libraryMembershipHistoryMetadata(): Promise<Metadata> {
+  return {
+    title: `${libraryMembershipHistoryCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
+export async function libraryMembershipHistoryDetailMetadata(): Promise<Metadata> {
+  return {
+    title: `${libraryMembershipHistoryCopy(await getRequestLocale()).detail} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
 export async function LibraryMembershipHistoryScreen({
   params,
   searchParams,
@@ -82,21 +106,16 @@ export async function LibraryMembershipHistoryScreen({
       if (missingReceipt) notFound();
       if (!receipt) {
         return (
-          <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
-            <Link
-              href={membershipHistoryHref()}
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+          <div className={pageShellMax5xl}>
+            <Link href={membershipHistoryHref()} className={linkAccentTight}>
               {m.history}
             </Link>
             <h1 className="font-display">{m.detail}</h1>
             <ErrorState
               title={m.loadUnavailable}
+              description={m.loadUnavailableDescription}
               action={
-                <Link
-                  href={membershipHistoryHref(receiptId)}
-                  className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
+                <Link href={membershipHistoryHref(receiptId)} className={linkAccentSmRounded}>
                   {dictionary.errors.retry}
                 </Link>
               }
@@ -105,11 +124,8 @@ export async function LibraryMembershipHistoryScreen({
         );
       }
       return (
-        <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
-          <Link
-            href={membershipHistoryHref()}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+        <div className={pageShellMax5xl}>
+          <Link href={membershipHistoryHref()} className={linkAccentTight}>
             {m.history}
           </Link>
           <h1>{m.detail}</h1>
@@ -131,15 +147,13 @@ export async function LibraryMembershipHistoryScreen({
       });
     if (!result) {
       return (
-        <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+        <div className={pageShellMax5xl}>
           <h1 className="font-display">{m.title}</h1>
           <ErrorState
             title={m.loadUnavailable}
+            description={m.loadUnavailableDescription}
             action={
-              <Link
-                href={retryHref}
-                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={retryHref} className={linkAccentSmRounded}>
                 {dictionary.errors.retry}
               </Link>
             }
@@ -154,35 +168,21 @@ export async function LibraryMembershipHistoryScreen({
       Boolean(result.productId) ||
       result.days !== 30;
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
-        <nav className="flex flex-wrap gap-4 text-sm" aria-label={m.title}>
-          <Link
-            href={collectionHref()}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+      <div className={pageShellMax5xl}>
+        <nav className={typeFlexWrapGap4Sm} aria-label={m.title}>
+          <Link href={collectionHref()} className={linkAccentTight}>
             {c.title}
           </Link>
-          <Link
-            href="/workspace/library/collections/history"
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href="/workspace/library/collections/history" className={linkAccentTight}>
             {h.title}
           </Link>
         </nav>
         <h1>{m.title}</h1>
         <p className="text-secondary">{m.note}</p>
-        <form
-          method="get"
-          action={membershipHistoryHref()}
-          className="flex flex-wrap items-end gap-3"
-        >
+        <form method="get" action={membershipHistoryHref()} className={typeFlexWrapEndGap3}>
           <label className="grid gap-1">
             {h.days}
-            <select
-              name="days"
-              defaultValue={result.days}
-              className="rounded border border-base bg-surface p-2"
-            >
+            <select name="days" defaultValue={result.days} className={typeSurfaceBorderP2}>
               {LIBRARY_COLLECTION_HISTORY_DAYS.map((days) => (
                 <option key={days} value={days}>
                   {days}
@@ -195,7 +195,7 @@ export async function LibraryMembershipHistoryScreen({
             <select
               name="operation"
               defaultValue={result.operation}
-              className="rounded border border-base bg-surface p-2"
+              className={typeSurfaceBorderP2}
             >
               {LIBRARY_MEMBERSHIP_HISTORY_OPERATIONS.map((op) => (
                 <option key={op} value={op}>
@@ -211,7 +211,7 @@ export async function LibraryMembershipHistoryScreen({
               defaultValue={result.collectionId ?? ""}
               maxLength={160}
               pattern="[A-Za-z0-9_-]+"
-              className="rounded border border-base bg-surface p-2"
+              className={typeSurfaceBorderP2}
             />
           </label>
           <label className="grid gap-1">
@@ -221,17 +221,14 @@ export async function LibraryMembershipHistoryScreen({
               defaultValue={result.productId ?? ""}
               maxLength={160}
               pattern="[A-Za-z0-9_-]+"
-              className="rounded border border-base bg-surface p-2"
+              className={typeSurfaceBorderP2}
             />
           </label>
           <Button type="submit" variant="outline">
             {h.filter}
           </Button>
           {filtered ? (
-            <Link
-              href={membershipHistoryHref()}
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={membershipHistoryHref()} className={linkAccentSm}>
               {m.clear}
             </Link>
           ) : null}
@@ -242,7 +239,7 @@ export async function LibraryMembershipHistoryScreen({
         </p>
         <a
           href={`/api/library/collections/membership-history/export?${suffix(result.page)}`}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentTight}
         >
           {h.export}
         </a>
@@ -252,10 +249,7 @@ export async function LibraryMembershipHistoryScreen({
             description={m.note}
             action={
               filtered ? (
-                <Link
-                  href={membershipHistoryHref()}
-                  className="inline-flex min-h-11 items-center text-sm font-medium text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                >
+                <Link href={membershipHistoryHref()} className={linkAccentSmMedium}>
                   {m.clear}
                 </Link>
               ) : undefined
@@ -270,11 +264,11 @@ export async function LibraryMembershipHistoryScreen({
           ))}
         </ol>
         {result.totalPages > 1 && (
-          <nav aria-label={c.page} className="flex flex-wrap gap-4 text-sm">
+          <nav aria-label={c.page} className={typeFlexWrapGap4Sm}>
             {result.page > 1 && (
               <Link
                 href={`${membershipHistoryHref()}?${suffix(result.page - 1)}`}
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentTight}
               >
                 {c.previous}
               </Link>
@@ -285,7 +279,7 @@ export async function LibraryMembershipHistoryScreen({
             {result.page < result.totalPages && (
               <Link
                 href={`${membershipHistoryHref()}?${suffix(result.page + 1)}`}
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentTight}
               >
                 {c.next}
               </Link>
@@ -298,14 +292,12 @@ export async function LibraryMembershipHistoryScreen({
     if (error instanceof Error && error.message === "NEXT_NOT_FOUND") throw error;
     if (!(error instanceof AppError)) {
       return (
-        <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+        <div className={pageShellMax5xl}>
           <ErrorState
             title={m.loadUnavailable}
+            description={m.loadUnavailableDescription}
             action={
-              <Link
-                href={membershipHistoryHref()}
-                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={membershipHistoryHref()} className={linkAccentSmRounded}>
                 {dictionary.errors.retry}
               </Link>
             }
@@ -314,15 +306,14 @@ export async function LibraryMembershipHistoryScreen({
       );
     }
     if (error.statusCode === 404) notFound();
+    const title = libraryCollectionError(locale, error.code);
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+      <div className={pageShellMax5xl}>
         <ErrorState
-          title={libraryCollectionError(locale, error.code)}
+          title={title}
+          description={title === c.retry ? m.loadUnavailableDescription : undefined}
           action={
-            <Link
-              href={membershipHistoryHref()}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={membershipHistoryHref()} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }

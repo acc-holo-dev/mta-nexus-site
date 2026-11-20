@@ -1,10 +1,12 @@
 import type { NextRequest } from "next/server";
+import { contentApiCopy } from "../../../../features/community/content-api-copy";
+import { resolveLocale } from "../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-} from "../../../../lib/observability";
-import { contentService } from "../../../../lib/services/content-service";
+} from "../../../../lib/platform/observability";
+import { contentService } from "../../../../lib/services/community/content-service";
 
 const publicHeaders = {
   "Cache-Control": "no-store",
@@ -16,6 +18,7 @@ const errorHeaders = {
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   const context = createRequestLogContext(request);
+  const copy = contentApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
 
   try {
     const { slug } = await params;
@@ -23,7 +26,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (!slug || slug.length > 200 || !/^[a-z0-9-]+$/u.test(slug)) {
       return jsonWithRequestId(
         context,
-        { error: "Article not found" },
+        { error: copy.notFound },
         { status: 404, headers: errorHeaders },
       );
     }
@@ -32,7 +35,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (!article) {
       return jsonWithRequestId(
         context,
-        { error: "Article not found" },
+        { error: copy.notFound },
         { status: 404, headers: errorHeaders },
       );
     }
@@ -52,7 +55,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return jsonWithRequestId(
       context,
       {
-        error: "Article is temporarily unavailable",
+        error: copy.unavailable,
       },
       { status: 503, headers: errorHeaders },
     );

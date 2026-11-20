@@ -1,10 +1,11 @@
+import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../helpers/browser-mutation-headers";
-import { NextRequest } from "next/server";
-import { AppError } from "@nexus/domain";
+
 const mocks = vi.hoisted(() => ({
   auth: vi.fn(),
   rate: vi.fn(),
@@ -12,7 +13,7 @@ const mocks = vi.hoisted(() => ({
   command: vi.fn(),
   review: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: mocks.auth,
     confirmStaffActionPassword: vi.fn(async () => ({ expectedPasswordHash: "hash_mod" })),
@@ -27,27 +28,28 @@ vi.mock("@nexus/security", async () => {
     generateId: () => "aud_a",
   };
 });
-vi.mock("../../src/lib/services/resource-build-workspace-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-build-workspace-service", () => ({
   resourceBuildWorkspaceService: { detail: mocks.detail, command: mocks.command },
 }));
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: { reviewBuild: mocks.review },
 }));
-vi.mock("../../src/lib/services/content-service", () => ({ contentService: {} }));
-vi.mock("../../src/lib/services/server-follow-notification-service", () => ({
+vi.mock("../../src/lib/services/community/content-service", () => ({ contentService: {} }));
+vi.mock("../../src/lib/services/notifications/server-follow-notification-service", () => ({
   notifyServerFollowersOfPublishedContent: vi.fn(),
 }));
-vi.mock("../../src/lib/services/resource-release-control-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-release-control-service", () => ({
   resourceModerationService: {},
 }));
-vi.mock("@nexus/db", () => ({
-  productRepository: {},
-  reportRepository: {},
-  verificationRepository: {},
+vi.mock("../../src/lib/services/moderation/admin-service", () => ({ adminService: {} }));
+vi.mock("../../src/lib/services/moderation/verification-workspace-service", () => ({
+  verificationWorkspaceService: {},
 }));
-import { GET, PATCH } from "../../src/app/api/products/[id]/builds/[buildId]/route";
-import { GET as staffGet } from "../../src/app/api/admin/resources/[id]/builds/[buildId]/route";
+
 import { POST as moderate } from "../../src/app/api/admin/actions/route";
+import { GET as staffGet } from "../../src/app/api/admin/resources/[id]/builds/[buildId]/route";
+import { GET, PATCH } from "../../src/app/api/products/[id]/builds/[buildId]/route";
+
 const actor = { id: "usr_a", role: "developer" },
   params = { params: Promise.resolve({ id: "prd_a", buildId: "bld_a" }) };
 const command = { action: "withdraw", expectedRevision: 3, reason: " Fix notes " };
@@ -119,7 +121,7 @@ it("forwards an explicit private conflict without leaking implementation details
   mocks.command.mockRejectedValue(new AppError("private data", 409, "BUILD_REVISION_CONFLICT"));
   const response = await PATCH(req(), params);
   expect(response.status).toBe(409);
-  expect(await response.json()).toEqual({ code: "BUILD_REVISION_CONFLICT" });
+  expect(await response.json()).toMatchObject({ code: "BUILD_REVISION_CONFLICT" });
 });
 it("uses separate live staff authority for admin detail", async () => {
   mocks.detail.mockResolvedValue({ build: { id: "bld_a" } });

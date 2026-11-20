@@ -12,7 +12,7 @@ const mocks = vi.hoisted(() => ({
   profile: vi.fn(),
   rate: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
 vi.mock("@nexus/db", () => ({
@@ -36,7 +36,7 @@ import {
   PATCH as update,
 } from "../../src/app/api/workspace/content/[id]/route";
 import { POST as create, GET as list } from "../../src/app/api/workspace/content/route";
-import { userPlatformError } from "../../src/lib/user-platform-copy";
+import { userPlatformError } from "../../src/features/community/user-platform-copy";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,

@@ -23,18 +23,18 @@ const mocks = vi.hoisted(() => ({
   rate: vi.fn(),
 }));
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
+    listOwnedOrganizations: mocks.ownedOrganizations,
+    listUserMemberships: mocks.memberships,
+    findOrganizationById: mocks.findOrganization,
+    findOrganizationSummariesByIds: vi.fn(async () => []),
+    findUserOrganizationContext: vi.fn(async () => null),
   },
 }));
 
 vi.mock("@nexus/db", () => ({
-  organizationRepository: {
-    listOwnedByUser: mocks.ownedOrganizations,
-    listUserMemberships: mocks.memberships,
-    findById: mocks.findOrganization,
-  },
   notificationRepository: {
     getPreferences: mocks.preferences,
     listByUser: mocks.notifications,
@@ -46,15 +46,16 @@ vi.mock("@nexus/db", () => ({
   productRepository: {
     findById: vi.fn(),
   },
+  webPushSubscriptionRepository: {},
 }));
 
-vi.mock("../../src/lib/services/server-service", () => ({
+vi.mock("../../src/lib/services/servers/server-service", () => ({
   serverService: {
     listServers: mocks.servers,
   },
 }));
 
-vi.mock("../../src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../../src/lib/services/servers/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: {
     getDirectory: mocks.directory,
   },
@@ -62,13 +63,13 @@ vi.mock("../../src/lib/services/mta-master-directory-service", () => ({
   mtaLiveStatus: vi.fn(() => "unknown"),
 }));
 
-vi.mock("../../src/lib/services/discovery-service", () => ({
+vi.mock("../../src/lib/services/discovery/discovery-service", () => ({
   discoveryService: {
     search: mocks.search,
   },
 }));
 
-vi.mock("../../src/lib/request-client-ip", () => ({
+vi.mock("../../src/features/shell/request-client-ip", () => ({
   getTrustedRequestIp: vi.fn(() => "203.0.113.10"),
 }));
 
@@ -231,7 +232,7 @@ describe("HTTP cache visibility contract", () => {
     const result = await getSearch(request("/api/search?q=nexus&limit=10"));
     expect(result.status).toBe(200);
     expect(result.headers.get("Cache-Control")).toBe("no-store");
-    expect(mocks.search).toHaveBeenCalledWith("nexus", 10, undefined);
+    expect(mocks.search).toHaveBeenCalledWith("nexus", 10, undefined, "en");
   });
 
   it("keeps the official MTA directory explicitly public-cacheable", async () => {

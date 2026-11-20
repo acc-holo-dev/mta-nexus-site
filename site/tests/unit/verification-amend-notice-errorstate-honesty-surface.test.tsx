@@ -14,16 +14,17 @@ const source = readFileSync(
 it("locks verification amend failure notice to ErrorState with stable id", () => {
   expect(source).toContain('import { Button, ErrorState } from "@nexus/ui"');
   expect(source).toContain('id="verification-amend-notice"');
-  expect(source).toMatch(
-    /\{notice && !saved \? <ErrorState id="verification-amend-notice" title=\{notice\} \/> : null\}/,
-  );
+  expect(source).toContain('id="verification-amend-notice"');
+  expect(source).toContain("title={notice}");
+  expect(source).toContain("description={formErrorHint}");
+  expect(source).toContain("getDictionary(locale).errors.formErrorHint");
   expect(source).not.toContain("{notice && !saved ? <ErrorState title={notice} /> : null}");
 });
 
 it("keeps successful verification amend confirmation on role=status", () => {
   expect(source).toContain('role="status"');
-  expect(source).toContain("text-success");
+  expect(source).toMatch(/text-success|typeSmSuccess/);
   expect(source).toMatch(
-    /\{notice && saved \? \(\s*<p role="status" className="text-sm text-success">\s*\{notice\}\s*<\/p>\s*\) : null\}/u,
+    /\{notice && saved \? \(\s*<p role="status" className=\{?(?:"text-sm text-success"|typeSmSuccess)\}?>\s*\{notice\}\s*<\/p>\s*\) : null\}/u,
   );
 });

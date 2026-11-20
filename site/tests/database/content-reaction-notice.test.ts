@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
@@ -31,9 +32,11 @@ vi.mock("../../packages/db/src/client", async () => {
   });
   return { db: proxy };
 });
+
 import { db } from "../../packages/db/src/client";
 import { contentReactionNotice } from "../../packages/db/src/repositories/content-reaction-notice";
-import { formatNotification } from "../../src/lib/notification-copy";
+import { formatNotification } from "../../src/features/notifications/notification-copy";
+
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 const item = { id: "content", slug: "guide", title: "Guide", authorId: "author" },
   insert = () => state.queries.find((q) => q.sql.startsWith("insert")),
@@ -52,8 +55,8 @@ it("locks content preferences and stores a status-only notice with a safe target
   expect(insert()?.params).toEqual(
     expect.arrayContaining([
       "author",
-      "Publication reaction",
-      "A reader reacted to your publication. (Guide)",
+      "Publication reaction / Реакция на публикацию",
+      "A reader reacted to your publication. (Guide) / Читатель оставил реакцию на вашу публикацию. (Guide)",
       "/articles/guide",
       JSON.stringify({
         kind: "content_reaction",
@@ -105,7 +108,11 @@ it.each(["en", "ru"] as const)(
   "localizes the bounded persisted reaction template in %s",
   (locale) => {
     const legacy = formatNotification(
-      { title: "Publication reaction", message: "Publication content: reaction.", data: undefined },
+      {
+        title: "Publication reaction / Реакция на публикацию",
+        message: "Publication content: reaction.",
+        data: undefined,
+      },
       { approved: "", rejected: "", version: "", notes: "" },
       locale,
     );
@@ -117,7 +124,7 @@ it.each(["en", "ru"] as const)(
     expect(legacy.message).not.toContain("content");
     const structured = formatNotification(
       {
-        title: "Publication reaction",
+        title: "Publication reaction / Реакция на публикацию",
         message: "stored",
         data: {
           kind: "content_reaction",

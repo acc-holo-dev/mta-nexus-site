@@ -41,8 +41,9 @@ const input = { recipientId: "reader", contentId: "article", commentId: "reply" 
 const data = {
   id: "ntf_reply_stable",
   recipientId: "reader",
-  title: "New discussion reply",
-  message: "A publication you follow has a new reply.",
+  title: "New discussion reply / Новый ответ в обсуждении",
+  message:
+    "A publication you follow has a new reply. / В публикации, на которую вы подписаны, появился новый ответ.",
   type: "content",
   category: "follow",
   link: "/articles/current?comment=reply#comment-reply",
@@ -79,7 +80,7 @@ it("serializes preferences after rechecking live source rights and stores a gene
     expect.arrayContaining([
       data.id,
       "reader",
-      "New discussion reply",
+      "New discussion reply / Новый ответ в обсуждении",
       data.message,
       data.link,
       "follow",

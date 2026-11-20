@@ -1,15 +1,15 @@
-import { eq } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
 import {
-  contentRepository,
   builds,
-  entitlements,
   comments,
+  contentRepository,
   db,
+  entitlements,
   productRepository,
   products,
   userRepository,
 } from "@nexus/db";
+import { eq } from "drizzle-orm";
+import { describe, expect, it } from "vitest";
 
 function databaseErrorCode(error: unknown): string | undefined {
   if (!error || typeof error !== "object") return undefined;

@@ -1,9 +1,6 @@
-import type { Metadata } from "next";
-
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
-  title: "Release history | MTA NEXUS",
-  robots: { index: false, follow: false },
-};
 
-export { PublicResourceVersionsPage as default } from "../../../../features/resources/versions-server";
+export {
+  PublicResourceVersionsPage as default,
+  publicResourceVersionsMetadata as generateMetadata,
+} from "../../../../features/resources/versions-server";

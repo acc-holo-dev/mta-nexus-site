@@ -1,20 +1,21 @@
 import { AppError, type ResourceRequirementsScope } from "@nexus/domain";
 import { Button, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { resourceRequirementsCopy } from "../../../lib/resource-requirements-i18n";
-import { resourceRequirementsQuery } from "../../../lib/resource-requirements-query";
-import { authService } from "../../../lib/services/auth-service";
-import { resourceRequirementsService } from "../../../lib/services/resource-requirements-service";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { resourceRequirementsService } from "../../../lib/services/resources/resource-requirements-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccent } from "../../shell/link-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelFlexWrapEndP4, panelP4 } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
 import { ResourceRequirementsReportBody } from "../components/resource-requirements-report-body";
-
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+import { resourceRequirementsCopy } from "../resource-requirements-i18n";
+import { resourceRequirementsQuery } from "../resource-requirements-query";
 
 function requirementsAccessError(error: unknown): "missing" | "failed" {
   if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) return "missing";
@@ -33,20 +34,28 @@ function ResourceRequirementsLoadError({
   const copy = resourceRequirementsCopy(locale),
     dictionary = getDictionary(locale);
   return (
-    <section className={pageShellClass}>
-      <Link href={backHref} className={navLinkClass}>
+    <section className={pageShellMax5xl}>
+      <Link href={backHref} className={linkAccent}>
         {copy.back}
       </Link>
       <ErrorState
         title={copy.loadUnavailable}
+        description={copy.loadUnavailableHint}
         action={
-          <Link href={retryHref} className={navLinkClass}>
+          <Link href={retryHref} className={linkAccent}>
             {dictionary.errors.retry}
           </Link>
         }
       />
     </section>
   );
+}
+
+export async function resourceRequirementsMetadata(): Promise<Metadata> {
+  return {
+    title: `${resourceRequirementsCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
 }
 
 export async function ResourceRequirementsScreen({
@@ -60,7 +69,20 @@ export async function ResourceRequirementsScreen({
 }) {
   const [locale, store] = await Promise.all([getRequestLocale(), cookies()]);
   const copy = resourceRequirementsCopy(locale);
-  const actor = await authService.getSession(store.get("nexus_session")?.value);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession(store.get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.loadUnavailable}
+        retryHref={"/admin/resources/"}
+      />
+    );
+  }
+
   const requirementsBase =
     scope === "library"
       ? `/workspace/library/${encodeURIComponent(productId)}/requirements`
@@ -110,8 +132,8 @@ export async function ResourceRequirementsScreen({
         ? `/api/products/${encodeURIComponent(productId)}/requirements`
         : `/api/admin/resources/${encodeURIComponent(productId)}/requirements`;
   return (
-    <div className={pageShellClass}>
-      <Link href={back} className={navLinkClass}>
+    <div className={pageShellMax5xl}>
+      <Link href={back} className={linkAccent}>
         {copy.back}
       </Link>
       <h1 className="font-display">{copy.title}</h1>
@@ -119,17 +141,17 @@ export async function ResourceRequirementsScreen({
       <p className="text-secondary">{copy.note}</p>
       {scope !== "library" && <p className="text-muted">{copy.preview}</p>}
       {query.previewBuildId && (
-        <p role="note" className="nexus-panel p-4">
+        <p role="note" className={panelP4}>
           {copy.libraryPreview}
         </p>
       )}
-      <form className="nexus-panel flex flex-wrap items-end gap-3 p-4">
+      <form className={panelFlexWrapEndP4}>
         <label className="grid gap-1">
           {copy.target}
           <input
             name="targetMta"
             maxLength={64}
-            placeholder="1.6.0-9.22279.0"
+            placeholder={copy.targetPlaceholder}
             defaultValue={query.targetMta}
             className="border border-base bg-inset p-2"
             required
@@ -154,4 +176,37 @@ export async function ResourceRequirementsScreen({
       />
     </div>
   );
+}
+
+export async function PublisherResourceRequirementsPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const [{ id }, raw] = await Promise.all([params, searchParams]);
+  return ResourceRequirementsScreen({ productId: id, scope: "publisher", raw });
+}
+
+export async function ModeratorResourceRequirementsPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const [{ id }, raw] = await Promise.all([params, searchParams]);
+  return ResourceRequirementsScreen({ productId: id, scope: "moderator", raw });
+}
+
+export async function LibraryResourceRequirementsPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const [{ id }, raw] = await Promise.all([params, searchParams]);
+  return ResourceRequirementsScreen({ productId: id, scope: "library", raw });
 }

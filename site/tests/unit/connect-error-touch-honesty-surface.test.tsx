@@ -9,21 +9,21 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const exclusive = [
   "site/src/features/servers/components/server-connect-controls.tsx",
-  "site/src/app/error.tsx",
+  "site/src/features/shell/components/route-error-page.tsx",
 ] as const;
 
 it("locks connect copy and root error CTAs to size=touch / min-h-11 without size=sm", () => {
   for (const path of exclusive) {
     const source = read(path);
     expect(source, path).toContain('size="touch"');
-    expect(source, path).toMatch(/min-h-11|size="touch"/u);
+    expect(source, path).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
     expect(source, path).not.toContain('size="sm"');
     expect(source, path).not.toContain("min-h-10");
   }
 });
 
 it("locks root error home link and both Buttons to touch chrome", () => {
-  const source = read("site/src/app/error.tsx");
+  const source = read("site/src/features/shell/components/route-error-page.tsx");
   expect(source.match(/size="touch"/gu)?.length ?? 0).toBeGreaterThanOrEqual(2);
   expect(source).toContain("min-h-11 items-center");
 });

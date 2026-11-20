@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
-import { PgDialect } from "drizzle-orm/pg-core";
 import type { SQL } from "drizzle-orm";
+import { PgDialect } from "drizzle-orm/pg-core";
+import { describe, expect, it, vi } from "vitest";
 
 const captured = vi.hoisted(() => ({
   selections: [] as unknown[],
@@ -25,11 +25,11 @@ vi.mock("../../packages/db/src/client", () => ({
   },
 }));
 
-import { UserRepository } from "../../packages/db/src/repositories/users";
-import { ServerRepository } from "../../packages/db/src/repositories/servers";
-import { ProductRepository } from "../../packages/db/src/repositories/products";
 import { ContentRepository } from "../../packages/db/src/repositories/content";
+import { ProductRepository } from "../../packages/db/src/repositories/products";
 import { ReportRepository } from "../../packages/db/src/repositories/reports";
+import { ServerRepository } from "../../packages/db/src/repositories/servers";
+import { UserRepository } from "../../packages/db/src/repositories/users";
 
 describe("admin aggregate metrics", () => {
   it("counts beyond listing caps using small scalar queries with the public safety gates", async () => {

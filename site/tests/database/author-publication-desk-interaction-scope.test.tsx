@@ -15,14 +15,14 @@ const harness = vi.hoisted(() => ({
   reload: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../../src/components/confirm-action", () => ({
+vi.mock("../../src/features/shell/confirm-action", () => ({
   confirmAction,
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
 
+import { authorPublicationDeskCopy } from "../../src/features/community/author-publication-desk-copy";
 import { AuthorPublicationRestore } from "../../src/features/community/author-publication-restore";
-import { authorPublicationDeskCopy } from "../../src/lib/author-publication-desk-copy";
 
 const { render, button, click, errorState, hasErrorAlert } =
   createAuthorPublicationDeskInteractionHelpers(harness, AuthorPublicationRestore, confirmAction);
@@ -31,7 +31,7 @@ it.each(["ru", "en"] as const)(
   "restores a team archive with a scope-bound acknowledgement in %s",
   async (locale) => {
     const { organizationPublicationHistoryCopy } = await import(
-      "../../src/lib/organization-publication-history-copy"
+      "../../src/features/organizations/organization-publication-history-copy"
     );
     const copy = organizationPublicationHistoryCopy(locale),
       labels = authorPublicationDeskCopy(locale);
@@ -78,7 +78,7 @@ it.each(["ru", "en"] as const)(
   "restores an exact server archive to a confirmed draft in %s",
   async (locale) => {
     const { serverPublicationHistoryCopy } = await import(
-      "../../src/lib/server-publication-history-copy"
+      "../../src/features/servers/server-publication-history-copy"
     );
     const copy = serverPublicationHistoryCopy(locale),
       labels = authorPublicationDeskCopy(locale);

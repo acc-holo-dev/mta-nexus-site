@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { safeResourceImageUrl } from "../../../lib/resource-image-url";
+import { typeCoverHoverScale } from "../../shell/type-shell";
+import { safeResourceImageUrl } from "../resource-image-url";
 
 export function ResourcePreview({
   src,
@@ -38,7 +39,7 @@ export function ResourcePreview({
         // A cached failure can finish before React attaches the error handler.
         if (image?.complete && image.naturalWidth === 0) setFailedUrl(url);
       }}
-      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+      className={typeCoverHoverScale}
     />
   );
 }

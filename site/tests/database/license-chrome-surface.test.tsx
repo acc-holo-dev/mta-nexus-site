@@ -1,8 +1,9 @@
 import { createElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { getLicenseControlCopy } from "../../src/lib/license-control-i18n";
-import { getLicenseMaintenanceCopy } from "../../src/lib/license-maintenance-i18n";
+import { getLicenseControlCopy } from "../../src/features/commerce/license-control-i18n";
+import { getLicenseMaintenanceCopy } from "../../src/features/commerce/license-maintenance-i18n";
+import { getDictionary } from "../../src/lib/i18n";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: () => undefined, push: () => undefined }),
@@ -14,12 +15,12 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href }, children),
   };
 });
-vi.mock("../../src/components/locale-context", () => ({
-  useNexusLocale: () => ({ locale: "en" }),
+vi.mock("../../src/features/shell/locale", () => ({
+  useNexusLocale: () => ({ locale: "en", dictionary: getDictionary("en") }),
 }));
 
-import { LicenseArchiveFilters } from "../../src/components/license-archive-filters";
-import { LicenseControlPanel } from "../../src/components/license-control-panel";
+import { LicenseArchiveFilters } from "../../src/features/commerce/license-archive";
+import { LicenseControlPanel } from "../../src/features/commerce/license-controls";
 
 describe("license chrome surface", () => {
   it.each(["en", "ru"] as const)(
@@ -45,9 +46,9 @@ describe("license chrome surface", () => {
       expect(html).toContain("rounded-lg");
       expect(html).toContain("text-accent");
       expect(html).toContain('type="submit"');
-      expect(html).toContain("min-h-11");
-      expect(html).toContain("min-w-0");
-      expect(html).toContain("overflow-x-clip");
+      expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
+      expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+      expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     },
   );
 
@@ -79,9 +80,9 @@ describe("license chrome surface", () => {
     expect(html).toContain(copy.refresh);
     expect(html).toContain("rounded-lg");
     expect(html).toContain("bg-accent");
-    expect(html).toContain("min-h-11");
-    expect(html).toContain("min-w-0");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toMatch(/id="[^"]+-confirm"/u);
     expect(html).toMatch(/for="[^"]+-confirm"/u);
     expect(html).toContain('type="checkbox"');

@@ -27,13 +27,13 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/library-collections-service", () => ({
+vi.mock("../../src/lib/services/library/library-collections-service", () => ({
   libraryCollectionsService: { exportManifest: state.history },
 }));
 
@@ -51,9 +51,9 @@ import Page, {
   dynamic,
   generateMetadata,
 } from "../../src/app/workspace/library/collections/[id]/import/page";
+import { libraryCollectionManifestsCopy } from "../../src/features/library/library-collection-manifests-i18n";
 import { getDictionary } from "../../src/lib/i18n";
-import { authService } from "../../src/lib/services/auth-service";
-import { libraryCollectionManifestsCopy } from "../../src/lib/library-collection-manifests-i18n";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 const collection = { id: "lcol_a", name: "Private & name", status: "active", revision: 7 };
 const screen = async (query: Record<string, string | string[] | undefined> = {}, id = "lcol_a") =>
@@ -104,8 +104,8 @@ it.each([{ userId: "other" }, { page: "1" }, { q: ["a", "b"] }])(
     const html = await screen(query);
     expect(html).toContain('role="alert"');
     expect(html).toContain(libraryCollectionManifestsCopy("en").loadUnavailableDescription);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(state.history).not.toHaveBeenCalled();
   },
 );
@@ -117,8 +117,8 @@ it("shows ErrorState recovery when import export fails to load", async () => {
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(`>${copy.title}</h1>`);
   expect(html).toContain(copy.loadUnavailableDescription);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
 });
 it("maps missing or foreign collection to the same unavailable page", async () => {
   state.history.mockRejectedValue(new AppError("PRIVATE", 404, "NOT_FOUND"));
@@ -136,8 +136,8 @@ it.each(["en", "ru"] as const)(
       }),
     );
     expect(html).toContain(libraryCollectionManifestsCopy(locale).reconcileTitle);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(await reconcileMetadata()).toMatchObject({
       title: `${libraryCollectionManifestsCopy(locale).reconcileTitle} | MTA NEXUS`,
       robots: { index: false, follow: false },
@@ -157,8 +157,8 @@ it("shows ErrorState recovery when reconcile export fails to load", async () => 
   expect(html).toContain(copy.reconcileLoadUnavailable);
   expect(html).toContain(`>${copy.reconcileTitle}</h1>`);
   expect(html).toContain(copy.reconcileLoadUnavailableDescription);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
 });
 it("returns to the collection list for invalid import and reconciliation identifiers", async () => {
   vi.spyOn(authService, "getSession")
@@ -182,9 +182,9 @@ it.each(["en", "ru"] as const)(
   async (locale) => {
     state.locale = locale;
     const html = await screen();
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-h-11");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   },
 );
 

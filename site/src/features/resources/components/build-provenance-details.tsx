@@ -1,7 +1,13 @@
 import { ErrorState } from "@nexus/ui";
 import { Fingerprint, ShieldCheck } from "lucide-react";
-import { getBuildProvenance } from "../model/build-provenance";
 import { getDictionary, type Locale } from "../../../lib/i18n";
+import {
+  typeBreakAllSecondary,
+  typeFlexCenterGap2,
+  typeMonoSecondary,
+  typeTenLeadingFaint,
+} from "../../shell/type-shell";
+import { getBuildProvenance } from "../model/build-provenance";
 
 const toneClass = {
   positive: "border-[color:var(--nexus-success)]/20 bg-success-soft text-success",
@@ -62,11 +68,11 @@ export function BuildProvenanceDetails({
       className="rounded-lg border border-base bg-surface"
     >
       <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3 py-2 text-[11px] font-semibold text-secondary">
-        <span className="flex items-center gap-2">
+        <span className={typeFlexCenterGap2}>
           <Fingerprint className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
           {copy.title}
         </span>
-        <span className="font-mono text-faint">SHA-256</span>
+        <span className="font-mono text-faint">{copy.hash}</span>
       </summary>
 
       <div className="space-y-3 border-t border-base px-3 py-3 text-[11px]">
@@ -113,11 +119,11 @@ export function BuildProvenanceDetails({
           {build.version ? (
             <>
               <dt className="text-faint">{copy.version}</dt>
-              <dd className="font-mono text-secondary">{build.version}</dd>
+              <dd className={typeMonoSecondary}>{build.version}</dd>
             </>
           ) : null}
 
-          <dt className="text-faint">SHA-256</dt>
+          <dt className="text-faint">{copy.hash}</dt>
           <dd>
             <code className="block select-all break-all rounded border border-base bg-inset px-2 py-1.5 font-mono text-[10px] leading-relaxed text-secondary">
               {build.sha256Hash}
@@ -125,27 +131,25 @@ export function BuildProvenanceDetails({
           </dd>
 
           <dt className="text-faint">{copy.scanTime}</dt>
-          <dd className="font-mono text-secondary">
-            {provenance.scannedAtLabel || copy.notRecorded}
-          </dd>
+          <dd className={typeMonoSecondary}>{provenance.scannedAtLabel || copy.notRecorded}</dd>
 
           <dt className="text-faint">{copy.artifactFile}</dt>
-          <dd className="break-all text-secondary">{build.fileName}</dd>
+          <dd className={typeBreakAllSecondary}>{build.fileName}</dd>
 
           {typeof build.fileSizeBytes === "number" ? (
             <>
               <dt className="text-faint">{copy.fileSize}</dt>
-              <dd className="font-mono text-secondary">
+              <dd className={typeMonoSecondary}>
                 {build.fileSizeBytes.toLocaleString(numberLocale)} B
               </dd>
             </>
           ) : null}
 
           <dt className="text-faint">{copy.mimeType}</dt>
-          <dd className="font-mono text-secondary">{build.mimeType?.trim() || copy.notRecorded}</dd>
+          <dd className={typeMonoSecondary}>{build.mimeType?.trim() || copy.notRecorded}</dd>
 
           <dt className="text-faint">{copy.mtaTarget}</dt>
-          <dd className="font-mono text-secondary">
+          <dd className={typeMonoSecondary}>
             {build.mtaVersionTarget ? `>= ${build.mtaVersionTarget}` : copy.notDeclared}
           </dd>
 
@@ -158,7 +162,7 @@ export function BuildProvenanceDetails({
           <dd className="text-secondary">{publicationState}</dd>
         </dl>
 
-        <p className="text-[10px] leading-relaxed text-faint">{copy.explanation}</p>
+        <p className={typeTenLeadingFaint}>{copy.explanation}</p>
       </div>
     </details>
   );

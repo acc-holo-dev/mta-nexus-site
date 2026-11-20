@@ -1,4 +1,6 @@
-vi.mock("../../../components/follow-button", () => ({
+vi.mock("server-only", () => ({}));
+
+vi.mock("../../../features/community/follow", () => ({
   FollowButton: (props: { initial?: unknown }) => (
     <button type="button" data-follow-initial={JSON.stringify(props.initial ?? null)}>
       Follow
@@ -51,19 +53,19 @@ vi.mock("@nexus/db", () => ({
     muteState: state.muteState,
   },
 }));
-vi.mock("../../../lib/i18n-server", () => ({
+vi.mock("../../../lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
   getRequestCookieStore: async () => ({ get: () => ({ value: "session" }) }),
 }));
-vi.mock("../../../lib/services/product-service", () => ({
+vi.mock("../../../lib/services/commerce/product-service", () => ({
   productService: { getPublicAttributions: async () => new Map() },
 }));
-vi.mock("../../../lib/services/profile-privacy-service", () => ({
+vi.mock("../../../lib/services/accounts/profile-privacy-service", () => ({
   profilePrivacyService: {
     visibility: async () => ({ showActivity: state.showActivity, showProfessionalContacts: true }),
   },
 }));
-vi.mock("../../../lib/services/mta-master-directory-service", () => ({
+vi.mock("../../../lib/services/servers/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: { getDirectory: state.directory },
   indexMtaObservations: () => () => undefined,
 }));
@@ -103,14 +105,14 @@ vi.mock("next/navigation", () => ({
 vi.mock("next/headers", () => ({
   cookies: async () => ({ get: () => ({ value: "session" }) }),
 }));
-vi.mock("../../../lib/services/auth-service", () => ({
+vi.mock("../../../lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: () => state.session(),
   },
 }));
 
+import { profilePrivacyCopy } from "../../../features/accounts/profile-privacy-copy";
 import { getDictionary } from "../../../lib/i18n";
-import { profilePrivacyCopy } from "../../../lib/profile-privacy-copy";
 import Page, { generateMetadata } from "./page";
 
 const input = (page?: string | string[]) => ({
@@ -304,7 +306,7 @@ it("keeps the public profile available and shows a recoverable follow error when
   state.session.mockRejectedValueOnce(new Error("PRIVATE_SESSION"));
   const html = renderToStaticMarkup(await Page(input()));
   expect(html).toContain(
-    "&quot;authenticated&quot;:false,&quot;actorId&quot;:null,&quot;following&quot;:false,&quot;error&quot;:true",
+    "&quot;authenticated&quot;:null,&quot;actorId&quot;:null,&quot;following&quot;:false,&quot;error&quot;:true",
   );
   expect(html).not.toContain("PRIVATE_SESSION");
   expect(html).toContain('data-report-auth="null"');

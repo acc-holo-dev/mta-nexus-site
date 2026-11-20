@@ -1,14 +1,14 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
 }));
-vi.mock("../../src/lib/services/server-content-service", () => ({
+vi.mock("../../src/lib/services/servers/server-content-service", () => ({
   serverContentService: {
     page: vi.fn(),
     get: vi.fn(),
@@ -18,12 +18,12 @@ vi.mock("../../src/lib/services/server-content-service", () => ({
   },
 }));
 
-import { POST as createContent } from "../../src/app/api/workspace/servers/[id]/content/route";
+import { POST as restoreContent } from "../../src/app/api/workspace/servers/[id]/content/[contentId]/restore/route";
 import {
   DELETE as deleteContent,
   PATCH as editContent,
 } from "../../src/app/api/workspace/servers/[id]/content/[contentId]/route";
-import { POST as restoreContent } from "../../src/app/api/workspace/servers/[id]/content/[contentId]/restore/route";
+import { POST as createContent } from "../../src/app/api/workspace/servers/[id]/content/route";
 
 const context = { params: Promise.resolve({ id: "srv_a", contentId: "cnt_a" }) };
 const mutations = [

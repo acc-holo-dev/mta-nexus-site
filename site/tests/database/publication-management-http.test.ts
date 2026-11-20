@@ -1,10 +1,11 @@
-import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../helpers/browser-mutation-headers";
-import { AppError } from "@nexus/domain";
+
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
   page: vi.fn(),
@@ -12,22 +13,24 @@ const mocks = vi.hoisted(() => ({
   manage: vi.fn(),
   rate: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../../src/lib/services/publication-feed-service", () => ({
+vi.mock("../../src/lib/services/discovery/publication-feed-service", () => ({
   publicationFeedService: { page: mocks.page, resolve: mocks.resolve },
 }));
-vi.mock("../../src/lib/services/content-service", () => ({
+vi.mock("../../src/lib/services/community/content-service", () => ({
   contentService: { manageComment: mocks.manage },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
-vi.mock("../../src/lib/request-client-ip", () => ({
+vi.mock("../../src/features/shell/request-client-ip", () => ({
   getTrustedRequestIp: () => "trusted-ip",
 }));
-import { GET as following } from "../../src/app/api/workspace/feed/route";
+
 import { GET as activity } from "../../src/app/api/activity/[kind]/[handle]/route";
-import { PATCH, DELETE } from "../../src/app/api/content/[slug]/comments/[id]/route";
+import { DELETE, PATCH } from "../../src/app/api/content/[slug]/comments/[id]/route";
+import { GET as following } from "../../src/app/api/workspace/feed/route";
+
 const actor = { id: "actor", role: "user" },
   expectedRevision = "a".repeat(64);
 const comment = { params: Promise.resolve({ slug: "article", id: "comment" }) };

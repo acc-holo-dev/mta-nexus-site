@@ -1,0 +1,152 @@
+const copies = {
+  en: {
+    title: "Resource gallery",
+    reviewDocumentTitle: "Review resource gallery",
+    loadUnavailable: "Resource gallery is temporarily unavailable. Please try again.",
+    loadUnavailableHint:
+      "Retry reloads this gallery only. A temporary load failure is not an empty media list.",
+    back: "Back to resource",
+    signIn: "Sign in",
+    signInRequired: "Sign in to view the gallery",
+    note: "Upload up to 8 static PNG, JPEG or WebP images, up to 5 MiB each and 4096 × 4096 pixels. Images are resized within 1920 × 1920, stored as PNG without source metadata, limited to 4 MiB after conversion, and checked by the scanner. The first image is the cover.",
+    reviewNote:
+      "Gallery changes withdraw publication and pending review. Submit the resource for moderation again when your changes are ready. Earlier external previews are replaced when you first edit this uploaded gallery.",
+    readonly: "This gallery is read-only while the resource is archived or suspended.",
+    readonlyDescription:
+      "Restore the resource draft or resolve the restriction before uploading or reordering images.",
+    reviewNoteDescription:
+      "Submit the resource for moderation again when gallery changes are ready.",
+    file: "Image file",
+    caption: "Caption",
+    upload: "Upload image",
+    save: "Save order and captions",
+    cover: "Make cover",
+    currentCover: "Cover",
+    up: "Move up",
+    down: "Move down",
+    remove: "Remove image",
+    removeConfirmTitle: "Remove this gallery image?",
+    removeConfirm:
+      "The image is deleted from the gallery. Cover and order update after the server confirms the change, and publication needs review again.",
+    confirm: "Confirm image removal",
+    cancel: "Cancel",
+    reload: "Reload gallery",
+    saved: "Gallery saved. Publication requires review.",
+    empty: "No uploaded gallery images yet.",
+    emptyDescription:
+      "Upload a static PNG, JPEG or WebP image to start the gallery. The first image becomes the cover.",
+    busy: "Processing…",
+    previewUnavailable: "Preview unavailable",
+    lightboxTitle: "Gallery image",
+    lightboxClose: "Close gallery view",
+    lightboxPrevious: "Previous image",
+    lightboxNext: "Next image",
+    lightboxOpenOriginal: "Open original",
+    lightboxExpand: "View larger in gallery",
+    dirty: "Save or reload your order and caption changes before uploading or removing an image.",
+    error: "The operation could not be confirmed. Reload the gallery before retrying.",
+    errorDescription:
+      "A failed gallery change is not an updated media set. Reload before uploading or saving again.",
+    errors: {
+      RESOURCE_MEDIA_CONFLICT: "The resource changed. Reload the gallery before continuing.",
+      RESOURCE_MEDIA_DUPLICATE: "This image is already in the gallery.",
+      RESOURCE_MEDIA_LIMIT:
+        "The gallery or image exceeds its size limit. Use up to 8 images and reduce the image size.",
+      RESOURCE_MEDIA_INVALID:
+        "Use a valid static PNG, JPEG or WebP and a single-line caption of up to 160 characters.",
+      RESOURCE_MEDIA_BUSY: "Image processing is busy. Retry in a few seconds.",
+      RESOURCE_MEDIA_SCAN_REQUIRED:
+        "The scanner did not approve this image. Upload is unavailable until scanning succeeds.",
+      PRODUCT_STATE_CHANGED: "This resource is read-only in its current state.",
+      NOT_FOUND: "The resource or your management access is unavailable.",
+      UNAUTHORIZED: "Sign in again before continuing.",
+      ACTOR_ID_REQUIRED: "Reload this page and confirm your account before continuing.",
+      ACTOR_CHANGED: "The signed-in account changed. Reload before continuing.",
+      FORBIDDEN: "You do not have permission to manage this gallery.",
+      CONFLICT: "The resource changed. Reload the gallery before continuing.",
+      VALIDATION_ERROR:
+        "Use a valid static PNG, JPEG or WebP and a single-line caption of up to 160 characters.",
+      RATE_LIMIT_EXCEEDED: "Too many requests. Retry later.",
+      RATE_LIMITED: "Too many requests. Retry later.",
+    },
+  },
+  ru: {
+    title: "Галерея ресурса",
+    reviewDocumentTitle: "Проверка галереи ресурса",
+    loadUnavailable: "Галерея ресурса временно недоступна. Попробуйте ещё раз.",
+    loadUnavailableHint:
+      "Повтор обновляет только эту галерею. Временный сбой загрузки — не пустой список медиа.",
+    back: "Назад к ресурсу",
+    signIn: "Войти",
+    signInRequired: "Войдите для просмотра галереи",
+    note: "Загрузите до 8 статичных PNG, JPEG или WebP, до 5 МиБ и 4096 × 4096 пикселей каждый. Изображения уменьшаются до 1920 × 1920, сохраняются в PNG без исходных метаданных, ограничиваются 4 МиБ после преобразования и проходят сканер. Первое изображение — обложка.",
+    reviewNote:
+      "Изменения галереи снимают публикацию и отменяют текущую проверку. После изменений отправьте ресурс на модерацию снова. Прежние внешние превью заменяются при первом изменении загруженной галереи.",
+    readonly: "Галерея доступна только для чтения, пока ресурс архивирован или приостановлен.",
+    readonlyDescription:
+      "Восстановите черновик ресурса или снимите ограничение перед загрузкой или изменением порядка изображений.",
+    reviewNoteDescription: "Когда изменения галереи готовы, снова отправьте ресурс на модерацию.",
+    file: "Файл изображения",
+    caption: "Подпись",
+    upload: "Загрузить изображение",
+    save: "Сохранить порядок и подписи",
+    cover: "Сделать обложкой",
+    currentCover: "Обложка",
+    up: "Переместить выше",
+    down: "Переместить ниже",
+    remove: "Удалить изображение",
+    removeConfirmTitle: "Удалить это изображение галереи?",
+    removeConfirm:
+      "Изображение будет удалено из галереи. Обложка и порядок обновятся после подтверждения сервером, а для публикации снова нужна проверка.",
+    confirm: "Подтвердить удаление изображения",
+    cancel: "Отмена",
+    reload: "Обновить галерею",
+    saved: "Галерея сохранена. Для публикации нужна проверка.",
+    empty: "В галерее пока нет загруженных изображений.",
+    emptyDescription:
+      "Загрузите статичное PNG, JPEG или WebP, чтобы начать галерею. Первое изображение станет обложкой.",
+    busy: "Обработка…",
+    previewUnavailable: "Превью недоступно",
+    lightboxTitle: "Изображение галереи",
+    lightboxClose: "Закрыть просмотр",
+    lightboxPrevious: "Предыдущее изображение",
+    lightboxNext: "Следующее изображение",
+    lightboxOpenOriginal: "Открыть оригинал",
+    lightboxExpand: "Увеличить в галерее",
+    dirty:
+      "Сохраните порядок и подписи или обновите галерею перед загрузкой и удалением изображения.",
+    error: "Результат операции не подтверждён. Обновите галерею перед повтором.",
+    errorDescription:
+      "Неуспешное изменение галереи не обновляет набор медиа. Обновите страницу перед новой загрузкой или сохранением.",
+    errors: {
+      RESOURCE_MEDIA_CONFLICT: "Ресурс изменился. Обновите галерею перед продолжением.",
+      RESOURCE_MEDIA_DUPLICATE: "Это изображение уже есть в галерее.",
+      RESOURCE_MEDIA_LIMIT:
+        "Превышен лимит галереи или изображения. Используйте до 8 изображений и уменьшите размер файла.",
+      RESOURCE_MEDIA_INVALID:
+        "Нужен корректный статичный PNG, JPEG или WebP и однострочная подпись до 160 символов.",
+      RESOURCE_MEDIA_BUSY: "Обработка изображений занята. Повторите через несколько секунд.",
+      RESOURCE_MEDIA_SCAN_REQUIRED:
+        "Сканер не одобрил изображение. Загрузка недоступна до успешной проверки.",
+      PRODUCT_STATE_CHANGED: "В текущем состоянии ресурс доступен только для чтения.",
+      NOT_FOUND: "Ресурс или права управления недоступны.",
+      UNAUTHORIZED: "Войдите снова перед продолжением.",
+      ACTOR_ID_REQUIRED: "Обновите страницу и подтвердите аккаунт перед продолжением.",
+      ACTOR_CHANGED: "Вошедший аккаунт изменился. Обновите страницу перед продолжением.",
+      FORBIDDEN: "У вас нет прав управлять этой галереей.",
+      CONFLICT: "Ресурс изменился. Обновите галерею перед продолжением.",
+      VALIDATION_ERROR:
+        "Нужен корректный статичный PNG, JPEG или WebP и однострочная подпись до 160 символов.",
+      RATE_LIMIT_EXCEEDED: "Слишком много запросов. Повторите позже.",
+      RATE_LIMITED: "Слишком много запросов. Повторите позже.",
+    },
+  },
+};
+export const resourceMediaCopy = (locale: "ru" | "en") => copies[locale];
+
+export function resourceMediaError(locale: "ru" | "en", code: unknown) {
+  const copy = resourceMediaCopy(locale);
+  return typeof code === "string" && Object.hasOwn(copy.errors, code)
+    ? copy.errors[code as keyof typeof copy.errors]
+    : copy.error;
+}

@@ -1,12 +1,12 @@
-import { describe, expect, it } from "vitest";
-import { eq, sql } from "drizzle-orm";
 import { setTimeout as delay } from "node:timers/promises";
-import { db, sessions } from "../client";
-import { lockInitiatingSession } from "./initiating-session";
-import { authService } from "../../../../src/lib/services/auth-service";
-import { sessionRepository } from "./sessions";
 import { UnauthorizedError } from "@nexus/domain";
 import { generateId, generateSessionToken } from "@nexus/security";
+import { eq, sql } from "drizzle-orm";
+import { describe, expect, it } from "vitest";
+import { authService } from "../../../../src/lib/services/accounts/auth-service";
+import { db, sessions } from "../client";
+import { lockInitiatingSession } from "./initiating-session";
+import { sessionRepository } from "./sessions";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 const password = "Initiating-barrier-005c-password!";

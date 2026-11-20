@@ -1,5 +1,5 @@
-import type * as React from "react";
 import { FolderOpen } from "lucide-react";
+import type * as React from "react";
 import { cn } from "./utils";
 
 export interface EmptyStateProps {

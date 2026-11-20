@@ -1,5 +1,5 @@
 import { expect, it, vi } from "vitest";
-import { followCopy } from "../../src/lib/follow-workspace-copy";
+import { followCopy } from "../../src/features/community/follow-workspace-copy";
 import {
   ack,
   createSavedFollowsInteractionHelpers,
@@ -14,12 +14,12 @@ const harness = vi.hoisted(() => ({
   fetch: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../../src/components/confirm-action", () => ({
+vi.mock("../../src/features/shell/confirm-action", () => ({
   confirmAction,
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 
-import { FollowWorkspace } from "../../src/components/follow-workspace";
+import { FollowWorkspace } from "../../src/features/community/follow";
 
 const { render, removeButton } = createSavedFollowsInteractionHelpers(
   harness,

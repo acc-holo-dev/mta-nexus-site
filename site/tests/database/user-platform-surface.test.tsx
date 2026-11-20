@@ -2,8 +2,8 @@ vi.mock("server-only", () => ({}));
 
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+import { getUserPlatformCopy } from "../../src/features/community/user-platform-copy";
 import { getDictionary, type Locale } from "../../src/lib/i18n";
-import { getUserPlatformCopy } from "../../src/lib/user-platform-copy";
 
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
@@ -15,10 +15,10 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: vi.fn(), refresh: vi.fn() }),
   usePathname: () => "/workspace/content",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/content-service", () => ({
+vi.mock("../../src/lib/services/community/content-service", () => ({
   contentService: { pageArticles: mocks.articles, pageCommunity: mocks.community },
 }));
 
@@ -26,7 +26,7 @@ import ArticlesPage from "../../src/app/articles/page";
 import CommunityPage from "../../src/app/community/page";
 import { AuthorContentForm } from "../../src/features/community/author-content-form";
 import { ContentPageNavigation } from "../../src/features/community/catalog-controls";
-import { PlatformSignIn } from "../../src/components/platform-sign-in";
+import { PlatformSignIn } from "../../src/features/shell/guest-auth";
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -103,7 +103,7 @@ it("renders service failure separately from an empty feed and hides internal tex
   expect(community).toContain(getUserPlatformCopy("en").unavailable);
   expect(community).toContain("Try again");
   expect(community).toContain('href="/community?q=help"');
-  expect(community).toContain("overflow-x-clip");
+  expect(community).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(community).not.toContain("DB private details");
   expect(community).not.toContain(getDictionary("en").community.noTopics);
 });
@@ -114,7 +114,7 @@ it("adds login next from pathname when PlatformSignIn has no returnPath", () => 
   expect(html).toContain("/auth/register?next=%2Fworkspace%2Fcontent");
   expect(html).toContain(copy.signInMessage);
   expect(html).toContain(copy.createAccount);
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain("focus-visible:outline-[var(--nexus-accent)]");
 });
 

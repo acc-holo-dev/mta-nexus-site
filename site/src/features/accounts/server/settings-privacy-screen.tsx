@@ -1,0 +1,64 @@
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { profilePrivacyService } from "../../../lib/services/accounts/profile-privacy-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
+import { pageShellMax3xl } from "../../shell/page-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import { type2xlBoldPrimary, typeSmMuted } from "../../shell/type-shell";
+import { ProfileChangeHistoryLink } from "../change-history";
+import { ProfilePrivacyEditor } from "../profile";
+import { editablePrivacySchema } from "../profile-privacy-contract";
+import { profilePrivacyCopy } from "../profile-privacy-copy";
+export async function settingsPrivacyMetadata(): Promise<Metadata> {
+  return {
+    title: profilePrivacyCopy(await getRequestLocale()).title,
+    robots: { index: false, follow: false },
+  };
+}
+
+export async function SettingsPrivacyScreen() {
+  const locale = await getRequestLocale(),
+    copy = profilePrivacyCopy(locale);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={getDictionary(locale).errors.message}
+        retryHref={"/settings/privacy"}
+      />
+    );
+  }
+
+  if (!actor) return <PlatformSignIn locale={locale} returnPath="/settings/privacy" />;
+  const initial = await profilePrivacyService
+    .own(actor)
+    .then((row) => editablePrivacySchema.parse(row))
+    .catch(() => null);
+  return (
+    <div className={pageShellMax3xl}>
+      <ProfileChangeHistoryLink locale={locale} />
+      <header className="space-y-2">
+        <Link href="/settings" className={linkAccentSm}>
+          {copy.back}
+        </Link>
+        <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
+        <p className={typeSmMuted}>{copy.description}</p>
+      </header>
+      <ProfilePrivacyEditor key={actor.id} initial={initial} locale={locale} />
+      {["developer", "admin"].includes(actor.role) && (
+        <Link href="/settings/developer" className={linkAccentSm}>
+          {copy.professional}
+        </Link>
+      )}
+    </div>
+  );
+}

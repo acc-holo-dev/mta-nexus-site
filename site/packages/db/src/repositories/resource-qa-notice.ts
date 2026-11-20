@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { noticeStoredTitles, resourceQaNoticeMessage } from "@nexus/domain";
 import { and, eq, gt, ne, sql } from "drizzle-orm";
 import type { db } from "../client";
 import {
@@ -29,28 +30,16 @@ function noticeId(parts: readonly unknown[]) {
 }
 
 function copyFor(kind: ResourceQaNoticeKind, productTitle: string) {
-  switch (kind) {
-    case "asked":
-      return {
-        title: "New resource question",
-        message: `Someone asked about ${productTitle}.`,
-      };
-    case "answered":
-      return {
-        title: "Resource question answered",
-        message: `There is a new answer for a question on ${productTitle}.`,
-      };
-    case "resolved":
-      return {
-        title: "Resource question resolved",
-        message: `A useful answer was marked for a question on ${productTitle}.`,
-      };
-    case "removed":
-      return {
-        title: "Resource question removed",
-        message: `A question on ${productTitle} was removed by staff or the publisher.`,
-      };
-  }
+  const titles = {
+    asked: noticeStoredTitles.newResourceQuestion,
+    answered: noticeStoredTitles.resourceQuestionAnswered,
+    resolved: noticeStoredTitles.resourceQuestionResolved,
+    removed: noticeStoredTitles.resourceQuestionRemoved,
+  } as const;
+  return {
+    title: titles[kind],
+    message: resourceQaNoticeMessage(kind, productTitle),
+  };
 }
 
 async function deliver(

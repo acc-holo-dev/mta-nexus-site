@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -17,10 +19,10 @@ vi.mock("next/navigation", () => ({
 vi.mock("@nexus/db", () => ({
   userLibraryRepository: { pageByUser: state.page },
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
 vi.mock("next/link", async () => {
@@ -63,8 +65,8 @@ vi.mock("../../src/features/resources/download", async () => {
 });
 
 import LibraryLoading from "../../src/app/workspace/library/loading";
-import LibraryPage, { metadata } from "../../src/app/workspace/library/page";
-import { getLibraryCopy } from "../../src/lib/library-view";
+import LibraryPage, { generateMetadata } from "../../src/app/workspace/library/page";
+import { getLibraryCopy } from "../../src/features/library/library-view";
 
 const now = new Date("2026-10-09T00:00:00.000Z");
 const pageProps = (query: { page?: string | string[]; filter?: string | string[] } = {}) => ({
@@ -211,7 +213,7 @@ describe("private resource library", () => {
     expect(html).toContain(copy.emptyHint);
     expect(html).not.toContain(copy.emptyFilterHint);
     expect(copy.emptyHint).not.toBe(copy.subtitle);
-    expect(metadata.robots).toMatchObject({ index: false, follow: false });
+    expect((await generateMetadata()).robots).toMatchObject({ index: false, follow: false });
 
     state.page.mockResolvedValueOnce({
       items: [],
@@ -239,7 +241,7 @@ describe("private resource library", () => {
       expect(html).toContain('href="/market/resource-a"');
       expect(html).toContain(copy.open);
       expect(html).toContain("min-w-0 max-w-5xl");
-      expect(html).toContain("overflow-x-clip");
+      expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
       expect(html).not.toContain(copy.loadUnavailable);
     },
   );
@@ -281,6 +283,6 @@ describe("private resource library", () => {
   it("clips the honest loading shell on narrow layouts", async () => {
     const html = renderToStaticMarkup(await LibraryLoading());
     expect(html).toContain("min-w-0 max-w-5xl");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   });
 });

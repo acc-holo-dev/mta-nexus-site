@@ -1,20 +1,30 @@
 import { collectionCommandItemResults } from "@nexus/domain";
 import Link from "next/link";
-import { libraryCollectionHistoryCopy } from "../../../lib/library-collection-history-i18n";
+import { formatUnknown } from "../../../lib/i18n/unknown";
+import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
+import { pageShellMax4xl } from "../../shell/page-shell";
+import { panelSpace2P4 } from "../../shell/panel-shell";
+import {
+  typeBreakAllSm,
+  typeBreakAllXsMuted,
+  typeDisplayPrimary,
+  typeSmMuted,
+  typeSpace1Sm,
+} from "../../shell/type-shell";
+import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,
-} from "../../../lib/library-collection-receipts-i18n";
-import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
+} from "../library-collection-receipts-i18n";
+import { libraryCollectionsCopy } from "../library-collections-i18n";
 import {
   collectionHref,
   collectionPageParams,
   collectionsQuery,
-} from "../../../lib/library-collections-query";
-import { libraryCollectionsService as service } from "../../../lib/services/library-collections-service";
+} from "../library-collections-query";
 import {
-  LibraryCollectionsPagination,
   type LibraryCollectionsActor,
+  LibraryCollectionsPagination,
   type LibraryCollectionsQuery,
   libraryCollectionsLinkClass,
 } from "./library-collections-screen-shared";
@@ -34,11 +44,11 @@ export async function LibraryCollectionsHistoryView({
   const query = collectionsQuery(collectionPageParams(queryValues), "history");
   const result = await service.history(actor, id, query.page);
   return (
-    <div className="mx-auto max-w-4xl space-y-6 py-8">
+    <div className={pageShellMax4xl}>
       <Link href={collectionHref(id)} className={libraryCollectionsLinkClass}>
         {c.back}
       </Link>
-      <h1 className="font-display text-primary">
+      <h1 className={typeDisplayPrimary}>
         {c.history}: {result.collection.name}
       </h1>
       <Link
@@ -48,13 +58,13 @@ export async function LibraryCollectionsHistoryView({
         {libraryCollectionHistoryCopy(locale).title}
       </Link>
       {!result.items.length && (
-        <p className="text-sm text-muted" role="status" aria-live="polite">
+        <p className={typeSmMuted} role="status" aria-live="polite">
           {c.emptyHistory}
         </p>
       )}
       <ol className="space-y-4">
         {result.items.map((item) => (
-          <li key={item.id} className="nexus-panel space-y-2 p-4">
+          <li key={item.id} className={panelSpace2P4}>
             <Link href={collectionReceiptHref(item.id)} className={libraryCollectionsLinkClass}>
               {libraryCollectionReceiptsCopy(locale).open}
             </Link>
@@ -65,34 +75,34 @@ export async function LibraryCollectionsHistoryView({
               {item.collection.name} · {c[item.collection.status]}
             </p>
             {item.command.action === "duplicate" && (
-              <p className="break-all text-sm">
+              <p className={typeBreakAllSm}>
                 {c.source}: {item.command.sourceCollectionId} · {c.revision}:{" "}
                 {item.command.expectedRevision} · {c.items}: {item.command.expectedItemCount}
               </p>
             )}
             {(item.command.action === "copy-items" || item.command.action === "move-items") && (
-              <p className="break-all text-sm">
+              <p className={typeBreakAllSm}>
                 {c.source}: {item.command.sourceCollectionId} · {c.revision}:{" "}
                 {item.command.expectedSourceRevision}
               </p>
             )}
             {item.sourceCollection && (
-              <p className="break-all text-sm">
+              <p className={typeBreakAllSm}>
                 {c.sourceSuccessor}: {item.sourceCollection.id} · {item.sourceCollection.revision}
               </p>
             )}
             {item.command.action === "move-items" && (
-              <p className="break-all text-sm">
+              <p className={typeBreakAllSm}>
                 {c.destination}: {item.collection.id} · {c.revision} {item.collection.revision}
               </p>
             )}
             {item.command.action === "reconcile-items" && (
               <div>
                 <p>
-                  {c.add}: {item.command.addProductIds.join(", ") || "—"}
+                  {c.add}: {formatUnknown(locale, item.command.addProductIds.join(", "))}
                 </p>
                 <p>
-                  {c.remove}: {item.command.removeProductIds.join(", ") || "—"}
+                  {c.remove}: {formatUnknown(locale, item.command.removeProductIds.join(", "))}
                 </p>
               </div>
             )}
@@ -102,7 +112,7 @@ export async function LibraryCollectionsHistoryView({
                 return (
                   <>
                     {"productIds" in item.command && (
-                      <ul className="space-y-1 text-sm">
+                      <ul className={typeSpace1Sm}>
                         {item.command.productIds.map((productId) => (
                           <li key={productId} className="break-all">
                             {productId}
@@ -111,7 +121,7 @@ export async function LibraryCollectionsHistoryView({
                       </ul>
                     )}
                     {"productId" in item.command && (
-                      <p className="break-all text-sm">{item.command.productId}</p>
+                      <p className={typeBreakAllSm}>{item.command.productId}</p>
                     )}
                   </>
                 );
@@ -123,7 +133,7 @@ export async function LibraryCollectionsHistoryView({
                 moved: c["move-items"],
               } as const;
               return (
-                <ul className="space-y-1 text-sm">
+                <ul className={typeSpace1Sm}>
                   {results.map((entry) => (
                     <li key={`${entry.outcome}:${entry.productId}`} className="break-all">
                       {outcomeLabel[entry.outcome]}: {entry.productId} · {c.batchApplied}
@@ -136,7 +146,7 @@ export async function LibraryCollectionsHistoryView({
               {c.created}:{" "}
               <time dateTime={item.createdAt.toISOString()}>{item.createdAt.toISOString()}</time>
             </p>
-            <p className="break-all text-xs text-muted">
+            <p className={typeBreakAllXsMuted}>
               {c.receipt}: {item.id} · {c.request}: {item.requestId}
             </p>
           </li>

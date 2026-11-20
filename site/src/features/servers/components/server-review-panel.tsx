@@ -4,20 +4,30 @@ import { Button, EmptyState, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { usePathname, useRouter } from "next/navigation";
 import { type FormEvent, useCallback, useEffect, useId, useRef, useState } from "react";
 import { getDictionary } from "../../../lib/i18n";
-import { confirmedServerReview } from "../../../lib/server-review-confirmation";
+import { formatUnknown } from "../../../lib/i18n/unknown";
+import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
+import { confirmAction } from "../../shell/confirm-action";
+import { GuestAuthLinks } from "../../shell/guest-auth";
+import { linkGhostUnderlineFocus } from "../../shell/link-shell";
+import { useNexusLocale } from "../../shell/locale";
+import { panelSpace2P4TextSm, panelSpace4P5 } from "../../shell/panel-shell";
+import {
+  typePrewrapBreak,
+  typePrewrapBreakSecondary,
+  typePrewrapSmSecondary,
+  typeSmSemiboldPrimary,
+  typeSpace2Sm,
+  typeXsLeadingMuted,
+  typeXsMuted,
+  typeXsSecondary,
+} from "../../shell/type-shell";
+import { confirmedServerReview } from "../server-review-confirmation";
 import {
   serverReviewCopy,
   serverReviewError,
   serverReviewLoadCopy,
   serverReviewState,
-} from "../../../lib/server-review-i18n";
-import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
-import { confirmAction } from "../../../components/confirm-action";
-import { GuestAuthLinks } from "../../../components/guest-auth-links";
-import { useNexusLocale } from "../../../components/locale-context";
-
-const ghostActionClass =
-  "h-auto min-h-11 px-0 text-sm underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+} from "../server-review-i18n";
 
 type Review = {
   id: string;
@@ -51,7 +61,9 @@ export function ServerReviewPanel({
   const { locale } = useNexusLocale();
   const pathname = usePathname();
   const router = useRouter();
-  const workspace = getDictionary(locale).workspace;
+  const dictionary = getDictionary(locale);
+  const workspace = dictionary.workspace;
+  const formErrorHint = dictionary.errors.formErrorHint;
   const copy = serverReviewCopy(locale);
   const loadCopy = serverReviewLoadCopy(locale);
   const statusId = useId();
@@ -328,12 +340,13 @@ export function ServerReviewPanel({
         <h2 id="server-reviews-heading" className="text-base font-bold text-primary">
           {copy.title}
         </h2>
-        <p className="text-xs leading-relaxed text-muted">{copy.description}</p>
+        <p className={typeXsLeadingMuted}>{copy.description}</p>
       </header>
 
       {unavailable || !page ? (
         <ErrorState
           title={loadCopy.unavailable}
+          description={loadCopy.unavailableHint}
           action={
             <Button
               type="button"
@@ -349,7 +362,7 @@ export function ServerReviewPanel({
         />
       ) : (
         <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-primary">
+          <h3 className={typeSmSemiboldPrimary}>
             {copy.all} ({page.total})
           </h3>
           {page.reviews.length === 0 ? (
@@ -357,16 +370,17 @@ export function ServerReviewPanel({
           ) : (
             <ul className="space-y-3">
               {page.reviews.map((review) => (
-                <li key={review.id} className="nexus-panel space-y-2 p-4 text-sm">
+                <li key={review.id} className={panelSpace2P4TextSm}>
                   <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
                     <span>
-                      {copy.author}: {review.author?.displayName || review.author?.username || "—"}
+                      {copy.author}:{" "}
+                      {formatUnknown(locale, review.author?.displayName || review.author?.username)}
                     </span>
                     <span>
                       {copy.rating}: {review.rating}/5 · {copy.follow}
                     </span>
                   </div>
-                  <p className="whitespace-pre-wrap break-words text-secondary">{review.text}</p>
+                  <p className={typePrewrapBreakSecondary}>{review.text}</p>
                 </li>
               ))}
             </ul>
@@ -374,8 +388,8 @@ export function ServerReviewPanel({
         </div>
       )}
 
-      <div className="nexus-panel space-y-4 p-5">
-        <h3 className="text-sm font-semibold text-primary">{copy.write}</h3>
+      <div className={panelSpace4P5}>
+        <h3 className={typeSmSemiboldPrimary}>{copy.write}</h3>
         {!signedIn ? (
           <GuestAuthLinks
             loginHref={loginHref}
@@ -385,12 +399,12 @@ export function ServerReviewPanel({
           />
         ) : (
           <>
-            <p className="text-xs text-secondary">{copy.access}</p>
+            <p className={typeXsSecondary}>{copy.access}</p>
             {mine?.review && (
-              <p className="text-xs text-muted">{serverReviewState(locale, mine.review.status)}</p>
+              <p className={typeXsMuted}>{serverReviewState(locale, mine.review.status)}</p>
             )}
             {mine?.review?.moderationReason && (
-              <p className="text-xs text-secondary">
+              <p className={typeXsSecondary}>
                 {copy.reason}: {mine.review.moderationReason}
               </p>
             )}
@@ -398,16 +412,22 @@ export function ServerReviewPanel({
               <ErrorState
                 id="server-review-eligibility-follow-required"
                 title={copy.followRequired}
+                description={formErrorHint}
               />
             )}
             {mine?.eligibility === "owner_conflict" && (
               <ErrorState
                 id="server-review-eligibility-owner-conflict"
                 title={copy.ownerConflict}
+                description={formErrorHint}
               />
             )}
             {mine?.eligibility === "moderated" && (
-              <ErrorState id="server-review-eligibility-moderated" title={copy.moderated} />
+              <ErrorState
+                id="server-review-eligibility-moderated"
+                title={copy.moderated}
+                description={formErrorHint}
+              />
             )}
             {mine?.canReview ? (
               <form className="space-y-4" onSubmit={onSave}>
@@ -454,17 +474,13 @@ export function ServerReviewPanel({
                 </Button>
               </form>
             ) : (
-              mine?.review && (
-                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                  {mine.review.text}
-                </p>
-              )
+              mine?.review && <p className={typePrewrapSmSecondary}>{mine.review.text}</p>
             )}
             {mine?.review?.status === "published" && (
               <Button
                 type="button"
                 variant="ghost"
-                className={`${ghostActionClass} text-danger`}
+                className={`${linkGhostUnderlineFocus} text-danger`}
                 disabled={busy || confirmed}
                 onClick={() => void withdrawReview()}
               >
@@ -477,11 +493,12 @@ export function ServerReviewPanel({
           <ErrorState
             id="server-review-write-error"
             title={notice.text}
+            description={formErrorHint}
             action={
               <Button
                 type="button"
                 variant="ghost"
-                className={`${ghostActionClass} text-accent`}
+                className={`${linkGhostUnderlineFocus} text-accent`}
                 onClick={() => router.refresh()}
               >
                 {copy.reload}
@@ -501,7 +518,7 @@ export function ServerReviewPanel({
           </p>
         ) : null}
         {conflict && (
-          <div className="space-y-2 text-sm">
+          <div className={typeSpace2Sm}>
             <Button
               type="button"
               variant="outline"
@@ -515,11 +532,11 @@ export function ServerReviewPanel({
               <div className="space-y-2">
                 <p className="font-semibold">{copy.latestReview}</p>
                 {latest.review ? (
-                  <p className="whitespace-pre-wrap break-words">
+                  <p className={typePrewrapBreak}>
                     {copy.rating}: {latest.review.rating}/5 · {latest.review.text}
                   </p>
                 ) : (
-                  <p>{copy.noLatestReview}</p>
+                  <EmptyState title={copy.noLatestReview} description={copy.noLatestReviewHint} />
                 )}
                 {latest.canReview && (
                   <Button
@@ -545,7 +562,7 @@ export function ServerReviewPanel({
           <Button
             type="button"
             variant="ghost"
-            className={`${ghostActionClass} text-accent`}
+            className={`${linkGhostUnderlineFocus} text-accent`}
             onClick={() => router.refresh()}
           >
             {copy.reload}

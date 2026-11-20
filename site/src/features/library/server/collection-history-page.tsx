@@ -8,43 +8,52 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { PlatformSessionError } from "../../../components/platform-session-error";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { libraryCollectionHistoryCopy } from "../../../lib/library-collection-history-i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { formatUnknown } from "../../../lib/i18n/unknown";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
+import { pageShellMax5xl, pageShellStack4 } from "../../shell/page-shell";
+import { panelClipSpace3P5, panelFlexClipWrapEndGap4 } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeBreakAllSm,
+  typeBreakAllXs,
+  typeBreakAllXsMuted,
+  typeBreakSm,
+  typeFlexMinWrapGap4Sm,
+  typeLabelBlockUpperSecondary,
+  typeMinBreakDisplay,
+  typeMinFlex1,
+  typeMinFlex1Space15SmSecondary,
+  typeMinSpace2Clip,
+  typeSmMuted,
+} from "../../shell/type-shell";
+import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import {
   libraryCollectionHistoryQuery,
   libraryCollectionHistorySuffix,
-} from "../../../lib/library-collection-history-query";
+} from "../library-collection-history-query";
 import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,
-} from "../../../lib/library-collection-receipts-i18n";
-import {
-  libraryCollectionError,
-  libraryCollectionsCopy,
-} from "../../../lib/library-collections-i18n";
-import { collectionHref, collectionPageParams } from "../../../lib/library-collections-query";
-import { libraryMembershipHistoryCopy } from "../../../lib/library-membership-history-i18n";
-import { membershipHistoryHref } from "../../../lib/library-membership-history-query";
-import { authService } from "../../../lib/services/auth-service";
-import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
+} from "../library-collection-receipts-i18n";
+import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
+import { collectionHref, collectionPageParams } from "../library-collections-query";
+import { libraryMembershipHistoryCopy } from "../library-membership-history-i18n";
+import { membershipHistoryHref } from "../library-membership-history-query";
 
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 const selectClass =
   "min-h-11 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
-const labelClass = "block font-label uppercase text-secondary";
-
-export async function generateMetadata(): Promise<Metadata> {
+export async function collectionHistoryMetadata(): Promise<Metadata> {
   return {
     title: `${libraryCollectionHistoryCopy(await getRequestLocale()).title} | MTA NEXUS`,
     robots: { index: false, follow: false },
   };
 }
-export default async function Page({
+export async function CollectionHistoryPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -86,13 +95,13 @@ export default async function Page({
       });
     if (!result) {
       return (
-        <div className={pageShellClass}>
+        <div className={pageShellMax5xl}>
           <h1 className="font-display">{h.title}</h1>
           <ErrorState
             title={h.loadUnavailable}
             description={h.loadUnavailableDescription}
             action={
-              <Link href={retryHref} className={navLinkClass}>
+              <Link href={retryHref} className={linkAccentSmRounded}>
                 {dictionary.errors.retry}
               </Link>
             }
@@ -107,27 +116,27 @@ export default async function Page({
       Boolean(result.productId) ||
       result.days !== 30;
     return (
-      <div className={pageShellClass}>
-        <nav className="flex min-w-0 flex-wrap gap-4 text-sm" aria-label={h.title}>
-          <Link href={membershipHistoryHref()} className={navLinkClass}>
+      <div className={pageShellMax5xl}>
+        <nav className={typeFlexMinWrapGap4Sm} aria-label={h.title}>
+          <Link href={membershipHistoryHref()} className={linkAccentSmRounded}>
             {libraryMembershipHistoryCopy(typedLocale).history}
           </Link>
-          <Link href={collectionHref()} className={navLinkClass}>
+          <Link href={collectionHref()} className={linkAccentSmRounded}>
             {c.title}
           </Link>
-          <Link href="/workspace/library" className={navLinkClass}>
+          <Link href="/workspace/library" className={linkAccentSmRounded}>
             {c.library}
           </Link>
         </nav>
-        <h1 className="min-w-0 break-words font-display">{h.title}</h1>
+        <h1 className={typeMinBreakDisplay}>{h.title}</h1>
         <p className="text-secondary">{h.note}</p>
         <form
           method="get"
           action="/workspace/library/collections/history"
-          className="nexus-panel flex min-w-0 flex-wrap items-end gap-4 overflow-x-clip p-4"
+          className={panelFlexClipWrapEndGap4}
         >
-          <label className="min-w-0 flex-1 space-y-1.5 text-sm text-secondary">
-            <span className={labelClass}>{h.days}</span>
+          <label className={typeMinFlex1Space15SmSecondary}>
+            <span className={typeLabelBlockUpperSecondary}>{h.days}</span>
             <select name="days" defaultValue={result.days} className={selectClass}>
               {LIBRARY_COLLECTION_HISTORY_DAYS.map((days) => (
                 <option key={days} value={days}>
@@ -136,8 +145,8 @@ export default async function Page({
               ))}
             </select>
           </label>
-          <label className="min-w-0 flex-1 space-y-1.5 text-sm text-secondary">
-            <span className={labelClass}>{h.action}</span>
+          <label className={typeMinFlex1Space15SmSecondary}>
+            <span className={typeLabelBlockUpperSecondary}>{h.action}</span>
             <select name="action" defaultValue={result.action} className={selectClass}>
               {LIBRARY_COLLECTION_HISTORY_ACTIONS.map((action) => (
                 <option key={action} value={action}>
@@ -146,7 +155,7 @@ export default async function Page({
               ))}
             </select>
           </label>
-          <div className="min-w-0 flex-1">
+          <div className={typeMinFlex1}>
             <Input
               name="collectionId"
               defaultValue={result.collectionId ?? ""}
@@ -155,7 +164,7 @@ export default async function Page({
               label={h.collectionId}
             />
           </div>
-          <div className="min-w-0 flex-1">
+          <div className={typeMinFlex1}>
             <Input
               name="productId"
               defaultValue={result.productId ?? ""}
@@ -167,17 +176,17 @@ export default async function Page({
           <Button type="submit" variant="secondary" size="touch">
             {h.filter}
           </Button>
-          <Link href="/workspace/library/collections/history" className={navLinkClass}>
+          <Link href="/workspace/library/collections/history" className={linkAccentSmRounded}>
             {h.clear}
           </Link>
         </form>
-        <p className="text-sm text-muted">
+        <p className={typeSmMuted}>
           {c.items}: {result.total} ·{" "}
           <time dateTime={result.generatedAt}>{result.generatedAt}</time>
         </p>
         <a
           href={`/api/library/collections/history/export?${suffix(result.page)}`}
-          className={navLinkClass}
+          className={linkAccentSmRounded}
         >
           {h.export}
         </a>
@@ -187,27 +196,27 @@ export default async function Page({
             description={h.emptyHint}
             action={
               filtered ? (
-                <Link href="/workspace/library/collections/history" className={navLinkClass}>
+                <Link href="/workspace/library/collections/history" className={linkAccentSmRounded}>
                   {h.clear}
                 </Link>
               ) : undefined
             }
           />
         ) : null}
-        <ol className="min-w-0 space-y-4 overflow-x-clip">
+        <ol className={pageShellStack4}>
           {result.items.map((item) => {
             const receipt = item.receipt,
               command = receipt?.command;
             return (
-              <li key={item.id} className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
-                <Link href={collectionReceiptHref(item.id)} className={navLinkClass}>
+              <li key={item.id} className={panelClipSpace3P5}>
+                <Link href={collectionReceiptHref(item.id)} className={linkAccentSmRounded}>
                   {libraryCollectionReceiptsCopy(typedLocale).open}
                 </Link>
                 <h2 className="font-semibold">{command ? c[command.action] : h.unknown}</h2>
                 <p className="text-sm">
                   {h.time}: <time dateTime={item.createdAt}>{item.createdAt}</time>
                 </p>
-                <p className="break-all text-xs text-muted">
+                <p className={typeBreakAllXsMuted}>
                   {c.receipt}: {item.id}
                   {receipt ? ` · ${c.request}: ${receipt.requestId}` : ""}
                 </p>
@@ -217,13 +226,13 @@ export default async function Page({
                       {h.recorded}: {receipt.collection.name} · {c[receipt.collection.status]} ·{" "}
                       {c.revision} {receipt.collection.revision}
                     </p>
-                    <code className="block break-all text-xs">{receipt.collection.id}</code>
+                    <code className={typeBreakAllXs}>{receipt.collection.id}</code>
                     {item.currentCollection ? (
                       <p className="break-words">
                         {h.current}:{" "}
                         <Link
                           href={collectionHref(item.currentCollection.id)}
-                          className={navLinkClass}
+                          className={linkAccentSmRounded}
                         >
                           {item.currentCollection.name}
                         </Link>{" "}
@@ -234,10 +243,11 @@ export default async function Page({
                       <ErrorState
                         id="library-collection-history-current-unavailable"
                         title={h.noCurrent}
+                        description={h.noCurrentHint}
                       />
                     )}
                     {command && "sourceCollectionId" in command && (
-                      <p className="break-all text-sm">
+                      <p className={typeBreakAllSm}>
                         {c.source}: {command.sourceCollectionId} · {c.revision}{" "}
                         {"expectedSourceRevision" in command
                           ? command.expectedSourceRevision
@@ -245,9 +255,12 @@ export default async function Page({
                       </p>
                     )}
                     {item.currentSource && (
-                      <p className="break-words text-sm">
+                      <p className={typeBreakSm}>
                         {h.sourceCurrent}:{" "}
-                        <Link href={collectionHref(item.currentSource.id)} className={navLinkClass}>
+                        <Link
+                          href={collectionHref(item.currentSource.id)}
+                          className={linkAccentSmRounded}
+                        >
                           {item.currentSource.name}
                         </Link>{" "}
                         · {c[item.currentSource.status]} · {c.revision}{" "}
@@ -255,7 +268,7 @@ export default async function Page({
                       </p>
                     )}
                     {receipt.sourceCollection && (
-                      <p className="break-all text-sm">
+                      <p className={typeBreakAllSm}>
                         {c.sourceSuccessor}: {receipt.sourceCollection.id} ·{" "}
                         {receipt.sourceCollection.revision}
                       </p>
@@ -263,10 +276,11 @@ export default async function Page({
                     {command?.action === "reconcile-items" && (
                       <div>
                         <p>
-                          {c.add}: {command.addProductIds.join(", ") || "—"}
+                          {c.add}: {formatUnknown(typedLocale, command.addProductIds.join(", "))}
                         </p>
                         <p>
-                          {c.remove}: {command.removeProductIds.join(", ") || "—"}
+                          {c.remove}:{" "}
+                          {formatUnknown(typedLocale, command.removeProductIds.join(", "))}
                         </p>
                       </div>
                     )}
@@ -275,13 +289,13 @@ export default async function Page({
                         <p>
                           {c.items}: {command.expectedItemCount}
                         </p>
-                        <p className="text-sm text-muted">{h.fullCopy}</p>
+                        <p className={typeSmMuted}>{h.fullCopy}</p>
                       </>
                     )}
                   </>
                 )}
                 {item.resources.length > 0 && (
-                  <ul className="min-w-0 space-y-2 overflow-x-clip">
+                  <ul className={typeMinSpace2Clip}>
                     {item.resources.map((resource) => (
                       <li key={resource.productId} className="space-y-1 border-t border-base pt-2">
                         <p className="break-words">
@@ -289,11 +303,11 @@ export default async function Page({
                             ? (resource.currentTitle ?? c.unavailable)
                             : h.unavailable}
                         </p>
-                        <code className="block break-all text-xs">{resource.productId}</code>
+                        <code className={typeBreakAllXs}>{resource.productId}</code>
                         {resource.currentAvailable && (
                           <Link
                             href={`/workspace/library/${encodeURIComponent(resource.productId)}/collections`}
-                            className={navLinkClass}
+                            className={linkAccentSmRounded}
                           >
                             {c.resourceCollections}
                           </Link>
@@ -307,22 +321,22 @@ export default async function Page({
           })}
         </ol>
         {result.totalPages > 1 && (
-          <nav aria-label={c.page} className="flex min-w-0 flex-wrap gap-4 text-sm">
+          <nav aria-label={c.page} className={typeFlexMinWrapGap4Sm}>
             {result.page > 1 && (
               <Link
                 href={`/workspace/library/collections/history?${suffix(result.page - 1)}`}
-                className={navLinkClass}
+                className={linkAccentSmRounded}
               >
                 {c.previous}
               </Link>
             )}
-            <span className="inline-flex min-h-11 items-center">
+            <span className={linkMinH}>
               {c.page} {result.page} {c.of} {result.totalPages}
             </span>
             {result.page < result.totalPages && (
               <Link
                 href={`/workspace/library/collections/history?${suffix(result.page + 1)}`}
-                className={navLinkClass}
+                className={linkAccentSmRounded}
               >
                 {c.next}
               </Link>
@@ -335,12 +349,12 @@ export default async function Page({
     if (!(error instanceof AppError)) throw error;
     if (error.statusCode === 404) notFound();
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax5xl}>
         <ErrorState
           title={libraryCollectionError(typedLocale, error.code)}
           description={h.loadUnavailableDescription}
           action={
-            <Link href="/workspace/library/collections/history" className={navLinkClass}>
+            <Link href="/workspace/library/collections/history" className={linkAccentSmRounded}>
               {c.reload}
             </Link>
           }

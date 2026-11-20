@@ -1,14 +1,14 @@
 import { createHash } from "node:crypto";
 import {
   AppError,
-  NotFoundError,
   LIBRARY_COLLECTION_COMMAND_LIMIT,
-  nextLibrarySelection,
   type LibrarySelectionBatchChoice,
   type LibrarySelectionBatchCommand,
   type LibrarySelectionBatchPreview,
   type LibrarySelectionBatchReceipt,
   type LibrarySelectionBatchResult,
+  NotFoundError,
+  nextLibrarySelection,
 } from "@nexus/domain";
 import {
   libraryCollectionIdSchema,
@@ -23,16 +23,17 @@ import {
   builds,
   libraryCollections as collections,
   libraryCollectionItems as members,
-  librarySelectionBatchReceipts as receipts,
   products,
+  librarySelectionBatchReceipts as receipts,
   resourceLibrarySelections as selections,
   users,
 } from "../schema";
 import { safePublishedBuildCondition, trustedCleanScanCondition } from "./build-safety";
 import { lockUserDownloadAccess, type ResourceTransaction } from "./entitlements";
-import { effectiveUserDownloadSources } from "./user-library";
 import { historyPageBounds } from "./history-pagination";
 import { lockInitiatingSession } from "./initiating-session";
+import { effectiveUserDownloadSources } from "./user-library";
+
 const fail = (code: string) => new AppError("Selection batch changed or is unavailable", 409, code);
 const hash = (value: unknown) => createHash("sha256").update(JSON.stringify(value)).digest("hex");
 const collectionFields = {

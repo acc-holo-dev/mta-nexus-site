@@ -1,11 +1,14 @@
 import type { LibraryMembershipHistoryItem } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
-import { libraryCollectionHistoryCopy } from "../../../lib/library-collection-history-i18n";
-import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
-import { collectionHref } from "../../../lib/library-collections-query";
-import { libraryMembershipHistoryCopy } from "../../../lib/library-membership-history-i18n";
-import { membershipHistoryHref } from "../../../lib/library-membership-history-query";
+import { linkAccentTight } from "../../shell/link-shell";
+import { panelSpace4P5 } from "../../shell/panel-shell";
+import { typeBreakAllXs, typeSpace2BorderTPt3 } from "../../shell/type-shell";
+import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
+import { libraryCollectionsCopy } from "../library-collections-i18n";
+import { collectionHref } from "../library-collections-query";
+import { libraryMembershipHistoryCopy } from "../library-membership-history-i18n";
+import { membershipHistoryHref } from "../library-membership-history-query";
 export function LibraryMembershipHistoryEntry({
   item,
   locale,
@@ -19,26 +22,27 @@ export function LibraryMembershipHistoryEntry({
   const receipt = item.receipt,
     resource = item.resource;
   return (
-    <article className="nexus-panel space-y-4 p-5">
+    <article className={panelSpace4P5}>
       <h2>
-        <Link
-          href={membershipHistoryHref(item.id)}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={membershipHistoryHref(item.id)} className={linkAccentTight}>
           {m.detail}
         </Link>
       </h2>
       <p>
         {h.time}: <time dateTime={item.createdAt}>{item.createdAt}</time>
       </p>
-      <code className="block break-all text-xs">
+      <code className={typeBreakAllXs}>
         {c.receipt}: {item.id}
       </code>
       {!receipt ? (
-        <ErrorState id="library-membership-history-unknown" title={h.unknown} />
+        <ErrorState
+          id="library-membership-history-unknown"
+          title={h.unknown}
+          description={h.unknownHint}
+        />
       ) : (
         <>
-          <code className="block break-all text-xs">
+          <code className={typeBreakAllXs}>
             {c.request}: {receipt.requestId}
           </code>
           {resource && (
@@ -60,11 +64,11 @@ export function LibraryMembershipHistoryEntry({
                   description={resource.productId}
                 />
               )}
-              <code className="block break-all text-xs">{resource.productId}</code>
+              <code className={typeBreakAllXs}>{resource.productId}</code>
               {resource.currentAvailable && (
                 <Link
                   href={`/workspace/library/${encodeURIComponent(resource.productId)}/collections`}
-                  className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={linkAccentTight}
                 >
                   {c.resourceCollections}
                 </Link>
@@ -76,13 +80,13 @@ export function LibraryMembershipHistoryEntry({
               const change = receipt.command.changes[index],
                 now = item.collections.find((value) => value.collectionId === child.collection.id);
               return (
-                <li key={child.id} className="space-y-2 border-t border-base pt-3">
+                <li key={child.id} className={typeSpace2BorderTPt3}>
                   <p>{child.command.action === "add" ? c.add : c.remove}</p>
                   <p className="break-words">
                     {h.recorded}: {child.collection.name} · {c[child.collection.status]} ·{" "}
                     {c.revision} {child.collection.revision}
                   </p>
-                  <code className="block break-all text-xs">{child.collection.id}</code>
+                  <code className={typeBreakAllXs}>{child.collection.id}</code>
                   <p>
                     {m.before}: {change?.wasInCollection ? m.present : m.absent} · {m.after}:{" "}
                     {change?.inCollection ? m.present : m.absent}
@@ -91,10 +95,7 @@ export function LibraryMembershipHistoryEntry({
                     <>
                       <p className="break-words">
                         {h.current}:{" "}
-                        <Link
-                          href={collectionHref(now.current.id)}
-                          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                        >
+                        <Link href={collectionHref(now.current.id)} className={linkAccentTight}>
                           {now.current.name}
                         </Link>{" "}
                         · {c[now.current.status]} · {c.revision} {now.current.revision}
@@ -109,15 +110,19 @@ export function LibraryMembershipHistoryEntry({
                       </p>
                     </>
                   ) : (
-                    <p>{h.noCurrent}</p>
+                    <ErrorState
+                      id="library-membership-history-current-unavailable"
+                      title={h.noCurrent}
+                      description={h.noCurrentHint}
+                    />
                   )}
                   <Link
                     href={collectionHref(child.collection.id, "history")}
-                    className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={linkAccentTight}
                   >
                     {c.history}
                   </Link>
-                  <code className="block break-all text-xs">
+                  <code className={typeBreakAllXs}>
                     {c.receipt}: {child.id}
                   </code>
                 </li>

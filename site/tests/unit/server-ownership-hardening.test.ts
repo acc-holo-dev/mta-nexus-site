@@ -1,12 +1,12 @@
-import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { describe, expect, it } from "vitest";
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
 describe("server ownership hardening surface", () => {
   it("hardens registration ownership and validates organization identifiers", () => {
-    const service = read("site/src/lib/services/server-service.ts");
+    const service = read("site/src/lib/services/servers/server-service.ts");
     const route = read("site/src/app/api/servers/route.ts");
     expect(service).toContain("ownerId: input.organizationId ? undefined : actor.id");
     expect(route).toContain("serverRegistrationSchema.safeParse");
@@ -15,14 +15,16 @@ describe("server ownership hardening surface", () => {
 
   it("uses trusted request IP for server registration", () => {
     const route = read("site/src/app/api/servers/route.ts");
-    expect(route).toContain('import { getTrustedRequestIp } from "../../../lib/request-client-ip"');
+    expect(route).toContain(
+      'import { getTrustedRequestIp } from "../../../features/shell/request-client-ip"',
+    );
     expect(route).toContain("getTrustedRequestIp(request)");
     expect(route).not.toContain("getClientIp(request.headers)");
   });
 
   it("uses one server management contract in service and workspace page", () => {
-    const service = read("site/src/lib/services/server-service.ts");
-    const page = read("site/src/app/workspace/servers/[id]/page.tsx");
+    const service = read("site/src/lib/services/servers/server-service.ts");
+    const page = read("site/src/features/servers/server/managed-server-workspace-screen.tsx");
 
     expect(service).toContain("async canManageServer(");
     expect(service).toContain("if (!organization) return false");
@@ -64,7 +66,7 @@ describe("server ownership hardening surface", () => {
     // Duplicate pending requests are detected per requester before enqueue;
     // cross-requester pending state stays available on the repository for
     // moderation-side checks.
-    expect(route).toContain("verificationRepository.findPendingForTarget(");
+    expect(route).toContain("verificationWorkspaceService.findPendingForTarget(");
     expect(route).toContain("error instanceof AppError");
   });
 
@@ -77,7 +79,9 @@ describe("server ownership hardening surface", () => {
     expect(route).toContain('Vary: "Cookie"');
     expect(route).toContain("headers: privateHeaders");
     expect(route).toContain("return json(context, { requests });");
-    expect(route).toMatch(/return json\(\s*context,\s*\{ error: "Unauthorized" \},\s*401,?\s*\)/u);
+    expect(route).toMatch(
+      /return json\(\s*context,\s*\{ error: copy\.unauthorized \},\s*401,?\s*\)/u,
+    );
   });
 
   it("does not claim automatic proof or live-ownership acceptance", () => {

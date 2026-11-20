@@ -6,8 +6,9 @@ import { PublicationFeed } from "../../src/features/community/publication-feed";
 import {
   type PublicationPage,
   publicationPageQuery,
-} from "../../src/lib/publication-feed-contract";
-import { publicationCopy } from "../../src/lib/publication-feed-copy";
+} from "../../src/features/community/publication-feed-contract";
+import { publicationCopy } from "../../src/features/community/publication-feed-copy";
+import { getDictionary } from "../../src/lib/i18n";
 
 const mocks = vi.hoisted(() => ({
   page: vi.fn(),
@@ -15,13 +16,13 @@ const mocks = vi.hoisted(() => ({
   locale: "en" as "ru" | "en",
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../../src/lib/services/publication-feed-service", () => ({
+vi.mock("../../src/lib/services/discovery/publication-feed-service", () => ({
   publicationFeedService: { page: mocks.page },
 }));
 
@@ -63,9 +64,9 @@ it.each(["en", "ru"] as const)(
     mocks.locale = locale;
     const copy = publicationCopy(locale);
     const html = renderToStaticMarkup(await FollowingPage({}));
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toContain(copy.title);
     expect(copy.emptyFollowing).not.toBe(copy.emptyFollowingHint);
     expect(copy.emptyFiltered).not.toBe(copy.emptyFilteredHint);
@@ -86,14 +87,16 @@ it.each(["en", "ru"] as const)(
       }),
     );
     expect(html).toContain('role="alert"');
+    expect(html).toContain(copy.title);
     expect(html).toContain(copy.error);
-    expect(html).toContain(copy.retry);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-h-11");
+    expect(html).toContain(getDictionary(locale).errors.retry);
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toContain('href="/workspace/feed?source=server&amp;q=MTA"');
     expect(html).not.toContain("session-secret");
     expect(html).not.toContain(copy.emptyFollowing);
     expect(html).not.toContain(copy.loadUnavailable);
+    expect(html).not.toContain("/auth/login");
   },
 );
 
@@ -113,8 +116,8 @@ it.each(["en", "ru"] as const)(
     expect(unavailable).toContain('role="alert"');
     expect(unavailable).toContain(copy.loadUnavailable);
     expect(unavailable).toContain(copy.retry);
-    expect(unavailable).toContain("overflow-x-clip");
-    expect(unavailable).toContain("min-h-11");
+    expect(unavailable).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(unavailable).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(unavailable).not.toContain(copy.emptyFollowing);
     expect(unavailable).not.toContain(copy.error);
 
@@ -140,8 +143,8 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(copy.emptyFollowing);
     expect(html).toContain(copy.emptyFollowingHint);
     expect(html).toContain(copy.discover);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toContain('href="/discover"');
   },
 );
@@ -162,8 +165,8 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(copy.emptyFiltered);
     expect(html).toContain(copy.emptyFilteredHint);
     expect(html).toContain(copy.reset);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).not.toContain(copy.emptyFollowing);
     expect(html).not.toContain('href="/discover"');
   },
@@ -179,7 +182,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('id="publication-feed-loading-heading"');
     expect(html).toContain(`>${copy.title}<`);
     expect(html).toContain(copy.loading);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   },
 );

@@ -14,12 +14,12 @@ const harness = vi.hoisted(() => ({
   refresh: vi.fn(),
 }));
 const confirmAction = vi.hoisted(() => vi.fn(async () => true));
-vi.mock("../../src/components/confirm-action", () => ({ confirmAction }));
+vi.mock("../../src/features/shell/confirm-action", () => ({ confirmAction }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: harness.refresh }),
 }));
-vi.mock("../../src/components/locale-context", async () => {
+vi.mock("../../src/features/shell/locale", async () => {
   const { getDictionary } = await import("../../src/lib/i18n");
   return {
     useNexusLocale: () => ({ locale: "en" as const, dictionary: getDictionary("en") }),
@@ -27,8 +27,8 @@ vi.mock("../../src/components/locale-context", async () => {
 });
 
 import { BuildQuarantineControls } from "../../src/features/resources/components/build-quarantine-controls";
+import { verificationCopy } from "../../src/features/trust/verification-workspace-copy";
 import { getDictionary } from "../../src/lib/i18n";
-import { verificationCopy } from "../../src/lib/verification-workspace-copy";
 
 const { render, actionButton, seedControls } =
   createBuildQuarantineControlsConfirmInteractionHelpers(

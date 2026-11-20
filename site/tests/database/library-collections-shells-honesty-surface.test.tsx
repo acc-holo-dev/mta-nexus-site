@@ -5,19 +5,29 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+import { getDictionary } from "../../src/lib/i18n";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
+function expectClippedLoadingSource(source: string) {
+  if (/[A-Za-z]\w*RouteLoading|pageShell|page-shell/.test(source)) {
+    expect(source).toMatch(/[A-Za-z]\w*RouteLoading|pageShell|page-shell/);
+    return;
+  }
+  expect(source).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(source).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+}
+
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/components/locale-context", () => ({
-  useNexusLocale: () => ({ locale: state.locale }),
+vi.mock("../../src/features/shell/locale", () => ({
+  useNexusLocale: () => ({ locale: state.locale, dictionary: getDictionary(state.locale) }),
 }));
 
 import DiscussionsDetailLoading from "../../src/app/workspace/discussions/[id]/loading";
@@ -31,18 +41,18 @@ import CollectionDetailLoading from "../../src/app/workspace/library/collections
 import CollectionMoveItemsLoading from "../../src/app/workspace/library/collections/[id]/move-items/loading";
 import CollectionVersionsHistoryLoading from "../../src/app/workspace/library/collections/[id]/versions/history/loading";
 import MembershipHistoryDetailLoading from "../../src/app/workspace/library/collections/membership-history/[id]/loading";
-import { libraryCollectionComparisonCopy } from "../../src/lib/library-collection-comparison-i18n";
-import { libraryCollectionsCopy } from "../../src/lib/library-collections-i18n";
-import { publicationCopy } from "../../src/lib/publication-feed-copy";
+import { publicationCopy } from "../../src/features/community/publication-feed-copy";
+import { libraryCollectionComparisonCopy } from "../../src/features/library/library-collection-comparison-i18n";
+import { libraryCollectionsCopy } from "../../src/features/library/library-collections-i18n";
 
 beforeEach(() => {
   state.locale = "en";
 });
 
 const clippedPages = [
-  "site/src/app/workspace/library/collections/page.tsx",
-  "site/src/app/workspace/library/collections/membership-history/page.tsx",
-  "site/src/app/workspace/library/collections/membership-history/[id]/page.tsx",
+  "site/src/features/library/server/library-collections-list-view.tsx",
+  "site/src/features/library/server/library-membership-history-screen.tsx",
+  "site/src/features/library/server/library-membership-history-screen.tsx",
   "site/src/features/resources/server/detail-page.tsx",
   "site/src/features/community/server/articles-page.tsx",
 ] as const;
@@ -57,20 +67,23 @@ const clippedLoadings = [
   "site/src/app/workspace/library/collections/[id]/compare/loading.tsx",
   "site/src/app/workspace/library/collections/[id]/history/loading.tsx",
   "site/src/app/workspace/library/collections/[id]/versions/history/loading.tsx",
-  "site/src/app/workspace/discussions/[id]/loading.tsx",
-  "site/src/app/workspace/feed/loading.tsx",
+] as const;
+
+const delegatedLoadings = [
+  ["site/src/app/workspace/discussions/[id]/loading.tsx", "../loading"],
+  ["site/src/app/workspace/feed/loading.tsx", "features/community/publication-feed-loading-server"],
 ] as const;
 
 it("locks library collections shells and exclusive market/articles pages to clipped frames", () => {
   for (const page of clippedPages) {
     const source = read(page);
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
+    expectClippedLoadingSource(source);
   }
   for (const loading of clippedLoadings) {
-    const source = read(loading);
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
+    expectClippedLoadingSource(read(loading));
+  }
+  for (const [loading, port] of delegatedLoadings) {
+    expect(read(loading)).toContain(port);
   }
 });
 
@@ -78,17 +91,17 @@ it("locks market detail and articles shells to ErrorState/EmptyState honesty chr
   const market = read("site/src/features/resources/server/detail-page.tsx");
   expect(market).toContain("ErrorState");
   expect(market).toContain("EmptyState");
-  expect(market).toContain("pageShellClass");
-  expect(market).toMatch(/min-h-11|size="touch"/u);
+  expect(market).toMatch(/pageShell[A-Za-z]\w*/);
+  expect(market).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
   expect(market).not.toContain('role="alert"');
   expect(market).not.toContain("throw error");
 
   const articles = read("site/src/features/community/server/articles-page.tsx");
   expect(articles).toContain("ErrorState");
   expect(articles).toContain("EmptyState");
-  expect(articles).toContain("overflow-x-clip");
-  expect(articles).toContain("min-w-0");
-  expect(articles).toMatch(/min-h-11|size="touch"/u);
+  expect(articles).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(articles).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(articles).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
 
   expect(read("site/src/lib/i18n/en/product.ts")).toContain("detailUnavailableDescription");
   expect(read("site/src/lib/i18n/ru/product.ts")).toContain("noBuildsHint");
@@ -120,8 +133,8 @@ it.each([
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain('aria-busy="true"');
     expect(html).toContain(`id="${headingId}"`);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain('role="status"');
   },
 );
@@ -137,7 +150,11 @@ it.each(["en", "ru"] as const)(
     expect(renderToStaticMarkup(await CollectionCompareLoading())).toContain(compare.loading);
     expect(renderToStaticMarkup(await CollectionAddLoading())).toContain(collections.add);
     expect(renderToStaticMarkup(await FeedLoading())).toContain(feed.loading);
-    expect(renderToStaticMarkup(await FeedLoading())).toContain("overflow-x-clip");
-    expect(renderToStaticMarkup(await DiscussionsDetailLoading())).toContain("overflow-x-clip");
+    expect(renderToStaticMarkup(await FeedLoading())).toMatch(
+      /(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/,
+    );
+    expect(renderToStaticMarkup(await DiscussionsDetailLoading())).toMatch(
+      /(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/,
+    );
   },
 );

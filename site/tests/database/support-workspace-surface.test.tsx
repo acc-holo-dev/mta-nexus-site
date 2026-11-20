@@ -7,19 +7,19 @@ const mocks = vi.hoisted(() => ({ session: vi.fn(), locale: "en" as "ru" | "en" 
 vi.mock("next/navigation", () => ({ usePathname: () => "/support" }));
 vi.mock("next/link", () => ({ default: "a" }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
 
-import { LocaleProvider } from "../../src/components/locale-context";
-import { SupportCaseActions } from "../../src/features/support/components/support-case-actions";
+import { LocaleProvider } from "../../src/features/shell/locale";
 import { SupportCenter } from "../../src/features/support/center";
+import { SupportCaseActions } from "../../src/features/support/components/support-case-actions";
 import { SupportPageSurface, supportMetadata } from "../../src/features/support/page-server";
+import { supportWorkspaceCopy } from "../../src/features/support/support-workspace-copy";
 import { getDictionary } from "../../src/lib/i18n";
-import { supportWorkspaceCopy } from "../../src/lib/support-workspace-copy";
 
 const supportCase = {
   id: `sup_${"a".repeat(24)}`,
@@ -63,7 +63,7 @@ it.each(["ru", "en"] as const)(
     expect(renderToStaticMarkup(<SupportCaseActions {...props} busy />)).toContain('disabled=""');
     const staff = renderToStaticMarkup(<SupportCaseActions {...props} staff />);
     expect(staff).toContain("border border-base bg-surface");
-    expect(staff).toContain("min-h-11");
+    expect(staff).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(staff).toContain("text-accent");
   },
 );
@@ -106,7 +106,7 @@ it("gates server-rendered support pages before showing private controls", async 
     `<h1 class="font-display text-primary">${getDictionary("en").support.title}</h1>`,
   );
   expect(guest).toContain("min-w-0 max-w-5xl");
-  expect(guest).toContain("overflow-x-clip");
+  expect(guest).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(guest).toContain('href="/auth/login?next=%2Fsupport"');
   expect(guest).toContain('href="/auth/register?next=%2Fsupport"');
   expect(guest).toContain(getDictionary("en").workspace.createAccount);

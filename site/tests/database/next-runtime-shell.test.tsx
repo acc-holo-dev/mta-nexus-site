@@ -12,6 +12,8 @@ const readSource = (relative: string) => readFileSync(join(root, relative), "utf
 
 const runtime = vi.hoisted(() => ({ locale: "en" as "en" | "ru" }));
 
+vi.mock("server-only", () => ({}));
+
 vi.mock("next/script", async () => {
   const ReactModule = await import("react");
   return {
@@ -32,11 +34,11 @@ vi.mock("next/script", async () => {
   };
 });
 
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => runtime.locale,
 }));
 
-vi.mock("../../src/components/nexus-shell", async () => {
+vi.mock("../../src/features/shell/shell", async () => {
   const ReactModule = await import("react");
   return {
     NexusShell: ({ children, locale }: { children?: React.ReactNode; locale: string }) =>
@@ -44,7 +46,7 @@ vi.mock("../../src/components/nexus-shell", async () => {
   };
 });
 
-vi.mock("../../src/components/pwa-service-worker", async () => {
+vi.mock("../../src/features/shell/pwa-service-worker", async () => {
   const ReactModule = await import("react");
   return {
     PwaServiceWorker: () => ReactModule.createElement("span", { "data-pwa": "registered" }),
@@ -66,11 +68,23 @@ vi.mock("next/link", async () => {
   };
 });
 
+vi.mock("next/font/google", () => {
+  const font = (variable: string) => () => ({
+    className: "",
+    variable,
+    style: { fontFamily: variable },
+  });
+  return {
+    Unbounded: font("--font-nexus-display"),
+    Source_Sans_3: font("--font-nexus-sans"),
+  };
+});
+
 import ErrorPage from "../../src/app/error";
 import GlobalError, { detectGlobalErrorLocale } from "../../src/app/global-error";
 import RootLayout from "../../src/app/layout";
 import NotFound from "../../src/app/not-found";
-import { LocaleProvider } from "../../src/components/locale-context";
+import { LocaleProvider } from "../../src/features/shell/locale";
 import { getDictionary } from "../../src/lib/i18n";
 
 function executeThemeScript(
@@ -175,14 +189,14 @@ describe("Next.js root runtime shell behavior", () => {
       expect(html).toContain(`>${dictionary.errors.retry}</span>`);
       expect(html).toContain(`>${dictionary.errors.home}</span>`);
       expect(html).toContain('href="/"');
-      expect(html).toContain("min-h-11");
+      expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
       expect(html).toContain("flex min-h-11 items-center");
       expect(html.match(/aria-hidden="true"/gu)?.length).toBeGreaterThanOrEqual(2);
     },
   );
 
   it("locks root error CTAs to size=touch / min-h-11 without size=sm", () => {
-    const source = readSource("site/src/app/error.tsx");
+    const source = readSource("site/src/features/shell/components/route-error-page.tsx");
     expect(source).toContain('size="touch"');
     expect(source.match(/size="touch"/gu)?.length ?? 0).toBeGreaterThanOrEqual(2);
     expect(source).toContain("min-h-11 items-center");

@@ -3,40 +3,53 @@
 import { PRODUCT_TYPES } from "@nexus/domain";
 import { Button, ErrorState, fieldControlClass, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { confirmedAuthorBuild } from "../../../lib/author-resource-response";
+import { useNexusLocale } from "../../shell/locale";
+import { pageShellMax2xlStandard } from "../../shell/page-shell";
+import { panelGridClipShadow } from "../../shell/panel-shell";
 import {
-  MAX_BUILD_FILE_SIZE_BYTES,
-  validateBuildFileSelection,
-} from "../../../lib/build-file-validation";
-import { buildPackageCopy } from "../../../lib/build-package-i18n";
-import { confirmedCreatedResource } from "../../../lib/new-resource-response";
+  typeDisplayPrimary,
+  typeFileInputInset,
+  typeLabelBlockUpperSecondary,
+  typeMaxXlSmLeadingMuted,
+  typeSmColSpan2,
+  typeSmSecondary,
+  typeSpace15SmCol2,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import { confirmedAuthorBuild } from "../author-resource-response";
+import { MAX_BUILD_FILE_SIZE_BYTES, validateBuildFileSelection } from "../build-file-validation";
+import { buildPackageCopy } from "../build-package-i18n";
+import { confirmedCreatedResource } from "../new-resource-response";
 import {
   createPendingResourceDraft,
   PENDING_RESOURCE_DRAFT_KEY,
   parsePendingResourceDraft,
   pendingResourceDraftKey,
-} from "../../../lib/pending-resource-draft";
-import { PRODUCT_PUBLISHING_KEYS } from "../../../lib/product-type-labels";
-import { getResourceSubmissionErrorMessage } from "../../../lib/publishing-error-message";
+} from "../pending-resource-draft";
+import { PRODUCT_PUBLISHING_KEYS } from "../product-type-labels";
+import { getResourceSubmissionErrorMessage } from "../publishing-error-message";
 import {
   parseResourceIntent,
   type ResourceSubmissionIntent,
   resourceFileHash,
   resourceIntentKey,
-} from "../../../lib/resource-submission-intent";
-import { useNexusLocale } from "../../../components/locale-context";
+} from "../resource-submission-intent";
 import { MtaMetaInspectorPanel } from "./mta-meta-inspector-panel";
 import { ResourceSubmissionSuccess } from "./resource-submission-success";
-
-const nativeLabelClass = "block font-label uppercase text-secondary";
-const fileClass =
-  "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-accent";
-
 export function NewResourceForm({ actorId }: { actorId: string }) {
   const storageKey = pendingResourceDraftKey(actorId);
   const intentKey = resourceIntentKey(actorId);
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.publishing;
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [
+      ...Object.values(copy).filter((value): value is string => typeof value === "string"),
+      ...Object.values(buildPackageCopy(locale)),
+    ].includes(text)
+      ? text
+      : fallback;
+  }
   const maxFileSizeMb = String(MAX_BUILD_FILE_SIZE_BYTES / (1024 * 1024));
   const buildFileTooLarge = copy.buildFileTooLarge.replace("{maxFileSize}", maxFileSizeMb);
   const buildFileRequirements = copy.buildFileRequirements.replace("{maxFileSize}", maxFileSizeMb);
@@ -72,7 +85,6 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
   const lock = useRef(false);
   const intentRef = useRef<ResourceSubmissionIntent | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const message = (ru: string, en: string) => (locale === "ru" ? ru : en);
   const [resultId, setResultId] = useState<string | null>(null);
   const [createdProduct, setCreatedProduct] = useState<{
     id: string;
@@ -129,19 +141,14 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
           setDraftReady(true);
         }
       } catch {
-        if (alive)
-          setError(
-            locale === "ru"
-              ? "Не удалось проверить сессию или восстановить отправку. Войдите в исходный аккаунт и обновите страницу."
-              : "Could not verify the session or restore the submission. Sign in to the original account and refresh.",
-          );
+        if (alive) setError(copy.restoreFailed);
       }
     }
     void restore();
     return () => {
       alive = false;
     };
-  }, [actorId, intentKey, storageKey, locale]);
+  }, [actorId, intentKey, storageKey, copy.restoreFailed]);
 
   useEffect(() => {
     if (!intent || !formRef.current) return;
@@ -218,12 +225,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
           file.size !== active.build.size ||
           hash !== active.build.sha256
         )
-          throw new Error(
-            message(
-              "Выберите тот же файл: содержимое или имя не совпадает с исходной отправкой.",
-              "Choose the same file: its name or contents do not match the original submission.",
-            ),
-          );
+          throw new Error(copy.sameFileRequired);
       } else {
         const mtaTarget = String(form.get("mtaMinVersion") || mtaVersionTarget || "").trim();
         const request = createdProduct
@@ -265,17 +267,11 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
           },
         };
         const raw = JSON.stringify(active);
-        if (!parseResourceIntent(raw, actorId))
-          throw new Error(message("Проверьте поля отправки.", "Check the submission fields."));
+        if (!parseResourceIntent(raw, actorId)) throw new Error(copy.checkSubmissionFields);
         try {
           sessionStorage.setItem(intentKey, raw);
         } catch {
-          throw new Error(
-            message(
-              "Не удалось сохранить данные для восстановления. Отправка не началась.",
-              "Could not save recovery information. Submission was not started.",
-            ),
-          );
+          throw new Error(copy.recoverySaveFailed);
         }
         intentRef.current = active;
         setIntent(active);
@@ -309,12 +305,8 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
             releaseKnownFailure();
           throw new Error(
             !firstAttempt
-              ? message(
-                  "Не удалось подтвердить исходное создание. Проверьте черновики и повторите исходную отправку позже.",
-                  "Could not confirm the original creation. Check your drafts and retry the original submission later.",
-                )
+              ? copy.creationUnconfirmed
               : getResourceSubmissionErrorMessage(productData?.code, publishingErrorMessages) ||
-                  productData?.error ||
                   copy.createError,
           );
         }
@@ -369,12 +361,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
           publishingErrorMessages,
         );
         throw new Error(
-          !firstAttempt
-            ? message(
-                "Не удалось подтвердить исходную сборку. Проверьте версии ресурса и повторите исходную отправку позже.",
-                "Could not confirm the original build. Check the resource versions and retry the original submission later.",
-              )
-            : publishingMessage || buildData?.error || copy.buildError,
+          !firstAttempt ? copy.buildUnconfirmed : publishingMessage || copy.buildError,
         );
       }
 
@@ -389,7 +376,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
       setCreatedProduct(null);
       setResultId(product.id);
     } catch (caught) {
-      setError(caught instanceof Error && caught.message ? caught.message : copy.unexpectedError);
+      setError(safeMessage(caught, copy.unexpectedError));
     } finally {
       setLoading(false);
       lock.current = false;
@@ -401,23 +388,18 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6 py-8">
+    <div className={pageShellMax2xlStandard}>
       <div className="space-y-1.5">
-        <h1 className="font-display text-primary">{copy.resourceTitle}</h1>
-        <p className="max-w-xl text-sm leading-relaxed text-muted">{copy.resourceDescription}</p>
+        <h1 className={typeDisplayPrimary}>{copy.resourceTitle}</h1>
+        <p className={typeMaxXlSmLeadingMuted}>{copy.resourceDescription}</p>
       </div>
 
       {intent ? (
-        <ErrorState
-          title={message(
-            "Результат может быть неизвестен. Для безопасного повтора выберите тот же файл; исходные данные сохранены.",
-            "The result may be unknown. To retry safely, select the same file; the original details are saved.",
-          )}
-        />
+        <ErrorState title={copy.resultMayBeUnknown} description={copy.buildErrorDescription} />
       ) : null}
       {createdProduct && (
         <div className="flex flex-col gap-3 rounded-lg border border-base bg-inset p-4 sm:flex-row sm:items-center sm:justify-between">
-          <p role="status" className="text-sm text-secondary">
+          <p role="status" className={typeSmSecondary}>
             {copy.buildRetryReady} {copy.pendingDraftLabel} {createdProduct.slug}
           </p>
           <Button
@@ -433,15 +415,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
         </div>
       )}
 
-      {error ? (
-        <ErrorState
-          title={error}
-          description={message(
-            "Отправка могла завершиться. Повтор использует исходные данные и тот же файл.",
-            "The submission may have completed. A retry uses the original details and the same file.",
-          )}
-        />
-      ) : null}
+      {error ? <ErrorState title={error} description={copy.errorMayHaveCompleted} /> : null}
 
       <MtaMetaInspectorPanel
         onApplyMinimumVersion={setMtaVersionTarget}
@@ -455,7 +429,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
         key={formEpoch}
         onSubmit={submit}
         aria-busy={loading}
-        className="nexus-panel grid min-w-0 grid-cols-1 gap-4 overflow-x-clip p-5 shadow-nexus-sm sm:grid-cols-2 sm:p-6"
+        className={panelGridClipShadow}
       >
         <fieldset disabled={loading} className="contents">
           <Input
@@ -481,7 +455,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
             readOnly={Boolean(createdProduct || intent)}
           />
 
-          <div className="sm:col-span-2">
+          <div className={typeSmColSpan2}>
             <Input
               id="resource-short-description"
               name="shortDescription"
@@ -491,8 +465,8 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
             />
           </div>
 
-          <div className="space-y-1.5 sm:col-span-2">
-            <label htmlFor="resource-description" className={nativeLabelClass}>
+          <div className={typeSpace15SmCol2}>
+            <label htmlFor="resource-description" className={typeLabelBlockUpperSecondary}>
               {copy.description}
             </label>
             <textarea
@@ -511,7 +485,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="resource-type" className={nativeLabelClass}>
+            <label htmlFor="resource-type" className={typeLabelBlockUpperSecondary}>
               {copy.type}
             </label>
             <select
@@ -561,19 +535,19 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
             readOnly={Boolean(createdProduct || intent)}
           />
 
-          <div className="sm:col-span-2">
+          <div className={typeSmColSpan2}>
             <Input
               id="resource-dependencies"
               name="dependencies"
               label={copy.dependencies}
               maxLength={1000}
-              placeholder="core-ui, vehicle-pack"
+              placeholder={copy.dependenciesPlaceholder}
               readOnly={Boolean(createdProduct || intent)}
             />
           </div>
 
-          <div className="space-y-1.5 sm:col-span-2">
-            <label htmlFor="resource-build-file" className={nativeLabelClass}>
+          <div className={typeSpace15SmCol2}>
+            <label htmlFor="resource-build-file" className={typeLabelBlockUpperSecondary}>
               {copy.buildArchive}
             </label>
             <input
@@ -582,13 +556,13 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
               type="file"
               accept=".zip,.rar,.7z,.lua"
               required
-              className={fileClass}
+              className={typeFileInputInset}
             />
-            <span className="text-xs text-muted">{buildFileRequirements}</span>
+            <span className={typeXsMuted}>{buildFileRequirements}</span>
           </div>
 
-          <div className="space-y-1.5 sm:col-span-2">
-            <label htmlFor="resource-release-notes" className={nativeLabelClass}>
+          <div className={typeSpace15SmCol2}>
+            <label htmlFor="resource-release-notes" className={typeLabelBlockUpperSecondary}>
               {copy.releaseNotes}
             </label>
             <textarea
@@ -614,7 +588,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
               : loading
                 ? copy.submitting
                 : intent
-                  ? message("Повторить исходную отправку", "Retry original submission")
+                  ? copy.retryOriginal
                   : createdProduct
                     ? copy.retryBuild
                     : copy.submit}

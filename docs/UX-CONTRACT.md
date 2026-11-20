@@ -30,7 +30,7 @@ Input уже умеет связывать label/error. Общая оболоч�
 
 ## Диалоги таблицы и короткие экраны
 
-More и notification panels используют native dialog и [useModalDialog](../site/src/components/use-modal-dialog.ts). Общий [Dialog](../site/packages/ui/src/dialog.tsx) применяется в ConfirmDialog и `confirmAction` для подтверждения действий. Оба пути сохраняют модальность, доступность с клавиатуры и возврат фокуса; повторный рендер не должен закрывать окно. Во время `busy` ConfirmDialog блокирует подтверждение и отмену, включая Escape и фон, и сообщает состояние через `aria-busy`. Исторический [modal hook на baseline](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/use-modal-dialog.ts#L5-L49) остаётся ссылкой на прежний срез.
+More и notification panels используют native dialog и [useModalDialog](../site/src/features/shell/modal-dialog.ts). Общий [Dialog](../site/packages/ui/src/dialog.tsx) применяется в ConfirmDialog и [`confirmAction`](../site/src/features/shell/confirm-action.ts) для подтверждения действий. Оба пути сохраняют модальность, доступность с клавиатуры и возврат фокуса; повторный рендер не должен закрывать окно. Во время `busy` ConfirmDialog блокирует подтверждение и отмену, включая Escape и фон, и сообщает состояние через `aria-busy`. Исторический [modal hook на baseline](https://github.com/acc-holo-dev/mta-nexus-site/blob/385e577e7443cf7d7b817419ce5c3b8afe87b690/apps/web/src/components/use-modal-dialog.ts#L5-L49) остаётся ссылкой на прежний срез.
 
 У длинного диалога доступен заголовок и закрытие, содержимое прокручивается в пределах доступной высоты с safe area. Для More и SectionHeader сначала проверяются реальные bounding boxes, начало/конец списка и длинные RU подписи; риска по классам недостаточно для заявления о поломке. Новый ConfirmAction — предложение: он показывает объект, масштаб и последствия, но сохраняет password, slug, revision, audit и отмену существующего действия.
 
@@ -46,7 +46,7 @@ More и notification panels используют native dialog и [useModalDialo
 
 ## Ресурс автор версия и получение
 
-До получения ресурса человек должен понять назначение, публичного автора/организацию, версию и состав выдачи. Автор показывается из безопасной публичной проекции; private ID, email и скрытая identity не заменяют профиль. Author и current owner не смешиваются без domain contract. Ссылки Trust и Publications имеют отдельные области и расстояние. [Принятые цели resource page](RESOURCES.md).
+До получения ресурса человек должен понять назначение, публичного автора/организацию, версию и состав выдачи. Автор показывается из безопасной публичной проекции; private ID, email и скрытая identity не заменяют профиль. Author и current owner не смешиваются без domain contract. Ссылки Trust и Publications имеют отдельные области и расстояние. [Принятые цели resource page](current/domains/RESOURCES.md).
 
 Free — цена, Open/Closed Source — способ выдачи исходников, license scope/term — условия использования, DRM — отдельная применимая возможность. Одно не выводится из другого. Новая source metadata требует согласованной схемы и unknown/default; отсутствие данных не заполняется догадкой. Production DRM не изображается действующим в бесплатной beta.
 
@@ -54,7 +54,7 @@ Free — цена, Open/Closed Source — способ выдачи исходн
 
 Single acquire и сбор бесплатного набора различимы. После входа сохраняется исходное намерение, но мутация не исполняется без необходимого подтверждения. Owned, pending, unconfirmed, error и receipt имеют понятные действия; «Открыть библиотеку» ведёт к библиотеке или записи. Корзина и безопасные повторы уже есть, повторять их логику в UI нельзя.
 
-Описание может получить предложенные секции «Назначение», «Установка», «Настройка», «Ограничения», «Поддержка». Код форматируется и копируется без выполнения. Compatibility остаётся optional; неизвестное не называется совместимым или несовместимым. Помощь передаёт разрешённый resource/version context без публикации приватных сведений. [Optional compatibility](RESOURCES.md).
+Описание может получить предложенные секции «Назначение», «Установка», «Настройка», «Ограничения», «Поддержка». Код форматируется и копируется без выполнения. Compatibility остаётся optional; неизвестное не называется совместимым или несовместимым. Помощь передаёт разрешённый resource/version context без публикации приватных сведений. [Optional compatibility](current/domains/RESOURCES.md).
 
 Gallery уже существует; lightbox — отдельное предложение. Авторский readiness overview также предложение: он собирает существующие формы и реальные блокеры, сохраняя черновик. Optional metadata не становится новым обязательным publishing gate. Preview не равен публикации, а заполненный checklist не заменяет clean scanner result.
 

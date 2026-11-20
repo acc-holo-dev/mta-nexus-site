@@ -1,21 +1,22 @@
-import { and, asc, count, desc, eq, ilike, inArray, sql } from "drizzle-orm";
 import {
   AppError,
   NotFoundError,
-  resourceModerationTarget,
   type ProductStatus,
   type ResourceModerationCommand,
+  resourceModerationTarget,
 } from "@nexus/domain";
+import { and, asc, count, desc, eq, ilike, inArray, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, builds, products } from "../schema";
+import type { ResourceTransaction } from "./entitlements";
+import { historyPageBounds } from "./history-pagination";
+import { lockInitiatingSession } from "./initiating-session";
 import {
   assertBuildModerationAuthority,
   assertProductMutationAuthority,
 } from "./product-mutation-authority";
-import { lockInitiatingSession } from "./initiating-session";
 import { containsPattern } from "./search-pattern";
-import { historyPageBounds } from "./history-pagination";
-import type { ResourceTransaction } from "./entitlements";
+
 const selection = {
   id: products.id,
   title: products.title,

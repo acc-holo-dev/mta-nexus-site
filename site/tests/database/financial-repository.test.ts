@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { getTableColumns } from "drizzle-orm";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   results: [] as unknown[][],
@@ -26,13 +27,15 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
+
+import {
+  FinancialReviewRepository,
+  FinancialStatementsRepository,
+} from "../../packages/db/src/repositories/financial-statements";
 import { LedgerRepository } from "../../packages/db/src/repositories/ledger";
 import { PaymentRepository } from "../../packages/db/src/repositories/payments";
-import {
-  FinancialStatementsRepository,
-  FinancialReviewRepository,
-} from "../../packages/db/src/repositories/financial-statements";
 import { ledgerEntries } from "../../packages/db/src/schema";
+
 const ledger = new LedgerRepository(),
   statements = new FinancialStatementsRepository(),
   review = new FinancialReviewRepository(),

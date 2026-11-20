@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { newFollowerNoticeMessage, noticeStoredTitles } from "@nexus/domain";
 import { eq } from "drizzle-orm";
 import type { db } from "../client";
 import { notificationPreferences, notifications } from "../schema";
@@ -29,8 +30,8 @@ export async function userFollowNotice(
     .values({
       id,
       recipientId,
-      title: "New Follower",
-      message: `@${followerUsername} started following your activity.`,
+      title: noticeStoredTitles.newFollower,
+      message: newFollowerNoticeMessage(followerUsername),
       link: `/users/${encodeURIComponent(followerUsername)}`,
       type: "system",
       category: "follow",

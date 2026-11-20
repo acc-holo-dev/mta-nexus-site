@@ -3,16 +3,18 @@ import type { ResourceBuildCommand, ResourceBuildView } from "@nexus/domain";
 import { Button, ErrorState, Input } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
-import { privateRequest } from "../../../lib/private-request";
-import { getResourceBuildWorkspaceCopy } from "../../../lib/resource-build-workspace-i18n";
-import { confirmedBuildCommand } from "../../../lib/resource-build-workspace-response";
-import { confirmAction } from "../../../components/confirm-action";
-import { useNexusLocale } from "../../../components/locale-context";
+import { confirmAction } from "../../shell/confirm-action";
+import { useNexusLocale } from "../../shell/locale";
+import { typeLabelBlockUpperSecondary, typeSmMuted, typeSmSecondary } from "../../shell/type-shell";
+import { privateRequest } from "../private-request";
+import {
+  getResourceBuildWorkspaceCopy,
+  resourceBuildWorkspaceError,
+} from "../resource-build-workspace-i18n";
+import { confirmedBuildCommand } from "../resource-build-workspace-response";
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
-const nativeLabelClass = "block font-label uppercase text-secondary";
-
 type EditorBuild = Pick<
   ResourceBuildView,
   "id" | "productId" | "version" | "status" | "revision" | "releaseNotes" | "mtaVersionTarget"
@@ -83,7 +85,20 @@ export function ResourceBuildControls({
       const body: unknown = await response.json().catch(() => null);
       const confirmed = confirmedBuildCommand(response.status, body, current, input);
       if (!confirmed) {
-        setMessage(response.status === 409 ? copy.conflict : copy.failed);
+        const payload =
+          body && typeof body === "object" && "code" in body
+            ? (body as { code?: unknown }).code
+            : undefined;
+        setMessage(
+          resourceBuildWorkspaceError(
+            locale,
+            typeof payload === "string"
+              ? payload
+              : response.status === 409
+                ? "CONFLICT"
+                : "UNCONFIRMED",
+          ),
+        );
         setUncertain(true);
         return;
       }
@@ -108,18 +123,22 @@ export function ResourceBuildControls({
   const blocked = pending || uncertain;
   return (
     <section className="space-y-4" aria-busy={pending}>
-      <p className="text-sm text-secondary">{copy.immutable}</p>
-      <p className="text-sm text-muted">
+      <p className={typeSmSecondary}>{copy.immutable}</p>
+      <p className={typeSmMuted}>
         {copy.revision}: {current.revision} · {copy.statuses[current.status]}
       </p>
       {withdrawn ? (
-        <ErrorState id="resource-build-withdrawn-unavailable" title={copy.unavailable} />
+        <ErrorState
+          id="resource-build-withdrawn-unavailable"
+          title={copy.unavailable}
+          description={copy.unavailableDescription}
+        />
       ) : null}
       {current.status === "pending_review" && <p className="text-secondary">{copy.pending}</p>}
       {editable && !withdrawn && (
         <form onSubmit={save} className="space-y-3">
           <div className="space-y-1.5">
-            <label htmlFor={`${prefix}-notes`} className={nativeLabelClass}>
+            <label htmlFor={`${prefix}-notes`} className={typeLabelBlockUpperSecondary}>
               {copy.notes}
             </label>
             <textarea
@@ -148,7 +167,7 @@ export function ResourceBuildControls({
       {current.status !== "retired" && current.status !== "quarantined" && (
         <div className="space-y-3">
           <div className="space-y-1.5">
-            <label htmlFor={`${prefix}-reason`} className={nativeLabelClass}>
+            <label htmlFor={`${prefix}-reason`} className={typeLabelBlockUpperSecondary}>
               {copy.reason}
             </label>
             <textarea
@@ -163,7 +182,7 @@ export function ResourceBuildControls({
           </div>
           {editable && !withdrawn && (
             <>
-              <p className="text-sm text-secondary">{copy.clean}</p>
+              <p className={typeSmSecondary}>{copy.clean}</p>
               <Button
                 type="button"
                 disabled={blocked || !trustedScan || dirty || reason.trim().length < 3}
@@ -200,7 +219,9 @@ export function ResourceBuildControls({
           </details>
         </div>
       )}
-      {message && uncertain ? <ErrorState title={message} /> : null}
+      {message && uncertain ? (
+        <ErrorState title={message} description={copy.failedDescription} />
+      ) : null}
       {message && !uncertain ? <p role="status">{message}</p> : null}
       {uncertain && (
         <Button

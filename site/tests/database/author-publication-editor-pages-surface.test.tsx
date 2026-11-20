@@ -10,11 +10,13 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
+  getRequestLocale: async () => state.locale,
+}));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../../src/lib/services/author-content-service", () => ({
+vi.mock("../../src/lib/services/organizations/author-content-service", () => ({
   authorContentService: { get: state.get },
 }));
 vi.mock("../../src/features/community/author-content-form", () => ({
@@ -22,19 +24,19 @@ vi.mock("../../src/features/community/author-content-form", () => ({
     <div data-editor={initial?.id ?? "new"} />
   ),
 }));
-vi.mock("../../src/components/platform-sign-in", () => ({
+vi.mock("../../src/features/shell/guest-auth", () => ({
   PlatformSignIn: ({ returnPath }: { returnPath: string }) => <div data-return-path={returnPath} />,
 }));
-vi.mock("../../src/lib/user-platform-client", () => ({
+vi.mock("../../src/features/community/user-platform-client", () => ({
   parseEditableContent: (value: unknown) => value,
 }));
 
-import NewPage, { generateMetadata as newMetadata } from "../../src/app/workspace/content/new/page";
 import EditPage, {
   generateMetadata as editMetadata,
 } from "../../src/app/workspace/content/[id]/page";
+import NewPage, { generateMetadata as newMetadata } from "../../src/app/workspace/content/new/page";
+import { getUserPlatformCopy } from "../../src/features/community/user-platform-copy";
 import { getDictionary } from "../../src/lib/i18n";
-import { getUserPlatformCopy } from "../../src/lib/user-platform-copy";
 
 beforeEach(() => {
   vi.clearAllMocks();

@@ -8,22 +8,26 @@ export const LEGAL_SURFACE_ROUTES = Object.freeze([
     path: "/terms",
     pageRelative: "site/src/app/terms/page.tsx",
     dictionaryKey: "terms",
+    pageExport: "TermsDocumentPage",
   }),
   Object.freeze({
     id: "privacy",
     path: "/privacy",
     pageRelative: "site/src/app/privacy/page.tsx",
     dictionaryKey: "privacy",
+    pageExport: "PrivacyDocumentPage",
   }),
   Object.freeze({
     id: "community_rules",
     path: "/community-rules",
     pageRelative: "site/src/app/community-rules/page.tsx",
     dictionaryKey: "communityRules",
+    pageExport: "CommunityRulesDocumentPage",
   }),
 ]);
 
-const FOOTER_RELATIVE = "site/src/components/footer.tsx";
+const FOOTER_RELATIVE = "site/src/features/shell/components/footer.tsx";
+const LEGAL_DOCUMENT_PAGE_RELATIVE = "site/src/features/shell/server/legal-document-page.tsx";
 const I18N_LOCALE_LEGAL = Object.freeze([
   Object.freeze({ locale: "en", relative: "site/src/lib/i18n/en/legal.ts" }),
   Object.freeze({ locale: "ru", relative: "site/src/lib/i18n/ru/legal.ts" }),
@@ -97,8 +101,17 @@ export function evaluateLegalSurfaces(repoRoot = process.cwd()) {
       continue;
     }
     present.push(surface.path);
-    if (!page.includes("LegalDocument")) {
-      problems.push(`${surface.pageRelative}: missing LegalDocument render`);
+    const legalDocumentPage = readText(repoRoot, LEGAL_DOCUMENT_PAGE_RELATIVE);
+    const hasNamedPort =
+      page.includes(surface.pageExport) &&
+      Boolean(legalDocumentPage) &&
+      legalDocumentPage.includes(surface.pageExport) &&
+      legalDocumentPage.includes("<LegalDocument");
+    const hasInlineRender = page.includes("LegalDocument");
+    if (!hasNamedPort && !hasInlineRender) {
+      problems.push(
+        `${surface.pageRelative}: missing LegalDocument render or ${surface.pageExport} port`,
+      );
     }
     if (footer && !footer.includes(`href="${surface.path}"`)) {
       problems.push(`footer: missing link to ${surface.path}`);

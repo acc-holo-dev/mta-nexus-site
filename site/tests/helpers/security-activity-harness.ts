@@ -5,4 +5,4 @@ export {
   SECURITY_ACTIVITY_LABEL_KEYS,
   SECURITY_SUBJECT_LABEL_KEYS,
   toSecurityActivityItem,
-} from "../../src/lib/security-activity";
+} from "../../src/features/accounts/security-activity";

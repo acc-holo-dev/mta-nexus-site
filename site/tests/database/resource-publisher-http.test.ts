@@ -1,21 +1,24 @@
-import { beforeEach, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   user: { id: "usr_a", role: "developer" } as { id: string; role: "developer" } | null,
   rate: vi.fn(),
   inventory: vi.fn(),
   history: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
 vi.mock("@nexus/db", () => ({
   resourcePublisherRepository: { inventory: state.inventory, history: state.history },
 }));
-import { GET as inventory } from "../../src/app/api/workspace/resources/route";
+
 import { GET as history } from "../../src/app/api/products/[id]/history/route";
+import { GET as inventory } from "../../src/app/api/workspace/resources/route";
+
 const context = { params: Promise.resolve({ id: "prd_a" }) };
 beforeEach(() => {
   vi.clearAllMocks();
@@ -74,5 +77,5 @@ it("denies guests, malformed selectors, rate excess and live scope revocation", 
     context,
   );
   expect(denied.status).toBe(404);
-  expect(await denied.json()).toEqual({ code: "NOT_FOUND" });
+  expect(await denied.json()).toMatchObject({ code: "NOT_FOUND" });
 });

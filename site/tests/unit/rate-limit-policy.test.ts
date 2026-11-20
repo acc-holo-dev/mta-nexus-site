@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { getRateLimitPolicy, RATE_LIMIT_POLICIES } from "@nexus/security";
+import { describe, expect, it } from "vitest";
 
 describe("risk-based rate limit policy", () => {
   it("defines bounded policies for every protected mutation category", () => {

@@ -1,4 +1,4 @@
-import type { Server, Product } from "./entities";
+import type { Product, Server } from "./entities";
 
 /**
  * UX-24 -- managed advertising placement lifecycle.

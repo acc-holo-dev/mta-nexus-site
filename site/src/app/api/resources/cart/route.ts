@@ -1,10 +1,10 @@
 import { AppError, UnauthorizedError } from "@nexus/domain";
 import { resourceCartItemSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
-import { readBoundedJson } from "../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { resourceCommerceRequest } from "../../../../lib/resource-commerce-http";
-import { commerceService } from "../../../../lib/services/commerce-service";
+import { resourceCommerceRequest } from "../../../../features/resources/resource-commerce-http";
+import { readBoundedJson } from "../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { commerceService } from "../../../../lib/services/commerce/commerce-service";
 
 export function GET(request: NextRequest) {
   return resourceCommerceRequest(request, false, (actor) => commerceService.getResourceCart(actor));

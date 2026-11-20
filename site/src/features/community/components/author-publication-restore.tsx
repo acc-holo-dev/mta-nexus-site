@@ -3,25 +3,28 @@ import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { confirmedAuthorPublicationRestore } from "../../../lib/author-publication-desk-contract";
-import {
-  authorPublicationDeskCopy,
-  authorPublicationDeskError,
-} from "../../../lib/author-publication-desk-copy";
-import type { Locale } from "../../../lib/i18n";
-import { confirmedOrganizationPublicationRestore } from "../../../lib/organization-publication-history-contract";
+import { getDictionary, type Locale } from "../../../lib/i18n";
 import {
   organizationPublicationHistoryCopy,
   organizationPublicationHistoryError,
-} from "../../../lib/organization-publication-history-copy";
-import { confirmedServerPublicationRestore } from "../../../lib/server-publication-history-contract";
+} from "../../organizations/organization-publication-history-copy";
 import {
   serverPublicationHistoryCopy,
   serverPublicationHistoryError,
-} from "../../../lib/server-publication-history-copy";
-import { platformRequest } from "../../../lib/user-platform-client";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
-import { confirmAction } from "../../../components/confirm-action";
+} from "../../servers/server-publication-history-copy";
+import { confirmAction } from "../../shell/confirm-action";
+import { linkAccentSm, linkGhostAccentSm, linkMinHAccentSemibold } from "../../shell/link-shell";
+import { panelClipSpace3P4 } from "../../shell/panel-shell";
+import { typeSmMuted, typeSmSuccess } from "../../shell/type-shell";
+import { confirmedAuthorPublicationRestore } from "../author-publication-desk-contract";
+import {
+  authorPublicationDeskCopy,
+  authorPublicationDeskError,
+} from "../author-publication-desk-copy";
+import { confirmedOrganizationPublicationRestore } from "../organization-publication-history-contract";
+import { confirmedServerPublicationRestore } from "../server-publication-history-contract";
+import { platformRequest } from "../user-platform-client";
+import { getUserPlatformCopy } from "../user-platform-copy";
 export function AuthorPublicationRestore({
   id,
   revision,
@@ -54,6 +57,12 @@ export function AuthorPublicationRestore({
     [notice, setNotice] = useState(""),
     [saved, setSaved] = useState(false),
     [blocked, setBlocked] = useState(false);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(text)
+      ? text
+      : fallback;
+  }
   const pending = useRef(false),
     mounted = useRef(true),
     controller = useRef<AbortController | null>(null);
@@ -116,12 +125,7 @@ export function AuthorPublicationRestore({
       router.refresh();
     } catch (failure) {
       if (mounted.current) {
-        const message = failure instanceof Error ? failure.message : "";
-        setNotice(
-          [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(message)
-            ? message
-            : copy.uncertain,
-        );
+        setNotice(safeMessage(failure, copy.uncertain));
       }
     } finally {
       pending.current = false;
@@ -129,20 +133,22 @@ export function AuthorPublicationRestore({
     }
   }
   return (
-    <div className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-4" aria-busy={busy}>
-      <p className="text-sm text-muted">{copy.restoreHelp}</p>
+    <div className={panelClipSpace3P4} aria-busy={busy}>
+      <p className={typeSmMuted}>{copy.restoreHelp}</p>
       <Button
         type="button"
         variant="outline"
         disabled={busy || blocked || saved}
         onClick={() => void restore()}
-        className="min-h-11 font-semibold text-accent"
+        className={linkMinHAccentSemibold}
       >
         {copy.restore}
       </Button>
-      {notice && !saved ? <ErrorState title={notice} /> : null}
+      {notice && !saved ? (
+        <ErrorState title={notice} description={getDictionary(locale).errors.formErrorHint} />
+      ) : null}
       {notice && saved ? (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {notice}
         </p>
       ) : null}
@@ -156,7 +162,7 @@ export function AuthorPublicationRestore({
                 ? `/workspace/organizations/${encodeURIComponent(organizationId)}/content/${encodeURIComponent(id)}`
                 : `/workspace/content/${encodeURIComponent(id)}`
           }
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentSm}
         >
           {copy.restored}
         </Link>
@@ -165,7 +171,7 @@ export function AuthorPublicationRestore({
           type="button"
           variant="ghost"
           onClick={() => router.refresh()}
-          className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkGhostAccentSm}
         >
           {copy.reload}
         </Button>

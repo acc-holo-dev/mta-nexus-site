@@ -1,5 +1,6 @@
-import { beforeEach, expect, it, vi } from "vitest";
 import { getTableColumns } from "drizzle-orm";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   results: [] as unknown[][][],
@@ -25,11 +26,12 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
-import { products } from "../../packages/db/src/schema";
-import { ResourceCartRepository } from "../../packages/db/src/repositories/resource-cart";
-import { ProductLifecycleRepository } from "../../packages/db/src/repositories/product-lifecycle";
+
 import { BuildRepository } from "../../packages/db/src/repositories/builds";
 import { OrderRepository } from "../../packages/db/src/repositories/orders";
+import { ProductLifecycleRepository } from "../../packages/db/src/repositories/product-lifecycle";
+import { ResourceCartRepository } from "../../packages/db/src/repositories/resource-cart";
+import { products } from "../../packages/db/src/schema";
 
 const cart = new ResourceCartRepository();
 const lifecycle = new ProductLifecycleRepository();

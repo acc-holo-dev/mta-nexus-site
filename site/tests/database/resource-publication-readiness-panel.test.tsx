@@ -6,8 +6,8 @@ import { ResourcePublicationReadinessPanel } from "../../src/features/resources/
 import {
   getResourcePublicationReadinessCopy,
   publicationReadinessDetail,
-} from "../../src/lib/resource-publication-readiness-i18n";
-import { getResourcePublisherCopy } from "../../src/lib/resource-publisher-i18n";
+} from "../../src/features/resources/resource-publication-readiness-i18n";
+import { getResourcePublisherCopy } from "../../src/features/resources/resource-publisher-i18n";
 
 vi.mock("next/link", async () => {
   const React = await import("react");

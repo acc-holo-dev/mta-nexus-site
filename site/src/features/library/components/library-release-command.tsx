@@ -4,18 +4,20 @@ import { Button, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
 import type { Locale } from "../../../lib/i18n";
+import { linkAccentTightBreakAll, linkGhostAccent } from "../../shell/link-shell";
+import { typeSmSuccess, typeSpace2Sm } from "../../shell/type-shell";
 import {
   type FrozenLibraryReleaseRequest,
   freezeLibraryReleaseRequest,
   matchesLibraryReleaseRequest,
-} from "../../../lib/library-release-request";
-import { privateApiRequest } from "../../../lib/private-api-request";
-import { confirmedLibraryRelease } from "../../../lib/resource-release-control-confirmation";
+} from "../library-release-request";
+import { confirmedLibraryRelease } from "../resource-release-control-confirmation";
 import {
   getResourceReleaseControlCopy,
   resourceReleaseControlError,
-} from "../../../lib/resource-release-control-i18n";
+} from "../resource-release-control-i18n";
 export function useLibraryReleaseCommand(productId: string, actorId: string, locale: Locale) {
   const copy = getResourceReleaseControlCopy(locale),
     router = useRouter(),
@@ -148,11 +150,8 @@ export function LibraryReleaseCommandStatus({
   return (
     <>
       {pending && pendingHref ? (
-        <div className="space-y-2 text-sm">
-          <Link
-            href={pendingHref}
-            className="break-all text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+        <div className={typeSpace2Sm}>
+          <Link href={pendingHref} className={linkAccentTightBreakAll}>
             {copy.pendingResource}: {pendingProductId}
           </Link>
           <p>
@@ -182,7 +181,11 @@ export function LibraryReleaseCommandStatus({
       ) : null}
       {pending && !saved ? (
         <div className="space-y-3">
-          <p className="text-sm text-muted">{copy.pendingNote}</p>
+          <ErrorState
+            id="library-release-command-pending"
+            title={copy.pendingNote}
+            description={copy.errors.actionErrorDescription}
+          />
           {!blocked ? (
             <Button
               type="button"
@@ -236,13 +239,13 @@ export function LibraryReleaseCommandStatus({
       ) : null}
       {saved ? (
         <div className="space-y-2">
-          <p role="status" className="text-sm text-success">
+          <p role="status" className={typeSmSuccess}>
             {copy.selectSaved}
           </p>
           <Button
             type="button"
             onClick={() => router.refresh()}
-            className="h-auto min-h-11 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkGhostAccent}
             variant="ghost"
           >
             {copy.reloadState}

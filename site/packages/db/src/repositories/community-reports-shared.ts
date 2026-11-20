@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { AppError } from "@nexus/domain";
+import { AppError, noticeStoredMessages, noticeStoredTitles } from "@nexus/domain";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import type { db } from "../client";
 import { comments, content, users } from "../schema";
@@ -80,7 +80,12 @@ export function assertDecisionState(status: string, expected: string, action: st
 
 export async function persistDecisionNotice(
   tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
-  input: { auditId: string; id: string; reporterId: string; status: Status },
+  input: {
+    auditId: string;
+    id: string;
+    reporterId: string;
+    status: Exclude<Status, "open">;
+  },
 ) {
   const result = await notificationRepository.createWithPushOutboxWithin(
     tx,
@@ -89,8 +94,8 @@ export async function persistDecisionNotice(
         .update(JSON.stringify([input.auditId, input.reporterId]))
         .digest("hex")}`,
       recipientId: input.reporterId,
-      title: "Community report status",
-      message: `Report status: ${input.status}.`,
+      title: noticeStoredTitles.communityReportStatus,
+      message: noticeStoredMessages.reportStatuses[input.status],
       link: `/workspace/reports/${encodeURIComponent(input.id)}`,
       type: "security",
       category: "security",

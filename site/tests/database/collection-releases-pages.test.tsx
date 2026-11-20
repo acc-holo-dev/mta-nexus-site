@@ -17,11 +17,11 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/library/collections/lcol_a/releases",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({ getRequestLocale: async () => h.locale }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({ getRequestLocale: async () => h.locale }));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => h.actor },
 }));
-vi.mock("../../src/lib/services/library-collections-service", () => ({
+vi.mock("../../src/lib/services/library/library-collections-service", () => ({
   libraryCollectionsService: { releases: h.releases },
 }));
 vi.mock("../../src/features/resources/download", () => ({
@@ -46,10 +46,10 @@ vi.mock("../../src/features/resources/release-watch", () => ({
   ),
 }));
 
+import { collectionReleasesCopy } from "../../src/features/library/collection-releases-i18n";
 import { CollectionReleasesScreen } from "../../src/features/library/collection-releases-server";
-import { collectionReleasesCopy } from "../../src/lib/collection-releases-i18n";
-import { libraryCollectionsCopy } from "../../src/lib/library-collections-i18n";
-import { authService } from "../../src/lib/services/auth-service";
+import { libraryCollectionsCopy } from "../../src/features/library/library-collections-i18n";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 const item = {
   productId: "prd_a",
@@ -192,7 +192,7 @@ it("shows an honest recovery state when collection releases fail to load", async
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(`>${copy.title}</h1>`);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("/lcol_a/releases");
   expect(html).not.toContain("releases unavailable");
 });

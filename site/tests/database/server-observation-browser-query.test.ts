@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
-import { beforeEach, afterEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
@@ -25,7 +26,9 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
+
 import { ServerObservationRepository } from "../../packages/db/src/repositories/server-observations";
+
 const repository = new ServerObservationRepository(),
   end = new Date("2026-10-11T00:00:00.000Z"),
   exact = "2026-10-10T23:59:00.123456Z";

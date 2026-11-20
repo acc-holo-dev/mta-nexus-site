@@ -1,11 +1,11 @@
 import { AppError, UnauthorizedError } from "@nexus/domain";
 import { orderCaseReviewSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
-import { readBoundedJson } from "../../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
-import { orderCaseQuery } from "../../../../../../lib/order-case-query";
-import { resourceCommerceRequest } from "../../../../../../lib/resource-commerce-http";
-import { orderCaseService } from "../../../../../../lib/services/order-case-service";
+import { orderCaseQuery } from "../../../../../../features/commerce/order-case-query";
+import { resourceCommerceRequest } from "../../../../../../features/resources/resource-commerce-http";
+import { readBoundedJson } from "../../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../../lib/http/browser-route-adapter";
+import { orderCaseService } from "../../../../../../lib/services/commerce/order-case-service";
 
 type Context = { params: Promise<{ id: string }> };
 export function GET(request: NextRequest, { params }: Context) {

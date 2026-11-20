@@ -1,10 +1,13 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
-import { reportFilters, reportRateLimit } from "../../../../../../lib/community-report-api";
-import { communityReportError } from "../../../../../../lib/community-report-copy";
-import { publicationReportsPageSchema } from "../../../../../../lib/community-report-groups-contract";
-import { communityReportService } from "../../../../../../lib/services/community-report-service";
-import { userPlatformApi } from "../../../../../../lib/user-platform-api";
+import { userPlatformApi } from "../../../../../../features/accounts/user-platform-api";
+import {
+  reportFilters,
+  reportRateLimit,
+} from "../../../../../../features/community/community-report-api";
+import { communityReportError } from "../../../../../../features/community/community-report-copy";
+import { publicationReportsPageSchema } from "../../../../../../features/community/community-report-groups-contract";
+import { communityReportService } from "../../../../../../lib/services/community/community-report-service";
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return userPlatformApi(
     request,

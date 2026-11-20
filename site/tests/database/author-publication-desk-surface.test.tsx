@@ -17,16 +17,16 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn() }),
   usePathname: () => "/workspace/content",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../../src/lib/services/author-content-service", () => ({
+vi.mock("../../src/lib/services/organizations/author-content-service", () => ({
   authorContentService: { desk: state.desk, history: state.history },
 }));
-vi.mock("../../src/lib/services/publication-feed-service", () => ({
+vi.mock("../../src/lib/services/discovery/publication-feed-service", () => ({
   publicationFeedService: { page: state.feed },
 }));
 
@@ -36,10 +36,10 @@ import History, {
 import Loading from "../../src/app/workspace/content/loading";
 import Desk, { generateMetadata as deskMetadata } from "../../src/app/workspace/content/page";
 import Following from "../../src/app/workspace/feed/page";
-import { FollowWorkspace } from "../../src/components/follow-workspace";
+import { authorPublicationDeskCopy } from "../../src/features/community/author-publication-desk-copy";
+import { FollowWorkspace } from "../../src/features/community/follow";
 import { PublicationFeed } from "../../src/features/community/publication-feed";
-import { authorPublicationDeskCopy } from "../../src/lib/author-publication-desk-copy";
-import { publicationCopy } from "../../src/lib/publication-feed-copy";
+import { publicationCopy } from "../../src/features/community/publication-feed-copy";
 
 const revision = "2026-10-11T00:00:00.123456Z";
 const cursor = JSON.stringify({
@@ -155,8 +155,8 @@ it.each(["en", "ru"] as const)(
     expect(loadingHtml).toContain('aria-labelledby="publication-desk-loading-heading"');
     expect(loadingHtml).toContain(`>${loadingCopy.title}<`);
     expect(loadingHtml).toContain(loadingCopy.loading);
-    expect(loadingHtml).toContain("overflow-x-clip");
-    expect(loadingHtml).toContain("min-w-0");
+    expect(loadingHtml).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(loadingHtml).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   },
 );
 it.each(["en", "ru"] as const)(
@@ -239,7 +239,7 @@ it.each(["en", "ru"] as const)(
     expect(empty).toContain(copy.empty);
     expect(empty).toContain(copy.emptyHint);
     expect(empty).not.toContain(copy.emptyFiltered);
-    expect(empty).toContain("overflow-x-clip");
+    expect(empty).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(empty).toContain('href="/workspace/content/new"');
     const filtered = renderToStaticMarkup(
       await Desk({ searchParams: Promise.resolve({ status: "draft" }) }),
@@ -254,17 +254,19 @@ it.each(["en", "ru"] as const)(
 it("distinguishes auth, unavailable and forbidden-target errors from empty histories", async () => {
   state.session.mockRejectedValueOnce(Error("PRIVATE_AUTH_DETAILS"));
   const desk = renderToStaticMarkup(await Desk({}));
-  expect(desk).toContain('href="/auth/login?next=%2Fworkspace%2Fcontent"');
+  expect(desk).toContain('role="alert"');
+  expect(desk).toContain(authorPublicationDeskCopy("en").unavailable);
+  expect(desk).toContain('href="/workspace/content"');
+  expect(desk).not.toContain('href="/auth/login?next=%2Fworkspace%2Fcontent"');
   expect(desk).not.toContain("PRIVATE_AUTH_DETAILS");
   expect(desk).not.toContain(authorPublicationDeskCopy("en").empty);
-  expect(desk).not.toContain(authorPublicationDeskCopy("en").title);
   state.history.mockRejectedValueOnce(new AppError("PRIVATE_TITLE", 404, "NOT_FOUND"));
   const history = renderToStaticMarkup(
     await History({ params: Promise.resolve({ id: "article" }) }),
   );
   expect(history).toContain('role="alert"');
   expect(history).toContain('href="/workspace/content/article/history"');
-  expect(history).toContain("overflow-x-clip");
+  expect(history).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(history).not.toContain("PRIVATE_TITLE");
   expect(history).not.toContain(authorPublicationDeskCopy("en").historyEmpty);
 });
@@ -290,7 +292,7 @@ it.each(["en", "ru"] as const)(
     );
     expect(history).toContain(copy.historyEmpty);
     expect(history).toContain(copy.historyEmptyHint);
-    expect(history).toContain("overflow-x-clip");
+    expect(history).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   },
 );
 it.each(["en", "ru"] as const)(

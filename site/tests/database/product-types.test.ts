@@ -1,12 +1,15 @@
 import { readFileSync } from "node:fs";
-import { expect, it } from "vitest";
-import { PRODUCT_TYPES, isProductType } from "@nexus/domain";
+import { isProductType, PRODUCT_TYPES } from "@nexus/domain";
 import { createProductSchema } from "@nexus/validation";
 import { getTableConfig, PgDialect } from "drizzle-orm/pg-core";
+import { expect, it } from "vitest";
 import { products } from "../../packages/db/src/schema";
 import { parseMarketQuery } from "../../src/features/resources/model";
+import {
+  PRODUCT_CATEGORY_KEYS,
+  PRODUCT_PUBLISHING_KEYS,
+} from "../../src/features/resources/product-type-labels";
 import { getDictionary } from "../../src/lib/i18n";
-import { PRODUCT_CATEGORY_KEYS, PRODUCT_PUBLISHING_KEYS } from "../../src/lib/product-type-labels";
 
 it.each(PRODUCT_TYPES)(
   "supports %s consistently across validation, catalog and translations",

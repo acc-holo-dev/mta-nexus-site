@@ -6,15 +6,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { getDictionary } from "../../../lib/i18n";
-import { resourceDeliveriesCopy } from "../../../lib/resource-deliveries-i18n";
+import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
+import { GuestAuthLinks } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
+import { useNexusLocale } from "../../shell/locale";
+import { typeSmSecondary, typeXsMuted } from "../../shell/type-shell";
+import { resourceDeliveriesCopy } from "../resource-deliveries-i18n";
 import {
   type DownloadFailure,
   fetchResourceDownload,
   ResourceDownloadError,
-} from "../../../lib/resource-download-client";
-import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
-import { GuestAuthLinks } from "../../../components/guest-auth-links";
-import { useNexusLocale } from "../../../components/locale-context";
+} from "../resource-download-client";
 
 export function ResourceDownloadButton({
   productId,
@@ -128,8 +130,8 @@ export function ResourceDownloadButton({
   if (unavailableReason) {
     return (
       <div className="space-y-2">
-        <ErrorState title={unavailableReason} />
-        <p className="text-xs text-muted">{copy.downloadNotInstalled}</p>
+        <ErrorState title={unavailableReason} description={copy.downloadFixedUnavailable} />
+        <p className={typeXsMuted}>{copy.downloadNotInstalled}</p>
       </div>
     );
   }
@@ -148,7 +150,7 @@ export function ResourceDownloadButton({
         <Download className="h-4 w-4" aria-hidden="true" />
         {busy ? copy.downloadPreparing : label}
       </Button>
-      <p className="text-xs text-muted">{copy.downloadNotInstalled}</p>
+      <p className={typeXsMuted}>{copy.downloadNotInstalled}</p>
       {busy && (
         <div className="space-y-2">
           <progress
@@ -184,7 +186,7 @@ export function ResourceDownloadButton({
         />
       ) : null}
       {notice && (
-        <p role="status" className="text-sm text-secondary">
+        <p role="status" className={typeSmSecondary}>
           {notice === "cancelled" ? copy.downloadCancelled : copy.downloadHandedOff}
         </p>
       )}
@@ -194,7 +196,7 @@ export function ResourceDownloadButton({
       receipt.version === version ? (
         <Link
           href={`/workspace/library/downloads/${encodeURIComponent(receipt.id)}`}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentSm}
         >
           {resourceDeliveriesCopy(locale).details}
         </Link>

@@ -4,22 +4,31 @@ import { Button, ErrorState, Input } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import type { Locale } from "../../../lib/i18n";
-import { organizationRequest as platformRequest } from "../../../lib/organization-workspace-client";
+import { getDictionary, type Locale } from "../../../lib/i18n";
+import { PlatformRequestError, parseEditableProfile } from "../../community/user-platform-client";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
+import { linkAccentSm, linkAccentTightSmPlain } from "../../shell/link-shell";
+import { panelSpace4P5 } from "../../shell/panel-shell";
+import { surfaceSpace2P4 } from "../../shell/surface-shell";
+import {
+  typeGrid2Gap4,
+  typeHeadingPrimary,
+  typeLabelBlockUpperSecondary,
+  typePrewrapBreak,
+  typeSmMuted,
+} from "../../shell/type-shell";
+import { organizationRequest as platformRequest } from "../organization-workspace-client";
 import {
   type EditableOrganization,
   editableOrganizationSchema,
   organizationCreateSchema,
   organizationUpdateSchema,
   organizationWorkspaceSchema,
-} from "../../../lib/organization-workspace-contract";
-import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
-import { PlatformRequestError, parseEditableProfile } from "../../../lib/user-platform-client";
+} from "../organization-workspace-contract";
+import { getOrganizationCopy } from "../organization-workspace-copy";
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
-const nativeLabelClass = "block font-label uppercase text-secondary";
-
 export function OrganizationProfileForm({
   locale,
   actorId,
@@ -38,6 +47,13 @@ export function OrganizationProfileForm({
   onBusyChange?: (busy: boolean) => void;
 }) {
   const copy = getOrganizationCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(text)
+      ? text
+      : fallback;
+  }
+  const formErrorHint = getDictionary(locale).errors.formErrorHint;
   const router = useRouter();
   const [fields, setFields] = useState({
     name: initial?.name ?? "",
@@ -68,7 +84,6 @@ export function OrganizationProfileForm({
   currentCreationKey.current = creationKey;
   const localeRef = useRef(locale);
   localeRef.current = locale;
-  const text = (ru: string, en: string) => (locale === "ru" ? ru : en);
   useEffect(() => {
     if (initial) return;
     let alive = true;
@@ -106,12 +121,7 @@ export function OrganizationProfileForm({
           setCreationReady(true);
         }
       } catch {
-        if (alive)
-          setCreationNotice(
-            localeRef.current === "ru"
-              ? "Не удалось проверить сессию или восстановить черновик."
-              : "Could not verify the session or restore the draft.",
-          );
+        if (alive) setCreationNotice(getOrganizationCopy(localeRef.current).restoreFailed);
       }
     }
     void restore();
@@ -151,20 +161,10 @@ export function OrganizationProfileForm({
         router.push(`/workspace/organizations/${encodeURIComponent(item.id)}`);
         return;
       }
-      setCreationNotice(
-        text(
-          "Организация пока не подтверждена. Исходный запрос ещё может завершиться; повторное создание заблокировано.",
-          "The organization is not confirmed yet. The original request may still complete; creating another is blocked.",
-        ),
-      );
+      setCreationNotice(copy.creationUnconfirmed);
     } catch {
       if (identityEpoch.current !== requestEpoch) return;
-      setCreationNotice(
-        text(
-          "Не удалось проверить результат. Войдите в исходный аккаунт и попробуйте снова.",
-          "Could not check the result. Sign in to the original account and try again.",
-        ),
-      );
+      setCreationNotice(copy.resultCheckFailed);
     } finally {
       guard.current = false;
       setBusy(false);
@@ -281,6 +281,7 @@ export function OrganizationProfileForm({
           "REQUEST_BODY_TOO_LARGE",
           "UNSUPPORTED_MEDIA_TYPE",
           "RATE_LIMIT_EXCEEDED",
+          "RATE_LIMITED",
         ].includes(String(caught.code))
       ) {
         try {
@@ -290,7 +291,7 @@ export function OrganizationProfileForm({
           /* Keep recovery locked if storage is unavailable. */
         }
       }
-      setError(caught instanceof Error ? caught.message : copy.unavailable);
+      setError(safeMessage(caught, copy.unavailable));
       if (base) setNeedsCheck(true);
     } finally {
       guard.current = false;
@@ -347,7 +348,7 @@ export function OrganizationProfileForm({
       setChecked(result.data.organization);
       setError("");
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : copy.unavailable);
+      setError(safeMessage(caught, copy.unavailable));
     } finally {
       guard.current = false;
       setBusy(false);
@@ -355,11 +356,11 @@ export function OrganizationProfileForm({
     }
   }
   return (
-    <form onSubmit={submit} className="nexus-panel space-y-4 p-5" aria-busy={busy}>
-      <h2 className="font-heading text-primary">{initial ? copy.profile : copy.create}</h2>
-      <p className="text-sm text-muted">{initial ? copy.ownerHelp : copy.createHelp}</p>
+    <form onSubmit={submit} className={panelSpace4P5} aria-busy={busy}>
+      <h2 className={typeHeadingPrimary}>{initial ? copy.profile : copy.create}</h2>
+      <p className={typeSmMuted}>{initial ? copy.ownerHelp : copy.createHelp}</p>
       {creationNotice && !initial && (!creationReady || verifiedCreationKey === creationKey) ? (
-        <ErrorState title={creationNotice} />
+        <ErrorState title={creationNotice} description={formErrorHint} />
       ) : null}
       {creationNonce && !initial && verifiedCreationKey === creationKey ? (
         <Button
@@ -368,7 +369,7 @@ export function OrganizationProfileForm({
           disabled={busy}
           onClick={() => void recoverCreation()}
         >
-          {text("Проверить результат", "Check result")}
+          {copy.checkResult}
         </Button>
       ) : null}
       {showDraft && (Boolean(initial) || (creationReady && verifiedCreationKey === creationKey)) ? (
@@ -409,7 +410,7 @@ export function OrganizationProfileForm({
             </span>
           </div>
           <div className="space-y-1.5">
-            <label htmlFor="organization-description" className={nativeLabelClass}>
+            <label htmlFor="organization-description" className={typeLabelBlockUpperSecondary}>
               {copy.descriptionLabel}
             </label>
             <textarea
@@ -422,7 +423,7 @@ export function OrganizationProfileForm({
               className={textareaClass}
             />
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className={typeGrid2Gap4}>
             {(["logoUrl", "websiteUrl"] as const).map((key) => (
               <Input
                 key={key}
@@ -446,7 +447,7 @@ export function OrganizationProfileForm({
           </Button>
         </fieldset>
       ) : (
-        <p className="text-sm text-muted">{copy.profileVerify}</p>
+        <p className={typeSmMuted}>{copy.profileVerify}</p>
       )}
       {base && (!canEdit || needsCheck || !identityVerified || !serverPermits) && (
         <Button
@@ -459,16 +460,13 @@ export function OrganizationProfileForm({
         </Button>
       )}
       {showDraft && identityVerified && newest && (changed || checked) && (
-        <section
-          className="space-y-2 rounded-lg border border-base p-4"
-          aria-label={copy.profileLatest}
-        >
+        <section className={surfaceSpace2P4} aria-label={copy.profileLatest}>
           <p>{copy.profileChanged}</p>
-          <p className="text-sm text-muted">{copy.profileDraftHelp}</p>
+          <p className={typeSmMuted}>{copy.profileDraftHelp}</p>
           <p>
             {copy.name}: {newest.name}
           </p>
-          <p className="whitespace-pre-wrap break-words">
+          <p className={typePrewrapBreak}>
             {copy.descriptionLabel}: {newest.description}
           </p>
           <p className="break-words">
@@ -504,19 +502,13 @@ export function OrganizationProfileForm({
         </section>
       )}
       {initial && (
-        <Link
-          href={`/organizations/${encodeURIComponent(initial.slug)}`}
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={`/organizations/${encodeURIComponent(initial.slug)}`} className={linkAccentSm}>
           {copy.publicView}
         </Link>
       )}
-      {error && <ErrorState title={error} />}
+      {error && <ErrorState title={error} description={formErrorHint} />}
       {saved && (
-        <p
-          role="status"
-          className="text-sm text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <p role="status" className={linkAccentTightSmPlain}>
           {copy.saved}
         </p>
       )}

@@ -8,11 +8,18 @@ import {
 import { Button, ErrorState } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
 import type { Locale } from "../../../lib/i18n";
-import { privateApiRequest } from "../../../lib/private-api-request";
-import { confirmedResourceReleaseWatchBatch } from "../../../lib/resource-release-watch-batch-confirmation";
-import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
+import { panelSpace4P5 } from "../../shell/panel-shell";
+import {
+  typeSmSecondary,
+  typeSmSuccess,
+  typeSpace1SmSecondary,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import { confirmedResourceReleaseWatchBatch } from "../resource-release-watch-batch-confirmation";
+import { resourceReleaseWatchesCopy } from "../resource-release-watches-i18n";
 export function ResourceReleaseWatchBatchControls({
   items,
   locale,
@@ -154,11 +161,15 @@ export function ResourceReleaseWatchBatchControls({
         setError(
           body?.code === "RELEASE_WATCH_LIMIT"
             ? copy.maximum
-            : body?.code === "RELEASE_WATCH_UNAVAILABLE"
+            : body?.code === "RELEASE_WATCH_UNAVAILABLE" || body?.code === "FORBIDDEN"
               ? copy.access
-              : response.status === 409
-                ? copy.conflict
-                : copy.failed,
+              : body?.code === "UNAUTHORIZED" ||
+                  body?.code === "ACTOR_ID_REQUIRED" ||
+                  response.status === 401
+                ? copy.signInRequired
+                : response.status === 409 || body?.code === "ACTOR_CHANGED"
+                  ? copy.conflict
+                  : copy.failed,
         );
         if ([400, 401, 403, 404, 409, 413, 415].includes(response.status)) {
           settled.current = true;
@@ -181,17 +192,25 @@ export function ResourceReleaseWatchBatchControls({
   }
   if (!pending && (!eligible.length || collection?.status === "archived")) return null;
   return (
-    <section className="nexus-panel space-y-4 p-5">
+    <section className={panelSpace4P5}>
       <h2>{title}</h2>
-      <p className="text-sm text-secondary">{note}</p>
-      <p className="text-xs text-muted">{copy.batchLimit}</p>
+      <p className={typeSmSecondary}>{note}</p>
+      <p className={typeXsMuted}>{copy.batchLimit}</p>
       {enabling && capacity === 0 ? (
-        <ErrorState id="resource-release-watch-batch-maximum" title={copy.maximum} />
+        <ErrorState
+          id="resource-release-watch-batch-maximum"
+          title={copy.maximum}
+          description={copy.batchMaximumHint}
+        />
       ) : null}
       {enabling && skipped.length > 0 ? (
-        <div className="space-y-2" role="note">
-          <p className="text-sm text-muted">{copy.skippedNote}</p>
-          <ul className="space-y-1 text-sm text-secondary">
+        <div className="space-y-2">
+          <ErrorState
+            id="resource-release-watch-batch-skipped"
+            title={copy.skippedNote}
+            description={copy.failedDescription}
+          />
+          <ul className={typeSpace1SmSecondary}>
             {skipped.map((item) => (
               <li key={item.productId}>
                 {item.title ?? copy.privateResource}:{" "}
@@ -235,7 +254,11 @@ export function ResourceReleaseWatchBatchControls({
       )}
       {pending && !saved && (
         <div className="space-y-3">
-          <p className="text-sm text-muted">{copy.pendingNote}</p>
+          <ErrorState
+            id="resource-release-watch-batch-pending"
+            title={copy.pendingNote}
+            description={copy.failedDescription}
+          />
           {!blocked && (
             <Button
               type="button"
@@ -260,7 +283,7 @@ export function ResourceReleaseWatchBatchControls({
       )}
       {error ? <ErrorState title={error} description={copy.failedDescription} /> : null}
       {saved && (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {copy.saved}
         </p>
       )}

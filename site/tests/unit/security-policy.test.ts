@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
+import type { Product, Server, User } from "@nexus/domain";
 import { can, getStaticCapabilities } from "@nexus/security";
-import type { User, Product, Server } from "@nexus/domain";
+import { describe, expect, it } from "vitest";
 
 describe("Security Policy Engine can()", () => {
   const adminUser: User = {

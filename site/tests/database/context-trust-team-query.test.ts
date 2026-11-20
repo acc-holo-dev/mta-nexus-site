@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { getTableColumns } from "drizzle-orm";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
@@ -29,9 +30,11 @@ vi.mock("../../packages/db/src/client", async () => {
 vi.mock("../../packages/db/src/repositories/organization-access-notice", () => ({
   storeOrganizationAccessNotice: vi.fn(),
 }));
-import { publicContextTrustRepository as trust } from "../../packages/db/src/repositories/public-context-trust";
+
 import { organizationTeamDirectoryRepository as team } from "../../packages/db/src/repositories/organization-team-directory";
+import { publicContextTrustRepository as trust } from "../../packages/db/src/repositories/public-context-trust";
 import { organizations } from "../../packages/db/src/schema";
+
 const time = "2026-10-11T00:00:00.123456Z";
 const org = {
   id: "org",

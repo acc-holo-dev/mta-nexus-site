@@ -1,0 +1,187 @@
+import { EmptyState, ErrorState } from "@nexus/ui";
+import { Clock3, MailCheck, Monitor, Settings, ShieldCheck } from "lucide-react";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { securityCenterService } from "../../../lib/services/accounts/security-center-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkSettingsAction } from "../../shell/link-shell";
+import { pageShellMax4xlRoomy } from "../../shell/page-shell";
+import { panelClipP5Shadow, panelClipSpace4P5Shadow } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeBreakXsPrimary,
+  typeFlexCenterGap2,
+  typeIcon6Accent,
+  typeIconAccent,
+  typeMinSpace2Clip,
+  typeMt1XsMuted,
+  typeSmSemiboldPrimary,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import { securityActivityLabelKey } from "../security-activity";
+export async function securityCenterMetadata(): Promise<Metadata> {
+  return {
+    title: `${getDictionary(await getRequestLocale()).securityCenter.title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
+export async function SecurityCenterScreen() {
+  const locale = await getRequestLocale();
+  const dictionary = getDictionary(locale);
+  const copy = dictionary.securityCenter;
+  const token = (await cookies()).get("nexus_session")?.value;
+  let authenticated: Awaited<ReturnType<typeof authService.getSessionIdentity>>;
+  try {
+    authenticated = await authService.getSessionIdentity(token);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={getDictionary(locale).errors.message}
+        retryHref={"/security"}
+      />
+    );
+  }
+
+  if (!authenticated) {
+    return <PlatformSignIn locale={locale} returnPath="/security" />;
+  }
+
+  const { user, sessionId: currentSessionId } = authenticated;
+  const [sessions, recoveryEmail, activity] = await Promise.all([
+    authService.listSessions(user.id),
+    authService.getRecoveryEmailStatus(user.id),
+    securityCenterService.listActivity(user.id, 30),
+  ]);
+
+  const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
+
+  return (
+    <div className={pageShellMax4xlRoomy}>
+      <div className="flex min-w-0 flex-col justify-between gap-4 overflow-x-clip border-b border-base pb-6 sm:flex-row sm:items-start">
+        <div className="min-w-0">
+          <h1 className="flex min-w-0 items-center gap-2.5 break-words font-display text-primary">
+            <ShieldCheck className={typeIcon6Accent} aria-hidden="true" />
+            {copy.title}
+          </h1>
+          <p className="mt-1 max-w-2xl font-caption text-muted">{copy.description}</p>
+        </div>
+        <Link href="/settings" className={linkSettingsAction}>
+          <Settings className="h-4 w-4" aria-hidden="true" />
+          {copy.manageSettings}
+        </Link>
+      </div>
+
+      <section aria-labelledby="security-recovery-heading" className={panelClipP5Shadow}>
+        <div className={typeFlexCenterGap2}>
+          <MailCheck className={typeIconAccent} aria-hidden="true" />
+          <h2 id="security-recovery-heading" className={typeSmSemiboldPrimary}>
+            {copy.recovery}
+          </h2>
+        </div>
+        <p className="mt-3 break-all text-sm text-primary">{recoveryEmail?.email ?? user.email}</p>
+        {recoveryEmail ? (
+          recoveryEmail.verified ? (
+            <p className={typeMt1XsMuted}>{copy.recoveryVerified}</p>
+          ) : (
+            <ErrorState
+              id="security-recovery-needs-verification"
+              title={copy.recoveryNeedsVerification}
+              description={copy.recoveryNeedsVerificationHint}
+            />
+          )
+        ) : (
+          <ErrorState
+            id="security-recovery-unavailable"
+            title={copy.recoveryUnavailable}
+            description={copy.recoveryUnavailableHint}
+          />
+        )}
+      </section>
+
+      <section aria-labelledby="security-sessions-heading" className={panelClipSpace4P5Shadow}>
+        <div className={typeFlexCenterGap2}>
+          <Monitor className={typeIconAccent} aria-hidden="true" />
+          <h2 id="security-sessions-heading" className={typeSmSemiboldPrimary}>
+            {copy.sessions}
+          </h2>
+        </div>
+        <p className={typeXsMuted}>{copy.sessionsDescription}</p>
+        <div className={typeMinSpace2Clip}>
+          {sessions.map((session) => (
+            <div
+              key={session.id}
+              className="flex min-w-0 flex-wrap items-start justify-between gap-3 overflow-x-clip rounded-md border border-base bg-inset px-3 py-3"
+            >
+              <div className="min-w-0">
+                <p className={typeBreakXsPrimary}>{session.userAgent || copy.deviceUnavailable}</p>
+                <p className="mt-1 break-words text-xs text-muted">
+                  {session.ipAddress || copy.ipUnavailable}
+                </p>
+                <p className="mt-1 text-xs text-faint">
+                  {copy.started} {new Date(session.createdAt).toLocaleString(dateLocale)}
+                  {" · "}
+                  {copy.expires} {new Date(session.expiresAt).toLocaleString(dateLocale)}
+                </p>
+              </div>
+              {session.id === currentSessionId && (
+                <span className="rounded-full bg-accent-soft px-2 py-1 text-[11px] font-semibold text-accent">
+                  {copy.currentSession}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="security-activity-heading" className={panelClipSpace4P5Shadow}>
+        <div className={typeFlexCenterGap2}>
+          <Clock3 className={typeIconAccent} aria-hidden="true" />
+          <h2 id="security-activity-heading" className={typeSmSemiboldPrimary}>
+            {copy.activity}
+          </h2>
+        </div>
+        <p className={typeXsMuted}>{copy.activityDescription}</p>
+
+        {activity.length > 0 ? (
+          <ol className="min-w-0 divide-y divide-base overflow-x-clip">
+            {activity.map((event) => (
+              <li
+                key={event.id}
+                className="flex min-w-0 flex-wrap justify-between gap-3 overflow-x-clip py-3"
+              >
+                <div className="min-w-0">
+                  <p className="break-words text-sm font-medium text-primary">
+                    {copy.activityLabels[securityActivityLabelKey(event)]}
+                  </p>
+                  <p className="mt-0.5 break-words text-xs text-muted">
+                    {event.userAgent || event.targetType}
+                    {event.ipAddress ? ` · ${event.ipAddress}` : ""}
+                  </p>
+                </div>
+                <time
+                  dateTime={new Date(event.createdAt).toISOString()}
+                  className="shrink-0 text-xs text-faint"
+                >
+                  {new Date(event.createdAt).toLocaleString(dateLocale)}
+                </time>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <EmptyState
+            title={copy.noActivity}
+            description={copy.activityDescription}
+            icon={<Clock3 className="h-6 w-6" aria-hidden="true" />}
+          />
+        )}
+      </section>
+    </div>
+  );
+}

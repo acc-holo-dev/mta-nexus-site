@@ -1,3 +1,6 @@
 import "server-only";
 
-export { default, generateMetadata } from "./server/collection-reconcile-page";
+export {
+  CollectionReconcilePage,
+  collectionReconcileMetadata,
+} from "./server/collection-reconcile-page";

@@ -1,5 +1,8 @@
 import { NextRequest } from "next/server";
 import { describe, expect, it, vi } from "vitest";
+
+vi.mock("server-only", () => ({}));
+
 import { browserMutationHeaders } from "../helpers/browser-mutation-headers";
 
 vi.mock("next/server", async () => {
@@ -8,7 +11,7 @@ vi.mock("next/server", async () => {
   return { ...actual, after: supportRouteAfterMock };
 });
 
-vi.mock("../../src/lib/services/auth-service", async () => {
+vi.mock("../../src/lib/services/accounts/auth-service", async () => {
   const { supportRouteMocks } = await import("../helpers/support-route-harness");
   return { authService: { getSession: supportRouteMocks.session } };
 });
@@ -23,7 +26,7 @@ vi.mock("@nexus/db", async () => {
   return createSupportRouteDbMock();
 });
 
-vi.mock("../../src/lib/services/notification-dispatch-service", async () => {
+vi.mock("../../src/lib/services/notifications/notification-dispatch-service", async () => {
   const { supportRouteMocks } = await import("../helpers/support-route-harness");
   return { dispatchNotificationsBestEffort: supportRouteMocks.dispatch };
 });

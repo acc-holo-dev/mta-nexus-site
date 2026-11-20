@@ -13,17 +13,17 @@ vi.mock("@nexus/db", async () => {
     serverObservationRepository: { record: harnessSources.record },
   };
 });
-vi.mock("../../src/lib/services/mta-master-directory-service", async (importOriginal) => {
+vi.mock("../../src/lib/services/servers/mta-master-directory-service", async (importOriginal) => {
   const { sources: harnessSources } = await import("../helpers/server-observation-capture-harness");
   return {
     ...(await importOriginal<
-      typeof import("../../src/lib/services/mta-master-directory-service")
+      typeof import("../../src/lib/services/servers/mta-master-directory-service")
     >()),
     mtaMasterDirectoryService: { getDirectory: harnessSources.directory },
   };
 });
 
-import { captureKnownServerObservations } from "../../src/lib/services/server-observation-collector";
+import { captureKnownServerObservations } from "../../src/lib/services/servers/server-observation-collector";
 
 setupServerObservationCapture();
 

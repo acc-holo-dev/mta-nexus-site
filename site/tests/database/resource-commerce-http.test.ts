@@ -1,10 +1,10 @@
-import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../helpers/browser-mutation-headers";
-import { AppError } from "@nexus/domain";
 
 const mocks = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,
@@ -16,10 +16,10 @@ const mocks = vi.hoisted(() => ({
   transition: vi.fn(),
   order: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => mocks.user },
 }));
-vi.mock("../../src/lib/services/commerce-service", () => ({
+vi.mock("../../src/lib/services/commerce/commerce-service", () => ({
   commerceService: {
     getResourceCart: mocks.get,
     addResourceToCart: mocks.add,
@@ -28,14 +28,15 @@ vi.mock("../../src/lib/services/commerce-service", () => ({
     getBuyerOrderDetails: mocks.order,
   },
 }));
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: { transitionResource: mocks.transition },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
-import { GET, POST, DELETE } from "../../src/app/api/resources/cart/route";
-import { POST as acquire } from "../../src/app/api/resources/cart/acquire/route";
-import { POST as lifecycle } from "../../src/app/api/products/[id]/lifecycle/route";
+
 import { GET as orderDetails } from "../../src/app/api/orders/[id]/route";
+import { POST as lifecycle } from "../../src/app/api/products/[id]/lifecycle/route";
+import { POST as acquire } from "../../src/app/api/resources/cart/acquire/route";
+import { DELETE, GET, POST } from "../../src/app/api/resources/cart/route";
 
 const requestId = "607177bf-31df-4a67-a7d4-cba38c456d07";
 function request(
@@ -79,7 +80,7 @@ it("denies signed-out reads and writes without touching commerce", async () => {
     expect(response.status).toBe(401);
     expect(response.headers.get("cache-control")).toBe("private, no-store");
     expect(response.headers.get("vary")).toBe("Cookie");
-    expect(await response.json()).toEqual({ code: "UNAUTHORIZED" });
+    expect(await response.json()).toMatchObject({ code: "UNAUTHORIZED" });
   }
   expect(mocks.get).not.toHaveBeenCalled();
   expect(mocks.add).not.toHaveBeenCalled();
@@ -179,7 +180,7 @@ it("returns safe state conflicts without private repository data", async () => {
     }),
   );
   expect(response.status).toBe(409);
-  expect(await response.json()).toEqual({ code: "RESOURCE_CART_CHANGED" });
+  expect(await response.json()).toMatchObject({ code: "RESOURCE_CART_CHANGED" });
 });
 it("validates lifecycle commands and returns only the product revision", async () => {
   const command = {

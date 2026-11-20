@@ -3,16 +3,19 @@ import type { LibrarySelectionBatchCommand, LibrarySelectionBatchPreview } from 
 import { Button, ErrorState } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import {
-  confirmedSelectionBatchPreview,
-  confirmedSelectionBatchResult,
-} from "../../../lib/library-selection-batches-confirmation";
-import { librarySelectionBatchesCopy } from "../../../lib/library-selection-batches-i18n";
-import { privateApiRequest } from "../../../lib/private-api-request";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
 import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
-} from "../../../components/action-confirm-checkbox";
+} from "../../shell/action-confirm-checkbox";
+import { linkAccentSmRounded } from "../../shell/link-shell";
+import { panelSpace3P4 } from "../../shell/panel-shell";
+import { typeBreakAllXsOnly } from "../../shell/type-shell";
+import {
+  confirmedSelectionBatchPreview,
+  confirmedSelectionBatchResult,
+} from "../library-selection-batches-confirmation";
+import { librarySelectionBatchesCopy } from "../library-selection-batches-i18n";
 export function LibrarySelectionBatchControls({
   collectionId,
   locale,
@@ -106,7 +109,7 @@ export function LibrarySelectionBatchControls({
   return (
     <section className="space-y-5">
       <p className="text-secondary">{c.note}</p>
-      <fieldset disabled={busy || frozen || saved} className="nexus-panel space-y-3 p-4">
+      <fieldset disabled={busy || frozen || saved} className={panelSpace3P4}>
         <legend className="font-semibold">{c.choose}</legend>
         <label className="flex gap-2">
           <input
@@ -194,7 +197,7 @@ export function LibrarySelectionBatchControls({
                   {c.next}: {c[item.next.mode]} · {c.selectionRevision}: {item.next.revision}
                 </p>
                 {item.previous.revision === item.next.revision && <p>{c.unchanged}</p>}
-                <code className="break-all text-xs">{item.targetBuildId}</code>
+                <code className={typeBreakAllXsOnly}>{item.targetBuildId}</code>
               </li>
             ))}
           </ol>
@@ -219,7 +222,13 @@ export function LibrarySelectionBatchControls({
           </Button>
         </section>
       )}
-      {frozen && !saved && <p role="note">{c.frozen}</p>}
+      {frozen && !saved ? (
+        <ErrorState
+          id="library-selection-batch-frozen"
+          title={c.frozen}
+          description={c.actionErrorDescription}
+        />
+      ) : null}
       {error ? (
         <ErrorState
           title={error}
@@ -238,7 +247,7 @@ export function LibrarySelectionBatchControls({
             ) : (
               <a
                 href={`/workspace/library/collections/${encodeURIComponent(collectionId)}/versions`}
-                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentSmRounded}
               >
                 {c.reload}
               </a>

@@ -4,9 +4,9 @@ import { fileURLToPath } from "node:url";
 import type * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
+import type { OrganizationTeamPage } from "../../src/features/organizations/organization-team-contract";
+import { getOrganizationCopy } from "../../src/features/organizations/organization-workspace-copy";
 import { OrganizationTeamDirectory } from "../../src/features/organizations/team";
-import type { OrganizationTeamPage } from "../../src/lib/organization-team-contract";
-import { getOrganizationCopy } from "../../src/lib/organization-workspace-copy";
 
 vi.mock("next/link", () => ({
   default: ({ href, children }: { href: string; children: React.ReactNode }) => (
@@ -55,9 +55,9 @@ const data: OrganizationTeamPage = {
 it("locks organization team directory readonly notice to ErrorState without soft muted caption", () => {
   expect(source).toContain('import { EmptyState, ErrorState } from "@nexus/ui"');
   expect(source).toContain('id="organization-team-directory-readonly"');
-  expect(source).toMatch(
-    /<ErrorState id="organization-team-directory-readonly" title=\{team\.readOnly\} \/>/u,
-  );
+  expect(source).toContain('id="organization-team-directory-readonly"');
+  expect(source).toContain("title={team.readOnly}");
+  expect(source).toContain("description={team.readOnlyHint}");
   expect(source).not.toContain('className="text-sm text-muted">{team.readOnly}</p>');
 });
 

@@ -1,7 +1,7 @@
 import {
   AppError,
-  buildResourceRequirementsReport,
   buildCollectionRequirementsReport,
+  buildResourceRequirementsReport,
   LIBRARY_COLLECTION_ITEM_LIMIT,
   NotFoundError,
   RESOURCE_REQUIREMENTS_MAX_DEPTH,
@@ -10,15 +10,15 @@ import {
   type ResourceRequirementsScope,
   requirementDeclarations,
 } from "@nexus/domain";
-import { and, eq, sql, type SQL } from "drizzle-orm";
+import { and, eq, type SQL, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   builds,
+  libraryCollections as collections,
+  libraryCollectionItems as members,
   products,
   resourceLibrarySelections as selections,
   users,
-  libraryCollections as collections,
-  libraryCollectionItems as members,
 } from "../schema";
 import { safePublishedBuildCondition } from "./build-safety";
 import type { ResourceTransaction } from "./entitlements";

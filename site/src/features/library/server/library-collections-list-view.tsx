@@ -1,19 +1,29 @@
 import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
-import { libraryCollectionHistoryCopy } from "../../../lib/library-collection-history-i18n";
-import { libraryCollectionInventoryCopy } from "../../../lib/library-collection-inventory-i18n";
-import { collectionInventoryHref } from "../../../lib/library-collection-inventory-query";
-import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
+import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
+import { linkAccentSmRounded } from "../../shell/link-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
+import { panelSpace2P5, panelSpace3P5 } from "../../shell/panel-shell";
+import {
+  typeBreakSemibold,
+  typeDisplayPrimary,
+  typeGrid2Gap4,
+  typeSmMuted,
+  typeSmSecondary,
+} from "../../shell/type-shell";
+import { LibraryCollectionCommandForm } from "../collection-command";
+import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
+import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
+import { collectionInventoryHref } from "../library-collection-inventory-query";
+import { libraryCollectionsCopy } from "../library-collections-i18n";
 import {
   collectionHref,
   collectionPageParams,
   collectionsQuery,
-} from "../../../lib/library-collections-query";
-import { libraryMembershipHistoryCopy } from "../../../lib/library-membership-history-i18n";
-import { membershipHistoryHref } from "../../../lib/library-membership-history-query";
-import { libraryCollectionsService as service } from "../../../lib/services/library-collections-service";
-import { LibraryCollectionCommandForm } from "../collection-command";
+} from "../library-collections-query";
+import { libraryMembershipHistoryCopy } from "../library-membership-history-i18n";
+import { membershipHistoryHref } from "../library-membership-history-query";
 import {
   type LibraryCollectionsActor,
   LibraryCollectionsPagination,
@@ -40,17 +50,15 @@ export async function LibraryCollectionsListView({
   const result = await service.page(actor, query).catch(() => null);
   if (!result) {
     return (
-      <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8">
+      <div className={pageShellMax4xl}>
         <Link href="/workspace/library" className={libraryCollectionsLinkClass}>
           {c.library}
         </Link>
         <ErrorState
           title={c.loadUnavailable}
+          description={c.loadUnavailableDescription}
           action={
-            <Link
-              href={retryHref}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={retryHref} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -59,11 +67,11 @@ export async function LibraryCollectionsListView({
     );
   }
   return (
-    <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8">
+    <div className={pageShellMax4xl}>
       <Link href="/workspace/library" className={libraryCollectionsLinkClass}>
         {c.library}
       </Link>
-      <h1 className="font-display text-primary">{c.title}</h1>
+      <h1 className={typeDisplayPrimary}>{c.title}</h1>
       <Link href={membershipHistoryHref()} className={libraryCollectionsLinkClass}>
         {libraryMembershipHistoryCopy(locale).history}
       </Link>
@@ -73,11 +81,11 @@ export async function LibraryCollectionsListView({
       <Link href="/workspace/library/collections/history" className={libraryCollectionsLinkClass}>
         {libraryCollectionHistoryCopy(locale).title}
       </Link>
-      <p className="text-sm text-secondary">{c.subtitle}</p>
-      <p role="note" className="text-sm text-muted">
+      <p className={typeSmSecondary}>{c.subtitle}</p>
+      <p role="note" className={typeSmMuted}>
         {c.limit}
       </p>
-      <section className="nexus-panel space-y-3 p-5">
+      <section className={panelSpace3P5}>
         <h2 className="font-semibold">{c.create}</h2>
         <LibraryCollectionCommandForm
           key={`create:${actor.id}`}
@@ -120,10 +128,10 @@ export async function LibraryCollectionsListView({
           }
         />
       )}
-      <ol className="grid gap-4 sm:grid-cols-2">
+      <ol className={typeGrid2Gap4}>
         {result.items.map((item) => (
-          <li key={item.id} className="nexus-panel space-y-2 p-5">
-            <h2 className="break-words font-semibold">
+          <li key={item.id} className={panelSpace2P5}>
+            <h2 className={typeBreakSemibold}>
               <Link href={collectionHref(item.id)} className={libraryCollectionsLinkClass}>
                 {item.name}
               </Link>

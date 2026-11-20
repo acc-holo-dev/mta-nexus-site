@@ -28,14 +28,14 @@ const getDirectory = vi.hoisted(() =>
   })),
 );
 
-vi.mock("../../src/lib/services/content-service", () => ({
+vi.mock("../../src/lib/services/community/content-service", () => ({
   contentService: {
     getArticleBySlug,
     getComments,
   },
 }));
 
-vi.mock("../../src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../../src/lib/services/servers/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: {
     getDirectory,
   },

@@ -2,9 +2,18 @@ import type { ManagedServerClaimStatus } from "@nexus/db";
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
-import { getServerClaimStatusCopy } from "../../../lib/server-claim-status-view";
+import { linkAccentSmSemibold } from "../../shell/link-shell";
+import { pageShellStack4 } from "../../shell/page-shell";
+import { panelClipSpace3P5 } from "../../shell/panel-shell";
+import {
+  typeSmBoldPrimary,
+  typeSmSemiboldPrimary,
+  typeSmSemiboldSuccess,
+  typeXsLeadingMuted,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import { ServerClaimControlPanel } from "../components/server-claim-control-panel";
-
+import { getServerClaimStatusCopy } from "../server-claim-status-view";
 export function ServerClaimStatusPanel({
   serverId,
   serverName,
@@ -23,32 +32,27 @@ export function ServerClaimStatusPanel({
   const waiting = request?.status === "pending";
   const dateLabel = (date: Date) => `${date.toISOString().replace("T", " ").slice(0, 16)} UTC`;
   return (
-    <div className="min-w-0 space-y-4 overflow-x-clip">
+    <div className={pageShellStack4}>
       {(status.isVerified || request) && (
-        <section
-          className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5"
-          aria-labelledby="server-claim-status-heading"
-        >
-          <h2 id="server-claim-status-heading" className="text-sm font-bold text-primary">
+        <section className={panelClipSpace3P5} aria-labelledby="server-claim-status-heading">
+          <h2 id="server-claim-status-heading" className={typeSmBoldPrimary}>
             {copy.title}
           </h2>
-          {status.isVerified && (
-            <p className="text-sm font-semibold text-success">{copy.verified}</p>
-          )}
+          {status.isVerified && <p className={typeSmSemiboldSuccess}>{copy.verified}</p>}
           {request && (
             <>
-              <p className="text-sm font-semibold text-primary">{copy[request.status]}</p>
-              <p className="text-xs text-muted">
+              <p className={typeSmSemiboldPrimary}>{copy[request.status]}</p>
+              <p className={typeXsMuted}>
                 {request.isRequester ? copy.yourRequest : copy.teamRequest}
               </p>
-              <p className="text-xs text-muted">
+              <p className={typeXsMuted}>
                 {copy.created}:{" "}
                 <time dateTime={request.createdAt.toISOString()}>
                   {dateLabel(request.createdAt)}
                 </time>
               </p>
               {request.resolvedAt && (
-                <p className="text-xs text-muted">
+                <p className={typeXsMuted}>
                   {copy.resolved}:{" "}
                   <time dateTime={request.resolvedAt.toISOString()}>
                     {dateLabel(request.resolvedAt)}
@@ -56,18 +60,16 @@ export function ServerClaimStatusPanel({
                 </p>
               )}
               {!status.isVerified && !request.proofMatchesServer ? (
-                <ErrorState title={copy.outdated} />
+                <ErrorState title={copy.outdated} description={copy.outdatedHint} />
               ) : null}
               {!status.isVerified && (
-                <p className="text-xs leading-relaxed text-muted">
-                  {waiting ? copy.wait : copy.retry}
-                </p>
+                <p className={typeXsLeadingMuted}>{waiting ? copy.wait : copy.retry}</p>
               )}
             </>
           )}
           <Link
             href={`/workspace/servers/${encodeURIComponent(serverId)}`}
-            className="inline-flex min-h-11 items-center text-sm font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentSmSemibold}
           >
             {copy.refresh}
           </Link>

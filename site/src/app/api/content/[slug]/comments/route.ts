@@ -2,23 +2,26 @@ import { AppError, NotFoundError, RateLimitExceededError, UnauthorizedError } fr
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import { parseCommentIntentKey } from "../../../../../lib/content-comment-client";
+import { parseCommentIntentKey } from "../../../../../features/community/content-comment-client";
 import {
   discussionCommentSchema,
   parseDiscussionQuery,
-} from "../../../../../lib/content-discussion-contract";
-import { discussionError } from "../../../../../lib/content-discussion-copy";
+} from "../../../../../features/community/content-discussion-contract";
+import { discussionError } from "../../../../../features/community/content-discussion-copy";
+import { getTrustedRequestIp } from "../../../../../features/shell/request-client-ip";
+import {
+  readBoundedJson,
+  requireServerJsonContentType,
+} from "../../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
 import { resolveLocale } from "../../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-} from "../../../../../lib/observability";
-import { getTrustedRequestIp } from "../../../../../lib/request-client-ip";
-import { authService } from "../../../../../lib/services/auth-service";
-import { contentService } from "../../../../../lib/services/content-service";
+} from "../../../../../lib/platform/observability";
+import { authService } from "../../../../../lib/services/accounts/auth-service";
+import { contentService } from "../../../../../lib/services/community/content-service";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 const validSlug = (slug: string) => !!slug && slug.length <= 200 && /^[a-z0-9-]+$/u.test(slug);

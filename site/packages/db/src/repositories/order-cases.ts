@@ -1,31 +1,31 @@
 import { createHash } from "node:crypto";
-import { and, count, desc, eq, inArray, sql } from "drizzle-orm";
 import {
   AppError,
   NotFoundError,
-  UnauthorizedError,
-  orderCaseReviewTarget,
   type OrderCaseCreate,
   type OrderCaseEvidence,
   type OrderCaseReview,
   type OrderCaseReviewStatus,
   type OrderCaseView,
+  orderCaseReviewTarget,
   type SupportCaseStatus,
+  UnauthorizedError,
 } from "@nexus/domain";
+import { and, count, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   auditEvents,
   commerceOrderCases as cases,
-  orders,
   orderItems,
+  orders,
   payments,
-  supportCases,
   supportCaseMessages,
+  supportCases,
   supportMutationRequests,
 } from "../schema";
 import type { ResourceTransaction } from "./entitlements";
-import { lockInitiatingSession } from "./initiating-session";
 import { historyPageBounds } from "./history-pagination";
+import { lockInitiatingSession } from "./initiating-session";
 import { supportActor } from "./support-access";
 import { supportRequesterNotice } from "./support-requester-notice";
 

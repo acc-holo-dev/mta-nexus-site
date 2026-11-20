@@ -4,10 +4,13 @@ import {
   requestRecoveryEmailVerificationSchema,
 } from "@nexus/validation";
 import { type NextRequest, NextResponse } from "next/server";
-import { readAuthJson } from "../../../../lib/auth-request-body";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
-import { authService } from "../../../../lib/services/auth-service";
+import { authAppErrorText } from "../../../../features/accounts/auth-app-error";
+import { authEmailVerificationApiCopy } from "../../../../features/accounts/auth-email-verification-api-copy";
+import { readAuthJson } from "../../../../lib/http/auth-request-body";
+import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { resolveLocale } from "../../../../lib/i18n";
+import { createRequestLogContext, logRequestEvent } from "../../../../lib/platform/observability";
+import { authService } from "../../../../lib/services/accounts/auth-service";
 
 const headers = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 
@@ -23,11 +26,14 @@ async function actor(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+  const copy = authEmailVerificationApiCopy(
+    resolveLocale(request.cookies.get("nexus_locale")?.value),
+  );
   try {
     const current = await actor(request);
-    if (!current) return json({ error: "Authentication required" }, 401);
+    if (!current) return json({ error: copy.authenticationRequired }, 401);
     const status = await authService.getRecoveryEmailStatus(current.user.id);
-    if (!status) return json({ error: "Authentication required" }, 401);
+    if (!status) return json({ error: copy.authenticationRequired }, 401);
     return json({
       actorId: current.user.id,
       email: status.email,
@@ -36,24 +42,24 @@ export async function GET(request: NextRequest) {
       eligible: status.eligible,
     });
   } catch {
-    return json({ error: "Could not check recovery email status" }, 503);
+    return json({ error: copy.statusUnavailable }, 503);
   }
 }
 
 export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
+  const copy = authEmailVerificationApiCopy(
+    resolveLocale(request.cookies.get("nexus_locale")?.value),
+  );
   try {
     const current = await actor(request);
-    if (!current) return json({ error: "Authentication required" }, 401);
+    if (!current) return json({ error: copy.authenticationRequired }, 401);
     const parsed = requestRecoveryEmailVerificationSchema.safeParse(await readAuthJson(request));
     if (!parsed.success) {
-      return json(
-        { error: "Email verification validation failed", details: parsed.error.format() },
-        400,
-      );
+      return json({ error: copy.validationFailed, details: parsed.error.format() }, 400);
     }
     if (parsed.data.expectedActorId !== current.user.id) {
-      return json({ error: "Account changed. Reload settings.", code: "ACTOR_CHANGED" }, 409);
+      return json({ error: copy.accountChanged, code: "ACTOR_CHANGED" }, 409);
     }
     const result = await authService.requestRecoveryEmailVerification({
       userId: current.user.id,
@@ -71,7 +77,18 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     );
   } catch (error: unknown) {
     if (error instanceof AppError)
-      return json({ error: error.message, code: error.code }, error.statusCode);
+      return json(
+        {
+          error: authAppErrorText(error, {
+            unauthorized: copy.authenticationRequired,
+            freshAuthRequired: copy.validationFailed,
+            conflict: copy.accountChanged,
+            failed: copy.startFailed,
+          }),
+          code: error.code,
+        },
+        error.statusCode,
+      );
     // Configuration/DB/queue failures may contain secret-bearing context.
     logRequestEvent({
       level: "error",
@@ -80,17 +97,20 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       status: 503,
       error,
     });
-    return json({ error: "Could not start email verification. Please try again later." }, 503);
+    return json({ error: copy.startFailed }, 503);
   }
 });
 
 export const PATCH = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
+  const copy = authEmailVerificationApiCopy(
+    resolveLocale(request.cookies.get("nexus_locale")?.value),
+  );
   try {
     const current = await actor(request);
-    if (!current) return json({ error: "Authentication required" }, 401);
+    if (!current) return json({ error: copy.authenticationRequired }, 401);
     const parsed = confirmRecoveryEmailVerificationSchema.safeParse(await readAuthJson(request));
-    if (!parsed.success) return json({ error: "Invalid or expired email confirmation" }, 400);
+    if (!parsed.success) return json({ error: copy.invalidOrExpired }, 400);
     const result = await authService.confirmRecoveryEmailVerification({
       userId: current.user.id,
       currentToken: current.token,
@@ -100,7 +120,17 @@ export const PATCH = withBrowserMutation(async (request: NextRequest) => {
     return json({ success: true, email: result.email, verifiedAt: result.verifiedAt });
   } catch (error: unknown) {
     if (error instanceof AppError)
-      return json({ error: error.message, code: error.code }, error.statusCode);
+      return json(
+        {
+          error: authAppErrorText(error, {
+            unauthorized: copy.authenticationRequired,
+            conflict: copy.accountChanged,
+            failed: copy.confirmFailed,
+          }),
+          code: error.code,
+        },
+        error.statusCode,
+      );
     logRequestEvent({
       level: "error",
       event: "auth.recovery_email.confirm_failed",
@@ -108,6 +138,6 @@ export const PATCH = withBrowserMutation(async (request: NextRequest) => {
       status: 503,
       error,
     });
-    return json({ error: "Could not confirm this email. Please try again later." }, 503);
+    return json({ error: copy.confirmFailed }, 503);
   }
 });

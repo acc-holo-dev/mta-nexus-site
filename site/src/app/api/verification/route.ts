@@ -1,19 +1,22 @@
-import { organizationRepository, verificationRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit, generateId } from "@nexus/security";
 import { externalWebUrlSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
-import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../lib/browser-route-adapter";
+import { verificationApiCopy } from "../../../features/trust/verification-api-copy";
+import { readBoundedJson, requireServerJsonContentType } from "../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../lib/http/browser-route-adapter";
+import { localeAppErrorText } from "../../../lib/http/locale-app-error";
+import { resolveLocale } from "../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
-} from "../../../lib/observability";
-import { isPostgresDeadlock } from "../../../lib/postgres-error";
-import { authService } from "../../../lib/services/auth-service";
+} from "../../../lib/platform/observability";
+import { isPostgresDeadlock } from "../../../lib/platform/postgres-error";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { verificationWorkspaceService } from "../../../lib/services/moderation/verification-workspace-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -38,16 +41,17 @@ const verificationRequestSchema = z
 
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
+  const copy = verificationApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
 
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
 
     if (!token || !user) {
-      return json(context, { error: "Unauthorized" }, 401);
+      return json(context, { error: copy.unauthorized }, 401);
     }
 
-    const requests = await verificationRepository.listByRequester(user.id);
+    const requests = await verificationWorkspaceService.listByRequester(user.id);
     return json(context, { requests });
   } catch (error) {
     logRequestEvent({
@@ -60,7 +64,7 @@ export async function GET(request: NextRequest) {
     return json(
       context,
       {
-        error: "Failed to load verification requests",
+        error: copy.loadFailed,
       },
       500,
     );
@@ -69,12 +73,13 @@ export async function GET(request: NextRequest) {
 
 export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
+  const copy = verificationApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
 
     if (!token || !user) {
-      return json(context, { error: "Authentication required" }, 401);
+      return json(context, { error: copy.authenticationRequired }, 401);
     }
 
     requireServerJsonContentType(request);
@@ -83,7 +88,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: "Too many verification requests. Please try again tomorrow.",
+          error: copy.rate,
         },
         429,
       );
@@ -96,7 +101,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: "Invalid verification request",
+          error: copy.invalidRequest,
           details: parsed.error.format(),
         },
         400,
@@ -107,7 +112,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: "Server ownership verification requires the MTA control challenge flow.",
+          error: copy.serverChallengeRequired,
           code: "SERVER_CONTROL_CHALLENGE_REQUIRED",
         },
         422,
@@ -121,7 +126,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         return json(
           context,
           {
-            error: "You can only verify your own profile",
+            error: copy.ownProfileOnly,
           },
           403,
         );
@@ -129,18 +134,20 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       // Identity and experience use separate live flags in the repository.
       targetIsVerified = parsed.data.targetType === "user" && user.isVerified;
     } else {
-      const organization = await organizationRepository.findById(parsed.data.targetId);
+      const organization = await verificationWorkspaceService.findOrganizationById(
+        parsed.data.targetId,
+      );
       if (!organization) {
         return json(
           context,
           {
-            error: "Organization was not found",
+            error: copy.organizationNotFound,
           },
           404,
         );
       }
 
-      const memberships = await organizationRepository.listUserMemberships(user.id);
+      const memberships = await verificationWorkspaceService.listUserMemberships(user.id);
       const membership = memberships.find(
         (candidate) => candidate.organizationId === organization.id,
       );
@@ -152,7 +159,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         return json(
           context,
           {
-            error: "You do not manage this organization",
+            error: copy.organizationNotManaged,
           },
           403,
         );
@@ -165,13 +172,13 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: "This target is already verified",
+          error: copy.alreadyVerified,
         },
         409,
       );
     }
 
-    const duplicate = await verificationRepository.findPendingForTarget(
+    const duplicate = await verificationWorkspaceService.findPendingForTarget(
       user.id,
       parsed.data.targetType,
       parsed.data.targetId,
@@ -180,7 +187,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error: "A verification request is already pending",
+          error: copy.alreadyPending,
           requestId: duplicate.id,
         },
         409,
@@ -189,7 +196,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
 
     // Moderator inbox fanout is committed with the request as
     // verification_notification_deliveries; the push worker pages recipients.
-    const verificationRequest = await verificationRepository.createRequest(
+    const verificationRequest = await verificationWorkspaceService.createRequest(
       {
         requesterId: user.id,
         currentToken: token,
@@ -220,16 +227,32 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     );
   } catch (error: unknown) {
     if (isPostgresDeadlock(error))
-      return json(
-        context,
-        { code: "VERIFICATION_RETRY", error: "Please retry the application" },
-        409,
-      );
+      return json(context, { code: "VERIFICATION_RETRY", error: copy.retry }, 409);
     if (error instanceof AppError) {
       return json(
         context,
         {
-          error: error.message,
+          error: localeAppErrorText(
+            error,
+            {
+              unauthorized: copy.authenticationRequired,
+              forbidden: copy.forbidden,
+              notFound: copy.notFound,
+              conflict: copy.conflict,
+              unsupportedMediaType: copy.unsupportedMediaType,
+              requestBodyTooLarge: copy.requestBodyTooLarge,
+              invalidBodyLength: copy.invalidBodyLength,
+              requestBodyTimeout: copy.requestBodyTimeout,
+              failed: copy.submitFailed,
+            },
+            {
+              VALIDATION_ERROR: copy.invalidRequest,
+              VERIFICATION_ALREADY_VERIFIED: copy.alreadyVerified,
+              VERIFICATION_PROFILE_REQUIRED: copy.invalidRequest,
+              VERIFICATION_AUTHORITY_CHANGED: copy.conflict,
+              VERIFICATION_PROFILE_CHANGED: copy.conflict,
+            },
+          ),
           code: error.code,
         },
         error.statusCode,
@@ -246,7 +269,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     return json(
       context,
       {
-        error: "Failed to submit verification request",
+        error: copy.submitFailed,
       },
       500,
     );

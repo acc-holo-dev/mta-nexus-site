@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { SecurityCenterService } from "../../src/lib/services/security-center-service";
 import { auditEvents, reports } from "../../packages/db/src/schema";
+import { SecurityCenterService } from "../../src/lib/services/accounts/security-center-service";
 import {
   clearFixtures,
   db,

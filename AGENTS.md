@@ -14,7 +14,7 @@
 
 Архитектура вкратце: HTTP разбирает запрос и для составных изменений вызывает service; простые read/health → `@nexus/db` допустимы только из списка в [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) / `.dependency-cruiser.exceptions.cjs`. Пакеты не импортируют код приложения; domain независим; UI не тянет server packages. Версия приложения и toolchain pins — [OPS/OPERATIONS](docs/OPERATIONS.md); major-ok (`engines`) и exact pin (`.nvmrc` / `packageManager`) — разные проверки.
 
-Краткая навигация при необходимости: [система](docs/current/system.md), [разработка](docs/current/development.md), [CI / качество](docs/current/quality.md), [карта проекта](docs/PROJECT-MAP.md), [решения](docs/DECISIONS.md) и полный baseline ID в [реестре](docs/handbook/13-DECISION-REGISTER.md), [эксплуатация](docs/OPERATIONS.md), [ограничения](docs/issues/constraints.md), [roadmap](docs/ROADMAP.md), [инициативы](docs/future/initiatives.md).
+Краткая навигация при необходимости: [система](docs/current/system.md), [разработка](docs/current/development.md), [CI / качество](docs/current/quality.md), [топология кода](docs/current/code-topology.md), [дизайн](docs/current/design-direction.md), [карта проекта](docs/PROJECT-MAP.md), [решения](docs/DECISIONS.md) и полный baseline ID в [реестре](docs/handbook/13-DECISION-REGISTER.md), [эксплуатация](docs/OPERATIONS.md), [ограничения](docs/issues/constraints.md), [roadmap](docs/ROADMAP.md), [инициативы](docs/future/initiatives.md).
 
 ## Cursor Cloud specific instructions
 

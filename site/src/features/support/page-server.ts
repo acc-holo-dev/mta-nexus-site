@@ -1,3 +1,12 @@
 import "server-only";
 
-export { SupportPageSurface, supportMetadata } from "./server/support-page";
+export {
+  AdminSupportCasePage,
+  AdminSupportQueuePage,
+  adminSupportMetadata,
+  MemberSupportCasePage,
+  MemberSupportQueuePage,
+  memberSupportMetadata,
+  SupportPageSurface,
+  supportMetadata,
+} from "./server/support-page";

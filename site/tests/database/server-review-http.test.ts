@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { confirmedServerReview } from "../../src/lib/server-review-confirmation";
+import { confirmedServerReview } from "../../src/features/servers/server-review-confirmation";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
@@ -18,10 +18,10 @@ const state = vi.hoisted(() => ({
   rate: vi.fn(),
 }));
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/request-client-ip", () => ({
+vi.mock("../../src/features/shell/request-client-ip", () => ({
   getTrustedRequestIp: () => state.ip,
 }));
 vi.mock("@nexus/security", () => ({

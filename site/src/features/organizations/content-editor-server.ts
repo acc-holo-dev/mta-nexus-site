@@ -1,3 +1,8 @@
 import "server-only";
 
-export { OrganizationContentEditorPage } from "./server/organization-content-editor-page";
+export {
+  OrganizationContentEditorPage,
+  OrganizationContentEditRoutePage,
+  OrganizationContentNewRoutePage,
+  organizationContentEditorMetadata,
+} from "./server/organization-content-editor-page";

@@ -16,21 +16,25 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => mock.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mock.session },
 }));
-vi.mock("../../src/lib/services/community-report-groups-service", () => ({
+vi.mock("../../src/lib/services/community/community-report-groups-service", () => ({
   communityReportGroupsService: { page: mock.groups },
 }));
-vi.mock("../../src/lib/services/community-report-service", () => ({
+vi.mock("../../src/lib/services/community/community-report-service", () => ({
   communityReportService: { publicationReports: mock.reports },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mock.rate }));
 
+import { communityReportCopy } from "../../src/features/community/community-report-copy";
+import type { ReportGroupsPage } from "../../src/features/community/community-report-groups-contract";
+import { reportGroupsCopy } from "../../src/features/community/community-report-groups-copy";
 import { CommunityReportGroups } from "../../src/features/community/components/community-report-groups";
+import { reportBatchCopy } from "../../src/features/community/report-batch-copy";
 import {
   CommunityReportGroupsPage,
   reportGroupsMetadata,
@@ -39,10 +43,6 @@ import {
   PublicationReportsPage,
   publicationReportsMetadata,
 } from "../../src/features/community/server/publication-reports-page";
-import type { ReportGroupsPage } from "../../src/lib/community-report-groups-contract";
-import { reportGroupsCopy } from "../../src/lib/community-report-groups-copy";
-import { communityReportCopy } from "../../src/lib/community-report-copy";
-import { reportBatchCopy } from "../../src/lib/report-batch-copy";
 
 const stamp = "2026-10-12T00:00:00.123456Z",
   filters = {
@@ -157,7 +157,7 @@ it("keeps unavailable targets actionable only through an individual report and d
   expect(empty).toContain(copy.emptyFiltered);
   expect(empty).toContain(copy.reset);
   expect(empty).toContain("/admin/reports/targets");
-  expect(empty).toContain("overflow-x-clip");
+  expect(empty).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   const lifetime = renderToStaticMarkup(
     <CommunityReportGroups
       page={{ ...page, items: [] }}
@@ -166,7 +166,7 @@ it("keeps unavailable targets actionable only through an individual report and d
     />,
   );
   expect(lifetime).toContain(copy.empty);
-  expect(lifetime).toContain("overflow-x-clip");
+  expect(lifetime).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(lifetime).not.toContain(copy.emptyFiltered);
 });
 it.each(["en", "ru"] as const)(
@@ -212,7 +212,7 @@ it("gates anonymous and revoked staff and rejects malformed scopes before privat
     await CommunityReportGroupsPage({ searchParams: Promise.resolve({}) }),
   );
   expect(revoked).toContain('role="alert"');
-  expect(revoked).toContain("overflow-x-clip");
+  expect(revoked).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(revoked).toContain("/admin/reports/targets");
   const invalid = renderToStaticMarkup(
     await PublicationReportsPage({

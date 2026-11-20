@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, type Mock, vi } from "vitest";
-import type { CommunityReportDetail } from "../../src/lib/community-report-contract";
-import { communityReportCopy } from "../../src/lib/community-report-copy";
+import type { CommunityReportDetail } from "../../src/features/community/community-report-contract";
+import { communityReportCopy } from "../../src/features/community/community-report-copy";
 import {
   type FlatTestElement,
   findTestButton,

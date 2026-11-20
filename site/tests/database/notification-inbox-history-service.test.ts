@@ -5,12 +5,12 @@ vi.mock("@nexus/db", () => ({
   notificationRepository: { pageInbox: state.page, setInboxReadState: state.command },
 }));
 
-import { notificationInboxService } from "../../src/lib/services/notification-inbox-service";
+import { notificationInboxService } from "../../src/lib/services/notifications/notification-inbox-service";
 
 const filters = { query: "", state: "all" as const, category: "all" as const };
 const item = {
   id: "one",
-  title: "Publication reaction",
+  title: "Publication reaction / Реакция на публикацию",
   message: "Publication post: reaction.",
   link: "/articles/post",
   data: null,

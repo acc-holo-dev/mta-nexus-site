@@ -1,6 +1,3 @@
-import { describe, expect, it } from "vitest";
-import { and, eq } from "drizzle-orm";
-import { NextRequest } from "next/server";
 import {
   auditEvents,
   authRepository,
@@ -10,8 +7,11 @@ import {
   sessionRepository,
   userRepository,
 } from "@nexus/db";
-import { authService } from "../../src/lib/services/auth-service";
+import { and, eq } from "drizzle-orm";
+import { NextRequest } from "next/server";
+import { describe, expect, it } from "vitest";
 import { GET as getContexts } from "../../src/app/api/auth/context/route";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 describe("organization owner context switching integration", () => {
   it("shows and accepts a directly owned organization without requiring a membership row", async () => {

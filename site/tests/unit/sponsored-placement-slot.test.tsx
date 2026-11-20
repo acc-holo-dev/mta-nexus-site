@@ -1,7 +1,7 @@
+import { SponsoredPlacementSlot } from "@nexus/ui";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { SponsoredPlacementSlot } from "@nexus/ui";
 
 const placement = {
   targetType: "product" as const,

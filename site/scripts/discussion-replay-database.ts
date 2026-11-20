@@ -1,7 +1,7 @@
 import { comments, db, readDatabaseUrl } from "@nexus/db";
 import { and, asc, isNotNull, isNull, sql } from "drizzle-orm";
-import type { ReplayCursor } from "../src/lib/services/discussion-notification-replay";
-import { replayTimestamp } from "../src/lib/services/discussion-replay-checkpoint";
+import type { ReplayCursor } from "../src/lib/services/community/discussion-notification-replay";
+import { replayTimestamp } from "../src/lib/services/community/discussion-replay-checkpoint";
 import { discussionReplayDatabaseIdentity } from "./discussion-replay-options";
 
 /** Read only metadata for the exact unqualified relations used by replay/dispatch. */

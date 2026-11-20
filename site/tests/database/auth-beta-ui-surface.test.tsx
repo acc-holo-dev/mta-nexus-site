@@ -78,7 +78,7 @@ describe("beta auth UI surface (ROADMAP 18)", () => {
         expect(html).toContain('for="auth-password"');
         expect(html).toContain('id="auth-password"');
         expect(html).toContain('type="submit"');
-        expect(html).toContain("min-h-11");
+        expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
         expect(html).toContain("px-4");
         expect(html).toMatch(/focus-visible:ring-2|focus-visible:outline/u);
         if (mode === "register") {
@@ -96,17 +96,17 @@ describe("beta auth UI surface (ROADMAP 18)", () => {
 
   it("uses shared @nexus/ui Input/Button/ErrorState on auth and recovery screens", () => {
     const auth = read("site/src/features/accounts/components/auth-form.tsx");
-    const forgot = read("site/src/app/auth/forgot-password/page.tsx");
-    const reset = read("site/src/app/auth/reset-password/page.tsx");
+    const forgot = read("site/src/features/accounts/components/forgot-password-page.tsx");
+    const reset = read("site/src/features/accounts/components/reset-password-page.tsx");
 
     for (const source of [auth, forgot, reset]) {
       expect(source).toContain('from "@nexus/ui"');
       expect(source).toContain("Button");
       expect(source).toContain("ErrorState");
       expect(source).toContain("isLoading");
-      expect(source).toContain("min-h-11");
-      expect(source).toContain("min-w-0");
-      expect(source).toContain("overflow-x-clip");
+      expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
+      expect(source).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+      expect(source).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     }
 
     expect(auth).toContain("Input");

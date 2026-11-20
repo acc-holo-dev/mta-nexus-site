@@ -1,5 +1,5 @@
+import type { Content, License, Product, Server, User } from "@nexus/domain";
 import { grantsServerManagement } from "@nexus/domain";
-import type { User, Product, Server, License, Content } from "@nexus/domain";
 
 export type Action =
   | "admin.access"

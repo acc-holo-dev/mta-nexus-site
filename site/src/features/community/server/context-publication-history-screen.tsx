@@ -3,31 +3,39 @@ import { AppError } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { parseAuthorPublicationHistoryQuery } from "../../../lib/author-publication-desk-contract";
-import { authorPublicationDeskCopy } from "../../../lib/author-publication-desk-copy";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { organizationContentCopy } from "../../../lib/organization-content-copy";
-import { organizationPublicationHistorySchema } from "../../../lib/organization-publication-history-contract";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { organizationContentCopy } from "../../organizations/organization-content-copy";
 import {
   organizationPublicationHistoryCopy,
   organizationPublicationHistoryError,
-} from "../../../lib/organization-publication-history-copy";
-import { serverContentCopy } from "../../../lib/server-content-copy";
-import { serverPublicationHistorySchema } from "../../../lib/server-publication-history-contract";
+} from "../../organizations/organization-publication-history-copy";
+import { serverContentCopy } from "../../servers/server-content-copy";
 import {
   serverPublicationHistoryCopy,
   serverPublicationHistoryError,
-} from "../../../lib/server-publication-history-copy";
-import { authService } from "../../../lib/services/auth-service";
-import { publicationSupportHref } from "../../../lib/support-workspace-contract";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
+} from "../../servers/server-publication-history-copy";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
+import { pageShellMax4xl } from "../../shell/page-shell";
+import { panelClipSpace2P4, panelSpace2P4 } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import {
+  type2xlBoldPrimary,
+  typeBreakSemiboldPrimary,
+  typeFlexWrapGap4,
+  typeSemiboldPrimary,
+  typeSmMuted,
+  typeSmPrimary,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import { publicationSupportHref } from "../../support/support-workspace-contract";
+import { parseAuthorPublicationHistoryQuery } from "../author-publication-desk-contract";
+import { authorPublicationDeskCopy } from "../author-publication-desk-copy";
 import { AuthorPublicationRestore } from "../author-publication-restore";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-
-const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { organizationPublicationHistorySchema } from "../organization-publication-history-contract";
+import { serverPublicationHistorySchema } from "../server-publication-history-contract";
+import { getUserPlatformCopy } from "../user-platform-copy";
 export async function ContextPublicationHistoryScreen({
   id,
   contentId,
@@ -57,12 +65,19 @@ export async function ContextPublicationHistoryScreen({
     labels = getUserPlatformCopy(locale),
     path = `/workspace/${kind}/${encodeURIComponent(id)}/content/${encodeURIComponent(contentId)}/history`;
   let failure = "";
-  const actor = await authService
-    .getSession((await cookies()).get("nexus_session")?.value)
-    .catch(() => {
-      failure = copy.unavailable;
-      return null;
-    });
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <PlatformSessionError
+        locale={locale}
+        title={copy.title}
+        message={copy.unavailable}
+        retryHref={path}
+      />
+    );
+  }
   if (!actor) return <PlatformSignIn locale={locale} returnPath={path} />;
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries((await searchParams) ?? {}))
@@ -89,15 +104,15 @@ export async function ContextPublicationHistoryScreen({
   const base = `/workspace/${kind}/${encodeURIComponent(id)}/content`;
   const emptyDescription = copy.historyEmptyHint;
   return (
-    <div className={pageShellClass}>
-      <Link href={base} className={navLinkClass}>
+    <div className={pageShellMax4xl}>
+      <Link href={base} className={linkAccentSmRounded}>
         {workspaceTitle}
       </Link>
       <header className="space-y-2">
-        <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
-        <p className="text-sm text-muted">{copy.description}</p>
+        <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
+        <p className={typeSmMuted}>{copy.description}</p>
         {data && (
-          <p className="break-words font-semibold text-primary">
+          <p className={typeBreakSemiboldPrimary}>
             {context?.name} · {data.item.title}
           </p>
         )}
@@ -105,18 +120,19 @@ export async function ContextPublicationHistoryScreen({
       {!data ? (
         <ErrorState
           title={failure || copy.unavailable}
+          description={copy.unavailableHint}
           action={
-            <a href={path} className={navLinkClass}>
+            <a href={path} className={linkAccentSmRounded}>
               {history.reload}
             </a>
           }
         />
       ) : (
         <>
-          <p className="text-sm text-muted">
+          <p className={typeSmMuted}>
             {labels.status}: {labels[data.item.status]}
           </p>
-          <Link href={`${base}/${encodeURIComponent(contentId)}`} className={navLinkClass}>
+          <Link href={`${base}/${encodeURIComponent(contentId)}`} className={linkAccentSmRounded}>
             {labels.edit}
           </Link>
           {data.item.recoverable && (
@@ -129,9 +145,9 @@ export async function ContextPublicationHistoryScreen({
             />
           )}
           {data.item.status === "archived" && !data.item.recoverable && (
-            <section className="nexus-panel space-y-2 p-4">
-              <p className="text-sm text-muted">{copy.restoreHelp}</p>
-              <Link href={publicationSupportHref(data.item.title)} className={navLinkClass}>
+            <section className={panelSpace2P4}>
+              <p className={typeSmMuted}>{copy.restoreHelp}</p>
+              <Link href={publicationSupportHref(data.item.title)} className={linkAccentSmRounded}>
                 {history.support}
               </Link>
             </section>
@@ -141,15 +157,15 @@ export async function ContextPublicationHistoryScreen({
           ) : (
             <ol className="space-y-3">
               {data.events.map((event) => (
-                <li key={event.id} className="nexus-panel min-w-0 space-y-2 overflow-x-clip p-4">
-                  <p className="font-semibold text-primary">{history[event.kind]}</p>
-                  <time dateTime={event.createdAt} className="text-xs text-muted">
+                <li key={event.id} className={panelClipSpace2P4}>
+                  <p className={typeSemiboldPrimary}>{history[event.kind]}</p>
+                  <time dateTime={event.createdAt} className={typeXsMuted}>
                     {new Date(event.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                       timeZone: "UTC",
                       timeZoneName: "short",
                     })}
                   </time>
-                  <p className="text-xs text-muted">
+                  <p className={typeXsMuted}>
                     {event.actor === "moderation"
                       ? history.actorModeration
                       : event.actor === "team"
@@ -159,13 +175,13 @@ export async function ContextPublicationHistoryScreen({
                   {event.identity && (
                     <Link
                       href={`/users/${encodeURIComponent(event.identity.username)}`}
-                      className={navLinkClass}
+                      className={linkAccentSmRounded}
                     >
                       {copy.identity}: {event.identity.name} (@{event.identity.username})
                     </Link>
                   )}
                   {(event.from || event.to) && (
-                    <p className="text-sm text-primary">
+                    <p className={typeSmPrimary}>
                       {event.from ? labels[event.from] : ""}
                       {event.from && event.to ? " → " : ""}
                       {event.to ? labels[event.to] : ""}
@@ -175,15 +191,15 @@ export async function ContextPublicationHistoryScreen({
               ))}
             </ol>
           )}
-          <nav aria-label={copy.title} className="flex flex-wrap gap-4">
-            <Link prefetch={false} href={path} className={navLinkClass}>
+          <nav aria-label={copy.title} className={typeFlexWrapGap4}>
+            <Link prefetch={false} href={path} className={linkAccentSmRounded}>
               {history.historyLatest}
             </Link>
             {data.olderCursor && (
               <Link
                 prefetch={false}
                 href={`${path}?${new URLSearchParams({ cursor: data.olderCursor })}`}
-                className={navLinkClass}
+                className={linkAccentSmRounded}
               >
                 {history.historyOlder}
               </Link>

@@ -17,16 +17,22 @@ const harness = vi.hoisted(() => ({
 vi.mock("react", (originalModule) => mockReactHooks(harness)(originalModule));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
 vi.mock("next/link", () => ({ default: "a" }));
-vi.mock("../../src/components/locale-context", () => ({
-  useNexusLocale: () => ({ locale: harness.locale }),
-}));
-vi.mock("../../src/lib/user-platform-client", async (originalModule) => ({
-  ...(await originalModule<typeof import("../../src/lib/user-platform-client")>()),
+vi.mock("../../src/features/shell/locale", async () => {
+  const { getDictionary } = await import("../../src/lib/i18n");
+  return {
+    useNexusLocale: () => ({
+      locale: harness.locale,
+      dictionary: getDictionary(harness.locale),
+    }),
+  };
+});
+vi.mock("../../src/features/community/user-platform-client", async (originalModule) => ({
+  ...(await originalModule<typeof import("../../src/features/community/user-platform-client")>()),
   platformRequest: harness.request,
 }));
 
-import { PublicProfileForm } from "../../src/components/public-profile-form";
-import { getUserPlatformCopy } from "../../src/lib/user-platform-copy";
+import { PublicProfileForm } from "../../src/features/accounts/profile";
+import { getUserPlatformCopy } from "../../src/features/community/user-platform-copy";
 
 const { render, load, save } = createPublicProfileConflictInteractionHelpers(
   harness,
@@ -41,7 +47,7 @@ it("keeps the current draft on read failure and closes it if the actor changes",
   await save(render());
   harness.request.mockRejectedValueOnce(new Error("unauthorized"));
   (findTestButton(render(), copy.profileCompare).props.onClick as () => void)();
-  await vi.waitFor(() => expect(harness.slots[3]).toMatchObject({ text: "unauthorized" }));
+  await vi.waitFor(() => expect(harness.slots[3]).toMatchObject({ text: copy.unavailable }));
   expect(render().some((node) => node.type === "form")).toBe(true);
   expect(findTestButton(render(), copy.save).props.disabled).toBe(true);
   harness.request.mockResolvedValueOnce({ profile: { ...latest, id: "usr_2", username: "other" } });

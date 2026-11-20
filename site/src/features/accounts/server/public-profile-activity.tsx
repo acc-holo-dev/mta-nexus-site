@@ -1,0 +1,123 @@
+import { AppError } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { publicationFeedService } from "../../../lib/services/discovery/publication-feed-service";
+import { PublicationFeed } from "../../community/publication-feed";
+import { publicationCopy } from "../../community/publication-feed-copy";
+import { publicationFeedView } from "../../community/publication-feed-view";
+import { linkAccentSmRounded } from "../../shell/link-shell";
+import { pageShellStack6 } from "../../shell/page-shell";
+import { type2xlBoldPrimary, typeSmMuted } from "../../shell/type-shell";
+export async function publicProfileMetadata(): Promise<Metadata> {
+  const copy = publicationCopy(await getRequestLocale());
+  return {
+    title: copy.serverTitle,
+    description: copy.serverDescription,
+    robots: { index: false, follow: true },
+  };
+}
+
+export async function publicProfileActivityMetadata(): Promise<Metadata> {
+  return {
+    title: publicationCopy(await getRequestLocale()).activity,
+    robots: { index: false, follow: false },
+  };
+}
+
+export async function PublicProfileActivity({
+  kind,
+  handle,
+  searchParams,
+}: {
+  kind: "user" | "organization" | "server";
+  handle: string;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const locale = await getRequestLocale(),
+    copy = publicationCopy(locale);
+  const dictionary = getDictionary(locale);
+  const profile = await publicationFeedService.resolve(kind, handle).catch((error: unknown) => {
+    if (error instanceof AppError && error.statusCode === 404) notFound();
+    return null;
+  });
+  const profilePath = `/${kind === "user" ? "users" : kind === "server" ? "servers" : "organizations"}/${encodeURIComponent(handle)}`;
+  const activityPath = `${profilePath}/${kind === "server" ? "updates" : "activity"}`;
+  if (!profile) {
+    return (
+      <div className={pageShellStack6}>
+        <Link href={profilePath} className={linkAccentSmRounded}>
+          {kind === "server" ? copy.serverBack : copy.back}
+        </Link>
+        <ErrorState
+          title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
+          action={
+            <Link href={activityPath} className={linkAccentSmRounded}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
+  const { filters, initial, errorCode } = await publicationFeedView(
+    { kind, id: profile.id },
+    await searchParams,
+  );
+  return (
+    <div className={pageShellStack6}>
+      <header className="space-y-2">
+        <Link href={profilePath} className={linkAccentSmRounded}>
+          {kind === "server" ? copy.serverBack : copy.back}
+        </Link>
+        <h1 className={type2xlBoldPrimary}>
+          {profile.name}: {kind === "server" ? copy.serverTitle : copy.activity}
+        </h1>
+        <p className={typeSmMuted}>
+          {kind === "server" ? copy.serverDescription : copy.publicDescription}
+        </p>
+      </header>
+      <PublicationFeed
+        key={`${kind}:${profile.id}:${JSON.stringify(filters)}`}
+        initial={initial}
+        filters={filters}
+        locale={locale}
+        path={activityPath}
+        server={kind === "server"}
+        errorCode={errorCode}
+      />
+    </div>
+  );
+}
+
+export async function ServerPublicProfileActivityPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return PublicProfileActivity({
+    kind: "server",
+    handle: (await params).slug,
+    searchParams,
+  });
+}
+
+export async function UserPublicProfileActivityPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ username: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return PublicProfileActivity({
+    kind: "user",
+    handle: (await params).username,
+    searchParams,
+  });
+}

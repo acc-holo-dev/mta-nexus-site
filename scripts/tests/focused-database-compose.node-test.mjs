@@ -225,7 +225,10 @@ esac
     FOCUS_TEST_LOG: log,
   };
   for (const args of [
-    ["site/tests/database/password-change-transaction.test.ts", "site/src/components/sidebar.tsx"],
+    [
+      "site/tests/database/password-change-transaction.test.ts",
+      "site/src/features/shell/components/sidebar.tsx",
+    ],
     ["site/tests/database/password-change-transaction.test.ts", "site/src/missing.test.ts"],
     ["scripts/tests/focused-tests.node-test.mjs"],
   ]) {

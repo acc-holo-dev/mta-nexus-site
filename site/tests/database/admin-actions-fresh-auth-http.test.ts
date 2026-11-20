@@ -18,7 +18,7 @@ vi.mock("next/server", async () => {
   return { ...actual, after: vi.fn() };
 });
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => ({
       id: "usr_mod",
@@ -30,26 +30,35 @@ vi.mock("../../src/lib/services/auth-service", () => ({
   },
 }));
 
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: {
     reviewBuild,
     quarantineBuild: vi.fn(),
     restoreQuarantinedBuild: vi.fn(),
+    updateWithAudit: vi.fn(),
   },
 }));
 
-vi.mock("../../src/lib/services/content-service", () => ({
+vi.mock("../../src/lib/services/community/content-service", () => ({
   contentService: { moderateContent: vi.fn() },
 }));
 
-vi.mock("../../src/lib/services/resource-release-control-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-release-control-service", () => ({
   resourceModerationService: { command: vi.fn() },
 }));
 
-vi.mock("@nexus/db", () => ({
-  productRepository: { updateWithAudit: vi.fn() },
-  reportRepository: { resolve: resolveReport, findById: vi.fn() },
-  verificationRepository: { resolveRequest: vi.fn(), findById: vi.fn() },
+vi.mock("../../src/lib/services/moderation/admin-service", () => ({
+  adminService: {
+    resolveReportRecord: resolveReport,
+    findReportById: vi.fn(),
+  },
+}));
+
+vi.mock("../../src/lib/services/moderation/verification-workspace-service", () => ({
+  verificationWorkspaceService: {
+    resolveRequest: vi.fn(),
+    findRequestById: vi.fn(),
+  },
 }));
 
 vi.mock("@nexus/security", async () => {

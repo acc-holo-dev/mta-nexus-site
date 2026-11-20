@@ -1,5 +1,6 @@
 import { getTableColumns } from "drizzle-orm";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][],
@@ -26,9 +27,11 @@ vi.mock("../../packages/db/src/client", async () => {
   });
   return { db };
 });
-import { builds, resourceReleaseEvents } from "../../packages/db/src/schema";
+
 import { buildRepository } from "../../packages/db/src/repositories/builds";
 import { resourceReleaseWorkerRepository as worker } from "../../packages/db/src/repositories/resource-release-worker";
+import { builds, resourceReleaseEvents } from "../../packages/db/src/schema";
+
 function event() {
   const values: Record<string, unknown> = {
     sequence: "9007199254740993",

@@ -4,11 +4,14 @@ import { Button, ErrorState } from "@nexus/ui";
 import { LoaderCircle, RotateCcw, ShieldOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { confirmsAdminAction } from "../../../lib/admin-action-confirmation";
-import { verificationCopy } from "../../../lib/verification-workspace-copy";
-import { actionConfirmCheckboxFocusClass } from "../../../components/action-confirm-checkbox";
-import { confirmAction } from "../../../components/confirm-action";
-import { useNexusLocale } from "../../../components/locale-context";
+import { adminActionClientError } from "../../moderation/admin-action-client-error";
+import { confirmsAdminAction } from "../../moderation/admin-action-confirmation";
+import { actionConfirmCheckboxFocusClass } from "../../shell/action-confirm-checkbox";
+import { confirmAction } from "../../shell/confirm-action";
+import { useNexusLocale } from "../../shell/locale";
+import { skelH35W35Spin } from "../../shell/skeleton-shell";
+import { typeLabelUpperMuted, typeWFullMaxSmSpace2Md80 } from "../../shell/type-shell";
+import { verificationCopy } from "../../trust/verification-workspace-copy";
 
 export function BuildQuarantineControls({
   buildId,
@@ -66,7 +69,7 @@ export function BuildQuarantineControls({
       });
       const data = await response.json().catch(() => null);
       if (!confirmsAdminAction(response.status, data, buildId, action)) {
-        setError(data?.error || copy.quarantineBuildFailed);
+        setError(adminActionClientError(locale, data?.code, copy.quarantineBuildFailed));
         return;
       }
       setReason("");
@@ -81,9 +84,9 @@ export function BuildQuarantineControls({
   const action = status === "quarantined" ? "restore" : "quarantine";
 
   return (
-    <div className="w-full max-w-sm space-y-2 md:w-80" aria-busy={pending !== null}>
+    <div className={typeWFullMaxSmSpace2Md80} aria-busy={pending !== null}>
       <label className="block space-y-1">
-        <span className="font-label uppercase text-muted">
+        <span className={typeLabelUpperMuted}>
           {status === "quarantined" ? copy.restoreReason : copy.quarantineReason}
         </span>
         <textarea
@@ -120,7 +123,7 @@ export function BuildQuarantineControls({
         }
       >
         {pending ? (
-          <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+          <LoaderCircle className={skelH35W35Spin} aria-hidden="true" />
         ) : action === "quarantine" ? (
           <ShieldOff className="h-3.5 w-3.5" aria-hidden="true" />
         ) : (

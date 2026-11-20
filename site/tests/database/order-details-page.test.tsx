@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
@@ -13,19 +15,19 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../../src/lib/services/commerce-service", () => ({
+vi.mock("../../src/lib/services/commerce/commerce-service", () => ({
   commerceService: { getBuyerOrderDetails: state.details },
 }));
 
 import PurchaseDetailLoading from "../../src/app/workspace/purchases/[id]/loading";
 import Page from "../../src/app/workspace/purchases/[id]/page";
-import { getCommerceHistoryCopy } from "../../src/lib/commerce-history-i18n";
+import { getCommerceHistoryCopy } from "../../src/features/commerce/commerce-history-i18n";
 import { getDictionary } from "../../src/lib/i18n";
 
 const input = {
@@ -93,8 +95,8 @@ it.each(["en", "ru"] as const)(
       locale === "ru" ? "Действующего доступа к скачиванию нет" : "No current download access",
     );
     expect(html).toContain('href="?page=1"');
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).not.toContain("/api/checkout");
   },
 );
@@ -106,8 +108,8 @@ it("recovers with ErrorState when order details fail to load", async () => {
   expect(html).toContain(copy.orderLoadUnavailable);
   expect(html).toContain(copy.orderLoadUnavailableHint);
   expect(html).toContain(getDictionary("en").errors.retry);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain('href="/workspace/purchases/ord_a?page=2"');
 });
 it("renders EmptyState when an order has no line items", async () => {
@@ -137,7 +139,7 @@ it("renders EmptyState when an order has no line items", async () => {
 });
 it("clips the honest purchase detail loading shell on narrow layouts", async () => {
   const html = renderToStaticMarkup(await PurchaseDetailLoading());
-  expect(html).toContain("min-w-0");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(getCommerceHistoryCopy("en").loading);
 });

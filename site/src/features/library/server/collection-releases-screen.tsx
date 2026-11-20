@@ -1,30 +1,48 @@
 import { AppError, LIBRARY_RELEASE_FILTERS } from "@nexus/domain";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { collectionReleasesCopy } from "../../../lib/collection-releases-i18n";
-import { collectionReleasesQuery } from "../../../lib/collection-releases-query";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { libraryCollectionInventoryCopy } from "../../../lib/library-collection-inventory-i18n";
-import { collectionInventoryHref } from "../../../lib/library-collection-inventory-query";
-import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
-import {
-  collectionHref,
-  collectionId,
-  collectionPageParams,
-} from "../../../lib/library-collections-query";
-import { librarySelectionBatchesCopy } from "../../../lib/library-selection-batches-i18n";
-import { getResourceReleaseControlCopy } from "../../../lib/resource-release-control-i18n";
-import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
-import { authService } from "../../../lib/services/auth-service";
-import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
-import { LibraryReleaseFollowLatest } from "../release-follow";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { PlatformSessionError } from "../../../components/platform-session-error";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { ResourceDownloadButton } from "../../resources/download";
 import { ResourceReleaseWatchControl } from "../../resources/release-watch";
+import { resourceReleaseWatchesCopy } from "../../resources/resource-release-watches-i18n";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import {
+  linkAccentSmMedium,
+  linkAccentSmRounded,
+  linkAccentTightRounded,
+} from "../../shell/link-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeBreakSemibold,
+  typeFlexWrapEndGap3,
+  typeFlexWrapGap3,
+  typeFlexWrapGap4,
+  typeGrid2Gap4,
+} from "../../shell/type-shell";
+import { collectionReleasesCopy } from "../collection-releases-i18n";
+import { collectionReleasesQuery } from "../collection-releases-query";
+import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
+import { collectionInventoryHref } from "../library-collection-inventory-query";
+import { libraryCollectionsCopy } from "../library-collections-i18n";
+import { collectionHref, collectionId, collectionPageParams } from "../library-collections-query";
+import { librarySelectionBatchesCopy } from "../library-selection-batches-i18n";
+import { LibraryReleaseFollowLatest } from "../release-follow";
+import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
+export async function collectionReleasesMetadata(): Promise<Metadata> {
+  return {
+    title: `${collectionReleasesCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
 export async function CollectionReleasesScreen({
   params,
   searchParams,
@@ -85,21 +103,16 @@ export async function CollectionReleasesScreen({
   })}`;
   if (!result) {
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
-        <Link
-          href={collectionHref(path.id)}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+      <div className={pageShellMax5xl}>
+        <Link href={collectionHref(path.id)} className={linkAccentTightRounded}>
           {cc.back}
         </Link>
         <h1 className="font-display">{c.title}</h1>
         <ErrorState
           title={c.loadUnavailable}
+          description={c.loadUnavailableDescription}
           action={
-            <Link
-              href={retryHref}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={retryHref} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -116,11 +129,8 @@ export async function CollectionReleasesScreen({
   const href = (page: number, filter = result.filter) =>
     `${collectionHref(path.id, "releases")}?${suffix(page, filter)}`;
   return (
-    <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
-      <Link
-        href={collectionHref(path.id)}
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+    <div className={pageShellMax5xl}>
+      <Link href={collectionHref(path.id)} className={linkAccentTightRounded}>
         {cc.back}
       </Link>
       <h1 className="font-display">{c.title}</h1>
@@ -129,15 +139,12 @@ export async function CollectionReleasesScreen({
         {cc.revision}: {result.collection.revision} · {cc.items}: {result.itemCount}
       </p>
       <p className="text-secondary">{c.note}</p>
-      <Link
-        href={collectionInventoryHref(path.id, "attention")}
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href={collectionInventoryHref(path.id, "attention")} className={linkAccentTightRounded}>
         {libraryCollectionInventoryCopy(locale).versionOverview}
       </Link>
       <Link
         href={`/workspace/library/collections/${encodeURIComponent(path.id)}/watches`}
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className={linkAccentTightRounded}
       >
         {resourceReleaseWatchesCopy(locale).collectionTitle}
       </Link>
@@ -146,7 +153,7 @@ export async function CollectionReleasesScreen({
       ) : (
         <Link
           href={collectionHref(path.id, "versions", result.q ? { q: result.q } : {})}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentTightRounded}
         >
           {librarySelectionBatchesCopy(locale).title}
         </Link>
@@ -155,7 +162,7 @@ export async function CollectionReleasesScreen({
         <form
           method="get"
           action={collectionHref(path.id, "releases")}
-          className="flex flex-wrap items-end gap-3"
+          className={typeFlexWrapEndGap3}
         >
           <input type="hidden" name="filter" value={result.filter} />
           <label className="grid gap-1">
@@ -173,20 +180,20 @@ export async function CollectionReleasesScreen({
           {result.q && (
             <Link
               href={collectionHref(path.id, "releases", { filter: result.filter })}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentTightRounded}
             >
               {cc.clear}
             </Link>
           )}
         </form>
       </search>
-      <nav aria-label={c.title} className="flex flex-wrap gap-3">
+      <nav aria-label={c.title} className={typeFlexWrapGap3}>
         {LIBRARY_RELEASE_FILTERS.map((filter) => (
           <Link
             key={filter}
             href={href(1, filter)}
             aria-current={filter === result.filter ? "page" : undefined}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentTightRounded}
           >
             {filter === "updates" ? copy.update_available : copy[filter]} ({result.counts[filter]})
           </Link>
@@ -204,25 +211,22 @@ export async function CollectionReleasesScreen({
           description={c.note}
           action={
             result.filter !== "all" || result.q ? (
-              <Link
-                href={collectionHref(path.id, "releases")}
-                className="inline-flex min-h-11 items-center text-sm font-medium text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={collectionHref(path.id, "releases")} className={linkAccentSmMedium}>
                 {cc.clear}
               </Link>
             ) : undefined
           }
         />
       )}
-      <ol className="grid gap-4 sm:grid-cols-2">
+      <ol className={typeGrid2Gap4}>
         {result.items.map((item) => {
           const version = item.mode === "fixed" ? item.selectedVersion : item.latestVersion,
             buildId = item.mode === "fixed" ? item.selectedBuildId : item.latestBuildId;
           const downloadable =
             item.hasAccess && ["latest", "pinned", "update_available"].includes(item.state);
           return (
-            <li key={item.productId} className="nexus-panel space-y-3 p-5">
-              <h3 className="break-words font-semibold">{item.title ?? cc.unavailable}</h3>
+            <li key={item.productId} className={panelSpace3P5}>
+              <h3 className={typeBreakSemibold}>{item.title ?? cc.unavailable}</h3>
               <p>{copy[item.state]}</p>
               {item.latestVersion && (
                 <p>
@@ -262,11 +266,11 @@ export async function CollectionReleasesScreen({
                   hasAccess={item.hasAccess}
                 />
               ) : null}
-              <div className="flex flex-wrap gap-4">
+              <div className={typeFlexWrapGap4}>
                 {item.slug && item.state !== "unavailable" ? (
                   <Link
                     href={`/market/${encodeURIComponent(item.slug)}`}
-                    className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={linkAccentTightRounded}
                   >
                     {copy.open}
                   </Link>
@@ -282,7 +286,7 @@ export async function CollectionReleasesScreen({
                         to: item.latestBuildId,
                       },
                     )}`}
-                    className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={linkAccentTightRounded}
                   >
                     {copy.compare}
                   </Link>
@@ -290,7 +294,7 @@ export async function CollectionReleasesScreen({
                 {item.hasAccess && item.title !== null ? (
                   <Link
                     href={`/workspace/library/${encodeURIComponent(item.productId)}/versions`}
-                    className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={linkAccentTightRounded}
                   >
                     {copy.manage}
                   </Link>
@@ -302,10 +306,7 @@ export async function CollectionReleasesScreen({
       </ol>
       <nav aria-label={cc.page} className="flex gap-4">
         {result.page > 1 && (
-          <Link
-            href={href(result.page - 1)}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href={href(result.page - 1)} className={linkAccentTightRounded}>
             {cc.previous}
           </Link>
         )}
@@ -313,10 +314,7 @@ export async function CollectionReleasesScreen({
           {cc.page} {result.page} {cc.of} {result.totalPages}
         </span>
         {result.page < result.totalPages && (
-          <Link
-            href={href(result.page + 1)}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href={href(result.page + 1)} className={linkAccentTightRounded}>
             {cc.next}
           </Link>
         )}
@@ -326,7 +324,7 @@ export async function CollectionReleasesScreen({
       </p>
       <a
         href={`/api/library/collections/${encodeURIComponent(path.id)}/releases/export?${suffix()}`}
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className={linkAccentTightRounded}
       >
         {c.export}
       </a>

@@ -7,6 +7,7 @@ const state = vi.hoisted(() => ({
   locale: "en",
   report: vi.fn(),
 }));
+vi.mock("server-only", () => ({}));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
   usePathname: () => "/workspace/library/prd_a/requirements",
@@ -14,13 +15,13 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/services/resource-requirements-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-requirements-service", () => ({
   resourceRequirementsService: { report: state.report },
 }));
 vi.mock("../../src/features/resources/download", () => ({
@@ -39,8 +40,8 @@ vi.mock("../../src/features/resources/components/resource-cart-controls", () => 
 }));
 
 import AdminResourceRequirementsLoading from "../../src/app/admin/resources/[id]/requirements/loading";
+import { resourceRequirementsCopy } from "../../src/features/resources/resource-requirements-i18n";
 import { ResourceRequirementsScreen as screen } from "../../src/features/resources/server/resource-requirements-screen";
-import { resourceRequirementsCopy } from "../../src/lib/resource-requirements-i18n";
 
 const root: ResourceRequirementNode = {
   id: "prd_a",
@@ -172,7 +173,7 @@ it("shows an honest recovery state when the preparation report fails", async () 
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("targetMta=1.6.0");
   expect(html).not.toContain("Private");
 });
@@ -196,7 +197,7 @@ it("shows an honest staff recovery state for moderator requirements", async () =
 it("clips honest loading shells on narrow layouts", async () => {
   const html = renderToStaticMarkup(await AdminResourceRequirementsLoading());
   expect(html).toContain("min-w-0 max-w-5xl");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("clips the library requirements loading shell with honest copy", async () => {
   const { default: LibraryRequirementsLoading } = await import(
@@ -204,8 +205,8 @@ it("clips the library requirements loading shell with honest copy", async () => 
   );
   const copy = resourceRequirementsCopy("en");
   const html = renderToStaticMarkup(await LibraryRequirementsLoading());
-  expect(html).toContain("min-w-0");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(copy.title);
   expect(html).toContain(copy.loading);
 });

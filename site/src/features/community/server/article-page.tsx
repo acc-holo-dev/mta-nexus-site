@@ -1,26 +1,33 @@
 import { followWorkspaceRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import { can } from "@nexus/security";
-import { Avatar } from "@nexus/ui";
+import { Avatar, ErrorState } from "@nexus/ui";
 import { safeExternalWebUrl } from "@nexus/validation";
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CommunityReportForm } from "../report-form";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { contentReactionService } from "../../../lib/services/community/content-reaction-service";
+import { contentService } from "../../../lib/services/community/content-service";
+import { linkAccentSm } from "../../shell/link-shell";
+import { pageShellMax4xlLoose } from "../../shell/page-shell";
+import {
+  typeFlexWrapCenterGap2,
+  typeH35W35Shrink,
+  typeTruncateXsFaint,
+} from "../../shell/type-shell";
+import { parseDiscussionQuery } from "../content-discussion-contract";
+import { discussionError, getDiscussionCopy } from "../content-discussion-copy";
 import { ContentDiscussion } from "../discussion";
 import { ContentReactions } from "../reactions";
-import { parseDiscussionQuery } from "../../../lib/content-discussion-contract";
-import { discussionError, getDiscussionCopy } from "../../../lib/content-discussion-copy";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
-import { contentReactionService } from "../../../lib/services/content-reaction-service";
-import { contentService } from "../../../lib/services/content-service";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
+import { CommunityReportForm } from "../report-form";
+import { getUserPlatformCopy } from "../user-platform-copy";
 
-export async function generateMetadata({
+export async function articleDetailMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
@@ -50,7 +57,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function ArticleDetailPage({
+export async function ArticleDetailPage({
   params,
   searchParams,
 }: {
@@ -78,9 +85,15 @@ export default async function ArticleDetailPage({
   }
   const filters = parseDiscussionQuery(discussionParams);
   let discussionFailure = filters ? "" : discussionError(locale, "INVALID_CURSOR");
+  let sessionFailed = false;
   const viewer = await authService
     .getSession((await cookies()).get("nexus_session")?.value)
-    .catch(() => null);
+    .catch(() => {
+      sessionFailed = true;
+      return null;
+    });
+  const articlePath = `/articles/${encodeURIComponent(article.slug)}`;
+  const discussionCopy = getDiscussionCopy(locale);
   const [author, discussion, contentFollow, contentMute, reactions] = await Promise.all([
     authService.getUserById(article.authorId),
     filters
@@ -94,7 +107,7 @@ export default async function ArticleDetailPage({
           discussionFailure =
             error instanceof AppError
               ? discussionError(locale, error.code)
-              : getDiscussionCopy(locale).unavailable;
+              : discussionCopy.unavailable;
           return null;
         })
       : null,
@@ -104,28 +117,41 @@ export default async function ArticleDetailPage({
     viewer
       ? followWorkspaceRepository.muteState(viewer.id, "content", article.id).catch(() => null)
       : Promise.resolve(null),
-    contentReactionService.state(article.slug, viewer?.id).catch(() => null),
+    sessionFailed
+      ? Promise.resolve(null)
+      : contentReactionService.state(article.slug, viewer?.id).catch(() => null),
   ]);
   const followRow = Array.isArray(contentFollow)
     ? (contentFollow.find((row) => row.targetId === article.id) ?? null)
     : null;
-  const followInitial = viewer
+  const followInitial = sessionFailed
     ? {
-        authenticated: true,
-        actorId: viewer.id,
-        following: Boolean(followRow),
-        notifyComments: followRow?.notifyComments === true,
-        muted: Boolean(followRow?.mutedUntil ?? contentMute?.mutedUntil),
-        mutedUntil: followRow?.mutedUntil ?? contentMute?.mutedUntil ?? null,
-        ...(contentFollow === null || (!followRow && contentMute === null) ? { error: true } : {}),
-      }
-    : {
-        authenticated: false,
+        authenticated: null,
         following: false,
         notifyComments: false,
         muted: false,
         mutedUntil: null,
-      };
+        error: true,
+      }
+    : viewer
+      ? {
+          authenticated: true,
+          actorId: viewer.id,
+          following: Boolean(followRow),
+          notifyComments: followRow?.notifyComments === true,
+          muted: Boolean(followRow?.mutedUntil ?? contentMute?.mutedUntil),
+          mutedUntil: followRow?.mutedUntil ?? contentMute?.mutedUntil ?? null,
+          ...(contentFollow === null || (!followRow && contentMute === null)
+            ? { error: true }
+            : {}),
+        }
+      : {
+          authenticated: false,
+          following: false,
+          notifyComments: false,
+          muted: false,
+          mutedUntil: null,
+        };
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
   const formattedDate = new Date(article.createdAt).toLocaleDateString(dateLocale, {
     month: "long",
@@ -134,23 +160,19 @@ export default async function ArticleDetailPage({
   });
 
   return (
-    <article className="mx-auto min-w-0 max-w-4xl space-y-8 overflow-x-clip">
+    <article className={pageShellMax4xlLoose}>
       <Link
         href={isCommunity ? "/community" : "/articles"}
         className="inline-flex min-h-11 items-center gap-1.5 text-xs text-muted transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
-        <ArrowLeft className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+        <ArrowLeft className={typeH35W35Shrink} aria-hidden="true" />
         <span>{isCommunity ? getDiscussionCopy(locale).backCommunity : copy.back}</span>
       </Link>
 
       <header className="space-y-4">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className={typeFlexWrapCenterGap2}>
           <span className="rounded bg-warning-soft px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider text-warning">
-            {article.type === "review"
-              ? locale === "ru"
-                ? "Обзор"
-                : "Review"
-              : getUserPlatformCopy(locale)[article.type]}
+            {getUserPlatformCopy(locale)[article.type]}
           </span>
           <span className="font-numeric text-xs text-muted">• {formattedDate}</span>
           <span className="font-numeric text-xs text-muted">
@@ -171,7 +193,7 @@ export default async function ArticleDetailPage({
             />
             <div className="min-w-0">
               <div className="truncate text-sm font-bold text-primary">{author.displayName}</div>
-              <div className="truncate text-xs text-faint">@{author.username}</div>
+              <div className={typeTruncateXsFaint}>@{author.username}</div>
             </div>
           </div>
         )}
@@ -195,7 +217,18 @@ export default async function ArticleDetailPage({
         {article.body}
       </div>
 
-      {viewer?.id !== article.authorId && (
+      {sessionFailed ? (
+        <ErrorState
+          id="article-session-unavailable"
+          title={discussionCopy.identityUnavailable}
+          description={discussionCopy.identityUnavailableDescription}
+          action={
+            <Link href={articlePath} className={linkAccentSm}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      ) : viewer?.id !== article.authorId ? (
         <CommunityReportForm
           key={`report:${article.id}:${viewer?.id ?? "guest"}`}
           targetType="content"
@@ -203,10 +236,10 @@ export default async function ArticleDetailPage({
           locale={locale}
           actorId={viewer?.id ?? null}
         />
-      )}
+      ) : null}
 
       <div className="nexus-panel flex flex-wrap items-center justify-between gap-4 p-4">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className={typeFlexWrapCenterGap2}>
           {article.tags.map((tag) => (
             <span
               key={tag}
@@ -219,7 +252,7 @@ export default async function ArticleDetailPage({
       </div>
 
       <ContentReactions
-        key={`reactions:${article.id}:${viewer?.id ?? "guest"}`}
+        key={`reactions:${article.id}:${sessionFailed ? "session-failed" : (viewer?.id ?? "guest")}`}
         contentId={article.id}
         slug={article.slug}
         initial={reactions}
@@ -228,8 +261,9 @@ export default async function ArticleDetailPage({
 
       <ContentDiscussion
         title={article.title}
-        key={`${article.id}:${viewer?.id ?? "anonymous"}:${viewer?.role ?? ""}:${filters?.query ?? ""}:${filters?.focusId ?? ""}`}
+        key={`${article.id}:${sessionFailed ? "session-failed" : (viewer?.id ?? "anonymous")}:${viewer?.role ?? ""}:${filters?.query ?? ""}:${filters?.focusId ?? ""}`}
         viewer={viewer ? { id: viewer.id, canModerate: can(viewer, "admin.moderation") } : null}
+        identityUnavailable={sessionFailed}
         slug={article.slug}
         contentId={article.id}
         locale={locale}

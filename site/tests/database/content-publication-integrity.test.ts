@@ -6,7 +6,7 @@ const mocks = vi.hoisted(() => ({
   comments: vi.fn(),
 }));
 
-vi.mock("../../src/lib/services/content-service", () => ({
+vi.mock("../../src/lib/services/community/content-service", () => ({
   contentService: {
     getArticleBySlug: mocks.article,
     getComments: mocks.comments,

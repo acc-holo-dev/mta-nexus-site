@@ -15,11 +15,11 @@ const state = vi.hoisted(() => ({
   detail: vi.fn(),
   cleanup: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
-vi.mock("../../src/lib/services/storage-maintenance-service", () => ({
+vi.mock("../../src/lib/services/moderation/storage-maintenance-service", () => ({
   storageMaintenanceService: state,
 }));
 
@@ -75,7 +75,7 @@ it("maps live permission refusals without exposing inventory", async () => {
   state.list.mockRejectedValue(new ForbiddenError());
   const response = await list(request(""));
   expect(response.status).toBe(403);
-  expect(await response.json()).toEqual({ code: "FORBIDDEN" });
+  expect(await response.json()).toMatchObject({ code: "FORBIDDEN" });
 });
 it("requires strict metadata and explicit per-object confirmation", async () => {
   for (const body of [

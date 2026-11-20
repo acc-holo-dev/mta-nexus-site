@@ -33,9 +33,9 @@ vi.mock("../../packages/db/src/client", async () => {
   return { db: proxy };
 });
 
-import { formatNotification } from "../../src/lib/notification-copy";
 import { db } from "../../packages/db/src/client";
 import { discussionModerationNotice } from "../../packages/db/src/repositories/discussion-moderation-notice";
+import { formatNotification } from "../../src/features/notifications/notification-copy";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 const item = { auditId: "audit", authorId: "author", commentId: "comment" },
@@ -53,8 +53,8 @@ it("locks content preferences and stores a status-only notice with the author di
   expect(insert()?.params).toEqual(
     expect.arrayContaining([
       "author",
-      "Discussion moderation",
-      "Comment comment: removed.",
+      "Discussion moderation / Модерация обсуждения",
+      "Comment comment: removed. / Модератор удалил ваш комментарий. Откройте запись в рабочей области. Ответы сохранены.",
       "/workspace/discussions/comment",
     ]),
   );
@@ -97,7 +97,12 @@ it.each(["en", "ru"] as const)(
   "localizes the bounded persisted moderation template in %s",
   (locale) => {
     const result = formatNotification(
-      { title: "Discussion moderation", message: "Comment comment: removed.", data: undefined },
+      {
+        title: "Discussion moderation / Модерация обсуждения",
+        message:
+          "Comment comment: removed. / Модератор удалил ваш комментарий. Откройте запись в рабочей области. Ответы сохранены.",
+        data: undefined,
+      },
       { approved: "", rejected: "", version: "", notes: "" },
       locale,
     );

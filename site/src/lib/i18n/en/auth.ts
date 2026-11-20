@@ -30,6 +30,8 @@ export const auth = {
     already: "Already have an account?",
     newUser: "New to MTA Nexus?",
     genericError: "The request could not be completed. Please try again.",
+    formErrorHint:
+      "Sign-in was not completed. Check the fields above and submit the same form again.",
     registerError: "We could not confirm registration. Try signing in before registering again.",
     loginError: "We could not confirm sign in. Check your connection and try again.",
   },
@@ -46,10 +48,14 @@ export const auth = {
     resetTitle: "Reset password",
     checkingReset: "Checking this reset link...",
     invalidReset: "This reset link is incomplete or invalid.",
+    invalidResetHint:
+      "Request a new reset link from forgot-password. An invalid link is not a locked account and does not change your current password.",
     requestNew: "Request a new link",
     resetDescription: "Choose a new password. A successful reset signs out every existing session.",
     passwordsMismatch: "Passwords do not match.",
     resetFailed: "Could not reset the password.",
+    resetErrorHint:
+      "Retry submits the same reset proof again. A temporary failure is not a completed password change.",
     newPassword: "New password",
     confirmPassword: "Confirm new password",
     resetting: "Resetting...",
@@ -61,12 +67,16 @@ export const auth = {
     checkingVerification: "Checking this confirmation link...",
     invalidVerification:
       "This confirmation link is incomplete or invalid. Request a new one from Settings.",
+    invalidVerificationHint:
+      "Open Settings to request a fresh confirmation. An invalid link is not a verified recovery email and does not change your password.",
     backToSettings: "Back to Settings",
     verifyDescription:
       "Confirming verifies the email currently stored on your account for future recovery. It does not change your password or sign you out.",
     confirming: "Confirming...",
     confirmEmail: "Confirm email",
     verifyFailed: "Could not confirm this email. Please try again.",
+    verifyErrorHint:
+      "Retry repeats this confirmation only. A temporary failure is not a verified recovery email and does not sign you out.",
     retry: "Try again",
     verifiedPrefix: "Recovery email verified:",
     confirmationConsumed: "The confirmation cannot be used again.",

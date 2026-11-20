@@ -1,15 +1,16 @@
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { serverOrganizationsApiCopy } from "../../src/features/servers/server-organizations-api-copy";
 
 const state = vi.hoisted(() => ({
   user: { id: "usr_actor" } as null | { id: string },
   list: vi.fn(),
 }));
 
-vi.mock("@nexus/db", () => ({
-  organizationRepository: { listServerManageableByUser: state.list },
+vi.mock("../../src/lib/services/servers/server-service", () => ({
+  serverService: { listServerManageableOrganizations: state.list },
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: vi.fn(async () => state.user) },
 }));
 
@@ -62,7 +63,7 @@ describe("private server organization options endpoint", () => {
     expect(response.status).toBe(503);
     expectPrivate(response);
     expect(await response.json()).toEqual({
-      error: "Organization options temporarily unavailable",
+      error: serverOrganizationsApiCopy("en").unavailable,
     });
     expect(JSON.stringify(log.mock.calls)).not.toContain("private database detail");
   });

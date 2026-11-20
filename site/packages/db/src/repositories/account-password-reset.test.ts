@@ -1,15 +1,15 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { and, eq } from "drizzle-orm";
 import { randomBytes } from "node:crypto";
-import { auditEvents, db, notifications, webPushSubscriptions } from "../client";
+import { generateId } from "@nexus/security";
+import { and, eq } from "drizzle-orm";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { authService } from "../../../../src/lib/services/accounts/auth-service";
 import { accountMailOutbox } from "../account-mail-schema";
 import { authChallenges } from "../account-recovery-schema";
-import { AccountMailCipher } from "./account-mail-crypto";
+import { auditEvents, db, notifications, webPushSubscriptions } from "../client";
 import { accountChallengeRepository } from "./account-challenges";
-import { authService } from "../../../../src/lib/services/auth-service";
+import { AccountMailCipher } from "./account-mail-crypto";
 import { userRepository } from "./users";
 import { webPushSubscriptionRepository } from "./web-push-subscriptions";
-import { generateId } from "@nexus/security";
 
 const oldPassword = "Synthetic-D4-old-password!";
 const newPassword = "Synthetic-D4-new-password!";

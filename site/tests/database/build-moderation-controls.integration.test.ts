@@ -1,14 +1,3 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  browserMutationHeaders,
-  stubBrowserMutationOrigin,
-} from "../helpers/browser-mutation-headers";
-import {
-  INTEGRATION_STAFF_PASSWORD,
-  assignIntegrationStaffPassword,
-} from "../helpers/integration-staff-password";
-import { eq } from "drizzle-orm";
-import { NextRequest } from "next/server";
 import {
   auditEvents,
   buildRepository,
@@ -18,8 +7,20 @@ import {
   userRepository,
 } from "@nexus/db";
 import { storageService } from "@nexus/storage";
-import { GET as downloadReviewerArtifact } from "../../src/app/api/admin/builds/[buildId]/download/route";
+import { eq } from "drizzle-orm";
+import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { POST as moderate } from "../../src/app/api/admin/actions/route";
+import { GET as downloadReviewerArtifact } from "../../src/app/api/admin/builds/[buildId]/download/route";
+import { adminBuildDownloadApiCopy } from "../../src/features/resources/admin-build-download-api-copy";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../helpers/browser-mutation-headers";
+import {
+  assignIntegrationStaffPassword,
+  INTEGRATION_STAFF_PASSWORD,
+} from "../helpers/integration-staff-password";
 
 function getRequest(token: string, buildId: string) {
   return new NextRequest(`http://nexus.test/api/admin/builds/${buildId}/download`, {
@@ -181,7 +182,7 @@ describe("build moderation route integration", () => {
       );
       expect(nonCleanDownload.status).toBe(422);
       expect(await nonCleanDownload.json()).toEqual({
-        error: "Reviewer download requires a provenance-backed clean malware scan",
+        error: adminBuildDownloadApiCopy("en").scanProvenanceRequired,
       });
 
       const reviewerDownload = await downloadReviewerArtifact(
@@ -247,7 +248,7 @@ describe("build moderation route integration", () => {
       });
       expect(afterReview.status).toBe(409);
       expect(await afterReview.json()).toEqual({
-        error: "Build is not available for moderator evidence review",
+        error: adminBuildDownloadApiCopy("en").notAvailableForReview,
       });
 
       const quarantined = await moderate(

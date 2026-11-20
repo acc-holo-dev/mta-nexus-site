@@ -8,14 +8,13 @@ import { Button, ErrorState } from "@nexus/ui";
 import { libraryCollectionCommandSchema, libraryCollectionSnapshotSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
-import { confirmedCollectionCommand } from "../../../lib/library-collections-confirmation";
-import {
-  libraryCollectionError,
-  libraryCollectionsCopy,
-} from "../../../lib/library-collections-i18n";
-import { collectionHref } from "../../../lib/library-collections-query";
-import { privateApiRequest } from "../../../lib/private-api-request";
-import { confirmAction } from "../../../components/confirm-action";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
+import { confirmAction } from "../../shell/confirm-action";
+import { linkAccentSmRounded } from "../../shell/link-shell";
+import { typeWFullSurfaceBorderP2 } from "../../shell/type-shell";
+import { confirmedCollectionCommand } from "../library-collections-confirmation";
+import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
+import { collectionHref } from "../library-collections-query";
 export function LibraryCollectionCommandForm({
   locale,
   actorId,
@@ -144,12 +143,7 @@ export function LibraryCollectionCommandForm({
           setCreateReady(true);
         }
       } catch {
-        if (alive)
-          setError(
-            localeRef.current === "ru"
-              ? "Не удалось проверить сессию или восстановить коллекцию. Обновите страницу и войдите в исходный аккаунт."
-              : "Could not check the session or restore the collection. Refresh and sign in to the original account.",
-          );
+        if (alive) setError(libraryCollectionsCopy(localeRef.current).restoreFailed);
       }
     }
     void restore();
@@ -262,11 +256,7 @@ export function LibraryCollectionCommandForm({
         sessionStorage.setItem(storageKey, raw);
         if (sessionStorage.getItem(storageKey) !== raw) throw new Error("storage");
       } catch {
-        setError(
-          locale === "ru"
-            ? "Не удалось сохранить данные восстановления. Коллекция не отправлена."
-            : "Could not save recovery data. The collection was not submitted.",
-        );
+        setError(c.recoverySaveFailed);
         return;
       }
     }
@@ -352,7 +342,7 @@ export function LibraryCollectionCommandForm({
   return (
     <>
       {requiresStoredIntent && (!createReady || readyActor !== actorId) && error ? (
-        <ErrorState title={error} />
+        <ErrorState title={error} description={c.actionErrorDescription} />
       ) : null}
       <form
         onSubmit={submit}
@@ -374,7 +364,7 @@ export function LibraryCollectionCommandForm({
               required
               maxLength={80}
               disabled={busy || frozen || saved}
-              className="w-full rounded border border-base bg-surface p-2"
+              className={typeWFullSurfaceBorderP2}
             />
           </label>
         )}
@@ -394,11 +384,13 @@ export function LibraryCollectionCommandForm({
                   ? c.retryAction
                   : c[action]}
         </Button>
-        {frozen && !saved && (
-          <p role="note" className="text-xs text-muted">
-            {c.frozen}
-          </p>
-        )}
+        {frozen && !saved ? (
+          <ErrorState
+            id="library-collection-command-frozen"
+            title={c.frozen}
+            description={c.retry}
+          />
+        ) : null}
         {error ? (
           <ErrorState
             title={error}
@@ -406,7 +398,7 @@ export function LibraryCollectionCommandForm({
             action={
               <a
                 href={pending.current?.reloadHref ?? returnHref ?? collectionHref(collection?.id)}
-                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentSmRounded}
               >
                 {c.reload}
               </a>

@@ -1,3 +1,3 @@
 import "server-only";
 
-export { default, generateMetadata } from "./server/public-profile";
+export { OrganizationProfilePage, organizationProfileMetadata } from "./server/public-profile";

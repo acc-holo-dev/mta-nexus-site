@@ -1,11 +1,11 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({ authService }));
-vi.mock("../../src/lib/request-client-ip", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({ authService }));
+vi.mock("../../src/features/shell/request-client-ip", () => ({
   getTrustedRequestIp: () => "unknown",
 }));
 vi.mock("@nexus/security", () => ({
@@ -14,7 +14,7 @@ vi.mock("@nexus/security", () => ({
   generateId: () => "aud_a",
   getClientIp: () => "unknown",
 }));
-vi.mock("../../src/lib/services/resource-review-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-review-service", () => ({
   resourceReviewService: {
     command: vi.fn(),
     report: vi.fn(),
@@ -23,9 +23,9 @@ vi.mock("../../src/lib/services/resource-review-service", () => ({
   },
 }));
 
-import { POST as createReview } from "../../src/app/api/products/[id]/reviews/route";
-import { POST as reportReview } from "../../src/app/api/products/[id]/reviews/[reviewId]/report/route";
 import { POST as editReview } from "../../src/app/api/library/review/[id]/route";
+import { POST as reportReview } from "../../src/app/api/products/[id]/reviews/[reviewId]/report/route";
+import { POST as createReview } from "../../src/app/api/products/[id]/reviews/route";
 
 const context = { params: Promise.resolve({ id: "prd_a", reviewId: "cmt_a" }) };
 const mutations = [

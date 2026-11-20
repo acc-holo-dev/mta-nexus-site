@@ -1,10 +1,10 @@
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
-import { parseAuthorPublicationDeskQuery } from "../../../../../lib/author-publication-desk-contract";
-import { authorPublicationDeskError } from "../../../../../lib/author-publication-desk-copy";
-import { authorContentService } from "../../../../../lib/services/author-content-service";
-import { userPlatformApi } from "../../../../../lib/user-platform-api";
+import { userPlatformApi } from "../../../../../features/accounts/user-platform-api";
+import { parseAuthorPublicationDeskQuery } from "../../../../../features/community/author-publication-desk-contract";
+import { authorPublicationDeskError } from "../../../../../features/community/author-publication-desk-copy";
+import { authorContentService } from "../../../../../lib/services/organizations/author-content-service";
 export async function GET(request: NextRequest) {
   return userPlatformApi(
     request,

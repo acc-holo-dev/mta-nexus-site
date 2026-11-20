@@ -4,23 +4,27 @@ import type { ResourceCart, ResourceCartReview } from "@nexus/domain";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { getDictionary } from "../../../lib/i18n";
-import { privateApiRequest } from "../../../lib/private-api-request";
-import { resourceCartReceiptsCopy } from "../../../lib/resource-cart-receipts-i18n";
-import { resourceCartReceiptUrl } from "../../../lib/resource-cart-receipts-query";
-import { confirmedResourceCartReview } from "../../../lib/resource-cart-review-confirmation";
+import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
+import { confirmAction } from "../../shell/confirm-action";
+import { GuestAuthLinks } from "../../shell/guest-auth";
+import { useNexusLocale } from "../../shell/locale";
+import { panelMinSpace4P5 } from "../../shell/panel-shell";
+import { surfaceBgP4TextSmSecondary } from "../../shell/surface-shell";
 import {
-  confirmedCartAcquisition,
-  confirmedResourceCart,
-} from "../../../lib/resource-commerce-confirmation";
-import {
-  getResourceCommerceCopy,
-  resourceCommerceError,
-} from "../../../lib/resource-commerce-i18n";
-import { authEntryHref, currentBrowserReturnPath } from "../../../components/auth-return-path";
-import { confirmAction } from "../../../components/confirm-action";
-import { GuestAuthLinks } from "../../../components/guest-auth-links";
-import { useNexusLocale } from "../../../components/locale-context";
+  typeFlexMinWrapGap3,
+  typeMinSpace2,
+  typeSmMuted,
+  typeSmSecondary,
+  typeSmSuccess,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import { resourceCartReceiptsCopy } from "../resource-cart-receipts-i18n";
+import { resourceCartReceiptUrl } from "../resource-cart-receipts-query";
+import { confirmedResourceCartReview } from "../resource-cart-review-confirmation";
+import { confirmedCartAcquisition, confirmedResourceCart } from "../resource-commerce-confirmation";
+import { getResourceCommerceCopy, resourceCommerceError } from "../resource-commerce-i18n";
 import { ResourceCartReviewEvidence } from "./resource-cart-review-evidence";
 
 const buttonClass =
@@ -55,14 +59,14 @@ export function AddResourceToCart({
   if (!signedIn)
     return (
       <div className="space-y-2">
-        <p className="text-xs text-muted">{copy.batchIntent}</p>
+        <p className={typeXsMuted}>{copy.batchIntent}</p>
         <GuestAuthLinks
           loginHref={loginHref}
           registerHref={registerHref}
           signInLabel={copy.signIn}
           createAccountLabel={workspaceCopy.createAccount}
         />
-        <p className="text-xs text-muted">{copy.guestReturnNote}</p>
+        <p className={typeXsMuted}>{copy.guestReturnNote}</p>
       </div>
     );
   async function add() {
@@ -90,7 +94,7 @@ export function AddResourceToCart({
   }
   return (
     <div className="space-y-2" data-acquire-intent="batch">
-      <p className="text-xs text-muted">{copy.batchIntent}</p>
+      <p className={typeXsMuted}>{copy.batchIntent}</p>
       {added ? (
         <Link href="/workspace/cart" className={`${buttonClass} w-full`}>
           {copy.added} · {copy.openCart}
@@ -116,6 +120,15 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
   const { locale } = useNexusLocale();
   const copy = getResourceCommerceCopy(locale),
     receiptCopy = resourceCartReceiptsCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    const known = [
+      ...Object.values(copy).filter((value): value is string => typeof value === "string"),
+      ...Object.values(copy.errors),
+      ...Object.values(receiptCopy),
+    ];
+    return known.includes(text) ? text : fallback;
+  }
   const [cart, setCart] = useState(initialCart),
     [review, setReview] = useState<ResourceCartReview | null>(null);
   const [busy, setBusy] = useState(false),
@@ -157,8 +170,7 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
     try {
       await action(controller.signal);
     } catch (caught) {
-      if (current(controller.signal))
-        setError(caught instanceof Error ? caught.message : copy.errors.fallback);
+      if (current(controller.signal)) setError(safeMessage(caught, copy.errors.fallback));
     } finally {
       if (current(controller.signal)) {
         active.current = null;
@@ -261,14 +273,11 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
     unavailable = cart.items.some((item) => !item.available);
   return (
     <div className="space-y-5" aria-busy={busy} data-acquire-intent="batch">
-      <p aria-live="polite" className="text-sm text-secondary">
+      <p aria-live="polite" className={typeSmSecondary}>
         {copy.cart}: {cart.items.length}/{cart.limit}
       </p>
-      <p className="text-sm text-secondary">{copy.batchIntent}</p>
-      <p
-        role="note"
-        className="rounded-lg border border-base bg-surface p-4 text-sm text-secondary"
-      >
+      <p className={typeSmSecondary}>{copy.batchIntent}</p>
+      <p role="note" className={surfaceBgP4TextSmSecondary}>
         {receiptCopy.reviewNote}
       </p>
       {error ? (
@@ -290,7 +299,7 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
       ) : null}
       {uncertain && !busy ? (
         <div data-cart-state="pending">
-          <ErrorState title={receiptCopy.pending} />
+          <ErrorState title={receiptCopy.pending} description={receiptCopy.pendingHint} />
         </div>
       ) : null}
       {!cart.items.length ? (
@@ -308,9 +317,9 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
           {cart.items.map((item) => {
             const evidence = review?.items.find((row) => row.productId === item.productId);
             return (
-              <li key={item.productId} className="nexus-panel min-w-0 space-y-4 p-5">
+              <li key={item.productId} className={panelMinSpace4P5}>
                 <div className="flex min-w-0 flex-wrap items-center justify-between gap-4">
-                  <div className="min-w-0 space-y-2">
+                  <div className={typeMinSpace2}>
                     {item.available && item.slug ? (
                       <Link
                         href={`/market/${item.slug}`}
@@ -319,13 +328,19 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
                         {item.title}
                       </Link>
                     ) : (
-                      <ErrorState id="resource-cart-item-unavailable" title={copy.unavailable} />
+                      <ErrorState
+                        id="resource-cart-item-unavailable"
+                        title={copy.unavailable}
+                        description={copy.itemUnavailableHint}
+                      />
                     )}
-                    <p className="text-sm text-muted">
-                      {item.available ? `${copy.free} · ${item.version}` : copy.unavailableNote}
-                    </p>
+                    {item.available ? (
+                      <p className={typeSmMuted}>
+                        {copy.free} · {item.version}
+                      </p>
+                    ) : null}
                     {item.alreadyOwned ? (
-                      <p className="text-sm text-success" data-cart-state="owned">
+                      <p className={typeSmSuccess} data-cart-state="owned">
                         {copy.owned}
                       </p>
                     ) : null}
@@ -351,9 +366,13 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
         </ul>
       )}
       {unavailable ? (
-        <ErrorState id="resource-cart-unavailable" title={copy.unavailableNote} />
+        <ErrorState
+          id="resource-cart-unavailable"
+          title={copy.unavailableNote}
+          description={copy.unavailableNoteHint}
+        />
       ) : null}
-      <div className="flex min-w-0 flex-wrap gap-3">
+      <div className={typeFlexMinWrapGap3}>
         {uncertain ? (
           <Button
             type="button"

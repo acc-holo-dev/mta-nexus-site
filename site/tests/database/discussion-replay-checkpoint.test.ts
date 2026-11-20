@@ -3,7 +3,7 @@ import {
   assertDiscussionReplayProgress as assertProgress,
   parseDiscussionReplayCheckpoint as parse,
   replayTimestamp,
-} from "../../src/lib/services/discussion-replay-checkpoint";
+} from "../../src/lib/services/community/discussion-replay-checkpoint";
 
 const from = "2026-10-12T00:00:00.000000Z",
   until = "2026-10-12T01:00:00.000000Z";

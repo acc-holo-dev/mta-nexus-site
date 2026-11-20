@@ -1,5 +1,5 @@
-import { beforeAll, describe, expect, it } from "vitest";
 import { buildRepository, productRepository, sessionRepository, userRepository } from "@nexus/db";
+import { beforeAll, describe, expect, it } from "vitest";
 
 describe("published build/currentVersion consistency", () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`;

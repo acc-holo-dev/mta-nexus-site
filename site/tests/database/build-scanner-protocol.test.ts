@@ -1,6 +1,6 @@
 import net, { type AddressInfo } from "node:net";
 import { afterEach, describe, expect, it } from "vitest";
-import { createClamAvScanner } from "../../src/lib/services/build-scanner-service";
+import { createClamAvScanner } from "../../src/lib/services/resources/build-scanner-service";
 
 const servers: net.Server[] = [];
 const connections = new Set<net.Socket>();

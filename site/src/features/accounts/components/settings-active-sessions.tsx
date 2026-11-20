@@ -3,7 +3,18 @@
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { Monitor } from "lucide-react";
 import type { getDictionary } from "../../../lib/i18n";
-import type { SettingsSession } from "../../../lib/settings-client-api";
+import { linkGhostAccentSemibold } from "../../shell/link-shell";
+import { panelSpace4P5Shadow } from "../../shell/panel-shell";
+import {
+  typeBreakXsMuted,
+  typeBreakXsPrimary,
+  typeFlexCenterGap2,
+  typeFlexWrapCenterBetweenGap3,
+  typeIconAccent,
+  typeSmMuted,
+  typeSmSemiboldPrimary,
+} from "../../shell/type-shell";
+import type { SettingsSession } from "../settings-client-api";
 
 type SettingsCopy = ReturnType<typeof getDictionary>["settings"];
 
@@ -27,14 +38,11 @@ export function SettingsActiveSessions({
   onRevokeSession,
 }: Props) {
   return (
-    <section
-      aria-labelledby="sessions-heading"
-      className="nexus-panel space-y-4 p-5 shadow-nexus-sm"
-    >
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <Monitor className="h-4 w-4 text-accent" aria-hidden="true" />
-          <h2 id="sessions-heading" className="text-sm font-semibold text-primary">
+    <section aria-labelledby="sessions-heading" className={panelSpace4P5Shadow}>
+      <div className={typeFlexWrapCenterBetweenGap3}>
+        <div className={typeFlexCenterGap2}>
+          <Monitor className={typeIconAccent} aria-hidden="true" />
+          <h2 id="sessions-heading" className={typeSmSemiboldPrimary}>
             {copy.activeSessions}
           </h2>
         </div>
@@ -44,13 +52,13 @@ export function SettingsActiveSessions({
           size="touch"
           disabled={pending}
           onClick={onReload}
-          className="h-auto px-0 font-semibold text-accent"
+          className={linkGhostAccentSemibold}
         >
           {copy.reloadSettings}
         </Button>
       </div>
 
-      <p className="text-sm text-muted">{copy.sessionsDescription}</p>
+      <p className={typeSmMuted}>{copy.sessionsDescription}</p>
 
       {sessions && sessions.length > 1 && (
         <Button
@@ -73,10 +81,10 @@ export function SettingsActiveSessions({
             className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-base bg-inset px-3 py-2"
           >
             <div className="min-w-0">
-              <div className="break-words text-xs text-primary">
+              <div className={typeBreakXsPrimary}>
                 {session.userAgent || copy.deviceUnavailable}
               </div>
-              <div className="break-words text-xs text-muted">
+              <div className={typeBreakXsMuted}>
                 {session.ipAddress || copy.ipUnavailable} / {copy.started}{" "}
                 {new Date(session.createdAt).toLocaleString(dateLocale)}
               </div>
@@ -104,6 +112,7 @@ export function SettingsActiveSessions({
         {sessions === null ? (
           <ErrorState
             title={copy.sessionUnavailable}
+            description={copy.sessionUnavailableHint}
             action={
               <Button
                 type="button"
@@ -111,7 +120,7 @@ export function SettingsActiveSessions({
                 size="touch"
                 disabled={pending}
                 onClick={onReload}
-                className="h-auto px-0 font-semibold text-accent"
+                className={linkGhostAccentSemibold}
               >
                 {copy.reloadSettings}
               </Button>

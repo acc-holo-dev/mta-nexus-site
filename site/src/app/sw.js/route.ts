@@ -1,4 +1,11 @@
-const serviceWorkerSource = String.raw`
+import {
+  offlineDocumentCopy,
+  offlineDocumentTheme,
+} from "../../features/shell/offline-document-copy";
+
+const OFFLINE_BUNDLE_MARKER = "__NEXUS_OFFLINE_BUNDLE__";
+
+const serviceWorkerTemplate = String.raw`
 const OFFLINE_CACHE_NAME = "nexus-offline-v1";
 const STATIC_CACHE_NAME = "nexus-static-v1";
 const PUBLIC_DOCUMENT_CACHE_NAME = "nexus-public-documents-v1";
@@ -8,6 +15,7 @@ const PUBLIC_DOCUMENT_CACHE_HEADER = "x-nexus-offline-cache";
 const PUBLIC_DOCUMENT_CACHE_MARKER = "public-readonly-v1";
 const SAFE_ASSETS = ["/icon.svg"];
 const ARTICLE_SLUG_PATH = /^\/articles\/[a-z0-9][a-z0-9-]{2,199}$/;
+${OFFLINE_BUNDLE_MARKER}
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -41,28 +49,49 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+function offlineLocaleFromLanguage(value) {
+  return (value || "").toLowerCase().startsWith("ru") ? "ru" : "en";
+}
+
 function offlineDocument(request) {
-  const language = (request.headers.get("accept-language") || "").toLowerCase();
-  const russian = language.startsWith("ru");
-  const title = russian ? "MTA NEXUS — нет сети" : "MTA NEXUS — offline";
-  const heading = russian ? "Нет подключения к сети" : "You are offline";
-  const body = russian
-    ? "NEXUS не подтверждает покупки, публикации, модерацию и другие изменения без соединения с сервером."
-    : "NEXUS never confirms purchases, publishing, moderation, or other state changes without a server connection.";
-  const retry = russian ? "Повторить" : "Try again";
+  const locale = offlineLocaleFromLanguage(request.headers.get("accept-language"));
+  const copy = OFFLINE_COPY[locale];
+  const theme = OFFLINE_THEME;
   const html =
     "<!doctype html><html lang=\"" +
-    (russian ? "ru" : "en") +
-    "\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"theme-color\" content=\"#09090b\"><title>" +
-    title +
-    "</title><style>html{color-scheme:dark}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#09090b;color:#f4f4f5;font:16px/1.5 system-ui,sans-serif}main{max-width:38rem;padding:2rem}h1{font-size:2rem;line-height:1.1}p{color:#a1a1aa}a{display:inline-block;margin-top:1rem;padding:.7rem 1rem;border:1px solid #3f3f46;border-radius:.75rem;color:#fafafa;text-decoration:none}a:focus-visible{outline:2px solid #fafafa;outline-offset:3px}</style></head><body><main><strong>MTA NEXUS</strong><h1>" +
-    heading +
+    locale +
+    "\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"theme-color\" content=\"" +
+    theme.page +
+    "\"><title>" +
+    copy.title +
+    "</title><style>html{color-scheme:dark}body{margin:0;min-height:100vh;display:grid;place-items:center;background:" +
+    theme.page +
+    ";color:" +
+    theme.text +
+    ";font:16px/1.5 " +
+    theme.fontSans +
+    "}main{max-width:38rem;padding:2rem}strong{font-family:" +
+    theme.fontDisplay +
+    "}h1{font-family:" +
+    theme.fontDisplay +
+    ";font-size:2rem;line-height:1.1}p{color:" +
+    theme.textSecondary +
+    "}a{display:inline-block;margin-top:1rem;padding:.7rem 1rem;border:1px solid " +
+    theme.border +
+    ";border-radius:.75rem;color:" +
+    theme.text +
+    ";text-decoration:none}a:focus-visible{outline:2px solid " +
+    theme.text +
+    ";outline-offset:3px}</style></head><body><main><strong>" +
+    copy.brand +
+    "</strong><h1>" +
+    copy.heading +
     "</h1><p>" +
-    body +
+    copy.body +
     "</p><a href=\"\" aria-label=\"" +
-    retry +
+    copy.retry +
     "\">" +
-    retry +
+    copy.retry +
     "</a></main></body></html>";
 
   return new Response(html, {
@@ -167,14 +196,15 @@ self.addEventListener("push", (event) => {
     payload = event.data ? event.data.json() : {};
   } catch {}
 
+  const pushLocale = offlineLocaleFromLanguage(self.navigator && self.navigator.language);
   const title =
     typeof payload.title === "string" && payload.title.trim()
       ? payload.title.trim().slice(0, 120)
-      : "MTA NEXUS";
+      : OFFLINE_COPY[pushLocale].brand;
   const body =
     typeof payload.body === "string"
       ? payload.body.trim().slice(0, 280)
-      : "You have a new notification.";
+      : OFFLINE_COPY[pushLocale].pushFallbackBody;
   const target = notificationTarget(payload.url);
 
   event.waitUntil(
@@ -234,8 +264,27 @@ self.addEventListener("fetch", (event) => {
 });
 `;
 
+function buildServiceWorkerSource() {
+  const markerIndex = serviceWorkerTemplate.indexOf(OFFLINE_BUNDLE_MARKER);
+  if (markerIndex === -1) {
+    throw new Error("offline bundle marker missing from service worker template");
+  }
+  // Concatenate so JSON `$` sequences are not interpreted by String.replace.
+  const bundle =
+    "const OFFLINE_COPY = " +
+    JSON.stringify(offlineDocumentCopy) +
+    ";\nconst OFFLINE_THEME = " +
+    JSON.stringify(offlineDocumentTheme) +
+    ";";
+  return (
+    serviceWorkerTemplate.slice(0, markerIndex) +
+    bundle +
+    serviceWorkerTemplate.slice(markerIndex + OFFLINE_BUNDLE_MARKER.length)
+  );
+}
+
 export function GET() {
-  return new Response(serviceWorkerSource, {
+  return new Response(buildServiceWorkerSource(), {
     headers: {
       "Content-Type": "application/javascript; charset=utf-8",
       "Cache-Control": "no-cache, no-store, must-revalidate",

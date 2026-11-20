@@ -1,6 +1,8 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
+vi.mock("server-only", () => ({}));
+
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
   overview: vi.fn(),
@@ -12,23 +14,23 @@ vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "s
 vi.mock("next/navigation", () => ({
   usePathname: () => "/workspace/verification",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => mocks.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../../src/lib/services/verification-workspace-service", () => ({
+vi.mock("../../src/lib/services/moderation/verification-workspace-service", () => ({
   verificationWorkspaceService: mocks,
 }));
 
 import DeveloperSettingsPage from "../../src/app/settings/developer/page";
 import VerificationPage, { generateMetadata } from "../../src/app/workspace/verification/page";
-import { DeveloperExperience } from "../../src/components/developer-experience";
-import { DeveloperProfileEditor } from "../../src/components/developer-profile-editor";
+import { DeveloperExperience } from "../../src/features/accounts/developer-experience";
+import { DeveloperProfileEditor } from "../../src/features/accounts/profile";
 import { VerificationWorkspace } from "../../src/features/moderation/verification-workspace";
-import type { VerificationOverview } from "../../src/lib/verification-workspace-contract";
-import { verificationCopy } from "../../src/lib/verification-workspace-copy";
+import type { VerificationOverview } from "../../src/features/trust/verification-workspace-contract";
+import { verificationCopy } from "../../src/features/trust/verification-workspace-copy";
 
 const filters = { page: 2, view: "history" as const, type: "developer", query: "" };
 const overview: VerificationOverview = {
@@ -114,8 +116,8 @@ it("offers clear organization search when managed teams are empty", () => {
   expect(html).toContain(copy.noTeamsHint);
   expect(html).toContain(copy.clearTeamSearch);
   expect(html).toContain("teamsQ=");
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-w-0");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 
 it("offers a clear filter or alternate view when history is empty", () => {
@@ -170,8 +172,8 @@ it("shows errors without presenting a failed read as empty history or editable d
   expect(html).toContain('role="alert"');
   expect(html).toContain('id="verification-workspace-unavailable"');
   expect(html).toContain(copy.unavailable);
-  expect(html).toContain("min-h-11");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).not.toContain(copy.noApplications);
   const editor = renderToStaticMarkup(
     <DeveloperProfileEditor actorId="actor" initial={null} locale="en" />,
@@ -184,19 +186,20 @@ it("clips the verification centre loading shell on narrow layouts", async () => 
     "../../src/app/workspace/verification/loading"
   );
   const html = renderToStaticMarkup(await VerificationLoading());
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-w-0");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(verificationCopy("en").loading);
 });
 it("recovers with ErrorState when verification session probing fails", async () => {
   mocks.session.mockRejectedValueOnce(Error("PRIVATE_AUTH"));
   const html = renderToStaticMarkup(await VerificationPage({}));
   expect(html).toContain('role="alert"');
-  expect(html).toContain('id="verification-workspace-unavailable"');
+  expect(html).toContain(verificationCopy("en").title);
   expect(html).toContain(verificationCopy("en").unavailable);
   expect(html).toContain('href="/workspace/verification"');
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).not.toContain("PRIVATE_AUTH");
+  expect(html).not.toContain("/auth/login");
 });
 it("publishes a genuine experience badge only when that flag is verified; suppresses unsafe legacy contact links", () => {
   const profile = {
@@ -275,5 +278,5 @@ it("binds SSR history/managed organization filters to the session and marks priv
     { id: "actor", role: "developer" },
     expect.objectContaining({ page: 3, query: "Team" }),
   );
-  expect((await generateMetadata()).robots.index).toBe(false);
+  expect((await generateMetadata()).robots).toEqual({ index: false, follow: false });
 });

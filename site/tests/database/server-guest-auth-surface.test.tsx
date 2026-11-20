@@ -1,6 +1,6 @@
 import type { ReactElement, ReactNode } from "react";
 import { beforeEach, expect, it, vi } from "vitest";
-import { GuestAuthLinks } from "../../src/components/guest-auth-links";
+import { GuestAuthLinks } from "../../src/features/shell/guest-auth";
 import { getDictionary } from "../../src/lib/i18n";
 
 const harness = vi.hoisted(() => ({
@@ -38,14 +38,14 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/servers/demo-server",
 }));
 
-vi.mock("../../src/components/locale-context", () => ({
+vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({
     locale: "en" as const,
     dictionary: getDictionary("en"),
   }),
 }));
 
-vi.mock("../../src/components/confirm-action", () => ({
+vi.mock("../../src/features/shell/confirm-action", () => ({
   confirmAction: vi.fn(async () => true),
 }));
 

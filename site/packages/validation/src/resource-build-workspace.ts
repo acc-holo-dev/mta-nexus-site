@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { mtaVersionSchema } from "./mta-version";
+
 const revision = z.number().int().min(1).max(2147483646);
 const reason = z.string().trim().min(3).max(2000);
 export const resourceBuildCommandSchema = z.discriminatedUnion("action", [

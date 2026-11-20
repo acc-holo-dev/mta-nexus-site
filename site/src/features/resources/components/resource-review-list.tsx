@@ -2,12 +2,12 @@ import type { ResourceReviewView } from "@nexus/domain";
 import { EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
-import { resourceReviewCopy } from "../../../lib/resource-review-i18n";
+import { unknownMarker } from "../../../lib/i18n/unknown";
+import { linkAccent } from "../../shell/link-shell";
+import { pageShellStack4 } from "../../shell/page-shell";
+import { typePrewrapSmSecondary, typeXsMuted } from "../../shell/type-shell";
+import { resourceReviewCopy } from "../resource-review-i18n";
 import { ResourceReviewReportForm } from "./resource-review-controls";
-
-const actionLinkClass =
-  "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
 export function ResourceReviewList({
   reviews,
   productId,
@@ -16,12 +16,13 @@ export function ResourceReviewList({
 }: {
   reviews: ResourceReviewView[];
   productId: string;
-  authenticated: boolean;
+  /** `null` = session probe failed (not a guest). */
+  authenticated: boolean | null;
   locale: Locale;
 }) {
   const copy = resourceReviewCopy(locale);
   return (
-    <div className="min-w-0 space-y-4 overflow-x-clip">
+    <div className={pageShellStack4}>
       {reviews.length ? (
         reviews.map((review) => (
           <article
@@ -33,7 +34,7 @@ export function ResourceReviewList({
               {review.author && (
                 <Link
                   href={`/users/${encodeURIComponent(review.author.username)}`}
-                  className={actionLinkClass}
+                  className={linkAccent}
                 >
                   {review.author.displayName || review.author.username}
                 </Link>
@@ -42,14 +43,14 @@ export function ResourceReviewList({
                 {copy.rating}:{" "}
                 {review.rating && review.rating >= 1 && review.rating <= 5
                   ? `${review.rating}/5`
-                  : "—"}
+                  : unknownMarker(locale)}
               </span>
               <time dateTime={new Date(review.createdAt).toISOString()}>
                 {new Date(review.createdAt).toLocaleDateString(locale === "ru" ? "ru-RU" : "en-US")}
               </time>
             </div>
-            <p className="whitespace-pre-wrap break-words text-sm text-secondary">{review.text}</p>
-            <p className="text-xs text-muted">
+            <p className={typePrewrapSmSecondary}>{review.text}</p>
+            <p className={typeXsMuted}>
               {review.accessSource === "entitlement"
                 ? copy.entitlement
                 : review.accessSource === "license"
@@ -93,7 +94,7 @@ export function ResourceReviewPager({
       className="flex min-w-0 items-center gap-4 overflow-x-clip text-sm"
     >
       {page > 1 && (
-        <Link href={href(page - 1)} className={actionLinkClass}>
+        <Link href={href(page - 1)} className={linkAccent}>
           {copy.previous}
         </Link>
       )}
@@ -101,7 +102,7 @@ export function ResourceReviewPager({
         {page}/{totalPages}
       </span>
       {page < totalPages && (
-        <Link href={href(page + 1)} className={actionLinkClass}>
+        <Link href={href(page + 1)} className={linkAccent}>
           {copy.next}
         </Link>
       )}

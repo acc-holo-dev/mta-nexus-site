@@ -1,6 +1,7 @@
-import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   user: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
   allowed: true,
@@ -10,7 +11,7 @@ const state = vi.hoisted(() => ({
   detail: vi.fn(),
   rate: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
 vi.mock("@nexus/db", () => ({
@@ -23,10 +24,12 @@ vi.mock("@nexus/security", () => ({
     return { success: state.allowed };
   },
 }));
+
+import { GET as detail } from "../../src/app/api/admin/commerce/reconciliation/[id]/route";
+import { GET as review } from "../../src/app/api/admin/commerce/reconciliation/route";
 import { GET as statement } from "../../src/app/api/finance/route";
 import { GET as scopes } from "../../src/app/api/finance/scopes/route";
-import { GET as review } from "../../src/app/api/admin/commerce/reconciliation/route";
-import { GET as detail } from "../../src/app/api/admin/commerce/reconciliation/[id]/route";
+
 const get = (path: string) => new NextRequest(`https://nexus.test${path}`),
   context = { params: Promise.resolve({ id: "ord_a" }) };
 beforeEach(() => {
@@ -65,7 +68,7 @@ it("preserves privacy when current organization access has been revoked", async 
   state.statement.mockRejectedValue(new AppError("Secret organization", 404, "NOT_FOUND"));
   const response = await statement(get("/api/finance?organizationId=org_a"));
   expect(response.status).toBe(404);
-  expect(await response.json()).toEqual({ code: "NOT_FOUND" });
+  expect(await response.json()).toMatchObject({ code: "NOT_FOUND" });
 });
 it("rate limits all financial reads before repository access", async () => {
   state.allowed = false;

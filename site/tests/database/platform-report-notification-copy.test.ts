@@ -1,13 +1,13 @@
 import { expect, it } from "vitest";
-import { formatNotification } from "../../src/lib/notification-copy";
+import { formatNotification } from "../../src/features/notifications/notification-copy";
 
 const reviewCopy = { approved: "", rejected: "", version: "", notes: "" };
 
 it("localizes staff and reporter platform report notices in RU/EN", () => {
   const staff = formatNotification(
     {
-      title: "New report",
-      message: "A report is awaiting review.",
+      title: "New report / Новая жалоба",
+      message: "A report is awaiting review. / Жалоба ожидает рассмотрения.",
     },
     reviewCopy,
     "ru",
@@ -17,8 +17,8 @@ it("localizes staff and reporter platform report notices in RU/EN", () => {
 
   const status = formatNotification(
     {
-      title: "Platform report status",
-      message: "Report status: resolved.",
+      title: "Platform report status / Статус жалобы платформы",
+      message: "Report status: resolved. / Жалоба решена.",
     },
     reviewCopy,
     "ru",
@@ -28,8 +28,8 @@ it("localizes staff and reporter platform report notices in RU/EN", () => {
 
   const en = formatNotification(
     {
-      title: "Platform report status",
-      message: "Report status: dismissed.",
+      title: "Platform report status / Статус жалобы платформы",
+      message: "Report status: dismissed. / Жалоба отклонена.",
     },
     reviewCopy,
     "en",

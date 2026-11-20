@@ -4,6 +4,17 @@ import { Button, ErrorState, Input } from "@nexus/ui";
 import { editProductDetailsSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useState } from "react";
+import { confirmAction } from "../../shell/confirm-action";
+import { useNexusLocale } from "../../shell/locale";
+import {
+  typeFileInputInset,
+  typeLabelBlockUpperSecondary,
+  typeSmMuted,
+  typeSmSecondary,
+  typeSmSuccess,
+  typeXlSemiboldPrimary,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import {
   type AuthorDetailsDraft,
   type AuthorResourceDraft,
@@ -13,38 +24,29 @@ import {
   parseAuthorResourceDraft,
   reconcileAuthorDetails,
   sameAuthorDetails,
-} from "../../../lib/author-resource-draft";
+} from "../author-resource-draft";
 import {
   authorBuildRetireRequest,
   authorBuildUploadRequest,
   authorDetailsMutationRequest,
-} from "../../../lib/author-resource-requests";
+} from "../author-resource-requests";
 import {
   confirmedAuthorBuild,
   confirmedAuthorDetails,
   confirmedRetiredBuild,
-} from "../../../lib/author-resource-response";
+} from "../author-resource-response";
 import {
   exceedsBuildFileSizeLimit,
   getSupportedBuildExtension,
   MAX_BUILD_FILE_SIZE_BYTES,
-} from "../../../lib/build-file-validation";
-import { buildPackageCopy } from "../../../lib/build-package-i18n";
-import { getResourceSubmissionErrorMessage } from "../../../lib/publishing-error-message";
-import {
-  getResourceCommerceCopy,
-  resourceCommerceError,
-} from "../../../lib/resource-commerce-i18n";
-import { getResourcePublisherCopy } from "../../../lib/resource-publisher-i18n";
-import { confirmAction } from "../../../components/confirm-action";
-import { useNexusLocale } from "../../../components/locale-context";
+} from "../build-file-validation";
+import { buildPackageCopy } from "../build-package-i18n";
+import { getResourceSubmissionErrorMessage } from "../publishing-error-message";
+import { getResourceCommerceCopy, resourceCommerceError } from "../resource-commerce-i18n";
+import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
-const nativeLabelClass = "block font-label uppercase text-secondary";
-const fileClass =
-  "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-accent";
-
 export function AuthorResourceForms({
   product,
   actorId,
@@ -273,7 +275,7 @@ export function AuthorResourceForms({
               ? publishing.authenticationRequired
               : body?.code === "NOT_FOUND"
                 ? publishing.buildForbidden
-                : body?.code === "RATE_LIMIT_EXCEEDED"
+                : body?.code === "RATE_LIMIT_EXCEEDED" || body?.code === "RATE_LIMITED"
                   ? publishing.uploadRateLimited
                   : copy.failed,
         );
@@ -403,12 +405,12 @@ export function AuthorResourceForms({
           />
         ) : null}
         {recovered && (
-          <p role="status" className="text-sm text-secondary">
+          <p role="status" className={typeSmSecondary}>
             {copy.draftRestored}
           </p>
         )}
         {dirty && (
-          <p role="status" className="text-sm text-secondary">
+          <p role="status" className={typeSmSecondary}>
             {copy.unsaved}
           </p>
         )}
@@ -419,7 +421,7 @@ export function AuthorResourceForms({
           />
         ) : null}
         {(fileSelected || hasAuthorVersionDraft(versionDraft)) && (
-          <p className="text-sm text-muted">{copy.fileReselect}</p>
+          <p className={typeSmMuted}>{copy.fileReselect}</p>
         )}
       </div>
       <form
@@ -428,14 +430,15 @@ export function AuthorResourceForms({
         aria-label={copy.edit}
         className="min-w-0 space-y-4 overflow-x-clip rounded-lg border border-base bg-surface p-5"
       >
-        <h2 className="text-xl font-semibold text-primary">{copy.edit}</h2>
+        <h2 className={typeXlSemiboldPrimary}>{copy.edit}</h2>
         {uploadBlocked ? (
           <ErrorState
             id="author-resource-details-readonly"
             title={getResourcePublisherCopy(locale).readonly}
+            description={dictionary.errors.formErrorHint}
           />
         ) : (
-          <p className="text-sm text-secondary">{getResourcePublisherCopy(locale).editNote}</p>
+          <p className={typeSmSecondary}>{getResourcePublisherCopy(locale).editNote}</p>
         )}
         <fieldset
           disabled={uploadBlocked || saving || !ready || Boolean(conflict) || refreshPending}
@@ -460,7 +463,7 @@ export function AuthorResourceForms({
             onChange={(event) => changeDetails("shortDescription", event.target.value)}
           />
           <div className="space-y-1.5">
-            <label htmlFor={`${fieldId}-description`} className={nativeLabelClass}>
+            <label htmlFor={`${fieldId}-description`} className={typeLabelBlockUpperSecondary}>
               {publishing.description}
             </label>
             <textarea
@@ -486,7 +489,7 @@ export function AuthorResourceForms({
         </fieldset>
         {error ? <ErrorState title={error} description={copy.failedDescription} /> : null}
         {saved && !refreshPending && !conflict && (
-          <p role="status" className="text-sm text-success">
+          <p role="status" className={typeSmSuccess}>
             {copy.saved}
           </p>
         )}
@@ -505,14 +508,15 @@ export function AuthorResourceForms({
         aria-label={copy.newVersion}
         className="min-w-0 space-y-4 overflow-x-clip rounded-lg border border-base bg-surface p-5"
       >
-        <h2 className="text-xl font-semibold text-primary">{copy.newVersion}</h2>
+        <h2 className={typeXlSemiboldPrimary}>{copy.newVersion}</h2>
         {uploadBlocked ? (
           <ErrorState
             id="author-resource-upload-blocked"
             title={getResourceCommerceCopy(locale).errors.PRODUCT_STATE_CHANGED}
+            description={getResourceCommerceCopy(locale).errors.fallback}
           />
         ) : (
-          <p className="text-sm text-secondary">{publishing.submittedDescription}</p>
+          <p className={typeSmSecondary}>{publishing.submittedDescription}</p>
         )}
         <fieldset
           disabled={uploadBlocked || uploading || !ready || Boolean(conflict) || refreshPending}
@@ -529,7 +533,7 @@ export function AuthorResourceForms({
             }}
             required
             maxLength={64}
-            placeholder="1.1.0"
+            placeholder={publishing.versionPlaceholder}
             pattern="v?[0-9]+\.[0-9]+(\.[0-9]+)?(-[a-zA-Z0-9.]+)?"
           />
           <Input
@@ -542,10 +546,10 @@ export function AuthorResourceForms({
               setSubmitted(false);
             }}
             maxLength={64}
-            placeholder="1.6.0"
+            placeholder={publishing.minMtaVersionPlaceholder}
           />
           <div className="space-y-1.5">
-            <label htmlFor={`${fieldId}-release-notes`} className={nativeLabelClass}>
+            <label htmlFor={`${fieldId}-release-notes`} className={typeLabelBlockUpperSecondary}>
               {publishing.releaseNotes}
             </label>
             <textarea
@@ -560,10 +564,10 @@ export function AuthorResourceForms({
               rows={4}
               className={textareaClass}
             />
-            <p className="text-xs text-muted">{dictionary.versionHelpUi.authorReleaseNotesHint}</p>
+            <p className={typeXsMuted}>{dictionary.versionHelpUi.authorReleaseNotesHint}</p>
           </div>
           <div className="space-y-1.5">
-            <label htmlFor={`${fieldId}-build-file`} className={nativeLabelClass}>
+            <label htmlFor={`${fieldId}-build-file`} className={typeLabelBlockUpperSecondary}>
               {publishing.buildArchive}
             </label>
             <input
@@ -576,7 +580,7 @@ export function AuthorResourceForms({
               }}
               required
               accept=".zip,.rar,.7z,.lua"
-              className={fileClass}
+              className={typeFileInputInset}
             />
             <span className="block text-xs text-muted">
               {publishing.buildFileRequirements.replace("{maxFileSize}", maxFileSizeMb)}
@@ -587,7 +591,7 @@ export function AuthorResourceForms({
           <ErrorState title={uploadError} description={copy.uploadFailedDescription} />
         ) : null}
         {submitted && (
-          <p role="status" className="text-sm text-success">
+          <p role="status" className={typeSmSuccess}>
             {copy.versionSubmitted}
           </p>
         )}
@@ -658,14 +662,14 @@ export function RetireBuildForm({
     }
   }
   return (
-    <details className="text-sm text-secondary">
+    <details className={typeSmSecondary}>
       <summary className="cursor-pointer">
         {copy.retire} · {version}
       </summary>
       <form onSubmit={retire} className="mt-3 space-y-3">
         <p>{copy.retireHint}</p>
         <div className="space-y-1.5">
-          <label htmlFor={reasonId} className={nativeLabelClass}>
+          <label htmlFor={reasonId} className={typeLabelBlockUpperSecondary}>
             {copy.retireReason}
           </label>
           <textarea

@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][],
@@ -20,7 +21,9 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
+
 import { resourceBuildWorkspaceRepository as repo } from "../../packages/db/src/repositories/resource-build-workspace";
+
 const parent = ["prd_a", "Resource", "resource", "published", "usr_a", null];
 function build(status = "pending_review", revision = 3, notes: string | null = null) {
   return [

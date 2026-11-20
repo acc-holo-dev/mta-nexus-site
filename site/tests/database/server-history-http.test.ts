@@ -1,11 +1,15 @@
 import { NextRequest } from "next/server";
 import { beforeEach, expect, it, vi } from "vitest";
+import { serverHistoryApiCopy } from "../../src/features/servers/server-history-api-copy";
+
 const state = vi.hoisted(() => ({ getHistory: vi.fn() }));
-vi.mock("../../src/lib/services/server-history-service", () => ({
+vi.mock("../../src/lib/services/servers/server-history-service", () => ({
   serverHistoryService: { getHistory: state.getHistory },
   serverHistoryWindows: { "24h": 24, "7d": 168, "30d": 720 },
 }));
+
 import { GET } from "../../src/app/api/servers/[id]/history/route";
+
 const params = { params: Promise.resolve({ id: "server" }) };
 beforeEach(() => {
   state.getHistory.mockReset();
@@ -52,7 +56,9 @@ it("defaults an absent API window to twenty-four hours and hides missing/private
   );
   expect(response.status).toBe(404);
   expect(state.getHistory).toHaveBeenCalledExactlyOnceWith("server", "24h");
-  expect(await response.json()).toEqual({ error: "Server not found" });
+  expect(await response.json()).toEqual({
+    error: serverHistoryApiCopy("en").serverNotFound,
+  });
 });
 it("returns a generic retryable failure without exposing database errors", async () => {
   state.getHistory.mockRejectedValue(new Error("private SQL payload"));
@@ -62,5 +68,7 @@ it("returns a generic retryable failure without exposing database errors", async
   );
   expect(response.status).toBe(503);
   expect(response.headers.get("retry-after")).toBe("30");
-  expect(await response.text()).not.toContain("private SQL payload");
+  const body = await response.json();
+  expect(body).toEqual({ error: serverHistoryApiCopy("en").unavailable });
+  expect(JSON.stringify(body)).not.toContain("private SQL payload");
 });

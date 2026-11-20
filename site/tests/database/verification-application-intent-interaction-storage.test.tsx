@@ -15,13 +15,13 @@ const harness = vi.hoisted(() => ({
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/link", () => ({ default: "a" }));
-vi.mock("../../src/lib/user-platform-client", async (original) => ({
-  ...(await original<typeof import("../../src/lib/user-platform-client")>()),
+vi.mock("../../src/features/community/user-platform-client", async (original) => ({
+  ...(await original<typeof import("../../src/features/community/user-platform-client")>()),
   platformRequest: harness.request,
 }));
 
 import { VerificationWorkspace } from "../../src/features/moderation/verification-workspace";
-import { verificationCopy } from "../../src/lib/verification-workspace-copy";
+import { verificationCopy } from "../../src/features/trust/verification-workspace-copy";
 
 const { render, runEffects } = createVerificationApplicationIntentInteractionHelpers(
   harness,

@@ -12,7 +12,7 @@ const source = readFileSync(
 
 it("locks resource build uncertain failures to ErrorState with touch reload", () => {
   expect(source).toContain('import { Button, ErrorState, Input } from "@nexus/ui"');
-  expect(source).toContain("<ErrorState title={message} />");
+  expect(source).toContain("<ErrorState title={message} description={copy.failedDescription} />");
   expect(source).toContain('role="status"');
   expect(source).toMatch(
     /uncertain && \(\s*<Button[\s\S]*?className="min-h-11"[\s\S]*?\{copy\.reload\}/u,
@@ -24,7 +24,7 @@ it("locks resource build uncertain failures to ErrorState with touch reload", ()
 it("locks withdrawn product notice to ErrorState without fake retry", () => {
   expect(source).toContain('id="resource-build-withdrawn-unavailable"');
   expect(source).toMatch(
-    /withdrawn \? \(\s*<ErrorState id="resource-build-withdrawn-unavailable" title=\{copy\.unavailable\} \/>\s*\) : null/u,
+    /withdrawn \? \(\s*<ErrorState\s+id="resource-build-withdrawn-unavailable"\s+title=\{copy\.unavailable\}\s+description=\{copy\.unavailableDescription\}\s*\/>\s*\) : null/u,
   );
   expect(source).not.toContain('className="text-warning">{copy.unavailable}</p>');
 });

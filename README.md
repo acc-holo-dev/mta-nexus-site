@@ -66,7 +66,7 @@ docker compose -p nexus-local -f docker/compose.yaml exec app node scripts/check
 
 **Контракты и правила (исполнители):** [Правила](AGENTS.md) · [Агент](docs/AGENT.md) · [Механика вклада](CONTRIBUTING.md) · [Решения](docs/DECISIONS.md) · [Реестр ID](docs/handbook/13-DECISION-REGISTER.md) · [Roadmap](docs/ROADMAP.md) · [Инициативы](docs/future/initiatives.md).
 
-**Предметные контракты:** [Ресурсы](docs/RESOURCES.md) · [Сообщество](docs/COMMUNITY.md) · [Серверы/org](docs/SERVERS-ORGS.md) · [Trust/staff](docs/TRUST-STAFF.md) · [Коммерция](docs/future/commerce.md).
+**Предметные контракты:** [Ресурсы](docs/current/domains/RESOURCES.md) · [Сообщество](docs/current/domains/COMMUNITY.md) · [Серверы/org](docs/current/domains/SERVERS-ORGS.md) · [Trust/staff](docs/current/domains/TRUST-STAFF.md) · [Коммерция](docs/future/commerce.md).
 
 **Справочник и эксплуатация:** [Архитектура](docs/ARCHITECTURE.md) · [Эксплуатация](docs/OPERATIONS.md) — authoritative runbook · [Handbook](docs/handbook/00-README.md) — вступление и реестры.
 

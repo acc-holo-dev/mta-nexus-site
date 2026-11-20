@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
-import { AdminVerificationQueueSection } from "../../src/components/admin/admin-verification-queue-section";
+import { AdminVerificationQueueSection } from "../../src/features/moderation/components/admin-verification-queue-section";
 import { getDictionary } from "../../src/lib/i18n";
 
 vi.mock("next/link", async () => {

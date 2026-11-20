@@ -1,5 +1,6 @@
 import { beforeEach, expect, it, vi } from "vitest";
-import { parseDiscussionQuery } from "../../src/lib/content-discussion-contract";
+import { parseDiscussionQuery } from "../../src/features/community/content-discussion-contract";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
@@ -25,7 +26,9 @@ vi.mock("../../packages/db/src/client", async () => {
     }),
   };
 });
+
 import { contentDiscussionRepository as discussion } from "../../packages/db/src/repositories/content-discussion";
+
 beforeEach(() => {
   state.queries = [];
   state.rows = [];

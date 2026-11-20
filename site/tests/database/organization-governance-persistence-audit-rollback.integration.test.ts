@@ -34,7 +34,7 @@ describe("organization governance persistence: audit rollback", () => {
             eq(notifications.recipientId, f.target.id),
             eq(
               notifications.message,
-              `Organization ownership was transferred to you. (${f.org.name})`,
+              `Organization ownership was transferred to you. (${f.org.name}) / Вам передано владение организацией. (${f.org.name})`,
             ),
           ),
         ),

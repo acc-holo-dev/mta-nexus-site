@@ -1,21 +1,21 @@
-import { expect } from "vitest";
-import { and, eq, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { setTimeout as delay } from "node:timers/promises";
 import { UnauthorizedError } from "@nexus/domain";
 import { generateId } from "@nexus/security";
-import { db, auditEvents } from "../../packages/db/src/client";
+import { and, eq, sql } from "drizzle-orm";
+import { expect } from "vitest";
 import {
   accountAuthState,
   accountRecoveryBindings,
   authChallenges,
 } from "../../packages/db/src/account-recovery-schema";
+import { auditEvents, db } from "../../packages/db/src/client";
 import {
-  accountChallengeRepository as repo,
   type ConsumedProof,
+  accountChallengeRepository as repo,
 } from "../../packages/db/src/repositories/account-challenges";
 import { userRepository } from "../../packages/db/src/repositories/users";
-import { authService } from "../../src/lib/services/auth-service";
+import { authService } from "../../src/lib/services/accounts/auth-service";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 export const password = "Synthetic-D1-known-password!";

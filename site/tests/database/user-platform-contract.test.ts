@@ -1,5 +1,8 @@
 import { expect, it } from "vitest";
-import { parseEditableContent, parseEditableProfile } from "../../src/lib/user-platform-client";
+import {
+  parseEditableContent,
+  parseEditableProfile,
+} from "../../src/features/community/user-platform-client";
 import {
   contentPageFiltered,
   contentPageHref,
@@ -7,8 +10,11 @@ import {
   profileUpdateSchema,
   writerCreateSchema,
   writerUpdateSchema,
-} from "../../src/lib/user-platform-contract";
-import { getUserPlatformCopy, userPlatformError } from "../../src/lib/user-platform-copy";
+} from "../../src/features/community/user-platform-contract";
+import {
+  getUserPlatformCopy,
+  userPlatformError,
+} from "../../src/features/community/user-platform-copy";
 
 const fields = {
   title: "Title",

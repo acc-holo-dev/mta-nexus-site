@@ -1,4 +1,4 @@
-import { buildPackageSummary, type BuildPackageEvidence } from "./build-package-evidence";
+import { type BuildPackageEvidence, buildPackageSummary } from "./build-package-evidence";
 export type LibraryReleaseComparisonQuery = { from: string; to: string; returnPage: number };
 export type LibraryComparableRelease = {
   id: string;

@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import type { ShellAuthSession } from "../../src/components/shell-destination-policy";
+import type { ShellAuthSession } from "../../src/features/shell/session";
 
 const state = vi.hoisted(() => ({
   path: "/workspace/servers",
@@ -13,11 +13,11 @@ const state = vi.hoisted(() => ({
 }));
 
 vi.mock("next/navigation", () => ({ usePathname: () => state.path }));
-vi.mock("../../src/components/use-auth-session", () => ({
+vi.mock("../../src/features/shell/auth-session", () => ({
   useAuthSession: () => state.session,
 }));
 
-import { FooterContribute } from "../../src/components/footer-contribute";
+import { FooterContribute } from "../../src/features/shell/footer";
 import {
   adminDestinationAccessibleName,
   isShellSessionLoading,
@@ -26,8 +26,8 @@ import {
   showAdminDestination,
   showGuestSignInCta,
   showWorkspaceTools,
-} from "../../src/components/shell-destination-policy";
-import { Sidebar } from "../../src/components/sidebar";
+} from "../../src/features/shell/session";
+import { Sidebar } from "../../src/features/shell/sidebar";
 import { getDictionary } from "../../src/lib/i18n";
 
 beforeEach(() => {
@@ -108,7 +108,10 @@ it("applies UX-23 A staff/guest destination policy without inventing roles", () 
 });
 
 it("keeps mobile More menu session checking and staff admin labels in source", () => {
-  const source = readFileSync(resolve(process.cwd(), "site/src/components/mobile-nav.tsx"), "utf8");
+  const source = readFileSync(
+    resolve(process.cwd(), "site/src/features/shell/components/mobile-nav.tsx"),
+    "utf8",
+  );
   expect(source).toContain("dictionary.nav.checkingSession");
   expect(source).toContain("adminAccessibleName");
   expect(source).toContain('aria-busy="true"');

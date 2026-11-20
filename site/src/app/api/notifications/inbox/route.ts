@@ -1,16 +1,16 @@
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { resolveLocale } from "../../../../lib/i18n";
+import { userPlatformApi } from "../../../../features/accounts/user-platform-api";
 import {
   notificationInboxCommandSchema,
   parseNotificationInboxQuery,
-} from "../../../../lib/notification-inbox-contract";
-import { notificationInboxError } from "../../../../lib/notification-inbox-copy";
-import { notificationInboxService } from "../../../../lib/services/notification-inbox-service";
-import { userPlatformApi } from "../../../../lib/user-platform-api";
+} from "../../../../features/notifications/notification-inbox-contract";
+import { notificationInboxError } from "../../../../features/notifications/notification-inbox-copy";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { resolveLocale } from "../../../../lib/i18n";
+import { notificationInboxService } from "../../../../lib/services/notifications/notification-inbox-service";
 export async function GET(request: NextRequest) {
   return userPlatformApi(
     request,

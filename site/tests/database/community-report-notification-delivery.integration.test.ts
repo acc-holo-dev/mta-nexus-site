@@ -186,8 +186,8 @@ it("commits a private security outcome and push job with the decision, preservin
   const [notice] = await db.select().from(notifications).where(eq(notifications.id, expectedId));
   expect(notice).toMatchObject({
     recipientId: f.reporter.id,
-    title: "Community report status",
-    message: "Report status: under_review.",
+    title: "Community report status / Статус жалобы",
+    message: "Report status: under_review. / Жалоба рассматривается.",
     link: `/workspace/reports/${report.id}`,
     category: "security",
     type: "security",
@@ -321,7 +321,9 @@ it.each(["comment", "content"] as const)(
       .from(notifications)
       .where(inArray(notifications.recipientId, [f.reporter.id, second.id]));
     expect(notices).toHaveLength(2);
-    expect(notices.every((notice) => notice.message === "Report status: resolved.")).toBe(true);
+    expect(
+      notices.every((notice) => notice.message === "Report status: resolved. / Жалоба решена."),
+    ).toBe(true);
     expect(JSON.stringify(notices)).not.toContain("Private batch notes");
   },
 );

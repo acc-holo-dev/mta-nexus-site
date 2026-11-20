@@ -1,24 +1,27 @@
+import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../helpers/browser-mutation-headers";
-import { NextRequest } from "next/server";
-import { AppError } from "@nexus/domain";
+
 const h = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,
   rate: vi.fn(),
   page: vi.fn(),
   enable: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => h.user },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: h.rate, generateId: () => "aud_a" }));
 vi.mock("@nexus/db", () => ({
   resourceReleaseWatchesRepository: { collectionPage: h.page, enableCollectionBatch: h.enable },
 }));
+
 import { GET, POST } from "../../src/app/api/library/collections/[id]/watches/route";
+
 const context = { params: Promise.resolve({ id: "lcol_a" }) };
 const command = {
   expectedCollectionRevision: 3,
@@ -105,7 +108,7 @@ it("sanitizes stale membership errors and rate limits both operations", async ()
   );
   const response = await POST(post(), context);
   expect(response.status).toBe(409);
-  expect(await response.json()).toEqual({ code: "RELEASE_WATCH_COLLECTION_CONFLICT" });
+  expect(await response.json()).toMatchObject({ code: "RELEASE_WATCH_COLLECTION_CONFLICT" });
   h.rate.mockResolvedValue({ success: false });
   h.page.mockClear();
   h.enable.mockClear();

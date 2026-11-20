@@ -6,23 +6,26 @@ import { mtaVersionSchema, resourceVersionSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
 import {
-  MultipartBodyTooLargeError,
-  parseMultipartFormDataWithLimit,
-} from "../../../../../lib/bounded-multipart";
-import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
-import {
   getSupportedBuildExtension,
   hasExpectedBuildFileFormat,
-} from "../../../../../lib/build-file-validation";
+} from "../../../../../features/resources/build-file-validation";
+import { productBuildsApiCopy } from "../../../../../features/resources/product-builds-api-copy";
+import {
+  MultipartBodyTooLargeError,
+  parseMultipartFormDataWithLimit,
+} from "../../../../../lib/http/bounded-multipart";
+import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
+import { localeAppErrorText } from "../../../../../lib/http/locale-app-error";
+import { resolveLocale } from "../../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-} from "../../../../../lib/observability";
-import { authService } from "../../../../../lib/services/auth-service";
-import { inspectBuildPackage } from "../../../../../lib/services/build-package-inspection";
-import { buildScannerService } from "../../../../../lib/services/build-scanner-service";
-import { productService } from "../../../../../lib/services/product-service";
+} from "../../../../../lib/platform/observability";
+import { authService } from "../../../../../lib/services/accounts/auth-service";
+import { productService } from "../../../../../lib/services/commerce/product-service";
+import { inspectBuildPackage } from "../../../../../lib/services/resources/build-package-inspection";
+import { buildScannerService } from "../../../../../lib/services/resources/build-scanner-service";
 
 const BUILD_FILE_SIZE_LIMIT_MB = MAX_FILE_SIZE_BYTES / (1024 * 1024);
 const BUILD_MIME_TYPES: Record<string, string> = {
@@ -61,13 +64,14 @@ const buildMetadataSchema = z.object({
 export const POST = withBrowserMutation(
   async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
     const context = createRequestLogContext(request);
+    const copy = productBuildsApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
     try {
       const token = request.cookies.get("nexus_session")?.value;
       const user = token ? await authService.getSession(token) : null;
       if (!token || !user) {
         return privateJson(
           context,
-          { error: "Authentication required", code: "UNAUTHORIZED" },
+          { error: copy.authenticationRequired, code: "UNAUTHORIZED" },
           { status: 401 },
         );
       }
@@ -76,20 +80,20 @@ export const POST = withBrowserMutation(
       if (!expectedActor)
         return privateJson(
           context,
-          { error: "Actor precondition required", code: "ACTOR_ID_REQUIRED" },
+          { error: copy.actorRequired, code: "ACTOR_ID_REQUIRED" },
           { status: 428 },
         );
       if (expectedActor !== user.id)
         return privateJson(
           context,
-          { error: "Actor changed", code: "ACTOR_CHANGED" },
+          { error: copy.actorChanged, code: "ACTOR_CHANGED" },
           { status: 409 },
         );
       const rateLimit = await consumeRateLimit("buildUpload", user.id);
       if (!rateLimit.success) {
         return privateJson(
           context,
-          { error: "Build upload limit exceeded", code: "RATE_LIMIT_EXCEEDED" },
+          { error: copy.rate, code: "RATE_LIMIT_EXCEEDED" },
           { status: 429 },
         );
       }
@@ -105,7 +109,7 @@ export const POST = withBrowserMutation(
         return privateJson(
           context,
           {
-            error: `Build archive exceeds the ${BUILD_FILE_SIZE_LIMIT_MB}MB free-beta limit`,
+            error: copy.archiveTooLarge(BUILD_FILE_SIZE_LIMIT_MB),
             code: "BUILD_UPLOAD_TOO_LARGE",
           },
           { status: 413 },
@@ -117,7 +121,7 @@ export const POST = withBrowserMutation(
         return privateJson(
           context,
           {
-            error: "Build upload requires multipart/form-data",
+            error: copy.multipartRequired,
             code: "BUILD_MULTIPART_REQUIRED",
           },
           { status: 415 },
@@ -135,7 +139,7 @@ export const POST = withBrowserMutation(
           return privateJson(
             context,
             {
-              error: `Build archive exceeds the ${BUILD_FILE_SIZE_LIMIT_MB}MB free-beta limit`,
+              error: copy.archiveTooLarge(BUILD_FILE_SIZE_LIMIT_MB),
               code: "BUILD_UPLOAD_TOO_LARGE",
             },
             { status: 413 },
@@ -144,7 +148,7 @@ export const POST = withBrowserMutation(
         return privateJson(
           context,
           {
-            error: "Invalid multipart build upload",
+            error: copy.multipartInvalid,
             code: "BUILD_MULTIPART_INVALID",
           },
           { status: 400 },
@@ -160,7 +164,7 @@ export const POST = withBrowserMutation(
         return privateJson(
           context,
           {
-            error: "A valid build archive and semantic version are required",
+            error: copy.metadataInvalid,
             code: "BUILD_METADATA_INVALID",
           },
           { status: 400 },
@@ -171,7 +175,7 @@ export const POST = withBrowserMutation(
         return privateJson(
           context,
           {
-            error: "Only .zip, .rar, .7z, and .lua resource builds are allowed",
+            error: copy.fileTypeNotAllowed,
             code: "BUILD_FILE_TYPE_NOT_ALLOWED",
           },
           { status: 415 },
@@ -181,7 +185,7 @@ export const POST = withBrowserMutation(
         return privateJson(
           context,
           {
-            error: `Build archive exceeds the ${BUILD_FILE_SIZE_LIMIT_MB}MB free-beta limit`,
+            error: copy.archiveTooLarge(BUILD_FILE_SIZE_LIMIT_MB),
             code: "BUILD_UPLOAD_TOO_LARGE",
           },
           { status: 413 },
@@ -192,7 +196,7 @@ export const POST = withBrowserMutation(
       if (!safeFileName) {
         return privateJson(
           context,
-          { error: "A valid build file name is required", code: "BUILD_FILE_NAME_INVALID" },
+          { error: copy.fileNameInvalid, code: "BUILD_FILE_NAME_INVALID" },
           { status: 400 },
         );
       }
@@ -202,7 +206,7 @@ export const POST = withBrowserMutation(
         return privateJson(
           context,
           {
-            error: "Build content does not match its file extension",
+            error: copy.contentMismatch,
             code: "BUILD_CONTENT_MISMATCH",
           },
           { status: 415 },
@@ -226,7 +230,7 @@ export const POST = withBrowserMutation(
         return privateJson(
           context,
           {
-            error: "Build was rejected by the malware scanner",
+            error: copy.malwareDetected,
             code: "BUILD_MALWARE_DETECTED",
             scanner: scan.scanner,
           },
@@ -244,8 +248,7 @@ export const POST = withBrowserMutation(
         return privateJson(
           context,
           {
-            error:
-              "The build exceeds malware scanner limits and could not be fully checked. Reduce its size or archive complexity and try again.",
+            error: copy.scanLimitExceeded,
             code: "BUILD_SCAN_LIMIT_EXCEEDED",
             scanner: scan.scanner,
           },
@@ -263,8 +266,7 @@ export const POST = withBrowserMutation(
         return privateJson(
           context,
           {
-            error:
-              "Malware scanning is temporarily unavailable. No build was stored; retry the upload later.",
+            error: copy.scannerUnavailable,
             code: "BUILD_SCANNER_UNAVAILABLE",
           },
           { status: 503, headers: { "Retry-After": "30" } },
@@ -356,7 +358,32 @@ export const POST = withBrowserMutation(
       if (error instanceof AppError) {
         return privateJson(
           context,
-          { error: error.message, code: error.code },
+          {
+            error: localeAppErrorText(
+              error,
+              {
+                unauthorized: copy.authenticationRequired,
+                forbidden: copy.forbidden,
+                notFound: copy.notFound,
+                conflict: copy.actorChanged,
+                unsupportedMediaType: copy.unsupportedMediaType,
+                requestBodyTooLarge: copy.requestBodyTooLarge,
+                invalidBodyLength: copy.invalidBodyLength,
+                requestBodyTimeout: copy.requestBodyTimeout,
+                failed: copy.publishFailed,
+              },
+              {
+                ACTOR_REQUIRED: copy.actorRequired,
+                BUILD_PACKAGE_INSPECTOR_BUSY: copy.inspectorBusy,
+                MALWARE_DETECTED: copy.malwareDetected,
+                SCAN_LIMIT_EXCEEDED: copy.scanLimitExceeded,
+                SCANNER_UNAVAILABLE: copy.scannerUnavailable,
+                FILE_TYPE_NOT_ALLOWED: copy.fileTypeNotAllowed,
+                CONTENT_MISMATCH: copy.contentMismatch,
+              },
+            ),
+            code: error.code,
+          },
           {
             status: error.statusCode,
             ...(error.code === "BUILD_PACKAGE_INSPECTOR_BUSY"
@@ -365,7 +392,7 @@ export const POST = withBrowserMutation(
           },
         );
       }
-      return privateJson(context, { error: "Could not publish build" }, { status: 500 });
+      return privateJson(context, { error: copy.publishFailed }, { status: 500 });
     }
   },
 );

@@ -4,35 +4,31 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { LibraryCollectionImport } from "../collection-import";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { PlatformSessionError } from "../../../components/platform-session-error";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { libraryCollectionManifestsCopy } from "../../../lib/library-collection-manifests-i18n";
-import {
-  libraryCollectionError,
-  libraryCollectionsCopy,
-} from "../../../lib/library-collections-i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import { typeFlexMinWrapGap4, typeMinBreakWords } from "../../shell/type-shell";
+import { LibraryCollectionImport } from "../collection-import";
+import { libraryCollectionManifestsCopy } from "../library-collection-manifests-i18n";
+import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
 import {
   collectionHref,
-  collectionId as parseCollectionId,
   collectionPageParams,
-} from "../../../lib/library-collections-query";
-import { authService } from "../../../lib/services/auth-service";
-import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
+  collectionId as parseCollectionId,
+} from "../library-collections-query";
 
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
-export async function generateMetadata(): Promise<Metadata> {
+export async function collectionReconcileMetadata(): Promise<Metadata> {
   return {
     title: `${libraryCollectionManifestsCopy(await getRequestLocale()).reconcileTitle} | MTA NEXUS`,
     robots: { index: false, follow: false },
   };
 }
-export default async function Page({
+export async function CollectionReconcilePage({
   params,
   searchParams,
 }: {
@@ -78,13 +74,13 @@ export default async function Page({
       });
     if (!manifest) {
       return (
-        <div className={pageShellClass}>
+        <div className={pageShellMax5xl}>
           <h1 className="font-display">{m.reconcileTitle}</h1>
           <ErrorState
             title={m.reconcileLoadUnavailable}
             description={m.reconcileLoadUnavailableDescription}
             action={
-              <Link href={collectionHref(id, "reconcile")} className={navLinkClass}>
+              <Link href={collectionHref(id, "reconcile")} className={linkAccentSmRounded}>
                 {dictionary.errors.retry}
               </Link>
             }
@@ -94,19 +90,19 @@ export default async function Page({
     }
     const collection = manifest.collection;
     return (
-      <div className={pageShellClass}>
-        <nav className="flex min-w-0 flex-wrap gap-4">
-          <Link href={collectionHref(collection.id)} className={navLinkClass}>
+      <div className={pageShellMax5xl}>
+        <nav className={typeFlexMinWrapGap4}>
+          <Link href={collectionHref(collection.id)} className={linkAccentSmRounded}>
             {c.back}
           </Link>
           <a
             href={`/api/library/collections/${encodeURIComponent(collection.id)}/export`}
-            className={navLinkClass}
+            className={linkAccentSmRounded}
           >
             {m.export}
           </a>
         </nav>
-        <h1 className="min-w-0 break-words">
+        <h1 className={typeMinBreakWords}>
           {m.reconcileTitle}: {collection.name}
         </h1>
         <p>
@@ -115,7 +111,11 @@ export default async function Page({
         </p>
         {collection.status === "archived" && <p>{c.archivedNote}</p>}
         {collection.revision >= 2147483647 ? (
-          <ErrorState id="library-collection-reconcile-revision-locked" title={c.revisionLocked} />
+          <ErrorState
+            id="library-collection-reconcile-revision-locked"
+            title={c.revisionLocked}
+            description={c.revisionLockedHint}
+          />
         ) : null}
         <LibraryCollectionImport
           key={`reconcile:${collection.id}`}
@@ -129,12 +129,12 @@ export default async function Page({
     if (!(error instanceof AppError)) throw error;
     if (error.statusCode === 404) notFound();
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax5xl}>
         <ErrorState
           title={libraryCollectionError(typedLocale, error.code)}
           description={m.reconcileLoadUnavailableDescription}
           action={
-            <Link href={collectionHref()} className={navLinkClass}>
+            <Link href={collectionHref()} className={linkAccentSmRounded}>
               {c.reload}
             </Link>
           }

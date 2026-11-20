@@ -9,17 +9,23 @@ import { Button, ErrorState } from "@nexus/ui";
 import { libraryMembershipBatchCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
+import { privateApiRequest } from "../../../lib/http/private-api-request";
+import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
+import { linkAccentSmRounded, linkAccentTight } from "../../shell/link-shell";
+import { panelSpace4P5 } from "../../shell/panel-shell";
 import {
-  libraryCollectionError,
-  libraryCollectionsCopy,
-} from "../../../lib/library-collections-i18n";
-import { collectionHref } from "../../../lib/library-collections-query";
-import { confirmedMembershipBatch } from "../../../lib/library-membership-batch-confirmation";
-import { libraryMembershipBatchesCopy } from "../../../lib/library-membership-batches-i18n";
-import { libraryMembershipHistoryCopy } from "../../../lib/library-membership-history-i18n";
-import { membershipHistoryHref } from "../../../lib/library-membership-history-query";
-import { privateApiRequest } from "../../../lib/private-api-request";
-import { ActionConfirmCheckbox } from "../../../components/action-confirm-checkbox";
+  typeBreakAllXs,
+  typeBreakSm,
+  typeFlexStartGap3,
+  typeSmSecondary,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
+import { collectionHref } from "../library-collections-query";
+import { confirmedMembershipBatch } from "../library-membership-batch-confirmation";
+import { libraryMembershipBatchesCopy } from "../library-membership-batches-i18n";
+import { libraryMembershipHistoryCopy } from "../library-membership-history-i18n";
+import { membershipHistoryHref } from "../library-membership-history-query";
 export function LibraryMembershipBatchForm({
   report,
   locale,
@@ -169,11 +175,11 @@ export function LibraryMembershipBatchForm({
       inCollection: desired[collection.id] ?? collection.inCollection,
     }));
   return (
-    <form onSubmit={submit} className="nexus-panel space-y-4 p-5">
+    <form onSubmit={submit} className={panelSpace4P5}>
       <h2 className="font-semibold">{h.title}</h2>
-      <p className="text-sm text-secondary">{h.note}</p>
-      <p className="text-xs text-muted">{h.quota}</p>
-      <code className="block break-all text-xs">
+      <p className={typeSmSecondary}>{h.note}</p>
+      <p className={typeXsMuted}>{h.quota}</p>
+      <code className={typeBreakAllXs}>
         {pending.current?.productId ?? report.resource.productId}
       </code>
       <p>
@@ -193,7 +199,7 @@ export function LibraryMembershipBatchForm({
                 (!report.resource.canAdd || collection.itemCount >= report.itemLimit);
               return (
                 <li key={collection.id} className="space-y-1 border-t border-base pt-3">
-                  <label className="flex items-start gap-3">
+                  <label className={typeFlexStartGap3}>
                     <input
                       type="checkbox"
                       checked={value}
@@ -215,23 +221,28 @@ export function LibraryMembershipBatchForm({
                       <span className="block text-xs text-muted">{h.desired}</span>
                     </span>
                   </label>
-                  <p className="text-xs text-muted">
+                  <p className={typeXsMuted}>
                     {c[collection.status]} · {c.revision} {collection.revision} · {c.items}:{" "}
                     {collection.itemCount}/{report.itemLimit} · {h.current}:{" "}
                     {collection.inCollection ? c.inCollection : c.notInCollection}
                   </p>
                   {cannotAdd ? (
-                    <ErrorState id="library-membership-cannot-add" title={h.cannotAdd} />
+                    <ErrorState
+                      id="library-membership-cannot-add"
+                      title={h.cannotAdd}
+                      description={h.cannotAddHint}
+                    />
                   ) : null}
                   {readOnly &&
                     (collection.status === "archived" ? (
-                      <p role="note" className="text-xs text-muted">
+                      <p role="note" className={typeXsMuted}>
                         {c.archivedNote}
                       </p>
                     ) : (
                       <ErrorState
                         id="library-membership-revision-locked"
                         title={c.revisionLocked}
+                        description={c.revisionLockedHint}
                       />
                     ))}
                 </li>
@@ -245,7 +256,7 @@ export function LibraryMembershipBatchForm({
               (collection) => collection.id === change.collectionId,
             );
             return (
-              <li key={change.collectionId} className="break-words text-sm">
+              <li key={change.collectionId} className={typeBreakSm}>
                 {collection?.name ?? change.collectionId} · {change.inCollection ? c.add : c.remove}{" "}
                 · {c.revision} {change.expectedRevision} → {change.expectedRevision + 1}
               </li>
@@ -278,11 +289,9 @@ export function LibraryMembershipBatchForm({
       >
         {busy ? c.busy : saved ? c.saved : blocked ? c.reload : frozen ? c.retryAction : h.apply}
       </Button>
-      {frozen && !saved && (
-        <p role="note" className="text-sm text-muted">
-          {c.frozen}
-        </p>
-      )}
+      {frozen && !saved ? (
+        <ErrorState id="library-membership-batch-frozen" title={c.frozen} description={c.retry} />
+      ) : null}
       {error ? (
         <ErrorState
           title={error}
@@ -290,7 +299,7 @@ export function LibraryMembershipBatchForm({
           action={
             <a
               href={`/workspace/library/${encodeURIComponent(pending.current?.productId ?? report.resource.productId)}/collections`}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentSmRounded}
             >
               {c.reload}
             </a>
@@ -300,19 +309,16 @@ export function LibraryMembershipBatchForm({
       {saved && (
         <div className="space-y-2">
           <p role="status">{h.success}</p>
-          <a
-            href={membershipHistoryHref(saved.id)}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <a href={membershipHistoryHref(saved.id)} className={linkAccentTight}>
             {libraryMembershipHistoryCopy(locale).detail}
           </a>
           <a
             href={`/workspace/library/${encodeURIComponent(pending.current?.productId ?? report.resource.productId)}/collections`}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentTight}
           >
             {c.reload}
           </a>
-          <code className="block break-all text-xs">
+          <code className={typeBreakAllXs}>
             {h.receipt}: {saved.id}
           </code>
           <ul className="space-y-2">
@@ -320,12 +326,12 @@ export function LibraryMembershipBatchForm({
               <li key={child.id}>
                 <a
                   href={collectionHref(child.collection.id, "history")}
-                  className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={linkAccentTight}
                 >
                   {child.collection.name}
                 </a>{" "}
                 · {c.revision} {child.collection.revision}
-                <code className="block break-all text-xs">
+                <code className={typeBreakAllXs}>
                   {c.receipt}: {child.id}
                 </code>
               </li>

@@ -18,7 +18,7 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: h.refresh }) })
 import {
   StorageCleanupControls,
   StorageDiscoveryControls,
-} from "../../src/components/storage-maintenance-controls";
+} from "../../src/features/moderation/storage-maintenance";
 
 const { renderCleanup, check, click } = createStorageMaintenanceActorInteractionHelpers(
   h,

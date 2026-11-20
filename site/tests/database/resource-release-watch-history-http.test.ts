@@ -1,17 +1,20 @@
-import { beforeEach, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const h = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,
   rate: vi.fn(),
   history: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => h.user },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: h.rate }));
 vi.mock("@nexus/db", () => ({ resourceReleaseWatchesRepository: { history: h.history } }));
-import { GET as read } from "../../src/app/api/library/watches/history/route";
+
 import { GET as download } from "../../src/app/api/library/watches/history/export/route";
+import { GET as read } from "../../src/app/api/library/watches/history/route";
+
 const request = (query = "") =>
   new NextRequest(`https://nexus.test/api/library/watches/history${query}`);
 beforeEach(() => {

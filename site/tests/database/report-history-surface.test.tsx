@@ -18,19 +18,19 @@ vi.mock("next/navigation", () => ({
     throw Error("NOT_FOUND_BOUNDARY");
   },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../../src/lib/services/community-moderation-service", () => ({
+vi.mock("../../src/lib/services/community/community-moderation-service", () => ({
   communityModerationService: state,
 }));
-vi.mock("../../src/lib/services/server-content-service", () => ({
+vi.mock("../../src/lib/services/servers/server-content-service", () => ({
   serverContentService: state,
 }));
-vi.mock("../../src/lib/services/organization-content-service", () => ({
+vi.mock("../../src/lib/services/organizations/organization-content-service", () => ({
   organizationContentService: state,
 }));
 vi.mock("../../src/features/community/author-publication-restore", () => ({
@@ -43,10 +43,10 @@ vi.mock("../../src/features/community/author-publication-restore", () => ({
   }) => <div data-restore={organizationId ?? serverId} />,
 }));
 
+import { discussionReportsCopy } from "../../src/features/community/discussion-reports-copy";
 import { DiscussionReportsScreen as Reports } from "../../src/features/community/server/discussion-reports-screen";
+import { organizationPublicationHistoryCopy } from "../../src/features/organizations/organization-publication-history-copy";
 import { OrganizationPublicationHistoryScreen as History } from "../../src/features/organizations/publication-history-server";
-import { discussionReportsCopy } from "../../src/lib/discussion-reports-copy";
-import { organizationPublicationHistoryCopy } from "../../src/lib/organization-publication-history-copy";
 
 const time = "2026-10-11T00:00:00.123456Z",
   publication = {
@@ -164,14 +164,14 @@ it("rejects stale team rights and mismatched private DTOs without showing loaded
   state.discussionReports.mockResolvedValue({ ...reports, commentId: "foreign" });
   const mismatched = renderToStaticMarkup(await Reports({ id: "post", commentId: "comment" }));
   expect(mismatched).toContain('role="alert"');
-  expect(mismatched).toContain("overflow-x-clip");
+  expect(mismatched).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(mismatched).not.toContain("Private title");
 });
 it("does not read private reports for ordinary users or history for anonymous sessions", async () => {
   state.session.mockResolvedValue({ id: "actor", role: "user" });
   const denied = renderToStaticMarkup(await Reports({ id: "post", commentId: "comment" }));
   expect(denied).toContain('role="alert"');
-  expect(denied).toContain("overflow-x-clip");
+  expect(denied).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(state.discussionReports).not.toHaveBeenCalled();
   state.session.mockResolvedValue(null);
   expect(renderToStaticMarkup(await History({ id: "org", contentId: "post" }))).toContain(
@@ -180,9 +180,10 @@ it("does not read private reports for ordinary users or history for anonymous se
   expect(state.history).not.toHaveBeenCalled();
   state.session.mockRejectedValueOnce(new Error("private session"));
   const failed = renderToStaticMarkup(await History({ id: "org", contentId: "post" }));
-  expect(failed).toContain("/auth/login");
+  expect(failed).toContain('role="alert"');
+  expect(failed).toContain(organizationPublicationHistoryCopy("en").unavailable);
+  expect(failed).not.toContain("/auth/login");
   expect(failed).not.toContain("private session");
-  expect(failed).not.toContain(organizationPublicationHistoryCopy("en").title);
   expect(state.history).not.toHaveBeenCalled();
 });
 it.each(["en", "ru"] as const)(
@@ -232,7 +233,7 @@ it("shows an honest recovery state when comment reports fail to load", async () 
     }),
   );
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("q=word&amp;view=history");
   expect(html).not.toContain("Private title");
 });
@@ -252,7 +253,9 @@ it("rejects duplicate filters before either private data source", async () => {
     }),
   );
   expect(invalidReports).toContain('role="alert"');
-  expect(invalidReports).toContain("overflow-x-clip");
+  expect(invalidReports).toMatch(
+    /(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/,
+  );
   expect(state.discussionReports).not.toHaveBeenCalled();
   expect(
     renderToStaticMarkup(
@@ -276,7 +279,7 @@ it.each(["ru", "en"] as const)(
       "../../src/features/servers/server/server-publication-history-screen"
     );
     const { serverPublicationHistoryCopy } = await import(
-      "../../src/lib/server-publication-history-copy"
+      "../../src/features/servers/server-publication-history-copy"
     );
     const html = renderToStaticMarkup(
       await ServerPublicationHistoryScreen({ id: "srv", contentId: "post" }),

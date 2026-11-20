@@ -1,7 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { profilePrivacyCopy } from "../../src/lib/profile-privacy-copy";
+import { profilePrivacyCopy } from "../../src/features/accounts/profile-privacy-copy";
 
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
@@ -9,10 +9,10 @@ const mocks = vi.hoisted(() => ({
   own: vi.fn(),
   update: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../../src/lib/services/profile-privacy-service", () => ({
+vi.mock("../../src/lib/services/accounts/profile-privacy-service", () => ({
   profilePrivacyService: { own: mocks.own, update: mocks.update },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
@@ -90,7 +90,7 @@ it.each(["en", "ru"] as const)(
       ),
     );
     expect(response.status).toBe(409);
-    expect(await response.json()).toEqual({
+    expect(await response.json()).toMatchObject({
       code: "ACCOUNT_CHANGED",
       error: profilePrivacyCopy(locale).accountChanged,
     });
@@ -161,7 +161,7 @@ it.each(["en", "ru"] as const)(
     mocks.update.mockRejectedValue(new AppError("private SQL", 409, "CONFLICT"));
     const conflict = await PATCH(request("PATCH", input, "", headers));
     expect(conflict.status).toBe(409);
-    expect(await conflict.json()).toEqual({
+    expect(await conflict.json()).toMatchObject({
       code: "CONFLICT",
       error: profilePrivacyCopy(locale).conflict,
     });

@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
-import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
-import { resourcePublisherHistoryQuery } from "../../../../../lib/resource-publisher-query";
-import { resourcePublisherService } from "../../../../../lib/services/resource-publisher-service";
+import { resourceCommerceRequest } from "../../../../../features/resources/resource-commerce-http";
+import { resourcePublisherHistoryQuery } from "../../../../../features/resources/resource-publisher-query";
+import { resourcePublisherService } from "../../../../../lib/services/resources/resource-publisher-service";
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, false, async (actor) =>
     resourcePublisherService.history(

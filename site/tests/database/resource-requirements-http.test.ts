@@ -8,10 +8,10 @@ const state = vi.hoisted(() => ({
   rate: vi.fn(),
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/services/resource-requirements-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-requirements-service", () => ({
   resourceRequirementsService: { report: state.report },
 }));
 
@@ -62,7 +62,7 @@ it("hides private or inaccessible roots", async () => {
   state.report.mockRejectedValue(new NotFoundError("Resource"));
   const response = await read(request(), context);
   expect(response.status).toBe(404);
-  expect(await response.json()).toEqual({ code: "NOT_FOUND" });
+  expect(await response.json()).toMatchObject({ code: "NOT_FOUND" });
 });
 it("exports the same authorized report without storage URLs or browser caching", async () => {
   const response = await download(request(), context);

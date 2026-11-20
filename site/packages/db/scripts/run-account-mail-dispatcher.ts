@@ -1,14 +1,14 @@
 import { rename, rm, writeFile } from "node:fs/promises";
 import { checkDatabaseConnection, closeDatabaseConnection } from "../src/client";
 import { accountMailOutboxRepository } from "../src/repositories/account-mail-outbox";
-import { accountMailWorkerRepository } from "../src/repositories/account-mail-worker";
-import { accountRecoveryAbuseLimitRepository } from "../src/repositories/account-recovery-abuse";
 import {
   createAccountMailDispatcher,
   readAccountMailRuntimeConfig,
   runAccountMailLoop,
   runtimeFingerprint,
 } from "../src/repositories/account-mail-runtime";
+import { accountMailWorkerRepository } from "../src/repositories/account-mail-worker";
+import { accountRecoveryAbuseLimitRepository } from "../src/repositories/account-recovery-abuse";
 
 const HEALTH_FILE = "/tmp/nexus-account-mail-worker-health.json";
 const HEALTH_TMP = `${HEALTH_FILE}.${process.pid}.tmp`;

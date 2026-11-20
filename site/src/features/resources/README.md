@@ -8,43 +8,134 @@ Services и repositories не дублируются и не переносят�
 
 ## Публичные entrypoints
 
-| Entry                       | Контракт                                                                                                    |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `detail-view.ts`            | `ProductDependencyList`; общее представление зависимостей для detail и workspace                            |
-| `compatibility-controls.ts` | `ResourceCompatibilityForm`; клиентская форма совместимости workspace                                       |
-| `variant-controls.ts`       | `ResourceVariantsForm`; клиентская форма вариантов workspace                                                |
-| `publisher-view.ts`         | `ResourcePublisherFilters`, `ResourcePublicationReadinessPanel`; server-compatible UI workspace             |
-| `publisher-navigation.ts`   | `ResourcePublisherWorkspaceNav`; клиентская навигация workspace                                             |
-| `create-controls.ts`        | `NewResourceForm`; клиентская форма создания                                                                |
-| `copy-controls.ts`          | `ResourceCopyForm`; клиентская форма копирования                                                            |
-| `copy-view.ts`              | `ResourceCopyMetadataView`; server-compatible метаданные копии                                              |
-| `author-controls.ts`        | `AuthorResourceForms`, `RetireBuildForm`; клиентские формы автора                                           |
-| `lifecycle-controls.ts`     | `ResourceLifecycleControls`; управление жизненным циклом                                                    |
-| `moderation-controls.ts`    | `ResourceModerationControls`; staff moderation UI                                                           |
-| `requirements-view.ts`      | `ResourceRequirementsReportBody`; общее представление отчёта                                                |
-| `quarantine-controls.ts`    | `BuildQuarantineControls`; client UI карантина                                                              |
-| `package-server.ts`         | `BuildPackageScreen`; server-only экран состава сборки                                                      |
-| `requirements-server.ts`    | `ResourceRequirementsScreen`; server-only экран требований                                                  |
-| `review-report-server.ts`   | `ResourceReviewReportScreen`; server-only жалобы на отзывы                                                  |
-| `qa-report-actions.ts`      | `AdminResourceQaReportActions`; client staff actions для Q&A                                                |
-| `release-watch-batch.ts`    | `ResourceReleaseWatchBatchControls`; client batch подписок                                                  |
-| `cart-controls.ts`          | `ResourceCartControls`; client UI корзины                                                                   |
-| `cart-view.ts`              | `ResourceCartReviewEvidence`; представление метаданных корзины                                              |
-| `delivery-server.ts`        | `ResourceDeliveryEvidence`; server-only представление выдачи                                                |
-| `review-controls.ts`        | `ResourceReviewEditor`, `ResourceReviewDecisionForm`; клиентские формы для library и moderation             |
-| `reviews-view.ts`           | `ResourceReviewPager`; общая пагинация для workspace                                                        |
-| `release-watch.ts`          | `ResourceReleaseWatchControl`; клиентская подписка для detail и library                                     |
-| `download.ts`               | `ResourceDownloadButton`; отдельный клиентский контракт для detail, versions и library                      |
-| `client.ts`                 | `ResourceGallery`, `ResourceQaPanel`; client components                                                     |
-| `evidence.ts`               | `BuildProvenanceDetails`, `BuildPackageSummaryPanel`, `BuildPackageEvidencePanel`; RSC/client-compatible UI |
-| `view.ts`                   | `ProductCard`, совместимая с RSC и Discovery                                                                |
-| `server.ts`                 | `MarketPage`, Next `server-only` composition с request locale и существующим product service                |
-| `build-server.ts`           | `ResourceBuildScreen`; server-only composition авторской и staff страниц сборки                             |
-| `media-server.ts`           | `ResourceMediaScreen`; server-only composition авторской и staff страниц медиа                              |
-| `detail-server.ts`          | `ProductDetailPage`, отдельный Next `server-only` composition с session/visibility/access hydration         |
-| `versions-server.ts`        | `PublicResourceVersionsPage`, публичные safe releases и session-aware download affordance                   |
-| `reviews-server.ts`         | `PublicResourceReviewsPage`, публичная пагинация отзывов и guest/auth links                                 |
-| `model.ts`                  | Query/pagination, gallery interaction и build provenance; только pure domain dependency                     |
+| Entry                                          | Контракт                                                                                                    |
+| ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `detail-view.ts`                               | `ProductDependencyList`; общее представление зависимостей для detail и workspace                            |
+| `compatibility-controls.ts`                    | `ResourceCompatibilityForm`; клиентская форма совместимости workspace                                       |
+| `variant-controls.ts`                          | `ResourceVariantsForm`; клиентская форма вариантов workspace                                                |
+| `publisher-view.ts`                            | `ResourcePublisherFilters`, `ResourcePublicationReadinessPanel`; server-compatible UI workspace             |
+| `publisher-navigation.ts`                      | `ResourcePublisherWorkspaceNav`; клиентская навигация workspace                                             |
+| `create-controls.ts`                           | `NewResourceForm`; клиентская форма создания                                                                |
+| `resource-submission-intent.ts`                | `parseResourceIntent`, `resourceIntentKey` (create-form draft intent)                                       |
+| `copy-controls.ts`                             | `ResourceCopyForm`; клиентская форма копирования                                                            |
+| `copy-view.ts`                                 | `ResourceCopyMetadataView`; server-compatible метаданные копии                                              |
+| `author-controls.ts`                           | `AuthorResourceForms`, `RetireBuildForm`; клиентские формы автора                                           |
+| `lifecycle-controls.ts`                        | `ResourceLifecycleControls`; управление жизненным циклом                                                    |
+| `moderation-controls.ts`                       | `ResourceModerationControls`; staff moderation UI                                                           |
+| `requirements-view.ts`                         | `ResourceRequirementsReportBody`; общее представление отчёта                                                |
+| `quarantine-controls.ts`                       | `BuildQuarantineControls`; client UI карантина                                                              |
+| `package-server.ts`                            | `BuildPackageScreen`; server-only экран состава сборки                                                      |
+| `requirements-server.ts`                       | `ResourceRequirementsScreen`; server-only экран требований                                                  |
+| `review-report-server.ts`                      | `ResourceReviewReportScreen`; server-only жалобы на отзывы                                                  |
+| `qa-report-actions.ts`                         | `AdminResourceQaReportActions`; client staff actions для Q&A                                                |
+| `release-watch-batch.ts`                       | `ResourceReleaseWatchBatchControls`; client batch подписок                                                  |
+| `cart-controls.ts`                             | `ResourceCartControls`; client UI корзины                                                                   |
+| `cart-view.ts`                                 | `ResourceCartReviewEvidence`; представление метаданных корзины                                              |
+| `delivery-server.ts`                           | `ResourceDeliveryEvidence`; server-only представление выдачи                                                |
+| `staff-resources-server.ts`                    | `StaffResourcesScreen`; server-only `/admin/resources` moderation list                                      |
+| `staff-resource-detail-server.ts`              | `StaffResourceDetailScreen`; server-only `/admin/resources/[id]` decision document                          |
+| `resource-manage-server.ts`                    | `ResourceManageScreen`; server-only `/workspace/resources/[id]` author manage                               |
+| `author-resources-server.ts`                   | `AuthorResourcesScreen`; server-only `/workspace/resources` publisher inventory                             |
+| `resource-publisher-history-server.ts`         | `ResourcePublisherHistoryScreen`; server-only `/workspace/resources/[id]/history`                           |
+| `publisher-deliveries-server.ts`               | `PublisherDeliveriesScreen`; server-only `/workspace/resources/[id]/deliveries`                             |
+| `resource-copies-server.ts`                    | `ResourceCopiesScreen`; server-only `/workspace/resources/[id]/copies`                                      |
+| `resource-activity-server.ts`                  | `ResourceActivityScreen`; server-only `/workspace/resources/[id]/activity`                                  |
+| `resource-publisher-moderation-server.ts`      | `ResourcePublisherModerationScreen`; server-only `/workspace/resources/[id]/moderation`                     |
+| `resource-copy-receipt-server.ts`              | `ResourceCopyReceiptScreen`; server-only `/workspace/resources/[id]/copies/[receiptId]`                     |
+| `resource-copy-create-server.ts`               | `ResourceCopyCreateScreen`; server-only `/workspace/resources/[id]/copy`                                    |
+| `resource-variants-server.ts`                  | `ResourceVariantsScreen`; server-only `/workspace/resources/[id]/variants`                                  |
+| `resource-compatibility-server.ts`             | `ResourceCompatibilityScreen`; server-only `/workspace/resources/[id]/compatibility`                        |
+| `review-controls.ts`                           | `ResourceReviewEditor`, `ResourceReviewDecisionForm`; клиентские формы для library и moderation             |
+| `reviews-view.ts`                              | `ResourceReviewPager`; общая пагинация для workspace                                                        |
+| `release-watch.ts`                             | `ResourceReleaseWatchControl`; клиентская подписка для detail и library                                     |
+| `download.ts`                                  | `ResourceDownloadButton`; отдельный клиентский контракт для detail, versions и library                      |
+| `client.ts`                                    | `ResourceGallery`, `ResourceQaPanel`; client components                                                     |
+| `evidence.ts`                                  | `BuildProvenanceDetails`, `BuildPackageSummaryPanel`, `BuildPackageEvidencePanel`; RSC/client-compatible UI |
+| `view.ts`                                      | `ProductCard`, совместимая с RSC и Discovery                                                                |
+| `server.ts`                                    | `MarketPage`, Next `server-only` composition с request locale и существующим product service                |
+| `build-server.ts`                              | `ResourceBuildScreen`; server-only composition авторской и staff страниц сборки                             |
+| `media-server.ts`                              | `ResourceMediaScreen`; server-only composition авторской и staff страниц медиа                              |
+| `detail-server.ts`                             | `ProductDetailPage`, отдельный Next `server-only` composition с session/visibility/access hydration         |
+| `versions-server.ts`                           | `PublicResourceVersionsPage`, публичные safe releases и session-aware download affordance                   |
+| `reviews-server.ts`                            | `PublicResourceReviewsPage`, публичная пагинация отзывов и guest/auth links                                 |
+| `model.ts`                                     | Query/pagination, gallery interaction и build provenance; только pure domain dependency                     |
+| `mta-version-target.ts`                        | util port `mta-version-target`                                                                              |
+| `build-moderation-ui.ts`                       | util port `build-moderation-ui`                                                                             |
+| `new-resource-response.ts`                     | util port `new-resource-response`                                                                           |
+| `pending-resource-draft.ts`                    | util port `pending-resource-draft`                                                                          |
+| `resource-build-workspace-response.ts`         | util port `resource-build-workspace-response`                                                               |
+| `resource-copy-confirmation.ts`                | util port `resource-copy-confirmation`                                                                      |
+| `resource-review-confirmation.ts`              | util port `resource-review-confirmation`                                                                    |
+| `author-resource-response.ts`                  | util port `author-resource-response`                                                                        |
+| `resource-management-confirmation.ts`          | util port `resource-management-confirmation`                                                                |
+| `resource-publication-readiness-i18n.ts`       | util port `resource-publication-readiness-i18n`                                                             |
+| `resource-release-watch-batch-confirmation.ts` | util port `resource-release-watch-batch-confirmation`                                                       |
+| `publishing-error-message.ts`                  | util port `publishing-error-message`                                                                        |
+| `resource-publisher-nav-i18n.ts`               | util port `resource-publisher-nav-i18n`                                                                     |
+| `author-resource-requests.ts`                  | util port `author-resource-requests`                                                                        |
+| `resource-cart-review-confirmation.ts`         | util port `resource-cart-review-confirmation`                                                               |
+| `mta-meta-inspector-messages.ts`               | util port `mta-meta-inspector-messages`                                                                     |
+| `resource-image-url.ts`                        | util port `resource-image-url`                                                                              |
+| `private-request.ts`                           | util port `private-request`                                                                                 |
+| `author-resource-draft.ts`                     | util port `author-resource-draft`                                                                           |
+| `build-file-validation.ts`                     | util port `build-file-validation`                                                                           |
+| `resource-commerce-confirmation.ts`            | util port `resource-commerce-confirmation`                                                                  |
+| `public-release-history.ts`                    | util port `public-release-history`                                                                          |
+| `resource-cart-receipts-query.ts`              | util port `resource-cart-receipts-query`                                                                    |
+| `resource-publisher-query.ts`                  | util port `resource-publisher-query`                                                                        |
+| `resource-review-query.ts`                     | util port `resource-review-query`                                                                           |
+| `product-type-labels.ts`                       | util port `product-type-labels`                                                                             |
+| `resource-deliveries-i18n.ts`                  | util port `resource-deliveries-i18n`                                                                        |
+| `resource-qa-i18n.ts`                          | util port `resource-qa-i18n`                                                                                |
+| `resource-cart-receipts-i18n.ts`               | util port `resource-cart-receipts-i18n`                                                                     |
+| `build-package-i18n.ts`                        | util port `build-package-i18n`                                                                              |
+| `resource-copy-i18n.ts`                        | util port `resource-copy-i18n`                                                                              |
+| `resource-publisher-i18n.ts`                   | util port `resource-publisher-i18n`                                                                         |
+| `resource-build-workspace-i18n.ts`             | util port `resource-build-workspace-i18n`                                                                   |
+| `resource-qa-query.ts`                         | util port `resource-qa-query`                                                                               |
+| `resource-cart-receipts-csv.ts`                | util port `resource-cart-receipts-csv`                                                                      |
+| `build-download-metadata.ts`                   | util port `build-download-metadata`                                                                         |
+| `resource-deliveries-csv.ts`                   | util port `resource-deliveries-csv`                                                                         |
+| `resource-download-policy.ts`                  | util port `resource-download-policy`                                                                        |
+| `resource-activity-view.ts`                    | util port `resource-activity-view`                                                                          |
+| `resource-activity-query.ts`                   | util port `resource-activity-query`                                                                         |
+| `resource-release-watch-history-i18n.ts`       | util port `resource-release-watch-history-i18n`                                                             |
+| `resource-activity-i18n.ts`                    | util port `resource-activity-i18n`                                                                          |
+| `resource-release-watches-query.ts`            | util port `resource-release-watches-query`                                                                  |
+| `resource-deliveries-query.ts`                 | util port `resource-deliveries-query`                                                                       |
+| `resource-media-i18n.ts`                       | util port `resource-media-i18n`                                                                             |
+| `resource-management-i18n.ts`                  | util port `resource-management-i18n`                                                                        |
+| `resource-download-sha256.ts`                  | util port `resource-download-sha256`                                                                        |
+| `build-download-selection.ts`                  | util port `build-download-selection`                                                                        |
+| `resource-release-control-query.ts`            | util port `resource-release-control-query`                                                                  |
+| `resource-commerce-i18n.ts`                    | util port `resource-commerce-i18n`                                                                          |
+| `resource-claim-api-copy.ts`                   | util port `resource-claim-api-copy`                                                                         |
+| `resource-inspect-meta-api-copy.ts`            | util port `resource-inspect-meta-api-copy`                                                                  |
+| `products-api-copy.ts`                         | util port `products-api-copy`                                                                               |
+| `product-download-api-copy.ts`                 | util port `product-download-api-copy`                                                                       |
+| `product-builds-api-copy.ts`                   | util port `product-builds-api-copy`                                                                         |
+| `admin-build-download-api-copy.ts`             | util port `admin-build-download-api-copy`                                                                   |
+| `resource-requirements-i18n.ts`                | util port `resource-requirements-i18n`                                                                      |
+| `resource-requirements-query.ts`               | util port `resource-requirements-query`                                                                     |
+| `resource-review-i18n.ts`                      | util port `resource-review-i18n`                                                                            |
+| `resource-release-watch-history-query.ts`      | util port `resource-release-watch-history-query`                                                            |
+| `product-dependency-resolution.ts`             | util port `product-dependency-resolution`                                                                   |
+| `resource-copy-query.ts`                       | util port `resource-copy-query`                                                                             |
+| `reverse-dependency-summary.ts`                | util port `reverse-dependency-summary`                                                                      |
+| `build-package-query.ts`                       | util port `build-package-query`                                                                             |
+| `mta-meta-inspector.ts`                        | util port `mta-meta-inspector`                                                                              |
+| `public-resource-attribution.ts`               | util port `public-resource-attribution`                                                                     |
+| `resource-release-watches-i18n.ts`             | util port `resource-release-watches-i18n`                                                                   |
+| `build-package-files-http.ts`                  | util port `build-package-files-http`                                                                        |
+| `build-package-report-http.ts`                 | util port `build-package-report-http`                                                                       |
+| `resource-commerce-http.ts`                    | util port `resource-commerce-http`                                                                          |
+| `resource-media-image-http.ts`                 | util port `resource-media-image-http`                                                                       |
+| `resource-media-upload-http.ts`                | util port `resource-media-upload-http`                                                                      |
+| `resource-activity-csv.ts`                     | util port `resource-activity-csv`                                                                           |
+| `resource-delivery-stream.ts`                  | util port `resource-delivery-stream`                                                                        |
+| `download-web-stream.ts`                       | util port `download-web-stream`                                                                             |
+| `resource-download-client.ts`                  | util port `resource-download-client`                                                                        |
+| `resource-attachment-filename.ts`              | util port `resource-attachment-filename`                                                                    |
 
 `view` и `evidence` не добавляют `use client`; их компоненты сохраняют RSC/client
 совместимость. `client` экспортирует gallery и Q&A с прежними client directives; preview остаётся private;

@@ -1,14 +1,17 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({ page: vi.fn(), resolve: vi.fn() }));
 vi.mock("@nexus/db", () => ({
   publicationFeedRepository: { page: state.page, resolvePublicScope: state.resolve },
 }));
-import { publicationFeedService as service } from "../../src/lib/services/publication-feed-service";
+
 import {
+  type PublicationQuery,
   parsePublicationQuery,
   publicationPageQuery,
-  type PublicationQuery,
-} from "../../src/lib/publication-feed-contract";
+} from "../../src/features/community/publication-feed-contract";
+import { publicationFeedService as service } from "../../src/lib/services/discovery/publication-feed-service";
+
 const scope = { kind: "server" as const, id: "server" };
 const boundary = { createdAt: "2026-10-11T00:00:00.123456Z", id: "boundary" };
 beforeEach(() => {

@@ -1,13 +1,13 @@
 import { readOrderLineTerms, validatePendingOrder } from "@nexus/domain";
 import { expect, it } from "vitest";
-import { orderTermsId, orderTermsPageQuery } from "../../src/lib/order-terms-query";
-import { sellerSalesCsv } from "../../src/lib/seller-sales-csv";
+import { orderTermsId, orderTermsPageQuery } from "../../src/features/commerce/order-terms-query";
+import { sellerSalesCsv } from "../../src/features/commerce/seller-sales-csv";
 import {
   sellerSalesDetailQuery,
   sellerSalesQuery,
   sellerSalesUrl,
   sellerSaleUrl,
-} from "../../src/lib/seller-sales-query";
+} from "../../src/features/commerce/seller-sales-query";
 
 const terms = {
   version: 1,

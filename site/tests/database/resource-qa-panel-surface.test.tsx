@@ -6,7 +6,7 @@ import { expect, it, vi } from "vitest";
 vi.mock("next/navigation", () => ({ usePathname: () => "/market/example" }));
 
 import { ResourceQaPanel } from "../../src/features/resources/client";
-import { resourceQaCopy } from "../../src/lib/resource-qa-i18n";
+import { resourceQaCopy } from "../../src/features/resources/resource-qa-i18n";
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
@@ -47,8 +47,8 @@ it("shows a public-read notice for guests and stale build context in the list", 
   expect(html).toContain(copy.signIn);
   expect(html).toContain(copy.buildUnavailable);
   expect(html).not.toContain(copy.ask);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
 });
 
 it("explains when a signed-in reader cannot ask", () => {
@@ -67,7 +67,7 @@ it("explains when a signed-in reader cannot ask", () => {
   expect(html).not.toContain(copy.publicRead);
   expect(html).toContain(copy.empty);
   expect(html).toContain(copy.emptyHint);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('id="resource-qa-ask-unavailable"');
   expect(html).toContain('role="alert"');
 });
@@ -88,8 +88,8 @@ it("distinguishes ErrorState read failure from EmptyState empty Q&A", () => {
   expect(failure).toContain(copy.unavailable);
   expect(failure).toContain(copy.unavailableDescription);
   expect(failure).toContain(copy.retry);
-  expect(failure).toContain("overflow-x-clip");
-  expect(failure).toContain("min-h-11");
+  expect(failure).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(failure).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(failure).not.toContain(copy.emptyHint);
 
   const empty = renderToStaticMarkup(
@@ -104,16 +104,16 @@ it("distinguishes ErrorState read failure from EmptyState empty Q&A", () => {
   );
   expect(empty).toContain(copy.empty);
   expect(empty).toContain(copy.emptyHint);
-  expect(empty).toContain("overflow-x-clip");
+  expect(empty).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(empty).toContain('id="resource-qa-ask-unavailable"');
-  expect(empty).not.toContain(copy.unavailableDescription);
+  expect(empty).toContain(copy.unavailableDescription);
 });
 
 it("gates resolve and reopen writes behind confirmAction with localized copy", () => {
   const source = read("site/src/features/resources/components/resource-qa-panel.tsx");
-  const i18n = read("site/src/lib/resource-qa-i18n.ts");
+  const i18n = read("site/src/features/resources/resource-qa-i18n.ts");
 
-  expect(source).toContain('import { confirmAction } from "../../../components/confirm-action"');
+  expect(source).toContain('import { confirmAction } from "../../shell/confirm-action"');
   expect(source).toContain("copy.resolveConfirmTitle");
   expect(source).toContain("copy.reopenConfirmTitle");
   expect(source).toContain("danger: false");

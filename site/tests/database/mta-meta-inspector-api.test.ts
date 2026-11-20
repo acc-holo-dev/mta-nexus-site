@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { metaInspectionLimits } from "../../src/lib/mta-meta-inspector";
 import { getRateLimitPolicy } from "../../packages/security/src/rate-limit-policy";
+import { metaInspectionLimits } from "../../src/features/resources/mta-meta-inspector";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
@@ -17,7 +17,7 @@ const state = vi.hoisted(() => ({
 
 const rate = vi.hoisted(() => vi.fn());
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
   },

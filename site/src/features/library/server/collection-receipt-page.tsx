@@ -4,34 +4,37 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { LibraryCollectionRestoreControls } from "../collection-restore";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { PlatformSessionError } from "../../../components/platform-session-error";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { formatUnknown } from "../../../lib/i18n/unknown";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded } from "../../shell/link-shell";
+import { pageShellMax5xl, pageShellStack3 } from "../../shell/page-shell";
+import { panelClipSpace2P4, panelClipSpace3P5 } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeBreakAllXs,
+  typeBreakAllXsOnly,
+  typeFlexMinWrapGap4,
+  typeMinBreakWords,
+  typeSmMuted,
+} from "../../shell/type-shell";
+import { LibraryCollectionRestoreControls } from "../collection-restore";
 import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,
-} from "../../../lib/library-collection-receipts-i18n";
-import {
-  libraryCollectionError,
-  libraryCollectionsCopy,
-} from "../../../lib/library-collections-i18n";
-import { collectionHref, collectionPageParams } from "../../../lib/library-collections-query";
-import { authService } from "../../../lib/services/auth-service";
-import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
-
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
-const navLinkClass =
-  "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
-export async function generateMetadata(): Promise<Metadata> {
+} from "../library-collection-receipts-i18n";
+import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
+import { collectionHref, collectionPageParams } from "../library-collections-query";
+export async function collectionReceiptMetadata(): Promise<Metadata> {
   return {
     title: `${libraryCollectionReceiptsCopy(await getRequestLocale()).title} | MTA NEXUS`,
     robots: { index: false, follow: false },
   };
 }
-export default async function Page({
+export async function CollectionReceiptPage({
   params,
   searchParams,
 }: {
@@ -72,13 +75,13 @@ export default async function Page({
       });
     if (!report) {
       return (
-        <div className={pageShellClass}>
+        <div className={pageShellMax5xl}>
           <h1 className="font-display">{r.title}</h1>
           <ErrorState
             title={r.loadUnavailable}
             description={r.loadUnavailableDescription}
             action={
-              <Link href={collectionReceiptHref(id)} className={navLinkClass}>
+              <Link href={collectionReceiptHref(id)} className={linkAccentSmRounded}>
                 {dictionary.errors.retry}
               </Link>
             }
@@ -88,18 +91,18 @@ export default async function Page({
     }
     const receipt = report.receipt;
     return (
-      <div className={pageShellClass}>
-        <nav className="flex min-w-0 flex-wrap gap-4">
-          <Link href="/workspace/library/collections/history" className={navLinkClass}>
+      <div className={pageShellMax5xl}>
+        <nav className={typeFlexMinWrapGap4}>
+          <Link href="/workspace/library/collections/history" className={linkAccentSmRounded}>
             {c.history}
           </Link>
-          <Link href={collectionHref()} className={navLinkClass}>
+          <Link href={collectionHref()} className={linkAccentSmRounded}>
             {c.title}
           </Link>
         </nav>
-        <h1 className="min-w-0 break-words">{r.title}</h1>
+        <h1 className={typeMinBreakWords}>{r.title}</h1>
         <p>{r.note}</p>
-        <code className="block break-all text-xs">
+        <code className={typeBreakAllXs}>
           {c.receipt}: {report.id}
         </code>
         <p>
@@ -107,23 +110,23 @@ export default async function Page({
         </p>
         <a
           href={`/api/library/collections/receipts/${encodeURIComponent(report.id)}/export`}
-          className={navLinkClass}
+          className={linkAccentSmRounded}
         >
           {r.export}
         </a>
         {!receipt ? (
           <EmptyState title={r.unknown} description={r.unknownHint} />
         ) : (
-          <article className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-5">
+          <article className={panelClipSpace3P5}>
             <h2>{c[receipt.command.action]}</h2>
-            <code className="block break-all text-xs">
+            <code className={typeBreakAllXs}>
               {c.request}: {receipt.requestId}
             </code>
             <p>
               {r.recorded}: {receipt.collection.name} · {c[receipt.collection.status]} ·{" "}
               {c.revision} {receipt.collection.revision}
             </p>
-            <code className="block break-all text-xs">{receipt.collection.id}</code>
+            <code className={typeBreakAllXs}>{receipt.collection.id}</code>
             {"expectedRevision" in receipt.command && (
               <p>
                 {c.revision}: {receipt.command.expectedRevision}
@@ -151,7 +154,10 @@ export default async function Page({
             {report.currentCollection && (
               <p>
                 {r.current}:{" "}
-                <Link href={collectionHref(report.currentCollection.id)} className={navLinkClass}>
+                <Link
+                  href={collectionHref(report.currentCollection.id)}
+                  className={linkAccentSmRounded}
+                >
                   {report.currentCollection.name}
                 </Link>{" "}
                 · {c[report.currentCollection.status]} · {c.revision}{" "}
@@ -161,10 +167,11 @@ export default async function Page({
             {receipt.command.action === "reconcile-items" ? (
               <div>
                 <p>
-                  {c.add}: {receipt.command.addProductIds.join(", ") || "—"}
+                  {c.add}: {formatUnknown(typedLocale, receipt.command.addProductIds.join(", "))}
                 </p>
                 <p>
-                  {c.remove}: {receipt.command.removeProductIds.join(", ") || "—"}
+                  {c.remove}:{" "}
+                  {formatUnknown(typedLocale, receipt.command.removeProductIds.join(", "))}
                 </p>
               </div>
             ) : (
@@ -173,7 +180,7 @@ export default async function Page({
                 <ul>
                   {collectionCommandProductIds(receipt.command).map((productId) => (
                     <li key={productId}>
-                      <code className="break-all text-xs">{productId}</code>
+                      <code className={typeBreakAllXsOnly}>{productId}</code>
                     </li>
                   ))}
                 </ul>
@@ -182,18 +189,15 @@ export default async function Page({
           </article>
         )}
         {report.resources.length > 0 && (
-          <ul className="min-w-0 space-y-3 overflow-x-clip">
+          <ul className={pageShellStack3}>
             {report.resources.map((resource) => (
-              <li
-                key={resource.productId}
-                className="nexus-panel min-w-0 space-y-2 overflow-x-clip p-4"
-              >
+              <li key={resource.productId} className={panelClipSpace2P4}>
                 <p>
                   {resource.currentAvailable
                     ? (resource.currentTitle ?? c.unavailable)
                     : c.unavailable}
                 </p>
-                <code className="block break-all text-xs">{resource.productId}</code>
+                <code className={typeBreakAllXs}>{resource.productId}</code>
                 <p>
                   {r.expected}:{" "}
                   {resource.restoreAction === "remove" ? c.inCollection : c.notInCollection} ·{" "}
@@ -223,7 +227,7 @@ export default async function Page({
             locale={typedLocale}
           />
         )}
-        <p className="text-sm text-muted">
+        <p className={typeSmMuted}>
           <time dateTime={report.generatedAt}>{report.generatedAt}</time>
         </p>
       </div>
@@ -232,12 +236,12 @@ export default async function Page({
     if (!(error instanceof AppError)) throw error;
     if (error.statusCode === 404) notFound();
     return (
-      <section className={pageShellClass}>
+      <section className={pageShellMax5xl}>
         <ErrorState
           title={libraryCollectionError(typedLocale, error.code)}
           description={r.loadUnavailableDescription}
           action={
-            <Link href={collectionHref()} className={navLinkClass}>
+            <Link href={collectionHref()} className={linkAccentSmRounded}>
               {c.reload}
             </Link>
           }

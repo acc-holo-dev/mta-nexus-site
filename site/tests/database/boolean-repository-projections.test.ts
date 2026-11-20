@@ -15,8 +15,8 @@ vi.mock("../../packages/db/src/client", async () => {
   };
 });
 
-import { SocialRepository } from "../../packages/db/src/repositories/social";
 import { NotificationRepository } from "../../packages/db/src/repositories/notifications";
+import { SocialRepository } from "../../packages/db/src/repositories/social";
 
 beforeEach(() => {
   state.statements = [];

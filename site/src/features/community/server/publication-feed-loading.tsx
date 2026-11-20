@@ -1,34 +1,38 @@
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { publicationCopy } from "../../../lib/publication-feed-copy";
+import { pageShellMax5xl } from "../../shell/page-shell";
+import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
+import { publicationCopy } from "../publication-feed-copy";
 
 type PublicationFeedLoadingHeading = "title" | "activity" | "serverTitle";
 
-export async function PublicationFeedLoading({
+async function PublicationFeedLoading({
   heading = "title",
 }: {
   heading?: PublicationFeedLoadingHeading;
 } = {}) {
-  const copy = publicationCopy(await getRequestLocale());
-  return (
-    <section
-      className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8"
-      aria-busy="true"
-      aria-labelledby="publication-feed-loading-heading"
-    >
-      <header className="space-y-2">
-        <h1 id="publication-feed-loading-heading" className="text-2xl font-bold text-primary">
-          {copy[heading]}
-        </h1>
-        <p role="status" aria-live="polite" className="text-sm text-muted">
-          {copy.loading}
-        </p>
-      </header>
-      <div className="animate-pulse space-y-4" aria-hidden="true">
-        <div className="h-10 rounded bg-inset" />
-        {[1, 2, 3].map((key) => (
-          <div key={key} className="h-24 rounded bg-inset" />
-        ))}
-      </div>
-    </section>
-  );
+  return LocaleCopyRouteLoading({
+    headingId: "publication-feed-loading-heading",
+    className: pageShellMax5xl,
+    titleClassName: "text-2xl font-bold text-primary",
+    rowClassName: "h-24 rounded bg-inset",
+    leading: <div className="h-10 rounded bg-inset" />,
+    load: (locale) => {
+      const copy = publicationCopy(locale);
+      return {
+        title: copy[heading],
+        loading: copy.loading,
+      };
+    },
+  });
+}
+
+export async function PublicationFeedTitleLoading() {
+  return PublicationFeedLoading({ heading: "title" });
+}
+
+export async function PublicationFeedActivityLoading() {
+  return PublicationFeedLoading({ heading: "activity" });
+}
+
+export async function PublicationFeedServerTitleLoading() {
+  return PublicationFeedLoading({ heading: "serverTitle" });
 }

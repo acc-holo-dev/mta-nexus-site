@@ -16,18 +16,18 @@ const state = vi.hoisted(() => ({
 const directoryPage = vi.hoisted(() => vi.fn());
 
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => null },
 }));
-vi.mock("../../src/components/follow-button", () => ({ FollowButton: () => null }));
-vi.mock("../../src/lib/services/discovery-service", () => ({
+vi.mock("../../src/features/community/follow", () => ({ FollowButton: () => null }));
+vi.mock("../../src/lib/services/discovery/discovery-service", () => ({
   discoveryService: { page: directoryPage },
 }));
-vi.mock("../../src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../../src/lib/services/servers/mta-master-directory-service", () => ({
   indexMtaObservations: () => () => null,
 }));
 
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 
@@ -113,8 +113,8 @@ vi.mock("../../src/features/resources/view", () => ({ ProductCard: () => null })
 vi.mock("../../src/features/servers/client", () => ({ ServerCard: () => null }));
 vi.mock("../../src/features/community/article-view", () => ({ ArticleCard: () => null }));
 
-import DevelopersPage from "../../src/app/developers/page";
 import { UserRepository } from "../../packages/db/src/repositories/users";
+import DevelopersPage from "../../src/app/developers/page";
 
 describe("creator directory trust behavior", () => {
   beforeEach(() => {

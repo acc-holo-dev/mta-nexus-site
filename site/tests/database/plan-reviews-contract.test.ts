@@ -1,13 +1,16 @@
 import { commercialFeeEstimate, readPlanReviewTerms } from "@nexus/domain";
 import { planReviewCommandSchema } from "@nexus/validation";
 import { expect, it } from "vitest";
-import { confirmedPlanReview, expectedPlanReviewId } from "../../src/lib/plan-review-confirmation";
-import { planReviewError, planReviewsCopy } from "../../src/lib/plan-reviews-i18n";
+import {
+  confirmedPlanReview,
+  expectedPlanReviewId,
+} from "../../src/features/commerce/plan-review-confirmation";
+import { planReviewError, planReviewsCopy } from "../../src/features/commerce/plan-reviews-i18n";
 import {
   planReviewHref,
   planReviewNewQuery,
   planReviewsQuery,
-} from "../../src/lib/plan-reviews-query";
+} from "../../src/features/commerce/plan-reviews-query";
 
 const terms = {
   titleRu: "Тариф",

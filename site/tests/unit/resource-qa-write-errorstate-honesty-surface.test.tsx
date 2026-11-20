@@ -15,7 +15,7 @@ it("locks resource QA writeError to ErrorState with stable id", () => {
   expect(source).toContain("ErrorState");
   expect(source).toContain('id="resource-qa-write-failed"');
   expect(source).toMatch(
-    /\{writeError \? <ErrorState id="resource-qa-write-failed" title=\{writeError\} \/> : null\}/,
+    /\{writeError \? \(\s*<ErrorState\s+id="resource-qa-write-failed"\s+title=\{writeError\}\s+description=\{getDictionary\(locale\)\.errors\.formErrorHint\}\s*\/>\s*\) : null\}/u,
   );
   expect(source).not.toContain("{writeError ? <ErrorState title={writeError} /> : null}");
 });

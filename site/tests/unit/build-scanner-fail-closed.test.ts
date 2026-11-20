@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { describe, expect, it } from "vitest";
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
@@ -17,7 +17,7 @@ describe("build scanner fail-closed upload flow", () => {
     expect(scanLimits).toBeGreaterThan(malicious);
     expect(unavailable).toBeGreaterThan(scanLimits);
     expect(storage).toBeGreaterThan(unavailable);
-    expect(route).toContain("No build was stored; retry the upload later.");
+    expect(route).toContain("copy.scannerUnavailable");
     expect(route).toContain('status: 503, headers: { "Retry-After": "30" }');
   });
 
@@ -29,7 +29,7 @@ describe("build scanner fail-closed upload flow", () => {
   });
 
   it("keeps non-clean builds impossible to approve", () => {
-    const service = read("site/src/lib/services/product-service.ts");
+    const service = read("site/src/lib/services/commerce/product-service.ts");
     const config = read("site/packages/config/src/index.ts");
 
     expect(service).toContain('build.scanStatus !== "clean"');
@@ -38,8 +38,8 @@ describe("build scanner fail-closed upload flow", () => {
   });
 
   it("moves INSTREAM framing into a backpressure-aware transport helper", () => {
-    const scanner = read("site/src/lib/services/build-scanner-service.ts");
-    const transport = read("site/src/lib/services/clamav-instream.ts");
+    const scanner = read("site/src/lib/services/resources/build-scanner-service.ts");
+    const transport = read("site/src/lib/services/resources/clamav-instream.ts");
 
     expect(scanner).toContain("writeClamAvInstream(socket, bytes)");
     expect(scanner).not.toContain("socket.write(length)");

@@ -1,6 +1,6 @@
-import { createInterface } from "node:readline";
 import { once } from "node:events";
 import net from "node:net";
+import { createInterface } from "node:readline";
 import tls from "node:tls";
 
 export type AccountMailTransportInput = Readonly<{

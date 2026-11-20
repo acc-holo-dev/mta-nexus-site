@@ -1,30 +1,31 @@
 import {
   AppError,
-  NotFoundError,
-  LIBRARY_COLLECTION_LIMIT,
   LIBRARY_COLLECTION_ITEM_LIMIT,
+  LIBRARY_COLLECTION_LIMIT,
   type LibraryCollectionInventory,
   type LibraryCollectionInventoryQuery,
+  NotFoundError,
 } from "@nexus/domain";
 import {
+  libraryCollectionIdSchema,
   libraryCollectionInventoryQuerySchema,
   libraryCollectionSnapshotSchema,
-  libraryCollectionIdSchema,
 } from "@nexus/validation";
 import { and, asc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
-  users,
   libraryCollections as collections,
   libraryCollectionItems as members,
   products,
+  users,
   resourceReleaseWatches as watches,
 } from "../schema";
-import { effectiveUserDownloadSources } from "./user-library";
-import { libraryReleaseProjection } from "./library-release-projection";
-import { inventoryReleaseSnapshot, type InventoryReleaseRow } from "./library-inventory-release";
 import { historyPageBounds } from "./history-pagination";
+import { type InventoryReleaseRow, inventoryReleaseSnapshot } from "./library-inventory-release";
+import { libraryReleaseProjection } from "./library-release-projection";
 import { containsPattern } from "./search-pattern";
+import { effectiveUserDownloadSources } from "./user-library";
+
 const invalidSnapshot = () =>
   new AppError("Invalid collection inventory snapshot", 500, "COLLECTION_SNAPSHOT_INVALID");
 export async function readLibraryCollectionInventory(

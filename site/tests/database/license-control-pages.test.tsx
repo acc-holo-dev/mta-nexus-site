@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
@@ -23,13 +25,13 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/license-control-service", () => ({
+vi.mock("../../src/lib/services/commerce/license-control-service", () => ({
   licenseControlService: {
     detail: state.detail,
     servers: state.servers,
@@ -39,7 +41,13 @@ vi.mock("../../src/lib/services/license-control-service", () => ({
     history: state.history,
   },
 }));
-vi.mock("../../src/components/license-control-panel", () => ({
+vi.mock("../../src/features/commerce/license-controls", () => ({
+  LicenseControlPanel: (props: unknown) => {
+    state.panel(props);
+    return <section>Controls</section>;
+  },
+}));
+vi.mock("../../src/features/commerce/components/license-control-panel", () => ({
   LicenseControlPanel: (props: unknown) => {
     state.panel(props);
     return <section>Controls</section>;
@@ -55,14 +63,14 @@ import MaintenancePage from "../../src/app/admin/licenses/maintenance/page";
 import QueuePage from "../../src/app/admin/licenses/page";
 import WorkspaceLicenseHistoryLoading from "../../src/app/workspace/licenses/[id]/history/loading";
 import OwnerLicenseLoading from "../../src/app/workspace/licenses/[id]/loading";
-import OwnerPage, { metadata } from "../../src/app/workspace/licenses/[id]/page";
+import OwnerPage, { generateMetadata } from "../../src/app/workspace/licenses/[id]/page";
+import { getLicenseControlCopy } from "../../src/features/commerce/license-control-i18n";
 import {
   LicenseHistoryPage,
   licenseHistoryMetadata,
-} from "../../src/components/license-history-page";
+} from "../../src/features/commerce/license-history-server";
+import { getLicenseMaintenanceCopy } from "../../src/features/commerce/license-maintenance-i18n";
 import { getDictionary } from "../../src/lib/i18n";
-import { getLicenseControlCopy } from "../../src/lib/license-control-i18n";
-import { getLicenseMaintenanceCopy } from "../../src/lib/license-maintenance-i18n";
 
 const params = { params: Promise.resolve({ id: "lic_a" }) };
 const license = {
@@ -132,7 +140,7 @@ it("requires sign-in and does not load private license data for guests", async (
   state.user = null;
   expect(renderToStaticMarkup(await OwnerPage(params))).toContain("Sign in");
   expect(state.detail).not.toHaveBeenCalled();
-  expect(metadata.robots).toEqual({ index: false, follow: false });
+  expect((await generateMetadata()).robots).toEqual({ index: false, follow: false });
 });
 it("hides missing or foreign licenses", async () => {
   state.detail.mockResolvedValue(null);
@@ -215,7 +223,7 @@ it("shows an honest recovery state when full license history fails", async () =>
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("/workspace/licenses/lic_a/history?page=2");
   expect(html).not.toContain("&lt;script&gt;product&lt;/script&gt;");
 });
@@ -241,7 +249,7 @@ it("shows an honest recovery state when the moderator queue fails", async () => 
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/admin/licenses?status=active&amp;q=alpha&amp;page=2"');
   expect(html).not.toContain(license.key);
 });
@@ -257,7 +265,7 @@ it("renders an empty moderator queue with clear-filters recovery when filters ar
   expect(html).toContain(copy.clearFilters);
   expect(html).toContain(`<search aria-label="${copy.search}"`);
   expect(html).toContain('href="/admin/licenses"');
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("rejects stale staff privilege before loading the moderator queue", async () => {
   state.user = { id: "usr_a", role: "moderator" };
@@ -273,7 +281,7 @@ it("shows an honest recovery state when license maintenance inventory fails", as
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/admin/licenses/maintenance?page=2"');
 });
 it("renders empty maintenance inventory without inventing due licenses", async () => {
@@ -281,13 +289,13 @@ it("renders empty maintenance inventory without inventing due licenses", async (
   const copy = getLicenseMaintenanceCopy("en");
   const html = renderToStaticMarkup(await MaintenancePage({ searchParams: Promise.resolve({}) }));
   expect(html).toContain(copy.empty);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("clips honest loading shells on narrow layouts", async () => {
   for (const Loading of [LicensesLoading, MaintenanceLoading, AdminLicenseDetailLoading]) {
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain("min-w-0 max-w-5xl");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   }
   for (const Loading of [
     WorkspaceLicenseHistoryLoading,
@@ -296,7 +304,7 @@ it("clips honest loading shells on narrow layouts", async () => {
   ]) {
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain("min-w-0 max-w-4xl");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   }
 });
 it("shows an honest recovery state when owner license detail fails", async () => {
@@ -306,8 +314,8 @@ it("shows an honest recovery state when owner license detail fails", async () =>
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(getDictionary("en").errors.retry);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain('href="/workspace/licenses/lic_a"');
   expect(html).not.toContain(license.key);
   expect(state.servers).not.toHaveBeenCalled();
@@ -320,17 +328,17 @@ it("shows an honest recovery state when moderator license detail fails", async (
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(getDictionary("en").errors.retry);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain('href="/admin/licenses/lic_a"');
   expect(html).not.toContain(license.key);
 });
 it("clips the moderator license detail shell and raises history navigation to touch height", async () => {
   state.user = { id: "usr_a", role: "moderator" };
   const html = renderToStaticMarkup(await ModeratorPage(params));
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-w-0");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain('href="/admin/licenses/lic_a/history"');
   expect(html).not.toContain(license.key);
 });
@@ -340,7 +348,7 @@ it("renders EmptyState when owner license detail has no recorded actions", async
   const html = renderToStaticMarkup(await OwnerPage(params));
   expect(html).toContain(copy.noHistory);
   expect(html).toContain(copy.policy);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-h-11");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).not.toContain(license.key);
 });

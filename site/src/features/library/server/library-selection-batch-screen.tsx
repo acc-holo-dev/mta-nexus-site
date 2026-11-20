@@ -1,23 +1,32 @@
 import { AppError } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
-import {
-  collectionId,
-  collectionPageParams,
-  collectionsQuery,
-} from "../../../lib/library-collections-query";
-import { librarySelectionBatchesCopy } from "../../../lib/library-selection-batches-i18n";
-import { authService } from "../../../lib/services/auth-service";
-import { libraryCollectionsService } from "../../../lib/services/library-collections-service";
-import { librarySelectionBatchesService } from "../../../lib/services/library-selection-batches-service";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { formatUnknown } from "../../../lib/i18n/unknown";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
+import { librarySelectionBatchesService } from "../../../lib/services/library/library-selection-batches-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSmRounded, linkAccentTightRounded } from "../../shell/link-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelSpace3P4 } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import { typeBreakAllSm, typeBreakAllXsOnly } from "../../shell/type-shell";
 import { LibrarySelectionBatchControls } from "../components/library-selection-batch-controls";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { PlatformSessionError } from "../../../components/platform-session-error";
+import { libraryCollectionsCopy } from "../library-collections-i18n";
+import { collectionId, collectionPageParams, collectionsQuery } from "../library-collections-query";
+import { librarySelectionBatchesCopy } from "../library-selection-batches-i18n";
+export async function librarySelectionBatchMetadata(): Promise<Metadata> {
+  return {
+    title: `${librarySelectionBatchesCopy(await getRequestLocale()).history} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
+
 export async function LibrarySelectionBatchScreen({
   params,
   searchParams,
@@ -62,15 +71,13 @@ export async function LibrarySelectionBatchScreen({
   }
   if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const loadFailure = (retryHref: string) => (
-    <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+    <div className={pageShellMax5xl}>
       <h1 className="font-display">{history ? c.history : c.title}</h1>
       <ErrorState
         title={c.loadUnavailable}
+        description={c.loadUnavailableDescription}
         action={
-          <Link
-            href={retryHref}
-            className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href={retryHref} className={linkAccentSmRounded}>
             {dictionary.errors.retry}
           </Link>
         }
@@ -91,11 +98,8 @@ export async function LibrarySelectionBatchScreen({
         });
       if (!result) return loadFailure(retryHref);
       return (
-        <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
-          <Link
-            href={base}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+        <div className={pageShellMax5xl}>
+          <Link href={base} className={linkAccentTightRounded}>
             {c.title}
           </Link>
           <h1 className="font-display">
@@ -105,7 +109,7 @@ export async function LibrarySelectionBatchScreen({
           {!result.items.length && <EmptyState title={c.empty} description={c.privacy} />}
           <ol className="space-y-4">
             {result.items.map((receipt) => (
-              <li key={receipt.id} className="nexus-panel space-y-3 p-4">
+              <li key={receipt.id} className={panelSpace3P4}>
                 <h2>
                   {c[receipt.snapshot.mode]} · {c.changed}:{" "}
                   {
@@ -119,22 +123,23 @@ export async function LibrarySelectionBatchScreen({
                     {receipt.createdAt.toISOString()}
                   </time>
                 </p>
-                <p className="break-all text-xs">
+                <p className={typeBreakAllXsOnly}>
                   {c.receipt}: {receipt.id} · {c.request}: {receipt.requestId}
                 </p>
                 <details>
                   <summary>{c.preview}</summary>
                   <ul className="space-y-2 pt-3">
                     {receipt.snapshot.items.map((item) => (
-                      <li key={item.productId} className="break-all text-sm">
+                      <li key={item.productId} className={typeBreakAllSm}>
                         <code>{item.productId}</code>
                         <p>
-                          {c.previous}: {c[item.previous.mode]} · {item.previous.buildId ?? "—"} ·{" "}
-                          {c.selectionRevision}: {item.previous.revision}
+                          {c.previous}: {c[item.previous.mode]} ·{" "}
+                          {formatUnknown(locale, item.previous.buildId)} · {c.selectionRevision}:{" "}
+                          {item.previous.revision}
                         </p>
                         <p>
-                          {c.next}: {c[item.next.mode]} · {item.next.buildId ?? "—"} ·{" "}
-                          {c.selectionRevision}: {item.next.revision}
+                          {c.next}: {c[item.next.mode]} · {formatUnknown(locale, item.next.buildId)}{" "}
+                          · {c.selectionRevision}: {item.next.revision}
                         </p>
                       </li>
                     ))}
@@ -156,7 +161,7 @@ export async function LibrarySelectionBatchScreen({
           </nav>
           <a
             href={`/api/library/collections/${encodeURIComponent(id)}/versions/history/export?page=${result.page}`}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentTightRounded}
           >
             {c.export}
           </a>
@@ -173,20 +178,17 @@ export async function LibrarySelectionBatchScreen({
     const pageHref = (page: number) =>
       `${base}?${new URLSearchParams({ page: String(page), ...(result.q ? { q: result.q } : {}) })}`;
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+      <div className={pageShellMax5xl}>
         <Link
           href={`/workspace/library/collections/${encodeURIComponent(id)}`}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentTightRounded}
         >
           {c.back}
         </Link>
         <h1 className="font-display">
           {c.title}: {result.collection.name}
         </h1>
-        <Link
-          href={`${base}/history`}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={`${base}/history`} className={linkAccentTightRounded}>
           {c.history}
         </Link>
         {result.collection.status === "archived" ? (
@@ -206,10 +208,7 @@ export async function LibrarySelectionBatchScreen({
         )}
         <nav aria-label={cc.page} className="flex gap-4">
           {result.page > 1 && (
-            <Link
-              href={pageHref(result.page - 1)}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={pageHref(result.page - 1)} className={linkAccentTightRounded}>
               {cc.previous}
             </Link>
           )}
@@ -217,10 +216,7 @@ export async function LibrarySelectionBatchScreen({
             {cc.page} {result.page} {cc.of} {result.totalPages}
           </span>
           {result.page < result.totalPages && (
-            <Link
-              href={pageHref(result.page + 1)}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={pageHref(result.page + 1)} className={linkAccentTightRounded}>
               {cc.next}
             </Link>
           )}

@@ -1,9 +1,9 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { serverReviewCopy, serverReviewLoadCopy } from "../../../lib/server-review-i18n";
+import { serverReviewCopy, serverReviewLoadCopy } from "../server-review-i18n";
 
-vi.mock("../../../components/locale-context", () => ({
+vi.mock("../../shell/locale", () => ({
   useNexusLocale: () => ({ locale: "en" }),
 }));
 vi.mock("next/navigation", () => ({
@@ -53,6 +53,7 @@ describe("server review panel honest load states", () => {
       }),
     );
     expect(html).toContain(loadCopy.unavailable);
+    expect(html).toContain(loadCopy.unavailableHint);
     expect(html).toContain(loadCopy.retry);
     expect(html).toContain('role="alert"');
     expect(html).toContain("min-h-11");

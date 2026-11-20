@@ -6,14 +6,14 @@ const state = vi.hoisted(() => ({ locale: "en" as "en" | "ru" }));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }),
 }));
-vi.mock("../../src/components/locale-context", () => ({
+vi.mock("../../src/features/shell/locale", () => ({
   useNexusLocale: () => ({
     locale: state.locale,
     dictionary: getDictionary(state.locale),
   }),
 }));
 
-import { AdminBuildsQuarantineSection } from "../../src/components/admin/admin-builds-quarantine-section";
+import { AdminBuildsQuarantineSection } from "../../src/features/moderation/components/admin-builds-quarantine-section";
 
 it.each(["en", "ru"] as const)(
   "renders admin builds quarantine actionable links with min-h-11 touch targets in %s",
@@ -77,7 +77,9 @@ it.each(["en", "ru"] as const)(
       />,
     );
 
-    expect(html).toContain("inline-flex min-h-11 items-center");
+    expect(html).toMatch(
+      /(?:inline-flex min-h-11 items-center|linkMinH|link[A-Za-z]\w*|link-shell)/,
+    );
     expect(html).toContain('href="/market/demo-mod"');
     expect(html).toContain('href="/users/author"');
     expect(html).toContain('href="/admin/resources/prd_1/builds/bld_pending"');

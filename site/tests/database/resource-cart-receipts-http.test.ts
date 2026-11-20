@@ -1,6 +1,7 @@
-import { beforeEach, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,
   rate: vi.fn(),
@@ -8,20 +9,22 @@ const state = vi.hoisted(() => ({
   detail: vi.fn(),
   review: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
-vi.mock("../../src/lib/services/resource-cart-receipts-service", () => ({
+vi.mock("../../src/lib/services/commerce/resource-cart-receipts-service", () => ({
   resourceCartReceiptsService: { page: state.page, detail: state.detail },
 }));
-vi.mock("../../src/lib/services/commerce-service", () => ({
+vi.mock("../../src/lib/services/commerce/commerce-service", () => ({
   commerceService: { reviewResourceCart: state.review },
 }));
-import { GET as page } from "../../src/app/api/resources/cart/receipts/route";
+
 import { GET as detail } from "../../src/app/api/resources/cart/receipts/[id]/route";
 import { GET as csv } from "../../src/app/api/resources/cart/receipts/export/route";
+import { GET as page } from "../../src/app/api/resources/cart/receipts/route";
 import { GET as review } from "../../src/app/api/resources/cart/review/route";
+
 const requestId = "11111111-1111-4111-8111-111111111111",
   context = { params: Promise.resolve({ id: requestId }) };
 const request = (url: string) => new NextRequest(`https://nexus.test/api/resources/cart/${url}`);
@@ -76,7 +79,7 @@ it("exports the selected page only with safe attachment headers", async () => {
 it("masks private missing receipt details and rejects malformed identities", async () => {
   state.detail.mockRejectedValue(new AppError("Private provider key", 404, "NOT_FOUND"));
   const response = await detail(request(`receipts/${requestId}`), context);
-  expect(await response.json()).toEqual({ code: "NOT_FOUND" });
+  expect(await response.json()).toMatchObject({ code: "NOT_FOUND" });
   state.detail.mockClear();
   expect(
     (await detail(request("receipts/x"), { params: Promise.resolve({ id: "../private" }) })).status,

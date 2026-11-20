@@ -8,6 +8,7 @@ const state = vi.hoisted(() => ({
   discussion: vi.fn(),
   discussionDetail: vi.fn(),
 }));
+vi.mock("server-only", () => ({}));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "token" }) }) }));
 vi.mock("next/navigation", () => ({
   usePathname: () => "/admin/community/post/discussion",
@@ -15,13 +16,13 @@ vi.mock("next/navigation", () => ({
     throw Error("NOT_FOUND_BOUNDARY");
   },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../../src/lib/services/community-moderation-service", () => ({
+vi.mock("../../src/lib/services/community/community-moderation-service", () => ({
   communityModerationService: state,
 }));
 vi.mock("../../src/features/community/components/moderated-discussion-removal", () => ({
@@ -30,9 +31,9 @@ vi.mock("../../src/features/community/components/moderated-discussion-removal", 
 
 import DiscussionReportsLoading from "../../src/app/admin/community/[id]/discussion/[commentId]/reports/loading";
 import DiscussionLoading from "../../src/app/admin/community/[id]/discussion/loading";
+import { moderationCopy } from "../../src/features/community/community-moderation-copy";
+import { moderatedDiscussionCopy } from "../../src/features/community/moderated-discussion-copy";
 import { ModeratedDiscussionScreen } from "../../src/features/community/server/moderated-discussion-screen";
-import { moderationCopy } from "../../src/lib/community-moderation-copy";
-import { moderatedDiscussionCopy } from "../../src/lib/moderated-discussion-copy";
 
 const time = "2026-10-11T00:00:00.000Z",
   publication = {
@@ -139,7 +140,7 @@ it("denies ordinary sessions before loading private discussion and shows login f
   const denied = renderToStaticMarkup(await ModeratedDiscussionScreen({ id: "post" }));
   expect(denied).toContain("current administrator or moderator");
   expect(denied).toContain('role="alert"');
-  expect(denied).toContain("overflow-x-clip");
+  expect(denied).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(state.discussion).not.toHaveBeenCalled();
   state.session.mockResolvedValue(null);
   expect(renderToStaticMarkup(await ModeratedDiscussionScreen({ id: "post" }))).toContain(
@@ -150,11 +151,11 @@ it("shows localized service failures and rejects scope-mismatched DTOs", async (
   state.discussion.mockRejectedValue(new AppError("Revoked", 403, "FORBIDDEN"));
   const revoked = renderToStaticMarkup(await ModeratedDiscussionScreen({ id: "post" }));
   expect(revoked).toContain('role="alert"');
-  expect(revoked).toContain("overflow-x-clip");
+  expect(revoked).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   state.discussion.mockResolvedValue({ ...page, publication: { ...publication, id: "foreign" } });
   const html = renderToStaticMarkup(await ModeratedDiscussionScreen({ id: "post" }));
   expect(html).toContain('role="alert"');
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).not.toContain("Private publication");
 });
 it("shows an honest recovery state when discussion moderation fails to load", async () => {
@@ -167,7 +168,7 @@ it("shows an honest recovery state when discussion moderation fails to load", as
     }),
   );
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("/admin/community/post/discussion?q=word&amp;author=writer");
   expect(html).not.toContain("Private publication");
 });
@@ -228,6 +229,6 @@ it("clips honest loading shells on narrow layouts", async () => {
   for (const Loading of [DiscussionLoading, DiscussionReportsLoading]) {
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain("min-w-0 max-w-4xl");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   }
 });

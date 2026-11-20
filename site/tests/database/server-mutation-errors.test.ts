@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { serverMutationErrorMessage } from "../../src/lib/server-mutation-errors";
+import { serverMutationErrorMessage } from "../../src/features/servers/server-mutation-errors";
 import { getDictionary } from "../../src/lib/i18n";
 
 describe("localized server mutation errors", () => {
@@ -52,7 +52,7 @@ describe("localized server mutation errors", () => {
     ).toBe(copy.bodyTimedOut);
   });
 
-  it("does not trust arbitrary payloads or prototype keys", () => {
+  it("does not trust payload.error or prototype keys", () => {
     const messages = { FORBIDDEN: "Not allowed" };
     expect(serverMutationErrorMessage(null, messages, "Fallback")).toBe("Fallback");
     expect(serverMutationErrorMessage([], messages, "Fallback")).toBe("Fallback");
@@ -63,22 +63,10 @@ describe("localized server mutation errors", () => {
       "Fallback",
     );
     expect(serverMutationErrorMessage({ error: "ordinary error" }, messages, "Fallback")).toBe(
-      "ordinary error",
+      "Fallback",
     );
-  });
-
-  it("rejects every C0 control character while permitting ordinary multilingual text", () => {
-    for (let code = 0; code < 32; code++) {
-      expect(
-        serverMutationErrorMessage(
-          { error: `error${String.fromCharCode(code)}message` },
-          {},
-          "Fallback",
-        ),
-      ).toBe("Fallback");
-    }
     expect(serverMutationErrorMessage({ error: "Сервер недоступен 🌍" }, {}, "Fallback")).toBe(
-      "Сервер недоступен 🌍",
+      "Fallback",
     );
   });
 });

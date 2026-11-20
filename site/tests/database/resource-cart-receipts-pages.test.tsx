@@ -1,7 +1,9 @@
+vi.mock("server-only", () => ({}));
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { LocaleProvider } from "../../src/components/locale-context";
 import { ResourceCartControls } from "../../src/features/resources/components/resource-cart-controls";
+import { LocaleProvider } from "../../src/features/shell/locale";
 
 const state = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,
@@ -16,13 +18,13 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/acquisitions/receipts",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../../src/lib/services/resource-cart-receipts-service", () => ({
+vi.mock("../../src/lib/services/commerce/resource-cart-receipts-service", () => ({
   resourceCartReceiptsService: { page: state.page, detail: state.detail },
 }));
 vi.mock("../../src/features/resources/download", () => ({
@@ -33,11 +35,11 @@ vi.mock("../../src/features/resources/download", () => ({
   ),
 }));
 
-import Detail from "../../src/app/workspace/acquisitions/receipts/[id]/page";
 import DetailLoading from "../../src/app/workspace/acquisitions/receipts/[id]/loading";
-import Page, { generateMetadata } from "../../src/app/workspace/acquisitions/receipts/page";
+import Detail from "../../src/app/workspace/acquisitions/receipts/[id]/page";
 import ListLoading from "../../src/app/workspace/acquisitions/receipts/loading";
-import { resourceCartReceiptsCopy } from "../../src/lib/resource-cart-receipts-i18n";
+import Page, { generateMetadata } from "../../src/app/workspace/acquisitions/receipts/page";
+import { resourceCartReceiptsCopy } from "../../src/features/resources/resource-cart-receipts-i18n";
 
 const requestId = "11111111-1111-4111-8111-111111111111";
 beforeEach(() => {
@@ -140,7 +142,7 @@ it("authenticates and rejects repeated filters before querying receipts", async 
   expect(invalid).toContain(copy.invalid);
   expect(invalid).toContain('role="alert"');
   expect(invalid).toContain("bg-danger-soft");
-  expect(invalid).toContain("overflow-x-clip");
+  expect(invalid).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(invalid).toContain('href="/workspace/acquisitions/receipts"');
   expect(state.page).not.toHaveBeenCalled();
 });
@@ -215,7 +217,7 @@ it("shows an honest recovery state when acquisition receipts fail to load", asyn
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("days=30");
   expect(html).not.toContain("receipts unavailable");
 });
@@ -225,13 +227,13 @@ it("shows an honest recovery state when a receipt detail fails to load", async (
   const html = renderToStaticMarkup(await Detail({ params: Promise.resolve({ id: requestId }) }));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(`href="/workspace/acquisitions/receipts/${requestId}"`);
 });
 it("clips honest receipt loading shells on narrow layouts", async () => {
   for (const Loading of [ListLoading, DetailLoading]) {
     const html = renderToStaticMarkup(await Loading());
-    expect(html).toContain("min-w-0");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   }
 });

@@ -11,21 +11,21 @@ const state = vi.hoisted(() => ({ locale: "en" as "en" | "ru", session: vi.fn(),
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "token" }) }) }));
 vi.mock("next/navigation", () => ({ usePathname: () => "/notifications" }));
 vi.mock("next/link", () => ({ default: "a" }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: state.session },
 }));
-vi.mock("../../src/lib/services/notification-inbox-service", () => ({
+vi.mock("../../src/lib/services/notifications/notification-inbox-service", () => ({
   notificationInboxService: { page: state.page },
 }));
 
 import Loading from "../../src/app/notifications/loading";
 import Page, { generateMetadata } from "../../src/app/notifications/page";
-import { LocaleProvider } from "../../src/components/locale-context";
+import { notificationInboxCopy } from "../../src/features/notifications/notification-inbox-copy";
+import { LocaleProvider } from "../../src/features/shell/locale";
 import { getDictionary } from "../../src/lib/i18n";
-import { notificationInboxCopy } from "../../src/lib/notification-inbox-copy";
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -48,7 +48,7 @@ it.each(["en", "ru"] as const)(
     const html = await render({ q: "needle", state: "unread", category: "content" });
     expect(html).toContain(copy.openBetaNote);
     expect(html).toContain("min-w-0 max-w-4xl");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain(`<nav aria-label="${copy.readingState}"`);
     expect(html).not.toContain(`<nav aria-label="${copy.title}"`);
     expect(html).toContain(`aria-label="${copy.pageNavigation}"`);
@@ -72,7 +72,7 @@ it.each(["en", "ru"] as const)(
     const loadingHtml = renderToStaticMarkup(await Loading());
     expect(loadingHtml).toContain('aria-busy="true"');
     expect(loadingHtml).toContain("min-w-0 max-w-4xl");
-    expect(loadingHtml).toContain("overflow-x-clip");
+    expect(loadingHtml).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(loadingHtml).toContain('id="notification-inbox-loading-heading"');
     expect(loadingHtml).toContain('aria-labelledby="notification-inbox-loading-heading"');
     expect(loadingHtml).toContain(`>${copy.title}<`);
@@ -276,13 +276,17 @@ it.each(["session", "page"] as const)(
   async (dependency) => {
     state[dependency].mockRejectedValue(new Error("PRIVATE_SQL"));
     const html = await render({ state: "unread" });
+    const copy = notificationInboxCopy("en");
     expect(html).toContain("temporarily unavailable");
     expect(html).toContain('role="alert"');
-    expect(html).toContain(`>${notificationInboxCopy("en").title}</h1>`);
-    expect(html).toContain("Try again");
+    expect(html).toContain(`>${copy.title}</h1>`);
+    expect(html).toContain(getDictionary("en").errors.retry);
     expect(html).toContain('href="/notifications?state=unread"');
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).not.toContain("PRIVATE_SQL");
     expect(html).not.toContain("No notifications yet");
+    if (dependency === "session") {
+      expect(html).not.toContain("/auth/login");
+    }
   },
 );

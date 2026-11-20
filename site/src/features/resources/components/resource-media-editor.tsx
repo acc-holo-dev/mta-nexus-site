@@ -6,10 +6,18 @@ import {
 } from "@nexus/domain";
 import { Button, EmptyState, ErrorState, Input } from "@nexus/ui";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { resourceMediaCopy } from "../../../lib/resource-media-i18n";
-import { confirmAction } from "../../../components/confirm-action";
+import { confirmAction } from "../../shell/confirm-action";
+import { linkGhostAccentSm } from "../../shell/link-shell";
+import { panelSpace3P4, panelSpace4P5 } from "../../shell/panel-shell";
+import {
+  typeBlockFileInputInset,
+  typeFlexWrapGap2,
+  typeLabelBlockUpperSecondary,
+  typeSmMuted,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import { resourceMediaCopy, resourceMediaError } from "../resource-media-i18n";
 import { ResourcePreview } from "./resource-preview";
-
 export function ResourceMediaEditor({
   initial,
   locale,
@@ -55,7 +63,7 @@ export function ResourceMediaEditor({
       const payload = await response.json();
       controller.signal.throwIfAborted();
       if (!response.ok) {
-        setError(copy.errors[payload.code as keyof typeof copy.errors] ?? copy.error);
+        setError(resourceMediaError(locale, payload.code));
         return;
       }
       if (!payload.product?.updatedAt || !Array.isArray(payload.items))
@@ -118,7 +126,13 @@ export function ResourceMediaEditor({
   }
   return (
     <div className="space-y-5" aria-busy={busy}>
-      {readonly ? <ErrorState id="resource-media-readonly" title={copy.readonly} /> : null}
+      {readonly ? (
+        <ErrorState
+          id="resource-media-readonly"
+          title={copy.readonly}
+          description={copy.readonlyDescription}
+        />
+      ) : null}
       {error ? (
         <ErrorState
           title={error}
@@ -129,7 +143,7 @@ export function ResourceMediaEditor({
               variant="ghost"
               disabled={busy}
               onClick={() => void execute("GET")}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
             >
               {copy.reload}
             </Button>
@@ -158,7 +172,7 @@ export function ResourceMediaEditor({
       {!items.length ? <EmptyState title={copy.empty} description={copy.emptyDescription} /> : null}
       <ol className="grid gap-5 sm:grid-cols-2">
         {items.map((item, index) => (
-          <li key={item.id} className="nexus-panel space-y-3 p-4">
+          <li key={item.id} className={panelSpace3P4}>
             <div className="aspect-video overflow-hidden rounded-lg bg-inset">
               <ResourcePreview
                 src={item.url}
@@ -166,7 +180,7 @@ export function ResourceMediaEditor({
                 fallback={copy.previewUnavailable}
               />
             </div>
-            <p className="text-xs text-muted">
+            <p className={typeXsMuted}>
               {item.width} × {item.height}
               {index === 0 ? ` · ${copy.currentCover}` : ""}
             </p>
@@ -183,7 +197,7 @@ export function ResourceMediaEditor({
               }
             />
             {!readonly && (
-              <div className="flex flex-wrap gap-2">
+              <div className={typeFlexWrapGap2}>
                 <Button
                   type="button"
                   variant="outline"
@@ -228,7 +242,7 @@ export function ResourceMediaEditor({
       {!readonly && (
         <>
           {dirty && (
-            <p role="note" className="text-sm text-muted">
+            <p role="note" className={typeSmMuted}>
               {copy.dirty}
             </p>
           )}
@@ -249,12 +263,9 @@ export function ResourceMediaEditor({
           >
             {copy.save}
           </Button>
-          <form onSubmit={upload} className="nexus-panel space-y-4 p-5">
+          <form onSubmit={upload} className={panelSpace4P5}>
             <div className="space-y-1.5">
-              <label
-                htmlFor="media-upload-file"
-                className="block font-label uppercase text-secondary"
-              >
+              <label htmlFor="media-upload-file" className={typeLabelBlockUpperSecondary}>
                 {copy.file}
               </label>
               <input
@@ -264,7 +275,7 @@ export function ResourceMediaEditor({
                 accept="image/png,image/jpeg,image/webp"
                 required
                 disabled={busy || dirty || items.length >= RESOURCE_MEDIA_LIMIT}
-                className="block w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-accent"
+                className={typeBlockFileInputInset}
               />
             </div>
             <Input

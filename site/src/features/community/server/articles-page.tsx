@@ -1,25 +1,23 @@
 import { EmptyState, ErrorState, PageHeader } from "@nexus/ui";
 import { BookOpen } from "lucide-react";
 import Link from "next/link";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { contentService } from "../../../lib/services/community/content-service";
+import { discoveryStreamCopy } from "../../discovery/discovery-stream-copy";
+import { linkAccentSm, linkAccentSmRounded } from "../../shell/link-shell";
+import { pageShellStack8 } from "../../shell/page-shell";
 import { ArticleCard } from "../article-view";
 import { ContentCatalogControls, ContentPageNavigation } from "../catalog-controls";
-import { discoveryStreamCopy } from "../../../lib/discovery-stream-copy";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { contentService } from "../../../lib/services/content-service";
-import {
-  contentPageHref,
-  editorialTypes,
-  parseContentPage,
-} from "../../../lib/user-platform-contract";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
+import { contentPageHref, editorialTypes, parseContentPage } from "../user-platform-contract";
+import { getUserPlatformCopy } from "../user-platform-copy";
 
-export async function generateMetadata() {
+export async function articlesMetadata() {
   const copy = getDictionary(await getRequestLocale()).articles;
   return { title: copy.title, description: copy.description };
 }
 
-export default async function ArticlesPage({
+export async function ArticlesPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -33,23 +31,17 @@ export default async function ArticlesPage({
   const filtersActive = Boolean(filters.query || filters.type);
 
   return (
-    <div className="min-w-0 space-y-8 overflow-x-clip">
+    <div className={pageShellStack8}>
       <PageHeader
         title={dictionary.articles.title}
         description={dictionary.articles.description}
         icon={<BookOpen className="h-7 w-7 text-warning" aria-hidden="true" />}
         action={
           <>
-            <Link
-              href="/workspace/content/new"
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href="/workspace/content/new" className={linkAccentSm}>
               {platformCopy.create}
             </Link>
-            <Link
-              href="/workspace/content"
-              className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href="/workspace/content" className={linkAccentSm}>
               {platformCopy.studio}
             </Link>
           </>
@@ -65,10 +57,11 @@ export default async function ArticlesPage({
       {!result ? (
         <ErrorState
           title={platformCopy.unavailable}
+          description={platformCopy.unavailableHint}
           action={
             <Link
               href={contentPageHref("/articles", filters, filters.page)}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentSmRounded}
             >
               {dictionary.errors.retry}
             </Link>
@@ -89,17 +82,11 @@ export default async function ArticlesPage({
           icon={<BookOpen className="h-6 w-6" />}
           action={
             filtersActive ? (
-              <Link
-                href="/articles"
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href="/articles" className={linkAccentSm}>
                 {dictionary.articles.clearFilters}
               </Link>
             ) : (
-              <Link
-                href="/discover/stream"
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href="/discover/stream" className={linkAccentSm}>
                 {discoveryStreamCopy(locale).title}
               </Link>
             )

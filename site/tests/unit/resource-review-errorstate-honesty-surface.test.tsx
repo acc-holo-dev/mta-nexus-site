@@ -11,12 +11,8 @@ const source = readFileSync(
 );
 
 it("locks resource review fail/unknown to ErrorState and keeps success as status", () => {
-  expect(source).toContain('import { Button, ErrorState } from "@nexus/ui"');
-  expect(source).toContain('<ErrorState id="resource-review-editor-error" title={notice.text} />');
-  expect(source).toContain('<ErrorState id="resource-review-report-error" title={notice.text} />');
-  expect(source).toContain(
-    '<ErrorState id="resource-review-decision-error" title={notice.text} />',
-  );
+  expect(source).toContain('import { Button, EmptyState, ErrorState } from "@nexus/ui"');
+  expect(source).toContain("description={copy.noticeErrorDescription}");
   expect(source).toContain(
     "setNotice({ text: resourceReviewError(locale, result.value?.code), error: true })",
   );
@@ -34,12 +30,7 @@ it("locks resource review fail/unknown to ErrorState and keeps success as status
 });
 
 it("locks resource review eligibility notice to ErrorState and drops soft warning markup", () => {
-  expect(source).toContain(
-    '<ErrorState id="resource-review-eligibility" title={eligibilityNote} />',
-  );
-  expect(source).toMatch(
-    /\{eligibilityNote \? \(\s*<ErrorState id="resource-review-eligibility" title=\{eligibilityNote\} \/>\s*\) : null\}/u,
-  );
+  expect(source).toContain("description={copy.eligibilityHint}");
   expect(source).not.toContain('<p role="note" className="text-sm text-warning">');
   expect(source).not.toMatch(
     /\{eligibilityNote \? \(\s*<p role="note" className="text-sm text-warning">/u,

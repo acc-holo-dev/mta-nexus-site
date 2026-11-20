@@ -1,0 +1,51 @@
+import type { Locale } from "../../lib/i18n";
+
+const en = {
+  catalogUnavailable: "Resource catalog is temporarily unavailable",
+  authenticationRequired: "Authentication required",
+  actorRequired: "Actor precondition required",
+  actorChanged: "Actor changed",
+  forbidden: "Forbidden",
+  unsupportedMediaType: "Request must use application/json",
+  requestBodyTooLarge: "Request body is too large",
+  invalidBodyLength: "Request body length is invalid",
+  requestBodyTimeout: "Request body timed out",
+  creationLimitExceeded: "Resource creation limit exceeded",
+  invalidDetails: "Invalid resource details",
+  paidDisabled: "Paid resources are disabled until a payment provider is configured",
+  slugExists: "A resource with this slug already exists",
+  createFailed: "Could not create resource",
+  notFound: "Product not found",
+  detailsUnavailable: "Resource details are temporarily unavailable",
+  rateLimitExceeded: "Too many operations. Wait a little and try again.",
+  metadataRevisionRequired: "Reload the resource before saving; an observed revision is required.",
+  metadataConflict: "The resource changed. Reload the page and review the current state.",
+  metadataInvalid: "Invalid resource details",
+  updateFailed: "Could not update resource",
+};
+
+const ru: Record<keyof typeof en, string> = {
+  catalogUnavailable: "Каталог ресурсов временно недоступен",
+  authenticationRequired: "Требуется вход",
+  actorRequired: "Требуется предусловие актора",
+  actorChanged: "Актор изменился",
+  forbidden: "Запрещено",
+  unsupportedMediaType: "Запрос должен использовать application/json",
+  requestBodyTooLarge: "Тело запроса слишком большое",
+  invalidBodyLength: "Некорректная длина тела запроса",
+  requestBodyTimeout: "Истекло время ожидания тела запроса",
+  creationLimitExceeded: "Превышен лимит создания ресурсов",
+  invalidDetails: "Некорректные данные ресурса",
+  paidDisabled: "Платные ресурсы отключены, пока не настроен платёжный провайдер",
+  slugExists: "Ресурс с таким slug уже существует",
+  createFailed: "Не удалось создать ресурс",
+  notFound: "Продукт не найден",
+  detailsUnavailable: "Детали ресурса временно недоступны",
+  rateLimitExceeded: "Слишком много операций. Подождите немного и повторите попытку.",
+  metadataRevisionRequired: "Обновите ресурс перед сохранением; требуется зафиксированная ревизия.",
+  metadataConflict: "Ресурс изменился. Обновите страницу и проверьте текущее состояние.",
+  metadataInvalid: "Некорректные данные ресурса",
+  updateFailed: "Не удалось обновить ресурс",
+};
+
+export const productsApiCopy = (locale: Locale) => (locale === "ru" ? ru : en);

@@ -3,7 +3,7 @@ import { Readable } from "node:stream";
 import { NextRequest } from "next/server";
 import { expect, it, vi } from "vitest";
 
-vi.mock("../../src/lib/services/auth-service", async () => {
+vi.mock("../../src/lib/services/accounts/auth-service", async () => {
   const { resourceDownloadHttpState } = await import("../helpers/resource-download-http-harness");
   return {
     authService: {
@@ -12,7 +12,7 @@ vi.mock("../../src/lib/services/auth-service", async () => {
   };
 });
 
-vi.mock("../../src/lib/services/commerce-service", async () => {
+vi.mock("../../src/lib/services/commerce/commerce-service", async () => {
   const { resourceDownloadHttpState } = await import("../helpers/resource-download-http-harness");
   return {
     commerceService: {
@@ -21,13 +21,11 @@ vi.mock("../../src/lib/services/commerce-service", async () => {
   };
 });
 
-vi.mock("../../src/lib/services/product-service", async () => {
-  const { resourceDownloadHttpState } = await import("../helpers/resource-download-http-harness");
-  return {
-    productService: {
-      canManageProduct: vi.fn(async () => resourceDownloadHttpState.managementAccess),
-    },
-  };
+vi.mock("../../src/lib/services/commerce/product-service", async () => {
+  const { createResourceDownloadHttpProductServiceMock } = await import(
+    "../helpers/resource-download-http-harness"
+  );
+  return createResourceDownloadHttpProductServiceMock();
 });
 
 vi.mock("@nexus/db", async () => {
@@ -58,6 +56,7 @@ vi.mock("@nexus/security", () => ({
 }));
 
 import { GET } from "../../src/app/api/products/[id]/download/route";
+import { productDownloadApiCopy } from "../../src/features/resources/product-download-api-copy";
 import {
   resourceDownloadHttpAuditRecord as auditRecord,
   resourceDownloadHttpContext as context,
@@ -121,7 +120,7 @@ it("returns 404 when access exists but no published build is available", async (
   expect(response.headers.get("Vary")).toBe("Cookie");
   expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
   expect(await response.json()).toEqual({
-    error: "No published build is available",
+    error: productDownloadApiCopy("en").noPublishedBuild,
   });
   expect(downloadStream).not.toHaveBeenCalled();
 });
@@ -138,7 +137,7 @@ it("fails closed when a published build has no trusted scan provenance", async (
 
   expect(response.status).toBe(409);
   expect(await response.json()).toEqual({
-    error: "Published build is not cleared for delivery",
+    error: productDownloadApiCopy("en").notCleared,
   });
   expect(downloadStream).not.toHaveBeenCalled();
   expect(auditRecord).not.toHaveBeenCalled();

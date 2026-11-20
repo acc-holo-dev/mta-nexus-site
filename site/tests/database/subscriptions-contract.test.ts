@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import {
   commercialFeeEstimate,
   effectiveSubscriptionStatus,
@@ -5,20 +6,22 @@ import {
 } from "@nexus/domain";
 import { subscriptionCommandSchema } from "@nexus/validation";
 import { expect, it } from "vitest";
-import { createHash } from "node:crypto";
 import {
-  expectedSubscriptionReceiptId,
   confirmedSubscriptionEstimate,
   confirmedSubscriptionReceipt,
-} from "../../src/lib/subscription-confirmation";
-import { subscriptionError, subscriptionsCopy } from "../../src/lib/subscriptions-i18n";
+  expectedSubscriptionReceiptId,
+} from "../../src/features/commerce/subscription-confirmation";
+import {
+  subscriptionError,
+  subscriptionsCopy,
+} from "../../src/features/commerce/subscriptions-i18n";
 import {
   subscriptionActivationQuery,
   subscriptionEstimateQuery,
   subscriptionId,
   subscriptionPageParams,
   subscriptionsQuery,
-} from "../../src/lib/subscriptions-query";
+} from "../../src/features/commerce/subscriptions-query";
 import {
   activation,
   cancellation,

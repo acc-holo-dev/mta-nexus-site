@@ -1,17 +1,18 @@
 import { randomBytes } from "node:crypto";
-import { and, eq, sql } from "drizzle-orm";
-import { expect, it } from "vitest";
 import {
   auditEvents,
+  buildRepository,
   builds,
   db,
-  products,
-  userRepository,
   productRepository,
-  buildRepository,
-  sessionRepository,
+  products,
   resourceBuildWorkspaceRepository as repo,
+  sessionRepository,
+  userRepository,
 } from "@nexus/db";
+import { and, eq, sql } from "drizzle-orm";
+import { expect, it } from "vitest";
+
 async function fixture(status: "pending_review" | "rejected" | "draft" = "pending_review") {
   const suffix = randomBytes(5).toString("hex"),
     actorId = `usr_bw_${suffix}`,

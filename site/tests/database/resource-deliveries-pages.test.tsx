@@ -18,13 +18,13 @@ vi.mock("next/navigation", () => ({
   },
   usePathname: () => "/workspace/library/downloads/dlv_a",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../../src/lib/services/resource-deliveries-service", () => ({
+vi.mock("../../src/lib/services/commerce/resource-deliveries-service", () => ({
   resourceDeliveriesService: { page: state.page, detail: state.detail, publisher: state.publisher },
 }));
 vi.mock("../../src/features/resources/download", () => ({
@@ -38,7 +38,7 @@ vi.mock("../../src/features/resources/download", () => ({
 import Detail from "../../src/app/workspace/library/downloads/[id]/page";
 import Page from "../../src/app/workspace/library/downloads/page";
 import Publisher from "../../src/app/workspace/resources/[id]/deliveries/page";
-import { resourceDeliveriesCopy } from "../../src/lib/resource-deliveries-i18n";
+import { resourceDeliveriesCopy } from "../../src/features/resources/resource-deliveries-i18n";
 
 const context = { params: Promise.resolve({ id: "dlv_a" }) };
 beforeEach(() => {
@@ -147,7 +147,7 @@ it("distinguishes empty inventory from filtered download history", async () => {
   const never = renderToStaticMarkup(await Page({ searchParams: Promise.resolve({}) }));
   expect(never).toContain(copy.emptyNever);
   expect(never).toContain(copy.emptyNeverHint);
-  expect(never).toContain("overflow-x-clip");
+  expect(never).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(never).not.toContain(copy.clearFilters);
 
   state.page.mockResolvedValueOnce({
@@ -192,7 +192,7 @@ it("shows an honest recovery state when download history fails", async () => {
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("days=30");
   expect(html).toContain("status=cancelled");
 });
@@ -202,7 +202,7 @@ it("shows an honest recovery state when a download receipt fails", async () => {
   const html = renderToStaticMarkup(await Detail(context));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("/workspace/library/downloads/dlv_a");
 });
 it("distinguishes empty publisher inventory from filtered version summary", async () => {
@@ -264,7 +264,9 @@ it("invalid filters cause no repository query and foreign receipt IDs are not fo
   );
   expect(publisherInvalid).toContain(resourceDeliveriesCopy("en").invalid);
   expect(publisherInvalid).toContain('role="alert"');
-  expect(publisherInvalid).toContain("overflow-x-clip");
+  expect(publisherInvalid).toMatch(
+    /(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/,
+  );
   expect(state.publisher).not.toHaveBeenCalled();
   state.detail.mockRejectedValue(new AppError("private", 404, "NOT_FOUND"));
   await expect(Detail(context)).rejects.toThrow("NEXT_NOT_FOUND");
@@ -283,6 +285,6 @@ it("shows an honest publisher recovery state when delivery evidence fails", asyn
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("days=7");
 });

@@ -1,13 +1,13 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
-import { withBrowserMutation } from "../../../../../../../../lib/browser-route-adapter";
 import {
   organizationApi,
   organizationId,
   organizationInput,
   organizationMutationToken,
-} from "../../../../../../../../lib/organization-workspace-api";
-import { organizationWorkspaceService } from "../../../../../../../../lib/services/organization-workspace-service";
+} from "../../../../../../../../features/organizations/organization-workspace-api";
+import { withBrowserMutation } from "../../../../../../../../lib/http/browser-route-adapter";
+import { organizationWorkspaceService } from "../../../../../../../../lib/services/organizations/organization-workspace-service";
 
 type Context = { params: Promise<{ id: string }> };
 export const POST = withBrowserMutation((request: NextRequest, { params }: Context) => {

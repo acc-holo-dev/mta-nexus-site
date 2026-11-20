@@ -1,3 +1,6 @@
 import "server-only";
 
-export { ServerWorkspaceHistoryScreen } from "./server/server-workspace-history-screen";
+export {
+  ManagedServerActivityRoutePage,
+  serverWorkspaceHistoryMetadata,
+} from "./server/server-workspace-history-screen";

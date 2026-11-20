@@ -1,11 +1,11 @@
-import { describe, expect, it } from "vitest";
 import {
+  buildRepository,
   contentRepository,
   organizationRepository,
   productRepository,
   userRepository,
-  buildRepository,
 } from "@nexus/db";
+import { describe, expect, it } from "vitest";
 
 describe("organization public listing integration", () => {
   it("returns only published rows for the requested organization", async () => {

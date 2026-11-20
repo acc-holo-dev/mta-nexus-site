@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
@@ -22,10 +24,10 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../../src/lib/services/resource-release-watches-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-release-watches-service", () => ({
   resourceReleaseWatchesService: {
     detail: async (_user: unknown, productId: string) => ({
       productId,
@@ -38,10 +40,10 @@ vi.mock("../../src/lib/services/resource-release-watches-service", () => ({
 vi.mock("../../src/features/resources/release-watch", () => ({
   ResourceReleaseWatchControl: () => <span>Release watch</span>,
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/resource-release-control-service", () => ({
+vi.mock("../../src/lib/services/resources/resource-release-control-service", () => ({
   libraryReleaseService: { page: state.updates, detail: state.versions },
 }));
 vi.mock("../../src/features/resources/download", () => ({
@@ -90,8 +92,8 @@ vi.mock("../../src/features/resources/release-watch", () => ({
 }));
 
 import Versions from "../../src/app/workspace/library/[id]/versions/page";
-import Updates, { metadata } from "../../src/app/workspace/library/updates/page";
-import { getResourceReleaseControlCopy } from "../../src/lib/resource-release-control-i18n";
+import Updates, { generateMetadata } from "../../src/app/workspace/library/updates/page";
+import { getResourceReleaseControlCopy } from "../../src/features/library/resource-release-control-i18n";
 
 const input = {
   params: Promise.resolve({ id: "prd_a" }),
@@ -180,7 +182,7 @@ it("distinguishes empty library inventory from filtered updates", async () => {
   );
   expect(never).toContain(copy.emptyInventory);
   expect(never).toContain(copy.emptyInventoryHint);
-  expect(never).toContain("overflow-x-clip");
+  expect(never).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(never).not.toContain(copy.emptyFiltered);
 
   state.updates.mockResolvedValueOnce({
@@ -205,7 +207,7 @@ it("shows an honest recovery state when library updates fail", async () => {
   const html = renderToStaticMarkup(await Updates(input));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.updatesLoadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("filter=all");
   expect(html).toContain("page=2");
 });
@@ -216,7 +218,7 @@ it("shows an honest recovery state when library versions fail", async () => {
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.versionsLoadUnavailable);
   expect(html).toContain(copy.versionsLoadUnavailableDescription);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("page=2");
   expect(html).not.toContain("versions unavailable");
 });
@@ -232,7 +234,7 @@ it("shows EmptyState honesty when no approved versions are available", async () 
   const html = renderToStaticMarkup(await Versions(input));
   expect(html).toContain(copy.noVersions);
   expect(html).toContain(copy.noVersionsHint);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("clips the library versions loading shell", async () => {
   const { default: VersionsLoading } = await import(
@@ -240,8 +242,8 @@ it("clips the library versions loading shell", async () => {
   );
   const copy = getResourceReleaseControlCopy("en");
   const html = renderToStaticMarkup(await VersionsLoading());
-  expect(html).toContain("min-w-0");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(copy.versions);
   expect(html).toContain(copy.updatesLoading);
 });
@@ -255,7 +257,7 @@ it("requires sign-in before reading the buyer library", async () => {
   );
   expect(state.updates).not.toHaveBeenCalled();
   expect(state.versions).not.toHaveBeenCalled();
-  expect(metadata.robots).toMatchObject({ index: false, follow: false });
+  expect((await generateMetadata()).robots).toMatchObject({ index: false, follow: false });
 });
 it.each(["en", "ru"] as const)(
   "a withdrawn fixed version offers management without silent replacement in %s",

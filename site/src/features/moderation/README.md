@@ -1,7 +1,33 @@
 # Модерация
 
-Жалобы на объекты, обработка жалоб и заявки на верификацию.
+Жалобы на объекты, обработка жалоб, заявки на верификацию и staff dashboard `/admin`.
 
-`object-report`, `report-controls`, `verification-workspace`, `verification-amend`, `verification-controls` — клиентские входы; `reports-server` — серверные экраны.
+| Entry                                                                            | Контракт                                                                    |
+| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `object-report.ts`                                                               | Форма жалобы на объект                                                      |
+| `report-controls.ts`                                                             | `ReportModerationControls`                                                  |
+| `verification-workspace.ts`, `verification-amend.ts`, `verification-controls.ts` | Верификация workspace                                                       |
+| `reports-server.ts`                                                              | Серверные экраны жалоб                                                      |
+| `admin-home-server.ts`                                                           | `AdminHomeScreen`; server-only хаб `/admin`                                 |
+| `staff-storage-server.ts`                                                        | `StaffStorageScreen`; server-only `/admin/storage`                          |
+| `staff-storage-object-server.ts`                                                 | `StaffStorageObjectScreen`; server-only `/admin/storage/objects/[id]`       |
+| `verification-history-server.ts`                                                 | `VerificationHistoryScreen`; server-only `/workspace/verification/history`  |
+| `verification-application-server.ts`                                             | `VerificationApplicationScreen`; server-only `/workspace/verification/[id]` |
+| `admin-home.ts`                                                                  | `Admin*Section` blocks для `/admin` overview                                |
+| `storage-maintenance.ts`                                                         | `StorageDiscoveryControls`, `StorageCleanupControls` для `/admin/storage`   |
+| `admin-status-labels.ts`                                                         | `adminStatusLabel`, `adminStatusTone` (staff enum labels)                   |
+| `verification-moderation.ts`                                                     | `buildVerificationDecisionPayload`, notes normalize                         |
+| `storage-maintenance-i18n.ts`                                                    | util port `storage-maintenance-i18n`                                        |
+| `verification-applications-copy.ts`                                              | util port `verification-applications-copy`                                  |
+| `storage-maintenance-query.ts`                                                   | util port `storage-maintenance-query`                                       |
+| `admin-action-confirmation.ts`                                                   | util port `admin-action-confirmation`                                       |
+| `admin-action-client-error.ts`                                                   | util port `admin-action-client-error`                                       |
+| `platform-report-i18n.ts`                                                        | util port `platform-report-i18n`                                            |
+| `report-batch-contract.ts`                                                       | util port `report-batch-contract`                                           |
+| `community-moderation-contract.ts`                                               | util port `community-moderation-contract`                                   |
+| `reports-api-copy.ts`                                                            | util port `reports-api-copy`                                                |
+| `platform-reports-api-copy.ts`                                                   | util port `platform-reports-api-copy`                                       |
+| `admin-actions-api-copy.ts`                                                      | util port `admin-actions-api-copy`                                          |
 
-Внутренние компоненты не являются публичным API. Маршруты остаются в App Router; сервисы, авторизация, доступ к данным и существующие правила предметной области сохраняются в прежних слоях. Границы импортов проверяются dependency-cruiser и тестами архитектуры.
+Внутренние `components/` не являются публичным API. Границы — dependency-cruiser и
+`scripts/tests/moderation-feature-boundaries.node-test.mjs`.

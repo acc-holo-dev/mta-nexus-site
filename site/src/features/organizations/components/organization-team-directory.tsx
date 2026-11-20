@@ -8,23 +8,25 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
-import { organizationBatchCopy } from "../../../lib/organization-batch-copy";
-import { confirmsOrganizationMemberMutation } from "../../../lib/organization-member-confirmation";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
+import { confirmAction } from "../../shell/confirm-action";
+import { linkAccentSm } from "../../shell/link-shell";
+import { panelClipSpace5P5 } from "../../shell/panel-shell";
+import { surfaceSpace2P4 } from "../../shell/surface-shell";
+import { typeFlexWrapGap4, typeSmMuted, typeSmSuccess, typeXsMuted } from "../../shell/type-shell";
+import { organizationBatchCopy } from "../organization-batch-copy";
+import { confirmsOrganizationMemberMutation } from "../organization-member-confirmation";
 import {
   type OrganizationTeamPage,
   type OrganizationTeamQuery,
   organizationTeamHref,
   organizationTeamPageSchema,
-} from "../../../lib/organization-team-contract";
-import { organizationTeamCopy } from "../../../lib/organization-team-copy";
-import { organizationRequest } from "../../../lib/organization-workspace-client";
-import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
-import { confirmAction } from "../../../components/confirm-action";
+} from "../organization-team-contract";
+import { organizationTeamCopy } from "../organization-team-copy";
+import { organizationRequest } from "../organization-workspace-client";
+import { getOrganizationCopy } from "../organization-workspace-copy";
 import { OrganizationMemberEditor } from "./organization-member-editor";
 import { OrganizationTeamBatch } from "./organization-team-batch";
-
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 export function OrganizationTeamDirectory({
   initial,
   filters,
@@ -45,7 +47,19 @@ export function OrganizationTeamDirectory({
     alive = useRef(true),
     controller = useRef<AbortController | null>(null),
     copy = organizationTeamCopy(locale),
-    team = getOrganizationCopy(locale);
+    team = getOrganizationCopy(locale),
+    batch = organizationBatchCopy(locale);
+  function safeMessage(failure: unknown, fallback: string) {
+    const text = failure instanceof Error ? failure.message : "";
+    return [
+      ...Object.values(copy),
+      ...Object.values(team),
+      ...Object.values(batch),
+      ...Object.values(getUserPlatformCopy(locale)),
+    ].includes(text)
+      ? text
+      : fallback;
+  }
   useEffect(() => {
     alive.current = true;
     return () => {
@@ -104,7 +118,7 @@ export function OrganizationTeamDirectory({
     } catch (failure) {
       if (alive.current) {
         setBlocked(true);
-        setError(failure instanceof Error ? failure.message : copy.uncertain);
+        setError(safeMessage(failure, copy.uncertain));
       }
       return false;
     } finally {
@@ -114,31 +128,35 @@ export function OrganizationTeamDirectory({
   }
   const filtered = !!filters.query || filters.role !== undefined || filters.access !== undefined;
   return (
-    <section className="nexus-panel min-w-0 space-y-5 overflow-x-clip p-5" aria-busy={pending}>
-      <p className="text-xs text-muted">{copy.private}</p>
+    <section className={panelClipSpace5P5} aria-busy={pending}>
+      <p className={typeXsMuted}>{copy.private}</p>
       {data.owner && (
-        <div className="space-y-2 rounded-lg border border-base p-4">
-          <p className="text-xs text-muted">{team.owner}</p>
+        <div className={surfaceSpace2P4}>
+          <p className={typeXsMuted}>{team.owner}</p>
           <Link
             href={`/users/${encodeURIComponent(data.owner.username)}`}
-            className={`${navLinkClass} break-words`}
+            className={`${linkAccentSm} break-words`}
           >
             {data.owner.displayName} (@{data.owner.username})
           </Link>
-          <p className="text-xs text-muted">{copy.ownerNote}</p>
+          <p className={typeXsMuted}>{copy.ownerNote}</p>
         </div>
       )}
-      <p className="text-sm text-muted">{team.roleHelp}</p>
-      <p className="text-xs text-muted">{team.accessHelp}</p>
+      <p className={typeSmMuted}>{team.roleHelp}</p>
+      <p className={typeXsMuted}>{team.accessHelp}</p>
       {canManageOrganization(data.role) ? (
         <Link
           href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}`}
-          className={navLinkClass}
+          className={linkAccentSm}
         >
           {copy.management}
         </Link>
       ) : (
-        <ErrorState id="organization-team-directory-readonly" title={team.readOnly} />
+        <ErrorState
+          id="organization-team-directory-readonly"
+          title={team.readOnly}
+          description={team.readOnlyHint}
+        />
       )}
       {canManageOrganization(data.role) && (
         <OrganizationTeamBatch
@@ -162,7 +180,16 @@ export function OrganizationTeamDirectory({
           onFailure={(problem) => {
             if (alive.current) {
               setBlocked(true);
-              setError(problem);
+              setError(
+                [
+                  ...Object.values(copy),
+                  ...Object.values(team),
+                  ...Object.values(batch),
+                  ...Object.values(getUserPlatformCopy(locale)),
+                ].includes(problem)
+                  ? problem
+                  : copy.uncertain,
+              );
             }
           }}
           onCommitted={async (organization, signal) => {
@@ -197,10 +224,10 @@ export function OrganizationTeamDirectory({
         <ul className="space-y-3">
           {data.members.map((member) => (
             <li key={`${member.id}:${member.role}:${member.managesServers}`} className="space-y-2">
-              <p className="text-xs text-muted">
+              <p className={typeXsMuted}>
                 {copy.access}: {member.effectiveServerAccess ? copy.yes : copy.no}
               </p>
-              <time dateTime={member.joinedAt} className="text-xs text-muted">
+              <time dateTime={member.joinedAt} className={typeXsMuted}>
                 {new Date(member.joinedAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
                   timeZone: "UTC",
                   timeZoneName: "short",
@@ -238,7 +265,7 @@ export function OrganizationTeamDirectory({
               {data.role === "owner" && ["admin", "developer", "member"].includes(member.role) && (
                 <Link
                   href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}?${new URLSearchParams({ q: member.username })}`}
-                  className={`${navLinkClass} text-xs`}
+                  className={`${linkAccentSm} text-xs`}
                 >
                   {copy.transfer}
                 </Link>
@@ -253,7 +280,7 @@ export function OrganizationTeamDirectory({
           action={
             <Link
               href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/team`}
-              className={navLinkClass}
+              className={linkAccentSm}
             >
               {copy.reset}
             </Link>
@@ -263,27 +290,28 @@ export function OrganizationTeamDirectory({
       {(error || blocked) && (
         <ErrorState
           title={error || copy.uncertain}
+          description={copy.uncertainHint}
           action={
-            <a href={organizationTeamHref(data.organization.id, filters)} className={navLinkClass}>
+            <a href={organizationTeamHref(data.organization.id, filters)} className={linkAccentSm}>
               {copy.uncertain}
             </a>
           }
         />
       )}
       {message && (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className={typeSmSuccess}>
           {message}
         </p>
       )}
-      <nav aria-label={copy.title} className="flex flex-wrap gap-4">
-        <a href={organizationTeamHref(data.organization.id, filters)} className={navLinkClass}>
+      <nav aria-label={copy.title} className={typeFlexWrapGap4}>
+        <a href={organizationTeamHref(data.organization.id, filters)} className={linkAccentSm}>
           {copy.latest}
         </a>
         {data.nextCursor && (
           <Link
             prefetch={false}
             href={organizationTeamHref(data.organization.id, filters, data.nextCursor)}
-            className={navLinkClass}
+            className={linkAccentSm}
           >
             {copy.older}
           </Link>

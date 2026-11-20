@@ -1,9 +1,17 @@
-import Link from "next/link";
-import { Library, Star, Tag } from "lucide-react";
 import type { Product } from "@nexus/domain";
+import { Library, Star, Tag } from "lucide-react";
+import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
-import type { PublicResourceAttribution } from "../../../lib/public-resource-attribution";
-import { PRODUCT_PUBLISHING_KEYS } from "../../../lib/product-type-labels";
+import { panelGroupHoverCol } from "../../shell/panel-shell";
+import {
+  typeClamp1XsHeadingPrimary,
+  typeClamp2CaptionMuted,
+  typeFlex1ColGap2P35,
+  typeFlexBetweenCaption,
+  typeFlexShrinkCenterGap2,
+} from "../../shell/type-shell";
+import { PRODUCT_PUBLISHING_KEYS } from "../product-type-labels";
+import type { PublicResourceAttribution } from "../public-resource-attribution";
 import { ResourcePreview } from "./resource-preview";
 
 const cardFocus =
@@ -64,7 +72,7 @@ export function ProductCard({
   const libraryLabel = market.libraryAdditions;
 
   return (
-    <article className="group flex flex-col overflow-hidden nexus-panel transition-all hover:border-strong hover:shadow-nexus">
+    <article className={panelGroupHoverCol}>
       <Link
         href={productHref}
         aria-label={product.title}
@@ -85,8 +93,8 @@ export function ProductCard({
         </div>
       </Link>
 
-      <div className="flex flex-1 flex-col gap-2 p-3.5">
-        <div className="flex items-center justify-between font-caption">
+      <div className={typeFlex1ColGap2P35}>
+        <div className={typeFlexBetweenCaption}>
           <div className="flex min-w-0 items-center gap-1 font-semibold text-warning">
             {hasReviews ? (
               <>
@@ -109,7 +117,7 @@ export function ProductCard({
           </span>
         </div>
 
-        <h3 className="line-clamp-1 text-xs font-heading text-primary">
+        <h3 className={typeClamp1XsHeadingPrimary}>
           <Link href={productHref} className={`transition-colors hover:text-accent ${cardFocus}`}>
             {product.title}
           </Link>
@@ -117,16 +125,14 @@ export function ProductCard({
 
         <AttributionLine attribution={attribution} unavailable={market.publisherUnavailable} />
 
-        <p className="line-clamp-2 flex-1 font-caption text-muted">
-          {product.shortDescription || product.description}
-        </p>
+        <p className={typeClamp2CaptionMuted}>{product.shortDescription || product.description}</p>
 
         <div className="flex items-center justify-between border-t border-base pt-2.5 font-caption text-faint">
           <div className="flex min-w-0 items-center gap-1.5">
             <Tag className="h-3 w-3 shrink-0" aria-hidden="true" />
             <span className="truncate">{product.tags.slice(0, 2).join(", ")}</span>
           </div>
-          <div className="flex shrink-0 items-center gap-2">
+          <div className={typeFlexShrinkCenterGap2}>
             <span>
               {market.updated} {updatedDate}
             </span>

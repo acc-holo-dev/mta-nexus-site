@@ -55,14 +55,14 @@ describe("organization governance persistence: ownership transfer", () => {
       .where(
         and(
           inArray(notifications.recipientId, [f.owner.id, f.target.id]),
-          eq(notifications.title, "Organization access changed"),
+          eq(notifications.title, "Organization access changed / Доступ к организации изменён"),
         ),
       );
     const orgName = f.org.name;
     expect(notices.map((notice) => notice.message)).toEqual(
       expect.arrayContaining([
-        `Organization ownership was transferred to you. (${orgName})`,
-        `You transferred organization ownership. (${orgName})`,
+        `Organization ownership was transferred to you. (${orgName}) / Вам передано владение организацией. (${orgName})`,
+        `You transferred organization ownership. (${orgName}) / Вы передали владение организацией. (${orgName})`,
       ]),
     );
     expect(notices.every((notice) => !String(notice.message).includes(f.org.id))).toBe(true);

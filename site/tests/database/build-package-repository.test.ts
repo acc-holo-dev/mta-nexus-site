@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][],
@@ -23,7 +24,9 @@ vi.mock("../../packages/db/src/client", async () => {
   });
   return { db };
 });
+
 import { buildPackageComparisonRepository as repo } from "../../packages/db/src/repositories/build-package-comparison";
+
 const input = {
   actorId: "usr_owner",
   productId: "prd_a",

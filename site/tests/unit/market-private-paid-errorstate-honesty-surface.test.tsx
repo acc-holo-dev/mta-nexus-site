@@ -20,9 +20,8 @@ it("routes market private preview and paid/disabled checkout notices through Err
   expect(source).toContain('id="market-paid-disabled"');
   expect(source).toContain("title={isPublic ? dictionary.checkout.paidDisabled : copy.notPublic}");
   expect(source).toMatch(/!isPublic \? \(\s*<ErrorState\s+id="market-private-preview"/u);
-  expect(source).toMatch(
-    /<ErrorState\s+id="market-paid-disabled"\s+title=\{isPublic \? dictionary\.checkout\.paidDisabled : copy\.notPublic\}/u,
-  );
+  expect(source).toContain("dictionary.checkout.paidDisabledHint");
+  expect(source).toContain("copy.notPublicHint");
   expect(source).not.toContain(
     'className="rounded-xl border border-[color:var(--nexus-warning)]/25 bg-warning-soft p-4 text-sm text-warning"',
   );

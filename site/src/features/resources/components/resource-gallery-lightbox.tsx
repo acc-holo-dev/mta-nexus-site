@@ -4,10 +4,10 @@ import type { ResourceMediaItem } from "@nexus/domain";
 import { Button, buttonClassName } from "@nexus/ui";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { safeResourceImageUrl } from "../../../lib/resource-image-url";
-import { resourceMediaCopy } from "../../../lib/resource-media-i18n";
+import { clickedDialogBackdrop, useModalDialog } from "../../shell/modal-dialog";
 import { stepGalleryIndex } from "../model/resource-gallery-interaction";
-import { clickedDialogBackdrop, useModalDialog } from "../../../components/use-modal-dialog";
+import { safeResourceImageUrl } from "../resource-image-url";
+import { resourceMediaCopy } from "../resource-media-i18n";
 
 function LightboxImage({
   src,

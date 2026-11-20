@@ -2,32 +2,41 @@ import { AppError } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { organizationContentService } from "../../../lib/services/organizations/organization-content-service";
 import { ContentCatalogControls, ContentPageNavigation } from "../../community/catalog-controls";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { PlatformSessionError } from "../../../components/platform-session-error";
-import { organizationReturnPath } from "./organization-return-path";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { organizationContentId } from "../../../lib/organization-content-api";
-import { organizationContentCopy } from "../../../lib/organization-content-copy";
-import { organizationPublicationHistoryCopy } from "../../../lib/organization-publication-history-copy";
-import { authService } from "../../../lib/services/auth-service";
-import { organizationContentService } from "../../../lib/services/organization-content-service";
 import {
   contentPageFiltered,
   parseContentPage,
   writerTypes,
-} from "../../../lib/user-platform-contract";
-import { getUserPlatformCopy, userPlatformError } from "../../../lib/user-platform-copy";
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-export async function generateMetadata() {
+} from "../../community/user-platform-contract";
+import { getUserPlatformCopy } from "../../community/user-platform-copy";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelSpace3P4 } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeBreakHeadingPrimary,
+  typeDisplayPrimary,
+  typeFlexWrapBetweenGap2,
+  typeFlexWrapStartBetweenGap4,
+  typeMt2SmMuted,
+  typeXsSecondary,
+} from "../../shell/type-shell";
+import { organizationContentId } from "../organization-content-api";
+import { organizationContentCopy } from "../organization-content-copy";
+import { organizationPublicationHistoryCopy } from "../organization-publication-history-copy";
+import { organizationError } from "../organization-workspace-copy";
+import { organizationReturnPath } from "./organization-return-path";
+export async function organizationPublicationsMetadata() {
   return {
     title: organizationContentCopy(await getRequestLocale()).title,
     robots: { index: false, follow: false },
   };
 }
-export default async function OrganizationPublications({
+export async function OrganizationPublications({
   params,
   searchParams,
 }: {
@@ -61,22 +70,22 @@ export default async function OrganizationPublications({
     .then(() => organizationContentService.page(organizationContentId(id), actor, filters))
     .catch((error: unknown) => {
       failure =
-        error instanceof AppError ? userPlatformError(locale, error.code) : copy.unavailable;
+        error instanceof AppError ? organizationError(locale, error.code) : copy.unavailable;
       return null;
     });
   return (
-    <div className={pageShellClass}>
-      <Link href={`/workspace/organizations/${encodeURIComponent(id)}`} className={navLinkClass}>
+    <div className={pageShellMax5xl}>
+      <Link href={`/workspace/organizations/${encodeURIComponent(id)}`} className={linkAccentSm}>
         {team.back}
       </Link>
-      <header className="flex flex-wrap items-start justify-between gap-4">
+      <header className={typeFlexWrapStartBetweenGap4}>
         <div>
-          <h1 className="font-display text-primary">
+          <h1 className={typeDisplayPrimary}>
             {team.title}
             {result ? `: ${result.organization.name}` : ""}
           </h1>
-          <p className="mt-2 text-sm text-muted">{team.description}</p>
-          <p className="mt-2 text-sm text-muted">{team.notice}</p>
+          <p className={typeMt2SmMuted}>{team.description}</p>
+          <p className={typeMt2SmMuted}>{team.notice}</p>
         </div>
         {result && (
           <Link
@@ -90,8 +99,9 @@ export default async function OrganizationPublications({
       {!result ? (
         <ErrorState
           title={failure}
+          description={copy.unavailableHint}
           action={
-            <Link href={returnPath} className={navLinkClass}>
+            <Link href={returnPath} className={linkAccentSm}>
               {copy.retry}
             </Link>
           }
@@ -108,9 +118,9 @@ export default async function OrganizationPublications({
           {result.items.length ? (
             <div className="space-y-3">
               {result.items.map((item) => (
-                <article key={item.id} className="nexus-panel space-y-3 p-4">
-                  <div className="flex flex-wrap justify-between gap-2">
-                    <h2 className="break-words font-heading text-primary">
+                <article key={item.id} className={panelSpace3P4}>
+                  <div className={typeFlexWrapBetweenGap2}>
+                    <h2 className={typeBreakHeadingPrimary}>
                       <Link
                         href={`${path}/${encodeURIComponent(item.id)}`}
                         className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -118,7 +128,7 @@ export default async function OrganizationPublications({
                         {item.title}
                       </Link>
                     </h2>
-                    <span className="text-xs text-secondary">
+                    <span className={typeXsSecondary}>
                       {copy[item.status as "draft" | "published" | "archived"]}
                     </span>
                   </div>
@@ -134,19 +144,19 @@ export default async function OrganizationPublications({
                     <span>
                       {copy.comments}: {item.commentCount}
                     </span>
-                    <Link href={`${path}/${encodeURIComponent(item.id)}`} className={navLinkClass}>
+                    <Link href={`${path}/${encodeURIComponent(item.id)}`} className={linkAccentSm}>
                       {copy.edit}
                     </Link>
                     <Link
                       href={`${path}/${encodeURIComponent(item.id)}/history`}
-                      className={navLinkClass}
+                      className={linkAccentSm}
                     >
                       {organizationPublicationHistoryCopy(locale).history}
                     </Link>
                     {item.status === "published" && (
                       <Link
                         href={`/articles/${encodeURIComponent(item.slug)}`}
-                        className={navLinkClass}
+                        className={linkAccentSm}
                       >
                         {copy.publicView}
                       </Link>
@@ -161,11 +171,11 @@ export default async function OrganizationPublications({
               description={contentPageFiltered(filters) ? team.emptyFilteredHint : team.emptyHint}
               action={
                 contentPageFiltered(filters) ? (
-                  <Link href={path} className={navLinkClass}>
+                  <Link href={path} className={linkAccentSm}>
                     {copy.reset}
                   </Link>
                 ) : (
-                  <Link href={`${path}/new`} className={navLinkClass}>
+                  <Link href={`${path}/new`} className={linkAccentSm}>
                     {team.new}
                   </Link>
                 )

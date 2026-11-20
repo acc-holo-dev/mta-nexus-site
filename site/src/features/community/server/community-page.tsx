@@ -1,24 +1,23 @@
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { MessageSquare, Plus } from "lucide-react";
 import Link from "next/link";
-import { ContentCatalogControls, ContentPageNavigation } from "../catalog-controls";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { publicationCopy } from "../../../lib/publication-feed-copy";
-import { contentService } from "../../../lib/services/content-service";
-import {
-  communityTypes,
-  contentPageHref,
-  parseContentPage,
-} from "../../../lib/user-platform-contract";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { contentService } from "../../../lib/services/community/content-service";
+import { linkAccentSm, linkAccentSmRounded } from "../../shell/link-shell";
+import { pageShellStack6 } from "../../shell/page-shell";
+import { typeFlexWrapGap4, typeIcon6Accent } from "../../shell/type-shell";
+import { ContentCatalogControls, ContentPageNavigation } from "../catalog-controls";
+import { publicationCopy } from "../publication-feed-copy";
+import { communityTypes, contentPageHref, parseContentPage } from "../user-platform-contract";
+import { getUserPlatformCopy } from "../user-platform-copy";
 
-export async function generateMetadata() {
+export async function communityMetadata() {
   const copy = getDictionary(await getRequestLocale()).community;
   return { title: copy.title, description: copy.description };
 }
 
-export default async function CommunityPage({
+export async function CommunityPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -33,11 +32,11 @@ export default async function CommunityPage({
   const filtersActive = Boolean(filters.query || filters.type || filters.page > 1);
 
   return (
-    <div className="min-w-0 space-y-6 overflow-x-clip">
+    <div className={pageShellStack6}>
       <header className="flex flex-col justify-between gap-4 border-b border-base pb-5 sm:flex-row sm:items-center">
         <div className="min-w-0">
           <h1 className="flex items-center gap-2 font-display text-primary">
-            <MessageSquare className="h-6 w-6 shrink-0 text-accent" aria-hidden="true" />
+            <MessageSquare className={typeIcon6Accent} aria-hidden="true" />
             <span>{copy.title}</span>
           </h1>
           <p className="mt-1 text-sm text-muted">{copy.description}</p>
@@ -51,17 +50,11 @@ export default async function CommunityPage({
         </Link>
       </header>
 
-      <div className="flex flex-wrap gap-4">
-        <Link
-          href="/workspace/content"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+      <div className={typeFlexWrapGap4}>
+        <Link href="/workspace/content" className={linkAccentSm}>
           {platformCopy.studio}
         </Link>
-        <Link
-          href="/workspace/feed"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/feed" className={linkAccentSm}>
           {publicationCopy(locale).title}
         </Link>
       </div>
@@ -75,10 +68,11 @@ export default async function CommunityPage({
       {!result ? (
         <ErrorState
           title={platformCopy.unavailable}
+          description={platformCopy.unavailableHint}
           action={
             <Link
               href={contentPageHref("/community", filters, filters.page)}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentSmRounded}
             >
               {dictionary.errors.retry}
             </Link>
@@ -116,10 +110,7 @@ export default async function CommunityPage({
           icon={<MessageSquare className="h-6 w-6" />}
           action={
             filtersActive ? (
-              <Link
-                href="/community"
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href="/community" className={linkAccentSm}>
                 {copy.clearFilters}
               </Link>
             ) : (

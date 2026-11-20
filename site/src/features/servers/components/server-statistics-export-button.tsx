@@ -2,9 +2,10 @@
 import { Button, ErrorState } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
-import { serverStatisticsCopy, serverStatisticsError } from "../../../lib/server-statistics-copy";
-import { fetchServerStatisticsCsv } from "../../../lib/server-statistics-download";
-
+import { linkGhostAccentSm, linkMinHAccentSemibold } from "../../shell/link-shell";
+import { typeItemsStretchPy4 } from "../../shell/type-shell";
+import { serverStatisticsCopy, serverStatisticsError } from "../server-statistics-copy";
+import { fetchServerStatisticsCsv } from "../server-statistics-download";
 export function ServerStatisticsExportButton({
   url,
   label,
@@ -60,7 +61,7 @@ export function ServerStatisticsExportButton({
         onClick={download}
         disabled={disabled || busy}
         isLoading={busy}
-        className="min-h-11 font-semibold text-accent"
+        className={linkMinHAccentSemibold}
       >
         {busy ? copy.downloading : label}
       </Button>
@@ -68,14 +69,14 @@ export function ServerStatisticsExportButton({
         <ErrorState
           title={error}
           description={copy.exportErrorHint}
-          className="items-stretch py-4"
+          className={typeItemsStretchPy4}
           action={
             <Button
               type="button"
               variant="ghost"
               disabled={disabled || busy}
               onClick={() => void download()}
-              className="h-auto min-h-11 px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkGhostAccentSm}
             >
               {copy.retry}
             </Button>

@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
@@ -7,10 +9,12 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
-vi.mock("../../../../lib/services/auth-service", () => ({
+vi.mock("../../../../lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => mocks.actor },
 }));
-vi.mock("../../../../lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../../../../lib/i18n/server", () => ({
+  getRequestLocale: async () => mocks.locale,
+}));
 vi.mock("../../../../features/resources/publisher-navigation", () => ({
   ResourcePublisherWorkspaceNav: () => <nav data-testid="resource-publisher-workspace-nav" />,
 }));

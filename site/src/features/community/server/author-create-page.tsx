@@ -1,25 +1,23 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
+import { pageShellMax3xlTight } from "../../shell/page-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary } from "../../shell/type-shell";
 import { AuthorContentForm } from "../author-content-form";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { PlatformSessionError } from "../../../components/platform-session-error";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
-
-const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip";
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
-export async function generateMetadata(): Promise<Metadata> {
+import { getUserPlatformCopy } from "../user-platform-copy";
+export async function newPublicationMetadata(): Promise<Metadata> {
   return {
     title: getUserPlatformCopy(await getRequestLocale()).create,
     robots: { index: false, follow: false },
   };
 }
 
-export default async function NewPublicationPage() {
+export async function NewPublicationPage() {
   const locale = await getRequestLocale();
   const copy = getUserPlatformCopy(locale);
   let actor: Awaited<ReturnType<typeof authService.getSession>>;
@@ -37,11 +35,11 @@ export default async function NewPublicationPage() {
   }
   if (!actor) return <PlatformSignIn locale={locale} returnPath="/workspace/content/new" />;
   return (
-    <div className={pageShellClass}>
-      <Link href="/workspace/content" className={navLinkClass}>
+    <div className={pageShellMax3xlTight}>
+      <Link href="/workspace/content" className={linkAccentSm}>
         {copy.back}
       </Link>
-      <h1 className="font-display text-primary">{copy.create}</h1>
+      <h1 className={typeDisplayPrimary}>{copy.create}</h1>
       <AuthorContentForm locale={locale} />
     </div>
   );

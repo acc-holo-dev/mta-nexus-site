@@ -17,28 +17,28 @@ vi.mock("next/navigation", () => ({ usePathname: () => "/discover" }));
 vi.mock("@nexus/db", () => ({
   followWorkspaceRepository: { states: mocks.states, muteStates: mocks.muteStates },
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.viewer },
 }));
-vi.mock("../../src/lib/services/discovery-service", () => ({
+vi.mock("../../src/lib/services/discovery/discovery-service", () => ({
   discoveryService: { page: mocks.page },
 }));
-vi.mock("../../src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../../src/lib/services/servers/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: { getDirectory: async () => null },
   indexMtaObservations: () => () => null,
 }));
-vi.mock("../../src/lib/services/product-service", () => ({
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: { getPublicAttributions: mocks.attributions },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => "en",
 }));
 
 import DiscoverPage from "../../src/app/discover/page";
 import { DirectoryFilters, DirectoryResults } from "../../src/features/discovery/directory-server";
-import { LocaleProvider } from "../../src/components/locale-context";
-import { parseDiscoverQuery } from "../../src/lib/discover-query";
-import { discoveryCopy } from "../../src/lib/discovery-copy";
+import { parseDiscoverQuery } from "../../src/features/discovery/discover-query";
+import { discoveryCopy } from "../../src/features/discovery/discovery-copy";
+import { LocaleProvider } from "../../src/features/shell/locale";
 import { getDictionary } from "../../src/lib/i18n";
 
 function resourceProduct() {

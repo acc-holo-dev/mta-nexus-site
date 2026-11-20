@@ -15,13 +15,13 @@ const harness = vi.hoisted(() => ({
 }));
 vi.mock("react", (original) => mockReactHooks(harness)(original));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: harness.refresh }) }));
-vi.mock("../../src/components/confirm-action", () => ({
+vi.mock("../../src/features/shell/confirm-action", () => ({
   confirmAction: (...args: unknown[]) => harness.confirm(...args),
 }));
 
 import { ManagedServerVisibilityBatch } from "../../src/features/servers/components/managed-server-visibility-batch";
-import { getManagedServerCopy } from "../../src/lib/managed-server-view";
-import { serverWorkspaceCopy } from "../../src/lib/server-workspace-copy";
+import { getManagedServerCopy } from "../../src/features/servers/managed-server-view";
+import { serverWorkspaceCopy } from "../../src/features/servers/server-workspace-copy";
 
 const { render, commitBatch, review } = createManagedServerVisibilityInteractionHelpers(
   harness,

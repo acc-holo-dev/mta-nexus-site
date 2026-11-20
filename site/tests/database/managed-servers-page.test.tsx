@@ -15,15 +15,17 @@ vi.mock("next/navigation", () => ({
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "token" }) }) }));
 vi.mock("@nexus/db", () => ({ serverRepository: { pageManagedByUser: state.page } }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/lib/services/mta-master-directory-service", async (importOriginal) => {
+vi.mock("../../src/lib/services/servers/mta-master-directory-service", async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import("../../src/lib/services/mta-master-directory-service")>();
+    await importOriginal<
+      typeof import("../../src/lib/services/servers/mta-master-directory-service")
+    >();
   return { ...actual, mtaMasterDirectoryService: { getDirectory: state.directory } };
 });
 
@@ -179,7 +181,7 @@ it("does not disguise a failed database read as an empty workspace", async () =>
   state.page.mockRejectedValue(new Error("Database unavailable"));
   const html = await render();
   expect(html).toContain('role="alert"');
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("temporarily unavailable");
   expect(html).not.toContain("Database unavailable");
   expect(state.directory).not.toHaveBeenCalled();

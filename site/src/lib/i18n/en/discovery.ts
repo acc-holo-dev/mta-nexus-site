@@ -1,7 +1,6 @@
 export const discovery = {
   home: {
     brand: "MTA NEXUS",
-    liveEcosystem: "Open free beta",
     title: "Live servers, community, and free resources",
     description:
       "MTA Nexus is an open free beta. Browse the official MTA server directory, community updates, and free resources without payment.",
@@ -19,6 +18,8 @@ export const discovery = {
     openDirectory: "Open directory",
     players: "players",
     directoryPanelUnavailable: "The official MTA directory is temporarily unavailable.",
+    directoryPanelUnavailableHint:
+      "Retry reloads this Home network panel only. A temporary directory failure is not an empty server list.",
     resourcesTitle: "Free resources",
     resourcesDescription: "Community resources you can add without payment",
     viewAllResources: "View all free resources",
@@ -27,6 +28,10 @@ export const discovery = {
     updatesDescription: "News, guides, and development notes from the MTA ecosystem",
     allUpdates: "All updates",
     noUpdates: "No community updates have been published yet.",
+    updatesLoadUnavailable:
+      "Community updates are temporarily unavailable. This does not mean there are no published updates.",
+    updatesLoadUnavailableHint:
+      "Retry reloads this Home updates panel only. A temporary load failure is not an empty updates list.",
     personalTitle: "Your changes",
     personalDescription:
       "Updates from release watches, discussion follows, and unread replies to you.",
@@ -37,6 +42,8 @@ export const discovery = {
       "An empty personal strip is not a load failure. Public Home sections below stay available, and your notification inbox keeps the full history.",
     personalError:
       "Your personal changes could not be loaded. Public Home sections below are still available.",
+    personalErrorHint:
+      "Retry reloads your personal changes only. A temporary load failure is not an empty activity list.",
     personalRetry: "Try again",
     personalPartial: "Some personal sources could not be loaded. Showing what is available.",
     personalHidden: "Personal changes are hidden on Home. Public sections below are unchanged.",
@@ -89,6 +96,8 @@ export const discovery = {
       "This is an empty result for the current URL, not a catalog outage. Adjust search, category, or sort and try again.",
     loadUnavailable:
       "The free resource catalog is temporarily unavailable. This does not mean there are no resources.",
+    loadUnavailableHint:
+      "Retry reloads this catalog page only. A temporary load failure is not an empty Market result.",
     activeFilters: "Active filters",
     clear: "Clear all filters",
     clearQuery: "Clear search only",

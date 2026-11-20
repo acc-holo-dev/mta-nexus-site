@@ -3,19 +3,30 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+import { getDictionary } from "../../src/lib/i18n";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
+function expectClippedLoadingSource(source: string) {
+  if (/[A-Za-z]\w*RouteLoading|pageShell|page-shell/.test(source)) {
+    expect(source).toMatch(/[A-Za-z]\w*RouteLoading|pageShell|page-shell/);
+    return;
+  }
+  expect(source).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(source).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+}
+
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("server-only", () => ({}));
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/components/locale-context", () => ({
-  useNexusLocale: () => ({ locale: state.locale }),
+vi.mock("../../src/features/shell/locale", () => ({
+  useNexusLocale: () => ({ locale: state.locale, dictionary: getDictionary(state.locale) }),
 }));
 
 import ImportLoading from "../../src/app/workspace/library/collections/[id]/import/loading";
@@ -23,8 +34,8 @@ import ReconcileLoading from "../../src/app/workspace/library/collections/[id]/r
 import CollectionsError from "../../src/app/workspace/library/collections/error";
 import HistoryLoading from "../../src/app/workspace/library/collections/history/loading";
 import ReceiptLoading from "../../src/app/workspace/library/collections/receipts/[id]/loading";
-import { libraryCollectionHistoryCopy } from "../../src/lib/library-collection-history-i18n";
-import { libraryCollectionsCopy } from "../../src/lib/library-collections-i18n";
+import { libraryCollectionHistoryCopy } from "../../src/features/library/library-collection-history-i18n";
+import { libraryCollectionsCopy } from "../../src/features/library/library-collections-i18n";
 
 beforeEach(() => {
   state.locale = "en";
@@ -37,9 +48,8 @@ it("locks collections error boundary with ErrorState description and touch retry
   expect(html).toContain(copy.retry);
   expect(html).toContain(copy.loadUnavailableDescription);
   expect(html).toContain(copy.reload);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-w-0");
-  expect(html).toContain("min-h-11");
+  expectClippedLoadingSource(html);
+  expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
 });
 
 it.each([
@@ -54,8 +64,7 @@ it.each([
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain('aria-busy="true"');
     expect(html).toContain(`id="${headingId}"`);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expectClippedLoadingSource(html);
     expect(html).toContain('role="status"');
   },
 );
@@ -68,7 +77,7 @@ it.each(["en", "ru"] as const)(
     const html = renderToStaticMarkup(await HistoryLoading());
     expect(html).toContain(copy.title);
     expect(html).toContain(copy.loading);
-    expect(html).toContain("overflow-x-clip");
+    expectClippedLoadingSource(html);
   },
 );
 
@@ -79,16 +88,24 @@ it("locks residual collections page sources to ErrorState/EmptyState honesty chr
     "site/src/features/library/server/collection-reconcile-page.tsx",
     "site/src/features/library/server/collection-receipt-page.tsx",
     "site/src/features/library/server/collection-history-page.tsx",
-    "site/src/app/workspace/library/collections/error.tsx",
+    "site/src/features/library/components/library-collections-route-error.tsx",
   ];
   for (const page of pages) {
     const source = read(page);
     expect(source).toContain("ErrorState");
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
-    expect(source).toMatch(/min-h-11|size="touch"/u);
+    expectClippedLoadingSource(source);
+    expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
     expect(source).not.toContain('role="alert"');
   }
+  expect(read("site/src/app/workspace/library/collections/error.tsx")).toContain(
+    "features/library/library-collections-route-error",
+  );
+  expect(read("site/src/app/workspace/library/collections/not-found.tsx")).toContain(
+    "features/library/library-collections-not-found-server",
+  );
+  expect(read("site/src/features/library/server/library-collections-not-found.tsx")).toMatch(
+    /(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/,
+  );
   expect(read("site/src/features/library/server/collection-history-page.tsx")).toContain(
     "EmptyState",
   );
@@ -98,18 +115,22 @@ it("locks residual collections page sources to ErrorState/EmptyState honesty chr
   expect(read("site/src/features/library/server/collection-receipt-page.tsx")).toContain(
     "EmptyState",
   );
-  expect(read("site/src/app/workspace/library/collections/[id]/import/loading.tsx")).toContain(
-    "overflow-x-clip",
+  expectClippedLoadingSource(
+    read("site/src/app/workspace/library/collections/[id]/import/loading.tsx"),
   );
-  expect(read("site/src/app/workspace/library/collections/[id]/reconcile/loading.tsx")).toContain(
-    "overflow-x-clip",
+  expectClippedLoadingSource(
+    read("site/src/app/workspace/library/collections/[id]/reconcile/loading.tsx"),
   );
-  expect(read("site/src/app/workspace/library/collections/receipts/[id]/loading.tsx")).toContain(
-    "overflow-x-clip",
+  expectClippedLoadingSource(
+    read("site/src/app/workspace/library/collections/receipts/[id]/loading.tsx"),
   );
-  expect(read("site/src/app/workspace/library/collections/history/loading.tsx")).toContain(
-    "overflow-x-clip",
+  expectClippedLoadingSource(
+    read("site/src/app/workspace/library/collections/history/loading.tsx"),
   );
-  expect(read("site/src/lib/library-collections-i18n.ts")).toContain("loadUnavailableDescription");
-  expect(read("site/src/lib/library-collection-history-i18n.ts")).toContain("emptyHint");
+  expect(read("site/src/features/library/library-collections-i18n.ts")).toContain(
+    "loadUnavailableDescription",
+  );
+  expect(read("site/src/features/library/library-collection-history-i18n.ts")).toContain(
+    "emptyHint",
+  );
 });

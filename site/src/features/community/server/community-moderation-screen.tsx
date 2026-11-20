@@ -2,9 +2,15 @@ import { AppError } from "@nexus/domain";
 import { can } from "@nexus/security";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { FileText, ShieldAlert } from "lucide-react";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { communityModerationService } from "../../../lib/services/community/community-moderation-service";
+import { discoveryCopy } from "../../discovery/discovery-copy";
 import {
   moderationDetailHref,
   moderationDetailSchema,
@@ -12,20 +18,49 @@ import {
   moderationPageSchema,
   parseModerationDetailQuery,
   parseModerationQuery,
-} from "../../../lib/community-moderation-contract";
-import { moderationCopy, moderationError } from "../../../lib/community-moderation-copy";
-import { discoveryCopy } from "../../../lib/discovery-copy";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { moderatedDiscussionCopy } from "../../../lib/moderated-discussion-copy";
-import { PUBLICATION_TYPES } from "../../../lib/publication-feed-contract";
-import { authService } from "../../../lib/services/auth-service";
-import { communityModerationService } from "../../../lib/services/community-moderation-service";
-import { platformFieldClass } from "../../../lib/user-platform-client";
+} from "../../moderation/community-moderation-contract";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm, linkAccentTightSm } from "../../shell/link-shell";
+import {
+  pageShellMax4xlTight,
+  pageShellMaxMdDense,
+  pageShellStack5,
+  pageShellStack6,
+} from "../../shell/page-shell";
+import {
+  panelFlexMinWrapEndP4,
+  panelMinSpace2P5,
+  panelMinSpace3P5,
+  panelMinSpace4P5,
+} from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import {
+  type2xlBoldPrimary,
+  typeBreakXsMuted,
+  typeFlexWrapGap4,
+  typeHeadingPrimary,
+  typeMinSpace2,
+  typeMinSpace3,
+  typeMinSpace4,
+  typePrewrapSmLeadingSecondary,
+  typePrewrapSmSecondary,
+  typeSmMuted,
+  typeSmPrimary,
+  typeSpace1XsMuted,
+  typeXlBoldPrimary,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import { moderationCopy, moderationError } from "../community-moderation-copy";
 import { ContentModerationControls } from "../content-moderation";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-
-const focusLink =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+import { moderatedDiscussionCopy } from "../moderated-discussion-copy";
+import { PUBLICATION_TYPES } from "../publication-feed-contract";
+import { platformFieldClass } from "../user-platform-client";
+export async function communityModerationMetadata(): Promise<Metadata> {
+  return {
+    title: moderationCopy(await getRequestLocale()).title,
+    robots: { index: false, follow: false },
+  };
+}
 
 export async function CommunityModerationScreen({
   id,
@@ -37,27 +72,18 @@ export async function CommunityModerationScreen({
   const locale = await getRequestLocale(),
     copy = moderationCopy(locale),
     types = discoveryCopy(locale);
-  let authError = false;
-  const actor = await authService
-    .getSession((await cookies()).get("nexus_session")?.value)
-    .catch(() => {
-      authError = true;
-      return null;
-    });
   const returnPath = id ? moderationDetailHref(id) : "/admin/community";
-  if (authError) {
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
     return (
-      <div className="mx-auto min-w-0 max-w-md space-y-4 overflow-x-clip py-8">
-        <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
-        <ErrorState
-          title={copy.unavailable}
-          action={
-            <a href={returnPath} className={focusLink}>
-              {copy.reload}
-            </a>
-          }
-        />
-      </div>
+      <PlatformSessionError
+        locale={locale}
+        title={getDictionary(locale).errors.title}
+        message={copy.unavailable}
+        retryHref={returnPath}
+      />
     );
   }
   if (!actor) {
@@ -65,10 +91,11 @@ export async function CommunityModerationScreen({
   }
   if (!can(actor, "admin.moderation")) {
     return (
-      <div className="mx-auto min-w-0 max-w-md space-y-4 overflow-x-clip py-8">
-        <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
+      <div className={pageShellMaxMdDense}>
+        <h1 className={typeXlBoldPrimary}>{copy.title}</h1>
         <ErrorState
           title={copy.denied}
+          description={copy.deniedHint}
           icon={<ShieldAlert className="h-5 w-5" aria-hidden="true" />}
         />
       </div>
@@ -89,8 +116,13 @@ export async function CommunityModerationScreen({
   const failure = (message: string, href: string) => (
     <ErrorState
       title={message}
+      description={
+        message === copy.unavailable || message === copy.invalid
+          ? copy.unavailableHint
+          : getDictionary(locale).errors.sessionRetryHint
+      }
       action={
-        <a className={focusLink} href={href}>
+        <a className={linkAccentSm} href={href}>
           {copy.reload}
         </a>
       }
@@ -115,36 +147,36 @@ export async function CommunityModerationScreen({
     if (raw && !parsed.success) error = copy.unavailable;
     if (!parsed.success)
       return (
-        <div className="min-w-0 space-y-5 overflow-x-clip">
-          <Link className={focusLink} href="/admin/community">
+        <div className={pageShellStack5}>
+          <Link className={linkAccentSm} href="/admin/community">
             {copy.back}
           </Link>
-          <h1 className="text-2xl font-bold text-primary">{copy.detail}</h1>
+          <h1 className={type2xlBoldPrimary}>{copy.detail}</h1>
           {failure(error || copy.unavailable, moderationDetailHref(id))}
         </div>
       );
     const { item, history, nextCursor } = parsed.data;
     return (
-      <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip">
-        <Link className={focusLink} href="/admin/community">
+      <div className={pageShellMax4xlTight}>
+        <Link className={linkAccentSm} href="/admin/community">
           {copy.back}
         </Link>
-        <header className="nexus-panel min-w-0 space-y-3 p-5">
+        <header className={panelMinSpace3P5}>
           <h1 className="break-words text-2xl font-bold text-primary">{item.title}</h1>
-          <p className="text-sm text-muted">
+          <p className={typeSmMuted}>
             {types[item.type]} · {copy[item.status]}
           </p>
           <Link
-            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentTightSm}
             href={`/users/${encodeURIComponent(item.author.username)}`}
           >
             {item.author.name} (@{item.author.username})
           </Link>
-          <p className="text-xs text-muted">
+          <p className={typeXsMuted}>
             {copy.updated}: {date(item.updatedAt)}
           </p>
           {item.status === "published" && (
-            <Link href={`/articles/${encodeURIComponent(item.slug)}`} className={focusLink}>
+            <Link href={`/articles/${encodeURIComponent(item.slug)}`} className={linkAccentSm}>
               {copy.publicPage}
             </Link>
           )}
@@ -160,26 +192,22 @@ export async function CommunityModerationScreen({
                 </Link>
               ),
           )}
-          {item.tags.length > 0 && (
-            <p className="break-words text-xs text-muted">{item.tags.join(" · ")}</p>
-          )}
+          {item.tags.length > 0 && <p className={typeBreakXsMuted}>{item.tags.join(" · ")}</p>}
         </header>
-        <section className="nexus-panel min-w-0 space-y-3 p-5">
-          <h2 className="font-heading text-primary">{copy.body}</h2>
-          <div className="whitespace-pre-wrap break-words text-sm leading-relaxed text-secondary">
-            {item.body}
-          </div>
+        <section className={panelMinSpace3P5}>
+          <h2 className={typeHeadingPrimary}>{copy.body}</h2>
+          <div className={typePrewrapSmLeadingSecondary}>{item.body}</div>
           {item.truncated ? (
-            <p role="note" className="text-sm text-muted">
+            <p role="note" className={typeSmMuted}>
               {copy.large}
             </p>
           ) : null}
         </section>
-        <section className="nexus-panel min-w-0 space-y-4 p-5">
-          <p className="text-sm text-muted">{copy.description}</p>
+        <section className={panelMinSpace4P5}>
+          <p className={typeSmMuted}>{copy.description}</p>
           <Link
             href={`/admin/community/${encodeURIComponent(id)}/discussion`}
-            className={focusLink}
+            className={linkAccentSm}
           >
             {moderatedDiscussionCopy(locale).open}
           </Link>
@@ -192,10 +220,10 @@ export async function CommunityModerationScreen({
             workspace
           />
         </section>
-        <section className="min-w-0 space-y-4">
-          <h2 className="font-heading text-primary">{copy.history}</h2>
-          <p className="text-sm text-muted">{copy.historyScope}</p>
-          <a className={focusLink} href={moderationDetailHref(id)}>
+        <section className={typeMinSpace4}>
+          <h2 className={typeHeadingPrimary}>{copy.history}</h2>
+          <p className={typeSmMuted}>{copy.historyScope}</p>
+          <a className={linkAccentSm} href={moderationDetailHref(id)}>
             {copy.latest}
           </a>
           {!history.length ? (
@@ -205,19 +233,19 @@ export async function CommunityModerationScreen({
               icon={<FileText className="h-6 w-6" aria-hidden="true" />}
             />
           ) : null}
-          <ol className="min-w-0 space-y-3">
+          <ol className={typeMinSpace3}>
             {history.map((event) => (
-              <li key={event.id} className="nexus-panel min-w-0 space-y-2 p-5">
-                <p className="text-sm text-primary">
+              <li key={event.id} className={panelMinSpace2P5}>
+                <p className={typeSmPrimary}>
                   {event.action === "content.published" ? copy.publish : copy.archive} ·{" "}
                   {date(event.createdAt)}
                 </p>
-                <p className="text-xs text-muted">
+                <p className={typeXsMuted}>
                   {event.from ? copy[event.from] : copy.unknown} →{" "}
                   {event.to ? copy[event.to] : copy.unknown}
                 </p>
                 {event.notes ? (
-                  <p className="whitespace-pre-wrap break-words text-sm text-secondary">
+                  <p className={typePrewrapSmSecondary}>
                     {copy.reason}: {event.notes}
                   </p>
                 ) : null}
@@ -227,7 +255,7 @@ export async function CommunityModerationScreen({
           {nextCursor ? (
             <Link
               prefetch={false}
-              className={focusLink}
+              className={linkAccentSm}
               href={moderationDetailHref(id, nextCursor)}
             >
               {copy.older}
@@ -255,22 +283,18 @@ export async function CommunityModerationScreen({
       (filters.query || filters.author || filters.status || filters.type || filters.cursor),
   );
   return (
-    <div className="min-w-0 space-y-6 overflow-x-clip">
-      <header className="min-w-0 space-y-2">
-        <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
-        <p className="text-sm text-muted">{copy.description}</p>
-        <Link className={focusLink} href="/admin/reports">
+    <div className={pageShellStack6}>
+      <header className={typeMinSpace2}>
+        <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
+        <p className={typeSmMuted}>{copy.description}</p>
+        <Link className={linkAccentSm} href="/admin/reports">
           {copy.reports}
         </Link>
       </header>
       {parsed.success && filters ? (
         <>
           <search aria-label={copy.search}>
-            <form
-              method="get"
-              action="/admin/community"
-              className="nexus-panel flex min-w-0 flex-wrap items-end gap-3 p-4"
-            >
+            <form method="get" action="/admin/community" className={panelFlexMinWrapEndP4}>
               <label className="min-w-44 flex-1 space-y-1 text-xs text-muted">
                 {copy.search}
                 <input
@@ -281,7 +305,7 @@ export async function CommunityModerationScreen({
                   className={`${platformFieldClass} min-h-11`}
                 />
               </label>
-              <label className="space-y-1 text-xs text-muted">
+              <label className={typeSpace1XsMuted}>
                 {copy.author}
                 <input
                   name="author"
@@ -290,7 +314,7 @@ export async function CommunityModerationScreen({
                   className={`${platformFieldClass} min-h-11`}
                 />
               </label>
-              <label className="space-y-1 text-xs text-muted">
+              <label className={typeSpace1XsMuted}>
                 {copy.status}
                 <select
                   name="status"
@@ -304,7 +328,7 @@ export async function CommunityModerationScreen({
                   ))}
                 </select>
               </label>
-              <label className="space-y-1 text-xs text-muted">
+              <label className={typeSpace1XsMuted}>
                 {copy.type}
                 <select
                   name="type"
@@ -322,7 +346,7 @@ export async function CommunityModerationScreen({
               <Button className="min-h-11" type="submit" variant="primary">
                 {copy.apply}
               </Button>
-              <Link className={focusLink} href="/admin/community">
+              <Link className={linkAccentSm} href="/admin/community">
                 {copy.reset}
               </Link>
             </form>
@@ -334,23 +358,23 @@ export async function CommunityModerationScreen({
               icon={<FileText className="h-6 w-6" aria-hidden="true" />}
               action={
                 filtersActive ? (
-                  <Link className={focusLink} href="/admin/community">
+                  <Link className={linkAccentSm} href="/admin/community">
                     {copy.reset}
                   </Link>
                 ) : undefined
               }
             />
           ) : (
-            <ul className="min-w-0 space-y-3">
+            <ul className={typeMinSpace3}>
               {parsed.data.items.map((item) => (
-                <li key={item.id} className="nexus-panel min-w-0 space-y-2 p-5">
+                <li key={item.id} className={panelMinSpace2P5}>
                   <Link
                     className="block break-words font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                     href={moderationDetailHref(item.id)}
                   >
                     {item.title}
                   </Link>
-                  <p className="text-xs text-muted">
+                  <p className={typeXsMuted}>
                     {types[item.type]} · {copy[item.status]} · @{item.author.username} ·{" "}
                     {date(item.updatedAt)}
                   </p>
@@ -359,14 +383,14 @@ export async function CommunityModerationScreen({
               ))}
             </ul>
           )}
-          <nav aria-label={copy.title} className="flex flex-wrap gap-4">
-            <a className={focusLink} href={moderationHref(filters)}>
+          <nav aria-label={copy.title} className={typeFlexWrapGap4}>
+            <a className={linkAccentSm} href={moderationHref(filters)}>
               {copy.latest}
             </a>
             {parsed.data.nextCursor ? (
               <Link
                 prefetch={false}
-                className={focusLink}
+                className={linkAccentSm}
                 href={moderationHref(filters, parsed.data.nextCursor)}
               >
                 {copy.older}
@@ -378,4 +402,22 @@ export async function CommunityModerationScreen({
       {error ? failure(error, filters ? moderationHref(filters) : "/admin/community") : null}
     </div>
   );
+}
+
+export function AdminCommunityModerationListPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return CommunityModerationScreen({ searchParams });
+}
+
+export async function AdminCommunityModerationDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return CommunityModerationScreen({ id: (await params).id, searchParams });
 }

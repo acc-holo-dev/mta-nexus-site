@@ -1,27 +1,37 @@
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { platformSignInFocusClass } from "../../../components/guest-auth-links";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { PlatformSessionError } from "../../../components/platform-session-error";
-import { organizationReturnPath } from "./organization-return-path";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { parseOrganizationPage } from "../../../lib/organization-workspace-contract";
-import { getOrganizationCopy } from "../../../lib/organization-workspace-copy";
-import { authService } from "../../../lib/services/auth-service";
-import { organizationWorkspaceService } from "../../../lib/services/organization-workspace-service";
-import { platformFieldClass } from "../../../lib/user-platform-client";
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-export async function generateMetadata() {
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { organizationWorkspaceService } from "../../../lib/services/organizations/organization-workspace-service";
+import { platformFieldClass } from "../../community/user-platform-client";
+import { PlatformSignIn, platformSignInFocusClass } from "../../shell/guest-auth";
+import { linkAccentSm, linkMinH } from "../../shell/link-shell";
+import { pageShellMax5xl } from "../../shell/page-shell";
+import { panelSpace3P5 } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import {
+  typeBreakHeadingPrimary,
+  typeDisplayPrimary,
+  typeFlexWrapEndGap3,
+  typeFlexWrapStartBetweenGap4,
+  typeGrid2Gap4,
+  typeMinFlex1Space1SmSecondary,
+  typeMt2SmMuted,
+  typeXsMuted,
+} from "../../shell/type-shell";
+import { parseOrganizationPage } from "../organization-workspace-contract";
+import { getOrganizationCopy } from "../organization-workspace-copy";
+import { organizationReturnPath } from "./organization-return-path";
+
+export async function organizationsMetadata() {
   return {
     title: getOrganizationCopy(await getRequestLocale()).title,
     robots: { index: false, follow: false },
   };
 }
-export default async function OrganizationsPage({
+export async function OrganizationsPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -55,11 +65,11 @@ export default async function OrganizationsPage({
     return `/workspace/organizations${params.size ? `?${params}` : ""}`;
   };
   return (
-    <div className={pageShellClass}>
-      <header className="flex flex-wrap items-start justify-between gap-4">
+    <div className={pageShellMax5xl}>
+      <header className={typeFlexWrapStartBetweenGap4}>
         <div>
-          <h1 className="font-display text-primary">{copy.title}</h1>
-          <p className="mt-2 text-sm text-muted">{copy.description}</p>
+          <h1 className={typeDisplayPrimary}>{copy.title}</h1>
+          <p className={typeMt2SmMuted}>{copy.description}</p>
         </div>
         <Link
           className={`inline-flex min-h-11 items-center rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white ${platformSignInFocusClass}`}
@@ -69,8 +79,8 @@ export default async function OrganizationsPage({
         </Link>
       </header>
       <search aria-label={copy.search}>
-        <form action="/workspace/organizations" className="flex flex-wrap items-end gap-3">
-          <label className="min-w-0 flex-1 space-y-1 text-sm text-secondary">
+        <form action="/workspace/organizations" className={typeFlexWrapEndGap3}>
+          <label className={typeMinFlex1Space1SmSecondary}>
             <span>{copy.search}</span>
             <input
               className={`${platformFieldClass} min-h-11`}
@@ -88,8 +98,9 @@ export default async function OrganizationsPage({
       {!result ? (
         <ErrorState
           title={copy.unavailable}
+          description={copy.unavailableHint}
           action={
-            <Link href={href(filters.page)} className={navLinkClass}>
+            <Link href={href(filters.page)} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -97,11 +108,11 @@ export default async function OrganizationsPage({
       ) : (
         <>
           {result.items.length ? (
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className={typeGrid2Gap4}>
               {result.items.map((item) => (
-                <article className="nexus-panel space-y-3 p-5" key={item.id}>
-                  <h2 className="break-words font-heading text-primary">{item.name}</h2>
-                  <p className="text-xs text-muted">
+                <article className={panelSpace3P5} key={item.id}>
+                  <h2 className={typeBreakHeadingPrimary}>{item.name}</h2>
+                  <p className={typeXsMuted}>
                     @{item.slug} ·{" "}
                     {item.role in copy
                       ? copy[item.role as "owner" | "admin" | "member" | "developer"]
@@ -109,7 +120,7 @@ export default async function OrganizationsPage({
                   </p>
                   <p className="line-clamp-3 text-sm text-secondary">{item.description}</p>
                   <Link
-                    className={navLinkClass}
+                    className={linkAccentSm}
                     href={`/workspace/organizations/${encodeURIComponent(item.id)}`}
                   >
                     {copy.open}
@@ -123,11 +134,11 @@ export default async function OrganizationsPage({
               description={filters.query ? copy.emptyFilteredHint : copy.emptyHint}
               action={
                 filters.query ? (
-                  <Link href="/workspace/organizations" className={navLinkClass}>
+                  <Link href="/workspace/organizations" className={linkAccentSm}>
                     {copy.clearSearch}
                   </Link>
                 ) : (
-                  <Link href="/workspace/organizations/new" className={navLinkClass}>
+                  <Link href="/workspace/organizations/new" className={linkAccentSm}>
                     {copy.create}
                   </Link>
                 )
@@ -136,17 +147,17 @@ export default async function OrganizationsPage({
           )}
           <nav className="flex justify-between text-sm" aria-label={copy.title}>
             {result.page > 1 ? (
-              <Link className={navLinkClass} href={href(result.page - 1)}>
+              <Link className={linkAccentSm} href={href(result.page - 1)}>
                 {copy.previous}
               </Link>
             ) : (
               <span />
             )}
-            <span className="inline-flex min-h-11 items-center">
+            <span className={linkMinH}>
               {copy.page} {result.page}
             </span>
             {result.hasMore && (
-              <Link className={navLinkClass} href={href(result.page + 1)}>
+              <Link className={linkAccentSm} href={href(result.page + 1)}>
                 {copy.next}
               </Link>
             )}

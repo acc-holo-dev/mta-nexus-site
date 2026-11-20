@@ -1,7 +1,10 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { describe, expect, it, vi } from "vitest";
-import { SUPPORT_JSON_MAX_BYTES } from "../../src/lib/bounded-json";
+
+vi.mock("server-only", () => ({}));
+
+import { SUPPORT_JSON_MAX_BYTES } from "../../src/lib/http/bounded-json";
 
 vi.mock("next/server", async () => {
   const actual = await vi.importActual<typeof import("next/server")>("next/server");
@@ -9,7 +12,7 @@ vi.mock("next/server", async () => {
   return { ...actual, after: supportRouteAfterMock };
 });
 
-vi.mock("../../src/lib/services/auth-service", async () => {
+vi.mock("../../src/lib/services/accounts/auth-service", async () => {
   const { supportRouteMocks } = await import("../helpers/support-route-harness");
   return { authService: { getSession: supportRouteMocks.session } };
 });
@@ -24,7 +27,7 @@ vi.mock("@nexus/db", async () => {
   return createSupportRouteDbMock();
 });
 
-vi.mock("../../src/lib/services/notification-dispatch-service", async () => {
+vi.mock("../../src/lib/services/notifications/notification-dispatch-service", async () => {
   const { supportRouteMocks } = await import("../helpers/support-route-harness");
   return { dispatchNotificationsBestEffort: supportRouteMocks.dispatch };
 });

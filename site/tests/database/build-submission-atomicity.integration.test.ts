@@ -1,5 +1,3 @@
-import { eq } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
 import {
   auditEvents,
   buildRepository,
@@ -9,6 +7,8 @@ import {
   sessionRepository,
   userRepository,
 } from "@nexus/db";
+import { eq } from "drizzle-orm";
+import { describe, expect, it } from "vitest";
 
 describe("build submission transaction atomicity", () => {
   it("rolls back build and product state when audit persistence fails", async () => {

@@ -1,8 +1,8 @@
 import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
-import { resourceCommerceRequest } from "../../../../../../../lib/resource-commerce-http";
-import { resourceRequirementsQuery } from "../../../../../../../lib/resource-requirements-query";
-import { resourceRequirementsService } from "../../../../../../../lib/services/resource-requirements-service";
+import { resourceCommerceRequest } from "../../../../../../../features/resources/resource-commerce-http";
+import { resourceRequirementsQuery } from "../../../../../../../features/resources/resource-requirements-query";
+import { resourceRequirementsService } from "../../../../../../../lib/services/resources/resource-requirements-service";
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, false, async (actor) => {
     const report = await resourceRequirementsService.report(

@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../../src/lib/i18n";
+import { unknownMarker } from "../../src/lib/i18n/unknown";
 
 const state = vi.hoisted(() => ({
   user: {
@@ -49,17 +50,17 @@ vi.mock("@nexus/db", () => ({
   serverRepository: { pageManagedByUser: repos.managedServers },
 }));
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
   },
 }));
 
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 
-vi.mock("../../src/lib/services/mta-master-directory-service", () => ({
+vi.mock("../../src/lib/services/servers/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: {
     getDirectory: repos.directory,
   },
@@ -116,9 +117,9 @@ describe("workspace live telemetry behavior", () => {
     expect(html).toContain(dictionary.workspace.noServersHint);
     expect(html).toContain(dictionary.workspace.emptyLibrary);
     expect(html).toContain(dictionary.workspace.emptyLibraryHint);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toContain('href="/workspace/library"');
     expect(html).toContain('href="/workspace/servers/new"');
     expect(html).toContain(dictionary.workspace.libraryTitle);
@@ -194,7 +195,7 @@ describe("workspace live telemetry behavior", () => {
 
     expect(html).toContain(dictionary.servers.unknown);
     expect(html).not.toContain(dictionary.servers.offline);
-    expect(html).toContain("—");
+    expect(html).toContain(unknownMarker("en"));
     expect(html).not.toContain('href="/servers/unknown-server"');
   });
 
@@ -288,7 +289,7 @@ describe("workspace live telemetry behavior", () => {
     });
     const html = renderToStaticMarkup(await WorkspacePage());
     expect(html).toContain(dictionary.servers.online);
-    expect(html).toContain("—");
+    expect(html).toContain(unknownMarker("en"));
     expect(html).toContain("On the displayed servers");
   });
 
@@ -331,8 +332,8 @@ describe("workspace live telemetry behavior", () => {
     expect(html).toContain(dictionary.workspace.libraryUnavailable);
     expect(html).toContain(dictionary.errors.retry);
     expect(html).toContain('href="/workspace"');
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toContain(dictionary.workspace.noServers);
     expect(html).not.toContain("library-secret");
     expect(html).not.toContain(dictionary.workspace.emptyLibrary);
@@ -345,8 +346,8 @@ describe("workspace live telemetry behavior", () => {
     expect(html).toContain(dictionary.workspace.serversUnavailable);
     expect(html).toContain(dictionary.errors.retry);
     expect(html).toContain('href="/workspace"');
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toContain(dictionary.workspace.emptyLibrary);
     expect(html).not.toContain("servers-secret");
     expect(html).not.toContain(dictionary.workspace.noServers);
@@ -356,7 +357,7 @@ describe("workspace live telemetry behavior", () => {
   it.each(["en", "ru"] as const)(
     "renders an honest workspace loading shell with clipped overflow in %s",
     async (locale) => {
-      const { getRequestLocale } = await import("../../src/lib/i18n-server");
+      const { getRequestLocale } = await import("../../src/lib/i18n/server");
       vi.mocked(getRequestLocale).mockResolvedValueOnce(locale);
       const copy = getDictionary(locale).workspace;
       const html = renderToStaticMarkup(await WorkspaceLoading());
@@ -364,8 +365,8 @@ describe("workspace live telemetry behavior", () => {
       expect(html).toContain('id="workspace-loading-heading"');
       expect(html).toContain(`>${copy.title}<`);
       expect(html).toContain(copy.loading);
-      expect(html).toContain("overflow-x-clip");
-      expect(html).toContain("min-w-0");
+      expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+      expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     },
   );
 

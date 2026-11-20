@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
@@ -14,17 +16,17 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-vi.mock("../../../../lib/services/auth-service", () => ({
+vi.mock("../../../../lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => ({ id: "author" }) },
 }));
-vi.mock("../../../../lib/services/product-service", () => ({
+vi.mock("../../../../lib/services/commerce/product-service", () => ({
   productService: {
     getManagedProduct: mocks.product,
     getManagedHistory: mocks.history,
     getResourceLifecycleHistory: async () => [],
   },
 }));
-vi.mock("../../../../lib/services/resource-publication-readiness-service", () => ({
+vi.mock("../../../../lib/services/resources/resource-publication-readiness-service", () => ({
   resourcePublicationReadinessService: {
     summary: async () => ({
       productId: "resource",
@@ -39,7 +41,9 @@ vi.mock("../../../../lib/services/resource-publication-readiness-service", () =>
 vi.mock("../../../../features/resources/publisher-view", () => ({
   ResourcePublicationReadinessPanel: () => null,
 }));
-vi.mock("../../../../lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../../../../lib/i18n/server", () => ({
+  getRequestLocale: async () => mocks.locale,
+}));
 vi.mock("../../../../features/resources/author-controls", () => ({
   AuthorResourceForms: (props: unknown) => {
     mocks.forms(props);
@@ -51,8 +55,8 @@ vi.mock("../../../../features/resources/lifecycle-controls", () => ({
   ResourceLifecycleControls: () => null,
 }));
 
-import { getResourcePublisherCopy } from "../../../../lib/resource-publisher-i18n";
-import Page, { metadata } from "./page";
+import { getResourcePublisherCopy } from "../../../../features/resources/resource-publisher-i18n";
+import Page, { generateMetadata } from "./page";
 
 const input = {
   params: Promise.resolve({ id: "resource" }),
@@ -116,7 +120,7 @@ it.each(["en", "ru"] as const)(
     expect(mocks.forms.mock.calls[0][0].actorId).toBe("author");
     expect(mocks.forms.mock.calls[0][0].product.updatedAt).toBe("2026-10-04T00:00:00.000Z");
     expect(html).toContain("?page=3");
-    expect(metadata.robots).toMatchObject({ index: false });
+    expect((await generateMetadata()).robots).toMatchObject({ index: false });
   },
 );
 it("shows an honest recovery state when managed resource data fails", async () => {

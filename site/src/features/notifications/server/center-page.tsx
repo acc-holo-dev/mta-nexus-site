@@ -3,24 +3,33 @@ import { AppError } from "@nexus/domain";
 import { Button, ErrorState, fieldClass } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { notificationInboxService } from "../../../lib/services/notifications/notification-inbox-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm, linkAccentSmRounded } from "../../shell/link-shell";
+import { pageShellMax4xlTight } from "../../shell/page-shell";
+import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import { surfaceSpace3BorderBPb6 } from "../../shell/surface-shell";
+import {
+  type2xlExtraboldPrimary,
+  typeMinH11Semibold,
+  typeSmMuted,
+  typeSpace1XsMuted,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import { NotificationCenterTabs } from "../components/notification-center-tabs";
 import { NotificationInbox } from "../components/notification-inbox";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
 import {
   INBOX_CATEGORIES,
   INBOX_PERIODS,
   notificationInboxHref,
   parseNotificationInboxQuery,
-} from "../../../lib/notification-inbox-contract";
-import {
-  notificationInboxCopy,
-  notificationInboxError,
-} from "../../../lib/notification-inbox-copy";
-import { authService } from "../../../lib/services/auth-service";
-import { notificationInboxService } from "../../../lib/services/notification-inbox-service";
-export async function generateMetadata() {
+} from "../notification-inbox-contract";
+import { notificationInboxCopy, notificationInboxError } from "../notification-inbox-copy";
+export async function notificationCenterMetadata() {
   const copy = notificationInboxCopy(await getRequestLocale());
   return {
     title: copy.title,
@@ -28,7 +37,7 @@ export async function generateMetadata() {
     robots: { index: false, follow: false },
   };
 }
-export default async function NotificationCenterPage({
+export async function NotificationCenterPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -47,20 +56,12 @@ export default async function NotificationCenterPage({
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
   } catch {
     return (
-      <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip">
-        <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
-        <ErrorState
-          title={copy.unavailable}
-          action={
-            <Link
-              href={returnPath}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {dictionary.errors.retry}
-            </Link>
-          }
-        />
-      </div>
+      <PlatformSessionError
+        locale={locale}
+        title={copy.title}
+        message={copy.unavailable}
+        retryHref={returnPath}
+      />
     );
   }
   if (!actor) {
@@ -87,21 +88,15 @@ export default async function NotificationCenterPage({
     }
   })();
   return (
-    <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip">
-      <header className="space-y-3 border-b border-base pb-6">
-        <Link
-          href="/workspace"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+    <div className={pageShellMax4xlTight}>
+      <header className={surfaceSpace3BorderBPb6}>
+        <Link href="/workspace" className={linkAccentSm}>
           {copy.workspace}
         </Link>
-        <h1 className="text-2xl font-extrabold text-primary">{copy.title}</h1>
-        <p className="text-sm text-muted">{copy.description}</p>
-        <p className="text-xs text-muted">{copy.openBetaNote}</p>
-        <Link
-          href="/settings#notification-heading"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <h1 className={type2xlExtraboldPrimary}>{copy.title}</h1>
+        <p className={typeSmMuted}>{copy.description}</p>
+        <p className={typeXsMuted}>{copy.openBetaNote}</p>
+        <Link href="/settings#notification-heading" className={linkAccentSm}>
           {copy.settings}
         </Link>
       </header>
@@ -117,11 +112,7 @@ export default async function NotificationCenterPage({
         }}
       >
         <search aria-label={copy.filters}>
-          <form
-            action="/notifications"
-            method="get"
-            className="nexus-panel flex flex-wrap items-end gap-3 p-4"
-          >
+          <form action="/notifications" method="get" className={panelFlexWrapEndP4}>
             <label className="min-w-0 flex-1 space-y-1 text-xs text-muted sm:min-w-40">
               {copy.query}
               <input
@@ -133,7 +124,7 @@ export default async function NotificationCenterPage({
               />
             </label>
             <input type="hidden" name="state" value={filters?.state ?? "all"} />
-            <label className="space-y-1 text-xs text-muted">
+            <label className={typeSpace1XsMuted}>
               {copy.category}
               <select
                 name="category"
@@ -148,7 +139,7 @@ export default async function NotificationCenterPage({
                 ))}
               </select>
             </label>
-            <label className="space-y-1 text-xs text-muted">
+            <label className={typeSpace1XsMuted}>
               {copy.period}
               <select
                 name="period"
@@ -162,14 +153,11 @@ export default async function NotificationCenterPage({
                 ))}
               </select>
             </label>
-            <Button type="submit" className="min-h-11 font-semibold">
+            <Button type="submit" className={typeMinH11Semibold}>
               {copy.search}
             </Button>
             {filtersActive ? (
-              <Link
-                href="/notifications"
-                className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href="/notifications" className={linkAccentSm}>
                 {copy.reset}
               </Link>
             ) : null}
@@ -182,18 +170,16 @@ export default async function NotificationCenterPage({
               ? notificationInboxHref("/notifications", { ...filters, at: undefined })
               : "/notifications"
           }
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentSm}
         >
           {copy.latest}
         </Link>
         {error ? (
           <ErrorState
             title={error}
+            description={copy.unavailableHint}
             action={
-              <Link
-                href={returnPath}
-                className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={returnPath} className={linkAccentSmRounded}>
                 {dictionary.errors.retry}
               </Link>
             }

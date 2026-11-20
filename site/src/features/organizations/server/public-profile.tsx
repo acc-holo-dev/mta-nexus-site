@@ -11,26 +11,36 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
-import { ArticleCard } from "../../community/article-view";
-import { FollowButton } from "../../../components/follow-button";
-import { ProductCard } from "../../resources/view";
-import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
-import { buildFollowInitialState } from "../../../lib/follow-initial-state";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n-server";
-import { parseProfilePage } from "../../../lib/profile-pagination";
-import { contextTrustCopy } from "../../../lib/public-context-trust-copy";
-import { publicationCopy } from "../../../lib/publication-feed-copy";
-import { authService } from "../../../lib/services/auth-service";
-import { productService } from "../../../lib/services/product-service";
-
-const pageShellClass = "min-w-0 space-y-10 overflow-x-clip";
-const actionLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { productService } from "../../../lib/services/commerce/product-service";
+import { ProfileResourcePagination, parseProfilePage } from "../../accounts/profile-pagination";
+import { ArticleCard } from "../../community/article-view";
+import { FollowButton } from "../../community/follow";
+import { buildFollowInitialState } from "../../community/follow-initial-state";
+import { publicationCopy } from "../../community/publication-feed-copy";
+import { ProductCard } from "../../resources/view";
+import { linkAccentSm } from "../../shell/link-shell";
+import { pageShellStack4, pageShellStack6, pageShellStack10 } from "../../shell/page-shell";
+import { panelHeroBetween } from "../../shell/panel-shell";
+import {
+  typeFlexMinCenterGap5Sm6,
+  typeFlexWrapCenterGap2,
+  typeGridMinCols1Gap6Clip,
+  typeH35W35Shrink,
+  typeHeadingPrimary,
+  typeIcon5Success,
+  typeMaxXlSmLeadingMuted,
+  typeMinSpace15,
+  typeTruncate2xlBlackPrimary,
+  typeTruncateXsFaint,
+} from "../../shell/type-shell";
+import { contextTrustCopy } from "../../trust/public-context-trust-copy";
 
 const getProfile = cache((slug: string) => organizationRepository.findBySlug(slug));
 
-export async function generateMetadata({
+export async function organizationProfileMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
@@ -52,7 +62,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function OrganizationProfilePage({
+export async function OrganizationProfilePage({
   params,
   searchParams,
 }: {
@@ -93,11 +103,12 @@ export default async function OrganizationProfilePage({
 
   if (loadError || !loaded) {
     return (
-      <div className="min-w-0 space-y-6 overflow-x-clip">
+      <div className={pageShellStack6}>
         <ErrorState
           title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
           action={
-            <Link href={profileHref} className={actionLinkClass}>
+            <Link href={profileHref} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }
@@ -131,9 +142,9 @@ export default async function OrganizationProfilePage({
   const portfolioEmpty = resourcePage.total === 0 && articlePage.total === 0;
 
   return (
-    <div className={pageShellClass}>
-      <section className="nexus-panel flex min-w-0 flex-col justify-between gap-6 overflow-x-clip p-6 shadow-nexus-sm md:flex-row md:items-center md:p-8">
-        <div className="flex min-w-0 items-center gap-5 sm:gap-6">
+    <div className={pageShellStack10}>
+      <section className={panelHeroBetween}>
+        <div className={typeFlexMinCenterGap5Sm6}>
           <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-base bg-inset text-muted shadow-nexus-sm">
             {logoUrl ? (
               <>
@@ -152,12 +163,12 @@ export default async function OrganizationProfilePage({
             )}
           </div>
 
-          <div className="min-w-0 space-y-1.5">
-            <div className="flex flex-wrap items-center gap-2">
-              <h1 className="truncate text-2xl font-black text-primary">{organization.name}</h1>
+          <div className={typeMinSpace15}>
+            <div className={typeFlexWrapCenterGap2}>
+              <h1 className={typeTruncate2xlBlackPrimary}>{organization.name}</h1>
               {organization.isVerified && (
                 <span title={copy.verified}>
-                  <ShieldCheck className="h-5 w-5 text-success" aria-hidden="true" />
+                  <ShieldCheck className={typeIcon5Success} aria-hidden="true" />
                 </span>
               )}
               <span className="rounded border border-[color:var(--nexus-warning)]/20 bg-warning-soft px-2 py-0.5 font-label uppercase text-warning">
@@ -165,11 +176,9 @@ export default async function OrganizationProfilePage({
               </span>
             </div>
 
-            <div className="truncate text-xs text-faint">@{organization.slug}</div>
+            <div className={typeTruncateXsFaint}>@{organization.slug}</div>
 
-            <p className="max-w-xl text-sm leading-relaxed text-muted">
-              {organization.description || copy.fallback}
-            </p>
+            <p className={typeMaxXlSmLeadingMuted}>{organization.description || copy.fallback}</p>
 
             <FollowButton
               targetType="organization"
@@ -177,10 +186,10 @@ export default async function OrganizationProfilePage({
               targetName={organization.name}
               initial={followInitial}
             />
-            <Link href={`${profileHref}/activity`} className={actionLinkClass}>
+            <Link href={`${profileHref}/activity`} className={linkAccentSm}>
               {publicationCopy(locale).activity}
             </Link>
-            <Link href={`${profileHref}/trust`} className={actionLinkClass}>
+            <Link href={`${profileHref}/trust`} className={linkAccentSm}>
               {contextTrustCopy(locale).title}
             </Link>
             {websiteUrl && (
@@ -190,7 +199,7 @@ export default async function OrganizationProfilePage({
                 rel="noreferrer"
                 className="inline-flex min-h-11 max-w-full items-center gap-1.5 text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
-                <Globe className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                <Globe className={typeH35W35Shrink} aria-hidden="true" />
                 <span className="truncate">{websiteUrl}</span>
                 <ExternalLink className="h-2.5 w-2.5 shrink-0" aria-hidden="true" />
               </a>
@@ -208,7 +217,7 @@ export default async function OrganizationProfilePage({
           title={copy.emptyPortfolio}
           description={copy.emptyPortfolioHint}
           action={
-            <Link href="/market?maxPrice=0" className={actionLinkClass}>
+            <Link href="/market?maxPrice=0" className={linkAccentSm}>
               {dictionary.home.browseResources}
             </Link>
           }
@@ -216,11 +225,11 @@ export default async function OrganizationProfilePage({
       ) : null}
 
       {resourcePage.total > 0 && (
-        <section id="resources" className="min-w-0 space-y-4 overflow-x-clip">
-          <h2 className="font-heading text-primary">
+        <section id="resources" className={pageShellStack4}>
+          <h2 className={typeHeadingPrimary}>
             {copy.marketplaceReleases} ({resourcePage.total})
           </h2>
-          <div className="grid min-w-0 grid-cols-1 gap-6 overflow-x-clip sm:grid-cols-2 lg:grid-cols-4">
+          <div className={typeGridMinCols1Gap6Clip}>
             {products.map((product) => (
               <ProductCard
                 key={product.id}
@@ -242,8 +251,8 @@ export default async function OrganizationProfilePage({
       )}
 
       {articlePage.total > 0 && (
-        <section id="articles" className="min-w-0 space-y-4 overflow-x-clip">
-          <h2 className="font-heading text-primary">
+        <section id="articles" className={pageShellStack4}>
+          <h2 className={typeHeadingPrimary}>
             {copy.articles} ({articlePage.total})
           </h2>
           <div className="grid min-w-0 grid-cols-1 gap-6 overflow-x-clip md:grid-cols-3">

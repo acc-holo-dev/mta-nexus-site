@@ -5,15 +5,17 @@ const { getDirectory, listServers } = vi.hoisted(() => ({
   getDirectory: vi.fn(),
   listServers: vi.fn(),
 }));
-vi.mock("../../src/lib/services/server-service", () => ({
+vi.mock("../../src/lib/services/servers/server-service", () => ({
   serverService: { listServers },
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {},
 }));
-vi.mock("../../src/lib/services/mta-master-directory-service", async (importOriginal) => {
+vi.mock("../../src/lib/services/servers/mta-master-directory-service", async (importOriginal) => {
   const original =
-    await importOriginal<typeof import("../../src/lib/services/mta-master-directory-service")>();
+    await importOriginal<
+      typeof import("../../src/lib/services/servers/mta-master-directory-service")
+    >();
   return { ...original, mtaMasterDirectoryService: { getDirectory } };
 });
 

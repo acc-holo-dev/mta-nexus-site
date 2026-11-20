@@ -1,27 +1,30 @@
-import { beforeEach, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
   trust: vi.fn(),
   team: vi.fn(),
   rate: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../../src/lib/services/public-context-trust-service", () => ({
+vi.mock("../../src/lib/services/trust/public-context-trust-service", () => ({
   publicContextTrustService: { page: mocks.trust },
 }));
-vi.mock("../../src/lib/services/organization-team-service", () => ({
+vi.mock("../../src/lib/services/organizations/organization-team-service", () => ({
   organizationTeamService: { page: mocks.team },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
-vi.mock("../../src/lib/request-client-ip", () => ({
+vi.mock("../../src/features/shell/request-client-ip", () => ({
   getTrustedRequestIp: () => "trusted-ip",
 }));
+
 import { GET as trust } from "../../src/app/api/trust/[kind]/[slug]/route";
 import { GET as team } from "../../src/app/api/workspace/organizations/[id]/team/route";
+
 const actor = { id: "actor", role: "admin" },
   organization = { params: Promise.resolve({ id: "org" }) },
   context = (kind = "servers") => ({ params: Promise.resolve({ kind, slug: "server" }) });

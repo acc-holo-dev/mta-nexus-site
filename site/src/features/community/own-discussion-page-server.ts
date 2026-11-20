@@ -1,3 +1,3 @@
 import "server-only";
 
-export { default, generateMetadata } from "./server/own-discussion-page";
+export { OwnCommentPage, ownCommentMetadata } from "./server/own-discussion-page";

@@ -4,28 +4,26 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AuthorContentForm } from "../author-content-form";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { PlatformSessionError } from "../../../components/platform-session-error";
 import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { authService } from "../../../lib/services/auth-service";
-import { authorContentService } from "../../../lib/services/author-content-service";
-import { parseEditableContent } from "../../../lib/user-platform-client";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
-
-const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip";
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
-export async function generateMetadata(): Promise<Metadata> {
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { authorContentService } from "../../../lib/services/organizations/author-content-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkAccentSm } from "../../shell/link-shell";
+import { pageShellMax3xlTight } from "../../shell/page-shell";
+import { PlatformSessionError } from "../../shell/session-error";
+import { typeDisplayPrimary } from "../../shell/type-shell";
+import { AuthorContentForm } from "../author-content-form";
+import { parseEditableContent } from "../user-platform-client";
+import { getUserPlatformCopy } from "../user-platform-copy";
+export async function editPublicationMetadata(): Promise<Metadata> {
   return {
     title: getUserPlatformCopy(await getRequestLocale()).edit,
     robots: { index: false, follow: false },
   };
 }
 
-export default async function EditPublicationPage({ params }: { params: Promise<{ id: string }> }) {
+export async function EditPublicationPage({ params }: { params: Promise<{ id: string }> }) {
   const [locale, { id }] = await Promise.all([getRequestLocale(), params]);
   const returnPath = `/workspace/content/${encodeURIComponent(id)}`;
   const copy = getUserPlatformCopy(locale);
@@ -50,18 +48,19 @@ export default async function EditPublicationPage({ params }: { params: Promise<
   });
   const initial = item ? parseEditableContent(JSON.parse(JSON.stringify(item))) : null;
   return (
-    <div className={pageShellClass}>
-      <Link href="/workspace/content" className={navLinkClass}>
+    <div className={pageShellMax3xlTight}>
+      <Link href="/workspace/content" className={linkAccentSm}>
         {copy.back}
       </Link>
-      <h1 className="font-display text-primary">{copy.edit}</h1>
+      <h1 className={typeDisplayPrimary}>{copy.edit}</h1>
       {initial ? (
         <AuthorContentForm locale={locale} initial={initial} />
       ) : (
         <ErrorState
           title={copy.unavailable}
+          description={copy.unavailableHint}
           action={
-            <Link href={returnPath} className={navLinkClass}>
+            <Link href={returnPath} className={linkAccentSm}>
               {dictionary.errors.retry}
             </Link>
           }

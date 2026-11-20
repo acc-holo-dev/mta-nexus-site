@@ -1,30 +1,29 @@
 import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
+import { getRequestLocale } from "../../../lib/i18n/server";
+import { authService } from "../../../lib/services/accounts/auth-service";
+import { organizationGovernanceService } from "../../../lib/services/organizations/organization-governance-service";
+import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellClip } from "../../shell/page-shell";
+import { PlatformSessionError } from "../../shell/session-error";
 import { OrganizationHistoryView } from "../history-view";
-import { PlatformSignIn } from "../../../components/platform-sign-in";
-import { PlatformSessionError } from "../../../components/platform-session-error";
-import { organizationReturnPath } from "./organization-return-path";
-import { getRequestLocale } from "../../../lib/i18n-server";
 import {
   organizationChangeHistorySchema,
   parseOrganizationChangeHistoryQuery,
-} from "../../../lib/organization-governance-contract";
+} from "../organization-governance-contract";
 import {
   organizationGovernanceCopy,
   organizationGovernanceError,
-} from "../../../lib/organization-governance-copy";
-import { authService } from "../../../lib/services/auth-service";
-import { organizationGovernanceService } from "../../../lib/services/organization-governance-service";
+} from "../organization-governance-copy";
+import { organizationReturnPath } from "./organization-return-path";
 
-const pageShellClass = "min-w-0 overflow-x-clip";
-
-export async function generateMetadata() {
+export async function organizationHistoryMetadata() {
   return {
     title: organizationGovernanceCopy(await getRequestLocale()).history,
     robots: { index: false, follow: false },
   };
 }
-export default async function OrganizationHistoryPage({
+export async function OrganizationHistoryPage({
   params,
   searchParams,
 }: {
@@ -49,7 +48,7 @@ export default async function OrganizationHistoryPage({
   }
   if (!actor)
     return (
-      <div className={pageShellClass}>
+      <div className={pageShellClip}>
         <PlatformSignIn locale={locale} returnPath={returnPath} />
       </div>
     );
@@ -75,7 +74,7 @@ export default async function OrganizationHistoryPage({
       : null;
   if (!filters) error = organizationGovernanceCopy(locale).invalid;
   return (
-    <div className={pageShellClass}>
+    <div className={pageShellClip}>
       <OrganizationHistoryView
         id={id}
         data={data}

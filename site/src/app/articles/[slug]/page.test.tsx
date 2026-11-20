@@ -23,7 +23,7 @@ const article = () =>
     likeCount: 0,
     viewCount: 1,
   }) as unknown as Content;
-vi.mock("../../../lib/services/content-service", () => ({
+vi.mock("../../../lib/services/community/content-service", () => ({
   contentService: {
     getArticleBySlug: async () => article(),
     pageDiscussion: async () => ({ items: [], hasMore: false, nextCursor: null }),
@@ -39,6 +39,7 @@ const follow = vi.hoisted(() => ({
   contentStates: vi.fn(async (): Promise<ContentFollowRow[]> => []),
   muteState: vi.fn(async (): Promise<MuteState> => ({ muted: false, mutedUntil: null })),
   session: null as null | { id: string; role: string },
+  sessionFailed: false,
 }));
 vi.mock("@nexus/db", () => ({
   followWorkspaceRepository: {
@@ -46,19 +47,27 @@ vi.mock("@nexus/db", () => ({
     muteState: follow.muteState,
   },
 }));
-vi.mock("../../../lib/services/auth-service", () => ({
+vi.mock("../../../lib/services/accounts/auth-service", () => ({
   authService: {
     getUserById: async () => null,
-    getSession: async () => follow.session,
+    getSession: async () => {
+      if (follow.sessionFailed) throw new Error("session probe failed");
+      return follow.session;
+    },
   },
 }));
-vi.mock("../../../lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../../lib/i18n/server", () => ({
+  getRequestLocale: async () => state.locale,
+}));
 vi.mock("../../../features/community/discussion", () => ({
-  ContentDiscussion: (props: { followInitial?: unknown }) => (
-    <div data-follow-initial={JSON.stringify(props.followInitial ?? null)} />
+  ContentDiscussion: (props: { followInitial?: unknown; identityUnavailable?: boolean }) => (
+    <div
+      data-follow-initial={JSON.stringify(props.followInitial ?? null)}
+      data-identity-unavailable={props.identityUnavailable ? "1" : "0"}
+    />
   ),
 }));
-vi.mock("../../../lib/services/content-reaction-service", () => ({
+vi.mock("../../../lib/services/community/content-reaction-service", () => ({
   contentReactionService: {
     state: async () => ({
       contentId: "article",
@@ -79,6 +88,7 @@ beforeEach(() => {
   state.cover = "";
   state.locale = "en";
   follow.session = null;
+  follow.sessionFailed = false;
   follow.contentStates.mockReset();
   follow.muteState.mockReset();
   follow.contentStates.mockResolvedValue([]);
@@ -163,4 +173,17 @@ it("falls back to muteState when the viewer is not following the article", async
   expect(html).toContain("&quot;following&quot;:false");
   expect(html).toContain("&quot;muted&quot;:true");
   expect(html).toContain("2026-11-30T12:00:00.000000Z");
+});
+
+it("treats session probe failure as identity error, not a guest follow seed", async () => {
+  follow.sessionFailed = true;
+  const html = renderToStaticMarkup(await Page(input()));
+  expect(follow.contentStates).not.toHaveBeenCalled();
+  expect(html).toContain('data-identity-unavailable="1"');
+  expect(html).toContain("&quot;authenticated&quot;:null");
+  expect(html).toContain("&quot;error&quot;:true");
+  expect(html).toContain("article-session-unavailable");
+  expect(html).not.toContain(
+    'data-follow-initial="{&quot;authenticated&quot;:false,&quot;following&quot;:false,&quot;notifyComments&quot;:false,&quot;muted&quot;:false,&quot;mutedUntil&quot;:null}"',
+  );
 });

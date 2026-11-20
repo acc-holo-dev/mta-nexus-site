@@ -13,14 +13,12 @@ const source = readFileSync(
 it("locks release-returns-draft notice to ErrorState without soft text-warning", () => {
   expect(source).toContain('import { Button, ErrorState } from "@nexus/ui"');
   expect(source).toContain('id="resource-moderation-release-draft"');
-  expect(source).toContain(
-    "Release returns a draft and requires a new review. Nothing is auto-published.",
-  );
+  expect(source).toContain("copy.releaseDraftWarning");
   expect(source).toMatch(
-    /release \? \(\s*<ErrorState\s+id="resource-moderation-release-draft"\s+title=\{/u,
+    /release \? \(\s*<ErrorState\s+id="resource-moderation-release-draft"\s+title=\{copy\.releaseDraftWarning\}/u,
   );
   expect(source).not.toContain('className="text-sm text-warning"');
   expect(source).not.toContain(
-    'className="text-sm text-warning">\n          {locale === "ru"\n            ? "Снятие ограничения возвращает черновик и требует новой проверки. Автоматической публикации нет."\n            : "Release returns a draft and requires a new review. Nothing is auto-published."}',
+    "Release returns a draft and requires a new review. Nothing is auto-published.",
   );
 });

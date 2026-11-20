@@ -1,5 +1,5 @@
-import { expect, it } from "vitest";
 import { serverClaimMatchesOwnershipScope } from "@nexus/domain";
+import { expect, it } from "vitest";
 
 it.each([
   [true, null, null, true],

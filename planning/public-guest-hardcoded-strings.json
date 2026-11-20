@@ -1,0 +1,96 @@
+{
+  "allowlist": [
+    {
+      "id": "acquire.version-prefix",
+      "kind": "jsx-text",
+      "path": "site/src/app/acquire/page.tsx",
+      "text": "v"
+    },
+    {
+      "id": "market.product-card.version-prefix",
+      "kind": "jsx-text",
+      "path": "site/src/features/resources/components/product-card.tsx",
+      "text": "v"
+    },
+    {
+      "id": "market.reverse-deps.version-prefix",
+      "kind": "jsx-text",
+      "path": "site/src/features/resources/components/reverse-dependency-list.tsx",
+      "text": "v"
+    }
+  ],
+  "findings": [
+    {
+      "allowlist_id": "market.product-card.version-prefix",
+      "kind": "jsx-text",
+      "line": 139,
+      "path": "site/src/features/resources/components/product-card.tsx",
+      "text": "v"
+    },
+    {
+      "allowlist_id": "market.reverse-deps.version-prefix",
+      "kind": "jsx-text",
+      "line": 41,
+      "path": "site/src/features/resources/components/reverse-dependency-list.tsx",
+      "text": "v"
+    }
+  ],
+  "scan_roots": [
+    "site/src/app/discover",
+    "site/src/app/servers",
+    "site/src/app/articles",
+    "site/src/app/market",
+    "site/src/app/community",
+    "site/src/app/organizations",
+    "site/src/app/users",
+    "site/src/app/developers",
+    "site/src/app/support",
+    "site/src/app/explore",
+    "site/src/app/acquire",
+    "site/src/features/discovery",
+    "site/src/features/servers/components/mta-master-server-directory.tsx",
+    "site/src/features/servers/components/server-card.tsx",
+    "site/src/features/servers/components/server-connect-controls.tsx",
+    "site/src/features/servers/components/server-follow-button.tsx",
+    "site/src/features/resources/components/product-card.tsx",
+    "site/src/features/resources/components/resource-preview.tsx",
+    "site/src/features/resources/components/resource-gallery.tsx",
+    "site/src/features/resources/components/resource-gallery-lightbox.tsx",
+    "site/src/features/resources/components/resource-download-button.tsx",
+    "site/src/features/resources/components/resource-review-list.tsx",
+    "site/src/features/resources/components/product-dependency-list.tsx",
+    "site/src/features/resources/components/reverse-dependency-list.tsx",
+    "site/src/features/resources/components/resource-variant-choices.tsx",
+    "site/src/features/resources/components/resource-version-help-section.tsx",
+    "site/src/features/resources/components/resource-version-help-support-link.tsx",
+    "site/src/features/resources/components/build-provenance-details.tsx",
+    "site/src/features/resources/components/resource-qa-panel.tsx",
+    "site/src/features/resources/components/resource-release-watch-control.tsx",
+    "site/src/features/resources/components/resource-cart-controls.tsx",
+    "site/src/features/community/components/article-card.tsx",
+    "site/src/features/community/components/publication-feed.tsx",
+    "site/src/features/community/components/follow-button.tsx",
+    "site/src/features/community/components/content-catalog-controls.tsx",
+    "site/src/features/community/components/content-discussion.tsx",
+    "site/src/features/community/components/content-discussion-compose-feedback.tsx",
+    "site/src/features/community/components/content-reactions.tsx",
+    "site/src/features/community/components/content-comment-form.tsx",
+    "site/src/features/community/components/content-follow-controls.tsx",
+    "site/src/features/community/components/community-topic-form.tsx",
+    "site/src/features/accounts/components/developer-experience.tsx",
+    "site/src/features/accounts/components/profile-resource-pagination.tsx",
+    "site/src/features/support/components/support-center.tsx",
+    "site/src/features/support/components/support-download-help-link.tsx",
+    "site/src/features/support/components/support-case-thread.tsx",
+    "site/src/features/support/components/support-message-browser.tsx"
+  ],
+  "scope": "Git-tracked public guest surfaces — discover, servers, articles, market, community, organizations, users, developers, support, explore, acquire; discovery feature; guest server directory components; guest market/resource, community feed/discussion, profile, and support UI components (excluding feature server/ and *-server ports) — hard-coded guest-facing literals + locale copy ternaries.",
+  "source_sha": "e6479fde148fddb81b5877fea8c15bd4a52a7e1e",
+  "summary": {
+    "allowlisted": 2,
+    "findings": 2,
+    "locale_copy_ternaries": 0,
+    "scanned_files": 102,
+    "unallowlisted": 0
+  }
+}

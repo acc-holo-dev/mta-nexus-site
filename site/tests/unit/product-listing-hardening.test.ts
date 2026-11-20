@@ -9,7 +9,7 @@ describe("public product listing hardening", () => {
       "utf8",
     );
     const service = readFileSync(
-      resolve(process.cwd(), "site/src/lib/services/product-service.ts"),
+      resolve(process.cwd(), "site/src/lib/services/commerce/product-service.ts"),
       "utf8",
     );
 

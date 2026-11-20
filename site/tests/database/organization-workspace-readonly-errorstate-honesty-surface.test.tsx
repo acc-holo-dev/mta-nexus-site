@@ -4,9 +4,9 @@ import { fileURLToPath } from "node:url";
 import type * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
+import type { OrganizationWorkspace } from "../../src/features/organizations/organization-workspace-contract";
+import { getOrganizationCopy } from "../../src/features/organizations/organization-workspace-copy";
 import { OrganizationWorkspacePanel } from "../../src/features/organizations/workspace";
-import type { OrganizationWorkspace } from "../../src/lib/organization-workspace-contract";
-import { getOrganizationCopy } from "../../src/lib/organization-workspace-copy";
 
 vi.mock("next/link", () => ({
   default: ({ href, children }: { href: string; children: React.ReactNode }) => (
@@ -58,12 +58,18 @@ const workspace: OrganizationWorkspace = {
 it("locks organization workspace readonly notice to ErrorState without soft muted caption", () => {
   expect(source).toContain('import { Avatar, Button, EmptyState, ErrorState } from "@nexus/ui"');
   expect(source).toContain('id="organization-workspace-readonly"');
-  expect(source).toMatch(
-    /\{!manageable && <ErrorState id="organization-workspace-readonly" title=\{copy\.readOnly\} \/>\}/u,
-  );
+  expect(source).toContain('id="organization-workspace-readonly"');
+  expect(source).toContain("title={copy.readOnly}");
+  expect(source).toContain("description={copy.readOnlyHint}");
   expect(source).not.toContain(
     'className="nexus-panel p-4 text-sm text-muted">{copy.readOnly}</p>',
   );
+});
+
+it("locks organization workspace retry ErrorState to unavailableHint recovery description", () => {
+  expect(source).toContain("description={copy.unavailableHint}");
+  expect(getOrganizationCopy("en").unavailableHint.length).toBeGreaterThan(0);
+  expect(getOrganizationCopy("ru").unavailableHint.length).toBeGreaterThan(0);
 });
 
 it.each(["en", "ru"] as const)(

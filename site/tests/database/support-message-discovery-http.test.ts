@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
 const mock = vi.hoisted(() => ({ session: vi.fn(), rate: vi.fn(), page: vi.fn() }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: mock.session },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mock.rate }));
@@ -11,7 +11,7 @@ vi.mock("@nexus/db", () => ({ supportMessageDiscoveryRepository: { page: mock.pa
 
 import { GET as download } from "../../src/app/api/support/[id]/messages/export/route";
 import { GET } from "../../src/app/api/support/[id]/messages/route";
-import { supportMessageCopy } from "../../src/lib/support-message-discovery-copy";
+import { supportMessageCopy } from "../../src/features/support/support-message-discovery-copy";
 
 const id = `sup_${"a".repeat(24)}`,
   messageId = `spm_${"b".repeat(24)}`,

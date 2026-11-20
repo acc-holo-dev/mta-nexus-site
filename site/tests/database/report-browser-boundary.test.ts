@@ -1,28 +1,30 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const authService = vi.hoisted(() => ({
   getSession: vi.fn(async () => null),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({ authService }));
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({ authService }));
 vi.mock("@nexus/security", () => ({
   can: () => false,
   consumeRateLimit: vi.fn(async () => ({ success: true })),
   generateId: () => "rpt_a",
 }));
 vi.mock("@nexus/db", () => ({
-  reportRepository: { listPage: vi.fn(), createWithAudit: vi.fn() },
   productRepository: { findById: vi.fn() },
   serverRepository: { findById: vi.fn() },
   contentRepository: { findById: vi.fn(), findCommentById: vi.fn() },
   userRepository: { findById: vi.fn(), listModeratorIds: vi.fn() },
   communityReportsRepository: { page: vi.fn(), submit: vi.fn() },
 }));
-vi.mock("../../src/lib/services/notification-dispatch-service", () => ({
+vi.mock("../../src/lib/services/notifications/notification-dispatch-service", () => ({
   dispatchNotificationsBestEffort: vi.fn(),
 }));
-vi.mock("../../src/lib/services/community-report-service", () => ({
+vi.mock("../../src/lib/services/community/community-report-service", () => ({
   communityReportService: { page: vi.fn(), submit: vi.fn() },
+}));
+vi.mock("../../src/lib/services/moderation/platform-report-service", () => ({
+  platformReportService: { listPage: vi.fn(), createWithAudit: vi.fn() },
 }));
 
 import { POST as createPublicReport } from "../../src/app/api/reports/route";

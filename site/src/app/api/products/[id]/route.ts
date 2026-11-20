@@ -2,16 +2,19 @@ import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { editProductDetailsSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
+import { productsApiCopy } from "../../../../features/resources/products-api-copy";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/http/bounded-json";
+import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
+import { localeAppErrorText } from "../../../../lib/http/locale-app-error";
+import { resolveLocale } from "../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
   type RequestLogContext,
-} from "../../../../lib/observability";
-import { authService } from "../../../../lib/services/auth-service";
-import { productService } from "../../../../lib/services/product-service";
+} from "../../../../lib/platform/observability";
+import { authService } from "../../../../lib/services/accounts/auth-service";
+import { productService } from "../../../../lib/services/commerce/product-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -38,6 +41,7 @@ export async function GET(
   },
 ) {
   const context = createRequestLogContext(request);
+  const copy = productsApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
 
   try {
     const { id } = await params;
@@ -46,7 +50,7 @@ export async function GET(
     if (!product) {
       return jsonWithRequestId(
         context,
-        { error: "Product not found" },
+        { error: copy.notFound },
         {
           status: 404,
           headers: noStoreHeaders,
@@ -79,7 +83,7 @@ export async function GET(
     return jsonWithRequestId(
       context,
       {
-        error: "Resource details are temporarily unavailable",
+        error: copy.detailsUnavailable,
       },
       {
         status: 503,
@@ -99,11 +103,16 @@ export const PATCH = withBrowserMutation(
     },
   ) => {
     const context = createRequestLogContext(request);
+    const copy = productsApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
 
     try {
       const actor = await authService.getSession(request.cookies.get("nexus_session")?.value);
       if (!actor) {
-        return privateJson(context, { code: "UNAUTHORIZED" }, 401);
+        return privateJson(
+          context,
+          { code: "UNAUTHORIZED", error: copy.authenticationRequired },
+          401,
+        );
       }
 
       requireServerJsonContentType(request);
@@ -112,7 +121,7 @@ export const PATCH = withBrowserMutation(
 
       const { id } = await params;
       if (!(await productService.getManagedProduct(id, actor))) {
-        return privateJson(context, { code: "NOT_FOUND" }, 404);
+        return privateJson(context, { code: "NOT_FOUND", error: copy.notFound }, 404);
       }
 
       const limit = await consumeRateLimit("contentCreation", actor.id);
@@ -121,6 +130,7 @@ export const PATCH = withBrowserMutation(
           context,
           {
             code: "RATE_LIMIT_EXCEEDED",
+            error: copy.rateLimitExceeded,
           },
           429,
         );
@@ -128,7 +138,14 @@ export const PATCH = withBrowserMutation(
 
       const revision = request.headers.get("if-match");
       if (revision === null)
-        return privateJson(context, { code: "PRODUCT_METADATA_REVISION_REQUIRED" }, 428);
+        return privateJson(
+          context,
+          {
+            code: "PRODUCT_METADATA_REVISION_REQUIRED",
+            error: copy.metadataRevisionRequired,
+          },
+          428,
+        );
       let expectedUpdatedAt: Date | undefined;
       if (revision !== null) {
         if (!/^"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z"$/u.test(revision)) {
@@ -136,6 +153,7 @@ export const PATCH = withBrowserMutation(
             context,
             {
               code: "PRODUCT_METADATA_INVALID",
+              error: copy.metadataInvalid,
             },
             400,
           );
@@ -151,6 +169,7 @@ export const PATCH = withBrowserMutation(
             context,
             {
               code: "PRODUCT_METADATA_INVALID",
+              error: copy.metadataInvalid,
             },
             400,
           );
@@ -163,6 +182,7 @@ export const PATCH = withBrowserMutation(
           context,
           {
             code: "PRODUCT_METADATA_INVALID",
+            error: copy.metadataInvalid,
           },
           400,
         );
@@ -186,7 +206,33 @@ export const PATCH = withBrowserMutation(
       });
     } catch (error) {
       if (error instanceof AppError) {
-        return privateJson(context, { code: error.code }, error.statusCode);
+        return privateJson(
+          context,
+          {
+            code: error.code,
+            error: localeAppErrorText(
+              error,
+              {
+                unauthorized: copy.authenticationRequired,
+                forbidden: copy.forbidden,
+                notFound: copy.notFound,
+                unsupportedMediaType: copy.unsupportedMediaType,
+                requestBodyTooLarge: copy.requestBodyTooLarge,
+                invalidBodyLength: copy.invalidBodyLength,
+                requestBodyTimeout: copy.requestBodyTimeout,
+                failed: copy.updateFailed,
+              },
+              {
+                PRODUCT_METADATA_CONFLICT: copy.metadataConflict,
+                PRODUCT_METADATA_INVALID: copy.metadataInvalid,
+                PRODUCT_METADATA_REVISION_REQUIRED: copy.metadataRevisionRequired,
+                RATE_LIMIT_EXCEEDED: copy.rateLimitExceeded,
+                RATE_LIMITED: copy.rateLimitExceeded,
+              },
+            ),
+          },
+          error.statusCode,
+        );
       }
 
       logRequestEvent({
@@ -200,6 +246,7 @@ export const PATCH = withBrowserMutation(
         context,
         {
           code: "RESOURCE_UPDATE_FAILED",
+          error: copy.updateFailed,
         },
         500,
       );

@@ -1,5 +1,5 @@
+import { buildRepository, productRepository, userRepository } from "@nexus/db";
 import { beforeAll, describe, expect, it } from "vitest";
-import { productRepository, userRepository, buildRepository } from "@nexus/db";
 
 describe("published dependency repository integration", () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`;

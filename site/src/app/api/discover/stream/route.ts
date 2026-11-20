@@ -1,11 +1,11 @@
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
-import { parseDiscoveryStreamQuery } from "../../../../lib/discovery-stream-contract";
-import { discoveryStreamError } from "../../../../lib/discovery-stream-copy";
-import { publicPlatformApi } from "../../../../lib/public-platform-api";
-import { getTrustedRequestIp } from "../../../../lib/request-client-ip";
-import { discoveryService } from "../../../../lib/services/discovery-service";
+import { parseDiscoveryStreamQuery } from "../../../../features/discovery/discovery-stream-contract";
+import { discoveryStreamError } from "../../../../features/discovery/discovery-stream-copy";
+import { getTrustedRequestIp } from "../../../../features/shell/request-client-ip";
+import { publicPlatformApi } from "../../../../lib/http/public-platform-api";
+import { discoveryService } from "../../../../lib/services/discovery/discovery-service";
 export async function GET(request: NextRequest) {
   return publicPlatformApi(
     request,

@@ -1,5 +1,5 @@
-import { and, eq, sql } from "drizzle-orm";
 import { AppError, NotFoundError } from "@nexus/domain";
+import { and, eq, sql } from "drizzle-orm";
 import type { db } from "../client";
 import {
   builds,
@@ -9,9 +9,9 @@ import {
   supportCases,
   users,
 } from "../schema";
-import { digestSessionToken } from "./sessions";
 import { lockUserDownloadAccess } from "./entitlements";
 import { assertProductMutationAuthority } from "./product-mutation-authority";
+import { digestSessionToken } from "./sessions";
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 

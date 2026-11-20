@@ -3,13 +3,13 @@ import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { Clock3 } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { z } from "zod";
-import { supportActivitySchema } from "../../../lib/support-workspace-contract";
-import { supportWorkspaceCopy, supportWorkspaceError } from "../../../lib/support-workspace-copy";
-import { useNexusLocale } from "../../../components/locale-context";
-
-const ghostActionClass =
-  "h-auto min-h-11 px-0 text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-
+import { linkGhostAccent } from "../../shell/link-shell";
+import { useNexusLocale } from "../../shell/locale";
+import { pageShellStack3 } from "../../shell/page-shell";
+import { panelClipSpace3P4 } from "../../shell/panel-shell";
+import { typeFlexMinWrapGap4, typeSmMuted, typeXsMuted } from "../../shell/type-shell";
+import { supportActivitySchema } from "../support-workspace-contract";
+import { supportWorkspaceCopy, supportWorkspaceError } from "../support-workspace-copy";
 export function SupportStatusHistory({
   caseId,
   actorId,
@@ -66,15 +66,12 @@ export function SupportStatusHistory({
         ? dictionary.support.resolved
         : dictionary.support.closed;
   return (
-    <details
-      className="nexus-panel min-w-0 space-y-3 overflow-x-clip p-4"
-      onToggle={(event) => setOpen(event.currentTarget.open)}
-    >
+    <details className={panelClipSpace3P4} onToggle={(event) => setOpen(event.currentTarget.open)}>
       <summary className="min-h-11 cursor-pointer font-heading text-primary">
         {copy.history}
       </summary>
       {open && (
-        <div className="min-w-0 space-y-3 overflow-x-clip" aria-live="polite">
+        <div className={pageShellStack3} aria-live="polite">
           {error ? (
             <ErrorState
               title={error}
@@ -83,7 +80,7 @@ export function SupportStatusHistory({
                 <Button
                   type="button"
                   onClick={() => setRetry((value) => value + 1)}
-                  className={ghostActionClass}
+                  className={linkGhostAccent}
                   variant="ghost"
                 >
                   {copy.reload}
@@ -91,7 +88,7 @@ export function SupportStatusHistory({
               }
             />
           ) : !data ? (
-            <p role="status" className="text-sm text-muted">
+            <p role="status" className={typeSmMuted}>
               {dictionary.support.historyLoading}
             </p>
           ) : data.items.length === 0 ? (
@@ -101,7 +98,7 @@ export function SupportStatusHistory({
               icon={<Clock3 className="h-6 w-6" aria-hidden="true" />}
             />
           ) : (
-            <ol className="min-w-0 space-y-3 overflow-x-clip">
+            <ol className={pageShellStack3}>
               {data.items.map((item) => (
                 <li
                   key={item.id}
@@ -113,19 +110,19 @@ export function SupportStatusHistory({
                   <span className="text-muted">
                     {item.by === "staff" ? dictionary.support.staff : dictionary.support.requester}
                   </span>
-                  <time dateTime={item.createdAt} className="text-xs text-muted">
+                  <time dateTime={item.createdAt} className={typeXsMuted}>
                     {new Date(item.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US")}
                   </time>
                 </li>
               ))}
             </ol>
           )}
-          <nav className="flex min-w-0 flex-wrap gap-4" aria-label={copy.history}>
+          <nav className={typeFlexMinWrapGap4} aria-label={copy.history}>
             {before && (
               <Button
                 type="button"
                 onClick={() => setBefore(undefined)}
-                className={ghostActionClass}
+                className={linkGhostAccent}
                 variant="ghost"
               >
                 {copy.latest}
@@ -135,7 +132,7 @@ export function SupportStatusHistory({
               <Button
                 type="button"
                 onClick={() => setBefore(data.nextCursor ?? undefined)}
-                className={ghostActionClass}
+                className={linkGhostAccent}
                 variant="ghost"
               >
                 {copy.older}

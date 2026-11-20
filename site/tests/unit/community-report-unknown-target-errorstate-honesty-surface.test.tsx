@@ -14,8 +14,10 @@ const source = readFileSync(
 it("locks community report unknown target to ErrorState", () => {
   expect(source).toContain('import { Button, EmptyState, ErrorState } from "@nexus/ui"');
   expect(source).toContain('id="community-report-unknown-target"');
-  expect(source).toMatch(
-    /!item\.target \? \(\s*<ErrorState id="community-report-unknown-target" title=\{copy\.unknown\} \/>\s*\) : null/u,
-  );
+  expect(source).toContain("title={copy.unknown}");
+  expect(source).toContain("description={copy.unknownHint}");
+  expect(
+    readFileSync(join(root, "site/src/features/community/community-report-groups-copy.ts"), "utf8"),
+  ).toContain("unknownHint:");
   expect(source).not.toContain('className="text-xs text-muted">{copy.unknown}</p>');
 });

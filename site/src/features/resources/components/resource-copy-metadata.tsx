@@ -1,6 +1,8 @@
 import type { ResourceCopyMetadata } from "@nexus/domain";
 import type { Locale } from "../../../lib/i18n";
-import { resourceCopyCopy } from "../../../lib/resource-copy-i18n";
+import { panelSpace4P5 } from "../../shell/panel-shell";
+import { typePrewrapBreak, typeSmSecondary } from "../../shell/type-shell";
+import { resourceCopyCopy } from "../resource-copy-i18n";
 export function ResourceCopyMetadataView({
   metadata,
   locale,
@@ -18,11 +20,11 @@ export function ResourceCopyMetadataView({
     [c.dependencies, metadata.compatibility.dependencies.join(", ") || c.none],
   ];
   return (
-    <dl className="nexus-panel space-y-4 p-5">
+    <dl className={panelSpace4P5}>
       {rows.map(([label, value]) => (
         <div key={label}>
-          <dt className="text-sm text-secondary">{label}</dt>
-          <dd className="whitespace-pre-wrap break-words">{value}</dd>
+          <dt className={typeSmSecondary}>{label}</dt>
+          <dd className={typePrewrapBreak}>{value}</dd>
         </div>
       ))}
     </dl>

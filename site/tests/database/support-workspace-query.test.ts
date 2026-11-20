@@ -99,7 +99,9 @@ it("resolves an own case under actor/case locks and saves audit plus a generic t
   );
   expect(writes("audit_events")[0].params.join()).not.toContain("secret");
   const notice = writes("notifications")[0];
-  expect(notice.params).toContain("Your case was marked as resolved. (Private subject)");
+  expect(notice.params).toContain(
+    "Your case was marked as resolved. (Private subject) / Обращение отмечено решённым. (Private subject)",
+  );
   expect(notice.params.join(" ")).not.toMatch(new RegExp(`Support case ${id}:`, "u"));
   expect(notice.params).toContain(
     JSON.stringify({

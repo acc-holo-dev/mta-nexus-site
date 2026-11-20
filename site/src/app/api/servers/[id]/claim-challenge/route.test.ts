@@ -3,6 +3,7 @@ import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../../../../../../tests/helpers/browser-mutation-headers";
+import { serverClaimApiCopy } from "../../../../../features/servers/server-claim-api-copy";
 
 const state = vi.hoisted(() => ({
   authenticated: true,
@@ -22,7 +23,7 @@ const issueChallenge = vi.hoisted(() =>
   }),
 );
 
-vi.mock("../../../../../lib/services/auth-service", () => ({
+vi.mock("../../../../../lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () =>
       state.authenticated
@@ -35,7 +36,7 @@ vi.mock("../../../../../lib/services/auth-service", () => ({
   },
 }));
 
-vi.mock("../../../../../lib/services/server-claim-service", () => ({
+vi.mock("../../../../../lib/services/servers/server-claim-service", () => ({
   serverClaimService: {
     issueChallenge,
   },
@@ -142,7 +143,7 @@ describe("server claim challenge issue HTTP contract", () => {
       });
       expect(response.status).toBe(409);
       expect(await response.json()).toEqual({
-        error: "Claim changed",
+        error: serverClaimApiCopy("en").claimChanged,
         code,
       });
     },

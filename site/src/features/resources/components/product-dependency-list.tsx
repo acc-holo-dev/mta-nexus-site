@@ -1,7 +1,8 @@
 import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
-import type { ProductDependencyResolution } from "../../../lib/product-dependency-resolution";
+import { typeMonoSecondary } from "../../shell/type-shell";
+import type { ProductDependencyResolution } from "../product-dependency-resolution";
 
 export function ProductDependencyList({
   declared,
@@ -15,11 +16,13 @@ export function ProductDependencyList({
   const copy = getDictionary(locale).dependencyUi;
 
   if (declared.length === 0) {
-    return <span className="font-mono text-secondary">{copy.noneDeclared}</span>;
+    return <span className={typeMonoSecondary}>{copy.noneDeclared}</span>;
   }
 
   if (!resolution) {
-    return <ErrorState title={copy.resolutionUnavailable} />;
+    return (
+      <ErrorState title={copy.resolutionUnavailable} description={copy.resolutionUnavailableHint} />
+    );
   }
 
   return (

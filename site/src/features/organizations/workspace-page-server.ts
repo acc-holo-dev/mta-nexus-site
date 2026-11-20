@@ -1,3 +1,3 @@
 import "server-only";
 
-export { default, generateMetadata } from "./server/workspace-page";
+export { OrganizationPage, organizationMetadata } from "./server/workspace-page";

@@ -1,6 +1,6 @@
 import type { User } from "@nexus/domain";
 import { beforeEach, expect, it, vi } from "vitest";
-import { parseAuthorPublicationDeskQuery } from "../../src/lib/author-publication-desk-contract";
+import { parseAuthorPublicationDeskQuery } from "../../src/features/community/author-publication-desk-contract";
 
 const state = vi.hoisted(() => ({
   desk: vi.fn(),
@@ -17,8 +17,8 @@ vi.mock("@nexus/db", () => ({
 }));
 vi.mock("@nexus/security", () => ({ generateId: () => "audit_generated" }));
 
-import { authorContentService as author } from "../../src/lib/services/author-content-service";
-import { publicationFeedService as feed } from "../../src/lib/services/publication-feed-service";
+import { publicationFeedService as feed } from "../../src/lib/services/discovery/publication-feed-service";
+import { authorContentService as author } from "../../src/lib/services/organizations/author-content-service";
 
 const actor = { id: "actor" } as User,
   revision = "2026-10-11T00:00:00.123456Z";

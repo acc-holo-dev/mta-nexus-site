@@ -1,6 +1,7 @@
 import { ForbiddenError, UnauthorizedError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { adminActionsApiCopy } from "../../src/features/moderation/admin-actions-api-copy";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
@@ -17,14 +18,23 @@ const mocks = vi.hoisted(() => ({
   findById: vi.fn(),
 }));
 
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: {
     getSession: async () => mocks.user,
     confirmStaffActionPassword: async () => ({ expectedPasswordHash: "hash_mod" }),
   },
 }));
-vi.mock("../../src/lib/services/product-service", () => ({ productService: {} }));
-vi.mock("../../src/lib/services/content-service", () => ({ contentService: {} }));
+vi.mock("../../src/lib/services/commerce/product-service", () => ({ productService: {} }));
+vi.mock("../../src/lib/services/community/content-service", () => ({ contentService: {} }));
+vi.mock("../../src/lib/services/moderation/admin-service", () => ({
+  adminService: {
+    resolveReportRecord: mocks.resolve,
+    findReportById: mocks.findById,
+  },
+}));
+vi.mock("../../src/lib/services/moderation/verification-workspace-service", () => ({
+  verificationWorkspaceService: {},
+}));
 vi.mock("@nexus/security", async () => {
   const actual = await vi.importActual<typeof import("@nexus/security")>("@nexus/security");
   return {
@@ -34,11 +44,6 @@ vi.mock("@nexus/security", async () => {
     generateId: () => "aud_test",
   };
 });
-vi.mock("@nexus/db", () => ({
-  reportRepository: { resolve: mocks.resolve, findById: mocks.findById },
-  productRepository: {},
-  verificationRepository: {},
-}));
 
 import { POST } from "../../src/app/api/admin/actions/route";
 
@@ -132,7 +137,16 @@ describe("report decisions over HTTP", () => {
       expect(response.status).toBe(error.statusCode);
       expect(response.headers.get("Cache-Control")).toBe("private, no-store");
       expect(response.headers.get("Vary")).toBe("Cookie");
-      expect(await response.json()).toEqual({ error: error.message, code: error.code });
+      const copy = adminActionsApiCopy("en");
+      expect(await response.json()).toEqual({
+        error:
+          error.code === "UNAUTHORIZED"
+            ? copy.authenticationRequired
+            : error.code === "FORBIDDEN"
+              ? copy.forbidden
+              : copy.executeFailed,
+        code: error.code,
+      });
       expect(mocks.findById).not.toHaveBeenCalled();
     });
   }

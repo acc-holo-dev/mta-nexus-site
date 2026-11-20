@@ -1,17 +1,17 @@
-import { and, count, desc, eq, sql } from "drizzle-orm";
 import {
   AppError,
   NotFoundError,
   type ResourceDeliveryFinish,
   type ResourceDeliveryQuery,
 } from "@nexus/domain";
+import { and, count, desc, eq, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, builds, products, resourceDeliveryReceipts as receipts } from "../schema";
-import { historyPageBounds } from "./history-pagination";
-import { effectiveUserDownloadSources } from "./user-library";
-import { managedProductCondition } from "./products";
 import { trustedCleanScanCondition } from "./build-safety";
+import { historyPageBounds } from "./history-pagination";
 import { assertProductMutationAuthority } from "./product-mutation-authority";
+import { managedProductCondition } from "./products";
+import { effectiveUserDownloadSources } from "./user-library";
 
 const evidence = {
   id: receipts.id,

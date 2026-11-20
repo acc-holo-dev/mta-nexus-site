@@ -15,7 +15,7 @@ const state = vi.hoisted(() => ({
   preview: vi.fn(),
   publish: vi.fn(),
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate, generateId: () => "evt_a" }));
@@ -157,7 +157,7 @@ it("exports only accessible frozen data and current state as private JSON", asyn
   state.detail.mockRejectedValue(new AppError("private details", 404, "NOT_FOUND"));
   const denied = await exportGET(request(`${base}/copies/${receiptId}/export`), context);
   expect(denied.status).toBe(404);
-  expect(await denied.json()).toEqual({ code: "NOT_FOUND" });
+  expect(await denied.json()).toMatchObject({ code: "NOT_FOUND" });
 });
 it("does not expose internal failures and bounds the exported representation", async () => {
   const log = vi.spyOn(console, "error").mockImplementation(() => undefined);

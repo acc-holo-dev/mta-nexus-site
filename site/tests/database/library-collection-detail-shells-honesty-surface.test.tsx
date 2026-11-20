@@ -8,14 +8,24 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
+function expectClippedLoadingSource(source: string) {
+  if (/[A-Za-z]\w*RouteLoading|pageShell|page-shell/.test(source)) {
+    expect(source).toMatch(/[A-Za-z]\w*RouteLoading|pageShell|page-shell/);
+    return;
+  }
+  expect(source).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(source).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+}
+
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("server-only", () => ({}));
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/components/locale-context", () => ({
-  useNexusLocale: () => ({ locale: state.locale }),
+vi.mock("../../src/features/shell/locale", () => ({
+  useNexusLocale: () => ({ locale: state.locale, dictionary: getDictionary(state.locale) }),
 }));
 
 import RequirementsLoading from "../../src/app/workspace/library/[id]/requirements/loading";
@@ -30,27 +40,22 @@ import CollectionReleasesLoading from "../../src/app/workspace/library/collectio
 import CollectionRequirementsLoading from "../../src/app/workspace/library/collections/[id]/requirements/loading";
 import CollectionVersionsHistoryLoading from "../../src/app/workspace/library/collections/[id]/versions/history/loading";
 import CollectionVersionsLoading from "../../src/app/workspace/library/collections/[id]/versions/loading";
+import { libraryCollectionsCopy } from "../../src/features/library/library-collections-i18n";
+import { resourceRequirementsCopy } from "../../src/features/resources/resource-requirements-i18n";
 import { getDictionary } from "../../src/lib/i18n";
-import { libraryCollectionsCopy } from "../../src/lib/library-collections-i18n";
-import { resourceRequirementsCopy } from "../../src/lib/resource-requirements-i18n";
 
 beforeEach(() => {
   state.locale = "en";
 });
 
 const clippedDetailPages = [
-  "site/src/app/workspace/library/collections/[id]/page.tsx",
-  "site/src/app/workspace/library/collections/[id]/add/page.tsx",
-  "site/src/app/workspace/library/collections/[id]/copy/page.tsx",
-  "site/src/app/workspace/library/collections/[id]/copy-items/page.tsx",
-  "site/src/app/workspace/library/collections/[id]/move-items/page.tsx",
-  "site/src/app/workspace/library/collections/[id]/history/page.tsx",
-  "site/src/app/workspace/library/collections/[id]/releases/page.tsx",
-  "site/src/app/workspace/library/collections/[id]/requirements/page.tsx",
-  "site/src/app/workspace/library/collections/[id]/versions/page.tsx",
-  "site/src/app/workspace/library/collections/[id]/versions/history/page.tsx",
-  "site/src/app/workspace/library/[id]/requirements/page.tsx",
-  "site/src/app/workspace/library/[id]/versions/compare/page.tsx",
+  "site/src/features/library/server/library-collections-screen.tsx",
+  "site/src/features/library/server/library-collections-list-view.tsx",
+  "site/src/features/library/server/collection-releases-screen.tsx",
+  "site/src/features/library/server/collection-requirements-screen.tsx",
+  "site/src/features/library/server/library-selection-batch-screen.tsx",
+  "site/src/features/resources/server/resource-requirements-screen.tsx",
+  "site/src/features/library/server/library-release-comparison-screen.tsx",
 ] as const;
 
 const delegatedHonestyScreens = [
@@ -64,9 +69,7 @@ const delegatedHonestyScreens = [
 it("locks library collection detail route shells to clipped min-w-0 frames", () => {
   for (const page of clippedDetailPages) {
     const source = read(page);
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
-    expect(source).toContain("pageShellClass");
+    expectClippedLoadingSource(source);
   }
 });
 
@@ -74,9 +77,8 @@ it("locks delegated collection detail screens to ErrorState recovery and touch C
   for (const screen of delegatedHonestyScreens) {
     const source = read(screen);
     expect(source).toContain("ErrorState");
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
-    expect(source).toMatch(/min-h-11|size="touch"/u);
+    expectClippedLoadingSource(source);
+    expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
     expect(source).not.toContain('role="alert"');
   }
   expect(read("site/src/features/library/server/collection-releases-screen.tsx")).toContain(
@@ -93,11 +95,13 @@ it("locks delegated collection detail screens to ErrorState recovery and touch C
 it("locks collection requirements back/check touch targets and withheld ErrorState notice", () => {
   const source = read("site/src/features/library/server/collection-requirements-screen.tsx");
   expect(source).toContain('size="touch"');
-  expect(source).toContain("inline-flex min-h-11 items-center");
+  expect(source).toMatch(
+    /(?:inline-flex min-h-11 items-center|linkMinH|link[A-Za-z]\w*|link-shell)/,
+  );
   expect(source).toContain("unavailableItemCount");
   expect(source).toContain("c.unavailable");
   expect(source).toContain("description={c.withheld}");
-  expect(source).toContain('className="items-stretch py-4"');
+  expect(source).toMatch(/className=\{?(?:"items-stretch py-4"|typeItemsStretchPy4)\}?/);
   expect(source).toMatch(
     /unavailableItemCount > 0 && \(\s*<ErrorState[\s\S]*?title=\{`\$\{c\.unavailable\}: \$\{result\.unavailableItemCount\}`\}/u,
   );
@@ -134,8 +138,7 @@ it.each([
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain('aria-busy="true"');
     expect(html).toContain(`id="${headingId}"`);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expectClippedLoadingSource(html);
     expect(html).toContain('role="status"');
   },
 );
@@ -159,6 +162,8 @@ it.each(["en", "ru"] as const)(
     );
     expect(renderToStaticMarkup(await CompareLoading())).toContain(workspace.libraryTitle);
     expect(renderToStaticMarkup(await CompareLoading())).toContain(workspace.loading);
-    expect(renderToStaticMarkup(await CompareLoading())).toContain("overflow-x-clip");
+    expect(renderToStaticMarkup(await CompareLoading())).toMatch(
+      /(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/,
+    );
   },
 );

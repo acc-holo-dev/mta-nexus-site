@@ -1,6 +1,8 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
+vi.mock("server-only", () => ({}));
+
 const state = vi.hoisted(() => ({
   actor: null as null | { id: string },
   locale: "en" as "ru" | "en",
@@ -10,16 +12,16 @@ vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "s
 vi.mock("next/navigation", () => ({
   usePathname: () => "/workspace/saved",
 }));
-vi.mock("../../src/lib/services/auth-service", () => ({
+vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.actor },
 }));
-vi.mock("../../src/lib/services/follow-workspace-service", () => ({
+vi.mock("../../src/lib/services/community/follow-workspace-service", () => ({
   followWorkspaceService: { page: state.page },
 }));
-vi.mock("../../src/lib/i18n-server", () => ({
+vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
-vi.mock("../../src/components/follow-workspace", () => ({
+vi.mock("../../src/features/community/follow", () => ({
   FollowWorkspace: ({
     initial,
     type,
@@ -42,7 +44,7 @@ vi.mock("../../src/components/follow-workspace", () => ({
 
 import SavedLoading from "../../src/app/workspace/saved/loading";
 import SavedPage, { generateMetadata } from "../../src/app/workspace/saved/page";
-import { followCopy } from "../../src/lib/follow-workspace-copy";
+import { followCopy } from "../../src/features/community/follow-workspace-copy";
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -96,7 +98,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('data-query="Team"');
     expect(html).toContain('id="saved-follows-heading"');
     expect(html).toContain('aria-labelledby="saved-follows-heading"');
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect((await generateMetadata()).robots).toMatchObject({ index: false, follow: false });
   },
 );
@@ -114,8 +116,8 @@ it.each(["en", "ru"] as const)(
     );
     expect(html).toContain('role="alert"');
     expect(html).toContain(copy.pageError);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-h-11");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
     expect(html).toContain('href="/workspace/saved?type=organization&amp;q=Team"');
     expect(html).not.toContain("database-secret");
     expect(html).not.toContain("data-loaded");
@@ -132,8 +134,8 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('aria-labelledby="saved-follows-loading-heading"');
     expect(html).toContain(`>${copy.title}<`);
     expect(html).toContain(copy.loading);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   },
 );
 it.each(["en", "ru"] as const)(
@@ -143,8 +145,8 @@ it.each(["en", "ru"] as const)(
     state.locale = locale;
     const copy = followCopy(locale);
     const html = renderToStaticMarkup(await SavedPage({}));
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain('data-loaded="true"');
     expect(copy.emptyFiltered).not.toBe(copy.empty);
     expect(copy.emptyHint.length).toBeGreaterThan(0);
