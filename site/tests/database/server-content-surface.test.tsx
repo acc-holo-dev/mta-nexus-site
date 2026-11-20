@@ -1,6 +1,9 @@
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+
+vi.mock("server-only", () => ({}));
+
 import { getUserPlatformCopy } from "../../src/features/community/user-platform-copy";
 import { serverContentCopy } from "../../src/features/servers/server-content-copy";
 

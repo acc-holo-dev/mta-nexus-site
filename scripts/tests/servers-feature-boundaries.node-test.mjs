@@ -123,6 +123,8 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "updates",
     "server-detail",
     "managed-servers",
+    "publications",
+    "register",
   ]) {
     write(
       `site/src/features/servers/${port}-server.ts`,
@@ -212,6 +214,8 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     ["features/servers/components/updates-leak.ts", "servers-client-isolation"],
     ["features/servers/components/server-detail-leak.ts", "servers-client-isolation"],
     ["features/servers/components/managed-servers-leak.ts", "servers-client-isolation"],
+    ["features/servers/components/publications-leak.ts", "servers-client-isolation"],
+    ["features/servers/components/register-leak.ts", "servers-client-isolation"],
     ["features/servers/components/claim-status-leak.ts", "servers-client-isolation"],
     ["features/servers/components/managed-card-leak.ts", "servers-client-isolation"],
     ["features/servers/components/statistics-leak.ts", "servers-client-isolation"],
@@ -235,6 +239,8 @@ test("Servers pilot rejects private imports, server leaks and impure model edges
     "app/updates-server.ts",
     "app/server-detail-server.ts",
     "app/managed-servers-server.ts",
+    "app/publications-server.ts",
+    "app/register-server.ts",
     "app/claim-status-server.ts",
     "app/managed-card-server.ts",
     "app/statistics-server.ts",
@@ -341,7 +347,7 @@ test("real client and model entrypoints have no transitive server dependencies",
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/servers\/(?:server(?:\.ts$|\/)|(?:statistics|observations|history|claim-status|managed-card|content-editor|activity|publication-history|updates)-server\.ts$)|lib\/(?!(?:(?:i18n(?:\.ts$|\/)|platform\/i18n\.ts$)|(?:http\/private-api-request|user-platform-client|user-platform-copy|user-platform-contract|follow-initial-state|follow-confirmation|follow-workspace-contract|follow-workspace-copy|publication-feed-contract|publication-feed-copy|content-discussion-contract)\.ts$)))/u.test(
+      !/^site\/src\/(?:app\/|features\/servers\/(?:server(?:\.ts$|\/)|(?:statistics|observations|history|claim-status|managed-card|content-editor|activity|publication-history|updates|publications|register)-server\.ts$)|lib\/(?!(?:(?:i18n(?:\.ts$|\/)|platform\/i18n\.ts$)|(?:http\/private-api-request|user-platform-client|user-platform-copy|user-platform-contract|follow-initial-state|follow-confirmation|follow-workspace-contract|follow-workspace-copy|publication-feed-contract|publication-feed-copy|content-discussion-contract)\.ts$)))/u.test(
         name,
       ),
       name,
@@ -470,5 +476,29 @@ test("Servers managed-servers entry stays server-only and avoids routing", () =>
   assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
   const modules = new Set(graph.modules.map((module) => module.source));
   assert(modules.has("site/src/features/servers/server/managed-servers-screen.tsx"));
+  assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+});
+
+test("Servers publications entry stays server-only and avoids routing", () => {
+  const source = "site/src/features/servers/publications-server.ts";
+  assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+  const result = cruise(root, [source]);
+  assert.equal(result.status, 0, result.stderr);
+  const graph = JSON.parse(result.stdout);
+  assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+  const modules = new Set(graph.modules.map((module) => module.source));
+  assert(modules.has("site/src/features/servers/server/publications-screen.tsx"));
+  assert(![...modules].some((name) => name.startsWith("site/src/app/")));
+});
+
+test("Servers register entry stays server-only and avoids routing", () => {
+  const source = "site/src/features/servers/register-server.ts";
+  assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+  const result = cruise(root, [source]);
+  assert.equal(result.status, 0, result.stderr);
+  const graph = JSON.parse(result.stdout);
+  assert.equal(graph.summary.violations.length, 0, JSON.stringify(graph.summary.violations));
+  const modules = new Set(graph.modules.map((module) => module.source));
+  assert(modules.has("site/src/features/servers/server/register-screen.tsx"));
   assert(![...modules].some((name) => name.startsWith("site/src/app/")));
 });
