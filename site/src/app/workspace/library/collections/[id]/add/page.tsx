@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
 export {
-  LibraryCollectionsScreen as default,
+  LibraryCollectionsAddScreen as default,
   libraryCollectionsMetadata as generateMetadata,
 } from "../../../../../../features/library/collections-server";

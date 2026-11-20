@@ -117,3 +117,36 @@ export async function LibraryCollectionsScreen({
     );
   }
 }
+
+type CollectionsRouteProps = {
+  searchParams: Promise<LibraryCollectionsQuery>;
+  params?: Promise<{ id: string }>;
+};
+
+export function LibraryCollectionsListScreen(props: Omit<CollectionsRouteProps, "params">) {
+  return LibraryCollectionsScreen({ ...props, view: "list" });
+}
+
+export function LibraryCollectionsDetailScreen(props: CollectionsRouteProps) {
+  return LibraryCollectionsScreen({ ...props, view: "detail" });
+}
+
+export function LibraryCollectionsHistoryScreen(props: CollectionsRouteProps) {
+  return LibraryCollectionsScreen({ ...props, view: "history" });
+}
+
+export function LibraryCollectionsCopyScreen(props: CollectionsRouteProps) {
+  return LibraryCollectionsScreen({ ...props, view: "copy" });
+}
+
+export function LibraryCollectionsCopyItemsScreen(props: CollectionsRouteProps) {
+  return LibraryCollectionsScreen({ ...props, view: "copy-items" });
+}
+
+export function LibraryCollectionsMoveItemsScreen(props: CollectionsRouteProps) {
+  return LibraryCollectionsScreen({ ...props, view: "move-items" });
+}
+
+export function LibraryCollectionsAddScreen(props: CollectionsRouteProps) {
+  return LibraryCollectionsScreen({ ...props, view: "add" });
+}

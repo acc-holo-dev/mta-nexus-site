@@ -143,3 +143,30 @@ export async function SupportPageSurface({
     />
   );
 }
+
+export const memberSupportMetadata = () => supportMetadata(false);
+export const adminSupportMetadata = () => supportMetadata(true);
+
+export function MemberSupportQueuePage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return SupportPageSurface({ searchParams });
+}
+
+export function AdminSupportQueuePage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return SupportPageSurface({ searchParams, staff: true });
+}
+
+export async function MemberSupportCasePage({ params }: { params: Promise<{ id: string }> }) {
+  return SupportPageSurface({ id: (await params).id });
+}
+
+export async function AdminSupportCasePage({ params }: { params: Promise<{ id: string }> }) {
+  return SupportPageSurface({ id: (await params).id, staff: true });
+}

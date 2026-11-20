@@ -231,3 +231,35 @@ export async function ResourceReviewReportScreen({
     </section>
   );
 }
+
+export async function StaffResourceReviewReportsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return ResourceReviewReportScreen({ staff: true, query: await searchParams });
+}
+
+export async function WorkspaceResourceReviewReportsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return ResourceReviewReportScreen({ staff: false, query: await searchParams });
+}
+
+export async function StaffResourceReviewReportDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return ResourceReviewReportScreen({ staff: true, id: (await params).id });
+}
+
+export async function WorkspaceResourceReviewReportDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return ResourceReviewReportScreen({ staff: false, id: (await params).id });
+}

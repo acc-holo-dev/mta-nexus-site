@@ -530,3 +530,36 @@ export async function OrderCaseDetailPage({
     </div>
   );
 }
+
+export const memberOrderCaseMetadata = () => orderCaseMetadata(false);
+export const staffOrderCaseMetadata = () => orderCaseMetadata(true);
+
+export async function MemberOrderCaseListPage({ searchParams }: { searchParams: Promise<Query> }) {
+  return OrderCaseListPage({ query: await searchParams });
+}
+
+export async function StaffOrderCaseListPage({ searchParams }: { searchParams: Promise<Query> }) {
+  return OrderCaseListPage({ staff: true, query: await searchParams });
+}
+
+export async function MemberOrderCaseDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Query>;
+}) {
+  const [{ id }, query] = await Promise.all([params, searchParams]);
+  return OrderCaseDetailPage({ caseId: id, query });
+}
+
+export async function StaffOrderCaseDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Query>;
+}) {
+  const [{ id }, query] = await Promise.all([params, searchParams]);
+  return OrderCaseDetailPage({ staff: true, caseId: id, query });
+}

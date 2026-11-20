@@ -93,3 +93,31 @@ export async function PublicProfileActivity({
     </div>
   );
 }
+
+export async function ServerPublicProfileActivityPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return PublicProfileActivity({
+    kind: "server",
+    handle: (await params).slug,
+    searchParams,
+  });
+}
+
+export async function UserPublicProfileActivityPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ username: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return PublicProfileActivity({
+    kind: "user",
+    handle: (await params).username,
+    searchParams,
+  });
+}

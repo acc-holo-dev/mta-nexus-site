@@ -1,9 +1,6 @@
-import { SupportPageSurface, supportMetadata } from "../../../features/support/page-server";
-
 export const dynamic = "force-dynamic";
-export const generateMetadata = () => supportMetadata();
 
-export default async function SupportCasePage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  return <SupportPageSurface id={id} />;
-}
+export {
+  MemberSupportCasePage as default,
+  memberSupportMetadata as generateMetadata,
+} from "../../../features/support/page-server";

@@ -185,3 +185,10 @@ export async function PublicContextTrustPage({
     </div>
   );
 }
+
+export const serverContextTrustMetadata = (props: ContextTrustPageProps) =>
+  contextTrustMetadata("server", props);
+
+export function ServerContextTrustPage(props: ContextTrustPageProps) {
+  return PublicContextTrustPage({ ...props, kind: "server" });
+}
