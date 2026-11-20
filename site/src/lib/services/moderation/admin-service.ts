@@ -1,12 +1,15 @@
 import {
   type AdminReportTargetPreview,
+  AdPlacementRepository,
   auditRepository,
+  buildRepository,
   contentRepository,
   productRepository,
   reportRepository,
   resolveAdminReportTargets,
   serverRepository,
   userRepository,
+  verificationRepository,
 } from "@nexus/db";
 import type { AuditEvent, Report, User } from "@nexus/domain";
 import { ForbiddenError, NotFoundError } from "@nexus/domain";
@@ -126,6 +129,58 @@ class AdminService {
 
   findReportById(id: string) {
     return reportRepository.findById(id);
+  }
+
+  listVerificationPage(view: "pending" | "history", page: number) {
+    return verificationRepository.listPage(view, page);
+  }
+
+  getVerificationQueueItem(id: string) {
+    return verificationRepository.getQueueItem(id);
+  }
+
+  countPendingVerifications() {
+    return verificationRepository.countPending();
+  }
+
+  listPendingReviewBuilds(page: number) {
+    return buildRepository.listPendingReviewPage(page);
+  }
+
+  countPendingReviewBuilds() {
+    return buildRepository.countPendingReview();
+  }
+
+  listRiskReviewBuilds(page: number) {
+    return buildRepository.listRiskReviewPage(page);
+  }
+
+  countQuarantinedBuilds() {
+    return buildRepository.countQuarantined();
+  }
+
+  listDraftContent(page: number) {
+    return contentRepository.listDraftPage(page);
+  }
+
+  countDraftContent() {
+    return contentRepository.countDrafts();
+  }
+
+  async listAdPlacementSummaries() {
+    const repo = new AdPlacementRepository();
+    const slots = await repo.listSlots();
+    return Promise.all(
+      slots.map(async (slot) => {
+        const placements = await repo.placementsForSlot(slot.id);
+        return {
+          slot,
+          pending: placements.filter((pl) => pl.status === "pending_approval").length,
+          active: placements.filter((pl) => ["scheduled", "live", "paused"].includes(pl.status))
+            .length,
+        };
+      }),
+    );
   }
 }
 
