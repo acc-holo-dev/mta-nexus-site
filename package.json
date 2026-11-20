@@ -78,12 +78,12 @@
     "test:properties": "vitest run --project unit site/tests/unit/request-ip-properties.test.ts"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.7",
+    "@biomejs/biome": "2.6.8",
     "@swc/core": "1.16.22",
     "@types/node": "^26.6.6",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
-    "dependency-cruiser": "18.7.2",
+    "dependency-cruiser": "18.8.0",
     "drizzle-orm": "^0.45.4",
     "fast-check": "4.10.2",
     "knip": "6.45.1",
