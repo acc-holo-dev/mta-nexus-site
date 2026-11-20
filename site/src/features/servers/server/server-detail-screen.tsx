@@ -26,6 +26,7 @@ import { linkAccentTightHover } from "../../shell/link-shell";
 import { pageShellStack8 } from "../../shell/page-shell";
 import { panelSpace3P6, panelSpace4P5, panelSpace4P6 } from "../../shell/panel-shell";
 import {
+  type3xlBlackPrimary,
   typeElevenFaint,
   typeFlexCenterGap2,
   typeFlexWrapCenterGap2,
@@ -383,7 +384,7 @@ export async function ServerDetailScreen({
             <span className="font-semibold uppercase tracking-wider">{copy.livePlayerLoad}</span>
             <Users className="h-4 w-4 text-success" aria-hidden="true" />
           </div>
-          <div className="text-3xl font-black text-primary">
+          <div className={type3xlBlackPrimary}>
             {formatUnknown(locale, currentPlayers)}{" "}
             <span className="text-base font-normal text-faint">
               / {formatUnknown(locale, maxPlayers)}

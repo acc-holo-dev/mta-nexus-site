@@ -11,7 +11,12 @@ import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { linkAccent, linkAccentSm, linkMinHAccentFocus } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
-import { typeSmSecondary, typeSmSuccess, typeXsMuted } from "../../shell/type-shell";
+import {
+  typeFlexWrapGap3Sm,
+  typeSmSecondary,
+  typeSmSuccess,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import { resourceReleaseWatchesCopy } from "../resource-release-watches-i18n";
 
 export function ResourceReleaseWatchControl({
@@ -253,7 +258,7 @@ export function ResourceReleaseWatchControl({
         </p>
       ) : null}
       {surface === "detail" || !commerceEnabled ? (
-        <div className="flex flex-wrap gap-3 text-sm">
+        <div className={typeFlexWrapGap3Sm}>
           <Link href={settingsHref} className={linkAccent}>
             {copy.settings}
           </Link>

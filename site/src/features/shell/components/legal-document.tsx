@@ -1,5 +1,10 @@
 import { panelP5 } from "../panel-shell";
-import { typeCaptionFaint, typeLgBoldPrimary, typeSmBoldPrimary } from "../type-shell";
+import {
+  type3xlBlackPrimary,
+  typeCaptionFaint,
+  typeLgBoldPrimary,
+  typeSmBoldPrimary,
+} from "../type-shell";
 
 type LegalSection = Readonly<{
   title: string;
@@ -29,7 +34,7 @@ export function LegalDocument({
     <article className="mx-auto max-w-3xl space-y-7 py-10 text-sm leading-7 text-secondary">
       <header className="nexus-panel space-y-3 p-6 shadow-nexus-sm">
         <p className="font-label uppercase text-accent">{badge}</p>
-        <h1 className="text-3xl font-black text-primary">{title}</h1>
+        <h1 className={type3xlBlackPrimary}>{title}</h1>
         <p className="max-w-2xl text-muted">{lead}</p>
         <p className={typeCaptionFaint}>
           {lastUpdatedLabel}: {updated}

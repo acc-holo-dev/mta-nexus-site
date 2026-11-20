@@ -109,3 +109,6 @@ export const linkFocusRing =
 
 export const linkGhostUnderlineFocus =
   "h-auto min-h-11 px-0 text-sm underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export const linkSettingsAction =
+  "inline-flex min-h-11 items-center gap-2 self-start rounded-lg border border-base px-3 text-xs font-semibold text-secondary hover:border-strong hover:text-primary focus-visible:outline-2 focus-visible:outline-accent";

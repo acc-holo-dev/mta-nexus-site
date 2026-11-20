@@ -9,6 +9,7 @@ import { CopyablePlainCodeBlock } from "../../shell/copyable-plain-code-block";
 import { linkAccentTightSemiboldHover } from "../../shell/link-shell";
 import { panelSpace4P6 } from "../../shell/panel-shell";
 import {
+  typeFlexWrapGap3Sm,
   typeIconAccent,
   typeMt1XsMuted,
   typeSmSecondary,
@@ -153,7 +154,7 @@ export function ResourceVersionHelpSection({
       <div className="space-y-2 border-t border-base pt-4">
         <h3 className={typeSmSemiboldPrimary}>{copy.sections.support}</h3>
         <p className={typeSmSecondary}>{copy.supportBody}</p>
-        <div className="flex flex-wrap gap-3 text-sm">
+        <div className={typeFlexWrapGap3Sm}>
           <Link href={`#${qaAnchorId}`} className={linkAccentTightSemiboldHover}>
             {copy.openQa}
           </Link>

@@ -33,6 +33,7 @@ import {
   typeFlexCenterGap2,
   typeMinSpace1,
   typeMt3FlexCenterGap3Xs,
+  typeMt05CaptionMuted,
   typeSemiboldPrimary,
   typeWarningSoftBadge,
 } from "../../shell/type-shell";
@@ -230,7 +231,7 @@ export async function AdminHomeScreen({
             <ShieldAlert className="h-6 w-6 shrink-0 text-danger" aria-hidden="true" />
             <span>{copy.title}</span>
           </h1>
-          <p className="mt-0.5 font-caption text-muted">{copy.description}</p>
+          <p className={typeMt05CaptionMuted}>{copy.description}</p>
         </div>
         <div className="flex min-w-0 flex-wrap items-center gap-2 self-start sm:self-auto">
           {currentUser.role === "admin" ? (

@@ -7,6 +7,7 @@ import { getDictionary, type Locale } from "../../../lib/i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../auth-return";
 import { useAuthSession } from "../auth-session";
 import { isShellSessionLoading, showGuestSignInCta, showWorkspaceTools } from "../session";
+import { typeSpace2Muted } from "../type-shell";
 import { ShellSessionUnavailable } from "./shell-session-unavailable";
 
 const linkClass =
@@ -34,7 +35,7 @@ export function FooterContribute({ locale }: { locale: Locale }) {
       ) : session.status === "unavailable" ? (
         <ShellSessionUnavailable locale={locale} retry={session.retry} />
       ) : showWorkspaceTools(session) ? (
-        <ul className="space-y-2 text-muted">
+        <ul className={typeSpace2Muted}>
           <li>
             <Link href="/workspace/servers/new" className={linkClass}>
               {dictionary.footer.registerServer}
@@ -52,7 +53,7 @@ export function FooterContribute({ locale }: { locale: Locale }) {
           </li>
         </ul>
       ) : showGuestSignInCta(session) ? (
-        <ul className="space-y-2 text-muted">
+        <ul className={typeSpace2Muted}>
           <li>
             <Link href={loginHref} className={linkClass}>
               {dictionary.workspace.signIn}

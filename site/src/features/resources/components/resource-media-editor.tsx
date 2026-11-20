@@ -10,6 +10,7 @@ import { confirmAction } from "../../shell/confirm-action";
 import { linkGhostAccentSm } from "../../shell/link-shell";
 import { panelSpace3P4, panelSpace4P5 } from "../../shell/panel-shell";
 import {
+  typeBlockFileInputInset,
   typeFlexWrapGap2,
   typeLabelBlockUpperSecondary,
   typeSmMuted,
@@ -274,7 +275,7 @@ export function ResourceMediaEditor({
                 accept="image/png,image/jpeg,image/webp"
                 required
                 disabled={busy || dirty || items.length >= RESOURCE_MEDIA_LIMIT}
-                className="block w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-accent"
+                className={typeBlockFileInputInset}
               />
             </div>
             <Input

@@ -28,6 +28,7 @@ import { linkAccentSmRounded, linkAccentTightSemiboldHover } from "../../shell/l
 import { pageShellStack4, pageShellStack10 } from "../../shell/page-shell";
 import { panelSpace4P6 } from "../../shell/panel-shell";
 import {
+  type3xlBlackPrimary,
   typeFlexWrapCenterGap2,
   typeIconAccent,
   typeMonoSecondary,
@@ -357,7 +358,7 @@ export async function ProductDetailPage({
         <aside className="space-y-6 lg:order-2" data-testid="resource-acquisition-panel">
           <div className="nexus-panel sticky top-24 space-y-6 p-6 shadow-nexus-sm">
             <div>
-              <div className="text-3xl font-black text-primary">{formattedPrice}</div>
+              <div className={type3xlBlackPrimary}>{formattedPrice}</div>
               <div className={typeMt1XsMuted}>
                 {copy.licenseModel}: <span>{licenseModelLabel(locale, product.licenseModel)}</span>
               </div>

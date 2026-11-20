@@ -9,6 +9,7 @@ import { panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceInsetP3 } from "../../shell/surface-shell";
 import {
   typeBreakAllSecondary,
+  typeFileInputInset,
   typeFlexStartGap3,
   typeItemsStretchPy4,
   typeLabelUpperFaint,
@@ -179,7 +180,7 @@ export function MtaMetaInspectorPanel({
               setFile(event.target.files?.[0] ?? null);
               setResult(null);
             }}
-            className="w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-accent"
+            className={typeFileInputInset}
           />
         </label>
 

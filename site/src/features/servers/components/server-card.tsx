@@ -9,9 +9,11 @@ import { getDictionary, type Locale } from "../../../lib/i18n";
 import { formatUnknown } from "../../../lib/i18n/unknown";
 import { panelFlexColGap3P5, panelGroupHoverCol } from "../../shell/panel-shell";
 import {
+  typeClamp1XsHeadingPrimary,
   typeClamp2CaptionMuted,
   typeCoverHoverScale,
   typeFlex1ColGap2P35,
+  typeFlexBetweenCaption,
   typeFlexWrapGap2,
   typeH35W35Shrink,
   typeMinSpace1,
@@ -181,7 +183,7 @@ export function ServerCard({
       </Link>
 
       <div className={typeFlex1ColGap2P35}>
-        <h3 className="line-clamp-1 text-xs font-heading text-primary">
+        <h3 className={typeClamp1XsHeadingPrimary}>
           <Link
             href={profileHref}
             className="transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -198,7 +200,7 @@ export function ServerCard({
         <p className={typeClamp2CaptionMuted}>{server.description}</p>
 
         <div className="space-y-1.5 border-t border-base pt-2.5">
-          <div className="flex items-center justify-between font-caption">
+          <div className={typeFlexBetweenCaption}>
             <span className="flex items-center gap-1 font-medium text-secondary">
               <Users className="h-3.5 w-3.5" aria-hidden="true" />
               <span className="font-numeric">

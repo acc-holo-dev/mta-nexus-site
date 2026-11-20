@@ -8,7 +8,9 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { securityCenterService } from "../../../lib/services/accounts/security-center-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { linkSettingsAction } from "../../shell/link-shell";
 import { pageShellMax4xlRoomy } from "../../shell/page-shell";
+import { panelClipP5Shadow, panelClipSpace4P5Shadow } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeBreakXsPrimary,
@@ -21,12 +23,6 @@ import {
   typeXsMuted,
 } from "../../shell/type-shell";
 import { securityActivityLabelKey } from "../security-activity";
-
-const recoveryPanelClass = "nexus-panel min-w-0 overflow-x-clip p-5 shadow-nexus-sm";
-const panelShellClass = "nexus-panel min-w-0 space-y-4 overflow-x-clip p-5 shadow-nexus-sm";
-const settingsActionClass =
-  "inline-flex min-h-11 items-center gap-2 self-start rounded-lg border border-base px-3 text-xs font-semibold text-secondary hover:border-strong hover:text-primary focus-visible:outline-2 focus-visible:outline-accent";
-
 export async function securityCenterMetadata(): Promise<Metadata> {
   return {
     title: `${getDictionary(await getRequestLocale()).securityCenter.title} | MTA NEXUS`,
@@ -76,13 +72,13 @@ export async function SecurityCenterScreen() {
           </h1>
           <p className="mt-1 max-w-2xl font-caption text-muted">{copy.description}</p>
         </div>
-        <Link href="/settings" className={settingsActionClass}>
+        <Link href="/settings" className={linkSettingsAction}>
           <Settings className="h-4 w-4" aria-hidden="true" />
           {copy.manageSettings}
         </Link>
       </div>
 
-      <section aria-labelledby="security-recovery-heading" className={recoveryPanelClass}>
+      <section aria-labelledby="security-recovery-heading" className={panelClipP5Shadow}>
         <div className={typeFlexCenterGap2}>
           <MailCheck className={typeIconAccent} aria-hidden="true" />
           <h2 id="security-recovery-heading" className={typeSmSemiboldPrimary}>
@@ -109,7 +105,7 @@ export async function SecurityCenterScreen() {
         )}
       </section>
 
-      <section aria-labelledby="security-sessions-heading" className={panelShellClass}>
+      <section aria-labelledby="security-sessions-heading" className={panelClipSpace4P5Shadow}>
         <div className={typeFlexCenterGap2}>
           <Monitor className={typeIconAccent} aria-hidden="true" />
           <h2 id="security-sessions-heading" className={typeSmSemiboldPrimary}>
@@ -144,7 +140,7 @@ export async function SecurityCenterScreen() {
         </div>
       </section>
 
-      <section aria-labelledby="security-activity-heading" className={panelShellClass}>
+      <section aria-labelledby="security-activity-heading" className={panelClipSpace4P5Shadow}>
         <div className={typeFlexCenterGap2}>
           <Clock3 className={typeIconAccent} aria-hidden="true" />
           <h2 id="security-activity-heading" className={typeSmSemiboldPrimary}>

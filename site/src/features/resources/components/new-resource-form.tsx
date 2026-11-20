@@ -8,6 +8,7 @@ import { pageShellMax2xlStandard } from "../../shell/page-shell";
 import { panelGridClipShadow } from "../../shell/panel-shell";
 import {
   typeDisplayPrimary,
+  typeFileInputInset,
   typeLabelBlockUpperSecondary,
   typeMaxXlSmLeadingMuted,
   typeSmColSpan2,
@@ -35,10 +36,6 @@ import {
 } from "../resource-submission-intent";
 import { MtaMetaInspectorPanel } from "./mta-meta-inspector-panel";
 import { ResourceSubmissionSuccess } from "./resource-submission-success";
-
-const fileClass =
-  "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-accent";
-
 export function NewResourceForm({ actorId }: { actorId: string }) {
   const storageKey = pendingResourceDraftKey(actorId);
   const intentKey = resourceIntentKey(actorId);
@@ -559,7 +556,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
               type="file"
               accept=".zip,.rar,.7z,.lua"
               required
-              className={fileClass}
+              className={typeFileInputInset}
             />
             <span className={typeXsMuted}>{buildFileRequirements}</span>
           </div>

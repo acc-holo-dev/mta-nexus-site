@@ -1,6 +1,7 @@
 import { BrandMark } from "@nexus/ui";
 import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
+import { typeSpace2Muted } from "../type-shell";
 import { FooterContribute } from "./footer-contribute";
 
 export function Footer({ locale }: { locale: Locale }) {
@@ -15,7 +16,7 @@ export function Footer({ locale }: { locale: Locale }) {
         </div>
         <div>
           <h4 className="mb-3 font-label uppercase text-primary">{dictionary.footer.discover}</h4>
-          <ul className="space-y-2 text-muted">
+          <ul className={typeSpace2Muted}>
             <li>
               <Link
                 href="/servers"

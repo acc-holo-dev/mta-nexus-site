@@ -15,6 +15,7 @@ import {
   typeFlexWrapGap2,
   typeIcon6Accent,
   typeMinBreakWords,
+  typeMt05CaptionMuted,
   typeSemiboldPrimary,
   typeSmMuted,
 } from "../../shell/type-shell";
@@ -99,7 +100,7 @@ export async function MarketPage({
             <ShoppingBag className={typeIcon6Accent} />
             <span className={typeMinBreakWords}>{dictionary.market.title}</span>
           </h1>
-          <p className="mt-0.5 font-caption text-muted">
+          <p className={typeMt05CaptionMuted}>
             {dictionary.market.showing} {formatUnknown(locale, catalog?.products.length)}
           </p>
         </div>

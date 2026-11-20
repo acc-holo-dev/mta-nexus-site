@@ -7,6 +7,7 @@ import { type FormEvent, useEffect, useId, useState } from "react";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import {
+  typeFileInputInset,
   typeLabelBlockUpperSecondary,
   typeSmMuted,
   typeSmSecondary,
@@ -46,9 +47,6 @@ import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
-const fileClass =
-  "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-accent";
-
 export function AuthorResourceForms({
   product,
   actorId,
@@ -582,7 +580,7 @@ export function AuthorResourceForms({
               }}
               required
               accept=".zip,.rar,.7z,.lua"
-              className={fileClass}
+              className={typeFileInputInset}
             />
             <span className="block text-xs text-muted">
               {publishing.buildFileRequirements.replace("{maxFileSize}", maxFileSizeMb)}

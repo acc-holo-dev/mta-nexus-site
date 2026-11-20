@@ -77,3 +77,7 @@ export const panelClipSpace4P6 = "nexus-panel min-w-0 space-y-4 overflow-x-clip 
 
 export const panelGroupHoverCol =
   "group flex flex-col overflow-hidden nexus-panel transition-all hover:border-strong hover:shadow-nexus";
+
+export const panelClipSpace4P5Shadow =
+  "nexus-panel min-w-0 space-y-4 overflow-x-clip p-5 shadow-nexus-sm";
+export const panelClipP5Shadow = "nexus-panel min-w-0 overflow-x-clip p-5 shadow-nexus-sm";

@@ -13,7 +13,7 @@ import {
   requestShellSessionRefresh,
   SHELL_SESSION_REFRESH_EVENT,
 } from "../../shell/session";
-import { typeItemsStretchPy4 } from "../../shell/type-shell";
+import { typeItemsStretchPy4, typeSelectMinH11 } from "../../shell/type-shell";
 
 type Account = { id: string; username: string };
 
@@ -170,7 +170,7 @@ export function AccountControls() {
             isLoading={signingOut}
             aria-label={signingOut ? copy.signingOut : copy.signOut}
             title={signingOut ? copy.signingOut : copy.signOut}
-            className="min-h-11 shrink-0 rounded-md border-base bg-elevated px-2 font-semibold sm:px-2.5"
+            className={typeSelectMinH11}
           >
             <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
             <span className="hidden sm:block">{signingOut ? copy.signingOut : copy.signOut}</span>
@@ -182,7 +182,7 @@ export function AccountControls() {
           variant="outline"
           size="sm"
           onClick={requestShellSessionRefresh}
-          className="min-h-11 shrink-0 rounded-md border-base bg-elevated px-2 font-semibold sm:px-2.5"
+          className={typeSelectMinH11}
         >
           <UserRound className="h-3.5 w-3.5" aria-hidden="true" />
           <span className="hidden sm:block">{copy.retry}</span>

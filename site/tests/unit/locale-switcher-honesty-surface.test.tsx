@@ -10,8 +10,10 @@ const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 it("locks locale switcher CTA to size=touch / min-h-11 without size=sm", () => {
   const source = read("site/src/features/shell/components/locale-switcher.tsx");
   expect(source).toContain('size="touch"');
-  expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
-  expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|size="touch")/u);
+  expect(source).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell|typeSelectMinH11|type-shell)/);
+  expect(source).toMatch(
+    /(?:min-h-11|link[A-Za-z]\w*|link-shell|typeSelectMinH11|type-shell|size="touch")/u,
+  );
   expect(source).not.toContain('size="sm"');
   expect(source).not.toContain("min-h-10");
 });

@@ -5,6 +5,7 @@ import {
   typeBreakSemiboldPrimary,
   typeCaptionFaint,
   typeCaptionMuted,
+  typeFlexShrinkCenterGap2,
 } from "../../shell/type-shell";
 import { adminAdPlacementCopy } from "../admin-ad-placement-i18n";
 
@@ -56,7 +57,7 @@ export function AdminAdPlacementSection({
                   {copy.positionCapacity(slot.positionKey, slot.capacity)}
                 </p>
               </div>
-              <div className="flex shrink-0 items-center gap-2">
+              <div className={typeFlexShrinkCenterGap2}>
                 {pending > 0 && <StatusBadge tone="warning" status={copy.pending(pending)} />}
                 <StatusBadge
                   tone={active > 0 ? "success" : "neutral"}

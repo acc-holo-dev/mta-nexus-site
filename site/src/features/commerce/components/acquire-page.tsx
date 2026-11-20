@@ -19,7 +19,7 @@ import {
   pageShellMaxXl,
   pageShellMaxXlPy12,
 } from "../../shell/page-shell";
-import { skelH12W48, skelH28 } from "../../shell/skeleton-shell";
+import { skelH12W48, skelH28, skelPulseSpace4 } from "../../shell/skeleton-shell";
 import {
   typeDisplayPrimary,
   typeFlexMinCenterGap25Display,
@@ -298,7 +298,7 @@ function AcquireContent() {
         titleClassName="font-display text-primary"
         statusClassName="text-sm text-muted"
       >
-        <div className="animate-pulse space-y-4" aria-hidden="true">
+        <div className={skelPulseSpace4} aria-hidden="true">
           <div className={skelH28} />
           <div className={skelH12W48} />
         </div>
@@ -427,7 +427,7 @@ export function AcquirePage() {
           titleClassName="font-display text-primary"
           statusClassName="text-sm text-muted"
         >
-          <div className="animate-pulse space-y-4" aria-hidden="true">
+          <div className={skelPulseSpace4} aria-hidden="true">
             <div className={skelH28} />
             <div className={skelH12W48} />
           </div>

@@ -10,7 +10,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { pageShellMax5xlLoose } from "../page-shell";
 import { panelClipSpace2P5 } from "../panel-shell";
-import { typeIconAccent } from "../type-shell";
+import { typeFlexCenterGap2SmSemiboldPrimary, typeIconAccent } from "../type-shell";
 
 export async function DevelopmentStatusScreen() {
   if (process.env.NODE_ENV === "production") {
@@ -98,10 +98,7 @@ export async function DevelopmentStatusScreen() {
       </section>
 
       <section aria-labelledby="dev-app-url-heading" className={panelClipSpace2P5}>
-        <h2
-          id="dev-app-url-heading"
-          className="flex items-center gap-2 text-sm font-semibold text-primary"
-        >
+        <h2 id="dev-app-url-heading" className={typeFlexCenterGap2SmSemiboldPrimary}>
           <Globe2 className={typeIconAccent} aria-hidden="true" />
           {copy.appUrl}
         </h2>

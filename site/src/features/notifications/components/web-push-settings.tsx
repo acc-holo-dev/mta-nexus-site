@@ -5,7 +5,12 @@ import { BellRing } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
-import { typeIconAccent, typeMt1XsMuted, typeXsMuted } from "../../shell/type-shell";
+import {
+  typeFlexCenterGap2SmSemiboldPrimary,
+  typeIconAccent,
+  typeMt1XsMuted,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import { notificationInboxCopy } from "../notification-inbox-copy";
 
 type PushStatus =
@@ -426,7 +431,7 @@ export function WebPushSettings({ expectedIdentity }: { expectedIdentity: PushId
         aria-describedby={openBetaNoteId}
         className="mt-4 flex flex-col gap-3 rounded-lg border border-base bg-inset p-4"
       >
-        <h3 id={titleId} className="flex items-center gap-2 text-sm font-semibold text-primary">
+        <h3 id={titleId} className={typeFlexCenterGap2SmSemiboldPrimary}>
           <BellRing className={typeIconAccent} aria-hidden="true" />
           <span>{copy.webPush}</span>
         </h3>
@@ -454,7 +459,7 @@ export function WebPushSettings({ expectedIdentity }: { expectedIdentity: PushId
       className="mt-4 flex flex-col gap-3 rounded-lg border border-base bg-inset p-4 sm:flex-row sm:items-center sm:justify-between"
     >
       <div className="min-w-0">
-        <h3 id={titleId} className="flex items-center gap-2 text-sm font-semibold text-primary">
+        <h3 id={titleId} className={typeFlexCenterGap2SmSemiboldPrimary}>
           <BellRing className={typeIconAccent} aria-hidden="true" />
           <span>{copy.webPush}</span>
         </h3>

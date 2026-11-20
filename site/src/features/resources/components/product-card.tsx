@@ -3,7 +3,13 @@ import { Library, Star, Tag } from "lucide-react";
 import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { panelGroupHoverCol } from "../../shell/panel-shell";
-import { typeClamp2CaptionMuted, typeFlex1ColGap2P35 } from "../../shell/type-shell";
+import {
+  typeClamp1XsHeadingPrimary,
+  typeClamp2CaptionMuted,
+  typeFlex1ColGap2P35,
+  typeFlexBetweenCaption,
+  typeFlexShrinkCenterGap2,
+} from "../../shell/type-shell";
 import { PRODUCT_PUBLISHING_KEYS } from "../product-type-labels";
 import type { PublicResourceAttribution } from "../public-resource-attribution";
 import { ResourcePreview } from "./resource-preview";
@@ -88,7 +94,7 @@ export function ProductCard({
       </Link>
 
       <div className={typeFlex1ColGap2P35}>
-        <div className="flex items-center justify-between font-caption">
+        <div className={typeFlexBetweenCaption}>
           <div className="flex min-w-0 items-center gap-1 font-semibold text-warning">
             {hasReviews ? (
               <>
@@ -111,7 +117,7 @@ export function ProductCard({
           </span>
         </div>
 
-        <h3 className="line-clamp-1 text-xs font-heading text-primary">
+        <h3 className={typeClamp1XsHeadingPrimary}>
           <Link href={productHref} className={`transition-colors hover:text-accent ${cardFocus}`}>
             {product.title}
           </Link>
@@ -126,7 +132,7 @@ export function ProductCard({
             <Tag className="h-3 w-3 shrink-0" aria-hidden="true" />
             <span className="truncate">{product.tags.slice(0, 2).join(", ")}</span>
           </div>
-          <div className="flex shrink-0 items-center gap-2">
+          <div className={typeFlexShrinkCenterGap2}>
             <span>
               {market.updated} {updatedDate}
             </span>

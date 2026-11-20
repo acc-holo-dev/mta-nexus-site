@@ -32,6 +32,7 @@ import {
   typeFlexWrapGap2,
   typeMinSpace3,
   typeMinSpace4,
+  typeMt05CaptionMuted,
   typeXsFaint,
 } from "../type-shell";
 export async function workspaceHubMetadata(): Promise<Metadata> {
@@ -111,7 +112,7 @@ export async function WorkspaceHubPage() {
       <header className="flex min-w-0 flex-col justify-between gap-4 border-b border-base pb-6 md:flex-row md:items-center">
         <div className="min-w-0">
           <h1 className={typeDisplayPrimary}>{dictionary.workspace.title}</h1>
-          <p className="mt-0.5 font-caption text-muted">
+          <p className={typeMt05CaptionMuted}>
             @{user.username} · {dictionary.workspace.subtitle}
           </p>
           <p className="mt-1 max-w-2xl font-caption text-faint">{dictionary.workspace.liveNote}</p>

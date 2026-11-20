@@ -3,7 +3,7 @@ import { getDictionary, type Locale } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { HonestLoadingShell } from "../honest-loading";
 import { pageShellStack6 } from "../page-shell";
-import { skelH20 } from "../skeleton-shell";
+import { skelH20, skelPulseSpace4 } from "../skeleton-shell";
 
 type Dictionary = ReturnType<typeof getDictionary>;
 
@@ -50,7 +50,7 @@ function RouteHonestLoading({
       {...(titleClassName ? { titleClassName } : {})}
       {...(statusClassName ? { statusClassName } : {})}
     >
-      <div className="animate-pulse space-y-4" aria-hidden="true">
+      <div className={skelPulseSpace4} aria-hidden="true">
         {leading}
         {keys.map((key) => (
           <div key={key} className={rowClassName} />

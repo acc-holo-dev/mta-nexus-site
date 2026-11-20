@@ -212,3 +212,22 @@ export const typeAvatarAccentBorder =
   "h-20 w-20 shrink-0 border-2 border-[color:var(--nexus-accent)]/30";
 export const typeGridCols1Gap6Md3 = "grid grid-cols-1 gap-6 md:grid-cols-3";
 export const typeGridGap2SmSecondarySm2 = "grid gap-2 text-sm text-secondary sm:grid-cols-2";
+
+export const type3xlBlackPrimary = "text-3xl font-black text-primary";
+export const typeMt05CaptionMuted = "mt-0.5 font-caption text-muted";
+export const typeSpace2Muted = "space-y-2 text-muted";
+export const typeFlexCenterGap2SmSemiboldPrimary =
+  "flex items-center gap-2 text-sm font-semibold text-primary";
+export const typeFlexBetweenCaption = "flex items-center justify-between font-caption";
+export const typeClamp1XsHeadingPrimary = "line-clamp-1 text-xs font-heading text-primary";
+export const typeFlexShrinkCenterGap2 = "flex shrink-0 items-center gap-2";
+export const typeBreakAllMonoXs = "break-all font-mono text-xs";
+export const typeFlexWrapGap3Sm = "flex flex-wrap gap-3 text-sm";
+export const typeSelectMinH11 =
+  "min-h-11 shrink-0 rounded-md border-base bg-elevated px-2 font-semibold sm:px-2.5";
+
+export const typeFileInputInset =
+  "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-accent";
+
+export const typeBlockFileInputInset =
+  "block w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-accent";

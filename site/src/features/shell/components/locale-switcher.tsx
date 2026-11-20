@@ -3,6 +3,7 @@
 import { Button } from "@nexus/ui";
 import { Languages } from "lucide-react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
+import { typeSelectMinH11 } from "../type-shell";
 
 export function LocaleSwitcher({ locale }: { locale: Locale }) {
   const dictionary = getDictionary(locale);
@@ -21,7 +22,7 @@ export function LocaleSwitcher({ locale }: { locale: Locale }) {
       variant="outline"
       size="touch"
       onClick={switchLocale}
-      className="min-h-11 shrink-0 rounded-md border-base bg-elevated px-2 font-semibold sm:px-2.5"
+      className={typeSelectMinH11}
       aria-label={dictionary.locale.label}
       title={dictionary.locale.label}
     >
