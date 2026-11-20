@@ -36,7 +36,6 @@ it("locks residual page shells to clipped min-w-0 frames", () => {
     const source = read(page);
     expect(source).toContain("overflow-x-clip");
     expect(source).toContain("min-w-0");
-    
   }
 });
 
@@ -105,7 +104,7 @@ it("locks /dev diagnostics shell clipped without raw alert failure chrome", () =
   const source = read("site/src/features/shell/server/development-status-screen.tsx");
   expect(source).toContain("overflow-x-clip");
   expect(source).toContain("min-w-0");
-  
+
   expect(source).toContain("checkDatabaseConnection");
   expect(source).not.toContain('role="alert"');
   expect(source).not.toContain("ErrorState");

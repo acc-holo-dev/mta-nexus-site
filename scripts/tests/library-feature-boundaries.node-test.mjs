@@ -286,7 +286,10 @@ test("Library collection routes preserve dynamic rendering and server entry", ()
     );
     assert.match(source, /export const dynamic = "force-dynamic";/u);
     assert(source.includes("features/library/collections-server"));
-    assert.match(source, /export (?:const metadata|async function generateMetadata)/u);
+    assert.match(
+      source,
+      /export (?:const metadata|const generateMetadata\s*=|async function generateMetadata)/u,
+    );
   }
 });
 
@@ -303,7 +306,10 @@ test("Library release routes preserve dynamic rendering and server entry", () =>
     );
     assert.match(source, /export const dynamic = "force-dynamic";/u);
     assert(source.includes(`features/library/${port}-server`));
-    assert.match(source, /export (?:const metadata|async function generateMetadata)/u);
+    assert.match(
+      source,
+      /export (?:const metadata|const generateMetadata\s*=|async function generateMetadata)/u,
+    );
   }
 });
 

@@ -42,7 +42,6 @@ it("locks residual settings and auth route shells to clipped min-w-0 frames", ()
     const source = read(page);
     expect(source).toContain("overflow-x-clip");
     expect(source).toContain("min-w-0");
-    
   }
 });
 
