@@ -15,8 +15,40 @@ vi.mock("../../src/lib/services/accounts/auth-service", () => ({
 vi.mock("../../src/lib/services/commerce/commerce-service", () => ({
   commerceService: { checkEntitlement: async () => true },
 }));
+const buildFixture = {
+  id: "build",
+  productId: "product",
+  version: "1.0.0",
+  status: "pending_review",
+  scanStatus: "clean",
+  scanner: "test",
+  scannedAt: new Date(),
+  storageKey: "build.zip",
+  fileName: "build.zip",
+  fileSizeBytes: 4,
+  sha256Hash: "a".repeat(64),
+};
 vi.mock("../../src/lib/services/commerce/product-service", () => ({
-  productService: { canManageProduct: async () => true },
+  productService: {
+    canManageProduct: async () => true,
+    getProductById: async () => ({ id: "product", slug: "product", status: "published" }),
+    findBuildById: async () => ({ ...buildFixture, sha256Hash: mocks.hash }),
+    findLatestPublishedBuildByProduct: async () => ({
+      ...buildFixture,
+      status: "published",
+      sha256Hash: mocks.hash,
+    }),
+    findPublishedBuildByProductAndId: async () => ({
+      ...buildFixture,
+      status: "published",
+      sha256Hash: mocks.hash,
+    }),
+    authorizeReviewDownload: mocks.audit,
+    authorizeResourceDownload: async (input: unknown) => {
+      await mocks.audit(input);
+      return { slug: "product", receiptId: "receipt" };
+    },
+  },
 }));
 vi.mock("@nexus/security", () => ({
   can: () => true,
@@ -24,43 +56,10 @@ vi.mock("@nexus/security", () => ({
   generateId: () => "audit",
 }));
 vi.mock("@nexus/storage", () => ({ storageService: { getDownloadStream: mocks.download } }));
-vi.mock("@nexus/db", () => {
-  const build = {
-    id: "build",
-    productId: "product",
-    version: "1.0.0",
-    status: "pending_review",
-    scanStatus: "clean",
-    scanner: "test",
-    scannedAt: new Date(),
-    storageKey: "build.zip",
-    fileName: "build.zip",
-    fileSizeBytes: 4,
-    sha256Hash: "a".repeat(64),
-  };
-  return {
-    buildReviewDownloadRepository: { authorize: mocks.audit },
-    resourceDownloadAuthorizationRepository: {
-      authorize: async (input: unknown) => {
-        await mocks.audit(input);
-        return { slug: "product", receiptId: "receipt" };
-      },
-    },
-    resourceDeliveriesRepository: { finish: mocks.finish },
-    productRepository: {
-      findById: async () => ({ id: "product", slug: "product", status: "published" }),
-    },
-    buildRepository: {
-      findById: async () => ({ ...build, sha256Hash: mocks.hash }),
-      findLatestPublishedByProduct: async () => ({
-        ...build,
-        status: "published",
-        sha256Hash: mocks.hash,
-      }),
-    },
-    auditRepository: { record: mocks.audit },
-  };
-});
+vi.mock("@nexus/db", () => ({
+  resourceDeliveriesRepository: { finish: mocks.finish },
+  auditRepository: { record: mocks.audit },
+}));
 
 import { GET as reviewDownload } from "../../src/app/api/admin/builds/[buildId]/download/route";
 import { GET as publicDownload } from "../../src/app/api/products/[id]/download/route";

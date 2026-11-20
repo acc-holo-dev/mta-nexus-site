@@ -1,4 +1,10 @@
-import { buildRepository, productLifecycleRepository, productRepository } from "@nexus/db";
+import {
+  buildRepository,
+  buildReviewDownloadRepository,
+  productLifecycleRepository,
+  productRepository,
+  resourceDownloadAuthorizationRepository,
+} from "@nexus/db";
 import type {
   Build,
   BuildPackageEvidence,
@@ -698,6 +704,32 @@ export class ProductService {
     }
 
     return retired;
+  }
+
+  updateWithAudit(...args: Parameters<typeof productRepository.updateWithAudit>) {
+    return productRepository.updateWithAudit(...args);
+  }
+
+  findBuildById(id: string) {
+    return buildRepository.findById(id);
+  }
+
+  findPublishedBuildByProductAndId(productId: string, buildId: string) {
+    return buildRepository.findPublishedByProductAndId(productId, buildId);
+  }
+
+  findLatestPublishedBuildByProduct(productId: string) {
+    return buildRepository.findLatestPublishedByProduct(productId);
+  }
+
+  authorizeReviewDownload(...args: Parameters<typeof buildReviewDownloadRepository.authorize>) {
+    return buildReviewDownloadRepository.authorize(...args);
+  }
+
+  authorizeResourceDownload(
+    ...args: Parameters<typeof resourceDownloadAuthorizationRepository.authorize>
+  ) {
+    return resourceDownloadAuthorizationRepository.authorize(...args);
   }
 }
 

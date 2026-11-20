@@ -14,13 +14,12 @@ vi.mock("@nexus/security", async () => {
     generateId: () => "aud_test",
   };
 });
-vi.mock("@nexus/db", () => ({
-  productRepository: {},
-  reportRepository: {},
-  verificationRepository: {},
-}));
 vi.mock("../../src/lib/services/commerce/product-service", () => ({ productService: {} }));
 vi.mock("../../src/lib/services/community/content-service", () => ({ contentService: {} }));
+vi.mock("../../src/lib/services/moderation/admin-service", () => ({ adminService: {} }));
+vi.mock("../../src/lib/services/moderation/verification-workspace-service", () => ({
+  verificationWorkspaceService: {},
+}));
 vi.mock("../../src/lib/services/notifications/server-follow-notification-service", () => ({
   notifyServerFollowersOfPublishedContent: vi.fn(),
 }));

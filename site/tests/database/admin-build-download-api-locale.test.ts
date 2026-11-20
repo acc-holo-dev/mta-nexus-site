@@ -21,11 +21,11 @@ vi.mock("@nexus/security", () => ({
   generateId: vi.fn(() => "aud_1"),
 }));
 
-vi.mock("@nexus/db", () => ({
-  buildRepository: {
-    findById: mocks.findById,
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
+  productService: {
+    findBuildById: mocks.findById,
+    authorizeReviewDownload: vi.fn(),
   },
-  buildReviewDownloadRepository: {},
 }));
 
 import { GET } from "../../src/app/api/admin/builds/[buildId]/download/route";

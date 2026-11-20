@@ -236,6 +236,14 @@ class VerificationWorkspaceService {
     return verificationRepository.createRequest(...args);
   }
 
+  resolveRequest(...args: Parameters<typeof verificationRepository.resolveRequest>) {
+    return verificationRepository.resolveRequest(...args);
+  }
+
+  findRequestById(id: string) {
+    return verificationRepository.findById(id);
+  }
+
   findOrganizationById(id: string) {
     return organizationRepository.findById(id);
   }

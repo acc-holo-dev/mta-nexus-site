@@ -1,4 +1,3 @@
-import { productRepository, reportRepository, verificationRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
 import {
   can,
@@ -20,6 +19,8 @@ import { createRequestLogContext, logRequestEvent } from "../../../../lib/platfo
 import { authService } from "../../../../lib/services/accounts/auth-service";
 import { productService } from "../../../../lib/services/commerce/product-service";
 import { contentService } from "../../../../lib/services/community/content-service";
+import { adminService } from "../../../../lib/services/moderation/admin-service";
+import { verificationWorkspaceService } from "../../../../lib/services/moderation/verification-workspace-service";
 import { resourceModerationService } from "../../../../lib/services/resources/resource-release-control-service";
 
 const privateHeaders = {
@@ -137,7 +138,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     if (targetType === "product") {
       if (action === "feature" || action === "unfeature") {
         if (!token) return json({ error: copy.authenticationRequired }, 401);
-        const updated = await productRepository.updateWithAudit(
+        const updated = await productService.updateWithAudit(
           targetId,
           { isFeatured: action === "feature" },
           makeAudit(),
@@ -164,7 +165,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     } else if (targetType === "report") {
       if (action === "resolve" || action === "dismiss") {
         if (!token) return json({ error: copy.authenticationRequired }, 401);
-        const resolved = await reportRepository.resolve(
+        const resolved = await adminService.resolveReportRecord(
           targetId,
           action === "resolve" ? "resolved" : "dismissed",
           notes,
@@ -172,7 +173,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
           token,
         );
         if (!resolved) {
-          const current = await reportRepository.findById(targetId);
+          const current = await adminService.findReportById(targetId);
           if (!current) {
             return json({ error: copy.reportNotFound }, 404);
           }
@@ -187,7 +188,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       // Verification can only be granted through the moderation workflow
       if (action === "approve" || action === "reject") {
         if (!token) return json({ error: copy.authenticationRequired }, 401);
-        const resolved = await verificationRepository.resolveRequest(
+        const resolved = await verificationWorkspaceService.resolveRequest(
           {
             id: targetId,
             reviewerId: user.id,
@@ -199,7 +200,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         );
 
         if (!resolved) {
-          const current = await verificationRepository.findById(targetId);
+          const current = await verificationWorkspaceService.findRequestById(targetId);
           if (!current) {
             return json({ error: copy.verificationNotFound }, 404);
           }

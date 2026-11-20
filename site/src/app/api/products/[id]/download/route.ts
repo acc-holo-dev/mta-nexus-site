@@ -1,8 +1,3 @@
-import {
-  buildRepository,
-  productRepository,
-  resourceDownloadAuthorizationRepository,
-} from "@nexus/db";
 import { AppError, ValidationError } from "@nexus/domain";
 import { consumeRateLimit, generateId } from "@nexus/security";
 import { storageService } from "@nexus/storage";
@@ -73,7 +68,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return json(context, { error: copy.rate }, 429);
     }
 
-    const product = await productRepository.findById(productId);
+    const product = await productService.getProductById(productId);
     if (!product) {
       return json(context, { error: copy.notFound }, 404);
     }
@@ -108,8 +103,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
     const selectedBuild =
       selection.kind === "pinned"
-        ? await buildRepository.findPublishedByProductAndId(productId, selection.buildId)
-        : await buildRepository.findLatestPublishedByProduct(productId);
+        ? await productService.findPublishedBuildByProductAndId(productId, selection.buildId)
+        : await productService.findLatestPublishedBuildByProduct(productId);
     if (!selectedBuild) {
       return json(
         context,
@@ -147,7 +142,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       });
     try {
       request.signal.throwIfAborted();
-      authorized = await resourceDownloadAuthorizationRepository.authorize({
+      authorized = await productService.authorizeResourceDownload({
         auditId: generateId("aud"),
         receiptId: generateId("dlv"),
         actorId: user.id,

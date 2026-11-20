@@ -48,6 +48,7 @@ vi.mock("../../src/lib/services/commerce/product-service", () => ({
     reviewBuild: vi.fn(),
     quarantineBuild: vi.fn(),
     restoreQuarantinedBuild: vi.fn(),
+    updateWithAudit: product.updateWithAudit,
   },
 }));
 
@@ -57,17 +58,22 @@ vi.mock("../../src/lib/services/community/content-service", () => ({
   },
 }));
 
-vi.mock("../../src/lib/services/notifications/server-follow-notification-service", () => ({
-  notifyServerFollowersOfPublishedContent: vi.fn(),
+vi.mock("../../src/lib/services/moderation/admin-service", () => ({
+  adminService: {
+    resolveReportRecord: report.resolve,
+    findReportById: report.findById,
+  },
 }));
 
-vi.mock("@nexus/db", () => ({
-  productRepository: product,
-  reportRepository: report,
-  verificationRepository: {
+vi.mock("../../src/lib/services/moderation/verification-workspace-service", () => ({
+  verificationWorkspaceService: {
     resolveRequest: vi.fn(),
-    findById: vi.fn(),
+    findRequestById: vi.fn(),
   },
+}));
+
+vi.mock("../../src/lib/services/notifications/server-follow-notification-service", () => ({
+  notifyServerFollowersOfPublishedContent: vi.fn(),
 }));
 
 vi.mock("@nexus/security", async () => {

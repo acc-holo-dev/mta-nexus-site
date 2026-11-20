@@ -33,26 +33,20 @@ vi.mock("../../src/lib/services/commerce/product-service", () => ({
     reviewBuild,
     quarantineBuild: vi.fn(async () => ({ id: "bld_1" })),
     restoreQuarantinedBuild: vi.fn(async () => ({ id: "bld_1" })),
+    updateWithAudit: vi.fn(),
   },
 }));
 vi.mock("../../src/lib/services/community/content-service", () => ({
   contentService: { moderateContent: vi.fn() },
 }));
+vi.mock("../../src/lib/services/moderation/admin-service", () => ({
+  adminService: { resolveReportRecord: vi.fn(), findReportById: vi.fn() },
+}));
+vi.mock("../../src/lib/services/moderation/verification-workspace-service", () => ({
+  verificationWorkspaceService: { resolveRequest: vi.fn(), findRequestById: vi.fn() },
+}));
 vi.mock("../../src/lib/services/notifications/server-follow-notification-service", () => ({
   notifyServerFollowersOfPublishedContent: vi.fn(),
-}));
-vi.mock("@nexus/db", () => ({
-  productRepository: {
-    updateWithAudit: vi.fn(),
-    suspendPublished: vi.fn(),
-    restoreSuspendedWithPublishedBuild: vi.fn(),
-    findById: vi.fn(),
-  },
-  reportRepository: { resolve: vi.fn(), findById: vi.fn() },
-  verificationRepository: {
-    resolveRequest: vi.fn(),
-    findById: vi.fn(),
-  },
 }));
 vi.mock("@nexus/security", async () => {
   const actual = await vi.importActual<typeof import("@nexus/security")>("@nexus/security");

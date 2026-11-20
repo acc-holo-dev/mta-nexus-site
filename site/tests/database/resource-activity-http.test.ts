@@ -30,13 +30,6 @@ vi.mock("../../src/lib/services/resources/resource-activity-service", () => ({
 vi.mock("../../src/lib/services/commerce/commerce-service", () => ({
   commerceService: { checkEntitlement: async () => true, claimFreeResource: state.claim },
 }));
-vi.mock("../../src/lib/services/commerce/product-service", () => ({
-  productService: { canManageProduct: async () => false },
-}));
-vi.mock("@nexus/security", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@nexus/security")>()),
-  consumeRateLimit: vi.fn(async () => ({ success: state.allowed })),
-}));
 const build = {
   id: "bld_a",
   productId: "prd_a",
@@ -51,13 +44,20 @@ const build = {
   fileName: "resource.zip",
   mimeType: "application/zip",
 };
-vi.mock("@nexus/db", () => ({
-  resourceDownloadAuthorizationRepository: { authorize: state.authorize },
-  productRepository: {
-    findById: async () => ({ id: "prd_a", slug: "resource", status: "published" }),
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
+  productService: {
+    canManageProduct: async () => false,
+    getProductById: async () => ({ id: "prd_a", slug: "resource", status: "published" }),
+    findLatestPublishedBuildByProduct: async () => build,
+    findPublishedBuildByProductAndId: async () => build,
+    authorizeResourceDownload: state.authorize,
   },
-  buildRepository: { findLatestPublishedByProduct: async () => build },
 }));
+vi.mock("@nexus/security", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@nexus/security")>()),
+  consumeRateLimit: vi.fn(async () => ({ success: state.allowed })),
+}));
+vi.mock("@nexus/db", () => ({}));
 vi.mock("@nexus/storage", () => ({ storageService: { getDownloadStream: state.download } }));
 
 import { GET as history } from "../../src/app/api/acquisitions/route";

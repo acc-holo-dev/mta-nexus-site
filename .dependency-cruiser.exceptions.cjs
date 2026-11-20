@@ -21,11 +21,7 @@ const HTTP_DB_ALLOWED_READ_HEALTH = Object.freeze([
   "^(?:apps/web|site)/src/app/api/licenses/check-release/",
 ]);
 
-const HTTP_DB_SERVICE_REQUIRED = Object.freeze([
-  "^(?:apps/web|site)/src/app/api/admin/actions/",
-  "^(?:apps/web|site)/src/app/api/admin/builds/",
-  "^(?:apps/web|site)/src/app/api/products/[^/]+/download/",
-]);
+const HTTP_DB_SERVICE_REQUIRED = Object.freeze([]);
 
 module.exports = {
   HTTP_DB_ALLOWED_READ_HEALTH,

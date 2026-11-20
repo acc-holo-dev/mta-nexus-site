@@ -29,8 +29,6 @@ vi.mock("@nexus/db", () => ({
     candidates: state.candidates,
   },
   resourceCompatibilityRepository: { update: state.compatibility },
-  buildReviewDownloadRepository: { authorize: state.authorize },
-  buildRepository: { findById: state.findBuild },
 }));
 vi.mock("@nexus/security", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@nexus/security")>()),
@@ -41,7 +39,11 @@ vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
 vi.mock("../../src/lib/services/commerce/product-service", () => ({
-  productService: { getManagedProduct: state.findManagedProduct },
+  productService: {
+    getManagedProduct: state.findManagedProduct,
+    findBuildById: state.findBuild,
+    authorizeReviewDownload: state.authorize,
+  },
 }));
 
 import { consumeRateLimit } from "@nexus/security";

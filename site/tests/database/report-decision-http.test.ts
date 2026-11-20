@@ -26,6 +26,15 @@ vi.mock("../../src/lib/services/accounts/auth-service", () => ({
 }));
 vi.mock("../../src/lib/services/commerce/product-service", () => ({ productService: {} }));
 vi.mock("../../src/lib/services/community/content-service", () => ({ contentService: {} }));
+vi.mock("../../src/lib/services/moderation/admin-service", () => ({
+  adminService: {
+    resolveReportRecord: mocks.resolve,
+    findReportById: mocks.findById,
+  },
+}));
+vi.mock("../../src/lib/services/moderation/verification-workspace-service", () => ({
+  verificationWorkspaceService: {},
+}));
 vi.mock("@nexus/security", async () => {
   const actual = await vi.importActual<typeof import("@nexus/security")>("@nexus/security");
   return {
@@ -35,11 +44,6 @@ vi.mock("@nexus/security", async () => {
     generateId: () => "aud_test",
   };
 });
-vi.mock("@nexus/db", () => ({
-  reportRepository: { resolve: mocks.resolve, findById: mocks.findById },
-  productRepository: {},
-  verificationRepository: {},
-}));
 
 import { POST } from "../../src/app/api/admin/actions/route";
 

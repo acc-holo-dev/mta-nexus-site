@@ -1,4 +1,3 @@
-import { buildRepository, buildReviewDownloadRepository } from "@nexus/db";
 import { AppError, ValidationError } from "@nexus/domain";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 import { storageService } from "@nexus/storage";
@@ -19,6 +18,7 @@ import {
   type RequestLogContext,
 } from "../../../../../../lib/platform/observability";
 import { authService } from "../../../../../../lib/services/accounts/auth-service";
+import { productService } from "../../../../../../lib/services/commerce/product-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -79,7 +79,7 @@ export async function GET(
       return json(context, { error: copy.notFound }, 404);
     }
 
-    const build = await buildRepository.findById(buildId);
+    const build = await productService.findBuildById(buildId);
     if (!build) {
       return json(context, { error: copy.notFound }, 404);
     }
@@ -109,7 +109,7 @@ export async function GET(
 
     try {
       request.signal.throwIfAborted();
-      await buildReviewDownloadRepository.authorize({
+      await productService.authorizeReviewDownload({
         actorId: actor.id,
         auditId: generateId("aud"),
         expected: build,

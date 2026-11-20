@@ -20,12 +20,10 @@ vi.mock("../../src/lib/services/commerce/commerce-service", async () => {
 });
 
 vi.mock("../../src/lib/services/commerce/product-service", async () => {
-  const { resourceDownloadHttpState } = await import("../helpers/resource-download-http-harness");
-  return {
-    productService: {
-      canManageProduct: vi.fn(async () => resourceDownloadHttpState.managementAccess),
-    },
-  };
+  const { createResourceDownloadHttpProductServiceMock } = await import(
+    "../helpers/resource-download-http-harness"
+  );
+  return createResourceDownloadHttpProductServiceMock();
 });
 
 vi.mock("@nexus/db", async () => {

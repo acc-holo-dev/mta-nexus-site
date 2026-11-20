@@ -14,12 +14,14 @@ vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   },
 }));
 
-vi.mock("@nexus/db", () => ({
-  productRepository: {
-    findById: mocks.findById,
+vi.mock("../../src/lib/services/commerce/product-service", () => ({
+  productService: {
+    getProductById: mocks.findById,
+    canManageProduct: vi.fn(),
+    findPublishedBuildByProductAndId: vi.fn(),
+    findLatestPublishedBuildByProduct: vi.fn(),
+    authorizeResourceDownload: vi.fn(),
   },
-  buildRepository: {},
-  resourceDownloadAuthorizationRepository: {},
 }));
 
 vi.mock("@nexus/security", () => ({

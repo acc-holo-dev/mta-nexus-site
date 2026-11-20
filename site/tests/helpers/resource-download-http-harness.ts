@@ -46,19 +46,22 @@ export const resourceDownloadHttpFindPinnedPublishedBuild = vi.fn();
 /** Factory for `vi.mock("@nexus/db", …)` from suite files under `site/tests/unit` or `site/tests/database`. */
 export function createResourceDownloadHttpDbMock() {
   return {
-    productRepository: {
-      findById: vi.fn(async () => resourceDownloadHttpState.product),
-    },
-    buildRepository: {
-      findLatestPublishedByProduct: resourceDownloadHttpFindLatestPublishedBuild,
-      findPublishedByProductAndId: resourceDownloadHttpFindPinnedPublishedBuild,
-    },
     resourceDeliveriesRepository: { finish: resourceDownloadHttpDeliveryFinish },
     auditRepository: {
       record: resourceDownloadHttpAuditRecord,
     },
-    resourceDownloadAuthorizationRepository: {
-      authorize: async (input: unknown) => {
+  };
+}
+
+/** Factory for `vi.mock("…/product-service", …)` download HTTP suites. */
+export function createResourceDownloadHttpProductServiceMock() {
+  return {
+    productService: {
+      canManageProduct: vi.fn(async () => resourceDownloadHttpState.managementAccess),
+      getProductById: vi.fn(async () => resourceDownloadHttpState.product),
+      findLatestPublishedBuildByProduct: resourceDownloadHttpFindLatestPublishedBuild,
+      findPublishedBuildByProductAndId: resourceDownloadHttpFindPinnedPublishedBuild,
+      authorizeResourceDownload: async (input: unknown) => {
         await resourceDownloadHttpAuditRecord(input);
         return {
           slug: resourceDownloadHttpState.product?.slug ?? "http-resource",

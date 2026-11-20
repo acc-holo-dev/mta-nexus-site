@@ -41,10 +41,9 @@ vi.mock("../../src/lib/services/notifications/server-follow-notification-service
 vi.mock("../../src/lib/services/resources/resource-release-control-service", () => ({
   resourceModerationService: {},
 }));
-vi.mock("@nexus/db", () => ({
-  productRepository: {},
-  reportRepository: {},
-  verificationRepository: {},
+vi.mock("../../src/lib/services/moderation/admin-service", () => ({ adminService: {} }));
+vi.mock("../../src/lib/services/moderation/verification-workspace-service", () => ({
+  verificationWorkspaceService: {},
 }));
 
 import { POST as moderate } from "../../src/app/api/admin/actions/route";

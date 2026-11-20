@@ -119,6 +119,14 @@ class AdminService {
 
     return report;
   }
+
+  resolveReportRecord(...args: Parameters<typeof reportRepository.resolve>) {
+    return reportRepository.resolve(...args);
+  }
+
+  findReportById(id: string) {
+    return reportRepository.findById(id);
+  }
 }
 
 export const adminService = new AdminService();
