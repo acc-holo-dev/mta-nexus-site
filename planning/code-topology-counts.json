@@ -42,8 +42,8 @@
       "files": 49
     },
     "resources": {
-      "bytes": 761128,
-      "files": 171
+      "bytes": 769752,
+      "files": 173
     },
     "servers": {
       "bytes": 349158,
@@ -96,7 +96,7 @@
     "validation": 18
   },
   "scope": "Git-tracked blobs under site/ at source_sha (git ls-tree). Ignores untracked/ignored host files so CI and dirty worktrees match.",
-  "source_sha": "d005d86ac7498992ae65809da96e03b56acab072",
+  "source_sha": "944c7ec9caba458053bc719b34e4976eb8ca8fac",
   "tests": {
     "site_tests_files": 1681
   }
