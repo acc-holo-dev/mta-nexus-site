@@ -20,6 +20,7 @@ import { communityReportCopy } from "../community-report-copy";
 import { reportGroupsCopy } from "../community-report-groups-copy";
 import { CommunityReportDetailView } from "../components/community-report-detail";
 import { CommunityReportList } from "../components/community-report-list";
+import { pageShellStack6 } from "../../shell/page-shell";
 export async function communityReportMetadata(): Promise<Metadata> {
   return {
     title: communityReportCopy(await getRequestLocale()).detail,
@@ -122,7 +123,7 @@ export async function CommunityReportScreen({
       if (error instanceof AppError && error.statusCode === 404) notFound();
     }
     return (
-      <div className="min-w-0 space-y-6 overflow-x-clip">
+      <div className={pageShellStack6}>
         {header}
         <CommunityReportDetailView
           key={`${actor.id}:${id}:${staff}`}
@@ -158,7 +159,7 @@ export async function CommunityReportScreen({
     .then((value) => communityReportPageSchema.parse(value))
     .catch(() => null);
   return (
-    <div className="min-w-0 space-y-6 overflow-x-clip">
+    <div className={pageShellStack6}>
       {header}
       <CommunityReportList
         key={`${actor.id}:${staff}:${JSON.stringify(filters)}`}

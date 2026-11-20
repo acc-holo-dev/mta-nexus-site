@@ -18,6 +18,7 @@ import {
   formatFinancialMinor,
   getFinancialCopy,
 } from "../financial-i18n";
+import { pageShellMax5xl } from "../../shell/page-shell";
 
 export async function financialReconciliationMetadata(): Promise<Metadata> {
   return {
@@ -77,7 +78,7 @@ export async function FinancialReconciliationScreen({
 
   if (!result) {
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+      <div className={pageShellMax5xl}>
         <Link href="/admin" className={linkClass}>
           {copy.back}
         </Link>
@@ -95,7 +96,7 @@ export async function FinancialReconciliationScreen({
   }
 
   return (
-    <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+    <div className={pageShellMax5xl}>
       <Link href="/admin" className={linkClass}>
         {copy.back}
       </Link>

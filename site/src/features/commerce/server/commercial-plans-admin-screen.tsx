@@ -13,6 +13,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
 import { formatHistoryAmount, parseHistoryPage } from "../commerce-history-format";
 import { getCommercialCopy } from "../commercial-i18n";
+import { pageShellMax5xl } from "../../shell/page-shell";
 
 const linkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
@@ -73,7 +74,7 @@ export async function CommercialPlansAdminScreen({
 
   if (!result) {
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+      <div className={pageShellMax5xl}>
         <Link href="/admin" className={linkClass}>
           {copy.adminBack}
         </Link>
@@ -91,7 +92,7 @@ export async function CommercialPlansAdminScreen({
   }
 
   return (
-    <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+    <div className={pageShellMax5xl}>
       <Link href="/admin" className={linkClass}>
         {copy.adminBack}
       </Link>

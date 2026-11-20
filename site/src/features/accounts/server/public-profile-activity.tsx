@@ -9,6 +9,7 @@ import { publicationFeedService } from "../../../lib/services/discovery/publicat
 import { PublicationFeed } from "../../community/publication-feed";
 import { publicationCopy } from "../../community/publication-feed-copy";
 import { publicationFeedView } from "../../community/publication-feed-view";
+import { pageShellStack6 } from "../../shell/page-shell";
 
 const linkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
@@ -49,7 +50,7 @@ export async function PublicProfileActivity({
   const activityPath = `${profilePath}/${kind === "server" ? "updates" : "activity"}`;
   if (!profile) {
     return (
-      <div className="min-w-0 space-y-6 overflow-x-clip">
+      <div className={pageShellStack6}>
         <Link href={profilePath} className={linkClass}>
           {kind === "server" ? copy.serverBack : copy.back}
         </Link>
@@ -70,7 +71,7 @@ export async function PublicProfileActivity({
     await searchParams,
   );
   return (
-    <div className="min-w-0 space-y-6 overflow-x-clip">
+    <div className={pageShellStack6}>
       <header className="space-y-2">
         <Link href={profilePath} className={linkClass}>
           {kind === "server" ? copy.serverBack : copy.back}

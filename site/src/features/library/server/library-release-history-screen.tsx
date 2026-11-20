@@ -13,6 +13,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { collectionPageParams } from "../library-collections-query";
 import { libraryReleaseHistoryCopy } from "../library-release-history-i18n";
 import { libraryReleaseHistoryQuery } from "../library-release-history-query";
+import { pageShellMax5xl } from "../../shell/page-shell";
 export async function libraryReleaseHistoryMetadata(): Promise<Metadata> {
   return {
     title: `${libraryReleaseHistoryCopy(await getRequestLocale()).title} | MTA NEXUS`,
@@ -70,7 +71,7 @@ export async function LibraryReleaseHistoryScreen({
   });
   if (!result) {
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+      <div className={pageShellMax5xl}>
         <Link
           href="/workspace/library"
           className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -101,7 +102,7 @@ export async function LibraryReleaseHistoryScreen({
     }).toString();
   const href = (page: number) => `/workspace/library/version-history?${suffix(page)}`;
   return (
-    <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+    <div className={pageShellMax5xl}>
       <Link
         href="/workspace/library"
         className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

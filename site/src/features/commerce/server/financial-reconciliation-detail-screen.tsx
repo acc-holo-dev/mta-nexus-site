@@ -19,6 +19,7 @@ import {
   getFinancialCopy,
 } from "../financial-i18n";
 import { orderTermsCopy } from "../order-terms-i18n";
+import { pageShellMax4xl } from "../../shell/page-shell";
 
 export async function financialReconciliationDetailMetadata(): Promise<Metadata> {
   return {
@@ -83,7 +84,7 @@ export async function FinancialReconciliationDetailScreen({
 
   if (!result) {
     return (
-      <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8">
+      <div className={pageShellMax4xl}>
         <Link href="/admin/commerce/reconciliation" className={linkClass}>
           {copy.back}
         </Link>
@@ -101,7 +102,7 @@ export async function FinancialReconciliationDetailScreen({
   }
 
   return (
-    <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8">
+    <div className={pageShellMax4xl}>
       <Link href="/admin/commerce/reconciliation" className={linkClass}>
         {copy.back}
       </Link>

@@ -21,6 +21,7 @@ import {
 import { getCommerceHistoryCopy } from "../commerce-history-i18n";
 import { getLicenseControlCopy } from "../license-control-i18n";
 import { getLicenseMaintenanceCopy } from "../license-maintenance-i18n";
+import { pageShellMax5xl } from "../../shell/page-shell";
 
 export async function licenseModerationMetadata(): Promise<Metadata> {
   return {
@@ -89,7 +90,7 @@ export async function LicenseModerationScreen({
 
   if (!result) {
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+      <div className={pageShellMax5xl}>
         <Link
           href="/admin"
           className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -113,7 +114,7 @@ export async function LicenseModerationScreen({
   }
 
   return (
-    <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+    <div className={pageShellMax5xl}>
       <Link
         href="/admin"
         className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

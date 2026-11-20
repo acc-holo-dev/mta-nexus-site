@@ -13,6 +13,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { OrderTermsReportView } from "../order-terms";
 import { orderTermsCopy } from "../order-terms-i18n";
 import { orderTermsPageQuery } from "../order-terms-query";
+import { pageShellMax5xl } from "../../shell/page-shell";
 export async function financialReconciliationTermsMetadata(): Promise<Metadata> {
   return {
     title: `${orderTermsCopy(await getRequestLocale()).title} | MTA NEXUS`,
@@ -76,7 +77,7 @@ export async function FinancialReconciliationTermsScreen({
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && error.statusCode === 400) {
       return (
-        <section className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+        <section className={pageShellMax5xl}>
           <ErrorState
             title={c.invalid}
             description={c.invalidHint}
@@ -90,7 +91,7 @@ export async function FinancialReconciliationTermsScreen({
       );
     }
     return (
-      <section className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+      <section className={pageShellMax5xl}>
         <Link
           href={`/admin/commerce/reconciliation/${encodeURIComponent(id)}`}
           className={linkClass}

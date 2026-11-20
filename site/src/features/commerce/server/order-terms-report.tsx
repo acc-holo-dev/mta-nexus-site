@@ -5,6 +5,7 @@ import Link from "next/link";
 import { formatFinancialMinor } from "../financial-i18n";
 import { orderTermsCopy, orderTermsLicenseLabel } from "../order-terms-i18n";
 import { sellerSalesTime } from "../seller-sales-i18n";
+import { pageShellMax5xl } from "../../shell/page-shell";
 
 // Honesty residual: consistency flags via ErrorState.
 const ORDER_TERMS_FLAG_IDS = {
@@ -38,7 +39,7 @@ export function OrderTermsReportView({
   const linkClass =
     "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
   return (
-    <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+    <div className={pageShellMax5xl}>
       <Link href={base} className={linkClass}>
         {c.back}
       </Link>

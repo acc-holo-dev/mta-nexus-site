@@ -31,6 +31,7 @@ import { trustCopy } from "../../trust/public-user-trust-copy";
 import { DeveloperExperience } from "../developer-experience";
 import { ProfileResourcePagination, parseProfilePage } from "../profile-pagination";
 import { profilePrivacyCopy } from "../profile-privacy-copy";
+import { pageShellStack10, pageShellStack6 } from "../../shell/page-shell";
 
 const getProfile = cache((username: string) => userRepository.findByUsername(username));
 
@@ -98,7 +99,7 @@ export async function UserProfileScreen({
 
   if (loadError || !loaded) {
     return (
-      <div className="min-w-0 space-y-6 overflow-x-clip">
+      <div className={pageShellStack6}>
         <ErrorState
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
@@ -151,7 +152,7 @@ export async function UserProfileScreen({
   );
 
   return (
-    <div className="min-w-0 space-y-10 overflow-x-clip">
+    <div className={pageShellStack10}>
       {guestPreview && (
         <p role="status" className="rounded-lg border border-base bg-inset p-4 text-sm text-muted">
           {privacyCopy.guestPreviewNote} {privacyCopy.scope}

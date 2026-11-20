@@ -2,10 +2,11 @@ import type { ReactNode } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { HonestLoadingShell } from "../honest-loading";
+import { pageShellStack6 } from "../page-shell";
 
 type Dictionary = ReturnType<typeof getDictionary>;
 
-const DEFAULT_CLASS = "min-w-0 space-y-6 overflow-x-clip";
+const DEFAULT_CLASS = pageShellStack6;
 const DEFAULT_ROW = "h-20 rounded bg-inset";
 
 function RouteHonestLoading({

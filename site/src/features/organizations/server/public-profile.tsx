@@ -22,7 +22,7 @@ import { buildFollowInitialState } from "../../community/follow-initial-state";
 import { publicationCopy } from "../../community/publication-feed-copy";
 import { ProductCard } from "../../resources/view";
 import { contextTrustCopy } from "../../trust/public-context-trust-copy";
-import { pageShellStack10 as pageShellClass } from "../../shell/page-shell";
+import { pageShellStack10 as pageShellClass, pageShellStack6 } from "../../shell/page-shell";
 
 const actionLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
@@ -92,7 +92,7 @@ export default async function OrganizationProfilePage({
 
   if (loadError || !loaded) {
     return (
-      <div className="min-w-0 space-y-6 overflow-x-clip">
+      <div className={pageShellStack6}>
         <ErrorState
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}

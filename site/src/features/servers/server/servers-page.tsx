@@ -7,6 +7,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { serverService } from "../../../lib/services/servers/server-service";
 import { MtaMasterServerDirectory } from "../components/mta-master-server-directory";
 import { mtaListingProfileRecord } from "../model/mta-listing-profile-map";
+import { pageShellStack8 } from "../../shell/page-shell";
 
 export async function serversMetadata(): Promise<Metadata> {
   return {
@@ -21,7 +22,7 @@ export async function ServersPage() {
   const profileByEndpoint = mtaListingProfileRecord(listings);
 
   return (
-    <div className="min-w-0 space-y-8 overflow-x-clip">
+    <div className={pageShellStack8}>
       <PageHeader
         title={dictionary.servers.title}
         description={dictionary.servers.description}

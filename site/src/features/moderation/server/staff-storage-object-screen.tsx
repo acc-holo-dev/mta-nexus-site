@@ -13,6 +13,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
 import { StorageCleanupControls } from "../storage-maintenance";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
+import { pageShellMax4xl } from "../../shell/page-shell";
 
 const linkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
@@ -62,7 +63,7 @@ export async function StaffStorageObjectScreen({ params }: { params: Promise<{ i
   if (missing) notFound();
   if (!item) {
     return (
-      <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8">
+      <div className={pageShellMax4xl}>
         <Link href="/admin/storage" className={linkClass}>
           {copy.inventory}
         </Link>
@@ -83,7 +84,7 @@ export async function StaffStorageObjectScreen({ params }: { params: Promise<{ i
     (item.state === "retired" &&
       (!item.leaseExpiresAt || item.leaseExpiresAt.getTime() <= Date.now()));
   return (
-    <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8">
+    <div className={pageShellMax4xl}>
       <Link href="/admin/storage" className={linkClass}>
         {copy.inventory}
       </Link>

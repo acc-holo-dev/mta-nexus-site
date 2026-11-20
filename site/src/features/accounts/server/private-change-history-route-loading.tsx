@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { privateChangeHistoryCopy } from "../private-change-history-copy";
+import { pageShellMax5xlDense } from "../../shell/page-shell";
 
 type Copy = ReturnType<typeof privateChangeHistoryCopy>;
 type StringKey = {
@@ -13,7 +14,7 @@ export function PrivateChangeHistoryRouteLoading({
   loadingKey = "loading",
   title,
   loading,
-  className = "mx-auto min-w-0 max-w-5xl space-y-4 overflow-x-clip py-8",
+  className = pageShellMax5xlDense,
   headerClassName,
   titleClassName,
   statusClassName,

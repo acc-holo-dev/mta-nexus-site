@@ -1,12 +1,13 @@
 import type { ReactNode } from "react";
 import { DictionaryRouteLoading } from "../../shell/route-honest-loading-server";
+import { pageShellMax5xl } from "../../shell/page-shell";
 
 type AuthorResourcesTitleKey = "title" | "edit";
 
 export function AuthorResourcesRouteLoading({
   headingId,
   titleKey = "title",
-  className = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8",
+  className = pageShellMax5xl,
   headerClassName,
   statusClassName,
   rows = 4,

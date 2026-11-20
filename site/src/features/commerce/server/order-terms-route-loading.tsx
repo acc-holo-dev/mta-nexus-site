@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { orderTermsCopy } from "../order-terms-i18n";
+import { pageShellMax5xl } from "../../shell/page-shell";
 
 type Copy = ReturnType<typeof orderTermsCopy>;
 type StringKey = {
@@ -13,7 +14,7 @@ export function OrderTermsRouteLoading({
   loadingKey = "termsLoading",
   title,
   loading,
-  className = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8",
+  className = pageShellMax5xl,
   headerClassName,
   titleClassName,
   statusClassName,

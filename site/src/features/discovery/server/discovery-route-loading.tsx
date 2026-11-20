@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { discoveryCopy } from "../discovery-copy";
+import { pageShellStack6 } from "../../shell/page-shell";
 
 type Copy = ReturnType<typeof discoveryCopy>;
 type StringKey = {
@@ -13,7 +14,7 @@ export function DiscoveryRouteLoading({
   loadingKey = "organizationsLoading",
   title,
   loading,
-  className = "min-w-0 space-y-6 overflow-x-clip",
+  className = pageShellStack6,
   headerClassName,
   titleClassName,
   statusClassName,

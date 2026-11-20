@@ -16,6 +16,7 @@ import { LibrarySelectionBatchControls } from "../components/library-selection-b
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionId, collectionPageParams, collectionsQuery } from "../library-collections-query";
 import { librarySelectionBatchesCopy } from "../library-selection-batches-i18n";
+import { pageShellMax5xl } from "../../shell/page-shell";
 export async function librarySelectionBatchMetadata(): Promise<Metadata> {
   return {
     title: `${librarySelectionBatchesCopy(await getRequestLocale()).history} | MTA NEXUS`,
@@ -67,7 +68,7 @@ export async function LibrarySelectionBatchScreen({
   }
   if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   const loadFailure = (retryHref: string) => (
-    <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+    <div className={pageShellMax5xl}>
       <h1 className="font-display">{history ? c.history : c.title}</h1>
       <ErrorState
         title={c.loadUnavailable}
@@ -97,7 +98,7 @@ export async function LibrarySelectionBatchScreen({
         });
       if (!result) return loadFailure(retryHref);
       return (
-        <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+        <div className={pageShellMax5xl}>
           <Link
             href={base}
             className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -180,7 +181,7 @@ export async function LibrarySelectionBatchScreen({
     const pageHref = (page: number) =>
       `${base}?${new URLSearchParams({ page: String(page), ...(result.q ? { q: result.q } : {}) })}`;
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+      <div className={pageShellMax5xl}>
         <Link
           href={`/workspace/library/collections/${encodeURIComponent(id)}`}
           className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

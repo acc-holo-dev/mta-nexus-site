@@ -9,6 +9,7 @@ import { ArticleCard } from "../article-view";
 import { ContentCatalogControls, ContentPageNavigation } from "../catalog-controls";
 import { contentPageHref, editorialTypes, parseContentPage } from "../user-platform-contract";
 import { getUserPlatformCopy } from "../user-platform-copy";
+import { pageShellStack8 } from "../../shell/page-shell";
 
 export async function generateMetadata() {
   const copy = getDictionary(await getRequestLocale()).articles;
@@ -29,7 +30,7 @@ export default async function ArticlesPage({
   const filtersActive = Boolean(filters.query || filters.type);
 
   return (
-    <div className="min-w-0 space-y-8 overflow-x-clip">
+    <div className={pageShellStack8}>
       <PageHeader
         title={dictionary.articles.title}
         description={dictionary.articles.description}

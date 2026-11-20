@@ -47,3 +47,9 @@ export const pageShellMaxMdAuthTall = "mx-auto min-w-0 max-w-md space-y-6 overfl
 
 export const pageShellMax2xl =
   "mx-auto min-w-0 max-w-2xl space-y-5 overflow-x-clip px-4 py-8 sm:px-0";
+
+export const pageShellMax4xlDense = "mx-auto min-w-0 max-w-4xl space-y-4 overflow-x-clip py-8";
+
+export const pageShellMax5xlDense = "mx-auto min-w-0 max-w-5xl space-y-4 overflow-x-clip py-8";
+
+export const pageShellMax6xlDense = "mx-auto min-w-0 max-w-6xl space-y-4 overflow-x-clip py-8";

@@ -20,6 +20,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { ResourceModerationControls } from "../moderation-controls";
 import { resourceMediaCopy } from "../resource-media-i18n";
 import { resourceRequirementsCopy } from "../resource-requirements-i18n";
+import { pageShellMax4xl } from "../../shell/page-shell";
 
 export async function staffResourceDetailMetadata(): Promise<Metadata> {
   return {
@@ -78,7 +79,7 @@ export async function StaffResourceDetailScreen({
   if (missing) notFound();
   if (!result) {
     return (
-      <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8">
+      <div className={pageShellMax4xl}>
         <Link
           href="/admin/resources"
           className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -104,7 +105,7 @@ export async function StaffResourceDetailScreen({
   const linkClass =
     "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
   return (
-    <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8">
+    <div className={pageShellMax4xl}>
       <Link href="/admin/resources" className={linkClass}>
         {copy.moderation}
       </Link>

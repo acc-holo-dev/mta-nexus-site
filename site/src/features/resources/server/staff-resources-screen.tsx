@@ -16,6 +16,7 @@ import {
 } from "../../library/resource-release-control-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
+import { pageShellMax5xl } from "../../shell/page-shell";
 
 const statuses = ["draft", "pending_review", "published", "suspended", "archived"] as const;
 
@@ -82,7 +83,7 @@ export async function StaffResourcesScreen({
 
   if (!result) {
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+      <div className={pageShellMax5xl}>
         <Link
           href="/admin"
           className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -106,7 +107,7 @@ export async function StaffResourcesScreen({
   }
 
   return (
-    <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+    <div className={pageShellMax5xl}>
       <Link
         href="/admin"
         className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

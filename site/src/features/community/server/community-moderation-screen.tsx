@@ -26,6 +26,7 @@ import { ContentModerationControls } from "../content-moderation";
 import { moderatedDiscussionCopy } from "../moderated-discussion-copy";
 import { PUBLICATION_TYPES } from "../publication-feed-contract";
 import { platformFieldClass } from "../user-platform-client";
+import { pageShellMax4xlTight, pageShellStack6 } from "../../shell/page-shell";
 
 const focusLink =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
@@ -132,7 +133,7 @@ export async function CommunityModerationScreen({
       );
     const { item, history, nextCursor } = parsed.data;
     return (
-      <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip">
+      <div className={pageShellMax4xlTight}>
         <Link className={focusLink} href="/admin/community">
           {copy.back}
         </Link>
@@ -262,7 +263,7 @@ export async function CommunityModerationScreen({
       (filters.query || filters.author || filters.status || filters.type || filters.cursor),
   );
   return (
-    <div className="min-w-0 space-y-6 overflow-x-clip">
+    <div className={pageShellStack6}>
       <header className="min-w-0 space-y-2">
         <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
         <p className="text-sm text-muted">{copy.description}</p>

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { profilePrivacyCopy } from "../profile-privacy-copy";
+import { pageShellMax3xl } from "../../shell/page-shell";
 
 type Copy = ReturnType<typeof profilePrivacyCopy>;
 type StringKey = {
@@ -13,7 +14,7 @@ export function ProfilePrivacyRouteLoading({
   loadingKey = "loading",
   title,
   loading,
-  className = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8",
+  className = pageShellMax3xl,
   headerClassName,
   titleClassName,
   statusClassName,

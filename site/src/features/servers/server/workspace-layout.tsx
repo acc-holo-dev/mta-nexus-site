@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { ServerWorkspaceNav } from "../workspace-navigation";
+import { pageShellStack6 } from "../../shell/page-shell";
 
 export async function ServerWorkspaceLayout({
   children,
@@ -12,7 +13,7 @@ export async function ServerWorkspaceLayout({
   const [{ id }, locale] = await Promise.all([params, getRequestLocale()]);
 
   return (
-    <div className="min-w-0 space-y-6 overflow-x-clip">
+    <div className={pageShellStack6}>
       <ServerWorkspaceNav serverId={id} locale={locale} />
       {children}
     </div>

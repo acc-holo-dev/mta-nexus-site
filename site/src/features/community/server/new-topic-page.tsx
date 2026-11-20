@@ -5,6 +5,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSessionError } from "../../shell/session-error";
 import { CommunityTopicForm } from "../topic-form";
+import { pageShellMax3xl } from "../../shell/page-shell";
 
 export default async function NewCommunityTopicPage() {
   const locale = await getRequestLocale();
@@ -24,7 +25,7 @@ export default async function NewCommunityTopicPage() {
   }
 
   return (
-    <div className="mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8">
+    <div className={pageShellMax3xl}>
       <div className="min-w-0 space-y-1.5">
         <Link
           href="/community"

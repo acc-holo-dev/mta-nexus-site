@@ -13,6 +13,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { formatFinancialMinor } from "../financial-i18n";
 import { sellerSalesCopy, sellerSalesTime } from "../seller-sales-i18n";
 import { sellerSalesDetailQuery, sellerSalesUrl } from "../seller-sales-query";
+import { pageShellMax3xl } from "../../shell/page-shell";
 
 const linkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
@@ -79,7 +80,7 @@ export async function SellerSalesReportDetailScreen({
   });
   if (!result) {
     return (
-      <div className="mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8">
+      <div className={pageShellMax3xl}>
         <Link
           href={sellerSalesUrl({
             page: 1,
@@ -107,7 +108,7 @@ export async function SellerSalesReportDetailScreen({
   }
   const { sale, scope } = result;
   return (
-    <div className="mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8">
+    <div className={pageShellMax3xl}>
       <Link
         href={sellerSalesUrl({
           page: 1,

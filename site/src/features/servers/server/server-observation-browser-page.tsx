@@ -14,7 +14,7 @@ import {
 } from "../../../lib/services/servers/server-statistics-service";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { pageShellMax6xl as pageShellClass } from "../../shell/page-shell";
+import { pageShellMax6xl as pageShellClass, pageShellMax6xlDense } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -385,7 +385,7 @@ function ServerObservationBrowserPanel({
 export async function ServerObservationBrowserLoading() {
   return LocaleCopyRouteLoading({
     headingId: "server-observations-loading-heading",
-    className: "mx-auto min-w-0 max-w-6xl space-y-4 overflow-x-clip py-8",
+    className: pageShellMax6xlDense,
     rows: 0,
     leading: <div className="h-40 rounded-lg bg-inset" />,
     load: (locale) => {

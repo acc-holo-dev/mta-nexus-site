@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { ownDiscussionCopy } from "../discussion-workspace-copy";
+import { pageShellMax4xl } from "../../shell/page-shell";
 
 type Copy = ReturnType<typeof ownDiscussionCopy>;
 type StringKey = {
@@ -13,7 +14,7 @@ export function DiscussionWorkspaceRouteLoading({
   loadingKey = "loading",
   title,
   loading,
-  className = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8",
+  className = pageShellMax4xl,
   headerClassName,
   titleClassName,
   statusClassName,

@@ -18,7 +18,7 @@ import { ProductCard } from "../../resources/view";
 import { trustCopy } from "../../trust/public-user-trust-copy";
 import { DeveloperExperience } from "../developer-experience";
 import { ProfileResourcePagination, parseProfilePage } from "../profile-pagination";
-import { pageShellStack10 as pageShellClass } from "../../shell/page-shell";
+import { pageShellStack10 as pageShellClass, pageShellStack6 } from "../../shell/page-shell";
 
 const actionLinkClass =
   "inline-flex min-h-11 items-center rounded-md px-0.5 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
@@ -76,7 +76,7 @@ export async function DeveloperProfileScreen({
 
   if (loadError || !loaded) {
     return (
-      <div className="min-w-0 space-y-6 overflow-x-clip">
+      <div className={pageShellStack6}>
         <ErrorState
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
@@ -174,7 +174,7 @@ export async function DeveloperProfileScreen({
       </section>
 
       <DeveloperExperience profile={professional} locale={locale} />
-      <section id="resources" className="min-w-0 space-y-6 overflow-x-clip">
+      <section id="resources" className={pageShellStack6}>
         <h2 className="font-heading text-primary">
           {copy.releasesBy} {user.displayName}
         </h2>

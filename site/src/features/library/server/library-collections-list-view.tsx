@@ -20,6 +20,7 @@ import {
   type LibraryCollectionsQuery,
   libraryCollectionsLinkClass,
 } from "./library-collections-screen-shared";
+import { pageShellMax4xl } from "../../shell/page-shell";
 
 export async function LibraryCollectionsListView({
   locale,
@@ -40,7 +41,7 @@ export async function LibraryCollectionsListView({
   const result = await service.page(actor, query).catch(() => null);
   if (!result) {
     return (
-      <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8">
+      <div className={pageShellMax4xl}>
         <Link href="/workspace/library" className={libraryCollectionsLinkClass}>
           {c.library}
         </Link>
@@ -60,7 +61,7 @@ export async function LibraryCollectionsListView({
     );
   }
   return (
-    <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8">
+    <div className={pageShellMax4xl}>
       <Link href="/workspace/library" className={libraryCollectionsLinkClass}>
         {c.library}
       </Link>

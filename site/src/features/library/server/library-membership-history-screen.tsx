@@ -24,6 +24,7 @@ import {
   membershipHistoryHref,
 } from "../library-membership-history-query";
 import { LibraryMembershipHistoryEntry } from "./library-membership-history-item";
+import { pageShellMax5xl } from "../../shell/page-shell";
 export async function libraryMembershipHistoryMetadata(): Promise<Metadata> {
   return {
     title: `${libraryMembershipHistoryCopy(await getRequestLocale()).title} | MTA NEXUS`,
@@ -94,7 +95,7 @@ export async function LibraryMembershipHistoryScreen({
       if (missingReceipt) notFound();
       if (!receipt) {
         return (
-          <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+          <div className={pageShellMax5xl}>
             <Link
               href={membershipHistoryHref()}
               className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -118,7 +119,7 @@ export async function LibraryMembershipHistoryScreen({
         );
       }
       return (
-        <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+        <div className={pageShellMax5xl}>
           <Link
             href={membershipHistoryHref()}
             className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -144,7 +145,7 @@ export async function LibraryMembershipHistoryScreen({
       });
     if (!result) {
       return (
-        <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+        <div className={pageShellMax5xl}>
           <h1 className="font-display">{m.title}</h1>
           <ErrorState
             title={m.loadUnavailable}
@@ -168,7 +169,7 @@ export async function LibraryMembershipHistoryScreen({
       Boolean(result.productId) ||
       result.days !== 30;
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+      <div className={pageShellMax5xl}>
         <nav className="flex flex-wrap gap-4 text-sm" aria-label={m.title}>
           <Link
             href={collectionHref()}
@@ -312,7 +313,7 @@ export async function LibraryMembershipHistoryScreen({
     if (error instanceof Error && error.message === "NEXT_NOT_FOUND") throw error;
     if (!(error instanceof AppError)) {
       return (
-        <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+        <div className={pageShellMax5xl}>
           <ErrorState
             title={m.loadUnavailable}
             description={m.loadUnavailableDescription}
@@ -331,7 +332,7 @@ export async function LibraryMembershipHistoryScreen({
     if (error.statusCode === 404) notFound();
     const title = libraryCollectionError(locale, error.code);
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+      <div className={pageShellMax5xl}>
         <ErrorState
           title={title}
           description={title === c.retry ? m.loadUnavailableDescription : undefined}

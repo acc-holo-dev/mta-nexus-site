@@ -32,6 +32,7 @@ import {
   AdminReportsSection,
   AdminVerificationQueueSection,
 } from "../admin-home";
+import { pageShellStack6, pageShellStack8 } from "../../shell/page-shell";
 
 export async function adminHomeMetadata(): Promise<Metadata> {
   return {
@@ -158,7 +159,7 @@ export async function AdminHomeScreen({
 
   if (!loaded) {
     return (
-      <div className="min-w-0 space-y-6 overflow-x-clip">
+      <div className={pageShellStack6}>
         <ErrorState
           title={copy.hubUnavailable}
           description={copy.hubUnavailableHint}
@@ -215,7 +216,7 @@ export async function AdminHomeScreen({
     "inline-flex min-h-11 items-center rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
   return (
-    <div className="min-w-0 space-y-8 overflow-x-clip">
+    <div className={pageShellStack8}>
       <header className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <div className="min-w-0">
           <h1 className="flex items-center gap-2.5 font-display text-primary">

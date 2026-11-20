@@ -1,5 +1,6 @@
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { publicationCopy } from "../publication-feed-copy";
+import { pageShellMax5xl } from "../../shell/page-shell";
 
 type PublicationFeedLoadingHeading = "title" | "activity" | "serverTitle";
 
@@ -10,7 +11,7 @@ export async function PublicationFeedLoading({
 } = {}) {
   return LocaleCopyRouteLoading({
     headingId: "publication-feed-loading-heading",
-    className: "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8",
+    className: pageShellMax5xl,
     titleClassName: "text-2xl font-bold text-primary",
     rowClassName: "h-24 rounded bg-inset",
     leading: <div className="h-10 rounded bg-inset" />,

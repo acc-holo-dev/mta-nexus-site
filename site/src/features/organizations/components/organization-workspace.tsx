@@ -28,6 +28,7 @@ import { getOrganizationCopy } from "../organization-workspace-copy";
 import { OrganizationMemberEditor } from "./organization-member-editor";
 import { OrganizationOwnershipTransfer } from "./organization-ownership-transfer";
 import { OrganizationProfileForm } from "./organization-profile-form";
+import { pageShellStack6 } from "../../shell/page-shell";
 
 export function OrganizationWorkspacePanel({
   initial,
@@ -202,7 +203,7 @@ export function OrganizationWorkspacePanel({
   const navLinkClass =
     "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
   return (
-    <div className="min-w-0 space-y-6 overflow-x-clip">
+    <div className={pageShellStack6}>
       <Link
         href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/team`}
         className={navLinkClass}

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
+import { pageShellMax5xl } from "../../shell/page-shell";
 
 type Copy = ReturnType<typeof getResourceReleaseControlCopy>;
 type StringKey = {
@@ -13,7 +14,7 @@ export function ResourceReleaseControlRouteLoading({
   loadingKey = "moderationLoading",
   title,
   loading,
-  className = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8",
+  className = pageShellMax5xl,
   headerClassName,
   titleClassName,
   statusClassName,

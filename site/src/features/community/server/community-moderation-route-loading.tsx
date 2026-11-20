@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { moderationCopy } from "../community-moderation-copy";
+import { pageShellMax4xlTight } from "../../shell/page-shell";
 
 type Copy = ReturnType<typeof moderationCopy>;
 type StringKey = {
@@ -13,7 +14,7 @@ export function CommunityModerationRouteLoading({
   loadingKey = "loading",
   title,
   loading,
-  className = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip",
+  className = pageShellMax4xlTight,
   headerClassName,
   titleClassName,
   statusClassName,

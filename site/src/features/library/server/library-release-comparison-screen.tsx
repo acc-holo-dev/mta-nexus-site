@@ -14,6 +14,7 @@ import { LibraryReleaseComparisonSelection } from "../components/library-release
 import { collectionPageParams } from "../library-collections-query";
 import { libraryReleaseComparisonCopy } from "../library-release-comparison-i18n";
 import { libraryReleaseComparisonQuery } from "../library-release-comparison-query";
+import { pageShellMax5xl } from "../../shell/page-shell";
 export async function libraryReleaseComparisonMetadata(): Promise<Metadata> {
   return {
     title: `${libraryReleaseComparisonCopy(await getRequestLocale()).title} | MTA NEXUS`,
@@ -77,7 +78,7 @@ export async function LibraryReleaseComparisonScreen({
     });
   if (!result) {
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+      <div className={pageShellMax5xl}>
         <Link
           href={`/workspace/library/${encodeURIComponent(path.id)}/versions?page=${query.returnPage}`}
           className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -114,7 +115,7 @@ export async function LibraryReleaseComparisonScreen({
     [c.signed, result.from.isSigned ? c.yes : c.no, result.to.isSigned ? c.yes : c.no],
   ];
   return (
-    <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+    <div className={pageShellMax5xl}>
       <Link
         href={`${base}?page=${query.returnPage}`}
         className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

@@ -27,6 +27,7 @@ import {
 import { SupportCaseActions } from "./support-case-actions";
 import { type SupportFormObjectContext, supportObjectContextHref } from "./support-center";
 import { SupportStatusHistory } from "./support-status-history";
+import { pageShellMax4xlTight } from "../../shell/page-shell";
 
 export function SupportCaseThread({
   caseId,
@@ -299,7 +300,7 @@ export function SupportCaseThread({
   if (loading) {
     return (
       <HonestLoadingShell
-        className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip"
+        className={pageShellMax4xlTight}
         headingId="support-case-thread-loading-heading"
         title={copy.title}
         loadingLabel={copy.caseLoading}
@@ -349,7 +350,7 @@ export function SupportCaseThread({
   }
 
   return (
-    <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip">
+    <div className={pageShellMax4xlTight}>
       <Link
         href={backHref}
         className="inline-flex min-h-11 items-center gap-1 text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

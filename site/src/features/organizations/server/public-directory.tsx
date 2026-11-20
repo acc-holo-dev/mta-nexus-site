@@ -2,6 +2,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { DirectoryFilters, DirectoryResults } from "../../discovery/directory-server";
 import { parseDiscoverQuery } from "../../discovery/discover-query";
 import { discoveryCopy } from "../../discovery/discovery-copy";
+import { pageShellStack6 } from "../../shell/page-shell";
 export async function generateMetadata() {
   const copy = discoveryCopy(await getRequestLocale());
   return { title: copy.organizationsTitle, description: copy.organizationsDescription };
@@ -16,7 +17,7 @@ export default async function OrganizationsPage({
   const state = parseDiscoverQuery({ ...(await searchParams), type: "organizations" });
   const results = await DirectoryResults({ state, locale, path: "/organizations" });
   return (
-    <div className="min-w-0 space-y-6 overflow-x-clip">
+    <div className={pageShellStack6}>
       <header className="border-b border-base pb-6">
         <h1 className="text-2xl font-extrabold text-primary">{copy.organizationsTitle}</h1>
         <p className="mt-2 text-sm text-muted">{copy.organizationsDescription}</p>

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { getManagedServerCopy } from "../managed-server-view";
+import { pageShellMax6xl } from "../../shell/page-shell";
 
 type Copy = ReturnType<typeof getManagedServerCopy>;
 type StringKey = {
@@ -13,7 +14,7 @@ export function ManagedServerRouteLoading({
   loadingKey = "loading",
   title,
   loading,
-  className = "mx-auto min-w-0 max-w-6xl space-y-6 overflow-x-clip py-8",
+  className = pageShellMax6xl,
   headerClassName,
   titleClassName,
   statusClassName,

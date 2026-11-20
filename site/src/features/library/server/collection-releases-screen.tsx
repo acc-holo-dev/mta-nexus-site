@@ -22,6 +22,7 @@ import { collectionHref, collectionId, collectionPageParams } from "../library-c
 import { librarySelectionBatchesCopy } from "../library-selection-batches-i18n";
 import { LibraryReleaseFollowLatest } from "../release-follow";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
+import { pageShellMax5xl } from "../../shell/page-shell";
 export async function collectionReleasesMetadata(): Promise<Metadata> {
   return {
     title: `${collectionReleasesCopy(await getRequestLocale()).title} | MTA NEXUS`,
@@ -89,7 +90,7 @@ export async function CollectionReleasesScreen({
   })}`;
   if (!result) {
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+      <div className={pageShellMax5xl}>
         <Link
           href={collectionHref(path.id)}
           className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -121,7 +122,7 @@ export async function CollectionReleasesScreen({
   const href = (page: number, filter = result.filter) =>
     `${collectionHref(path.id, "releases")}?${suffix(page, filter)}`;
   return (
-    <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+    <div className={pageShellMax5xl}>
       <Link
         href={collectionHref(path.id)}
         className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

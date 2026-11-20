@@ -8,6 +8,7 @@ import { ContentCatalogControls, ContentPageNavigation } from "../catalog-contro
 import { publicationCopy } from "../publication-feed-copy";
 import { communityTypes, contentPageHref, parseContentPage } from "../user-platform-contract";
 import { getUserPlatformCopy } from "../user-platform-copy";
+import { pageShellStack6 } from "../../shell/page-shell";
 
 export async function generateMetadata() {
   const copy = getDictionary(await getRequestLocale()).community;
@@ -29,7 +30,7 @@ export default async function CommunityPage({
   const filtersActive = Boolean(filters.query || filters.type || filters.page > 1);
 
   return (
-    <div className="min-w-0 space-y-6 overflow-x-clip">
+    <div className={pageShellStack6}>
       <header className="flex flex-col justify-between gap-4 border-b border-base pb-5 sm:flex-row sm:items-center">
         <div className="min-w-0">
           <h1 className="flex items-center gap-2 font-display text-primary">

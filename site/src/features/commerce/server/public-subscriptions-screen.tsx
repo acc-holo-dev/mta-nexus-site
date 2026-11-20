@@ -10,8 +10,9 @@ import { getCommercialCopy } from "../commercial-i18n";
 import { CommercialFeeCalculator } from "../commercial-plans";
 import { planReviewsCopy } from "../plan-reviews-i18n";
 import { subscriptionsCopy } from "../subscriptions-i18n";
+import { pageShellMax5xl } from "../../shell/page-shell";
 
-const shellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
+const shellClass = pageShellMax5xl;
 const linkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 const scopeLinkClass =

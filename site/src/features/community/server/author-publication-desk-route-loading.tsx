@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { authorPublicationDeskCopy } from "../author-publication-desk-copy";
+import { pageShellMax5xlTight } from "../../shell/page-shell";
 
 type Copy = ReturnType<typeof authorPublicationDeskCopy>;
 type StringKey = {
@@ -13,7 +14,7 @@ export function AuthorPublicationDeskRouteLoading({
   loadingKey = "loading",
   title,
   loading,
-  className = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip",
+  className = pageShellMax5xlTight,
   headerClassName,
   titleClassName,
   statusClassName,

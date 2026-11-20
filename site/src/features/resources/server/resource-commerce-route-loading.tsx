@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { getResourceCommerceCopy } from "../resource-commerce-i18n";
+import { pageShellMax4xl } from "../../shell/page-shell";
 
 type Copy = ReturnType<typeof getResourceCommerceCopy>;
 type StringKey = {
@@ -13,7 +14,7 @@ export function ResourceCommerceRouteLoading({
   loadingKey = "loading",
   title,
   loading,
-  className = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8",
+  className = pageShellMax4xl,
   headerClassName,
   titleClassName,
   statusClassName,

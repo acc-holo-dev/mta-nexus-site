@@ -18,6 +18,7 @@ import {
 import { commercialTerms } from "../commercial-confirmation";
 import { getCommercialCopy } from "../commercial-i18n";
 import { CommercialPlanForm } from "../commercial-plans";
+import { pageShellMax4xl } from "../../shell/page-shell";
 
 const linkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
@@ -81,7 +82,7 @@ export async function CommercialPlanAdminDetailScreen({
   if (missing) notFound();
   if (!result) {
     return (
-      <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8">
+      <div className={pageShellMax4xl}>
         <Link href="/admin/commerce/plans" className={linkClass}>
           {copy.back}
         </Link>
@@ -107,7 +108,7 @@ export async function CommercialPlanAdminDetailScreen({
     revision: plan.revision,
   };
   return (
-    <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8">
+    <div className={pageShellMax4xl}>
       <Link href="/admin/commerce/plans" className={linkClass}>
         {copy.back}
       </Link>

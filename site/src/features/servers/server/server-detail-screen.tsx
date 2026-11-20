@@ -31,6 +31,7 @@ import { ServerReviewPanel } from "../review-controls";
 import { parseServerHistoryWindow } from "../server-history-window";
 import { serverStatisticsCopy } from "../server-statistics-copy";
 import { ServerUpdatesPanel } from "../updates-server";
+import { pageShellStack8 } from "../../shell/page-shell";
 
 const getServer = cache((slug: string) => serverService.getServerBySlug(slug));
 
@@ -158,7 +159,7 @@ export async function ServerDetailScreen({
     : "bg-[var(--nexus-text-faint)]";
 
   return (
-    <div className="min-w-0 space-y-8 overflow-x-clip">
+    <div className={pageShellStack8}>
       <div className="flex min-w-0 items-center gap-2 text-xs text-muted">
         <Link href="/servers" className="transition-colors hover:text-primary">
           {copy.breadcrumb}

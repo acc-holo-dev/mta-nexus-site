@@ -13,6 +13,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { sellerSalesCopy } from "../seller-sales-i18n";
 import { sellerSalesPageQuery } from "../seller-sales-query";
 import { SellerSalesReportView } from "./seller-sales-report";
+import { pageShellMax6xl, pageShellMax6xlDense } from "../../shell/page-shell";
 
 const linkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
@@ -66,7 +67,7 @@ export async function SellerSalesReportScreen({ query }: { query: Query }) {
     ]);
     if (!report || !scopes) {
       return (
-        <div className="mx-auto min-w-0 max-w-6xl space-y-6 overflow-x-clip py-8">
+        <div className={pageShellMax6xl}>
           <Link href="/workspace/sales" className={linkClass}>
             {c.back}
           </Link>
@@ -90,7 +91,7 @@ export async function SellerSalesReportScreen({ query }: { query: Query }) {
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && error.statusCode === 400)
       return (
-        <section className="mx-auto min-w-0 max-w-6xl space-y-4 overflow-x-clip py-8">
+        <section className={pageShellMax6xlDense}>
           <ErrorState
             title={c.invalid}
             description={c.invalidDescription}
@@ -103,7 +104,7 @@ export async function SellerSalesReportScreen({ query }: { query: Query }) {
         </section>
       );
     return (
-      <div className="mx-auto min-w-0 max-w-6xl space-y-6 overflow-x-clip py-8">
+      <div className={pageShellMax6xl}>
         <Link href="/workspace/sales" className={linkClass}>
           {c.back}
         </Link>

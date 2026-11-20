@@ -10,6 +10,7 @@ import { productService } from "../../../lib/services/commerce/product-service";
 import { MARKET_PAGE_SIZE, MAX_MARKET_PAGE, marketHref, parseMarketQuery } from "../model";
 import { PRODUCT_CATEGORY_KEYS } from "../product-type-labels";
 import { ProductCard } from "../view";
+import { pageShellStack6 } from "../../shell/page-shell";
 
 const CATEGORIES = [
   { id: "all", key: "all" },
@@ -84,7 +85,7 @@ export async function MarketPage({
   const activeQueryLabel = query ? `${dictionary.market.searchLabel}: ${query}` : null;
 
   return (
-    <div className="min-w-0 space-y-6 overflow-x-clip">
+    <div className={pageShellStack6}>
       <div className="flex min-w-0 flex-col justify-between gap-3 pb-1 md:flex-row md:items-center">
         <div className="min-w-0">
           <h1 className="flex min-w-0 items-center gap-2.5 font-display text-primary">

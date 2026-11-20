@@ -18,6 +18,7 @@ import {
   parseNotificationInboxQuery,
 } from "../notification-inbox-contract";
 import { notificationInboxCopy, notificationInboxError } from "../notification-inbox-copy";
+import { pageShellMax4xlTight } from "../../shell/page-shell";
 export async function generateMetadata() {
   const copy = notificationInboxCopy(await getRequestLocale());
   return {
@@ -77,7 +78,7 @@ export default async function NotificationCenterPage({
     }
   })();
   return (
-    <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip">
+    <div className={pageShellMax4xlTight}>
       <header className="space-y-3 border-b border-base pb-6">
         <Link
           href="/workspace"

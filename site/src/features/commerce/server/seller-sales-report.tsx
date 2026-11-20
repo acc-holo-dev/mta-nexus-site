@@ -6,6 +6,7 @@ import type { Locale } from "../../../lib/i18n";
 import { formatFinancialMinor } from "../financial-i18n";
 import { sellerSalesCopy, sellerSalesTime } from "../seller-sales-i18n";
 import { sellerSalesUrl, sellerSaleUrl } from "../seller-sales-query";
+import { pageShellMax6xl } from "../../shell/page-shell";
 
 type Scopes = { scopes: { id: string; name: string }[]; page: number; totalPages: number };
 export function SellerSalesReportView({
@@ -41,7 +42,7 @@ export function SellerSalesReportView({
     "/api/sales/export",
   );
   return (
-    <div className="mx-auto min-w-0 max-w-6xl space-y-6 overflow-x-clip py-8">
+    <div className={pageShellMax6xl}>
       <Link
         href="/workspace/sales"
         className="rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"

@@ -14,6 +14,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { StorageDiscoveryControls } from "../storage-maintenance";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 import { storageQuery } from "../storage-maintenance-query";
+import { pageShellMax5xl } from "../../shell/page-shell";
 
 const linkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
@@ -82,7 +83,7 @@ export async function StaffStorageScreen({
   const href = (page: number) => `?view=${query.view}&page=${page}`;
   if (!result) {
     return (
-      <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+      <div className={pageShellMax5xl}>
         <Link href="/admin" className={linkClass}>
           {copy.back}
         </Link>
@@ -99,7 +100,7 @@ export async function StaffStorageScreen({
     );
   }
   return (
-    <div className="mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8">
+    <div className={pageShellMax5xl}>
       <Link href="/admin" className={linkClass}>
         {copy.back}
       </Link>
