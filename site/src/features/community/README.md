@@ -26,6 +26,7 @@ Feature объединяет клиентское обсуждение публ�
 | `publication-reports-server.ts`                | `PublicationReportsPage`, metadata; server-only жалобы на публикацию          |
 | `catalog-controls.ts`                          | Фильтры и навигация каталога публикаций                                       |
 | `reactions.ts`                                 | `ContentReactions`; реакции на публикацию                                     |
+| `reactions-page-server.ts`                     | `ReactionsPageScreen`; server-only `/workspace/reactions`                     |
 | `reaction-removal.ts`                          | `ReactionRemoval`; снятие реакции в workspace с подтверждением                |
 | `discussion-mutation-confirmation.ts`          | `confirmsDiscussionMutation`                                                  |
 | `content-moderation.ts`                        | `ContentModerationControls`; действия модерации                               |

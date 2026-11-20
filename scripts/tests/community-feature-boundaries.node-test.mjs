@@ -146,6 +146,7 @@ test("Community rejects private imports, routing, server and infrastructure edge
     "author-edit-page",
     "author-history-page",
     "following-feed-page",
+    "reactions-page",
   ]) {
     write(`site/src/features/community/${port}-server.ts`, "export const value = 1;");
     write(
@@ -190,6 +191,7 @@ test("Community rejects private imports, routing, server and infrastructure edge
     "author-edit-page",
     "author-history-page",
     "following-feed-page",
+    "reactions-page",
   ]) {
     assert.deepEqual(rules(`app/${port}-server.ts`), []);
     assert(
@@ -228,7 +230,7 @@ test("real Community client graphs have no transitive server dependencies", () =
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/community\/(?:server(?:\.ts$|\/)|(?:reports|report-history|report-groups|moderation|moderated-discussion|discussion-reports|publication-reports|publication-feed-loading|context-history|community-page|new-topic-page|articles-page|article-page|own-discussions-page|own-discussion-page|author-desk-page|author-create-page|author-edit-page|author-history-page|following-feed-page)-server\.ts$))/u.test(
+      !/^site\/src\/(?:app\/|features\/community\/(?:server(?:\.ts$|\/)|(?:reports|report-history|report-groups|moderation|moderated-discussion|discussion-reports|publication-reports|publication-feed-loading|context-history|community-page|new-topic-page|articles-page|article-page|own-discussions-page|own-discussion-page|author-desk-page|author-create-page|author-edit-page|author-history-page|following-feed-page|reactions-page)-server\.ts$))/u.test(
         name,
       ),
       name,
@@ -293,6 +295,7 @@ test("Community report server entrypoints have isolated composition graphs", () 
     ["author-edit-page-server.ts", "author-edit-page.tsx"],
     ["author-history-page-server.ts", "author-history-page.tsx"],
     ["following-feed-page-server.ts", "following-feed-page.tsx"],
+    ["reactions-page-server.ts", "reactions-page.tsx"],
   ];
   for (const [entry, ownPage] of entries) {
     const source = `site/src/features/community/${entry}`;

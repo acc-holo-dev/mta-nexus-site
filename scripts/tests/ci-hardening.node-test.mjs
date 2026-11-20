@@ -173,6 +173,7 @@ test("product feature modules stay on fast_ci", () => {
     "site/src/features/community/author-edit-page-server.ts",
     "site/src/features/community/author-history-page-server.ts",
     "site/src/features/community/following-feed-page-server.ts",
+    "site/src/features/community/reactions-page-server.ts",
     "site/src/features/community/article-view.ts",
     "site/src/features/community/publication-feed.ts",
     "site/src/features/community/publication-feed-loading-server.ts",
