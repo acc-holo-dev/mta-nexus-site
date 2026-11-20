@@ -29,6 +29,7 @@ import { pageShellStack4, pageShellStack10 } from "../../shell/page-shell";
 import { panelSpace4P6 } from "../../shell/panel-shell";
 import {
   type3xlBlackPrimary,
+  typeFlexBetweenBorderBPy1,
   typeFlexCenterGap2BaseBoldPrimary,
   typeFlexWrapCenterGap2,
   typeHoverPrimary,
@@ -505,7 +506,7 @@ export async function ProductDetailPage({
             <div className="space-y-3 border-t border-base pt-4 text-xs">
               <h4 className="font-label uppercase text-primary">{copy.compatibility}</h4>
               <div className="space-y-2">
-                <div className="flex justify-between gap-4 border-b border-base py-1">
+                <div className={typeFlexBetweenBorderBPy1}>
                   <span className="text-muted">{copy.mtaVersion}</span>
                   <span className={typeMonoSecondary}>
                     {product.compatibility.mtaMinVersion
@@ -513,7 +514,7 @@ export async function ProductDetailPage({
                       : copy.notDeclared}
                   </span>
                 </div>
-                <div className="flex justify-between gap-4 border-b border-base py-1">
+                <div className={typeFlexBetweenBorderBPy1}>
                   <span className="text-muted">{copy.dependencies}</span>
                   <ProductDependencyList
                     declared={product.compatibility.dependencies ?? []}
@@ -521,11 +522,11 @@ export async function ProductDetailPage({
                     locale={locale}
                   />
                 </div>
-                <div className="flex justify-between gap-4 border-b border-base py-1">
+                <div className={typeFlexBetweenBorderBPy1}>
                   <span className="text-muted">{copy.libraryAdditions}</span>
                   <span className={typeMonoSecondary}>{product.salesCount}</span>
                 </div>
-                <div className="flex justify-between gap-4 border-b border-base py-1">
+                <div className={typeFlexBetweenBorderBPy1}>
                   <span className="text-muted">{copy.rating}</span>
                   {product.ratingCount > 0 ? (
                     <span className="font-mono text-warning">

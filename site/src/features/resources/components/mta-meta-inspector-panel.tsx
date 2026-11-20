@@ -17,6 +17,8 @@ import {
   typeLabelUpperFaint,
   typeMonoSecondary,
   typeMt1XsLeadingMuted,
+  typeFlexMinBaselineInsetChip,
+  typeMt1LgBlackPrimary,
   typeSmBoldPrimary,
   typeTenFaint,
   typeTenLeadingFaint,
@@ -222,7 +224,7 @@ export function MtaMetaInspectorPanel({
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             <div className={surfaceInsetP3}>
               <div className={typeLabelUpperFaint}>{copy.scripts}</div>
-              <div className="mt-1 text-lg font-black text-primary">
+              <div className={typeMt1LgBlackPrimary}>
                 {inspection.summary.scriptCount}
               </div>
               <div className={typeTenFaint}>
@@ -234,7 +236,7 @@ export function MtaMetaInspectorPanel({
 
             <div className={surfaceInsetP3}>
               <div className={typeLabelUpperFaint}>{copy.files}</div>
-              <div className="mt-1 text-lg font-black text-primary">
+              <div className={typeMt1LgBlackPrimary}>
                 {inspection.summary.fileCount}
               </div>
               {inspection.summary.mapCount > 0 && (
@@ -246,7 +248,7 @@ export function MtaMetaInspectorPanel({
 
             <div className={surfaceInsetP3}>
               <div className={typeLabelUpperFaint}>{copy.dependencies}</div>
-              <div className="mt-1 text-lg font-black text-primary">
+              <div className={typeMt1LgBlackPrimary}>
                 {inspection.summary.dependencyCount}
               </div>
               {(inspection.summary.settingCount ?? 0) > 0 && (
@@ -258,7 +260,7 @@ export function MtaMetaInspectorPanel({
 
             <div className={surfaceInsetP3}>
               <div className={typeLabelUpperFaint}>{copy.exports}</div>
-              <div className="mt-1 text-lg font-black text-primary">
+              <div className={typeMt1LgBlackPrimary}>
                 {inspection.summary.exportCount}
               </div>
               {inspection.summary.httpExportCount > 0 ? (
@@ -360,7 +362,7 @@ export function MtaMetaInspectorPanel({
                 ).map(({ key, item: entry }) => (
                   <li
                     key={key}
-                    className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1 rounded-md border border-base bg-inset px-2.5 py-2 text-xs"
+                    className={typeFlexMinBaselineInsetChip}
                   >
                     <code className={typeBreakAllSecondary}>
                       {entry.src || copy.scriptSourceMissing}
@@ -466,7 +468,7 @@ export function MtaMetaInspectorPanel({
                 ).map(({ key, item: entry }) => (
                   <li
                     key={key}
-                    className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1 rounded-md border border-base bg-inset px-2.5 py-2 text-xs"
+                    className={typeFlexMinBaselineInsetChip}
                   >
                     <code className={typeBreakAllSecondary}>
                       {entry.name || copy.settingNameMissing}
@@ -507,7 +509,7 @@ export function MtaMetaInspectorPanel({
                 ).map(({ key, item: right }) => (
                   <li
                     key={key}
-                    className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1 rounded-md border border-base bg-inset px-2.5 py-2 text-xs"
+                    className={typeFlexMinBaselineInsetChip}
                   >
                     <code className={typeBreakAllSecondary}>
                       {right.name || copy.aclRightNameMissing}
@@ -548,7 +550,7 @@ export function MtaMetaInspectorPanel({
                 ).map(({ key, item: entry }) => (
                   <li
                     key={key}
-                    className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1 rounded-md border border-base bg-inset px-2.5 py-2 text-xs"
+                    className={typeFlexMinBaselineInsetChip}
                   >
                     <code className={typeBreakAllSecondary}>
                       {entry.function || copy.exportFunctionNameMissing}

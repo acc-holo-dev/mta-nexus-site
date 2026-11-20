@@ -329,3 +329,12 @@ export const typeNowrapP2Normal = "whitespace-nowrap p-2 font-normal";
 export const typeMin24Max60BreakP2 = "min-w-24 max-w-60 break-words p-2";
 export const typeH40RoundedInset = "h-40 rounded-lg bg-inset";
 export const typeFlexFullMinEnd = "flex h-full min-w-0 flex-1 items-end";
+
+export const typeFooterNavLink =
+  "rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+export const typeMt1LgBlackPrimary = "mt-1 text-lg font-black text-primary";
+export const typeFlexMinBaselineInsetChip =
+  "flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1 rounded-md border border-base bg-inset px-2.5 py-2 text-xs";
+export const typeFlexBetweenBorderBPy1 = "flex justify-between gap-4 border-b border-base py-1";
+export const typeGridMinMaxGap15 = "grid min-w-0 max-w-full gap-1.5";
+export const typeFlexCenterBetweenGap4Py2 = "flex items-center justify-between gap-4 py-2";
