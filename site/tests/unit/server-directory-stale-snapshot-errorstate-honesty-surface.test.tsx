@@ -5,7 +5,10 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/features/servers/server/server-detail-screen.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/servers/server/server-detail-screen.tsx"),
+  "utf8",
+);
 
 it("locks server directory staleSnapshot notice to ErrorState without soft text-warning", () => {
   expect(source).toContain('import { ErrorState, TrustBadge } from "@nexus/ui"');
