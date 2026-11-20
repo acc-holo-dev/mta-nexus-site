@@ -165,11 +165,12 @@ test("Vite stays on the justified 8.3.5 override for the Vitest 5 unit toolchain
   assert.equal(readPkg(pnpmPackageDir("vite@8.3.5"), "vite/package.json").version, "8.3.5");
 });
 
-test("dependency-cruiser keeps a TypeScript 6 package extension until stable TS 7 support", () => {
+test("dependency-cruiser keeps a TypeScript 6 package extension until stable TS 7.1", () => {
   // Removal gate (do not apply until ALL are true on tip):
-  // 1) dependency-cruiser stable ≥18.8 published (18.8.0-beta-1 only as of 2026-10-31)
+  // 1) dependency-cruiser stable ≥18.8 published (18.8.0 is out; keep pin at 18.7.2
+  //    while root typescript is 7.0.x — 18.8 warns missing-tsc-transpiler on 7.0)
   // 2) root typescript resolved to ≥7.1 (public compiler API; 7.0.x is insufficient)
-  // 3) drop packageExtensions entry for dependency-cruiser
+  // 3) bump dependency-cruiser to ≥18.8 and drop packageExtensions entry
   // 4) update this pin test + pnpm-workspace.yaml
   // 5) pnpm install --frozen-lockfile && pnpm analyze:architecture && pnpm test:tooling
   assert.equal(rootPackage.devDependencies["dependency-cruiser"], "18.7.2");

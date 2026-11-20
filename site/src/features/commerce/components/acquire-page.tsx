@@ -22,6 +22,7 @@ import {
 import { skelH12W48, skelH28, skelPulseSpace4 } from "../../shell/skeleton-shell";
 import {
   typeDisplayPrimary,
+  typeFlexCenterBetweenGap4Py2,
   typeFlexMinCenterGap25Display,
   typeFlexWrapCenterJustifyGap3,
   typeIcon4Success,
@@ -351,23 +352,23 @@ function AcquireContent() {
           {copy.orderSummary}
         </h2>
         <dl className="divide-y divide-[color:var(--nexus-border)] text-sm">
-          <div className="flex items-center justify-between gap-4 py-2">
+          <div className={typeFlexCenterBetweenGap4Py2}>
             <dt className="text-muted">{copy.resource}</dt>
             <dd className="min-w-0 break-words text-right font-semibold text-primary">
               {product.title}
             </dd>
           </div>
-          <div className="flex items-center justify-between gap-4 py-2">
+          <div className={typeFlexCenterBetweenGap4Py2}>
             <dt className="text-muted">{copy.price}</dt>
             <dd className="font-numeric font-bold text-primary">{formattedPrice}</dd>
           </div>
-          <div className="flex items-center justify-between gap-4 py-2">
+          <div className={typeFlexCenterBetweenGap4Py2}>
             <dt className="text-muted">{copy.licenseModel}</dt>
             <dd className="min-w-0 break-words text-right text-primary">
               {licenseModelLabel(locale, product.licenseModel)}
             </dd>
           </div>
-          <div className="flex items-center justify-between gap-4 py-2">
+          <div className={typeFlexCenterBetweenGap4Py2}>
             <dt className="text-muted">{copy.version}</dt>
             <dd className={typeNumericPrimary}>{`v${product.currentVersion}`}</dd>
           </div>

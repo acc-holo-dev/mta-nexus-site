@@ -484,7 +484,7 @@ module.exports = {
   options: {
     tsConfig: { fileName: "tsconfig.json" },
     // SWC parses source; packageExtensions still supply TypeScript 6 for
-    // tsPreCompilationDeps until dependency-cruiser ships stable TypeScript 7 support.
+    // tsPreCompilationDeps until tip runs dependency-cruiser ≥18.8 with typescript ≥7.1.
     parser: "swc",
     tsPreCompilationDeps: true,
     doNotFollow: { path: "node_modules" },

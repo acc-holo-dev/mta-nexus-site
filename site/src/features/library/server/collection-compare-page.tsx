@@ -19,6 +19,7 @@ import {
   typeBreakSemibold,
   typeFlexMinWrapEndGap3,
   typeFlexMinWrapGap4Sm,
+  typeGridMinMaxGap15,
   typeLabelUpperSecondary,
   typeMinBreakDisplay,
   typeSmMuted,
@@ -141,7 +142,7 @@ export async function CollectionComparePage({
             action={collectionHref(id, "compare")}
             className={typeFlexMinWrapEndGap3}
           >
-            <label className="grid min-w-0 max-w-full gap-1.5">
+            <label className={typeGridMinMaxGap15}>
               <span className={typeLabelUpperSecondary}>{h.destination}</span>
               <select
                 name="to"
@@ -159,7 +160,7 @@ export async function CollectionComparePage({
             </label>
             {comparison && (
               <>
-                <label className="grid min-w-0 max-w-full gap-1.5">
+                <label className={typeGridMinMaxGap15}>
                   <span className={typeLabelUpperSecondary}>{c.all}</span>
                   <select
                     name="filter"
@@ -173,7 +174,7 @@ export async function CollectionComparePage({
                     ))}
                   </select>
                 </label>
-                <label className="grid min-w-0 max-w-full gap-1.5">
+                <label className={typeGridMinMaxGap15}>
                   <span className={typeLabelUpperSecondary}>{c.search}</span>
                   <input
                     name="q"
@@ -184,7 +185,7 @@ export async function CollectionComparePage({
                 </label>
               </>
             )}
-            <label className="grid min-w-0 max-w-full gap-1.5">
+            <label className={typeGridMinMaxGap15}>
               <span className={typeLabelUpperSecondary}>{h.transfer}</span>
               <select
                 name="transfer"

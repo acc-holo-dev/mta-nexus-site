@@ -7,11 +7,8 @@ import { getDictionary, type Locale } from "../../../lib/i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../auth-return";
 import { useAuthSession } from "../auth-session";
 import { isShellSessionLoading, showGuestSignInCta, showWorkspaceTools } from "../session";
-import { typeSpace2Muted } from "../type-shell";
+import { typeFooterNavLink, typeSpace2Muted } from "../type-shell";
 import { ShellSessionUnavailable } from "./shell-session-unavailable";
-
-const linkClass =
-  "rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 /** UX-23: workspace contribute links only after a confirmed member session. */
 export function FooterContribute({ locale }: { locale: Locale }) {
@@ -37,17 +34,17 @@ export function FooterContribute({ locale }: { locale: Locale }) {
       ) : showWorkspaceTools(session) ? (
         <ul className={typeSpace2Muted}>
           <li>
-            <Link href="/workspace/servers/new" className={linkClass}>
+            <Link href="/workspace/servers/new" className={typeFooterNavLink}>
               {dictionary.footer.registerServer}
             </Link>
           </li>
           <li>
-            <Link href="/workspace/resources/new" className={linkClass}>
+            <Link href="/workspace/resources/new" className={typeFooterNavLink}>
               {dictionary.footer.publishResource}
             </Link>
           </li>
           <li>
-            <Link href="/workspace" className={linkClass}>
+            <Link href="/workspace" className={typeFooterNavLink}>
               {dictionary.footer.workspace}
             </Link>
           </li>
@@ -55,7 +52,7 @@ export function FooterContribute({ locale }: { locale: Locale }) {
       ) : showGuestSignInCta(session) ? (
         <ul className={typeSpace2Muted}>
           <li>
-            <Link href={loginHref} className={linkClass}>
+            <Link href={loginHref} className={typeFooterNavLink}>
               {dictionary.workspace.signIn}
             </Link>
           </li>

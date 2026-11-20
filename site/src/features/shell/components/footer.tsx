@@ -1,7 +1,7 @@
 import { BrandMark } from "@nexus/ui";
 import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
-import { typeSpace2Muted } from "../type-shell";
+import { typeFooterNavLink, typeSpace2Muted } from "../type-shell";
 import { FooterContribute } from "./footer-contribute";
 
 export function Footer({ locale }: { locale: Locale }) {
@@ -18,26 +18,17 @@ export function Footer({ locale }: { locale: Locale }) {
           <h4 className="mb-3 font-label uppercase text-primary">{dictionary.footer.discover}</h4>
           <ul className={typeSpace2Muted}>
             <li>
-              <Link
-                href="/servers"
-                className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href="/servers" className={typeFooterNavLink}>
                 {dictionary.footer.liveServers}
               </Link>
             </li>
             <li>
-              <Link
-                href="/market"
-                className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href="/market" className={typeFooterNavLink}>
                 {dictionary.footer.freeResources}
               </Link>
             </li>
             <li>
-              <Link
-                href="/articles"
-                className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href="/articles" className={typeFooterNavLink}>
                 {dictionary.footer.communityUpdates}
               </Link>
             </li>
@@ -50,34 +41,19 @@ export function Footer({ locale }: { locale: Locale }) {
           {dictionary.footer.creditLine} · {dictionary.nav.openFreeBeta}
         </div>
         <div className="flex min-w-0 max-w-full flex-wrap items-center justify-center gap-x-3 gap-y-2 font-caption">
-          <Link
-            href="/support"
-            className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href="/support" className={typeFooterNavLink}>
             {dictionary.nav.support}
           </Link>
-          <Link
-            href="/terms"
-            className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href="/terms" className={typeFooterNavLink}>
             {dictionary.footer.terms}
           </Link>
-          <Link
-            href="/privacy"
-            className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href="/privacy" className={typeFooterNavLink}>
             {dictionary.footer.privacy}
           </Link>
-          <Link
-            href="/community-rules"
-            className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href="/community-rules" className={typeFooterNavLink}>
             {dictionary.footer.communityRules}
           </Link>
-          <Link
-            href="/copyright"
-            className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href="/copyright" className={typeFooterNavLink}>
             {dictionary.footer.copyright}
           </Link>
         </div>
