@@ -1,8 +1,8 @@
 # Система: продукт и подтверждённый срез
 
-**verified_at:** 16 ноября 2026 (Europe/Moscow). **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site).  
+**verified_at:** 20 ноября 2026 (Europe/Moscow). **Репозиторий:** [acc-holo-dev/mta-nexus-site](https://github.com/acc-holo-dev/mta-nexus-site).  
 **Постоянные ветки:** `dev` (интеграция) → `main` (линия выпуска). **Версия:** `1.2.0-beta.3`.  
-**verified_sha (ветка/процесс):** `748a85ea` (merge [PR #1183](https://github.com/acc-holo-dev/mta-nexus-site/pull/1183)). Исторический full CI на архитектурном merge: `c31bc8c5` / [CI #43778446076](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43778446076).
+**verified_sha (ветка/процесс):** `e2a000858` (merge [PR #1187](https://github.com/acc-holo-dev/mta-nexus-site/pull/1187)). Исторический full CI на архитектурном merge: `c31bc8c5` / [CI #43778446076](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/43778446076).
 
 Этот документ самодостаточен для ответа «что это за продукт и что уже подтверждено». Предметные детали сценариев — в `docs/current/domains/` (`RESOURCES`, `COMMUNITY`, `SERVERS-ORGS`, `TRUST-STAFF`); корневые одноимённые файлы — redirect stubs.
 
