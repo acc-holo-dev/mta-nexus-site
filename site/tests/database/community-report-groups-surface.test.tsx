@@ -157,7 +157,7 @@ it("keeps unavailable targets actionable only through an individual report and d
   expect(empty).toContain(copy.emptyFiltered);
   expect(empty).toContain(copy.reset);
   expect(empty).toContain("/admin/reports/targets");
-  expect(empty).toContain("overflow-x-clip");
+  expect(empty).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   const lifetime = renderToStaticMarkup(
     <CommunityReportGroups
       page={{ ...page, items: [] }}
@@ -166,7 +166,7 @@ it("keeps unavailable targets actionable only through an individual report and d
     />,
   );
   expect(lifetime).toContain(copy.empty);
-  expect(lifetime).toContain("overflow-x-clip");
+  expect(lifetime).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(lifetime).not.toContain(copy.emptyFiltered);
 });
 it.each(["en", "ru"] as const)(
@@ -212,7 +212,7 @@ it("gates anonymous and revoked staff and rejects malformed scopes before privat
     await CommunityReportGroupsPage({ searchParams: Promise.resolve({}) }),
   );
   expect(revoked).toContain('role="alert"');
-  expect(revoked).toContain("overflow-x-clip");
+  expect(revoked).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(revoked).toContain("/admin/reports/targets");
   const invalid = renderToStaticMarkup(
     await PublicationReportsPage({

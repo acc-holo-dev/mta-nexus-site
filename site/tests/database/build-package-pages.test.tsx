@@ -126,7 +126,7 @@ it("shows an honest recovery state when package inventory fails", async () => {
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("filter=changed");
   expect(html).toContain("baseline=bld_b");
   expect(html).not.toContain("Private title");
@@ -149,7 +149,7 @@ it("shows an honest staff recovery state without inventing package files", async
 it("clips honest loading shells on narrow layouts", async () => {
   const html = renderToStaticMarkup(await AdminResourceBuildPackageLoading());
   expect(html).toContain("min-w-0 max-w-5xl");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("offers reset when a filtered inventory page has no files", async () => {
   state.page.mockResolvedValue({

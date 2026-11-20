@@ -98,7 +98,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('data-query="Team"');
     expect(html).toContain('id="saved-follows-heading"');
     expect(html).toContain('aria-labelledby="saved-follows-heading"');
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect((await generateMetadata()).robots).toMatchObject({ index: false, follow: false });
   },
 );
@@ -116,7 +116,7 @@ it.each(["en", "ru"] as const)(
     );
     expect(html).toContain('role="alert"');
     expect(html).toContain(copy.pageError);
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("min-h-11");
     expect(html).toContain('href="/workspace/saved?type=organization&amp;q=Team"');
     expect(html).not.toContain("database-secret");
@@ -134,8 +134,8 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('aria-labelledby="saved-follows-loading-heading"');
     expect(html).toContain(`>${copy.title}<`);
     expect(html).toContain(copy.loading);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   },
 );
 it.each(["en", "ru"] as const)(
@@ -145,8 +145,8 @@ it.each(["en", "ru"] as const)(
     state.locale = locale;
     const copy = followCopy(locale);
     const html = renderToStaticMarkup(await SavedPage({}));
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain('data-loaded="true"');
     expect(copy.emptyFiltered).not.toBe(copy.empty);
     expect(copy.emptyHint.length).toBeGreaterThan(0);

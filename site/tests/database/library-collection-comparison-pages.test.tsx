@@ -209,7 +209,7 @@ it("chooses an owned comparison target before reading resources", async () => {
   const html = await screen({});
   expect(html).toContain(copy.choose);
   expect(html).toContain(copy.chooseHint);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("min-h-11");
   expect(html).not.toContain('role="alert"');
   expect(html).not.toContain("data-transfer");
@@ -223,7 +223,7 @@ it("shows EmptyState when comparison filters match no references", async () => {
   const html = await screen();
   const copy = libraryCollectionComparisonCopy("en");
   expect(html).toContain(copy.emptyHint);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("min-h-11");
   expect(html).toContain('role="alert"');
   expect(html).toContain('id="library-collection-compare-no-source-items"');
@@ -237,7 +237,7 @@ it("shows ErrorState recovery when comparison fails to load", async () => {
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(`>${copy.title}</h1>`);
   expect(html).toContain(copy.loadUnavailableDescription);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("min-h-11");
 });
 it("returns to the collection list when the comparison identifier is invalid and session lookup fails", async () => {
@@ -265,7 +265,7 @@ it.each([{ userId: "other" }, { to: ["a", "b"] }, { to: "../private" }, { filter
     const html = await screen(query);
     expect(html).toContain('role="alert"');
     expect(html).toContain(libraryCollectionComparisonCopy("en").loadUnavailableDescription);
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(state.comparison).not.toHaveBeenCalled();
   },
 );

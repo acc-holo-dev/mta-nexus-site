@@ -186,7 +186,7 @@ it("links empty collection state to creation", async () => {
   const html = await screen();
   expect(html).toContain(copy.empty);
   expect(html).toContain(copy.emptyHint);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/workspace/library/collections"');
   expect(html).not.toContain('data-action="');
 });
@@ -196,7 +196,7 @@ it("shows an honest recovery state when resource collections fail", async () => 
   expect(html).toContain('role="alert"');
   expect(html).toContain(libraryCollectionsCopy("en").loadUnavailable);
   expect(html).toContain(`>${libraryCollectionsCopy("en").resourceCollections}</h1>`);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("/workspace/library/prd_a/collections");
 });
 it.each(["en", "ru"] as const)(

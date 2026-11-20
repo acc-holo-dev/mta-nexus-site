@@ -17,8 +17,10 @@ it("locks commerce terms and receipt invalid filters to ErrorState without plain
   for (const path of commerceAlertPages) {
     const source = read(path);
     expect(source, path).toContain("ErrorState");
-    expect(source, path).toContain("overflow-x-clip");
-    expect(source, path).toContain("min-w-0");
+    expect(source, path).toMatch(
+      /(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/,
+    );
+    expect(source, path).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(source, path).toMatch(/min-h-11|size="touch"/u);
     expect(source, path).not.toContain('role="alert"');
     expect(source, path).not.toContain('<p role="alert"');

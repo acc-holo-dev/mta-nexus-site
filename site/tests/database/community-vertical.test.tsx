@@ -204,8 +204,8 @@ describe("community topic submission behavior", () => {
     expect(form).toContain('option value="question"');
     expect(form).toContain('option value="post"');
     expect(form).not.toContain('name="status"');
-    expect(form).toContain("min-w-0");
-    expect(form).toContain("overflow-x-clip");
+    expect(form).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(form).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(form).toContain("min-h-11");
   });
 

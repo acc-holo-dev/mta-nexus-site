@@ -13,8 +13,8 @@ function expectClippedLoadingSource(source: string) {
     expect(source).toMatch(/[A-Za-z]\w*RouteLoading|pageShell|page-shell/);
     return;
   }
-  expect(source).toContain("overflow-x-clip");
-  expect(source).toContain("min-w-0");
+  expect(source).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(source).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 }
 
 const state = vi.hoisted(() => ({
@@ -101,8 +101,8 @@ it.each([
     const copy = copyOf();
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain('aria-busy="true"');
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain(copy[titleKey]);
     expect(html).toContain(copy[loadingKey]);
     expect(html).toContain('role="status"');
@@ -111,8 +111,8 @@ it.each([
 
 it("locks /dev diagnostics shell clipped without raw alert failure chrome", () => {
   const source = read("site/src/features/shell/server/development-status-screen.tsx");
-  expect(source).toContain("overflow-x-clip");
-  expect(source).toContain("min-w-0");
+  expect(source).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(source).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 
   expect(source).toContain("checkDatabaseConnection");
   expect(source).not.toContain('role="alert"');

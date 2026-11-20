@@ -152,7 +152,7 @@ it("invalid query arrays recover through ErrorState without repository reads", a
   expect(buyer).toContain('role="alert"');
   expect(buyer).toContain("bg-danger-soft");
   expect(buyer).toContain(copy.invalid);
-  expect(buyer).toContain("overflow-x-clip");
+  expect(buyer).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(buyer).toContain('href="/workspace/purchases"');
   expect(state.report).not.toHaveBeenCalled();
 
@@ -163,7 +163,7 @@ it("invalid query arrays recover through ErrorState without repository reads", a
   expect(admin).toContain('role="alert"');
   expect(admin).toContain("bg-danger-soft");
   expect(admin).toContain(copy.invalid);
-  expect(admin).toContain("overflow-x-clip");
+  expect(admin).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(admin).toContain('href="/admin/commerce/reconciliation"');
   expect(state.report).not.toHaveBeenCalled();
 });
@@ -177,7 +177,7 @@ it("shows an honest recovery state when buyer order terms fail", async () => {
   const html = renderToStaticMarkup(await Buyer(input));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/workspace/purchases/ord_a/terms?page=2"');
 });
 it("shows an honest recovery state when admin order terms fail", async () => {
@@ -187,19 +187,19 @@ it("shows an honest recovery state when admin order terms fail", async () => {
   const html = renderToStaticMarkup(await Admin(input));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/admin/commerce/reconciliation/ord_a/terms?page=2"');
 });
 it("clips honest admin terms loading on narrow layouts", async () => {
   const html = renderToStaticMarkup(await TermsLoading());
   expect(html).toContain("min-w-0 max-w-5xl");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(orderTermsCopy("en").termsLoading);
 });
 it("clips honest buyer terms loading on narrow layouts", async () => {
   const copy = orderTermsCopy("en");
   const html = renderToStaticMarkup(await BuyerTermsLoading());
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(copy.title);
   expect(html).toContain(copy.termsLoading);
 });

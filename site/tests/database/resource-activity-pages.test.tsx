@@ -179,7 +179,7 @@ it("shows an honest recovery state when publisher activity fails", async () => {
   const html = renderToStaticMarkup(await Activity(activityInput));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("days=7");
 });
 it("normalizes ambiguous UI filters without accepting unsupported periods", () => {

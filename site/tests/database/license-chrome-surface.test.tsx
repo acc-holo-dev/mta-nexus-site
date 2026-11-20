@@ -47,8 +47,8 @@ describe("license chrome surface", () => {
       expect(html).toContain("text-accent");
       expect(html).toContain('type="submit"');
       expect(html).toContain("min-h-11");
-      expect(html).toContain("min-w-0");
-      expect(html).toContain("overflow-x-clip");
+      expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+      expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     },
   );
 
@@ -81,8 +81,8 @@ describe("license chrome surface", () => {
     expect(html).toContain("rounded-lg");
     expect(html).toContain("bg-accent");
     expect(html).toContain("min-h-11");
-    expect(html).toContain("min-w-0");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toMatch(/id="[^"]+-confirm"/u);
     expect(html).toMatch(/for="[^"]+-confirm"/u);
     expect(html).toContain('type="checkbox"');

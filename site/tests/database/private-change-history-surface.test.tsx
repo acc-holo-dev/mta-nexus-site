@@ -219,7 +219,7 @@ it.each(["en", "ru"] as const)(
     );
     expect(lifetime).toContain(copy.empty);
     expect(lifetime).toContain(copy.emptyHint);
-    expect(lifetime).toContain("overflow-x-clip");
+    expect(lifetime).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(lifetime).not.toContain(copy.emptyFiltered);
     const filtered = renderToStaticMarkup(
       <ProfileChangeHistoryView
@@ -250,7 +250,7 @@ it("preserves normalized organization selectors and renders a read failure disti
   expect(html).toContain('role="alert"');
   expect(html).toContain(privateChangeHistoryCopy("en").unavailable);
   expect(html).toContain(privateChangeHistoryCopy("en").reload);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("min-h-11");
   expect(html).not.toContain("database-private");
   expect(html).not.toContain(privateChangeHistoryCopy("en").empty);

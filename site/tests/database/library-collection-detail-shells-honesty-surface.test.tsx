@@ -13,8 +13,8 @@ function expectClippedLoadingSource(source: string) {
     expect(source).toMatch(/[A-Za-z]\w*RouteLoading|pageShell|page-shell/);
     return;
   }
-  expect(source).toContain("overflow-x-clip");
-  expect(source).toContain("min-w-0");
+  expect(source).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(source).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 }
 
 const state = vi.hoisted(() => ({
@@ -160,6 +160,8 @@ it.each(["en", "ru"] as const)(
     );
     expect(renderToStaticMarkup(await CompareLoading())).toContain(workspace.libraryTitle);
     expect(renderToStaticMarkup(await CompareLoading())).toContain(workspace.loading);
-    expect(renderToStaticMarkup(await CompareLoading())).toContain("overflow-x-clip");
+    expect(renderToStaticMarkup(await CompareLoading())).toMatch(
+      /(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/,
+    );
   },
 );

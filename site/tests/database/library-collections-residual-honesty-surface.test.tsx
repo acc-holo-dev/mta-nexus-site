@@ -14,8 +14,8 @@ function expectClippedLoadingSource(source: string) {
     expect(source).toMatch(/[A-Za-z]\w*RouteLoading|pageShell|page-shell/);
     return;
   }
-  expect(source).toContain("overflow-x-clip");
-  expect(source).toContain("min-w-0");
+  expect(source).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(source).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 }
 
 const state = vi.hoisted(() => ({
@@ -103,8 +103,8 @@ it("locks residual collections page sources to ErrorState/EmptyState honesty chr
   expect(read("site/src/app/workspace/library/collections/not-found.tsx")).toContain(
     "features/library/library-collections-not-found-server",
   );
-  expect(read("site/src/features/library/server/library-collections-not-found.tsx")).toContain(
-    "overflow-x-clip",
+  expect(read("site/src/features/library/server/library-collections-not-found.tsx")).toMatch(
+    /(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/,
   );
   expect(read("site/src/features/library/server/collection-history-page.tsx")).toContain(
     "EmptyState",

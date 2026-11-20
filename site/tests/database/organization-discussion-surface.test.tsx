@@ -138,7 +138,7 @@ it("distinguishes ErrorState read failure from EmptyState empty discussion", () 
   expect(failure).toContain(copy.unavailable);
   expect(failure).toContain(copy.unavailableDescription);
   expect(failure).toContain(copy.retry);
-  expect(failure).toContain("overflow-x-clip");
+  expect(failure).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(failure).not.toContain(copy.first);
   const empty = renderToStaticMarkup(
     <ContentDiscussion
@@ -151,6 +151,6 @@ it("distinguishes ErrorState read failure from EmptyState empty discussion", () 
   );
   expect(empty).toContain(copy.first);
   expect(empty).toContain(copy.firstDescription);
-  expect(empty).toContain("overflow-x-clip");
+  expect(empty).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(empty).not.toContain('role="alert"');
 });

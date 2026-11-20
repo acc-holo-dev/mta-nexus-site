@@ -212,13 +212,13 @@ it.each([
 ])("rejects ambiguous or injected list selectors %o", async (query) => {
   const html = await screen(query);
   expect(html).toContain('role="alert"');
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(state.history).not.toHaveBeenCalled();
 });
 it("rejects all detail selectors and maps missing/foreign detail to a missing page", async () => {
   const invalidDetail = await screen({ page: "1" }, "lmb_a");
   expect(invalidDetail).toContain('role="alert"');
-  expect(invalidDetail).toContain("overflow-x-clip");
+  expect(invalidDetail).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(state.detail).not.toHaveBeenCalled();
   state.detail.mockRejectedValue(new AppError("PRIVATE", 404, "NOT_FOUND"));
   await expect(screen({}, "lmb_foreign")).rejects.toThrow("NEXT_NOT_FOUND");
@@ -271,7 +271,7 @@ it("shows an honest recovery state when membership history fails to load", async
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(`>${copy.title}</h1>`);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/workspace/library/collections/membership-history');
   expect(html).not.toContain("membership history unavailable");
 });

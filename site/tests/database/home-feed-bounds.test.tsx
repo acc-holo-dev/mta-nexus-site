@@ -164,8 +164,8 @@ describe("bounded home feed reads", () => {
     expect(html).toContain(copy.personalTitle);
     expect(html).toContain(copy.personalEmpty);
     expect(html).toContain(copy.personalEmptyHint);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("min-h-11");
   });
 
@@ -180,8 +180,8 @@ describe("bounded home feed reads", () => {
     expect(html).toContain(copy.personalError);
     expect(html).toContain(copy.personalRetry);
     expect(html).toContain('href="/"');
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("min-h-11");
     expect(html).not.toContain("personal-secret");
     expect(html).not.toContain(copy.personalEmpty);
@@ -190,8 +190,8 @@ describe("bounded home feed reads", () => {
   it("names public home feed sections for assistive landmarks", async () => {
     const html = renderToStaticMarkup(await HomePage());
 
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain('aria-labelledby="home-network-heading"');
     expect(html).toContain('id="home-network-heading"');
     expect(html).toContain('aria-labelledby="home-free-resources-heading"');

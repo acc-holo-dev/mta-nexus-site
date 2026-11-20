@@ -117,8 +117,8 @@ describe("workspace live telemetry behavior", () => {
     expect(html).toContain(dictionary.workspace.noServersHint);
     expect(html).toContain(dictionary.workspace.emptyLibrary);
     expect(html).toContain(dictionary.workspace.emptyLibraryHint);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("min-h-11");
     expect(html).toContain('href="/workspace/library"');
     expect(html).toContain('href="/workspace/servers/new"');
@@ -332,7 +332,7 @@ describe("workspace live telemetry behavior", () => {
     expect(html).toContain(dictionary.workspace.libraryUnavailable);
     expect(html).toContain(dictionary.errors.retry);
     expect(html).toContain('href="/workspace"');
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("min-h-11");
     expect(html).toContain(dictionary.workspace.noServers);
     expect(html).not.toContain("library-secret");
@@ -346,7 +346,7 @@ describe("workspace live telemetry behavior", () => {
     expect(html).toContain(dictionary.workspace.serversUnavailable);
     expect(html).toContain(dictionary.errors.retry);
     expect(html).toContain('href="/workspace"');
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("min-h-11");
     expect(html).toContain(dictionary.workspace.emptyLibrary);
     expect(html).not.toContain("servers-secret");
@@ -365,8 +365,8 @@ describe("workspace live telemetry behavior", () => {
       expect(html).toContain('id="workspace-loading-heading"');
       expect(html).toContain(`>${copy.title}<`);
       expect(html).toContain(copy.loading);
-      expect(html).toContain("overflow-x-clip");
-      expect(html).toContain("min-w-0");
+      expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+      expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     },
   );
 

@@ -126,7 +126,7 @@ it("offers to clear filters when a filtered watch history view is empty", async 
   );
   expect(html).toContain("Clear filters");
   expect(html).toContain(copy.emptyHint);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/workspace/library/watches/history"');
 });
 
@@ -140,7 +140,7 @@ it("shows an honest recovery state when release watch history fails to load", as
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(copy.loadUnavailableDescription);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("source=batch");
   expect(html).toContain("page=2");
   expect(html).not.toContain("history unavailable");

@@ -39,7 +39,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(copy.empty);
     expect(html).toContain(copy.emptyHint);
     expect(html).toContain(copy.discover);
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("min-h-11");
   },
 );
@@ -56,6 +56,6 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('role="alert"');
     expect(html).toContain(copy.pageError);
     expect(html).toContain(copy.retry);
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   },
 );

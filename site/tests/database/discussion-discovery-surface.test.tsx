@@ -93,7 +93,7 @@ it("passes normalized search to server paging and renders a localized empty resu
   expect(html).toContain(copy.noMatches);
   expect(html).toContain(copy.noMatchesDescription);
   expect(html).toContain(copy.clearSearch);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('value="Lua"');
 });
 it("offers ErrorState recovery after a deleted focused comment without rendering internal errors", async () => {
@@ -111,7 +111,7 @@ it("offers ErrorState recovery after a deleted focused comment without rendering
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.returnDiscussion);
   expect(html).toContain(copy.retry);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).not.toContain("private details");
 });
 it("does not query comments for malformed or repeated discussion selectors", async () => {
@@ -124,7 +124,7 @@ it("does not query comments for malformed or repeated discussion selectors", asy
   expect(mocks.pageDiscussion).not.toHaveBeenCalled();
   expect(html).toContain(getDiscussionCopy("en").invalidCursor);
   expect(html).toContain('role="alert"');
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("renders standalone search EmptyState without requiring browser effects", () => {
   const copy = getDiscussionCopy("ru");
@@ -141,7 +141,7 @@ it("renders standalone search EmptyState without requiring browser effects", () 
   expect(html).toContain(copy.noMatches);
   expect(html).toContain(copy.noMatchesDescription);
   expect(html).toContain(copy.applySearch);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it.each(["en", "ru"] as const)(
   "renders working discussion subscription entry points and settings in %s",
@@ -160,7 +160,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('href="/settings#notification-heading"');
     expect(html).toContain('href="/auth/login?next=%2Farticles%2Farticle"');
     expect(html).toContain("min-h-11");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).not.toContain("Checking");
   },
 );

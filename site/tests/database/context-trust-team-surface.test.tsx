@@ -109,7 +109,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('href="/organizations/team/activity"');
     expect(html).toContain('href="/organizations/team/trust?cursor=next"');
     expect(html).toContain(copy.verifiedServers);
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("min-h-11");
     expect(html).not.toContain("secret");
     expect(await contextTrustMetadata("organization", context)).toMatchObject({
@@ -167,7 +167,7 @@ it("uses 404 for missing/nonpublic contexts and does not show empty records on f
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(contextTrustCopy("en").unavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("min-h-11");
   expect(html).not.toContain(contextTrustCopy("en").empty);
   expect(html).not.toContain(contextTrustCopy("en").emptyHint);

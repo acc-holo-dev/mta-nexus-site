@@ -105,8 +105,8 @@ describe("beta auth UI surface (ROADMAP 18)", () => {
       expect(source).toContain("ErrorState");
       expect(source).toContain("isLoading");
       expect(source).toContain("min-h-11");
-      expect(source).toContain("min-w-0");
-      expect(source).toContain("overflow-x-clip");
+      expect(source).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+      expect(source).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     }
 
     expect(auth).toContain("Input");

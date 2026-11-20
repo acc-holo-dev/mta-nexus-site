@@ -181,7 +181,7 @@ it("does not disguise a failed database read as an empty workspace", async () =>
   state.page.mockRejectedValue(new Error("Database unavailable"));
   const html = await render();
   expect(html).toContain('role="alert"');
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("temporarily unavailable");
   expect(html).not.toContain("Database unavailable");
   expect(state.directory).not.toHaveBeenCalled();

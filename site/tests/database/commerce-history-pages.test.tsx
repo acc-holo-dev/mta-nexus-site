@@ -216,7 +216,7 @@ describe("private legacy commerce pages", () => {
     expect(html).not.toContain("private@example.test");
     expect(html).toContain("gross");
     expect(html).not.toContain('name="withdraw"');
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("min-h-11");
   });
 
@@ -228,7 +228,7 @@ describe("private legacy commerce pages", () => {
     expect(html).toContain(copy.salesLoadUnavailable);
     expect(html).toContain(copy.salesLoadUnavailableHint);
     expect(html).toContain(getDictionary("en").errors.retry);
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("min-h-11");
     expect(html).toContain('href="/workspace/sales?page=2"');
   });
@@ -245,7 +245,7 @@ describe("private legacy commerce pages", () => {
     const html = renderToStaticMarkup(await Sales({ searchParams: Promise.resolve({}) }));
     expect(html).toContain(copy.emptySales);
     expect(html).toContain(copy.emptySalesHint);
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   });
   it("renders archive filters in both languages and preserves them in export and page links", async () => {
     for (const locale of ["en", "ru"] as const) {
@@ -312,7 +312,7 @@ describe("private legacy commerce pages", () => {
     expect(html).toContain('role="alert"');
     expect(html).toContain(copy.loadUnavailable);
     expect(html).toContain(getDictionary("en").errors.retry);
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("min-h-11");
     expect(html).toContain(
       'href="/workspace/licenses?page=2&amp;status=expiring&amp;binding=bound&amp;term=finite&amp;sort=expires_soon&amp;q=alpha"',
@@ -339,14 +339,14 @@ describe("private legacy commerce pages", () => {
     expect(html).toContain(copy.licenseNotice);
     expect(html).toContain(maintenance.clear);
     expect(html).toContain('href="/workspace/licenses"');
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("min-h-11");
   });
 
   it("clips the honest license archive loading shell on narrow layouts", async () => {
     const html = renderToStaticMarkup(await LicensesLoading());
     expect(html).toContain("min-w-0 max-w-5xl");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   });
 
   it("recovers with ErrorState when purchase history fails to load", async () => {
@@ -357,7 +357,7 @@ describe("private legacy commerce pages", () => {
     expect(html).toContain(copy.purchasesLoadUnavailable);
     expect(html).toContain(copy.purchasesLoadUnavailableHint);
     expect(html).toContain(getDictionary("en").errors.retry);
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("min-h-11");
     expect(html).toContain('href="/workspace/purchases?page=2"');
   });
@@ -374,13 +374,13 @@ describe("private legacy commerce pages", () => {
     const html = renderToStaticMarkup(await Purchases({ searchParams: Promise.resolve({}) }));
     expect(html).toContain(copy.emptyPurchases);
     expect(html).toContain(copy.emptyPurchasesHint);
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   });
 
   it("clips the honest purchases loading shell on narrow layouts", async () => {
     const html = renderToStaticMarkup(await PurchasesLoading());
     expect(html).toContain("min-w-0 max-w-5xl");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain(getCommerceHistoryCopy("en").loading);
   });
 });

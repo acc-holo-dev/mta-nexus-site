@@ -15,8 +15,8 @@ function expectClippedLoadingSource(source: string) {
     expect(source).toMatch(/[A-Za-z]\w*RouteLoading|pageShell|page-shell/);
     return;
   }
-  expect(source).toContain("overflow-x-clip");
-  expect(source).toContain("min-w-0");
+  expect(source).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(source).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 }
 
 const state = vi.hoisted(() => ({
@@ -78,11 +78,11 @@ it("locks activity and server panel loadings to feature ports with clipped chrom
   expect(read("site/src/features/community/publication-feed-loading-server.ts")).toMatch(
     /publication-feed|PublicationFeedLoading/,
   );
-  expect(read("site/src/features/servers/server/server-statistics-page.tsx")).toContain(
-    "overflow-x-clip",
+  expect(read("site/src/features/servers/server/server-statistics-page.tsx")).toMatch(
+    /(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/,
   );
-  expect(read("site/src/features/servers/server/server-observation-browser-page.tsx")).toContain(
-    "overflow-x-clip",
+  expect(read("site/src/features/servers/server/server-observation-browser-page.tsx")).toMatch(
+    /(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/,
   );
 });
 

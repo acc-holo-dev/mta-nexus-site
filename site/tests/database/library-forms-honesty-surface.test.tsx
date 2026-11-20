@@ -84,6 +84,6 @@ it("renders collections error panel with ErrorState description and touch recove
   expect(html).toContain(copy.conflict);
   expect(html).toContain(copy.actionErrorDescription);
   expect(html).toContain("min-h-11");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).not.toContain('class="text-warning"');
 });

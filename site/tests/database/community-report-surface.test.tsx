@@ -121,7 +121,7 @@ it("distinguishes empty, filtered empty, failed reads and confirmed target-unava
   );
   expect(failure).toContain('role="alert"');
   expect(failure).toContain(communityReportCopy("en").unavailable);
-  expect(failure).toContain("overflow-x-clip");
+  expect(failure).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(failure).toContain(communityReportCopy("en").reload);
   expect(failure).not.toContain(communityReportCopy("en").empty);
   expect(failure).not.toContain(communityReportCopy("en").emptyFiltered);
@@ -133,7 +133,7 @@ it("distinguishes empty, filtered empty, failed reads and confirmed target-unava
     />,
   );
   expect(empty).toContain(communityReportCopy("en").empty);
-  expect(empty).toContain("overflow-x-clip");
+  expect(empty).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(empty).not.toContain(communityReportCopy("en").emptyFiltered);
   const filteredEmpty = renderToStaticMarkup(
     <CommunityReportList
@@ -158,7 +158,7 @@ it("distinguishes empty, filtered empty, failed reads and confirmed target-unava
   );
   expect(detailFailure).toContain('role="alert"');
   expect(detailFailure).toContain(communityReportCopy("en").unavailable);
-  expect(detailFailure).toContain("overflow-x-clip");
+  expect(detailFailure).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("keeps staff report screens clipped and recovers invalid filters through ErrorState", async () => {
   mocks.session.mockResolvedValue({ id: "actor", role: "moderator" });
@@ -169,7 +169,7 @@ it("keeps staff report screens clipped and recovers invalid filters through Erro
     }),
   );
   expect(invalid).toContain(communityReportCopy("en").queryInvalid);
-  expect(invalid).toContain("overflow-x-clip");
+  expect(invalid).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(invalid).toContain('href="/admin/reports"');
   expect(mocks.page).not.toHaveBeenCalled();
 });

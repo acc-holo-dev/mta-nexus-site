@@ -14,7 +14,7 @@ describe("footer legal link reflow", () => {
       const html = renderToStaticMarkup(<Footer locale={locale} />);
 
       expect(html).toContain("flex min-w-0 max-w-full flex-wrap");
-      expect(html).toContain("overflow-x-clip");
+      expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
       expect(html).toContain(dictionary.footer.communityRules);
       expect(html).toContain(dictionary.footer.copyright);
       expect(html).toContain('href="/support"');

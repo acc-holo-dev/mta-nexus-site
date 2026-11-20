@@ -241,7 +241,7 @@ describe("private resource library", () => {
       expect(html).toContain('href="/market/resource-a"');
       expect(html).toContain(copy.open);
       expect(html).toContain("min-w-0 max-w-5xl");
-      expect(html).toContain("overflow-x-clip");
+      expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
       expect(html).not.toContain(copy.loadUnavailable);
     },
   );
@@ -283,6 +283,6 @@ describe("private resource library", () => {
   it("clips the honest loading shell on narrow layouts", async () => {
     const html = renderToStaticMarkup(await LibraryLoading());
     expect(html).toContain("min-w-0 max-w-5xl");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   });
 });

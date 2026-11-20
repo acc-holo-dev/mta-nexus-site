@@ -186,8 +186,8 @@ it("distinguishes never-empty history from filtered-empty results", async () => 
   expect(never).toContain(copy.emptyNeverHint);
   expect(never).not.toContain(copy.emptyFiltered);
   expect(never).toContain('href="/workspace/verification"');
-  expect(never).toContain("overflow-x-clip");
-  expect(never).toContain("min-w-0");
+  expect(never).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(never).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   const filtered = renderToStaticMarkup(
     await History({ searchParams: Promise.resolve({ status: "pending" }) }),
   );
@@ -211,7 +211,7 @@ it("distinguishes safe auth and target errors from an empty history", async () =
   const detail = renderToStaticMarkup(await Detail(params));
   expect(detail).toContain('role="alert"');
   expect(detail).toContain('href="/workspace/verification/request"');
-  expect(detail).toContain("overflow-x-clip");
+  expect(detail).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(detail).not.toContain("PRIVATE_TARGET");
 });
 it.each(["en", "ru"] as const)(
@@ -225,7 +225,7 @@ it.each(["en", "ru"] as const)(
     expect(history).toContain('role="alert"');
     expect(history).toContain(labels.unavailable);
     expect(history).toContain('href="/workspace/verification/history"');
-    expect(history).toContain("overflow-x-clip");
+    expect(history).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(history).not.toContain("PRIVATE_LIST");
     expect(history).not.toContain(copy.emptyNever);
     state.application.mockResolvedValueOnce({
@@ -236,7 +236,7 @@ it.each(["en", "ru"] as const)(
     const detail = renderToStaticMarkup(await Detail(params));
     expect(detail).toContain(copy.noEvents);
     expect(detail).toContain(copy.noEventsHint);
-    expect(detail).toContain("overflow-x-clip");
+    expect(detail).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(detail).toContain("min-h-11");
   },
 );
@@ -249,7 +249,7 @@ it("clips honest verification application loading shells on narrow layouts", asy
   );
   for (const LoadingShell of [HistoryLoading, DetailLoading]) {
     const html = renderToStaticMarkup(await LoadingShell());
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   }
 });

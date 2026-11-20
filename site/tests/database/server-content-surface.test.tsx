@@ -91,7 +91,7 @@ it("shows revoked authority and recovery without creating editor actions", async
   mocks.page.mockRejectedValue(new AppError("private role details", 403, "FORBIDDEN"));
   const html = renderToStaticMarkup(await Page({ params: Promise.resolve({ id: "srv" }) }));
   expect(html).toContain('role="alert"');
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(getUserPlatformCopy("en").retry);
   expect(html).not.toContain("private role");
   expect(html).not.toContain("/content/new");

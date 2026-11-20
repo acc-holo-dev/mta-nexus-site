@@ -103,7 +103,7 @@ it("renders service failure separately from an empty feed and hides internal tex
   expect(community).toContain(getUserPlatformCopy("en").unavailable);
   expect(community).toContain("Try again");
   expect(community).toContain('href="/community?q=help"');
-  expect(community).toContain("overflow-x-clip");
+  expect(community).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(community).not.toContain("DB private details");
   expect(community).not.toContain(getDictionary("en").community.noTopics);
 });

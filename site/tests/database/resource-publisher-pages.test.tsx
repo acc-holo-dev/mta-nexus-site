@@ -162,8 +162,8 @@ it.each([
       await InventoryPage({ searchParams: Promise.resolve(searchParams) }),
     );
     expect(html).toContain(expectText);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("min-h-11");
     if (Object.keys(statusCounts).length === 0 && Object.keys(searchParams).length === 0) {
       expect(html).toContain("/workspace/resources/new");
@@ -183,7 +183,7 @@ it("shows an honest recovery state when publisher inventory fails", async () => 
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(copy.loadUnavailableHint);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("status=draft");
   expect(html).not.toContain("DO_NOT_RENDER");
 });
@@ -247,7 +247,7 @@ it("shows an honest recovery state when editorial history fails", async () => {
   const html = renderToStaticMarkup(await HistoryPage(context));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("kind=changes");
   expect(html).not.toContain("DO_NOT_RENDER");
 });

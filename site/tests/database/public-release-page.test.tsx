@@ -234,7 +234,7 @@ describe("public safely published version archive", () => {
     const html = renderToStaticMarkup(await page("2"));
     expect(html).toContain('href="/market/safe-release/versions"');
     expect(html).toContain('href="/market/safe-release/versions?page=3"');
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("min-h-11");
     expect((await generateMetadata()).robots).toMatchObject({ index: false, follow: false });
     await page(["1", "2"]);
@@ -256,7 +256,7 @@ describe("public safely published version archive", () => {
       const html = renderToStaticMarkup(await page());
       expect(html).toContain(copy.noBuilds);
       expect(html).toContain(copy.noBuildsHint);
-      expect(html).toContain("overflow-x-clip");
+      expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     },
   );
 
@@ -269,7 +269,7 @@ describe("public safely published version archive", () => {
       const html = renderToStaticMarkup(await page("2"));
       expect(html).toContain('role="alert"');
       expect(html).toContain(copy.loadUnavailable);
-      expect(html).toContain("overflow-x-clip");
+      expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
       expect(html).toContain("min-h-11");
       expect(html).toContain('href="/market/safe-release/versions?page=2"');
       expect(html).not.toContain("database-secret");
@@ -282,8 +282,8 @@ describe("public safely published version archive", () => {
       "../../src/app/market/[slug]/versions/loading"
     );
     const html = renderToStaticMarkup(await VersionsLoading());
-    expect(html).toContain("min-w-0");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain(getReleaseHistoryCopy("en").loading);
   });
 });

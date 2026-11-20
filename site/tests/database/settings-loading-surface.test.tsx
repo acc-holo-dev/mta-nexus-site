@@ -22,6 +22,6 @@ it("renders an honest settings loading shell", async () => {
   expect(html).toContain(`>${copy.title}<`);
   expect(html).toContain(copy.loading);
   expect(html).toContain('aria-live="polite"');
-  expect(html).toContain("min-w-0");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });

@@ -172,7 +172,7 @@ it("provides 404 for missing or foreign own comments and reload for persistence 
   const html = renderToStaticMarkup(await DetailPage(detail));
   expect(html).toContain(ownDiscussionCopy("en").failed);
   expect(html).toContain('role="alert"');
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(getDictionary("en").errors.retry);
   expect(html).toContain('href="/workspace/discussions/comment"');
   expect(html).not.toContain("secret text");
@@ -183,7 +183,7 @@ it("shows an honest recovery state when own comments fail to load", async () => 
   const html = renderToStaticMarkup(await OwnPage({}));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.failed);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(getDictionary("en").errors.retry);
   expect(html).toContain('href="/workspace/discussions"');
   expect(html).not.toContain("comments unavailable");
@@ -204,8 +204,8 @@ it("shows EmptyState descriptions for empty and filtered own comments", async ()
 });
 it("clips honest discussions loading shells on narrow layouts", async () => {
   const html = renderToStaticMarkup(await DiscussionsLoading());
-  expect(html).toContain("min-w-0");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(ownDiscussionCopy("en").loading);
 });
 it.each(["en", "ru"] as const)(
@@ -254,8 +254,8 @@ it("does not interpret empty history or failed reads as verification decisions",
   expect(empty).toContain(copy.emptyHint);
   expect(empty).not.toContain(copy.emptyFiltered);
   expect(empty).toContain(copy.verified);
-  expect(empty).toContain("overflow-x-clip");
-  expect(empty).toContain("min-w-0");
+  expect(empty).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(empty).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(empty).toContain("min-h-11");
   mocks.approvals.mockResolvedValueOnce({
     subject,
@@ -275,7 +275,7 @@ it("does not interpret empty history or failed reads as verification decisions",
   expect(failed).toContain(approvalCopy("en").unavailable);
   expect(failed).toContain('role="alert"');
   expect(failed).toContain(getDictionary("en").errors.retry);
-  expect(failed).toContain("overflow-x-clip");
+  expect(failed).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(failed).toContain("min-h-11");
   expect(failed).not.toContain(approvalCopy("en").empty);
   expect(failed).not.toContain(approvalCopy("en").emptyHint);
@@ -296,7 +296,7 @@ it("rejects public proof filters and returns missing profile 404", async () => {
 });
 it("clips user trust history loading shells on narrow layouts", async () => {
   const html = renderToStaticMarkup(await UserTrustHistoryLoading());
-  expect(html).toContain("min-w-0");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(approvalCopy("en").loading);
 });

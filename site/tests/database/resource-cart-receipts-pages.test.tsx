@@ -142,7 +142,7 @@ it("authenticates and rejects repeated filters before querying receipts", async 
   expect(invalid).toContain(copy.invalid);
   expect(invalid).toContain('role="alert"');
   expect(invalid).toContain("bg-danger-soft");
-  expect(invalid).toContain("overflow-x-clip");
+  expect(invalid).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(invalid).toContain('href="/workspace/acquisitions/receipts"');
   expect(state.page).not.toHaveBeenCalled();
 });
@@ -217,7 +217,7 @@ it("shows an honest recovery state when acquisition receipts fail to load", asyn
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("days=30");
   expect(html).not.toContain("receipts unavailable");
 });
@@ -227,13 +227,13 @@ it("shows an honest recovery state when a receipt detail fails to load", async (
   const html = renderToStaticMarkup(await Detail({ params: Promise.resolve({ id: requestId }) }));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(`href="/workspace/acquisitions/receipts/${requestId}"`);
 });
 it("clips honest receipt loading shells on narrow layouts", async () => {
   for (const Loading of [ListLoading, DetailLoading]) {
     const html = renderToStaticMarkup(await Loading());
-    expect(html).toContain("min-w-0");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   }
 });

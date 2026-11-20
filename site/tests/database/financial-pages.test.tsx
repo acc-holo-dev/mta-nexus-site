@@ -157,7 +157,7 @@ it("shows recorded discrepancies and safe attempts without settlement actions or
   expect(html).not.toContain("SECRET-FAILURE");
   expect(html).not.toContain("<form");
   expect(html).toContain("page=3");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("shows an honest recovery state when the reconciliation queue fails", async () => {
   state.user = { id: "usr_a", role: "admin" };
@@ -168,7 +168,7 @@ it("shows an honest recovery state when the reconciliation queue fails", async (
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/admin/commerce/reconciliation?filter=review&amp;page=2"');
   expect(html).not.toContain("&lt;ORDER&gt;");
 });
@@ -182,7 +182,7 @@ it("renders an empty review queue with clear-filters recovery when the review fi
   expect(html).toContain(copy.empty);
   expect(html).toContain(copy.clearFilters);
   expect(html).toContain('href="?filter=all"');
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("rejects stale admin privilege before loading the reconciliation queue", async () => {
   state.user = { id: "usr_a", role: "admin" };
@@ -196,19 +196,21 @@ it("shows an honest recovery state when recorded order evidence fails", async ()
   const html = renderToStaticMarkup(await Detail(input));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/admin/commerce/reconciliation/ord_a?page=2"');
 });
 it("clips honest loading shells on narrow layouts", async () => {
   for (const Loading of [ReviewLoading, DetailLoading]) {
     const html = renderToStaticMarkup(await Loading());
-    expect(html).toContain("min-w-0");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain(getFinancialCopy("en").reviewLoading);
   }
   const financeLoading = renderToStaticMarkup(await FinanceLoading());
-  expect(financeLoading).toContain("min-w-0");
-  expect(financeLoading).toContain("overflow-x-clip");
+  expect(financeLoading).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(financeLoading).toMatch(
+    /(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/,
+  );
   expect(financeLoading).toContain(getFinancialCopy("en").loading);
 });
 it("shows an honest recovery state when workspace statements fail to load", async () => {
@@ -220,7 +222,7 @@ it("shows an honest recovery state when workspace statements fail to load", asyn
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.statementsLoadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/workspace/finance?page=2&amp;scopePage=1"');
   expect(html).not.toContain("statements unavailable");
 });

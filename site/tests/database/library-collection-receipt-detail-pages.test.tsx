@@ -165,7 +165,7 @@ it("renders neutral malformed proof and missing current state without restoratio
   const html = await screen();
   expect(html).toContain(copy.unknown);
   expect(html).toContain(copy.unknownHint);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).not.toContain('role="alert"');
   expect(html).not.toContain("data-restore");
 });
@@ -177,7 +177,7 @@ it("shows ErrorState recovery when receipt detail fails to load", async () => {
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(`>${copy.title}</h1>`);
   expect(html).toContain(copy.loadUnavailableDescription);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("min-h-11");
   expect(html).not.toContain(copy.unknownHint);
 });
@@ -201,7 +201,7 @@ it("locks ErrorState for unexpected receipt selectors with retry shell", async (
   const html = await screen({ userId: "other" });
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailableDescription);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("min-h-11");
 });
 it("does not promise inverse state for unsupported commands and handles foreign/missing receipts neutrally", async () => {

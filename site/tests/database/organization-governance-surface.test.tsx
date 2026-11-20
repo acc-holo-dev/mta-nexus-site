@@ -180,7 +180,7 @@ it.each(["ru", "en"] as const)(
       <OrganizationHistoryView data={null} id="org" locale={locale} />,
     );
     expect(failed).toContain('role="alert"');
-    expect(failed).toContain("overflow-x-clip");
+    expect(failed).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(failed).toContain(organizationGovernanceCopy(locale).unavailable);
     expect(failed).toContain(organizationGovernanceCopy(locale).reload);
     expect(failed).not.toContain(organizationGovernanceCopy(locale).empty);

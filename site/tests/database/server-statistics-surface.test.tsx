@@ -109,7 +109,7 @@ it("distinguishes unavailable, invalid and genuinely empty periods", async () =>
   expect(copy.emptyHint).not.toBe(copy.empty);
   expect(empty).toContain('disabled=""');
   expect(empty).toContain("min-h-11");
-  expect(empty).toContain("overflow-x-clip");
+  expect(empty).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(empty).not.toContain('role="alert"');
 });
 

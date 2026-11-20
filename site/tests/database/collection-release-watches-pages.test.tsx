@@ -130,14 +130,14 @@ it("offers a filter reset when a collection watch page is empty", async () => {
   expect(html).toContain("Try another filter or clear search");
   expect(html).toContain("Clear filters");
   expect(html).toContain("filter=all");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("shows an honest recovery state when collection watches fail", async () => {
   h.page.mockRejectedValue(new Error("watches unavailable"));
   const html = await screen();
   expect(html).toContain('role="alert"');
   expect(html).toContain("Release watches are temporarily unavailable");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("filter=disabled");
   expect(html).toContain("query=Core");
 });

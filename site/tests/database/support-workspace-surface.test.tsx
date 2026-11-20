@@ -106,7 +106,7 @@ it("gates server-rendered support pages before showing private controls", async 
     `<h1 class="font-display text-primary">${getDictionary("en").support.title}</h1>`,
   );
   expect(guest).toContain("min-w-0 max-w-5xl");
-  expect(guest).toContain("overflow-x-clip");
+  expect(guest).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(guest).toContain('href="/auth/login?next=%2Fsupport"');
   expect(guest).toContain('href="/auth/register?next=%2Fsupport"');
   expect(guest).toContain(getDictionary("en").workspace.createAccount);

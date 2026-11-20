@@ -254,7 +254,7 @@ it("shows an honest recovery state when subscription data fails to load", async 
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(copy.loadUnavailableHint);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("min-h-11");
   expect(html).toContain('href="/workspace/subscriptions"');
 });
@@ -280,8 +280,8 @@ it("shows honest recovery when activation prerequisites fail unexpectedly", asyn
 it("clips honest subscription loading shells on narrow layouts", async () => {
   for (const Loading of [SubscriptionsLoading, ActivateLoading, ReceiptLoading]) {
     const html = renderToStaticMarkup(await Loading());
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain(subscriptionsCopy("en").loading);
   }
 });

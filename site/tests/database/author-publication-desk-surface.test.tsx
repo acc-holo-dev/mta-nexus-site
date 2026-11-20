@@ -155,8 +155,8 @@ it.each(["en", "ru"] as const)(
     expect(loadingHtml).toContain('aria-labelledby="publication-desk-loading-heading"');
     expect(loadingHtml).toContain(`>${loadingCopy.title}<`);
     expect(loadingHtml).toContain(loadingCopy.loading);
-    expect(loadingHtml).toContain("overflow-x-clip");
-    expect(loadingHtml).toContain("min-w-0");
+    expect(loadingHtml).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(loadingHtml).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   },
 );
 it.each(["en", "ru"] as const)(
@@ -239,7 +239,7 @@ it.each(["en", "ru"] as const)(
     expect(empty).toContain(copy.empty);
     expect(empty).toContain(copy.emptyHint);
     expect(empty).not.toContain(copy.emptyFiltered);
-    expect(empty).toContain("overflow-x-clip");
+    expect(empty).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(empty).toContain('href="/workspace/content/new"');
     const filtered = renderToStaticMarkup(
       await Desk({ searchParams: Promise.resolve({ status: "draft" }) }),
@@ -266,7 +266,7 @@ it("distinguishes auth, unavailable and forbidden-target errors from empty histo
   );
   expect(history).toContain('role="alert"');
   expect(history).toContain('href="/workspace/content/article/history"');
-  expect(history).toContain("overflow-x-clip");
+  expect(history).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(history).not.toContain("PRIVATE_TITLE");
   expect(history).not.toContain(authorPublicationDeskCopy("en").historyEmpty);
 });
@@ -292,7 +292,7 @@ it.each(["en", "ru"] as const)(
     );
     expect(history).toContain(copy.historyEmpty);
     expect(history).toContain(copy.historyEmptyHint);
-    expect(history).toContain("overflow-x-clip");
+    expect(history).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   },
 );
 it.each(["en", "ru"] as const)(

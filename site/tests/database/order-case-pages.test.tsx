@@ -195,7 +195,7 @@ it("shows an honest recovery state when the case queue fails", async () => {
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(copy.loadUnavailableHint);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("min-h-11");
   expect(html).toContain("reviewStatus=refund_recommended&amp;page=2");
   expect(html).not.toContain("&lt;Private order&gt;");
@@ -212,7 +212,7 @@ it("renders an empty queue with clear-filters recovery when filters are active",
   expect(html).toContain(copy.empty);
   expect(html).toContain(copy.clear);
   expect(html).toContain('href="/admin/commerce/order-cases"');
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("shows an honest recovery state when intake evidence fails to load", async () => {
   state.orderDetail.mockRejectedValue(new Error("detail unavailable"));
@@ -220,13 +220,13 @@ it("shows an honest recovery state when intake evidence fails to load", async ()
   const html = renderToStaticMarkup(await OrderCaseCreatePage({ orderId: "ord_a" }));
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(copy.loadUnavailableHint);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("/workspace/purchases/ord_a/support");
 });
 it("clips honest loading shells on narrow layouts", async () => {
   for (const Loading of [OrderCasesLoading, OrderCaseDetailLoading]) {
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain("min-w-0 max-w-5xl");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   }
 });

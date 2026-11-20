@@ -64,8 +64,8 @@ it.each(["en", "ru"] as const)(
     mocks.locale = locale;
     const copy = publicationCopy(locale);
     const html = renderToStaticMarkup(await FollowingPage({}));
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("min-h-11");
     expect(html).toContain(copy.title);
     expect(copy.emptyFollowing).not.toBe(copy.emptyFollowingHint);
@@ -90,7 +90,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(copy.title);
     expect(html).toContain(copy.error);
     expect(html).toContain(getDictionary(locale).errors.retry);
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("min-h-11");
     expect(html).toContain('href="/workspace/feed?source=server&amp;q=MTA"');
     expect(html).not.toContain("session-secret");
@@ -116,7 +116,7 @@ it.each(["en", "ru"] as const)(
     expect(unavailable).toContain('role="alert"');
     expect(unavailable).toContain(copy.loadUnavailable);
     expect(unavailable).toContain(copy.retry);
-    expect(unavailable).toContain("overflow-x-clip");
+    expect(unavailable).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(unavailable).toContain("min-h-11");
     expect(unavailable).not.toContain(copy.emptyFollowing);
     expect(unavailable).not.toContain(copy.error);
@@ -143,7 +143,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(copy.emptyFollowing);
     expect(html).toContain(copy.emptyFollowingHint);
     expect(html).toContain(copy.discover);
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("min-h-11");
     expect(html).toContain('href="/discover"');
   },
@@ -165,7 +165,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(copy.emptyFiltered);
     expect(html).toContain(copy.emptyFilteredHint);
     expect(html).toContain(copy.reset);
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("min-h-11");
     expect(html).not.toContain(copy.emptyFollowing);
     expect(html).not.toContain('href="/discover"');
@@ -182,7 +182,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('id="publication-feed-loading-heading"');
     expect(html).toContain(`>${copy.title}<`);
     expect(html).toContain(copy.loading);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   },
 );

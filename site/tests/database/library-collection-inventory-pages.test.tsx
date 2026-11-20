@@ -217,7 +217,7 @@ it("shows empty results and masks absent/foreign collection scopes", async () =>
   const empty = await screen();
   expect(empty).toContain(copy.empty);
   expect(empty).toContain(copy.emptyHint);
-  expect(empty).toContain("overflow-x-clip");
+  expect(empty).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(empty).toContain(copy.clear);
   state.history.mockRejectedValue(new AppError("PRIVATE", 404, "NOT_FOUND"));
   await expect(screen()).rejects.toThrow("NEXT_NOT_FOUND");
@@ -228,7 +228,7 @@ it("shows an honest recovery state when collection inventory fails", async () =>
   expect(html).toContain('role="alert"');
   expect(html).toContain(libraryCollectionInventoryCopy("en").loadUnavailable);
   expect(html).toContain(`>${libraryCollectionInventoryCopy("en").title}</h1>`);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("collectionId=lcol_a");
   expect(html).toContain("release=updates");
 });

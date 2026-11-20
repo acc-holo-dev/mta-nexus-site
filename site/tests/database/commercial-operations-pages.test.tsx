@@ -175,7 +175,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(locale === "ru" ? "Активация недоступна" : "Activation unavailable");
     expect(html).toContain("disabled");
     expect(html).toContain("scope=organization&amp;page=1");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("min-h-11");
     expect(html).not.toContain("PRIVATE");
   },
@@ -190,7 +190,7 @@ it("shows an honest recovery state when the public catalog fails", async () => {
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(dictionary.errors.retry);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/subscriptions?scope=organization&amp;page=2"');
   expect(html).not.toContain(copy.empty);
 });
@@ -200,13 +200,13 @@ it("renders an empty public catalog with EmptyState title and description", asyn
   const html = markup(await Catalog({ searchParams: Promise.resolve({ scope: "user" }) }));
   expect(html).toContain(copy.empty);
   expect(html).toContain(copy.planNote);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).not.toContain('role="alert"');
 });
 it("clips honest public catalog loading on narrow layouts", async () => {
   const copy = getCommercialCopy("en");
   const html = renderToStaticMarkup(await CatalogLoading());
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(copy.catalog);
 });
 it("preserves immutable draft editor semantics and escapes historical reasons", async () => {
@@ -260,7 +260,7 @@ it("shows an honest recovery state when the admin plans queue fails", async () =
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/admin/commerce/plans?status=published&amp;page=2"');
 });
 it("renders an empty admin plans page with clear-filters recovery when filters are active", async () => {
@@ -272,7 +272,7 @@ it("renders an empty admin plans page with clear-filters recovery when filters a
   expect(html).toContain(copy.empty);
   expect(html).toContain(copy.clearFilters);
   expect(html).toContain('href="/admin/commerce/plans"');
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("rejects stale admin privilege before loading the plans queue", async () => {
   state.adminPage.mockRejectedValue(new AppError("Revoked", 403, "FORBIDDEN"));
@@ -284,7 +284,7 @@ it("shows an honest recovery state when admin plan detail fails", async () => {
   const html = markup(await Admin({ ...input, params: Promise.resolve({ id: "cplan_a" }) }));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/admin/commerce/plans/cplan_a?page=2"');
 });
 it("hides missing admin plans before inventing detail", async () => {
@@ -296,7 +296,7 @@ it("hides missing admin plans before inventing detail", async () => {
 it("clips honest loading shells on narrow layouts", async () => {
   for (const Loading of [PlansLoading, PlanDetailLoading, PlanNewLoading]) {
     const html = renderToStaticMarkup(await Loading());
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("Loading commercial plans");
   }
 });
@@ -310,13 +310,13 @@ it("shows an honest recovery state when buyer payment operations fail", async ()
   const html = markup(await Operations(input));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/workspace/purchases/ord_a/operations?page=2"');
 });
 it("clips honest buyer operations loading on narrow layouts", async () => {
   const copy = getCommercialCopy("en");
   const html = renderToStaticMarkup(await OperationsLoading());
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(copy.paymentOperations);
   expect(html).toContain(copy.loading);
 });

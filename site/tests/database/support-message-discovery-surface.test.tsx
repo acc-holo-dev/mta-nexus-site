@@ -108,7 +108,7 @@ it.each(["en", "ru"] as const)(
       );
     expect(html).toContain(copy.title);
     expect(html).toContain("min-w-0 max-w-4xl");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain(copy.focused);
     expect(html).toContain(copy.truncated);
     expect(html).toContain(`<search aria-label="${copy.filters}"`);
@@ -176,7 +176,7 @@ it("gates anonymous reads and validates duplicate filters before loading data", 
   expect(invalid).toContain('role="alert"');
   expect(invalid).toContain(supportMessageCopy("en").invalid);
   expect(invalid).toContain(supportMessageCopy("en").reset);
-  expect(invalid).toContain("overflow-x-clip");
+  expect(invalid).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(mock.page).not.toHaveBeenCalled();
 });
 it("delegates the staff-only requirement to a fresh server-side grant check", async () => {

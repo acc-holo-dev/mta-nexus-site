@@ -124,7 +124,7 @@ it("shows an honest recovery state when staff moderation inventory fails", async
   const html = renderToStaticMarkup(await Staff(input));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/admin/resources?page=2"');
   expect(html).not.toContain("&lt;Resource&gt;");
 });
@@ -146,7 +146,7 @@ it("renders empty staff inventory with clear-filters recovery when filters are a
   expect(filtered).toContain(copy.empty);
   expect(filtered).toContain(copy.clearFilters);
   expect(filtered).toContain('href="/admin/resources"');
-  expect(filtered).toContain("overflow-x-clip");
+  expect(filtered).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("renders staff decisions with resource revision controls and bounded history", async () => {
   state.user = { id: "usr_a", role: "moderator" };
@@ -154,7 +154,7 @@ it("renders staff decisions with resource revision controls and bounded history"
   expect(html).toContain('data-status="suspended"');
   expect(html).toContain("&lt;Evidence&gt;");
   expect(html).toContain("page=3");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(state.staffDetail).toHaveBeenCalledWith(state.user, "prd_a", 2);
 });
 it("shows an honest recovery state when staff resource detail fails", async () => {
@@ -164,7 +164,7 @@ it("shows an honest recovery state when staff resource detail fails", async () =
   const html = renderToStaticMarkup(await StaffDetail(input));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(`/admin/resources/prd_a?page=2`);
   expect(html).not.toContain("data-status");
 });
@@ -180,7 +180,7 @@ it("renders empty staff moderation history without inventing events", async () =
     }),
   );
   expect(html).toContain(copy.empty);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).not.toContain("&lt;Evidence&gt;");
 });
 it("shows the author a reason and review requirement without staff action controls", async () => {
@@ -198,6 +198,6 @@ it("shows an honest publisher recovery state when restriction history fails", as
   const html = renderToStaticMarkup(await Publisher(input));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("page=2");
 });

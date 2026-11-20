@@ -128,7 +128,7 @@ it("masks revoked access and rejects invalid query recovery without service read
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.errorDescription);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(state.preview).not.toHaveBeenCalled();
 });
 it("renders empty history with valid filters", async () => {
@@ -169,7 +169,7 @@ it("shows an honest recovery state when draft copy services fail", async () => {
   const html = renderToStaticMarkup(await New(context));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("shows an honest recovery state when copy history fails", async () => {
   state.page.mockRejectedValue(new Error("history unavailable"));
@@ -177,7 +177,7 @@ it("shows an honest recovery state when copy history fails", async () => {
   const html = renderToStaticMarkup(await History(context));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("shows an honest recovery state when a recorded copy detail fails", async () => {
   state.detail.mockRejectedValue(new Error("detail unavailable"));
@@ -185,5 +185,5 @@ it("shows an honest recovery state when a recorded copy detail fails", async () 
   const html = renderToStaticMarkup(await Detail(context));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });

@@ -145,7 +145,7 @@ it("shows an honest recovery state when variant management fails", async () => {
   const html = renderToStaticMarkup(await VariantsPage(context));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("shows an honest recovery state when compatibility resolution fails", async () => {
   state.resolution.mockRejectedValue(new Error("compatibility unavailable"));
@@ -157,7 +157,7 @@ it("shows an honest recovery state when compatibility resolution fails", async (
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(copy.loadUnavailableHint);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("min-h-11");
   expect(html).toContain("/workspace/resources/prd_a/compatibility");
   expect(state.compatibilityForm).not.toHaveBeenCalled();

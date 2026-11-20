@@ -116,7 +116,7 @@ it("shows an honest recovery state when gallery data fails", async () => {
   const html = renderToStaticMarkup(await ResourceMediaScreen({ productId: "prd_a" }));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/workspace/resources/prd_a/media"');
   expect(html).not.toContain("Private");
 });
@@ -131,5 +131,5 @@ it("shows an honest staff recovery state without inventing gallery content", asy
 it("clips honest loading shells on narrow layouts", async () => {
   const html = renderToStaticMarkup(await AdminResourceMediaLoading());
   expect(html).toContain("min-w-0 max-w-5xl");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });

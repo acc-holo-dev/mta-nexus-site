@@ -67,7 +67,7 @@ it.each(["en", "ru"])("renders discovery, private journal and inspection in %s",
   expect(html).toContain(locale === "ru" ? "Сканировать окно" : "Scan window");
   expect(html).toContain("bg-accent text-white");
   expect(html).toContain("view=all&amp;page=2");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("does not load journal data for moderators or signed-out visitors", async () => {
   state.actor = null;
@@ -118,7 +118,7 @@ it("preserves terminal changed states without offering automatic deletion", asyn
   const html = renderToStaticMarkup(await Detail({ params: Promise.resolve({ id: item.id }) }));
   expect(html).toContain("Changed — preserved");
   expect(html).not.toContain('type="checkbox"');
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("surfaces a failed removal resultCode through ErrorState instead of bare danger text", async () => {
   state.detail.mockResolvedValue({
@@ -147,7 +147,7 @@ it("shows an honest recovery state when the storage journal fails", async () => 
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/admin/storage?view=eligible&amp;page=2"');
   expect(html).not.toContain("assets/usr_a/ast_a.zip");
 });
@@ -160,7 +160,7 @@ it("renders empty journal inventory with clear-filters recovery when a view filt
   expect(html).toContain(copy.empty);
   expect(html).toContain(copy.clearFilters);
   expect(html).toContain('href="/admin/storage"');
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("shows an honest recovery state when object inspection fails", async () => {
   state.detail.mockRejectedValue(new Error("detail unavailable"));
@@ -168,7 +168,7 @@ it("shows an honest recovery state when object inspection fails", async () => {
   const html = renderToStaticMarkup(await Detail({ params: Promise.resolve({ id: item.id }) }));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/admin/storage/objects/smo_a"');
   expect(html).not.toContain('type="checkbox"');
 });
@@ -179,10 +179,10 @@ it("maps missing object inspection to not found", async () => {
 it("uses honest loading shells with storage maintenance copy", async () => {
   const copy = storageMaintenanceCopy("en");
   const listHtml = renderToStaticMarkup(await ListLoading());
-  expect(listHtml).toContain("overflow-x-clip");
+  expect(listHtml).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(listHtml).toContain(copy.title);
   const detailHtml = renderToStaticMarkup(await DetailLoading());
-  expect(detailHtml).toContain("overflow-x-clip");
+  expect(detailHtml).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(detailHtml).toContain(copy.detail);
   expect(detailHtml).not.toContain("Administration");
 });

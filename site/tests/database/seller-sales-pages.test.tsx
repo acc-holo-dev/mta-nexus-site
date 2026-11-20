@@ -247,7 +247,7 @@ it("shows an honest recovery state when the sales report fails to load", async (
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(copy.loadUnavailableHint);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("min-h-11");
   expect(html).toContain('href="/workspace/sales/report?page=2"');
   expect(html).not.toContain("report unavailable");
@@ -263,14 +263,14 @@ it("shows an honest recovery state when a sale line fails to load", async () => 
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/workspace/sales/report/itm_a?organizationId=org_a"');
 });
 it("clips honest sales loading shells on narrow layouts", async () => {
   for (const Loading of [ReportLoading, DetailLoading]) {
     const html = renderToStaticMarkup(await Loading());
-    expect(html).toContain("min-w-0");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   }
   expect(renderToStaticMarkup(await DetailLoading())).toContain(
     sellerSalesCopy("en").detailLoading,

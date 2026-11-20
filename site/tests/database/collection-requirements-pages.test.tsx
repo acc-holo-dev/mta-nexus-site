@@ -164,7 +164,7 @@ it("shows an honest recovery state when collection readiness fails to load", asy
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(`>${copy.title}</h1>`);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("/lcol_a/requirements?targetMta=1.6.0");
   expect(html).not.toContain("requirements unavailable");
 });

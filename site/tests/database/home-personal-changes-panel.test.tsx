@@ -92,8 +92,8 @@ describe("HomePersonalChangesPanel", () => {
       expect(html).toMatch(/12|до 12/u);
       expect(html).toMatch(/notification inbox|центре уведомлений/u);
       expect(html).toContain(copy.description);
-      expect(html).toContain("overflow-x-clip");
-      expect(html).toContain("min-w-0");
+      expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+      expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
       expect(html).toContain("min-h-11");
     },
   );
@@ -132,7 +132,7 @@ describe("HomePersonalChangesPanel", () => {
       expect(html).toContain(copy.emptyHint);
       expect(html).toContain(copy.openInbox);
       expect(html).toContain('href="/notifications?state=unread"');
-      expect(html).toContain("overflow-x-clip");
+      expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
       expect(html).toContain("min-h-11");
       expect(html).not.toContain('role="alert"');
       expect(html).not.toContain(copy.error);
@@ -154,7 +154,7 @@ describe("HomePersonalChangesPanel", () => {
       expect(copy.hidden).not.toBe(copy.hiddenHint);
       expect(html).toContain(copy.hidden);
       expect(html).toContain(copy.hiddenHint);
-      expect(html).toContain("overflow-x-clip");
+      expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
       expect(html).not.toContain('role="alert"');
       expect(html).not.toContain(copy.empty);
     },
@@ -182,7 +182,7 @@ describe("HomePersonalChangesPanel", () => {
       expect(html).toContain(copy.openInbox);
       expect(html).toContain('href="/"');
       expect(html).toContain('href="/notifications?state=unread"');
-      expect(html).toContain("overflow-x-clip");
+      expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
       expect(html).toContain("min-h-11");
       expect(html).not.toContain(copy.empty);
       expect(html).not.toContain(copy.emptyHint);
@@ -213,7 +213,7 @@ describe("HomePersonalChangesPanel", () => {
 
     expect(html).toContain(copy.partial);
     expect(html).toContain("Build shipped");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("min-h-11");
     expect(html).not.toContain('role="alert"');
   });

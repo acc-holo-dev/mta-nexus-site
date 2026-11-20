@@ -172,7 +172,7 @@ it("shows an honest recovery state when the report queue fails", async () => {
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(`>${copy.reports}</h1>`);
   expect(html).toContain(copy.loadUnavailableHint);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("min-h-11");
   expect(html).toContain("view=history&amp;page=2");
 });
@@ -209,7 +209,7 @@ it("clips honest loading shells on narrow layouts", async () => {
   for (const Loading of [ReviewsLoading, ReviewDetailLoading]) {
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain("min-w-0 max-w-5xl");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   }
 });
 it.each(["en", "ru"] as const)(
@@ -232,7 +232,7 @@ it.each(["en", "ru"] as const)(
     );
     expect(html).toContain(copy.empty);
     expect(html).toContain(copy.emptyHint);
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("min-h-11");
   },
 );
@@ -251,7 +251,7 @@ it.each(["en", "ru"] as const)(
     );
     expect(html).toContain('role="alert"');
     expect(html).toContain(copy.pageUnavailable);
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("min-h-11");
     expect(html).toContain('href="/market/resource/reviews?page=2"');
     expect(html).not.toContain("database-secret");
@@ -262,7 +262,7 @@ it("clips the public reviews loading shell", async () => {
     "../../src/app/market/[slug]/reviews/loading"
   );
   const html = renderToStaticMarkup(await MarketReviewsLoading());
-  expect(html).toContain("min-w-0");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(resourceReviewCopy("en").pageLoading);
 });

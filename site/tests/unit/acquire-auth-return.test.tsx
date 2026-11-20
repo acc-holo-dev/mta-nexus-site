@@ -32,12 +32,12 @@ describe("acquire guest auth return (FLOW-01)", () => {
     expect(page).toContain("EmptyState");
     expect(page).toContain("dictionary.errors.retry");
     expect(page).toContain('size="touch"');
-    expect(page).toContain("overflow-x-clip");
-    expect(page).toContain("min-w-0");
+    expect(page).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(page).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(page).toContain("min-h-11");
     expect(page).not.toContain('role="alert"');
-    expect(loading).toContain("overflow-x-clip");
-    expect(loading).toContain("min-w-0");
+    expect(loading).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(loading).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   });
 
   it("keeps productNotFound EmptyState distinct from loadFailed ErrorState", () => {

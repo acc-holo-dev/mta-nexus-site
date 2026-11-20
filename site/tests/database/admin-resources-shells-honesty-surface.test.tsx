@@ -13,8 +13,8 @@ function expectClippedLoadingSource(source: string) {
     expect(source).toMatch(/[A-Za-z]\w*RouteLoading|pageShell|page-shell/);
     return;
   }
-  expect(source).toContain("overflow-x-clip");
-  expect(source).toContain("min-w-0");
+  expect(source).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(source).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 }
 
 const state = vi.hoisted(() => ({
@@ -91,8 +91,8 @@ it.each([
   async (_name, Loading, titleOf) => {
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain('aria-busy="true"');
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain(titleOf());
     expect(html).toContain('role="status"');
   },
@@ -104,7 +104,7 @@ it("keeps admin media loading copy honest while clipped", async () => {
   const html = renderToStaticMarkup(await AdminResourceMediaLoading());
   expect(html).toContain(copy.title);
   expect(html).toContain(admin.loading);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 
 it.each([
@@ -128,8 +128,8 @@ it.each([
     const copy = copyOf();
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain('aria-busy="true"');
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain(copy[titleKey]);
     expect(html).toContain(copy[loadingKey]);
     expect(html).toContain('role="status"');

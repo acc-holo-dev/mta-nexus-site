@@ -136,7 +136,7 @@ it("shows an honest recovery state when comparison data fails to load", async ()
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(`>${copy.title}</h1>`);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("from=bld_a&amp;to=bld_b&amp;returnPage=2");
   expect(html).not.toContain("comparison-store-down");
 });

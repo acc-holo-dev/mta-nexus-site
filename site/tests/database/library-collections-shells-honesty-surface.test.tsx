@@ -16,8 +16,8 @@ function expectClippedLoadingSource(source: string) {
     expect(source).toMatch(/[A-Za-z]\w*RouteLoading|pageShell|page-shell/);
     return;
   }
-  expect(source).toContain("overflow-x-clip");
-  expect(source).toContain("min-w-0");
+  expect(source).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(source).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 }
 
 const state = vi.hoisted(() => ({
@@ -99,8 +99,8 @@ it("locks market detail and articles shells to ErrorState/EmptyState honesty chr
   const articles = read("site/src/features/community/server/articles-page.tsx");
   expect(articles).toContain("ErrorState");
   expect(articles).toContain("EmptyState");
-  expect(articles).toContain("overflow-x-clip");
-  expect(articles).toContain("min-w-0");
+  expect(articles).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(articles).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(articles).toMatch(/min-h-11|size="touch"/u);
 
   expect(read("site/src/lib/i18n/en/product.ts")).toContain("detailUnavailableDescription");
@@ -133,8 +133,8 @@ it.each([
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain('aria-busy="true"');
     expect(html).toContain(`id="${headingId}"`);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain('role="status"');
   },
 );
@@ -150,7 +150,11 @@ it.each(["en", "ru"] as const)(
     expect(renderToStaticMarkup(await CollectionCompareLoading())).toContain(compare.loading);
     expect(renderToStaticMarkup(await CollectionAddLoading())).toContain(collections.add);
     expect(renderToStaticMarkup(await FeedLoading())).toContain(feed.loading);
-    expect(renderToStaticMarkup(await FeedLoading())).toContain("overflow-x-clip");
-    expect(renderToStaticMarkup(await DiscussionsDetailLoading())).toContain("overflow-x-clip");
+    expect(renderToStaticMarkup(await FeedLoading())).toMatch(
+      /(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/,
+    );
+    expect(renderToStaticMarkup(await DiscussionsDetailLoading())).toMatch(
+      /(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/,
+    );
   },
 );

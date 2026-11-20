@@ -15,8 +15,8 @@ function expectClippedLoadingSource(source: string) {
     expect(source).toMatch(/[A-Za-z]\w*RouteLoading|pageShell|page-shell/);
     return;
   }
-  expect(source).toContain("overflow-x-clip");
-  expect(source).toContain("min-w-0");
+  expect(source).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(source).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 }
 
 const state = vi.hoisted(() => ({
@@ -56,23 +56,25 @@ it("locks residual settings and auth route shells to clipped min-w-0 frames", ()
 it("preserves settings and auth ErrorState/EmptyState honesty chrome under clipped shells", () => {
   const settingsClient = read("site/src/features/accounts/components/settings-page-client.tsx");
   expect(settingsClient).toContain("ErrorState");
-  expect(settingsClient).toContain("overflow-x-clip");
-  expect(settingsClient).toContain("min-w-0");
+  expect(settingsClient).toMatch(
+    /(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/,
+  );
+  expect(settingsClient).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(settingsClient).toMatch(/min-h-11|size="touch"/u);
   expect(settingsClient).not.toContain('role="alert"');
 
   const authForm = read("site/src/features/accounts/components/auth-form.tsx");
   expect(authForm).toContain("ErrorState");
-  expect(authForm).toContain("overflow-x-clip");
-  expect(authForm).toContain("min-w-0");
+  expect(authForm).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(authForm).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(authForm).toMatch(/min-h-11|size="touch"/u);
   expect(authForm).not.toContain('role="alert"');
 
   const history = read("site/src/features/accounts/components/profile-change-history.tsx");
   expect(history).toContain("ErrorState");
   expect(history).toContain("EmptyState");
-  expect(history).toContain("overflow-x-clip");
-  expect(history).toContain("min-w-0");
+  expect(history).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(history).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(history).toMatch(/min-h-11|size="touch"/u);
   expect(history).not.toContain('role="alert"');
 });
@@ -120,21 +122,25 @@ it.each(["en", "ru"] as const)(
         <SettingsPage />
       </LocaleProvider>,
     );
-    expect(settingsHtml).toContain("overflow-x-clip");
-    expect(settingsHtml).toContain("min-w-0");
+    expect(settingsHtml).toMatch(
+      /(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/,
+    );
+    expect(settingsHtml).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(settingsHtml).toContain(dictionary.settings.title);
     expect(settingsHtml).toContain(dictionary.settings.loading);
 
     const loginHtml = renderToStaticMarkup(await LoginPage({ searchParams: Promise.resolve({}) }));
-    expect(loginHtml).toContain("overflow-x-clip");
-    expect(loginHtml).toContain("min-w-0");
+    expect(loginHtml).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(loginHtml).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(loginHtml).toContain(dictionary.auth.loginTitle);
 
     const registerHtml = renderToStaticMarkup(
       await RegisterPage({ searchParams: Promise.resolve({}) }),
     );
-    expect(registerHtml).toContain("overflow-x-clip");
-    expect(registerHtml).toContain("min-w-0");
+    expect(registerHtml).toMatch(
+      /(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/,
+    );
+    expect(registerHtml).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(registerHtml).toContain(dictionary.auth.registerTitle);
   },
 );

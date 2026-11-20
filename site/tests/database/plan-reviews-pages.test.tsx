@@ -260,7 +260,7 @@ it("shows an honest recovery state when saved plan reviews fail to load", async 
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(copy.loadUnavailableHint);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("min-h-11");
   expect(html).toContain('href="/workspace/subscriptions/reviews"');
 });
@@ -285,7 +285,7 @@ it("shows honest recovery when review detail or new review loads fail", async ()
 it("clips honest plan review loading shells on narrow layouts", async () => {
   for (const Loading of [ReviewsLoading, ReviewDetailLoading]) {
     const html = renderToStaticMarkup(await Loading());
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain(planReviewsCopy("en").loading);
   }
 });

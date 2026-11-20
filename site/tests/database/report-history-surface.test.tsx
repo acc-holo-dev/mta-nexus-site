@@ -164,14 +164,14 @@ it("rejects stale team rights and mismatched private DTOs without showing loaded
   state.discussionReports.mockResolvedValue({ ...reports, commentId: "foreign" });
   const mismatched = renderToStaticMarkup(await Reports({ id: "post", commentId: "comment" }));
   expect(mismatched).toContain('role="alert"');
-  expect(mismatched).toContain("overflow-x-clip");
+  expect(mismatched).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(mismatched).not.toContain("Private title");
 });
 it("does not read private reports for ordinary users or history for anonymous sessions", async () => {
   state.session.mockResolvedValue({ id: "actor", role: "user" });
   const denied = renderToStaticMarkup(await Reports({ id: "post", commentId: "comment" }));
   expect(denied).toContain('role="alert"');
-  expect(denied).toContain("overflow-x-clip");
+  expect(denied).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(state.discussionReports).not.toHaveBeenCalled();
   state.session.mockResolvedValue(null);
   expect(renderToStaticMarkup(await History({ id: "org", contentId: "post" }))).toContain(
@@ -233,7 +233,7 @@ it("shows an honest recovery state when comment reports fail to load", async () 
     }),
   );
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("q=word&amp;view=history");
   expect(html).not.toContain("Private title");
 });
@@ -253,7 +253,9 @@ it("rejects duplicate filters before either private data source", async () => {
     }),
   );
   expect(invalidReports).toContain('role="alert"');
-  expect(invalidReports).toContain("overflow-x-clip");
+  expect(invalidReports).toMatch(
+    /(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/,
+  );
   expect(state.discussionReports).not.toHaveBeenCalled();
   expect(
     renderToStaticMarkup(

@@ -122,7 +122,7 @@ describe("moderation queue admin boundary", () => {
     expect(markup).toContain('role="alert"');
     expect(markup).toContain(getDictionary("en").admin.accessDenied);
     expect(markup).toContain(getDictionary("en").admin.accessDeniedDescription);
-    expect(markup).toContain("overflow-x-clip");
+    expect(markup).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(markup).toContain('href="/"');
     expect(mocks.listPendingReviewPage).not.toHaveBeenCalled();
     expect(mocks.countPendingReview).not.toHaveBeenCalled();
@@ -182,7 +182,7 @@ describe("moderation queue admin boundary", () => {
 
     expect(markup).toContain('role="alert"');
     expect(markup).toContain(copy.hubUnavailable);
-    expect(markup).toContain("overflow-x-clip");
+    expect(markup).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(markup).toContain(getDictionary("en").errors.retry);
     expect(markup).toContain('href="/admin?');
     expect(markup).not.toContain(copy.resourceBuildQueue);

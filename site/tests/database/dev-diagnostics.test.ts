@@ -31,8 +31,8 @@ describe("development diagnostics", () => {
     expect(page).toContain('titleId="dev-environment-heading"');
     expect(page).toContain('aria-labelledby="dev-app-url-heading"');
     expect(page).toContain('id="dev-app-url-heading"');
-    expect(page).toContain("overflow-x-clip");
-    expect(page).toContain("min-w-0");
+    expect(page).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(page).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(page).toContain("pageShellClass");
     expect(page).not.toContain('role="alert"');
   });

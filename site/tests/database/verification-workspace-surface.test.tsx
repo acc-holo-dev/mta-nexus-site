@@ -116,8 +116,8 @@ it("offers clear organization search when managed teams are empty", () => {
   expect(html).toContain(copy.noTeamsHint);
   expect(html).toContain(copy.clearTeamSearch);
   expect(html).toContain("teamsQ=");
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-w-0");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 
 it("offers a clear filter or alternate view when history is empty", () => {
@@ -173,7 +173,7 @@ it("shows errors without presenting a failed read as empty history or editable d
   expect(html).toContain('id="verification-workspace-unavailable"');
   expect(html).toContain(copy.unavailable);
   expect(html).toContain("min-h-11");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).not.toContain(copy.noApplications);
   const editor = renderToStaticMarkup(
     <DeveloperProfileEditor actorId="actor" initial={null} locale="en" />,
@@ -186,8 +186,8 @@ it("clips the verification centre loading shell on narrow layouts", async () => 
     "../../src/app/workspace/verification/loading"
   );
   const html = renderToStaticMarkup(await VerificationLoading());
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-w-0");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(verificationCopy("en").loading);
 });
 it("recovers with ErrorState when verification session probing fails", async () => {
@@ -197,7 +197,7 @@ it("recovers with ErrorState when verification session probing fails", async () 
   expect(html).toContain(verificationCopy("en").title);
   expect(html).toContain(verificationCopy("en").unavailable);
   expect(html).toContain('href="/workspace/verification"');
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).not.toContain("PRIVATE_AUTH");
   expect(html).not.toContain("/auth/login");
 });

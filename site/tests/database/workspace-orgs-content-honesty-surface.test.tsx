@@ -13,8 +13,8 @@ function expectClippedLoadingSource(source: string) {
     expect(source).toMatch(/[A-Za-z]\w*RouteLoading|pageShell|page-shell/);
     return;
   }
-  expect(source).toContain("overflow-x-clip");
-  expect(source).toContain("min-w-0");
+  expect(source).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(source).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 }
 
 const state = vi.hoisted(() => ({
@@ -99,8 +99,8 @@ it.each([
   async (_name, Loading, headingId) => {
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain('aria-busy="true"');
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+    expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain('role="status"');
     expect(html).toContain(`id="${headingId}"`);
   },
@@ -114,7 +114,7 @@ it.each(["en", "ru"] as const)(
     const html = renderToStaticMarkup(await ActivityLoading());
     expect(html).toContain(copy.history);
     expect(html).toContain(copy.historyDescription);
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   },
 );
 

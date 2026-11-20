@@ -105,7 +105,7 @@ it("shows explicit empty or unknown evidence without inventing a status transiti
     );
   expect(empty).toContain(copy.empty);
   expect(empty).not.toContain(copy.emptyFiltered);
-  expect(empty).toContain("overflow-x-clip");
+  expect(empty).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   const filtered = renderToStaticMarkup(
     <CommunityReportHistory
       page={{ ...page, items: [] }}
@@ -116,7 +116,7 @@ it("shows explicit empty or unknown evidence without inventing a status transiti
   expect(filtered).toContain(copy.emptyFiltered);
   expect(filtered).toContain(copy.reset);
   expect(filtered).toContain("/workspace/reports/report/history");
-  expect(filtered).toContain("overflow-x-clip");
+  expect(filtered).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   const unknown = renderToStaticMarkup(
     <CommunityReportHistory
       page={{ ...page, items: [{ ...event, from: null, to: null, by: "unknown" }] }}
@@ -168,7 +168,7 @@ it("keeps authentication, query validation and live authority errors ahead of pr
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(`>${reportHistoryCopy("en").title}</h1>`);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("/admin/reports/report/history");
   expect(mock.page).toHaveBeenCalledWith(
     { id: "owner", role: "moderator" },

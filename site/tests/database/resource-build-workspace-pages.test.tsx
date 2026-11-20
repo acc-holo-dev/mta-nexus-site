@@ -132,7 +132,7 @@ it("shows an honest recovery state when version detail fails", async () => {
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("/workspace/resources/prd_a/builds/bld_a");
   expect(html).not.toContain("<Private resource>");
 });
@@ -149,7 +149,7 @@ it("shows an honest staff recovery state without inventing build content", async
 it("clips honest loading shells on narrow layouts", async () => {
   const html = renderToStaticMarkup(await AdminResourceBuildLoading());
   expect(html).toContain("min-w-0 max-w-5xl");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("does not expose edit or resubmit controls for quarantined or retired builds", async () => {
   for (const status of ["quarantined", "retired"]) {

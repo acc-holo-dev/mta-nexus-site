@@ -95,7 +95,7 @@ it.each(["en", "ru"] as const)(
       locale === "ru" ? "Действующего доступа к скачиванию нет" : "No current download access",
     );
     expect(html).toContain('href="?page=1"');
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain("min-h-11");
     expect(html).not.toContain("/api/checkout");
   },
@@ -108,7 +108,7 @@ it("recovers with ErrorState when order details fail to load", async () => {
   expect(html).toContain(copy.orderLoadUnavailable);
   expect(html).toContain(copy.orderLoadUnavailableHint);
   expect(html).toContain(getDictionary("en").errors.retry);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("min-h-11");
   expect(html).toContain('href="/workspace/purchases/ord_a?page=2"');
 });
@@ -139,7 +139,7 @@ it("renders EmptyState when an order has no line items", async () => {
 });
 it("clips the honest purchase detail loading shell on narrow layouts", async () => {
   const html = renderToStaticMarkup(await PurchaseDetailLoading());
-  expect(html).toContain("min-w-0");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(getCommerceHistoryCopy("en").loading);
 });

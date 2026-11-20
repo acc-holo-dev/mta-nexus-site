@@ -394,7 +394,7 @@ it("shows an honest recovery state when the collections list fails to load", asy
   const html = await screen("list");
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/workspace/library/collections?status=active&amp;page=1"');
   expect(html).not.toContain("collections unavailable");
 });

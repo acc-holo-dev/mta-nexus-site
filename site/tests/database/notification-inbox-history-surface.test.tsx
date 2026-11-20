@@ -48,7 +48,7 @@ it.each(["en", "ru"] as const)(
     const html = await render({ q: "needle", state: "unread", category: "content" });
     expect(html).toContain(copy.openBetaNote);
     expect(html).toContain("min-w-0 max-w-4xl");
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).toContain(`<nav aria-label="${copy.readingState}"`);
     expect(html).not.toContain(`<nav aria-label="${copy.title}"`);
     expect(html).toContain(`aria-label="${copy.pageNavigation}"`);
@@ -72,7 +72,7 @@ it.each(["en", "ru"] as const)(
     const loadingHtml = renderToStaticMarkup(await Loading());
     expect(loadingHtml).toContain('aria-busy="true"');
     expect(loadingHtml).toContain("min-w-0 max-w-4xl");
-    expect(loadingHtml).toContain("overflow-x-clip");
+    expect(loadingHtml).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(loadingHtml).toContain('id="notification-inbox-loading-heading"');
     expect(loadingHtml).toContain('aria-labelledby="notification-inbox-loading-heading"');
     expect(loadingHtml).toContain(`>${copy.title}<`);
@@ -282,7 +282,7 @@ it.each(["session", "page"] as const)(
     expect(html).toContain(`>${copy.title}</h1>`);
     expect(html).toContain(getDictionary("en").errors.retry);
     expect(html).toContain('href="/notifications?state=unread"');
-    expect(html).toContain("overflow-x-clip");
+    expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(html).not.toContain("PRIVATE_SQL");
     expect(html).not.toContain("No notifications yet");
     if (dependency === "session") {

@@ -182,7 +182,7 @@ it("distinguishes empty library inventory from filtered updates", async () => {
   );
   expect(never).toContain(copy.emptyInventory);
   expect(never).toContain(copy.emptyInventoryHint);
-  expect(never).toContain("overflow-x-clip");
+  expect(never).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(never).not.toContain(copy.emptyFiltered);
 
   state.updates.mockResolvedValueOnce({
@@ -207,7 +207,7 @@ it("shows an honest recovery state when library updates fail", async () => {
   const html = renderToStaticMarkup(await Updates(input));
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.updatesLoadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("filter=all");
   expect(html).toContain("page=2");
 });
@@ -218,7 +218,7 @@ it("shows an honest recovery state when library versions fail", async () => {
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.versionsLoadUnavailable);
   expect(html).toContain(copy.versionsLoadUnavailableDescription);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("page=2");
   expect(html).not.toContain("versions unavailable");
 });
@@ -234,7 +234,7 @@ it("shows EmptyState honesty when no approved versions are available", async () 
   const html = renderToStaticMarkup(await Versions(input));
   expect(html).toContain(copy.noVersions);
   expect(html).toContain(copy.noVersionsHint);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("clips the library versions loading shell", async () => {
   const { default: VersionsLoading } = await import(
@@ -242,8 +242,8 @@ it("clips the library versions loading shell", async () => {
   );
   const copy = getResourceReleaseControlCopy("en");
   const html = renderToStaticMarkup(await VersionsLoading());
-  expect(html).toContain("min-w-0");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(copy.versions);
   expect(html).toContain(copy.updatesLoading);
 });

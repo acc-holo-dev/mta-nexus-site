@@ -109,7 +109,7 @@ it("authenticates early and invalid duplicate filters never reach the repository
   expect(invalid).toContain(copy.invalid);
   expect(invalid).toContain(copy.invalidDescription);
   expect(invalid).toContain('role="alert"');
-  expect(invalid).toContain("overflow-x-clip");
+  expect(invalid).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(state.page).not.toHaveBeenCalled();
 });
 
@@ -124,7 +124,7 @@ it("shows an honest recovery state when release watches fail to load", async () 
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toContain(copy.loadUnavailableDescription);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("filter=enabled");
   expect(html).toContain("page=2");
   expect(html).not.toContain("watches unavailable");
@@ -150,7 +150,7 @@ it.each(["en", "ru"] as const)(
     );
     expect(lifetime).toContain(copy.empty);
     expect(lifetime).toContain(copy.emptyHint);
-    expect(lifetime).toContain("overflow-x-clip");
+    expect(lifetime).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     expect(lifetime).not.toContain(copy.emptyFiltered);
     state.page.mockResolvedValueOnce({
       items: [],

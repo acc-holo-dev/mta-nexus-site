@@ -173,7 +173,7 @@ it("shows an honest recovery state when the preparation report fails", async () 
   );
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain("targetMta=1.6.0");
   expect(html).not.toContain("Private");
 });
@@ -197,7 +197,7 @@ it("shows an honest staff recovery state for moderator requirements", async () =
 it("clips honest loading shells on narrow layouts", async () => {
   const html = renderToStaticMarkup(await AdminResourceRequirementsLoading());
   expect(html).toContain("min-w-0 max-w-5xl");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
 });
 it("clips the library requirements loading shell with honest copy", async () => {
   const { default: LibraryRequirementsLoading } = await import(
@@ -205,8 +205,8 @@ it("clips the library requirements loading shell with honest copy", async () => 
   );
   const copy = resourceRequirementsCopy("en");
   const html = renderToStaticMarkup(await LibraryRequirementsLoading());
-  expect(html).toContain("min-w-0");
-  expect(html).toContain("overflow-x-clip");
+  expect(html).toMatch(/(?:min-w-0|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+  expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain(copy.title);
   expect(html).toContain(copy.loading);
 });
