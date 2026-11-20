@@ -25,7 +25,10 @@ const pages: Array<[string, string]> = [
   ["site/src/app/admin/commerce/reconciliation/[id]/page.tsx", "copy.loadUnavailableHint"],
   ["site/src/app/admin/commerce/reconciliation/[id]/terms/page.tsx", "c.loadUnavailableHint"],
   ["site/src/app/workspace/resources/[id]/activity/page.tsx", "copy.loadUnavailableHint"],
-  ["site/src/app/workspace/resources/[id]/history/page.tsx", "copy.loadUnavailableHint"],
+  [
+    "site/src/features/resources/server/resource-publisher-history-screen.tsx",
+    "copy.loadUnavailableHint",
+  ],
   ["site/src/app/workspace/resources/[id]/moderation/page.tsx", "copy.loadUnavailableHint"],
   ["site/src/app/workspace/resources/[id]/copies/page.tsx", "c.loadUnavailableHint"],
   ["site/src/app/workspace/resources/[id]/copy/page.tsx", "c.loadUnavailableHint"],

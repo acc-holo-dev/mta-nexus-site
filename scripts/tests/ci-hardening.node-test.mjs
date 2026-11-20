@@ -55,6 +55,7 @@ test("product feature modules stay on fast_ci", () => {
     "site/src/features/resources/staff-resource-detail-server.ts",
     "site/src/features/resources/resource-manage-server.ts",
     "site/src/features/resources/author-resources-server.ts",
+    "site/src/features/resources/resource-publisher-history-server.ts",
     "site/src/features/resources/review-report-server.ts",
     "site/src/features/resources/qa-report-actions.ts",
     "site/src/features/resources/release-watch-batch.ts",
