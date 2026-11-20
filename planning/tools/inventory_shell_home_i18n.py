@@ -82,7 +82,13 @@ ALLOWLIST: tuple[dict[str, str], ...] = (
         "path": "site/src/app/layout.tsx",
         "kind": "template",
         "text": "%s | MTA NEXUS",
-    }
+    },
+    {
+        "id": "global-error.brand.wordmark",
+        "path": "site/src/features/shell/components/global-error-page.tsx",
+        "kind": "jsx-text",
+        "text": "MTA NEXUS",
+    },
 )
 
 
