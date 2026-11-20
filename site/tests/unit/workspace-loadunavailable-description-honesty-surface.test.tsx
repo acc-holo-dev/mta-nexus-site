@@ -16,8 +16,8 @@ const pages: Array<[string, string]> = [
   ["site/src/app/workspace/resources/[id]/deliveries/page.tsx", "copy.loadUnavailableHint"],
   ["site/src/app/workspace/resources/[id]/variants/page.tsx", "copy.loadUnavailableHint"],
   ["site/src/app/workspace/sales/report/[id]/page.tsx", "c.loadUnavailableHint"],
-  ["site/src/app/developers/[username]/page.tsx", "copy.loadUnavailableHint"],
-  ["site/src/app/users/[username]/page.tsx", "copy.loadUnavailableHint"],
+  ["site/src/features/accounts/server/developer-profile-screen.tsx", "copy.loadUnavailableHint"],
+  ["site/src/features/accounts/server/user-profile-screen.tsx", "copy.loadUnavailableHint"],
   ["site/src/app/workspace/resources/[id]/page.tsx", "publisherCopy.loadUnavailableHint"],
 ];
 

@@ -131,6 +131,8 @@ test("product feature modules stay on fast_ci", () => {
     "site/src/features/accounts/auth.ts",
     "site/src/features/accounts/controls.ts",
     "site/src/features/accounts/settings.ts",
+    "site/src/features/accounts/user-profile-server.ts",
+    "site/src/features/accounts/developer-profile-server.ts",
     "site/src/features/discovery/directory-server.ts",
     "site/src/features/library/collections-server.ts",
     "site/src/features/library/collection-command.ts",

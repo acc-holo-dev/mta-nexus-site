@@ -78,7 +78,10 @@ const features = [
       "settings-recovery-email-section",
       "settings-advertising-preferences-section",
     ],
-    servers: [],
+    servers: [
+      ["user-profile-server", "user-profile-screen.tsx"],
+      ["developer-profile-server", "developer-profile-screen.tsx"],
+    ],
     clientUtilPorts: [
       "profile-pagination",
       "developer-experience",
