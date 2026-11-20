@@ -42,6 +42,7 @@ const utilPorts = [
   "checkout-api-copy",
 ];
 const clientPorts = [
+  "acquire-page",
   "workspace-history",
   "license-controls",
   "subscription-controls",

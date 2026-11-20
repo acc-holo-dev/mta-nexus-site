@@ -19,11 +19,26 @@ const pages: Array<[string, string]> = [
     "site/src/features/moderation/server/staff-storage-object-screen.tsx",
     "copy.loadUnavailableHint",
   ],
-  ["site/src/app/admin/commerce/plans/page.tsx", "copy.loadUnavailableHint"],
-  ["site/src/app/admin/commerce/plans/[id]/page.tsx", "copy.loadUnavailableHint"],
-  ["site/src/app/admin/commerce/reconciliation/page.tsx", "copy.loadUnavailableHint"],
-  ["site/src/app/admin/commerce/reconciliation/[id]/page.tsx", "copy.loadUnavailableHint"],
-  ["site/src/app/admin/commerce/reconciliation/[id]/terms/page.tsx", "c.loadUnavailableHint"],
+  [
+    "site/src/features/commerce/server/commercial-plans-admin-screen.tsx",
+    "copy.loadUnavailableHint",
+  ],
+  [
+    "site/src/features/commerce/server/commercial-plan-admin-detail-screen.tsx",
+    "copy.loadUnavailableHint",
+  ],
+  [
+    "site/src/features/commerce/server/financial-reconciliation-screen.tsx",
+    "copy.loadUnavailableHint",
+  ],
+  [
+    "site/src/features/commerce/server/financial-reconciliation-detail-screen.tsx",
+    "copy.loadUnavailableHint",
+  ],
+  [
+    "site/src/features/commerce/server/financial-reconciliation-terms-screen.tsx",
+    "c.loadUnavailableHint",
+  ],
   ["site/src/features/resources/server/resource-activity-screen.tsx", "copy.loadUnavailableHint"],
   [
     "site/src/features/resources/server/resource-publisher-history-screen.tsx",
@@ -36,8 +51,8 @@ const pages: Array<[string, string]> = [
   ["site/src/features/resources/server/resource-copies-screen.tsx", "c.loadUnavailableHint"],
   ["site/src/features/resources/server/resource-copy-create-screen.tsx", "c.loadUnavailableHint"],
   ["site/src/features/resources/server/resource-copy-receipt-screen.tsx", "c.loadUnavailableHint"],
-  ["site/src/app/workspace/purchases/[id]/operations/page.tsx", "copy.loadUnavailableHint"],
-  ["site/src/app/workspace/purchases/[id]/terms/page.tsx", "c.loadUnavailableHint"],
+  ["site/src/features/commerce/server/purchase-operations-screen.tsx", "copy.loadUnavailableHint"],
+  ["site/src/features/commerce/server/purchase-terms-screen.tsx", "c.loadUnavailableHint"],
 ];
 
 it("locks residual admin/resource loadUnavailable ErrorStates to recovery hints", () => {

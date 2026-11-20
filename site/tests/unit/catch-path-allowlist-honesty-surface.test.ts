@@ -38,7 +38,7 @@ describe("catch-path allowlist honesty surface", () => {
     "site/src/app/auth/verify-email/page.tsx",
     "site/src/app/auth/reset-password/page.tsx",
     "site/src/app/auth/forgot-password/page.tsx",
-    "site/src/app/acquire/page.tsx",
+    "site/src/features/commerce/components/acquire-page.tsx",
     "site/src/features/support/components/support-center.tsx",
     "site/src/features/support/components/support-case-thread.tsx",
   ])("%s allowlists failure messages", (path) => {

@@ -1,32 +1,10 @@
-import type { Metadata } from "next";
-import { LegalDocument } from "../../features/shell/legal-document";
-import { getDictionary } from "../../lib/i18n";
-import { getRequestLocale } from "../../lib/i18n/server";
+import {
+  LegalDocumentPage,
+  legalDocumentMetadata,
+} from "../../features/shell/legal-document-page-server";
 
-const pageShellClass = "min-w-0 overflow-x-clip";
+export const generateMetadata = () => legalDocumentMetadata("terms");
 
-export async function generateMetadata(): Promise<Metadata> {
-  const locale = await getRequestLocale();
-  return { title: getDictionary(locale).legal.terms.metadataTitle };
-}
-
-export default async function TermsPage() {
-  const locale = await getRequestLocale();
-  const legal = getDictionary(locale).legal;
-  const document = legal.terms;
-
-  return (
-    <div className={pageShellClass}>
-      <LegalDocument
-        badge={legal.openFreeBeta}
-        title={document.title}
-        lead={document.lead}
-        lastUpdatedLabel={legal.lastUpdated}
-        updated={document.updated}
-        sections={document.sections}
-        contactLabel={document.contactLabel}
-        contactEmail={document.contactEmail}
-      />
-    </div>
-  );
+export default async function Page() {
+  return LegalDocumentPage({ kind: "terms" });
 }

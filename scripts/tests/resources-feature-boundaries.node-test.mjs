@@ -699,7 +699,7 @@ test("real client, evidence, view and model entrypoints have no transitive serve
     if (visited.has(name)) return;
     visited.add(name);
     assert(
-      !/^site\/src\/(?:app\/|features\/resources\/(?:server|(?:detail|versions|reviews|media|build|package|requirements|review-report|delivery|staff-resources|staff-resource-detail|resource-manage|author-resources|resource-publisher-history|publisher-deliveries|resource-copies|resource-activity|resource-publisher-moderation|resource-copy-receipt|resource-copy-create|resource-variants|resource-compatibility|resource-create)-server)(?:\.ts$|\/)|lib\/(?:services\/|i18n-server\.ts$))/u.test(
+      !/^site\/src\/(?:app\/|features\/resources\/(?:server|(?:detail|versions|reviews|media|build|package|requirements|review-report|delivery|staff-resources|staff-resource-detail|resource-manage|author-resources|resource-publisher-history|publisher-deliveries|resource-copies|resource-activity|resource-publisher-moderation|resource-copy-receipt|resource-copy-create|resource-variants|resource-compatibility|resource-create|publisher-acquisitions|acquisition-receipts|acquisition-receipt-detail)-server)(?:\.ts$|\/)|lib\/(?:services\/|i18n-server\.ts$))/u.test(
         name,
       ),
       name,

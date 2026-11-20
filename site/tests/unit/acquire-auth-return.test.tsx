@@ -6,7 +6,7 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8"
 
 describe("acquire guest auth return (FLOW-01)", () => {
   it("preserves productId through login/register and never auto-claims after auth alone", () => {
-    const source = read("site/src/app/acquire/page.tsx");
+    const source = read("site/src/features/commerce/components/acquire-page.tsx");
 
     expect(source).toContain('authEntryHref("login", acquireReturnPath)');
     expect(source).toContain('authEntryHref("register", acquireReturnPath)');
@@ -25,7 +25,7 @@ describe("acquire guest auth return (FLOW-01)", () => {
   });
 
   it("locks ErrorState load failures, EmptyState empties, touch CTAs, and clipped shells", () => {
-    const page = read("site/src/app/acquire/page.tsx");
+    const page = read("site/src/features/commerce/components/acquire-page.tsx");
     const loading = read("site/src/app/acquire/loading.tsx");
 
     expect(page).toContain("ErrorState");
@@ -41,7 +41,7 @@ describe("acquire guest auth return (FLOW-01)", () => {
   });
 
   it("keeps productNotFound EmptyState distinct from loadFailed ErrorState", () => {
-    const page = read("site/src/app/acquire/page.tsx");
+    const page = read("site/src/features/commerce/components/acquire-page.tsx");
     expect(page).toContain("copy.productNotFound");
     expect(page).toContain("copy.loadFailed");
     expect(page).toMatch(

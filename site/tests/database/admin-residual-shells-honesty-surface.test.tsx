@@ -58,7 +58,7 @@ it("locks residual admin route shells to clipped min-w-0 frames", () => {
 });
 
 it("locks admin license detail honesty chrome with ErrorState recovery", () => {
-  const source = read("site/src/app/admin/licenses/[id]/page.tsx");
+  const source = read("site/src/features/commerce/server/license-moderation-detail-screen.tsx");
   expect(source).toContain("ErrorState");
   expect(source).toContain("overflow-x-clip");
   expect(source).toContain("min-w-0");

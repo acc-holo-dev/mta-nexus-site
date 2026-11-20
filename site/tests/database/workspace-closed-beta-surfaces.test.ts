@@ -54,10 +54,26 @@ vi.mock("../../src/lib/services/servers/mta-master-directory-service", () => ({
   indexMtaObservations: vi.fn(() => () => undefined),
 }));
 
-import LicensesPage from "../../src/app/workspace/licenses/page";
 import PurchasesPage from "../../src/app/workspace/purchases/page";
-import SalesPage from "../../src/app/workspace/sales/page";
 import SavedPage from "../../src/app/workspace/saved/page";
+import { LicensesHistoryScreen } from "../../src/features/commerce/licenses-history-server";
+import { SalesHistoryScreen } from "../../src/features/commerce/sales-history-server";
+
+async function LicensesPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return LicensesHistoryScreen({ query: await searchParams });
+}
+
+async function SalesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string | string[] }>;
+}) {
+  return SalesHistoryScreen({ query: await searchParams });
+}
 
 describe("open free-beta workspace behavior", () => {
   beforeEach(() => {

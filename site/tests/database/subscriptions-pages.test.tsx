@@ -1,8 +1,10 @@
+vi.mock("server-only", () => ({}));
+
 import { AppError } from "@nexus/domain";
-import { getDictionary } from "../../src/lib/i18n";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+import { getDictionary } from "../../src/lib/i18n";
 
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,

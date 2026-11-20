@@ -370,3 +370,39 @@ test("discovery discovery-stream-page-server stays server-only and avoids routin
   assert(modules.has("site/src/features/discovery/server/discovery-stream-page.tsx"));
   assert(![...modules].some((path) => path.startsWith("site/src/app/")));
 });
+
+test("shell home-page-server stays server-only and avoids routing", () => {
+  const source = "site/src/features/shell/home-page-server.ts";
+  assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+  const result = cruise(root, [source]);
+  assert.equal(result.status, 0, result.stderr);
+  const graph = JSON.parse(result.stdout);
+  assert.deepEqual(graph.summary.violations, []);
+  const modules = new Set(graph.modules.map((mod) => mod.source));
+  assert(modules.has("site/src/features/shell/server/home-page.tsx"));
+  assert(![...modules].some((path) => path.startsWith("site/src/app/")));
+});
+
+test("shell workspace-hub-server stays server-only and avoids routing", () => {
+  const source = "site/src/features/shell/workspace-hub-server.ts";
+  assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+  const result = cruise(root, [source]);
+  assert.equal(result.status, 0, result.stderr);
+  const graph = JSON.parse(result.stdout);
+  assert.deepEqual(graph.summary.violations, []);
+  const modules = new Set(graph.modules.map((mod) => mod.source));
+  assert(modules.has("site/src/features/shell/server/workspace-hub-page.tsx"));
+  assert(![...modules].some((path) => path.startsWith("site/src/app/")));
+});
+
+test("shell legal-document-page-server stays server-only and avoids routing", () => {
+  const source = "site/src/features/shell/legal-document-page-server.ts";
+  assert.match(readFileSync(resolve(root, source), "utf8"), /import "server-only"/u);
+  const result = cruise(root, [source]);
+  assert.equal(result.status, 0, result.stderr);
+  const graph = JSON.parse(result.stdout);
+  assert.deepEqual(graph.summary.violations, []);
+  const modules = new Set(graph.modules.map((mod) => mod.source));
+  assert(modules.has("site/src/features/shell/server/legal-document-page.tsx"));
+  assert(![...modules].some((path) => path.startsWith("site/src/app/")));
+});

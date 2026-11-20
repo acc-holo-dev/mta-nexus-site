@@ -8,23 +8,41 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const pages: Array<[string, string]> = [
-  ["site/src/app/workspace/cart/page.tsx", "copy.loadUnavailableHint"],
-  ["site/src/app/workspace/acquisitions/page.tsx", "copy.historyLoadUnavailableHint"],
-  ["site/src/app/workspace/acquisitions/receipts/page.tsx", "copy.loadUnavailableHint"],
-  ["site/src/app/workspace/acquisitions/receipts/[id]/page.tsx", "copy.loadUnavailableHint"],
-  ["site/src/app/workspace/finance/page.tsx", "copy.statementsLoadUnavailableHint"],
+  ["site/src/features/commerce/server/cart-workspace-screen.tsx", "copy.loadUnavailableHint"],
+  [
+    "site/src/features/resources/server/publisher-acquisitions-screen.tsx",
+    "copy.historyLoadUnavailableHint",
+  ],
+  [
+    "site/src/features/resources/server/acquisition-receipts-screen.tsx",
+    "copy.loadUnavailableHint",
+  ],
+  [
+    "site/src/features/resources/server/acquisition-receipt-detail-screen.tsx",
+    "copy.loadUnavailableHint",
+  ],
+  [
+    "site/src/features/commerce/server/workspace-finance-screen.tsx",
+    "copy.statementsLoadUnavailableHint",
+  ],
   ["site/src/features/library/server/library-page-screen.tsx", "copy.loadUnavailableHint"],
   [
     "site/src/features/library/server/library-updates-screen.tsx",
     "copy.updatesLoadUnavailableHint",
   ],
-  ["site/src/app/workspace/page.tsx", "dictionary.workspace.libraryUnavailableHint"],
-  ["site/src/app/workspace/page.tsx", "dictionary.workspace.serversUnavailableHint"],
+  [
+    "site/src/features/shell/server/workspace-hub-page.tsx",
+    "dictionary.workspace.libraryUnavailableHint",
+  ],
+  [
+    "site/src/features/shell/server/workspace-hub-page.tsx",
+    "dictionary.workspace.serversUnavailableHint",
+  ],
   [
     "site/src/features/library/server/collection-watches-screen.tsx",
     "copy.loadUnavailableDescription",
   ],
-  ["site/src/app/admin/licenses/maintenance/page.tsx", "copy.loadUnavailableHint"],
+  ["site/src/features/commerce/server/license-maintenance-screen.tsx", "copy.loadUnavailableHint"],
 ];
 
 it("locks cart/acquisitions/finance/library workspace load failures to recovery hints", () => {

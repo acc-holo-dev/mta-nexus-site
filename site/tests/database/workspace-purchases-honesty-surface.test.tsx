@@ -100,8 +100,8 @@ it.each(["en", "ru"] as const)(
 
 it("locks purchases and order-case honesty chrome in exclusive page sources", () => {
   const purchasesPages = [
-    "site/src/app/workspace/purchases/page.tsx",
-    "site/src/app/workspace/purchases/[id]/page.tsx",
+    "site/src/features/commerce/server/purchases-history-screen.tsx",
+    "site/src/features/commerce/server/purchase-detail-screen.tsx",
   ];
   for (const page of purchasesPages) {
     const source = read(page);
@@ -114,7 +114,7 @@ it("locks purchases and order-case honesty chrome in exclusive page sources", ()
     expect(source).not.toContain('role="alert"');
   }
 
-  const terms = read("site/src/app/workspace/purchases/[id]/terms/page.tsx");
+  const terms = read("site/src/features/commerce/server/purchase-terms-screen.tsx");
   expect(terms).toContain("ErrorState");
   expect(terms).toContain("overflow-x-clip");
   expect(terms).toContain("min-w-0");
@@ -124,6 +124,10 @@ it("locks purchases and order-case honesty chrome in exclusive page sources", ()
   expect(terms).not.toContain('<p role="alert"');
 
   const shellPages = [
+    "site/src/app/workspace/purchases/page.tsx",
+    "site/src/app/workspace/purchases/[id]/page.tsx",
+    "site/src/app/workspace/purchases/[id]/operations/page.tsx",
+    "site/src/app/workspace/purchases/[id]/terms/page.tsx",
     "site/src/app/workspace/purchases/[id]/support/page.tsx",
     "site/src/app/workspace/order-cases/page.tsx",
     "site/src/app/workspace/order-cases/[id]/page.tsx",

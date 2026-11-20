@@ -35,13 +35,13 @@ const clippedOrgPages = [
 ] as const;
 
 const clippedSubscriptionPages = [
-  "site/src/app/workspace/subscriptions/page.tsx",
-  "site/src/app/workspace/subscriptions/activate/page.tsx",
-  "site/src/app/workspace/subscriptions/history/page.tsx",
-  "site/src/app/workspace/subscriptions/reviews/page.tsx",
-  "site/src/app/workspace/subscriptions/reviews/new/page.tsx",
-  "site/src/app/workspace/subscriptions/reviews/[id]/page.tsx",
-  "site/src/app/workspace/subscriptions/receipts/[id]/page.tsx",
+  "site/src/features/commerce/server/subscriptions-workspace-screen.tsx",
+  "site/src/features/commerce/server/subscription-activate-screen.tsx",
+  "site/src/features/commerce/server/subscription-history-screen.tsx",
+  "site/src/features/commerce/server/subscription-reviews-screen.tsx",
+  "site/src/features/commerce/server/subscription-review-create-screen.tsx",
+  "site/src/features/commerce/server/subscription-review-detail-screen.tsx",
+  "site/src/features/commerce/server/subscription-receipt-screen.tsx",
 ] as const;
 
 it("locks workspace org activity and content page shells to clipped min-w-0 frames", () => {
@@ -67,10 +67,18 @@ it("locks residual workspace subscription page shells to clipped min-w-0 frames"
     expect(source).toContain("pageShellClass");
     expect(source).toContain("ErrorState");
   }
-  expect(read("site/src/app/workspace/subscriptions/page.tsx")).toContain("EmptyState");
-  expect(read("site/src/app/workspace/subscriptions/history/page.tsx")).toContain("EmptyState");
-  expect(read("site/src/app/workspace/subscriptions/reviews/page.tsx")).toContain("EmptyState");
-  expect(read("site/src/app/workspace/subscriptions/reviews/new/page.tsx")).toContain("EmptyState");
+  expect(read("site/src/features/commerce/server/subscriptions-workspace-screen.tsx")).toContain(
+    "EmptyState",
+  );
+  expect(read("site/src/features/commerce/server/subscription-history-screen.tsx")).toContain(
+    "EmptyState",
+  );
+  expect(read("site/src/features/commerce/server/subscription-reviews-screen.tsx")).toContain(
+    "EmptyState",
+  );
+  expect(read("site/src/features/commerce/server/subscription-review-create-screen.tsx")).toContain(
+    "EmptyState",
+  );
 });
 
 it.each([

@@ -6,7 +6,7 @@ import { expect, it } from "vitest";
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
-const source = read("site/src/app/workspace/acquisitions/receipts/[id]/page.tsx");
+const source = read("site/src/features/resources/server/acquisition-receipt-detail-screen.tsx");
 
 it("locks non-downloadable receipt access notices to ErrorState", () => {
   expect(source).toContain('import { ErrorState } from "@nexus/ui"');

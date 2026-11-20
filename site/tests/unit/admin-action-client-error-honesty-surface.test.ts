@@ -28,7 +28,7 @@ it("stops admin/auth/acquire clients from assigning data?.error English bodies",
     "site/src/app/auth/forgot-password/page.tsx",
     "site/src/app/auth/reset-password/page.tsx",
     "site/src/app/auth/verify-email/page.tsx",
-    "site/src/app/acquire/page.tsx",
+    "site/src/features/commerce/components/acquire-page.tsx",
     "site/src/features/resources/components/new-resource-form.tsx",
   ]) {
     const source = readFileSync(resolve(process.cwd(), relative), "utf8");
