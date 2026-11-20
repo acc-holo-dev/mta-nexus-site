@@ -1,182 +1,20 @@
-import { AppError } from "@nexus/domain";
-import { EmptyState, ErrorState } from "@nexus/ui";
-import { Package } from "lucide-react";
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import {
-  formatHistoryDate,
-  parseHistoryPage,
-} from "../../../../features/commerce/commerce-history-format";
-import {
-  getResourceReleaseControlCopy,
-  resourceModerationLabel,
-  resourceStatusLabel,
-} from "../../../../features/library/resource-release-control-i18n";
-import { ResourceModerationControls } from "../../../../features/resources/moderation-controls";
-import { resourceMediaCopy } from "../../../../features/resources/resource-media-i18n";
-import { resourceRequirementsCopy } from "../../../../features/resources/resource-requirements-i18n";
-import { PlatformSignIn } from "../../../../features/shell/guest-auth";
-import { PlatformSessionError } from "../../../../features/shell/session-error";
-
-import { getDictionary } from "../../../../lib/i18n";
+import { getResourceReleaseControlCopy } from "../../../../features/library/resource-release-control-i18n";
+import { StaffResourceDetailScreen } from "../../../../features/resources/staff-resource-detail-server";
 import { getRequestLocale } from "../../../../lib/i18n/server";
-import { authService } from "../../../../lib/services/accounts/auth-service";
-import { resourceModerationService } from "../../../../lib/services/resources/resource-release-control-service";
 
 export const dynamic = "force-dynamic";
+
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: `${getResourceReleaseControlCopy(await getRequestLocale()).decisionDocumentTitle} | MTA NEXUS`,
     robots: { index: false, follow: false },
   };
 }
-export default async function ResourceModerationDetail({
-  params,
-  searchParams,
-}: {
+
+export default async function ResourceModerationDetail(props: {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ page?: string | string[] }>;
 }) {
-  const [locale, store, { id }, query] = await Promise.all([
-    getRequestLocale(),
-    cookies(),
-    params,
-    searchParams,
-  ]);
-  const copy = getResourceReleaseControlCopy(locale);
-  const dictionary = getDictionary(locale);
-  let user: Awaited<ReturnType<typeof authService.getSession>>;
-  try {
-    user = await authService.getSession(store.get("nexus_session")?.value);
-  } catch {
-    return (
-      <PlatformSessionError
-        locale={locale}
-        title={getDictionary(locale).errors.title}
-        message={copy.loadUnavailable}
-        retryHref={"/admin/resources/"}
-      />
-    );
-  }
-
-  if (!user)
-    return (
-      <PlatformSignIn locale={locale} returnPath={`/admin/resources/${encodeURIComponent(id)}`} />
-    );
-  if (user.role !== "admin" && user.role !== "moderator") notFound();
-  const pageNumber = Math.min(parseHistoryPage(query.page), 1000);
-  const returnHref =
-    pageNumber > 1
-      ? `/admin/resources/${encodeURIComponent(id)}?page=${pageNumber}`
-      : `/admin/resources/${encodeURIComponent(id)}`;
-  let missing = false;
-  const result = await resourceModerationService.detail(user, id, pageNumber).catch((error) => {
-    if (error instanceof AppError && [403, 404].includes(error.statusCode)) {
-      missing = true;
-      return null;
-    }
-    return null;
-  });
-  if (missing) notFound();
-  if (!result) {
-    return (
-      <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8">
-        <Link
-          href="/admin/resources"
-          className="inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
-          {copy.moderation}
-        </Link>
-        <ErrorState
-          title={copy.loadUnavailable}
-          description={copy.loadUnavailableHint}
-          action={
-            <Link
-              href={returnHref}
-              className="inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
-              {dictionary.errors.retry}
-            </Link>
-          }
-        />
-      </div>
-    );
-  }
-  const product = result.product;
-  const linkClass =
-    "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
-  return (
-    <div className="mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8">
-      <Link href="/admin/resources" className={linkClass}>
-        {copy.moderation}
-      </Link>
-      <h1 className="break-words font-display text-primary">{product.title}</h1>
-      <p className="text-secondary">
-        {resourceStatusLabel(locale, product.status)} · {product.currentVersion}
-      </p>
-      <p role="note" className="text-sm text-secondary">
-        {copy.moderationNote}
-      </p>
-      <div className="flex min-w-0 flex-wrap gap-4">
-        <Link href={`/admin/resources/${encodeURIComponent(id)}/media`} className={linkClass}>
-          {resourceMediaCopy(locale).title}
-        </Link>
-        <Link
-          href={`/admin/resources/${encodeURIComponent(id)}/requirements`}
-          className={linkClass}
-        >
-          {resourceRequirementsCopy(locale).title}
-        </Link>
-      </div>
-      <ResourceModerationControls
-        key={`${id}:${product.updatedAt.toISOString()}`}
-        product={{ id, status: product.status, updatedAt: product.updatedAt.toISOString() }}
-      />
-      <h2 className="text-lg font-semibold text-primary">{copy.history}</h2>
-      {result.events.length ? (
-        <ol className="min-w-0 space-y-3">
-          {result.events.map((event) => (
-            <li key={event.id} className="nexus-panel min-w-0 space-y-3 p-5">
-              <h3 className="font-semibold text-primary">
-                {resourceModerationLabel(locale, event.action)}
-              </h3>
-              <time dateTime={event.createdAt.toISOString()} className="text-xs text-muted">
-                {formatHistoryDate(event.createdAt, locale)}
-              </time>
-              {event.reason ? (
-                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
-                  {event.reason}
-                </p>
-              ) : null}
-            </li>
-          ))}
-        </ol>
-      ) : (
-        <EmptyState
-          title={copy.empty}
-          description={copy.moderationNote}
-          icon={<Package className="h-6 w-6" aria-hidden="true" />}
-        />
-      )}
-      {result.totalPages > 1 ? (
-        <nav aria-label={copy.page} className="flex flex-wrap gap-4 text-sm">
-          {result.page > 1 ? (
-            <Link href={`?page=${result.page - 1}`} className={linkClass}>
-              {copy.previous}
-            </Link>
-          ) : null}
-          <span className="inline-flex min-h-11 items-center">
-            {copy.page} {result.page} {copy.of} {result.totalPages}
-          </span>
-          {result.page < result.totalPages ? (
-            <Link href={`?page=${result.page + 1}`} className={linkClass}>
-              {copy.next}
-            </Link>
-          ) : null}
-        </nav>
-      ) : null}
-    </div>
-  );
+  return StaffResourceDetailScreen(props);
 }
