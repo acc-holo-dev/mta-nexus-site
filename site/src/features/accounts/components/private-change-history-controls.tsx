@@ -4,13 +4,15 @@ import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import { linkAccentSm } from "../../shell/link-shell";
 import { panelFlexWrapEndGap4P4 } from "../../shell/panel-shell";
-import { typeMinFlex1Space15SmSecondary, typeXsMuted } from "../../shell/type-shell";
+import {
+  typeLabelBlockUpperSecondary,
+  typeMinFlex1Space15SmSecondary,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import { privateChangeHistoryCopy } from "../private-change-history-copy";
 
 const selectClass =
   "min-h-11 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
-const labelClass = "block font-label uppercase text-secondary";
-
 export function PrivateChangeHistoryFilters<
   Group extends keyof ReturnType<typeof privateChangeHistoryCopy>["groups"],
 >({
@@ -31,7 +33,7 @@ export function PrivateChangeHistoryFilters<
     <search aria-label={search ? copy.search : copy.apply}>
       <form method="get" action={path} className={panelFlexWrapEndGap4P4}>
         <label className={typeMinFlex1Space15SmSecondary}>
-          <span className={labelClass}>{copy.period}</span>
+          <span className={typeLabelBlockUpperSecondary}>{copy.period}</span>
           <select name="period" className={selectClass} defaultValue={filters.period}>
             {CHANGE_HISTORY_PERIODS.map((period) => (
               <option key={period} value={period}>
@@ -41,7 +43,7 @@ export function PrivateChangeHistoryFilters<
           </select>
         </label>
         <label className={typeMinFlex1Space15SmSecondary}>
-          <span className={labelClass}>{copy.group}</span>
+          <span className={typeLabelBlockUpperSecondary}>{copy.group}</span>
           <select name="group" className={selectClass} defaultValue={filters.group}>
             {groups.map((group) => (
               <option key={group} value={group}>

@@ -18,6 +18,7 @@ import { ProductCard } from "../../resources/view";
 import { pageShellStack6, pageShellStack10 } from "../../shell/page-shell";
 import { panelHeroBetween } from "../../shell/panel-shell";
 import {
+  typeAvatarAccentBorder,
   typeFlexCenterGap2,
   typeFlexMinCenterGap5Sm6,
   typeGridMinCols1Gap6Clip,
@@ -132,7 +133,7 @@ export async function DeveloperProfileScreen({
             alt={user.displayName}
             fallback={user.displayName || user.username}
             size="lg"
-            className="h-20 w-20 shrink-0 border-2 border-[color:var(--nexus-accent)]/30"
+            className={typeAvatarAccentBorder}
           />
           <div className={typeMinSpace15}>
             <div className={typeFlexCenterGap2}>

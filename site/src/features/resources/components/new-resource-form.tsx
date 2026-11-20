@@ -8,6 +8,7 @@ import { pageShellMax2xlStandard } from "../../shell/page-shell";
 import { panelGridClipShadow } from "../../shell/panel-shell";
 import {
   typeDisplayPrimary,
+  typeLabelBlockUpperSecondary,
   typeMaxXlSmLeadingMuted,
   typeSmColSpan2,
   typeSmSecondary,
@@ -35,7 +36,6 @@ import {
 import { MtaMetaInspectorPanel } from "./mta-meta-inspector-panel";
 import { ResourceSubmissionSuccess } from "./resource-submission-success";
 
-const nativeLabelClass = "block font-label uppercase text-secondary";
 const fileClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-accent";
 
@@ -469,7 +469,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
           </div>
 
           <div className={typeSpace15SmCol2}>
-            <label htmlFor="resource-description" className={nativeLabelClass}>
+            <label htmlFor="resource-description" className={typeLabelBlockUpperSecondary}>
               {copy.description}
             </label>
             <textarea
@@ -488,7 +488,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="resource-type" className={nativeLabelClass}>
+            <label htmlFor="resource-type" className={typeLabelBlockUpperSecondary}>
               {copy.type}
             </label>
             <select
@@ -550,7 +550,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
           </div>
 
           <div className={typeSpace15SmCol2}>
-            <label htmlFor="resource-build-file" className={nativeLabelClass}>
+            <label htmlFor="resource-build-file" className={typeLabelBlockUpperSecondary}>
               {copy.buildArchive}
             </label>
             <input
@@ -565,7 +565,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
           </div>
 
           <div className={typeSpace15SmCol2}>
-            <label htmlFor="resource-release-notes" className={nativeLabelClass}>
+            <label htmlFor="resource-release-notes" className={typeLabelBlockUpperSecondary}>
               {copy.releaseNotes}
             </label>
             <textarea

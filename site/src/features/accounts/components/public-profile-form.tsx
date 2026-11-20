@@ -16,6 +16,7 @@ import { panelSpace4P5Shadow } from "../../shell/panel-shell";
 import { surfaceSpace2P4 } from "../../shell/surface-shell";
 import {
   typeFlexCenterGap3,
+  typeLabelBlockUpperSecondary,
   typePrewrapBreak,
   typeSmMuted,
   typeSmSemiboldPrimary,
@@ -25,8 +26,6 @@ import {
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
-const nativeLabelClass = "block font-label uppercase text-secondary";
-
 export function PublicProfileForm() {
   const { locale, dictionary } = useNexusLocale();
   const copy = getUserPlatformCopy(locale);
@@ -218,7 +217,7 @@ export function PublicProfileForm() {
               defaultValue={profile.displayName}
             />
             <div className="space-y-1.5">
-              <label htmlFor="profile-bio" className={nativeLabelClass}>
+              <label htmlFor="profile-bio" className={typeLabelBlockUpperSecondary}>
                 {copy.bio}
               </label>
               <textarea

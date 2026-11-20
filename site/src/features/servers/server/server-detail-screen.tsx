@@ -29,6 +29,7 @@ import {
   typeElevenFaint,
   typeFlexCenterGap2,
   typeFlexWrapCenterGap2,
+  typeGridCols1Gap6Md3,
   typeIconAccent,
   typeSmSemiboldPrimary,
 } from "../../shell/type-shell";
@@ -376,7 +377,7 @@ export async function ServerDetailScreen({
         <ServerReviewPanel serverId={server.id} loadState="unavailable" />
       ) : null}
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <div className={typeGridCols1Gap6Md3}>
         <div className={panelSpace4P6}>
           <div className="flex items-center justify-between text-xs text-muted">
             <span className="font-semibold uppercase tracking-wider">{copy.livePlayerLoad}</span>

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
-import { typeSmMuted, typeSmSecondary } from "../../shell/type-shell";
+import { typeLabelBlockUpperSecondary, typeSmMuted, typeSmSecondary } from "../../shell/type-shell";
 import { privateRequest } from "../private-request";
 import {
   getResourceBuildWorkspaceCopy,
@@ -15,8 +15,6 @@ import { confirmedBuildCommand } from "../resource-build-workspace-response";
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
-const nativeLabelClass = "block font-label uppercase text-secondary";
-
 type EditorBuild = Pick<
   ResourceBuildView,
   "id" | "productId" | "version" | "status" | "revision" | "releaseNotes" | "mtaVersionTarget"
@@ -140,7 +138,7 @@ export function ResourceBuildControls({
       {editable && !withdrawn && (
         <form onSubmit={save} className="space-y-3">
           <div className="space-y-1.5">
-            <label htmlFor={`${prefix}-notes`} className={nativeLabelClass}>
+            <label htmlFor={`${prefix}-notes`} className={typeLabelBlockUpperSecondary}>
               {copy.notes}
             </label>
             <textarea
@@ -169,7 +167,7 @@ export function ResourceBuildControls({
       {current.status !== "retired" && current.status !== "quarantined" && (
         <div className="space-y-3">
           <div className="space-y-1.5">
-            <label htmlFor={`${prefix}-reason`} className={nativeLabelClass}>
+            <label htmlFor={`${prefix}-reason`} className={typeLabelBlockUpperSecondary}>
               {copy.reason}
             </label>
             <textarea

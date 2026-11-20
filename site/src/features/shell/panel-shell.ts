@@ -74,3 +74,6 @@ export const panelFlexColGap3P5 = "nexus-panel flex flex-col gap-3 p-5";
 export const panelSpace3P6 = "nexus-panel space-y-3 p-6";
 
 export const panelClipSpace4P6 = "nexus-panel min-w-0 space-y-4 overflow-x-clip p-6";
+
+export const panelGroupHoverCol =
+  "group flex flex-col overflow-hidden nexus-panel transition-all hover:border-strong hover:shadow-nexus";

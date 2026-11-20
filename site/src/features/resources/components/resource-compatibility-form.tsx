@@ -11,6 +11,7 @@ import { useNexusLocale } from "../../shell/locale";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceSpace2P3TextSm } from "../../shell/surface-shell";
 import {
+  typeLabelBlockUpperSecondary,
   typePrewrapBreak,
   typeSmSecondary,
   typeSmSuccess,
@@ -22,8 +23,6 @@ import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 font-mono text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
-const nativeLabelClass = "block font-label uppercase text-secondary";
-
 export function ResourceCompatibilityForm({
   product,
   actorId,
@@ -219,7 +218,7 @@ export function ResourceCompatibilityForm({
             }}
           />
           <div className="space-y-1.5">
-            <label htmlFor={`${field}-dependencies`} className={nativeLabelClass}>
+            <label htmlFor={`${field}-dependencies`} className={typeLabelBlockUpperSecondary}>
               {copy.dependencies}
             </label>
             <textarea

@@ -106,3 +106,6 @@ export const linkGhostAccentSemibold = "h-auto px-0 font-semibold text-accent";
 
 export const linkFocusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export const linkGhostUnderlineFocus =
+  "h-auto min-h-11 px-0 text-sm underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

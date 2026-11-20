@@ -9,7 +9,12 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { confirmAction } from "../../shell/confirm-action";
 import { linkGhostAccentSm } from "../../shell/link-shell";
 import { panelSpace3P4, panelSpace4P5 } from "../../shell/panel-shell";
-import { typeFlexWrapGap2, typeSmMuted, typeXsMuted } from "../../shell/type-shell";
+import {
+  typeFlexWrapGap2,
+  typeLabelBlockUpperSecondary,
+  typeSmMuted,
+  typeXsMuted,
+} from "../../shell/type-shell";
 import { resourceMediaCopy, resourceMediaError } from "../resource-media-i18n";
 import { ResourcePreview } from "./resource-preview";
 export function ResourceMediaEditor({
@@ -259,10 +264,7 @@ export function ResourceMediaEditor({
           </Button>
           <form onSubmit={upload} className={panelSpace4P5}>
             <div className="space-y-1.5">
-              <label
-                htmlFor="media-upload-file"
-                className="block font-label uppercase text-secondary"
-              >
+              <label htmlFor="media-upload-file" className={typeLabelBlockUpperSecondary}>
                 {copy.file}
               </label>
               <input

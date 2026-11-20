@@ -20,12 +20,17 @@ import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceInsetP3TextSmSecondary } from "../../shell/surface-shell";
-import { typeLabelUpperMuted, typeSmSecondary, typeSmSuccess } from "../../shell/type-shell";
+import {
+  typeGridGap2SmSecondarySm2,
+  typeLabelBlockUpperSecondary,
+  typeLabelUpperMuted,
+  typeSmSecondary,
+  typeSmSuccess,
+} from "../../shell/type-shell";
 import { stashSupportObjectContext } from "../../support/center";
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
-const nativeLabelClass = "block font-label uppercase text-secondary";
 export function ResourceModerationControls({
   product,
   selectedBuild = null,
@@ -142,7 +147,7 @@ export function ResourceModerationControls({
       <p role="note" className={typeSmSecondary}>
         {copy.moderationNote}
       </p>
-      <dl className="grid gap-2 text-sm text-secondary sm:grid-cols-2">
+      <dl className={typeGridGap2SmSecondarySm2}>
         <div>
           <dt className={typeLabelUpperMuted}>{copy.resourceStatus}</dt>
           <dd className="text-primary">{product.status}</dd>
@@ -177,7 +182,7 @@ export function ResourceModerationControls({
       ) : null}
       <fieldset disabled={busy || saved} className="space-y-4">
         <div className="space-y-1.5">
-          <label htmlFor={`${field}-reason`} className={nativeLabelClass}>
+          <label htmlFor={`${field}-reason`} className={typeLabelBlockUpperSecondary}>
             {copy.reason}
           </label>
           <textarea

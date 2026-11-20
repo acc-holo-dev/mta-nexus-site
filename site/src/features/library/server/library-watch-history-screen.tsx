@@ -22,6 +22,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeBreakAllXsOnly,
   typeFlexMinWrapGap4Sm,
+  typeLabelBlockUpperSecondary,
   typeMinBreakDisplay,
   typeMinFlex1,
   typeMinFlex1Space15SmSecondary,
@@ -31,8 +32,6 @@ import { collectionPageParams } from "../library-collections-query";
 
 const selectClass =
   "min-h-11 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
-const labelClass = "block font-label uppercase text-secondary";
-
 export async function libraryWatchHistoryMetadata(): Promise<Metadata> {
   return {
     title: `${resourceReleaseWatchHistoryCopy(await getRequestLocale()).title} | MTA NEXUS`,
@@ -132,7 +131,7 @@ export async function LibraryWatchHistoryScreen({
       <p className="text-secondary">{c.note}</p>
       <form method="get" className={panelFlexClipWrapEndGap4}>
         <label className={typeMinFlex1Space15SmSecondary}>
-          <span className={labelClass}>{c.days}</span>
+          <span className={typeLabelBlockUpperSecondary}>{c.days}</span>
           <select name="days" className={selectClass} defaultValue={result.days}>
             {LIBRARY_RELEASE_HISTORY_DAYS.map((days) => (
               <option key={days} value={days}>
@@ -142,7 +141,7 @@ export async function LibraryWatchHistoryScreen({
           </select>
         </label>
         <label className={typeMinFlex1Space15SmSecondary}>
-          <span className={labelClass}>{c.source}</span>
+          <span className={typeLabelBlockUpperSecondary}>{c.source}</span>
           <select name="source" className={selectClass} defaultValue={result.source}>
             {RESOURCE_RELEASE_WATCH_HISTORY_SOURCES.map((source) => (
               <option key={source} value={source}>

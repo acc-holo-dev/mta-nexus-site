@@ -10,6 +10,7 @@ import { panelGridClipShadow } from "../../shell/panel-shell";
 import {
   typeDisplayPrimary,
   typeItemsStretchPy4,
+  typeLabelBlockUpperSecondary,
   typeMaxXlSmLeadingMuted,
   typeSmColSpan2,
   typeSpace15SmCol2,
@@ -20,9 +21,6 @@ import {
   parseServerOrganizations,
   type ServerOrganizationOption,
 } from "../server-organization-options";
-
-const nativeLabelClass = "block font-label uppercase text-secondary";
-
 export function RegisterServerForm({ actorId }: { actorId: string }) {
   const { dictionary } = useNexusLocale();
   const copy = dictionary.serverRegistration;
@@ -287,7 +285,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
         className={panelGridClipShadow}
       >
         <div className={typeSpace15SmCol2}>
-          <label htmlFor="server-organization" className={nativeLabelClass}>
+          <label htmlFor="server-organization" className={typeLabelBlockUpperSecondary}>
             {copy.ownerScope}
           </label>
           <select
@@ -356,7 +354,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
         />
 
         <div className={typeSpace15SmCol2}>
-          <label htmlFor="server-description" className={nativeLabelClass}>
+          <label htmlFor="server-description" className={typeLabelBlockUpperSecondary}>
             {copy.descriptionLabel}
           </label>
           <textarea
@@ -436,7 +434,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
         </div>
 
         <div className={typeSpace15SmCol2}>
-          <label htmlFor="server-media-urls" className={nativeLabelClass}>
+          <label htmlFor="server-media-urls" className={typeLabelBlockUpperSecondary}>
             {copy.mediaUrls}
           </label>
           <textarea
@@ -521,7 +519,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
         />
 
         <div className="space-y-1.5">
-          <label htmlFor="server-visibility" className={nativeLabelClass}>
+          <label htmlFor="server-visibility" className={typeLabelBlockUpperSecondary}>
             {copy.visibility}
           </label>
           <select

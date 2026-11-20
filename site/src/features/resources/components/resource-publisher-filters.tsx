@@ -3,15 +3,17 @@ import { Button, Input } from "@nexus/ui";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { linkAccentTightSm, linkFocusRing } from "../../shell/link-shell";
-import { typeFlexEndGap4, typeFlexWrapGap2 } from "../../shell/type-shell";
+import {
+  typeFlexEndGap4,
+  typeFlexWrapGap2,
+  typeLabelBlockUpperSecondary,
+} from "../../shell/type-shell";
 import { PRODUCT_PUBLISHING_KEYS } from "../product-type-labels";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 import { resourcePublisherUrl } from "../resource-publisher-query";
 
 const controlClass =
   "min-h-11 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
-const nativeLabelClass = "block font-label uppercase text-secondary";
-
 export function ResourcePublisherFilters({
   query,
   statusCounts,
@@ -41,7 +43,7 @@ export function ResourcePublisherFilters({
             maxLength={120}
           />
           <div className="space-y-1.5">
-            <label htmlFor="publisher-type" className={nativeLabelClass}>
+            <label htmlFor="publisher-type" className={typeLabelBlockUpperSecondary}>
               {copy.type}
             </label>
             <select
@@ -59,7 +61,7 @@ export function ResourcePublisherFilters({
             </select>
           </div>
           <div className="space-y-1.5">
-            <label htmlFor="publisher-scope" className={nativeLabelClass}>
+            <label htmlFor="publisher-scope" className={typeLabelBlockUpperSecondary}>
               {copy.scope}
             </label>
             <select
@@ -76,7 +78,7 @@ export function ResourcePublisherFilters({
             </select>
           </div>
           <div className="space-y-1.5">
-            <label htmlFor="publisher-readiness" className={nativeLabelClass}>
+            <label htmlFor="publisher-readiness" className={typeLabelBlockUpperSecondary}>
               {copy.readinessLabel}
             </label>
             <select
@@ -94,7 +96,7 @@ export function ResourcePublisherFilters({
             </select>
           </div>
           <div className="space-y-1.5">
-            <label htmlFor="publisher-sort" className={nativeLabelClass}>
+            <label htmlFor="publisher-sort" className={typeLabelBlockUpperSecondary}>
               {copy.sort}
             </label>
             <select

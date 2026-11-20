@@ -13,6 +13,7 @@ import { surfaceSpace2P4 } from "../../shell/surface-shell";
 import {
   typeGrid2Gap4,
   typeHeadingPrimary,
+  typeLabelBlockUpperSecondary,
   typePrewrapBreak,
   typeSmMuted,
 } from "../../shell/type-shell";
@@ -28,8 +29,6 @@ import { getOrganizationCopy } from "../organization-workspace-copy";
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
-const nativeLabelClass = "block font-label uppercase text-secondary";
-
 export function OrganizationProfileForm({
   locale,
   actorId,
@@ -411,7 +410,7 @@ export function OrganizationProfileForm({
             </span>
           </div>
           <div className="space-y-1.5">
-            <label htmlFor="organization-description" className={nativeLabelClass}>
+            <label htmlFor="organization-description" className={typeLabelBlockUpperSecondary}>
               {copy.descriptionLabel}
             </label>
             <textarea

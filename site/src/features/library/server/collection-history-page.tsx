@@ -24,6 +24,7 @@ import {
   typeBreakAllXsMuted,
   typeBreakSm,
   typeFlexMinWrapGap4Sm,
+  typeLabelBlockUpperSecondary,
   typeMinBreakDisplay,
   typeMinFlex1,
   typeMinFlex1Space15SmSecondary,
@@ -46,8 +47,6 @@ import { membershipHistoryHref } from "../library-membership-history-query";
 
 const selectClass =
   "min-h-11 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
-const labelClass = "block font-label uppercase text-secondary";
-
 export async function collectionHistoryMetadata(): Promise<Metadata> {
   return {
     title: `${libraryCollectionHistoryCopy(await getRequestLocale()).title} | MTA NEXUS`,
@@ -137,7 +136,7 @@ export async function CollectionHistoryPage({
           className={panelFlexClipWrapEndGap4}
         >
           <label className={typeMinFlex1Space15SmSecondary}>
-            <span className={labelClass}>{h.days}</span>
+            <span className={typeLabelBlockUpperSecondary}>{h.days}</span>
             <select name="days" defaultValue={result.days} className={selectClass}>
               {LIBRARY_COLLECTION_HISTORY_DAYS.map((days) => (
                 <option key={days} value={days}>
@@ -147,7 +146,7 @@ export async function CollectionHistoryPage({
             </select>
           </label>
           <label className={typeMinFlex1Space15SmSecondary}>
-            <span className={labelClass}>{h.action}</span>
+            <span className={typeLabelBlockUpperSecondary}>{h.action}</span>
             <select name="action" defaultValue={result.action} className={selectClass}>
               {LIBRARY_COLLECTION_HISTORY_ACTIONS.map((action) => (
                 <option key={action} value={action}>

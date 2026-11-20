@@ -7,6 +7,7 @@ import { type FormEvent, useEffect, useId, useState } from "react";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import {
+  typeLabelBlockUpperSecondary,
   typeSmMuted,
   typeSmSecondary,
   typeSmSuccess,
@@ -45,7 +46,6 @@ import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
-const nativeLabelClass = "block font-label uppercase text-secondary";
 const fileClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-accent";
 
@@ -465,7 +465,7 @@ export function AuthorResourceForms({
             onChange={(event) => changeDetails("shortDescription", event.target.value)}
           />
           <div className="space-y-1.5">
-            <label htmlFor={`${fieldId}-description`} className={nativeLabelClass}>
+            <label htmlFor={`${fieldId}-description`} className={typeLabelBlockUpperSecondary}>
               {publishing.description}
             </label>
             <textarea
@@ -551,7 +551,7 @@ export function AuthorResourceForms({
             placeholder={publishing.minMtaVersionPlaceholder}
           />
           <div className="space-y-1.5">
-            <label htmlFor={`${fieldId}-release-notes`} className={nativeLabelClass}>
+            <label htmlFor={`${fieldId}-release-notes`} className={typeLabelBlockUpperSecondary}>
               {publishing.releaseNotes}
             </label>
             <textarea
@@ -569,7 +569,7 @@ export function AuthorResourceForms({
             <p className={typeXsMuted}>{dictionary.versionHelpUi.authorReleaseNotesHint}</p>
           </div>
           <div className="space-y-1.5">
-            <label htmlFor={`${fieldId}-build-file`} className={nativeLabelClass}>
+            <label htmlFor={`${fieldId}-build-file`} className={typeLabelBlockUpperSecondary}>
               {publishing.buildArchive}
             </label>
             <input
@@ -671,7 +671,7 @@ export function RetireBuildForm({
       <form onSubmit={retire} className="mt-3 space-y-3">
         <p>{copy.retireHint}</p>
         <div className="space-y-1.5">
-          <label htmlFor={reasonId} className={nativeLabelClass}>
+          <label htmlFor={reasonId} className={typeLabelBlockUpperSecondary}>
             {copy.retireReason}
           </label>
           <textarea

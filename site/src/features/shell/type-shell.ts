@@ -205,3 +205,10 @@ export const typeBreakXsPrimary = "break-words text-xs text-primary";
 export const typeMinSpace2Clip = "min-w-0 space-y-2 overflow-x-clip";
 export const typeGridMinCols1Gap6Clip =
   "grid min-w-0 grid-cols-1 gap-6 overflow-x-clip sm:grid-cols-2 lg:grid-cols-4";
+
+export const typeLabelBlockUpperSecondary = "block font-label uppercase text-secondary";
+
+export const typeAvatarAccentBorder =
+  "h-20 w-20 shrink-0 border-2 border-[color:var(--nexus-accent)]/30";
+export const typeGridCols1Gap6Md3 = "grid grid-cols-1 gap-6 md:grid-cols-3";
+export const typeGridGap2SmSecondarySm2 = "grid gap-2 text-sm text-secondary sm:grid-cols-2";

@@ -8,6 +8,7 @@ import { formatUnknown } from "../../../lib/i18n/unknown";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
+import { linkGhostUnderlineFocus } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace2P4TextSm, panelSpace4P5 } from "../../shell/panel-shell";
 import {
@@ -27,9 +28,6 @@ import {
   serverReviewLoadCopy,
   serverReviewState,
 } from "../server-review-i18n";
-
-const ghostActionClass =
-  "h-auto min-h-11 px-0 text-sm underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 type Review = {
   id: string;
@@ -482,7 +480,7 @@ export function ServerReviewPanel({
               <Button
                 type="button"
                 variant="ghost"
-                className={`${ghostActionClass} text-danger`}
+                className={`${linkGhostUnderlineFocus} text-danger`}
                 disabled={busy || confirmed}
                 onClick={() => void withdrawReview()}
               >
@@ -500,7 +498,7 @@ export function ServerReviewPanel({
               <Button
                 type="button"
                 variant="ghost"
-                className={`${ghostActionClass} text-accent`}
+                className={`${linkGhostUnderlineFocus} text-accent`}
                 onClick={() => router.refresh()}
               >
                 {copy.reload}
@@ -564,7 +562,7 @@ export function ServerReviewPanel({
           <Button
             type="button"
             variant="ghost"
-            className={`${ghostActionClass} text-accent`}
+            className={`${linkGhostUnderlineFocus} text-accent`}
             onClick={() => router.refresh()}
           >
             {copy.reload}

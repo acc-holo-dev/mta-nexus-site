@@ -9,6 +9,7 @@ import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 import { panelClipSpace5P5Sm } from "../../shell/panel-shell";
 import {
   typeFlexWrapGap3,
+  typeLabelBlockUpperSecondary,
   typeSmMuted,
   typeSmSemiboldSuccess,
   typeSmSuccess,
@@ -27,8 +28,6 @@ import {
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
-const nativeLabelClass = "block font-label uppercase text-secondary";
-
 export function DeveloperProfileEditor({
   initial,
   locale,
@@ -151,7 +150,7 @@ export function DeveloperProfileEditor({
       {profile?.verifiedDeveloper && <p className={typeSmSemiboldSuccess}>{copy.experience}</p>}
       <form className="space-y-4" onSubmit={submit}>
         <div className="space-y-1.5">
-          <label htmlFor="developer-specialties" className={nativeLabelClass}>
+          <label htmlFor="developer-specialties" className={typeLabelBlockUpperSecondary}>
             {copy.specialties}
           </label>
           <textarea

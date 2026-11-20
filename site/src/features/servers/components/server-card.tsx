@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { formatUnknown } from "../../../lib/i18n/unknown";
-import { panelFlexColGap3P5 } from "../../shell/panel-shell";
+import { panelFlexColGap3P5, panelGroupHoverCol } from "../../shell/panel-shell";
 import {
   typeClamp2CaptionMuted,
   typeCoverHoverScale,
@@ -140,7 +140,7 @@ export function ServerCard({
   const address = `${server.ipAddress}:${server.port}`;
 
   return (
-    <article className="group flex flex-col overflow-hidden nexus-panel transition-all hover:border-strong hover:shadow-nexus">
+    <article className={panelGroupHoverCol}>
       <Link
         href={profileHref}
         className="relative block h-28 w-full overflow-hidden bg-inset"

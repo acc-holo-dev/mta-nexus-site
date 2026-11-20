@@ -31,8 +31,10 @@ import { linkAccentSm, linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellStack6, pageShellStack10 } from "../../shell/page-shell";
 import { surfaceInsetP4TextSmMuted } from "../../shell/surface-shell";
 import {
+  typeAvatarAccentBorder,
   typeFlexMinCenterGap5Sm6,
   typeFlexWrapCenterGap2,
+  typeGridCols1Gap6Md3,
   typeHeadingPrimary,
   typeIcon5Success,
   typeMaxXlSmLeadingMuted,
@@ -174,7 +176,7 @@ export async function UserProfileScreen({
             alt={user.displayName}
             fallback={user.displayName || user.username}
             size="lg"
-            className="h-20 w-20 shrink-0 border-2 border-[color:var(--nexus-accent)]/30"
+            className={typeAvatarAccentBorder}
           />
           <div className={typeMinSpace15}>
             <div className={typeFlexWrapCenterGap2}>
@@ -268,7 +270,7 @@ export async function UserProfileScreen({
           <h2 className={typeHeadingPrimary}>
             {copy.operatedServers} ({serverPage.total})
           </h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className={typeGridCols1Gap6Md3}>
             {userServers.map((server) => (
               <ServerCard
                 key={server.id}

@@ -2,6 +2,7 @@ import type { Product } from "@nexus/domain";
 import { Library, Star, Tag } from "lucide-react";
 import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
+import { panelGroupHoverCol } from "../../shell/panel-shell";
 import { typeClamp2CaptionMuted, typeFlex1ColGap2P35 } from "../../shell/type-shell";
 import { PRODUCT_PUBLISHING_KEYS } from "../product-type-labels";
 import type { PublicResourceAttribution } from "../public-resource-attribution";
@@ -65,7 +66,7 @@ export function ProductCard({
   const libraryLabel = market.libraryAdditions;
 
   return (
-    <article className="group flex flex-col overflow-hidden nexus-panel transition-all hover:border-strong hover:shadow-nexus">
+    <article className={panelGroupHoverCol}>
       <Link
         href={productHref}
         aria-label={product.title}
