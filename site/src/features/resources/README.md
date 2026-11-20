@@ -37,6 +37,8 @@ Services и repositories не дублируются и не переносят�
 | `resource-manage-server.ts`                    | `ResourceManageScreen`; server-only `/workspace/resources/[id]` author manage                               |
 | `author-resources-server.ts`                   | `AuthorResourcesScreen`; server-only `/workspace/resources` publisher inventory                             |
 | `resource-publisher-history-server.ts`         | `ResourcePublisherHistoryScreen`; server-only `/workspace/resources/[id]/history`                           |
+| `publisher-deliveries-server.ts`               | `PublisherDeliveriesScreen`; server-only `/workspace/resources/[id]/deliveries`                             |
+| `resource-copies-server.ts`                    | `ResourceCopiesScreen`; server-only `/workspace/resources/[id]/copies`                                      |
 | `review-controls.ts`                           | `ResourceReviewEditor`, `ResourceReviewDecisionForm`; клиентские формы для library и moderation             |
 | `reviews-view.ts`                              | `ResourceReviewPager`; общая пагинация для workspace                                                        |
 | `release-watch.ts`                             | `ResourceReleaseWatchControl`; клиентская подписка для detail и library                                     |

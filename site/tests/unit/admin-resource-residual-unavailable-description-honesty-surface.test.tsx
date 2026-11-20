@@ -30,7 +30,7 @@ const pages: Array<[string, string]> = [
     "copy.loadUnavailableHint",
   ],
   ["site/src/app/workspace/resources/[id]/moderation/page.tsx", "copy.loadUnavailableHint"],
-  ["site/src/app/workspace/resources/[id]/copies/page.tsx", "c.loadUnavailableHint"],
+  ["site/src/features/resources/server/resource-copies-screen.tsx", "c.loadUnavailableHint"],
   ["site/src/app/workspace/resources/[id]/copy/page.tsx", "c.loadUnavailableHint"],
   ["site/src/app/workspace/resources/[id]/copies/[receiptId]/page.tsx", "c.loadUnavailableHint"],
   ["site/src/app/workspace/purchases/[id]/operations/page.tsx", "copy.loadUnavailableHint"],
