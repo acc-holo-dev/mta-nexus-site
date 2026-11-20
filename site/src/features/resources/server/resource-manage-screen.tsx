@@ -16,8 +16,8 @@ import { ResourcePublicationReadinessPanel } from "../publisher-view";
 import { getResourceBuildWorkspaceCopy } from "../resource-build-workspace-i18n";
 import { getResourceCommerceCopy } from "../resource-commerce-i18n";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
+import { pageShellMax5xlLoose as pageShellClass } from "../../shell/page-shell";
 
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-8 overflow-x-clip py-8";
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 

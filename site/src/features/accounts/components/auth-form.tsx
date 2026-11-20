@@ -7,10 +7,10 @@ import { getDictionary, type Locale } from "../../../lib/i18n";
 import { authEntryHref, parseAuthReturnPath, resolveAuthReturnPath } from "../../shell/auth-return";
 import { authLoginApiCopy } from "../auth-login-api-copy";
 import { authRegisterApiCopy } from "../auth-register-api-copy";
+import { pageShellMaxMdAuth as pageShellClass } from "../../shell/page-shell";
 
 type AuthMode = "login" | "register";
 
-const pageShellClass = "mx-auto min-w-0 max-w-md space-y-6 overflow-x-clip px-4 py-10 sm:px-0";
 const navLinkClass =
   "inline-flex min-h-11 items-center font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 

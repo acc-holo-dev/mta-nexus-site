@@ -8,8 +8,7 @@ import { notFound } from "next/navigation";
 import packageMetadata from "../../../../../package.json";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
-
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-8 overflow-x-clip py-8";
+import { pageShellMax5xlLoose as pageShellClass } from "../page-shell";
 
 export async function DevelopmentStatusScreen() {
   if (process.env.NODE_ENV === "production") {

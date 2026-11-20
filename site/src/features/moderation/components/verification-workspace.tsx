@@ -27,13 +27,13 @@ import {
   verificationMutationError,
 } from "../../trust/verification-workspace-copy";
 import { verificationApplicationsCopy } from "../verification-applications-copy";
+import { pageShellStack6 as pageShellClass } from "../../shell/page-shell";
 
 type Target = { type: "user" | "developer" | "organization"; id: string; name: string };
 
 const filterNavLinkClass =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 const accentLinkClass = `inline-flex min-h-11 items-center rounded text-sm text-accent underline ${filterNavLinkClass}`;
-const pageShellClass = "min-w-0 space-y-6 overflow-x-clip";
 
 export function VerificationWorkspace({
   actorId,

@@ -18,8 +18,8 @@ import { ProductCard } from "../../resources/view";
 import { trustCopy } from "../../trust/public-user-trust-copy";
 import { DeveloperExperience } from "../developer-experience";
 import { ProfileResourcePagination, parseProfilePage } from "../profile-pagination";
+import { pageShellStack10 as pageShellClass } from "../../shell/page-shell";
 
-const pageShellClass = "min-w-0 space-y-10 overflow-x-clip";
 const actionLinkClass =
   "inline-flex min-h-11 items-center rounded-md px-0.5 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 

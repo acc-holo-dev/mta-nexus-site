@@ -23,6 +23,7 @@ import { ManagedServerCard } from "../../servers/managed-card-server";
 import { getManagedServerCopy } from "../../servers/managed-server-view";
 import { PlatformSignIn, platformSignInFocusClass } from "../guest-auth";
 import { PlatformSessionError } from "../session-error";
+import { pageShellStack8 as pageShellClass } from "../page-shell";
 
 export async function workspaceHubMetadata(): Promise<Metadata> {
   return {
@@ -31,7 +32,6 @@ export async function workspaceHubMetadata(): Promise<Metadata> {
   };
 }
 
-const pageShellClass = "min-w-0 space-y-8 overflow-x-clip";
 const primaryCtaClass = `inline-flex min-h-11 items-center gap-1.5 rounded-md bg-accent px-4 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] ${platformSignInFocusClass}`;
 const secondaryCtaClass = `inline-flex min-h-11 items-center gap-1.5 rounded-md border border-base bg-surface px-4 text-xs font-semibold text-secondary transition-colors hover:border-strong hover:bg-hover hover:text-primary ${platformSignInFocusClass}`;
 const navChipClass = `inline-flex min-h-11 items-center rounded-md border border-base px-4 text-xs font-semibold text-secondary hover:text-primary ${platformSignInFocusClass}`;

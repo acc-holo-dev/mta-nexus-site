@@ -14,8 +14,8 @@ import {
 import { getOrganizationCopy, organizationError } from "../organization-workspace-copy";
 import { OrganizationWorkspacePanel } from "../workspace";
 import { organizationReturnPath } from "./organization-return-path";
+import { pageShellMax5xlCompact as pageShellClass } from "../../shell/page-shell";
 
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-5 overflow-x-clip py-8";
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 export async function generateMetadata() {

@@ -11,6 +11,7 @@ import {
   recoveryJsonRequest,
 } from "../account-recovery-browser";
 import { authEmailVerificationApiCopy } from "../auth-email-verification-api-copy";
+import { pageShellMaxLg as pageShellClass } from "../../shell/page-shell";
 
 type Proof = AccountRecoveryProof;
 type State =
@@ -21,7 +22,6 @@ type State =
   | { kind: "success"; email: string }
   | { kind: "error"; proof?: Proof; message: string };
 
-const pageShellClass = "mx-auto min-w-0 max-w-lg overflow-x-clip py-16";
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 const retryButtonClass =

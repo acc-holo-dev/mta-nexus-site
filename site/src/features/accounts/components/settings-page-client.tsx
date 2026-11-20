@@ -31,6 +31,7 @@ import { SettingsActiveSessions } from "./settings-active-sessions";
 import { SettingsAdvertisingPreferencesSection } from "./settings-advertising-preferences-section";
 import { SettingsPasswordForm } from "./settings-password-form";
 import { SettingsRecoveryEmailSection } from "./settings-recovery-email-section";
+import { pageShellMax3xlRoomy as pageShellClass } from "../../shell/page-shell";
 
 type Notice = {
   text: string;
@@ -68,7 +69,6 @@ function parseSessionSnapshot(value: unknown): SessionSnapshot | null {
   return { actorId: data.actorId, sessions: data.sessions };
 }
 
-const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-8 overflow-x-clip";
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 const retryButtonClass =

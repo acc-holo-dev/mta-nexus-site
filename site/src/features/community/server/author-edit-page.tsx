@@ -13,8 +13,8 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { AuthorContentForm } from "../author-content-form";
 import { parseEditableContent } from "../user-platform-client";
 import { getUserPlatformCopy } from "../user-platform-copy";
+import { pageShellMax3xlTight as pageShellClass } from "../../shell/page-shell";
 
-const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip";
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 

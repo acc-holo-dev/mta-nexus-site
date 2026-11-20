@@ -7,8 +7,8 @@ import { type FormEvent, useState } from "react";
 import { useNexusLocale } from "../../shell/locale";
 import { recoveryJsonRequest } from "../account-recovery-browser";
 import { authPasswordResetApiCopy } from "../auth-password-reset-api-copy";
+import { pageShellMaxMd as pageShellClass } from "../../shell/page-shell";
 
-const pageShellClass = "mx-auto min-w-0 max-w-md overflow-x-clip py-12";
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 

@@ -10,8 +10,8 @@ import { securityCenterService } from "../../../lib/services/accounts/security-c
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { PlatformSessionError } from "../../shell/session-error";
 import { securityActivityLabelKey } from "../security-activity";
+import { pageShellMax4xlRoomy as pageShellClass } from "../../shell/page-shell";
 
-const pageShellClass = "min-w-0 max-w-4xl space-y-8 overflow-x-clip";
 const recoveryPanelClass = "nexus-panel min-w-0 overflow-x-clip p-5 shadow-nexus-sm";
 const panelShellClass = "nexus-panel min-w-0 space-y-4 overflow-x-clip p-5 shadow-nexus-sm";
 const settingsActionClass =
