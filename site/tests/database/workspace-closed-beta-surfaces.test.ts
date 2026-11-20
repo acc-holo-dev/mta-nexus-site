@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { showAdminDestination, showWorkspaceTools } from "../../src/features/shell/session";
