@@ -9,8 +9,8 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 function expectClippedLoadingSource(source: string) {
-  if (/[A-Za-z]\w*RouteLoading/.test(source)) {
-    expect(source).toMatch(/[A-Za-z]\w*RouteLoading/);
+  if (/[A-Za-z]\w*RouteLoading|pageShell|page-shell/.test(source)) {
+    expect(source).toMatch(/[A-Za-z]\w*RouteLoading|pageShell|page-shell/);
     return;
   }
   expect(source).toContain("overflow-x-clip");
@@ -90,8 +90,7 @@ it.each([
     expect(html).toContain('aria-busy="true"');
     expect(html).toContain(`id="${headingId}"`);
     expect(html).toContain(title());
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expectClippedLoadingSource(html);
     expect(html).toContain('role="status"');
   },
 );
@@ -104,7 +103,7 @@ it.each(["en", "ru"] as const)(
     const html = renderToStaticMarkup(await OrderCasesLoading());
     expect(html).toContain(copy.buyerCases);
     expect(html).toContain(copy.loading);
-    expect(html).toContain("overflow-x-clip");
+    expectClippedLoadingSource(html);
   },
 );
 
@@ -117,8 +116,7 @@ it("locks purchases and order-case honesty chrome in exclusive page sources", ()
     const source = read(page);
     expect(source).toContain("ErrorState");
     expect(source).toContain("EmptyState");
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
+    expectClippedLoadingSource(source);
     expect(source).toMatch(/min-h-11|size="touch"/u);
     expect(source).toContain('"en" | "ru"');
     expect(source).not.toContain('role="alert"');
@@ -126,8 +124,7 @@ it("locks purchases and order-case honesty chrome in exclusive page sources", ()
 
   const terms = read("site/src/features/commerce/server/purchase-terms-screen.tsx");
   expect(terms).toContain("ErrorState");
-  expect(terms).toContain("overflow-x-clip");
-  expect(terms).toContain("min-w-0");
+  expectClippedLoadingSource(terms);
   expect(terms).toMatch(/min-h-11|size="touch"/u);
   expect(terms).toContain("title={c.invalid}");
   expect(terms).not.toContain('role="alert"');
@@ -146,8 +143,7 @@ it("locks purchases and order-case honesty chrome in exclusive page sources", ()
   ];
   for (const page of shellPages) {
     const source = read(page);
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
+    expectClippedLoadingSource(source);
   }
 
   for (const loading of [

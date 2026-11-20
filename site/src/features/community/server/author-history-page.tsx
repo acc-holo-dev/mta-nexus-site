@@ -8,6 +8,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { authorContentService } from "../../../lib/services/organizations/author-content-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax4xlTight as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { publicationSupportHref } from "../../support/support-workspace-contract";
 import { parseAuthorPublicationHistoryQuery } from "../author-publication-desk-contract";
@@ -18,7 +19,6 @@ import {
 import { AuthorPublicationRestore } from "../author-publication-restore";
 import { getUserPlatformCopy } from "../user-platform-copy";
 
-const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip";
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 

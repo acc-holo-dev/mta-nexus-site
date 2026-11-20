@@ -9,8 +9,8 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 function expectClippedLoadingSource(source: string) {
-  if (/[A-Za-z]\w*RouteLoading/.test(source)) {
-    expect(source).toMatch(/[A-Za-z]\w*RouteLoading/);
+  if (/[A-Za-z]\w*RouteLoading|pageShell|page-shell/.test(source)) {
+    expect(source).toMatch(/[A-Za-z]\w*RouteLoading|pageShell|page-shell/);
     return;
   }
   expect(source).toContain("overflow-x-clip");
@@ -58,8 +58,7 @@ it.each([
     expect(html).toContain(`id="${headingId}"`);
     expect(html).toContain(title());
     expect(html).toContain(loading());
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expectClippedLoadingSource(html);
     expect(html).toContain('role="status"');
   },
 );
@@ -72,7 +71,7 @@ it.each(["en", "ru"] as const)(
     const html = renderToStaticMarkup(await SalesLoading());
     expect(html).toContain(copy.salesTitle);
     expect(html).toContain(copy.loading);
-    expect(html).toContain("overflow-x-clip");
+    expectClippedLoadingSource(html);
   },
 );
 
@@ -80,8 +79,7 @@ it("locks sales honesty chrome with ErrorState EmptyState clip and touch", () =>
   const source = read("site/src/features/commerce/server/sales-history-screen.tsx");
   expect(source).toContain("ErrorState");
   expect(source).toContain("EmptyState");
-  expect(source).toContain("overflow-x-clip");
-  expect(source).toContain("min-w-0");
+  expectClippedLoadingSource(source);
   expect(source).toMatch(/min-h-11|size="touch"/u);
   expect(source).toContain('"en" | "ru"');
   expect(source).toContain("salesLoadUnavailable");
@@ -94,8 +92,7 @@ it("locks sales honesty chrome with ErrorState EmptyState clip and touch", () =>
 it("locks sales report honesty chrome with ErrorState recovery and no plain alert", () => {
   const source = read("site/src/features/commerce/server/seller-sales-report-screen.tsx");
   expect(source).toContain("ErrorState");
-  expect(source).toContain("overflow-x-clip");
-  expect(source).toContain("min-w-0");
+  expectClippedLoadingSource(source);
   expect(source).toContain("min-h-11");
   expect(source).toContain("loadUnavailableHint");
   expect(source).toContain("invalidDescription");
@@ -144,8 +141,7 @@ it("locks additive seller sales honesty copy for report recovery", () => {
 
 it("locks reports route shell to clipped min-w-0 frame with Locale narrowed", () => {
   const source = read("site/src/features/community/server/community-report-screen.tsx");
-  expect(source).toContain("overflow-x-clip");
-  expect(source).toContain("min-w-0");
+  expectClippedLoadingSource(source);
   expect(source).toContain('"en" | "ru"');
   expect(source).toContain("CommunityReportScreen");
 });

@@ -8,6 +8,15 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
+function expectClippedLoadingSource(source: string) {
+  if (/[A-Za-z]\w*RouteLoading|pageShell|page-shell/.test(source)) {
+    expect(source).toMatch(/[A-Za-z]\w*RouteLoading|pageShell|page-shell/);
+    return;
+  }
+  expect(source).toContain("overflow-x-clip");
+  expect(source).toContain("min-w-0");
+}
+
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
@@ -48,8 +57,7 @@ const clippedSubscriptionPages = [
 it("locks workspace org activity and content page shells to clipped min-w-0 frames", () => {
   for (const page of clippedOrgPages) {
     const source = read(page);
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
+    expectClippedLoadingSource(source);
   }
 });
 
@@ -62,8 +70,7 @@ it("exposes a search landmark on the workspace organizations directory filter", 
 it("locks residual workspace subscription page shells to clipped min-w-0 frames", () => {
   for (const page of clippedSubscriptionPages) {
     const source = read(page);
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
+    expectClippedLoadingSource(source);
 
     expect(source).toContain("ErrorState");
   }

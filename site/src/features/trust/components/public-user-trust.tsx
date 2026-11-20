@@ -1,11 +1,11 @@
 import { Avatar, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
+import { pageShellMax4xlTight as pageShellClass } from "../../shell/page-shell";
 import type { PublicUserTrust } from "../public-user-trust-contract";
 import { trustCopy } from "../public-user-trust-copy";
 import { approvalCopy } from "../public-verification-history-copy";
 
-const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip";
 const actionLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; locale: Locale }) {

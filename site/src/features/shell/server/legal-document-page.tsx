@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { LegalDocument } from "../legal-document";
-
-const pageShellClass = "min-w-0 overflow-x-clip";
+import { pageShellClip as pageShellClass } from "../page-shell";
 
 export type LegalKind = "terms" | "privacy" | "copyright" | "communityRules";
 

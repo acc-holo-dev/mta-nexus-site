@@ -9,13 +9,13 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { planReviewsService } from "../../../lib/services/commerce/plan-reviews-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { PlanReviewDetailView } from "../plan-review-detail";
 import { planReviewsCopy } from "../plan-reviews-i18n";
 import { planReviewHref, planReviewsPageParams, planReviewsQuery } from "../plan-reviews-query";
 import { planReviewNavLinkClass } from "../plan-reviews-workspace";
 
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 export async function subscriptionReviewDetailMetadata(): Promise<Metadata> {
   return {
     title: `${planReviewsCopy(await getRequestLocale()).saved} | MTA NEXUS`,

@@ -14,6 +14,7 @@ import {
 } from "../../../lib/services/servers/server-statistics-service";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax6xl as pageShellClass } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
@@ -30,7 +31,6 @@ import { serverStatisticsCopy } from "../server-statistics-copy";
 import { ServerStatisticsExportButton } from "../statistics-export";
 import { ServerObservationPeriodControls } from "../statistics-view";
 
-const pageShellClass = "mx-auto min-w-0 max-w-6xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 export async function serverObservationBrowserMetadata() {

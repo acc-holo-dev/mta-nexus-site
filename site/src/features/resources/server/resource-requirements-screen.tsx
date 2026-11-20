@@ -9,13 +9,12 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceRequirementsService } from "../../../lib/services/resources/resource-requirements-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-
 import { ResourceRequirementsReportBody } from "../components/resource-requirements-report-body";
 import { resourceRequirementsCopy } from "../resource-requirements-i18n";
 import { resourceRequirementsQuery } from "../resource-requirements-query";
 
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =
   "inline-flex min-h-11 items-center text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 

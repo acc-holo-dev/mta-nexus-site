@@ -8,11 +8,11 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { discussionWorkspaceService } from "../../../lib/services/community/discussion-workspace-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax3xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ownDiscussionCopy } from "../discussion-workspace-copy";
 import { OwnDiscussionDetail } from "../own-discussion";
 
-const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8";
 const linkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 

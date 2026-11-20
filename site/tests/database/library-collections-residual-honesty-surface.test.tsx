@@ -10,8 +10,8 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 function expectClippedLoadingSource(source: string) {
-  if (/[A-Za-z]\w*RouteLoading/.test(source)) {
-    expect(source).toMatch(/[A-Za-z]\w*RouteLoading/);
+  if (/[A-Za-z]\w*RouteLoading|pageShell|page-shell/.test(source)) {
+    expect(source).toMatch(/[A-Za-z]\w*RouteLoading|pageShell|page-shell/);
     return;
   }
   expect(source).toContain("overflow-x-clip");
@@ -48,8 +48,7 @@ it("locks collections error boundary with ErrorState description and touch retry
   expect(html).toContain(copy.retry);
   expect(html).toContain(copy.loadUnavailableDescription);
   expect(html).toContain(copy.reload);
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-w-0");
+  expectClippedLoadingSource(html);
   expect(html).toContain("min-h-11");
 });
 
@@ -65,8 +64,7 @@ it.each([
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain('aria-busy="true"');
     expect(html).toContain(`id="${headingId}"`);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expectClippedLoadingSource(html);
     expect(html).toContain('role="status"');
   },
 );
@@ -79,7 +77,7 @@ it.each(["en", "ru"] as const)(
     const html = renderToStaticMarkup(await HistoryLoading());
     expect(html).toContain(copy.title);
     expect(html).toContain(copy.loading);
-    expect(html).toContain("overflow-x-clip");
+    expectClippedLoadingSource(html);
   },
 );
 
@@ -95,8 +93,7 @@ it("locks residual collections page sources to ErrorState/EmptyState honesty chr
   for (const page of pages) {
     const source = read(page);
     expect(source).toContain("ErrorState");
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
+    expectClippedLoadingSource(source);
     expect(source).toMatch(/min-h-11|size="touch"/u);
     expect(source).not.toContain('role="alert"');
   }

@@ -7,12 +7,12 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { followWorkspaceService } from "../../../lib/services/community/follow-workspace-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { FollowWorkspace } from "../follow";
 import { FOLLOW_TYPES, type FollowTargetType } from "../follow-workspace-contract";
 import { followCopy } from "../follow-workspace-copy";
 
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 const retryLinkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 

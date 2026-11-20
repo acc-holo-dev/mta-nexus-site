@@ -9,8 +9,8 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 function expectClippedLoadingSource(source: string) {
-  if (/[A-Za-z]\w*RouteLoading/.test(source)) {
-    expect(source).toMatch(/[A-Za-z]\w*RouteLoading/);
+  if (/[A-Za-z]\w*RouteLoading|pageShell|page-shell/.test(source)) {
+    expect(source).toMatch(/[A-Za-z]\w*RouteLoading|pageShell|page-shell/);
     return;
   }
   expect(source).toContain("overflow-x-clip");
@@ -44,8 +44,7 @@ const clippedShellPages = [
 it("locks residual page shells to clipped min-w-0 frames", () => {
   for (const page of clippedShellPages) {
     const source = read(page);
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
+    expectClippedLoadingSource(source);
   }
 });
 

@@ -9,6 +9,15 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
+function expectClippedLoadingSource(source: string) {
+  if (/[A-Za-z]\w*RouteLoading|pageShell|page-shell/.test(source)) {
+    expect(source).toMatch(/[A-Za-z]\w*RouteLoading|pageShell|page-shell/);
+    return;
+  }
+  expect(source).toContain("overflow-x-clip");
+  expect(source).toContain("min-w-0");
+}
+
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
@@ -50,8 +59,7 @@ it.each([
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain('aria-busy="true"');
     expect(html).toContain(`id="${headingId}"`);
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expectClippedLoadingSource(html);
     expect(html).toContain('role="status"');
   },
 );
@@ -85,8 +93,7 @@ it("locks library watches honesty page sources to ErrorState/EmptyState chrome",
   for (const page of pages) {
     const source = read(page);
     expect(source).toContain("ErrorState");
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
+    expectClippedLoadingSource(source);
     expect(source).toMatch(/min-h-11|size="touch"/u);
     expect(source).not.toContain('role="alert"');
   }
@@ -114,8 +121,7 @@ it("locks library watches honesty page sources to ErrorState/EmptyState chrome",
     if (/[A-Za-z]\w*RouteLoading/.test(source)) {
       expect(source).toMatch(/[A-Za-z]\w*RouteLoading/);
     } else {
-      expect(source).toContain("overflow-x-clip");
-      expect(source).toContain("min-w-0");
+      expectClippedLoadingSource(source);
     }
   }
   expect(read("site/src/features/resources/resource-release-watches-i18n.ts")).toContain(

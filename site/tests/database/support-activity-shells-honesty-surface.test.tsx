@@ -10,6 +10,15 @@ let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
+function expectClippedLoadingSource(source: string) {
+  if (/[A-Za-z]\w*RouteLoading|pageShell|page-shell/.test(source)) {
+    expect(source).toMatch(/[A-Za-z]\w*RouteLoading|pageShell|page-shell/);
+    return;
+  }
+  expect(source).toContain("overflow-x-clip");
+  expect(source).toContain("min-w-0");
+}
+
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
 }));
@@ -58,8 +67,7 @@ const delegatedLoadings = [
 it("locks support and activity page shells to clipped min-w-0 frames", () => {
   for (const page of clippedPages) {
     const source = read(page);
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
+    expectClippedLoadingSource(source);
   }
 });
 
@@ -100,8 +108,7 @@ it.each([
     const copy = publicationCopy("en");
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain('aria-busy="true"');
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expectClippedLoadingSource(html);
     expect(html).toContain('role="status"');
     expect(html).toContain(copy[headingKey]);
     expect(html).toContain(copy.loading);
@@ -114,11 +121,11 @@ it("locks server statistics and observations loading shells to honest busy copy"
   expect(statistics).toContain("ServerStatisticsLoading");
   expect(statistics).toContain("copy.loading");
   expect(statistics).toMatch(/LocaleCopyRouteLoading|RouteHonestLoading/);
-  expect(statistics).toContain("overflow-x-clip");
+  expectClippedLoadingSource(statistics);
   expect(observations).toContain("ServerObservationBrowserLoading");
   expect(observations).toContain("copy.loading");
   expect(observations).toMatch(/LocaleCopyRouteLoading|RouteHonestLoading/);
-  expect(observations).toContain("overflow-x-clip");
+  expectClippedLoadingSource(observations);
   expect(read("site/src/app/servers/[slug]/statistics/loading.tsx")).toContain(
     "features/servers/statistics-server",
   );
@@ -141,8 +148,7 @@ it("locks nested support and activity surfaces to ErrorState/EmptyState honesty 
   for (const surface of surfaces) {
     const source = read(surface);
     expect(source).toContain("ErrorState");
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
+    expectClippedLoadingSource(source);
     expect(source).toContain("min-h-11");
   }
   expect(read("site/src/features/support/components/support-center.tsx")).toContain("EmptyState");

@@ -1,10 +1,9 @@
+import { pageShellClip as pageShellClass } from "../../shell/page-shell";
 import {
   type ContextTrustPageProps,
   contextTrustMetadata,
   PublicContextTrustPage,
 } from "../../trust/public-context-trust-page";
-
-const pageShellClass = "min-w-0 overflow-x-clip";
 
 export const generateMetadata = (props: ContextTrustPageProps) =>
   contextTrustMetadata("organization", props);

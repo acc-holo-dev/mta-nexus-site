@@ -14,12 +14,12 @@ import { resourceReleaseWatchHistoryCopy } from "../../resources/resource-releas
 import { resourceReleaseWatchesCopy } from "../../resources/resource-release-watches-i18n";
 import { resourceReleaseWatchesQuery } from "../../resources/resource-release-watches-query";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { collectionReleasesCopy } from "../collection-releases-i18n";
 import { collectionHref, collectionPageParams } from "../library-collections-query";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
 
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 

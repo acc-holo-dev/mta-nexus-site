@@ -10,6 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { commerceService } from "../../../lib/services/commerce/commerce-service";
 import { getResourceCommerceCopy } from "../../resources/resource-commerce-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   formatHistoryAmount,
@@ -22,7 +23,6 @@ import { getCommercialCopy } from "../commercial-i18n";
 import { orderCaseCopy } from "../order-case-i18n";
 import { orderTermsCopy } from "../order-terms-i18n";
 
-const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 

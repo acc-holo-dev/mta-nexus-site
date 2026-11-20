@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { publicContextTrustService } from "../../../lib/services/trust/public-context-trust-service";
+import { pageShellMax4xlTight as pageShellClass } from "../../shell/page-shell";
 import {
   type ContextKind,
   contextTrustHref,
@@ -16,7 +17,6 @@ export type ContextTrustPageProps = {
   params: Promise<{ slug: string }>;
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
-const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip";
 const actionLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 export async function contextTrustMetadata(kind: ContextKind, props: ContextTrustPageProps) {

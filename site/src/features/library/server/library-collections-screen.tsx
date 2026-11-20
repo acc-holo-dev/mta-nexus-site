@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellClip as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref, collectionId, collectionPageParams } from "../library-collections-query";
@@ -21,8 +22,6 @@ import {
   type LibraryCollectionsQuery,
   type LibraryCollectionsView,
 } from "./library-collections-screen-shared";
-
-const pageShellClass = "min-w-0 overflow-x-clip";
 
 function clipShell(children: ReactNode) {
   return <div className={pageShellClass}>{children}</div>;

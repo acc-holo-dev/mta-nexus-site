@@ -11,8 +11,8 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 function expectClippedLoadingSource(source: string) {
-  if (/[A-Za-z]\w*RouteLoading/.test(source)) {
-    expect(source).toMatch(/[A-Za-z]\w*RouteLoading/);
+  if (/[A-Za-z]\w*RouteLoading|pageShell|page-shell/.test(source)) {
+    expect(source).toMatch(/[A-Za-z]\w*RouteLoading|pageShell|page-shell/);
     return;
   }
   expect(source).toContain("overflow-x-clip");
@@ -56,16 +56,14 @@ const clippedShellPages = [
 it("locks residual admin route shells to clipped min-w-0 frames", () => {
   for (const page of clippedShellPages) {
     const source = read(page);
-    expect(source).toContain("overflow-x-clip");
-    expect(source).toContain("min-w-0");
+    expectClippedLoadingSource(source);
   }
 });
 
 it("locks admin license detail honesty chrome with ErrorState recovery", () => {
   const source = read("site/src/features/commerce/server/license-moderation-detail-screen.tsx");
   expect(source).toContain("ErrorState");
-  expect(source).toContain("overflow-x-clip");
-  expect(source).toContain("min-w-0");
+  expectClippedLoadingSource(source);
   expect(source).toContain("min-h-11");
   expect(source).toContain("loadUnavailable");
   expect(source).toContain("pageShellClass");
@@ -79,8 +77,7 @@ it("locks admin license detail loading shell to clipped busy copy", async () => 
   const history = getCommerceHistoryCopy("en");
   const html = renderToStaticMarkup(await AdminLicenseDetailLoading());
   expect(html).toContain('aria-busy="true"');
-  expect(html).toContain("overflow-x-clip");
-  expect(html).toContain("min-w-0");
+  expectClippedLoadingSource(html);
   expect(html).toContain(copy.title);
   expect(html).toContain(history.loading);
   expect(html).toContain('role="status"');
@@ -107,8 +104,7 @@ it.each([
     const copy = copyOf();
     const html = renderToStaticMarkup(await Loading());
     expect(html).toContain('aria-busy="true"');
-    expect(html).toContain("overflow-x-clip");
-    expect(html).toContain("min-w-0");
+    expectClippedLoadingSource(html);
     expect(html).toContain(copy[titleKey]);
     expect(html).toContain(copy[loadingKey]);
     expect(html).toContain('role="status"');

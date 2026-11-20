@@ -15,10 +15,10 @@ import { resourceReleaseWatchesService } from "../../../lib/services/resources/r
 import { resourceReleaseWatchHistoryCopy } from "../../resources/resource-release-watch-history-i18n";
 import { resourceReleaseWatchHistoryQuery } from "../../resources/resource-release-watch-history-query";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { collectionPageParams } from "../library-collections-query";
 
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 const selectClass =

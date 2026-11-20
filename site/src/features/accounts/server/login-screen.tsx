@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { parseAuthReturnPath } from "../../shell/auth-return";
+import { pageShellClip as pageShellClass } from "../../shell/page-shell";
 import { AuthForm } from "../components/auth-form";
-
-const pageShellClass = "min-w-0 overflow-x-clip";
 
 export async function loginMetadata(): Promise<Metadata> {
   return {

@@ -16,6 +16,7 @@ import {
   serverPublicationHistoryError,
 } from "../../servers/server-publication-history-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { publicationSupportHref } from "../../support/support-workspace-contract";
 import { parseAuthorPublicationHistoryQuery } from "../author-publication-desk-contract";
@@ -25,7 +26,6 @@ import { organizationPublicationHistorySchema } from "../organization-publicatio
 import { serverPublicationHistorySchema } from "../server-publication-history-contract";
 import { getUserPlatformCopy } from "../user-platform-copy";
 
-const pageShellClass = "mx-auto min-w-0 max-w-4xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =
   "inline-flex min-h-11 items-center rounded text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 

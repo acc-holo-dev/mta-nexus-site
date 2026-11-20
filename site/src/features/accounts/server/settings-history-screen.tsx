@@ -6,6 +6,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { profileChangeHistoryService } from "../../../lib/services/accounts/profile-change-history-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellClip as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   privateChangeHistoryCopy,
@@ -14,8 +15,6 @@ import {
 import { changeHistoryHref } from "../private-change-history-query";
 import { ProfileChangeHistoryView } from "../profile-change-history";
 import { parseProfileChangeHistoryQuery } from "../profile-change-history-contract";
-
-const pageShellClass = "min-w-0 overflow-x-clip";
 
 export async function settingsHistoryMetadata(): Promise<Metadata> {
   return {

@@ -4,6 +4,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { organizationGovernanceService } from "../../../lib/services/organizations/organization-governance-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellClip as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { OrganizationHistoryView } from "../history-view";
 import {
@@ -15,8 +16,6 @@ import {
   organizationGovernanceError,
 } from "../organization-governance-copy";
 import { organizationReturnPath } from "./organization-return-path";
-
-const pageShellClass = "min-w-0 overflow-x-clip";
 
 export async function generateMetadata() {
   return {

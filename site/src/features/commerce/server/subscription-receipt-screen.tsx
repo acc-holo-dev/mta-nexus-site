@@ -9,6 +9,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { subscriptionsService } from "../../../lib/services/commerce/subscriptions-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { PlanReviewTerms } from "../plan-reviews-workspace";
 import { formatSubscriptionTime } from "../subscription-time";
@@ -21,7 +22,6 @@ import {
   subscriptionsQuery,
 } from "../subscriptions-query";
 
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 export async function subscriptionReceiptMetadata(): Promise<Metadata> {
   return {
     title: `${subscriptionsCopy(await getRequestLocale()).recorded} | MTA NEXUS`,

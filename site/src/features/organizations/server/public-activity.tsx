@@ -1,8 +1,7 @@
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { PublicProfileActivity } from "../../accounts/public-profile-activity-server";
 import { publicationCopy } from "../../community/publication-feed-copy";
-
-const pageShellClass = "min-w-0 overflow-x-clip";
+import { pageShellClip as pageShellClass } from "../../shell/page-shell";
 
 export async function generateMetadata() {
   return { title: publicationCopy(await getRequestLocale()).activity };

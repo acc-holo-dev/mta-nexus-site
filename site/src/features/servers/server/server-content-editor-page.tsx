@@ -12,13 +12,12 @@ import { AuthorContentForm } from "../../community/author-content-form";
 import { parseEditableContent } from "../../community/user-platform-client";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax3xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-
 import { serverContentId } from "../server-content-api";
 import { serverContentCopy, serverContentMutationError } from "../server-content-copy";
 import { serverPublicationHistoryCopy } from "../server-publication-history-copy";
 
-const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 

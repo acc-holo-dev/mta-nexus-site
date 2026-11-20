@@ -4,6 +4,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { verificationWorkspaceService } from "../../../lib/services/moderation/verification-workspace-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   verificationOverviewSchema,
@@ -12,8 +13,6 @@ import {
 } from "../../trust/verification-workspace-contract";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
 import { VerificationWorkspace } from "../verification-workspace";
-
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
 
 export async function verificationWorkspaceMetadata(): Promise<Metadata> {
   return {

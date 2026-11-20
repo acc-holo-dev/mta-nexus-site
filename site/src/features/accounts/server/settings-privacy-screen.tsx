@@ -6,13 +6,13 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { profilePrivacyService } from "../../../lib/services/accounts/profile-privacy-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax3xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ProfileChangeHistoryLink } from "../change-history";
 import { ProfilePrivacyEditor } from "../profile";
 import { editablePrivacySchema } from "../profile-privacy-contract";
 import { profilePrivacyCopy } from "../profile-privacy-copy";
 
-const pageShellClass = "mx-auto min-w-0 max-w-3xl space-y-6 overflow-x-clip py-8";
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 

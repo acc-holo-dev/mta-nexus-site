@@ -12,6 +12,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { communityModerationService } from "../../../lib/services/community/community-moderation-service";
 import { parseModerationDetailQuery } from "../../moderation/community-moderation-contract";
 import { PlatformSignIn } from "../../shell/guest-auth";
+import { pageShellMax5xlTight as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { moderationCopy } from "../community-moderation-copy";
 import { ModeratedDiscussionRemoval } from "../components/moderated-discussion-removal";
@@ -26,7 +27,6 @@ import {
 import { moderatedDiscussionCopy } from "../moderated-discussion-copy";
 import { platformFieldClass } from "../user-platform-client";
 
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip";
 const navLinkClass =
   "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
