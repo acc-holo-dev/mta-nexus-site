@@ -13,8 +13,11 @@ import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { skelH35W35Spin } from "../../shell/skeleton-shell";
 import {
+  typeBlockSpace1,
   typeFlexWrapGap2,
+  typeIcon35,
   typeLabelUpperMuted,
+  typeMinH11SuccessSoftEleven,
   typeSmSuccess,
   typeTenFaint,
   typeWFullMaxSmSpace2Md80,
@@ -136,7 +139,7 @@ export function ContentModerationControls({
 
   return (
     <div className={typeWFullMaxSmSpace2Md80} aria-busy={pending !== null ? true : undefined}>
-      <label className="block space-y-1">
+      <label className={typeBlockSpace1}>
         <span className={typeLabelUpperMuted}>{copy.reviewNote}</span>
         <textarea
           disabled={pending !== null || blocked}
@@ -155,13 +158,13 @@ export function ContentModerationControls({
           type="button"
           disabled={!hasNotes || pending !== null || blocked || status === "published" || truncated}
           onClick={() => void moderate("publish")}
-          className="min-h-11 gap-1.5 bg-success-soft text-success text-[11px]"
+          className={typeMinH11SuccessSoftEleven}
           variant="outline"
         >
           {pending === "publish" ? (
             <LoaderCircle className={skelH35W35Spin} aria-hidden="true" />
           ) : (
-            <Send className="h-3.5 w-3.5" aria-hidden="true" />
+            <Send className={typeIcon35} aria-hidden="true" />
           )}
           {copy.publish}
         </Button>
@@ -176,7 +179,7 @@ export function ContentModerationControls({
           {pending === "archive" ? (
             <LoaderCircle className={skelH35W35Spin} aria-hidden="true" />
           ) : (
-            <Archive className="h-3.5 w-3.5" aria-hidden="true" />
+            <Archive className={typeIcon35} aria-hidden="true" />
           )}
           {copy.archive}
         </Button>

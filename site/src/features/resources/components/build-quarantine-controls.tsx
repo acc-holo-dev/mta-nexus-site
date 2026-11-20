@@ -10,7 +10,12 @@ import { actionConfirmCheckboxFocusClass } from "../../shell/action-confirm-chec
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import { skelH35W35Spin } from "../../shell/skeleton-shell";
-import { typeLabelUpperMuted, typeWFullMaxSmSpace2Md80 } from "../../shell/type-shell";
+import {
+  typeBlockSpace1,
+  typeIcon35,
+  typeLabelUpperMuted,
+  typeWFullMaxSmSpace2Md80,
+} from "../../shell/type-shell";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
 
 export function BuildQuarantineControls({
@@ -85,7 +90,7 @@ export function BuildQuarantineControls({
 
   return (
     <div className={typeWFullMaxSmSpace2Md80} aria-busy={pending !== null}>
-      <label className="block space-y-1">
+      <label className={typeBlockSpace1}>
         <span className={typeLabelUpperMuted}>
           {status === "quarantined" ? copy.restoreReason : copy.quarantineReason}
         </span>
@@ -125,9 +130,9 @@ export function BuildQuarantineControls({
         {pending ? (
           <LoaderCircle className={skelH35W35Spin} aria-hidden="true" />
         ) : action === "quarantine" ? (
-          <ShieldOff className="h-3.5 w-3.5" aria-hidden="true" />
+          <ShieldOff className={typeIcon35} aria-hidden="true" />
         ) : (
-          <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+          <RotateCcw className={typeIcon35} aria-hidden="true" />
         )}
         {action === "quarantine" ? copy.quarantineBuild : copy.restoreBuild}
       </Button>

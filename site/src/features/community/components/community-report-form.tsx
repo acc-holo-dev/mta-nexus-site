@@ -10,6 +10,7 @@ import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { linkAccentSm, linkAccentTightSm, linkAccentTightSmPlain } from "../../shell/link-shell";
 import {
+  typeBlockSpace1SmSecondary,
   typeFlexWrapCenterBetweenGap3,
   typeFlexWrapCenterGap3,
   typeSmSemiboldPrimary,
@@ -267,7 +268,7 @@ export function CommunityReportForm({
         </div>
       ) : (
         <form className="space-y-3" onSubmit={submit} aria-busy={pending}>
-          <label className="block space-y-1 text-sm text-secondary">
+          <label className={typeBlockSpace1SmSecondary}>
             <span>{copy.category}</span>
             <select
               className={platformFieldClass}
@@ -282,7 +283,7 @@ export function CommunityReportForm({
               ))}
             </select>
           </label>
-          <label className="block space-y-1 text-sm text-secondary">
+          <label className={typeBlockSpace1SmSecondary}>
             <span>{copy.reason}</span>
             <textarea
               className={platformFieldClass}
@@ -295,7 +296,7 @@ export function CommunityReportForm({
               onChange={(event) => setReason(event.target.value)}
             />
           </label>
-          <label className="block space-y-1 text-sm text-secondary">
+          <label className={typeBlockSpace1SmSecondary}>
             <span>{copy.evidence}</span>
             <textarea
               className={platformFieldClass}

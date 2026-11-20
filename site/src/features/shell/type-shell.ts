@@ -231,3 +231,101 @@ export const typeFileInputInset =
 
 export const typeBlockFileInputInset =
   "block w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-accent";
+
+export const typeBlockXsMuted = "block text-xs text-muted";
+export const typeBlockSmSecondary = "block text-sm text-secondary";
+export const typeBlockSpace1SmSecondary = "block space-y-1 text-sm text-secondary";
+export const typeFlexWrapBaselineBetweenGap2 =
+  "flex flex-wrap items-baseline justify-between gap-2";
+export const typeMt1XsSecondary = "mt-1 text-xs text-secondary";
+export const typeLabelUpperSecondary = "font-label uppercase text-secondary";
+export const typeBlockMinSmSecondary = "block min-w-0 text-sm text-secondary";
+
+export const typeBlockSpace2 = "block space-y-2";
+export const typeBlockSpace15 = "block space-y-1.5";
+export const typeP3Numeric = "p-3 font-numeric";
+export const typeMt3Space3 = "mt-3 space-y-3";
+export const typeCursorAccent = "cursor-pointer text-accent";
+export const typeBreakCode = "break-words font-code";
+export const typeBaseBoldPrimary = "text-base font-bold text-primary";
+export const typeMinH11SmCol2 = "min-h-11 sm:col-span-2";
+export const typeFlexCenterGap2BaseBoldPrimary =
+  "flex items-center gap-2 text-base font-bold text-primary";
+export const typePrelineSmLeadingSecondary =
+  "whitespace-pre-line text-sm leading-relaxed text-secondary";
+export const typeFlexWrapGapX4Y2Sm = "flex flex-wrap gap-x-4 gap-y-2 text-sm";
+export const typeXsSemiboldPrimary = "text-xs font-semibold text-primary";
+export const typeBorderInsetP2 = "border border-base bg-inset p-2";
+export const typeRoundedBorderP4SmSecondary =
+  "rounded-md border border-base p-4 text-sm text-secondary";
+export const typeMax3xlSmSecondary = "max-w-3xl text-sm text-secondary";
+export const typeHoverPrimary = "transition-colors hover:text-primary";
+export const typeSpace3BorderTPt4 = "space-y-3 border-t border-base pt-4";
+export const typeMt05Icon4Accent = "mt-0.5 h-4 w-4 shrink-0 text-accent";
+export const typeIcon4Warning = "h-4 w-4 text-warning";
+export const typeListDiscInsideSpace1 = "list-inside list-disc space-y-1";
+export const typeMinH11Sm = "min-h-11 text-sm";
+export const typeBreakP3 = "break-words p-3";
+export const typeMinH11PageInputSmSecondary =
+  "min-h-11 w-full rounded-lg border border-base bg-page px-3 py-2 text-sm text-secondary";
+export const typeMinH24PageInputSmSecondary =
+  "min-h-24 w-full rounded-lg border border-base bg-page px-3 py-2 text-sm text-secondary";
+export const typeMinH11SuccessSoftEleven =
+  "min-h-11 gap-1.5 bg-success-soft text-success text-[11px]";
+export const typeMinH11DangerSoftXs = "min-h-11 gap-1.5 bg-danger-soft text-danger text-xs";
+
+export const typeBlockSm = "block text-sm";
+export const typeBlockSpace1 = "block space-y-1";
+export const typeBreakLgSemibold = "break-words text-lg font-semibold";
+export const typeGridGap3Cols2 = "grid gap-3 sm:grid-cols-2";
+
+export const typeIcon35 = "h-3.5 w-3.5";
+export const typeGridGap1 = "grid gap-1";
+export const typeFlexGap4 = "flex gap-4";
+export const typeMb3FlexGap2 = "mb-3 flex gap-2";
+export const typeCodeCaptionFaint = "font-code font-caption text-faint";
+export const typeMinW48Flex1 = "min-w-48 flex-1";
+export const typeFlexWrapBetweenGap4Sm = "flex flex-wrap justify-between gap-4 text-sm";
+export const typeFlexStartGap2Break = "flex items-start gap-2 break-words";
+export const typeFlexWrapCenterGap4 = "flex flex-wrap items-center gap-4";
+export const typeBlockBreakAllXsMuted = "block break-all text-xs text-muted";
+export const typeTruncateSmBoldPrimary = "truncate text-sm font-bold text-primary";
+export const typeIcon7Accent = "h-7 w-7 text-accent";
+export const typeClamp2SmMuted = "line-clamp-2 text-sm text-muted";
+export const typeFlexWrapGap4XsMuted = "flex flex-wrap gap-4 text-xs text-muted";
+export const typeCoverFull = "h-full w-full object-cover";
+export const typeIcon4Success = "h-4 w-4 text-success";
+export const typeBreakLgPrimary = "break-words text-lg text-primary";
+export const typeMt1SmMuted = "mt-1 text-sm text-muted";
+export const typeBreakSmSemiboldPrimary = "break-words text-sm font-semibold text-primary";
+export const typeIcon4ShrinkSuccess = "h-4 w-4 shrink-0 text-success";
+export const typeBreakSmPrimary = "break-words text-sm text-primary";
+export const typeMaxSmXsMuted = "max-w-sm text-xs text-muted";
+export const typeSpace2BorderBPb6 = "space-y-2 border-b border-base pb-6";
+export const typeMax3xlSmMuted = "max-w-3xl text-sm text-muted";
+export const typePulseSpace3 = "animate-pulse space-y-3";
+export const typeBreakSmBoldPrimary = "break-words text-sm font-bold text-primary";
+export const typeFlexWrapCenterBetweenGap3Sm =
+  "flex flex-wrap items-center justify-between gap-3 text-sm";
+export const typeFlexCenterGap2SmSecondary = "flex items-center gap-2 text-sm text-secondary";
+export const typeGridGap4Sm3 = "grid gap-4 sm:grid-cols-3";
+export const typeSpace3BorderTPt5 = "space-y-3 border-t border-base pt-5";
+export const typeRoundedBorderPx2Py1XsSecondary =
+  "rounded-md border border-base px-2 py-1 text-xs text-secondary";
+export const typeGridMinGap3Sm2 = "grid min-w-0 gap-3 text-sm sm:grid-cols-2";
+export const typeNumericSemiboldPrimary = "font-numeric font-semibold text-primary";
+export const typeHoverUnderlineAccentFocus =
+  "hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+export const typeInlineMinH11AccentCta =
+  "inline-flex min-h-11 items-center rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white";
+export const typeMinH11DangerUnderline = "h-auto min-h-11 px-0 text-sm text-danger underline";
+
+export const typeGridGap15Sm2 = "grid gap-1.5 sm:grid-cols-2";
+export const typeP2NumericTabular = "p-2 font-numeric tabular-nums";
+export const typeBlockMinH11SurfaceP2 =
+  "block min-h-11 w-full rounded border border-base bg-surface p-2";
+export const typeMinSpace1Sm = "min-w-0 space-y-1 text-sm";
+export const typeNowrapP2Normal = "whitespace-nowrap p-2 font-normal";
+export const typeMin24Max60BreakP2 = "min-w-24 max-w-60 break-words p-2";
+export const typeH40RoundedInset = "h-40 rounded-lg bg-inset";
+export const typeFlexFullMinEnd = "flex h-full min-w-0 flex-1 items-end";

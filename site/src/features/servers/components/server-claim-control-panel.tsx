@@ -16,6 +16,7 @@ import {
   typeFlexWrapGap2,
   typeLabelUpperMuted,
   typeMt1XsLeadingMuted,
+  typeMt05Icon4Accent,
   typeSmBoldPrimary,
   typeTenFaint,
   typeTenLeadingFaint,
@@ -319,7 +320,7 @@ export function ServerClaimControlPanel({
   return (
     <section className={panelSpace4P5} aria-labelledby="server-control-proof-heading">
       <div className={typeFlexStartGap3}>
-        <KeyRound className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
+        <KeyRound className={typeMt05Icon4Accent} aria-hidden="true" />
         <div>
           <h2 id="server-control-proof-heading" className={typeSmBoldPrimary}>
             {copy.title}

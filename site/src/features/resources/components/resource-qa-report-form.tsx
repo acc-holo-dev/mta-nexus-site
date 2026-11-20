@@ -11,6 +11,8 @@ import { surfaceMinSpace2BgP3 } from "../../shell/surface-shell";
 import {
   typeBlockMinSpace1XsMuted,
   typeFlexWrapGap2,
+  typeMinH11PageInputSmSecondary,
+  typeMinH24PageInputSmSecondary,
   typeXsMuted,
   typeXsSuccess,
 } from "../../shell/type-shell";
@@ -151,7 +153,7 @@ export function ResourceQaReportForm({
       <label className={typeBlockMinSpace1XsMuted}>
         <span>{copy.reportType}</span>
         <select
-          className="min-h-11 w-full rounded-lg border border-base bg-page px-3 py-2 text-sm text-secondary"
+          className={typeMinH11PageInputSmSecondary}
           value={type}
           disabled={pending}
           onChange={(event) => setType(event.target.value as (typeof REPORT_TYPES)[number])}
@@ -166,7 +168,7 @@ export function ResourceQaReportForm({
       <label className={typeBlockMinSpace1XsMuted}>
         <span>{copy.reportReason}</span>
         <textarea
-          className="min-h-24 w-full rounded-lg border border-base bg-page px-3 py-2 text-sm text-secondary"
+          className={typeMinH24PageInputSmSecondary}
           value={reason}
           maxLength={1000}
           disabled={pending}

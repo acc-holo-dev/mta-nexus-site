@@ -14,7 +14,10 @@ import { pageShellStack5 } from "../../shell/page-shell";
 import { panelMinSpace4P5, panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceSpace3P4 } from "../../shell/surface-shell";
 import {
+  typeBlockSpace1SmSecondary,
+  typeBlockXsMuted,
   typeBreakLgSemiboldPrimary,
+  typeBreakSmSemiboldPrimary,
   typeFlexWrapGap3,
   typeLgSemiboldPrimary,
   typePrewrapSmSecondary,
@@ -283,9 +286,7 @@ export function CommunityReportDetailView({
             )}
             {report.target ? (
               <>
-                <h3 className="break-words text-sm font-semibold text-primary">
-                  {report.target.title}
-                </h3>
+                <h3 className={typeBreakSmSemiboldPrimary}>{report.target.title}</h3>
                 {report.target.author && (
                   <Link
                     className="rounded text-xs text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -312,7 +313,7 @@ export function CommunityReportDetailView({
           </section>
           {staff && (report.status === "open" || report.status === "under_review") && (
             <section className={panelSpace4P5}>
-              <label className="block space-y-1 text-sm text-secondary">
+              <label className={typeBlockSpace1SmSecondary}>
                 <span>{copy.notes}</span>
                 <textarea
                   className={platformFieldClass}
@@ -323,7 +324,7 @@ export function CommunityReportDetailView({
                   disabled={pending || !!confirmation}
                   onChange={(event) => setNotes(event.target.value)}
                 />
-                <span className="block text-xs text-muted">{copy.notesHint}</span>
+                <span className={typeBlockXsMuted}>{copy.notesHint}</span>
               </label>
               {confirmation ? (
                 <fieldset className={surfaceSpace3P4} aria-label={copy.confirm}>

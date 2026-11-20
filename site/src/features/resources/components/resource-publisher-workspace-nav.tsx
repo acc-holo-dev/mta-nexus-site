@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Locale } from "../../../lib/i18n";
+import { typeFlexWrapGapX4Y2Sm } from "../../shell/type-shell";
 import {
   getResourcePublisherNavCopy,
   type ResourcePublisherNavCopy,
@@ -91,7 +92,7 @@ export function ResourcePublisherWorkspaceNav({
           <p className="font-label text-[10px] uppercase tracking-wide text-faint">
             {copy[section.labelKey]}
           </p>
-          <ul className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
+          <ul className={typeFlexWrapGapX4Y2Sm}>
             {section.items.map((item) => {
               const current = isCurrent(pathname, item);
               return (

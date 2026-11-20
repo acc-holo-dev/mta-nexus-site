@@ -13,6 +13,7 @@ import { skelH4W4Spin } from "../../shell/skeleton-shell";
 import {
   typeFlexWrapGap2,
   typeItemsStretchPy4,
+  typeMaxSmXsMuted,
   typeMaxSmXsSuccess,
   typeMinH11Xs,
   typeXsMuted,
@@ -317,7 +318,7 @@ function ContentFollowControl({
           signInLabel={copy.signIn}
           createAccountLabel={workspace.createAccount}
         />
-        <p className="max-w-sm text-xs text-muted">{copy.discussionHelp}</p>
+        <p className={typeMaxSmXsMuted}>{copy.discussionHelp}</p>
       </div>
     );
   }

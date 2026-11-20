@@ -30,6 +30,7 @@ import {
   typeFlexMinWrapGap2,
   typeFlexWrapCenterGap3,
   typeFlexWrapGap2,
+  typeIcon35,
   typeMinSpace3,
   typeMinSpace4,
   typeMt05CaptionMuted,
@@ -128,13 +129,13 @@ export async function WorkspaceHubPage() {
               {dictionary.authorResources.title}
             </Link>
             <Link href="/workspace/resources/new" className={primaryCtaClass}>
-              <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+              <Plus className={typeIcon35} aria-hidden="true" />
               {dictionary.workspace.publishResource}
             </Link>
           </nav>
           <nav className={typeFlexWrapGap2} aria-label={serverCopy.title}>
             <Link href="/workspace/servers/new" className={secondaryCtaClass}>
-              <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+              <Plus className={typeIcon35} aria-hidden="true" />
               {dictionary.workspace.registerServer}
             </Link>
           </nav>

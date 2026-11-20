@@ -23,8 +23,14 @@ import {
 import { pageShellStack6 } from "../../shell/page-shell";
 import { surfaceSpace3P4 } from "../../shell/surface-shell";
 import {
+  typeBlockSpace1SmSecondary,
+  typeBlockXsMuted,
+  typeFlexCenterGap2SmSecondary,
+  typeFlexWrapCenterBetweenGap3Sm,
+  typeGridGap3Cols2,
   typeHeadingPrimary,
   typeMinFlex1Space1SmSecondary,
+  typeMinH11DangerUnderline,
   typeMlAutoXsMuted,
   typeSmMuted,
   typeXsMuted,
@@ -313,8 +319,8 @@ export function OrganizationWorkspacePanel({
         )}
         {manageable && (
           <form onSubmit={add} className={surfaceSpace3P4}>
-            <fieldset disabled={busy} className="grid gap-3 sm:grid-cols-2">
-              <label className="block space-y-1 text-sm text-secondary">
+            <fieldset disabled={busy} className={typeGridGap3Cols2}>
+              <label className={typeBlockSpace1SmSecondary}>
                 <span>{copy.username}</span>
                 <input
                   className={platformFieldClass}
@@ -323,9 +329,9 @@ export function OrganizationWorkspacePanel({
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                 />
-                <span className="block text-xs text-muted">{copy.usernameHelp}</span>
+                <span className={typeBlockXsMuted}>{copy.usernameHelp}</span>
               </label>
-              <label className="block space-y-1 text-sm text-secondary">
+              <label className={typeBlockSpace1SmSecondary}>
                 <span>{copy.role}</span>
                 <select
                   className={platformFieldClass}
@@ -341,7 +347,7 @@ export function OrganizationWorkspacePanel({
                     ))}
                 </select>
               </label>
-              <label className="flex items-center gap-2 text-sm text-secondary">
+              <label className={typeFlexCenterGap2SmSecondary}>
                 <input
                   type="checkbox"
                   checked={servers}
@@ -442,10 +448,7 @@ export function OrganizationWorkspacePanel({
         ) : (
           <EmptyState title={copy.noMembers} description={copy.noMembersHint} />
         )}
-        <nav
-          className="flex flex-wrap items-center justify-between gap-3 text-sm"
-          aria-label={copy.team}
-        >
+        <nav className={typeFlexWrapCenterBetweenGap3Sm} aria-label={copy.team}>
           {data.page > 1 ? (
             <Link
               className={linkAccentSm}
@@ -495,7 +498,7 @@ export function OrganizationWorkspacePanel({
             type="button"
             variant="ghost"
             disabled={busy}
-            className="h-auto min-h-11 px-0 text-sm text-danger underline"
+            className={typeMinH11DangerUnderline}
             onClick={() => void leave()}
           >
             {copy.leave}

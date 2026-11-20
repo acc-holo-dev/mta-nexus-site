@@ -7,6 +7,7 @@ import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelMinSpace4P5 } from "../../shell/panel-shell";
 import { surfaceP4TextSmSecondary } from "../../shell/surface-shell";
 import {
+  typeBreakLgSemibold,
   typeBreakXl,
   typeDisplayPrimary,
   typeFlexWrapGap4Sm,
@@ -121,9 +122,7 @@ export function OrderTermsReportView({
         <ol className="space-y-4">
           {report.lines.map((line) => (
             <li key={line.id} className={panelMinSpace4P5}>
-              <h2 className="break-words text-lg font-semibold">
-                {line.terms?.product.title ?? line.productId}
-              </h2>
+              <h2 className={typeBreakLgSemibold}>{line.terms?.product.title ?? line.productId}</h2>
               <p className={typeSmSecondary}>
                 {c[line.evidence]} · {line.id}
               </p>

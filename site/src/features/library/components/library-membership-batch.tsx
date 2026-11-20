@@ -14,6 +14,7 @@ import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 import { linkAccentSmRounded, linkAccentTight } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import {
+  typeBlockXsMuted,
   typeBreakAllXs,
   typeBreakSm,
   typeFlexStartGap3,
@@ -218,7 +219,7 @@ export function LibraryMembershipBatchForm({
                     />
                     <span className="break-words">
                       {collection.name}
-                      <span className="block text-xs text-muted">{h.desired}</span>
+                      <span className={typeBlockXsMuted}>{h.desired}</span>
                     </span>
                   </label>
                   <p className={typeXsMuted}>

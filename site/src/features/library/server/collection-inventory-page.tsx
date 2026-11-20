@@ -24,6 +24,7 @@ import {
   typeBreakSemibold,
   typeFlexWrapEndGap3,
   typeFlexWrapGap4,
+  typeGridGap1,
   typeSmSecondary,
   typeSpace2BorderTPt3,
   typeSurfaceBorderP2,
@@ -135,7 +136,7 @@ export async function CollectionInventoryPage({
         ) : null}
         <search aria-label={v.search}>
           <form method="get" action={collectionInventoryHref()} className={typeFlexWrapEndGap3}>
-            <label className="grid gap-1">
+            <label className={typeGridGap1}>
               {v.search}
               <input
                 name="q"
@@ -144,7 +145,7 @@ export async function CollectionInventoryPage({
                 className="min-h-11 rounded border border-base bg-surface p-2"
               />
             </label>
-            <label className="grid gap-1">
+            <label className={typeGridGap1}>
               {v.status}
               <select name="status" defaultValue={report.status} className={typeSurfaceBorderP2}>
                 {(["all", "active", "archived"] as const).map((status) => (
@@ -154,7 +155,7 @@ export async function CollectionInventoryPage({
                 ))}
               </select>
             </label>
-            <label className="grid gap-1">
+            <label className={typeGridGap1}>
               {v.collection}
               <select
                 name="collectionId"
@@ -169,7 +170,7 @@ export async function CollectionInventoryPage({
                 ))}
               </select>
             </label>
-            <label className="grid gap-1">
+            <label className={typeGridGap1}>
               {v.filter}
               <select name="filter" defaultValue={report.filter} className={typeSurfaceBorderP2}>
                 {LIBRARY_COLLECTION_INVENTORY_FILTERS.map((filter) => (
@@ -179,7 +180,7 @@ export async function CollectionInventoryPage({
                 ))}
               </select>
             </label>
-            <label className="grid gap-1">
+            <label className={typeGridGap1}>
               {v.releaseFilter}
               <select name="release" defaultValue={report.release} className={typeSurfaceBorderP2}>
                 {LIBRARY_COLLECTION_INVENTORY_RELEASE_FILTERS.map((release) => (

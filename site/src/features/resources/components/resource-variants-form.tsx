@@ -14,6 +14,8 @@ import { useNexusLocale } from "../../shell/locale";
 import { panelSpace2P4TextSm, panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceP4 } from "../../shell/surface-shell";
 import {
+  typeBlockSmSecondary,
+  typeBlockXsMuted,
   typeBreakSmSecondary,
   typeSemiboldPrimary,
   typeSmSecondary,
@@ -307,7 +309,7 @@ export function ResourceVariantsForm({
     <section className="space-y-6">
       <form onSubmit={(event) => submit(event, "save")} className={panelSpace4P5}>
         <p className={typeSmSecondary}>{copy.variantNote}</p>
-        <label htmlFor={`${field}-title`} className="block text-sm text-secondary">
+        <label htmlFor={`${field}-title`} className={typeBlockSmSecondary}>
           {copy.title}
         </label>
         <input
@@ -398,7 +400,7 @@ export function ResourceVariantsForm({
             </li>
           ))}
         </ol>
-        <label htmlFor={`${field}-reason`} className="block text-sm text-secondary">
+        <label htmlFor={`${field}-reason`} className={typeBlockSmSecondary}>
           {copy.reason}
         </label>
         <textarea
@@ -431,7 +433,7 @@ export function ResourceVariantsForm({
             >
               <span className={typeBreakSmSecondary}>
                 {row.title}
-                <span className="block text-xs text-muted">{row.slug}</span>
+                <span className={typeBlockXsMuted}>{row.slug}</span>
               </span>
               <Button
                 type="button"
@@ -488,7 +490,7 @@ export function ResourceVariantsForm({
           <h2 className={typeSemiboldPrimary}>{copy.dissolve}</h2>
           <p className={typeSmSecondary}>{copy.dissolveNote}</p>
           <p className={typeXsMuted}>{copy.reason}</p>
-          <label htmlFor={`${field}-remove-reason`} className="block text-sm text-secondary">
+          <label htmlFor={`${field}-remove-reason`} className={typeBlockSmSecondary}>
             {copy.reason}
           </label>
           <textarea

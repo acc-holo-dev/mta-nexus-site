@@ -8,10 +8,12 @@ import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax2xlPadded } from "../../shell/page-shell";
 import { panelGridClipShadow } from "../../shell/panel-shell";
 import {
+  typeBlockXsMuted,
   typeDisplayPrimary,
   typeItemsStretchPy4,
   typeLabelBlockUpperSecondary,
   typeMaxXlSmLeadingMuted,
+  typeMinH11SmCol2,
   typeSmColSpan2,
   typeSpace15SmCol2,
 } from "../../shell/type-shell";
@@ -306,7 +308,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
             ))}
           </select>
           {organizationsLoading && (
-            <span className="block text-xs text-muted">{copy.organizationsLoading}</span>
+            <span className={typeBlockXsMuted}>{copy.organizationsLoading}</span>
           )}
           {organizationsFailed ? (
             <ErrorState
@@ -538,12 +540,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
           </select>
         </div>
 
-        <Button
-          type="submit"
-          disabled={!!pending}
-          isLoading={loading}
-          className="min-h-11 sm:col-span-2"
-        >
+        <Button type="submit" disabled={!!pending} isLoading={loading} className={typeMinH11SmCol2}>
           {loading ? copy.creating : copy.create}
         </Button>
       </form>

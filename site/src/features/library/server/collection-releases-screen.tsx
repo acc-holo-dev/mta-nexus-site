@@ -22,10 +22,12 @@ import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeBreakSemibold,
+  typeFlexGap4,
   typeFlexWrapEndGap3,
   typeFlexWrapGap3,
   typeFlexWrapGap4,
   typeGrid2Gap4,
+  typeGridGap1,
 } from "../../shell/type-shell";
 import { collectionReleasesCopy } from "../collection-releases-i18n";
 import { collectionReleasesQuery } from "../collection-releases-query";
@@ -165,7 +167,7 @@ export async function CollectionReleasesScreen({
           className={typeFlexWrapEndGap3}
         >
           <input type="hidden" name="filter" value={result.filter} />
-          <label className="grid gap-1">
+          <label className={typeGridGap1}>
             {cc.search}
             <input
               name="q"
@@ -304,7 +306,7 @@ export async function CollectionReleasesScreen({
           );
         })}
       </ol>
-      <nav aria-label={cc.page} className="flex gap-4">
+      <nav aria-label={cc.page} className={typeFlexGap4}>
         {result.page > 1 && (
           <Link href={href(result.page - 1)} className={linkAccentTightRounded}>
             {cc.previous}

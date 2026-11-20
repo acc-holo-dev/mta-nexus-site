@@ -11,6 +11,8 @@ import {
   typeBreakAllSecondary,
   typeFileInputInset,
   typeFlexStartGap3,
+  typeFlexWrapBaselineBetweenGap2,
+  typeGridGap15Sm2,
   typeItemsStretchPy4,
   typeLabelUpperFaint,
   typeMonoSecondary,
@@ -339,7 +341,7 @@ export function MtaMetaInspectorPanel({
 
           {scripts.length > 0 && (
             <section aria-labelledby="meta-inspector-scripts-heading" className="space-y-2">
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <div className={typeFlexWrapBaselineBetweenGap2}>
                 <h3 id="meta-inspector-scripts-heading" className={typeLabelUpperFaint}>
                   {copy.scriptsDetails}
                 </h3>
@@ -352,7 +354,7 @@ export function MtaMetaInspectorPanel({
                     .replace("{total}", String(scripts.length))}
                 </span>
               </div>
-              <ul className="grid gap-1.5 sm:grid-cols-2">
+              <ul className={typeGridGap15Sm2}>
                 {withOccurrenceKeys(metaInspectorPreview(scripts), (entry) =>
                   JSON.stringify([entry.src, entry.type, entry.cache, entry.validate]),
                 ).map(({ key, item: entry }) => (
@@ -379,7 +381,7 @@ export function MtaMetaInspectorPanel({
 
           {files.length > 0 && (
             <section aria-labelledby="meta-inspector-files-heading" className="space-y-2">
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <div className={typeFlexWrapBaselineBetweenGap2}>
                 <h3 id="meta-inspector-files-heading" className={typeLabelUpperFaint}>
                   {copy.filesDetails}
                 </h3>
@@ -392,7 +394,7 @@ export function MtaMetaInspectorPanel({
                     .replace("{total}", String(files.length))}
                 </span>
               </div>
-              <ul className="grid gap-1.5 sm:grid-cols-2">
+              <ul className={typeGridGap15Sm2}>
                 {withOccurrenceKeys(metaInspectorPreview(files), (entry) =>
                   JSON.stringify([entry.src, entry.download]),
                 ).map(({ key, item: entry }) => (
@@ -412,7 +414,7 @@ export function MtaMetaInspectorPanel({
 
           {maps.length > 0 && (
             <section aria-labelledby="meta-inspector-maps-heading" className="space-y-2">
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <div className={typeFlexWrapBaselineBetweenGap2}>
                 <h3 id="meta-inspector-maps-heading" className={typeLabelUpperFaint}>
                   {copy.mapsDetails}
                 </h3>
@@ -425,7 +427,7 @@ export function MtaMetaInspectorPanel({
                     .replace("{total}", String(maps.length))}
                 </span>
               </div>
-              <ul className="grid gap-1.5 sm:grid-cols-2">
+              <ul className={typeGridGap15Sm2}>
                 {withOccurrenceKeys(metaInspectorPreview(maps), (entry) =>
                   JSON.stringify([entry.src, entry.dimension]),
                 ).map(({ key, item: entry }) => (
@@ -445,7 +447,7 @@ export function MtaMetaInspectorPanel({
 
           {settings.length > 0 && (
             <section aria-labelledby="meta-inspector-settings-heading" className="space-y-2">
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <div className={typeFlexWrapBaselineBetweenGap2}>
                 <h3 id="meta-inspector-settings-heading" className={typeLabelUpperFaint}>
                   {copy.settingsDetails}
                 </h3>
@@ -458,7 +460,7 @@ export function MtaMetaInspectorPanel({
                     .replace("{total}", String(settings.length))}
                 </span>
               </div>
-              <ul className="grid gap-1.5 sm:grid-cols-2">
+              <ul className={typeGridGap15Sm2}>
                 {withOccurrenceKeys(metaInspectorPreview(settings), (entry) =>
                   JSON.stringify([entry.name, entry.value]),
                 ).map(({ key, item: entry }) => (
@@ -481,7 +483,7 @@ export function MtaMetaInspectorPanel({
 
           {inspection.aclRights.length > 0 && (
             <section aria-labelledby="meta-inspector-acl-heading" className="space-y-2">
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <div className={typeFlexWrapBaselineBetweenGap2}>
                 <h3 id="meta-inspector-acl-heading" className={typeLabelUpperFaint}>
                   {copy.aclRights}
                 </h3>
@@ -499,7 +501,7 @@ export function MtaMetaInspectorPanel({
                     .replace("{total}", String(inspection.aclRights.length))}
                 </span>
               </div>
-              <ul className="grid gap-1.5 sm:grid-cols-2">
+              <ul className={typeGridGap15Sm2}>
                 {withOccurrenceKeys(metaInspectorPreview(inspection.aclRights), (right) =>
                   JSON.stringify([right.name, right.access]),
                 ).map(({ key, item: right }) => (
@@ -522,7 +524,7 @@ export function MtaMetaInspectorPanel({
 
           {inspection.exports.length > 0 && (
             <section aria-labelledby="meta-inspector-exports-heading" className="space-y-2">
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <div className={typeFlexWrapBaselineBetweenGap2}>
                 <h3 id="meta-inspector-exports-heading" className={typeLabelUpperFaint}>
                   {copy.exportsDetails}
                 </h3>
@@ -540,7 +542,7 @@ export function MtaMetaInspectorPanel({
                     .replace("{total}", String(inspection.exports.length))}
                 </span>
               </div>
-              <ul className="grid gap-1.5 sm:grid-cols-2">
+              <ul className={typeGridGap15Sm2}>
                 {withOccurrenceKeys(metaInspectorPreview(inspection.exports), (entry) =>
                   JSON.stringify([entry.function, entry.type, entry.http]),
                 ).map(({ key, item: entry }) => (

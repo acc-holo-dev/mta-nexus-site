@@ -7,6 +7,7 @@ import {
   typeClamp2CaptionMuted,
   typeCoverHoverScale,
   typeFlex1ColGap2P35,
+  typeIcon35,
 } from "../../shell/type-shell";
 import { getUserPlatformCopy } from "../user-platform-copy";
 
@@ -65,11 +66,11 @@ export function ArticleCard({ article, locale = "en" }: { article: Content; loca
         <div className="flex items-center justify-between border-t border-base pt-2.5 font-caption">
           <div className="flex items-center gap-3 text-muted">
             <span className="flex items-center gap-1">
-              <ThumbsUp className="h-3.5 w-3.5" aria-hidden="true" />
+              <ThumbsUp className={typeIcon35} aria-hidden="true" />
               <span className="font-numeric">{article.likeCount}</span>
             </span>
             <span className="flex items-center gap-1">
-              <MessageSquare className="h-3.5 w-3.5" aria-hidden="true" />
+              <MessageSquare className={typeIcon35} aria-hidden="true" />
               <span className="font-numeric">{article.commentCount}</span>
             </span>
           </div>

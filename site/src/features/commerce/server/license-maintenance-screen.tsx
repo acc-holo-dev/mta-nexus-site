@@ -17,6 +17,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeDisplayPrimary,
   typeFlexWrapGap4Sm,
+  typeGridGap4Sm3,
   typeSmMuted,
   typeSmSecondary,
   typeXlPrimary,
@@ -107,7 +108,7 @@ export async function LicenseMaintenanceScreen({
       </Link>
       <h1 className={typeDisplayPrimary}>{copy.maintenance}</h1>
       <p className="text-secondary">{copy.maintenanceNote}</p>
-      <dl className="grid gap-4 sm:grid-cols-3">
+      <dl className={typeGridGap4Sm3}>
         {[
           [copy.due, result.expired],
           [copy.warnings, result.expiring],

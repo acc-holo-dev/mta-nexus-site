@@ -13,6 +13,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellStack7 } from "../../shell/page-shell";
+import { typeIcon7Accent } from "../../shell/type-shell";
 import { DirectoryFilters, DirectoryResults } from "../directory-server";
 import {
   DISCOVER_TYPES,
@@ -57,7 +58,7 @@ export async function DiscoverPage({
       <PageHeader
         title={copy.title}
         description={copy.description}
-        icon={<Compass className="h-7 w-7 text-accent" aria-hidden="true" />}
+        icon={<Compass className={typeIcon7Accent} aria-hidden="true" />}
       />
 
       <nav

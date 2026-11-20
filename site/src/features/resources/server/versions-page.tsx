@@ -26,6 +26,7 @@ import {
   typePrewrapSmSecondary,
   typeSmSecondary,
   typeXsMuted,
+  typeXsSemiboldPrimary,
 } from "../../shell/type-shell";
 import { BuildPackageSummaryPanel } from "../components/build-package-evidence";
 import { BuildProvenanceDetails } from "../components/build-provenance-details";
@@ -228,7 +229,7 @@ export async function PublicResourceVersionsPage({
               </div>
 
               <div className="space-y-2">
-                <h3 className="text-xs font-semibold text-primary">{copy.notes}</h3>
+                <h3 className={typeXsSemiboldPrimary}>{copy.notes}</h3>
                 <p className={typePrewrapSmSecondary}>
                   {release.releaseNotes?.trim() || copy.noNotes}
                 </p>

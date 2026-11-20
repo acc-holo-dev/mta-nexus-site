@@ -8,7 +8,9 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellStack3 } from "../../shell/page-shell";
 import {
   typeFlexCenterGap2,
+  typeFlexFullMinEnd,
   typeFlexMinWrapGap2,
+  typeIcon35,
   typeIconAccent,
   typeLabelUpperFaint,
   typeMinSpace1,
@@ -159,7 +161,7 @@ export function ServerHistoryPanel({
               const percent = serverHistoryBarPercent(point.peakPlayers, peak);
               const label = formatHistoryIntervalUtc(point.bucketAt, locale);
               return (
-                <li key={point.bucketAt} className="flex h-full min-w-0 flex-1 items-end">
+                <li key={point.bucketAt} className={typeFlexFullMinEnd}>
                   <div className="flex h-full w-full items-end">
                     <div
                       className={
@@ -183,7 +185,7 @@ export function ServerHistoryPanel({
             })}
           </ol>
           <div className="flex items-center gap-2 text-[11px] text-faint">
-            <Activity className="h-3.5 w-3.5" aria-hidden="true" />
+            <Activity className={typeIcon35} aria-hidden="true" />
             <span>{copy.barsDescription}</span>
           </div>
         </div>

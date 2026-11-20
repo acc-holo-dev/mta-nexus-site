@@ -1,3 +1,4 @@
+import { typeSpace2BorderBPb6 } from "../../shell/type-shell";
 import type { ReactNode } from "react";
 import { pageShellMax4xlTight, pageShellStack8 } from "../../shell/page-shell";
 import { DictionaryFieldRouteLoading } from "../../shell/route-honest-loading-server";
@@ -59,7 +60,7 @@ export function ArticleRouteLoading() {
 
 export function ArticlesIndexRouteLoading() {
   return ArticlesRouteLoading({
-    headerClassName: "space-y-2 border-b border-base pb-6",
+    headerClassName: typeSpace2BorderBPb6,
     titleClassName: "text-2xl font-extrabold text-primary sm:text-3xl",
   });
 }

@@ -10,6 +10,7 @@ import { linkAccentTightSm } from "../../shell/link-shell";
 import { surfaceSpace2P4TextSm } from "../../shell/surface-shell";
 import {
   typeBreakAllXs,
+  typeBreakCode,
   typeSemiboldPrimary,
   typeSmMuted,
   typeXsMuted,
@@ -124,7 +125,7 @@ export function BuildPackageEvidencePanel({
           <p className={typeSmMuted}>{copy.note}</p>
           {manifest && (
             <section className="space-y-4 rounded-lg border border-base p-4 text-sm">
-              <p className="break-words font-code">{manifest.path}</p>
+              <p className={typeBreakCode}>{manifest.path}</p>
               <code className={typeBreakAllXs}>
                 {copy.sha256Label}: {manifest.sha256Hash}
               </code>

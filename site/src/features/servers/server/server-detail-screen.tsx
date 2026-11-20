@@ -27,10 +27,13 @@ import { pageShellStack8 } from "../../shell/page-shell";
 import { panelSpace3P6, panelSpace4P5, panelSpace4P6 } from "../../shell/panel-shell";
 import {
   type3xlBlackPrimary,
+  typeCoverFull,
   typeElevenFaint,
   typeFlexCenterGap2,
   typeFlexWrapCenterGap2,
   typeGridCols1Gap6Md3,
+  typeHoverPrimary,
+  typeIcon4Success,
   typeIconAccent,
   typeSmSemiboldPrimary,
 } from "../../shell/type-shell";
@@ -172,7 +175,7 @@ export async function ServerDetailScreen({
   return (
     <div className={pageShellStack8}>
       <div className="flex min-w-0 items-center gap-2 text-xs text-muted">
-        <Link href="/servers" className="transition-colors hover:text-primary">
+        <Link href="/servers" className={typeHoverPrimary}>
           {copy.breadcrumb}
         </Link>
         <span aria-hidden="true">/</span>
@@ -191,7 +194,7 @@ export async function ServerDetailScreen({
                 height={640}
                 fetchPriority="high"
                 decoding="async"
-                className="h-full w-full object-cover"
+                className={typeCoverFull}
               />
             </>
           )}
@@ -382,7 +385,7 @@ export async function ServerDetailScreen({
         <div className={panelSpace4P6}>
           <div className="flex items-center justify-between text-xs text-muted">
             <span className="font-semibold uppercase tracking-wider">{copy.livePlayerLoad}</span>
-            <Users className="h-4 w-4 text-success" aria-hidden="true" />
+            <Users className={typeIcon4Success} aria-hidden="true" />
           </div>
           <div className={type3xlBlackPrimary}>
             {formatUnknown(locale, currentPlayers)}{" "}

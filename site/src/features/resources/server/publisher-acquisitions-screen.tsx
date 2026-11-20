@@ -17,6 +17,7 @@ import {
   typeFlexMinWrapGap3,
   typeFlexWrapGap4Sm,
   typeGrid2Gap4,
+  typeMax3xlSmSecondary,
   typeSmMuted,
   typeSmSecondary,
   typeXsMuted,
@@ -108,7 +109,7 @@ export async function PublisherAcquisitionsScreen({
         <Link href="/workspace/acquisitions/receipts" className={linkAccentSmRounded}>
           {resourceCartReceiptsCopy(locale).title}
         </Link>
-        <p className="max-w-3xl text-sm text-secondary" role="note">
+        <p className={typeMax3xlSmSecondary} role="note">
           {copy.historyNote}
         </p>
       </header>

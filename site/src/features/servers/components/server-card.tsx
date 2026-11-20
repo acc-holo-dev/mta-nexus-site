@@ -16,8 +16,10 @@ import {
   typeFlexBetweenCaption,
   typeFlexWrapGap2,
   typeH35W35Shrink,
+  typeIcon35,
   typeMinSpace1,
   typeSmSemiboldSuccess,
+  typeTruncateSmBoldPrimary,
 } from "../../shell/type-shell";
 import { type MtaMasterServer, mtaLiveStatus } from "../model/mta-master-directory-shared";
 
@@ -84,7 +86,7 @@ function CopyAddressControl({
         onClick={() => void copyAddress()}
         className="gap-1.5"
       >
-        <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+        <Copy className={typeIcon35} aria-hidden="true" />
         {copying ? copy.copying : copy.copyAddress}
       </Button>
       {copyMessage === copy.copyUnavailable ? (
@@ -202,7 +204,7 @@ export function ServerCard({
         <div className="space-y-1.5 border-t border-base pt-2.5">
           <div className={typeFlexBetweenCaption}>
             <span className="flex items-center gap-1 font-medium text-secondary">
-              <Users className="h-3.5 w-3.5" aria-hidden="true" />
+              <Users className={typeIcon35} aria-hidden="true" />
               <span className="font-numeric">
                 {playerCountLabel(hasLiveData ? livePlayers : undefined, maxPlayers, copy.unknown)}
               </span>
@@ -270,7 +272,7 @@ export function HomeNetworkServerCard({
   return (
     <article aria-label={name} className={panelFlexColGap3P5}>
       <div className={typeMinSpace1}>
-        <h3 className="truncate text-sm font-bold text-primary">{name}</h3>
+        <h3 className={typeTruncateSmBoldPrimary}>{name}</h3>
         <p className="truncate text-xs text-muted">
           {[observation.gameMode, observation.mapName].filter(Boolean).join(" · ") || address}
         </p>

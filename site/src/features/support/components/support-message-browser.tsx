@@ -8,6 +8,7 @@ import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import {
   typeDisplayPrimary,
   typeFlexWrapBetweenGap3,
+  typeFlexWrapCenterBetweenGap3Sm,
   typeMt2XsMuted,
   typePrewrapSmSecondary,
   typeSemiboldPrimary,
@@ -85,7 +86,7 @@ export function SupportMessageBrowser({
           </Link>
         </form>
       </search>
-      <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
+      <div className={typeFlexWrapCenterBetweenGap3Sm}>
         <Link href={supportMessageHref(path, filters, { fresh: true })} className={linkAccentTight}>
           {copy.latest}
         </Link>

@@ -6,6 +6,7 @@ import { resourceReleaseWatchesCopy } from "../../resources/resource-release-wat
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import {
+  typeBlockSm,
   typeBreakDisplayPrimary,
   typeBreakSemibold,
   typeFlexWrapEndGap3,
@@ -190,7 +191,7 @@ export async function LibraryCollectionsDetailView({
           className={typeFlexWrapEndGap3}
         >
           <label className="space-y-1">
-            <span className="block text-sm">{c.search}</span>
+            <span className={typeBlockSm}>{c.search}</span>
             <input
               name="q"
               defaultValue={result.q}

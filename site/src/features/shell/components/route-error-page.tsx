@@ -6,7 +6,12 @@ import Link from "next/link";
 import { useState } from "react";
 import { useNexusLocale } from "../locale";
 import { readSafePublicErrorReference } from "../safe-public-error-reference";
-import { typeCaptionMuted, typeDisplayPrimary, typeFlexWrapCenterJustifyGap3 } from "../type-shell";
+import {
+  typeCaptionMuted,
+  typeDisplayPrimary,
+  typeFlexWrapCenterJustifyGap3,
+  typeIcon35,
+} from "../type-shell";
 
 export function RouteErrorPage({
   error,
@@ -81,14 +86,14 @@ export function RouteErrorPage({
           onClick={reset}
           className="gap-1.5 rounded-md px-4 font-semibold"
         >
-          <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
+          <RefreshCw className={typeIcon35} aria-hidden="true" />
           <span>{dictionary.errors.retry}</span>
         </Button>
         <Link
           href="/"
           className="flex min-h-11 items-center gap-1.5 rounded-md border border-base bg-elevated px-4 py-2 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
-          <Home className="h-3.5 w-3.5" aria-hidden="true" />
+          <Home className={typeIcon35} aria-hidden="true" />
           <span>{dictionary.errors.home}</span>
         </Link>
       </div>

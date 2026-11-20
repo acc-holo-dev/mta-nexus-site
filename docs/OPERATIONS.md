@@ -1100,7 +1100,6 @@ request_body limit remains in place for streaming/chunked reads. Production smok
 reports safe phase names and line numbers on failure without shell xtrace or
 command text; all browser rehearsals share this production prerequisite.
 
-
 ## Existing-installation release and recovery
 
 This runbook prepares an operator-reviewed Docker deployment. It does not deploy
@@ -1436,7 +1435,6 @@ Keep the failed installation stopped and retain its volumes for investigation.
 Do not copy a raw PostgreSQL volume between major versions. Preserve both the
 failed volumes and the backup until the recovered installation is confirmed stable.
 
-
 ### Worker liveness vs progress
 
 Production delivery workers distinguish process heartbeat from dispatcher progress.
@@ -1446,7 +1444,6 @@ Account mail uses a minimum 180-second watchdog that scales with configured
 batch size and SMTP timeout. If progress exceeds that budget, the worker exits
 non-zero so the container restart policy can recover it; durable leases/outbox
 rows remain authoritative and are reclaimed after expiry.
-
 
 ### Web Push VAPID triplet generation
 

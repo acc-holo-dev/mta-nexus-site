@@ -11,6 +11,7 @@ import { linkAccentSm, linkAccentTightSmPlain } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceSpace2P4 } from "../../shell/surface-shell";
 import {
+  typeBlockXsMuted,
   typeGrid2Gap4,
   typeHeadingPrimary,
   typeLabelBlockUpperSecondary,
@@ -405,7 +406,7 @@ export function OrganizationProfileForm({
               onChange={(e) => change("slug", e.target.value)}
               aria-describedby="organization-slug-help"
             />
-            <span id="organization-slug-help" className="block text-xs text-muted">
+            <span id="organization-slug-help" className={typeBlockXsMuted}>
               {copy.slugHelp}
             </span>
           </div>

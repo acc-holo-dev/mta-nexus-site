@@ -18,6 +18,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeDisplayPrimary,
   typeFlexMinWrapEndGap3,
+  typeFlexWrapBetweenGap4Sm,
   typeSemiboldPrimary,
   typeSmSecondary,
 } from "../../shell/type-shell";
@@ -193,7 +194,7 @@ export async function LicenseModerationScreen({
         />
       )}
       {result.totalPages > 1 ? (
-        <nav aria-label={history.page} className="flex flex-wrap justify-between gap-4 text-sm">
+        <nav aria-label={history.page} className={typeFlexWrapBetweenGap4Sm}>
           {result.page > 1 ? (
             <Link href={href(result.page - 1)} className={linkAccent}>
               {history.previous}

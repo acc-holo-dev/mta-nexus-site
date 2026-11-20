@@ -3,7 +3,7 @@
 import { Button } from "@nexus/ui";
 import { Languages } from "lucide-react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
-import { typeSelectMinH11 } from "../type-shell";
+import { typeIcon35, typeSelectMinH11 } from "../type-shell";
 
 export function LocaleSwitcher({ locale }: { locale: Locale }) {
   const dictionary = getDictionary(locale);
@@ -26,7 +26,7 @@ export function LocaleSwitcher({ locale }: { locale: Locale }) {
       aria-label={dictionary.locale.label}
       title={dictionary.locale.label}
     >
-      <Languages className="h-3.5 w-3.5" aria-hidden="true" />
+      <Languages className={typeIcon35} aria-hidden="true" />
       <span className="sm:hidden">{nextLocale.toUpperCase()}</span>
       <span className="hidden sm:inline">{dictionary.locale.switchTo}</span>
     </Button>

@@ -19,6 +19,7 @@ import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentSm, linkGhostAccentSm } from "../../shell/link-shell";
 import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import {
+  typeBreakSmPrimary,
   typeFlexMinH11CenterGap3SmPrimary,
   typeFlexWrapGap3,
   typeGrid2Gap4,
@@ -343,7 +344,7 @@ export function DiscussionReportBatch({
       {preview && (
         <div className={panelSpace4P5}>
           <h3 className={typeSemiboldPrimary}>{copy.previewTitle}</h3>
-          <p className="break-words text-sm text-primary">{preview.publication.title}</p>
+          <p className={typeBreakSmPrimary}>{preview.publication.title}</p>
           <p className={typeSmSemiboldPrimary}>
             {commentId === null ? copy.publication : copy.comment}
           </p>

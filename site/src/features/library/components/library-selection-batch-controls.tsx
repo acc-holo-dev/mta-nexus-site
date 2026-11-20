@@ -10,7 +10,7 @@ import {
 } from "../../shell/action-confirm-checkbox";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
-import { typeBreakAllXsOnly } from "../../shell/type-shell";
+import { typeBreakAllXsOnly, typeFlexStartGap2Break } from "../../shell/type-shell";
 import {
   confirmedSelectionBatchPreview,
   confirmedSelectionBatchResult,
@@ -142,7 +142,7 @@ export function LibrarySelectionBatchControls({
         <ul className="space-y-2">
           {items.map((item) => (
             <li key={item.productId}>
-              <label className="flex items-start gap-2 break-words">
+              <label className={typeFlexStartGap2Break}>
                 <input
                   type="checkbox"
                   checked={ids.includes(item.productId)}

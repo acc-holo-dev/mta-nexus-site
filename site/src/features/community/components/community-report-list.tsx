@@ -8,6 +8,7 @@ import { linkFocusRing, linkGhostAccentSm, linkMuted } from "../../shell/link-sh
 import { pageShellStack5 } from "../../shell/page-shell";
 import { panelFlexMinWrapEndP4, panelMinSpace2P4 } from "../../shell/panel-shell";
 import {
+  typeBlockXsMuted,
   typeFlexMinWrapGap3,
   typeFlexWrapCenterGap4Sm,
   typeMinSpace3,
@@ -113,7 +114,7 @@ export function CommunityReportList({
               className={platformFieldClass}
               aria-describedby="community-report-search-help"
             />
-            <span id="community-report-search-help" className="block text-xs text-muted">
+            <span id="community-report-search-help" className={typeBlockXsMuted}>
               {copy.searchHint}
             </span>
           </label>

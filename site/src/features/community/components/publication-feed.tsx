@@ -12,6 +12,7 @@ import {
   typeFlexMinWrapGap2,
   typeFlexMinWrapGap3,
   typeMinSpace4,
+  typeMinW48Flex1,
   typeMlAutoXsMuted,
   typePrewrapSmSecondary,
   typeSpace1XsSecondary,
@@ -97,7 +98,7 @@ export function PublicationFeed({
             <input type="hidden" name="source" value={filters.source} />
           </>
         )}
-        <div className="min-w-48 flex-1">
+        <div className={typeMinW48Flex1}>
           <SearchField
             className={platformFieldClass}
             label={copy.query}

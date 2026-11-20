@@ -18,6 +18,7 @@ import {
   typeFlexWrapCenterBetweenGap3,
   typeFlexWrapEndGap3,
   typeGridGap4Md2,
+  typeIcon4ShrinkSuccess,
   typeMinFlex1,
   typeSmMuted,
   typeSmSuccess,
@@ -295,7 +296,7 @@ export function FollowWorkspace({
                     />
                   )}
                   {item.verified && (
-                    <ShieldCheck className="h-4 w-4 shrink-0 text-success" aria-hidden="true" />
+                    <ShieldCheck className={typeIcon4ShrinkSuccess} aria-hidden="true" />
                   )}
                 </h2>
                 {item.description && (

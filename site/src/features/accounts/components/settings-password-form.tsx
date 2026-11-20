@@ -8,6 +8,7 @@ import { panelSpace4P5Shadow } from "../../shell/panel-shell";
 import {
   typeBlockSmPrimary,
   typeFlexCenterGap2,
+  typeGridGap3Cols2,
   typeIconAccent,
   typeMinSpace1,
   typeSmMuted,
@@ -54,7 +55,7 @@ export function SettingsPasswordForm({
         onSubmit={onSubmit}
         aria-label={copy.changePassword}
         aria-describedby="password-policy"
-        className="grid gap-3 sm:grid-cols-2"
+        className={typeGridGap3Cols2}
       >
         <div className={typeMinSpace1}>
           <label htmlFor="current-password" className={typeBlockSmPrimary}>

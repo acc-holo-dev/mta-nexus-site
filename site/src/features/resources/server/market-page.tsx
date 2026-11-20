@@ -14,6 +14,7 @@ import {
   typeFlexWrapCenterJustifyGap3,
   typeFlexWrapGap2,
   typeIcon6Accent,
+  typeListDiscInsideSpace1,
   typeMinBreakWords,
   typeMt05CaptionMuted,
   typeSemiboldPrimary,
@@ -222,7 +223,7 @@ export async function MarketPage({
               {filtersActive ? (
                 <div className="space-y-2 text-left text-sm text-secondary">
                   <p className={typeSemiboldPrimary}>{dictionary.market.activeFilters}</p>
-                  <ul className="list-inside list-disc space-y-1">
+                  <ul className={typeListDiscInsideSpace1}>
                     {activeCategoryLabel ? <li>{activeCategoryLabel}</li> : null}
                     {activeSortLabel ? <li>{activeSortLabel}</li> : null}
                     {activeQueryLabel ? <li>{activeQueryLabel}</li> : null}

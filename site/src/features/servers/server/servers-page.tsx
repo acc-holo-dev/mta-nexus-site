@@ -6,6 +6,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { serverService } from "../../../lib/services/servers/server-service";
 import { pageShellStack8 } from "../../shell/page-shell";
+import { typeIcon7Accent } from "../../shell/type-shell";
 import { MtaMasterServerDirectory } from "../components/mta-master-server-directory";
 import { mtaListingProfileRecord } from "../model/mta-listing-profile-map";
 
@@ -26,7 +27,7 @@ export async function ServersPage() {
       <PageHeader
         title={dictionary.servers.title}
         description={dictionary.servers.description}
-        icon={<ServerIcon className="h-7 w-7 text-accent" aria-hidden="true" />}
+        icon={<ServerIcon className={typeIcon7Accent} aria-hidden="true" />}
         action={
           <Link
             href="/workspace/servers/new"

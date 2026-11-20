@@ -14,10 +14,12 @@ import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelClipSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
+  typeBlockBreakAllXsMuted,
   typeBorderT,
   typeBreakSemibold,
   typeFlexMinWrapEndGap3,
   typeFlexMinWrapGap4Sm,
+  typeLabelUpperSecondary,
   typeMinBreakDisplay,
   typeSmMuted,
   typeSmSecondary,
@@ -140,7 +142,7 @@ export async function CollectionComparePage({
             className={typeFlexMinWrapEndGap3}
           >
             <label className="grid min-w-0 max-w-full gap-1.5">
-              <span className="font-label uppercase text-secondary">{h.destination}</span>
+              <span className={typeLabelUpperSecondary}>{h.destination}</span>
               <select
                 name="to"
                 defaultValue={comparison?.destination.id ?? ""}
@@ -158,7 +160,7 @@ export async function CollectionComparePage({
             {comparison && (
               <>
                 <label className="grid min-w-0 max-w-full gap-1.5">
-                  <span className="font-label uppercase text-secondary">{c.all}</span>
+                  <span className={typeLabelUpperSecondary}>{c.all}</span>
                   <select
                     name="filter"
                     defaultValue={comparison.filter}
@@ -172,7 +174,7 @@ export async function CollectionComparePage({
                   </select>
                 </label>
                 <label className="grid min-w-0 max-w-full gap-1.5">
-                  <span className="font-label uppercase text-secondary">{c.search}</span>
+                  <span className={typeLabelUpperSecondary}>{c.search}</span>
                   <input
                     name="q"
                     defaultValue={comparison.q}
@@ -183,7 +185,7 @@ export async function CollectionComparePage({
               </>
             )}
             <label className="grid min-w-0 max-w-full gap-1.5">
-              <span className="font-label uppercase text-secondary">{h.transfer}</span>
+              <span className={typeLabelUpperSecondary}>{h.transfer}</span>
               <select
                 name="transfer"
                 defaultValue={comparison?.transfer ?? query.transfer}
@@ -269,7 +271,7 @@ export async function CollectionComparePage({
                     <tr key={item.productId} className={typeBorderT}>
                       <th scope="row" className="break-words p-2 font-normal">
                         {item.available ? (item.title ?? c.unavailable) : c.unavailable}
-                        <code className="block break-all text-xs text-muted">{item.productId}</code>
+                        <code className={typeBlockBreakAllXsMuted}>{item.productId}</code>
                       </th>
                       <td className="p-2 text-sm">
                         {item.inSource ? c.inCollection : c.notInCollection}

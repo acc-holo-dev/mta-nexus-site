@@ -26,6 +26,7 @@ import {
   typeSmSemiboldPrimary,
   typeXsMuted,
   typeXsSecondary,
+  typeXsSemiboldPrimary,
 } from "../../shell/type-shell";
 import { communityReportCopy } from "../community-report-copy";
 import type { ReportHistoryPage } from "../community-report-history-contract";
@@ -142,7 +143,7 @@ export function CommunityReportHistory({
               {event.removed && <p className={typeXsMuted}>{copy.removed}</p>}
               {page.audience === "staff" && "notes" in event && event.notes && (
                 <div>
-                  <h3 className="text-xs font-semibold text-primary">{copy.notes}</h3>
+                  <h3 className={typeXsSemiboldPrimary}>{copy.notes}</h3>
                   <p className={typePrewrapSmSecondary}>{event.notes}</p>
                 </div>
               )}

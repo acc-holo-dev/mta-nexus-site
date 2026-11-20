@@ -87,6 +87,7 @@ export async function resourceMediaImage(request: NextRequest, mediaId: string) 
         ...headers,
         "Content-Type": "image/png",
         "Content-Length": String(length),
+        "X-Resource-Content-Length": String(length),
         "Content-Disposition": 'inline; filename="resource-preview.png"',
       },
     });

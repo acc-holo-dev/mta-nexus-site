@@ -12,6 +12,8 @@ import { pageShellMax5xlLooseTight } from "../../shell/page-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceInsetP3TextSmSecondary } from "../../shell/surface-shell";
 import {
+  typeBlockSpace15,
+  typeBreakSmBoldPrimary,
   typeFlexCenterBetweenGap3,
   typeFlexCenterGap2,
   typeFlexMinCenterGap25Display,
@@ -21,9 +23,12 @@ import {
   typeIconAccent,
   typeLabelSecondary,
   typeLabelUpperMuted,
+  typeMax3xlSmMuted,
   typeMt1XsMuted,
+  typePulseSpace3,
   typeSmMuted,
   typeSmSecondary,
+  typeSpace2BorderBPb6,
 } from "../../shell/type-shell";
 import {
   confirmSupportCaseCreated,
@@ -318,14 +323,12 @@ export function SupportCenter({
 
   return (
     <div className={pageShellMax5xlLooseTight}>
-      <header className="space-y-2 border-b border-base pb-6">
+      <header className={typeSpace2BorderBPb6}>
         <h1 className={typeFlexMinCenterGap25Display}>
           <LifeBuoy className={typeIcon6Accent} aria-hidden="true" />
           <span>{staffMode ? copy.staffQueue : copy.title}</span>
         </h1>
-        <p className="max-w-3xl text-sm text-muted">
-          {staffMode ? copy.staffDescription : copy.description}
-        </p>
+        <p className={typeMax3xlSmMuted}>{staffMode ? copy.staffDescription : copy.description}</p>
         {!staffMode ? (
           <ErrorState
             id="support-no-guaranteed-sla"
@@ -346,7 +349,7 @@ export function SupportCenter({
             <h2 className={typeHeadingPrimary}>{copy.newCase}</h2>
           </div>
 
-          <label className="block space-y-1.5">
+          <label className={typeBlockSpace15}>
             <span className={typeLabelSecondary}>{copy.category}</span>
             <select
               value={category}
@@ -409,7 +412,7 @@ export function SupportCenter({
             placeholder={copy.subjectPlaceholder}
           />
 
-          <label className="block space-y-1.5">
+          <label className={typeBlockSpace15}>
             <span className={typeLabelSecondary}>{copy.message}</span>
             <textarea
               value={message}
@@ -478,7 +481,7 @@ export function SupportCenter({
                 className={`${platformFieldClass} min-w-0 w-full`}
               />
             </label>
-            <label className="block space-y-1.5">
+            <label className={typeBlockSpace15}>
               <span className={typeLabelSecondary}>{copy.filterStatus}</span>
               <select
                 name="status"
@@ -494,7 +497,7 @@ export function SupportCenter({
                 <option value="closed">{copy.closed}</option>
               </select>
             </label>
-            <label className="block space-y-1.5">
+            <label className={typeBlockSpace15}>
               <span className={typeLabelSecondary}>{copy.category}</span>
               <select
                 name="category"
@@ -533,7 +536,7 @@ export function SupportCenter({
         {loading ? (
           <div role="status" aria-live="polite" className="space-y-3">
             <p className={typeSmMuted}>{copy.loading}</p>
-            <div className="animate-pulse space-y-3" aria-hidden="true">
+            <div className={typePulseSpace3} aria-hidden="true">
               {[1, 2, 3].map((key) => (
                 <div key={key} className="nexus-panel h-24 p-4">
                   <div className="mb-3 h-4 max-w-md rounded bg-inset" />
@@ -579,9 +582,7 @@ export function SupportCenter({
             >
               <div className={typeFlexWrapStartBetweenGap3}>
                 <div className="min-w-0">
-                  <h3 className="break-words text-sm font-bold text-primary">
-                    {supportCase.subject}
-                  </h3>
+                  <h3 className={typeBreakSmBoldPrimary}>{supportCase.subject}</h3>
                   {staffMode && supportCase.requesterUsername && (
                     <p className={typeMt1XsMuted}>
                       {copy.requester}: @{supportCase.requesterUsername}

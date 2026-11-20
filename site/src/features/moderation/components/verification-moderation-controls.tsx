@@ -12,7 +12,9 @@ import { linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { skelH35W35Spin } from "../../shell/skeleton-shell";
 import {
+  typeBlockSpace1,
   typeFlexWrapGap2,
+  typeIcon35,
   typeLabelUpperMuted,
   typeTenFaint,
   typeWFullMaxSmSpace2Md80,
@@ -121,7 +123,7 @@ export function VerificationModerationControls({
 
   return (
     <div className={typeWFullMaxSmSpace2Md80} aria-busy={pending !== null}>
-      <label className="block space-y-1">
+      <label className={typeBlockSpace1}>
         <span className={typeLabelUpperMuted}>{copy.reviewNote}</span>
         <textarea
           value={notes}
@@ -146,7 +148,7 @@ export function VerificationModerationControls({
           {pending === "approve" ? (
             <LoaderCircle className={skelH35W35Spin} aria-hidden="true" />
           ) : (
-            <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />
+            <BadgeCheck className={typeIcon35} aria-hidden="true" />
           )}
           {copy.approve}
         </Button>
@@ -161,7 +163,7 @@ export function VerificationModerationControls({
           {pending === "reject" ? (
             <LoaderCircle className={skelH35W35Spin} aria-hidden="true" />
           ) : (
-            <XCircle className="h-3.5 w-3.5" aria-hidden="true" />
+            <XCircle className={typeIcon35} aria-hidden="true" />
           )}
           {copy.reject}
         </Button>

@@ -16,6 +16,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   type2xlBoldPrimary,
   typeBreakAllXsMuted,
+  typeFlexWrapBetweenGap4Sm,
   typeFlexWrapStartBetweenGap3,
   typeMinBreakSemiboldPrimary,
   typeMinSpace3,
@@ -238,7 +239,7 @@ export async function VerificationHistoryScreen({
         ))}
       </ul>
       {filters && report ? (
-        <nav aria-label={copy.title} className="flex flex-wrap justify-between gap-4 text-sm">
+        <nav aria-label={copy.title} className={typeFlexWrapBetweenGap4Sm}>
           {report.newerCursor ? (
             <Link
               prefetch={false}

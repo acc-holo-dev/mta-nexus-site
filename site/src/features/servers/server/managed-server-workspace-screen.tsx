@@ -14,6 +14,7 @@ import { pageShellMax4xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeLgBoldPrimary,
+  typeMt1SmMuted,
   typeMt1XsLeadingMuted,
   typeSmBoldPrimary,
 } from "../../shell/type-shell";
@@ -91,7 +92,7 @@ export async function ServerManagementScreen({ params }: { params: Promise<{ id:
       <section className="nexus-panel min-w-0 space-y-4 overflow-x-clip p-5 shadow-nexus-sm sm:p-6">
         <div>
           <h2 className={typeLgBoldPrimary}>{copy.listingDetails}</h2>
-          <p className="mt-1 text-sm text-muted">{copy.listingDescription}</p>
+          <p className={typeMt1SmMuted}>{copy.listingDescription}</p>
         </div>
         <ServerDetailsForm key={`${user.id}:${server.id}`} actorId={user.id} server={server} />
       </section>

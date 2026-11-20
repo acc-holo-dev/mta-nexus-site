@@ -13,7 +13,11 @@ import {
   pageShellMax5xlLooseTight,
 } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeDisplayPrimary } from "../../shell/type-shell";
+import {
+  typeDisplayPrimary,
+  typeMax3xlSmMuted,
+  typeSpace2BorderBPb6,
+} from "../../shell/type-shell";
 import { SupportCenter } from "../center";
 import { supportQuery } from "../support-workspace-contract";
 import { supportWorkspaceCopy } from "../support-workspace-copy";
@@ -64,9 +68,9 @@ export async function SupportPageSurface({
     if (id !== undefined) return <PlatformSignIn locale={locale} returnPath={casePath} />;
     return (
       <div className={pageShellMax5xlLooseTight}>
-        <header className="space-y-2 border-b border-base pb-6">
+        <header className={typeSpace2BorderBPb6}>
           <h1 className={typeDisplayPrimary}>{support.title}</h1>
-          <p className="max-w-3xl text-sm text-muted">{support.description}</p>
+          <p className={typeMax3xlSmMuted}>{support.description}</p>
           <ErrorState
             id="support-no-guaranteed-sla"
             title={support.noGuaranteedSla}

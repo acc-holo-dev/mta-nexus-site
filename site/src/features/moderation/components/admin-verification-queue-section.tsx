@@ -7,9 +7,11 @@ import { linkAccentTight, linkAccentXsBlock } from "../../shell/link-shell";
 import {
   typeCaptionFaint,
   typeCaptionMuted,
+  typeCodeCaptionFaint,
   typeFlexWFullColStartGap3Md,
   typeFlexWrapCenterGap2,
   typeIconAccent,
+  typeMb3FlexGap2,
   typeMinBreakSmSemiboldPrimary,
   typeMinSpace1,
   typeMt3FlexCenterGap3Xs,
@@ -75,7 +77,7 @@ export function AdminVerificationQueueSection({
         description={`${pendingVerificationCount} ${copy.pendingRequests}`}
         action={<BadgeCheck className={typeIconAccent} />}
       />
-      <nav aria-label={copy.verificationQueue} className="mb-3 flex gap-2">
+      <nav aria-label={copy.verificationQueue} className={typeMb3FlexGap2}>
         <Link
           href={verificationHref("pending", 1)}
           aria-current={verificationView === "pending" ? "page" : undefined}
@@ -198,7 +200,7 @@ export function AdminVerificationQueueSection({
                   </a>
                 )}
                 {request.reviewNotes && (
-                  <p className="font-code font-caption text-faint">
+                  <p className={typeCodeCaptionFaint}>
                     {copy.review}: {request.reviewNotes}
                   </p>
                 )}

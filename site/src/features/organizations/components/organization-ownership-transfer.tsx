@@ -8,6 +8,9 @@ import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
 import { linkGhostAccentSm } from "../../shell/link-shell";
 import {
+  typeBlockBreakAllXsMuted,
+  typeBlockSpace1SmSecondary,
+  typeBreakSmSemiboldPrimary,
   typeFlexWrapGap3,
   typeHeadingPrimary,
   typeSmMuted,
@@ -136,10 +139,10 @@ export function OrganizationOwnershipTransfer({
         <EmptyState title={copy.noSelection} description={copy.noSelectionHint} />
       ) : (
         <form onSubmit={submit} className="space-y-4">
-          <p className="break-words text-sm font-semibold text-primary">
+          <p className={typeBreakSmSemiboldPrimary}>
             {copy.selected}: {target.displayName} (@{target.username})
           </p>
-          <label className="block space-y-1 text-sm text-secondary">
+          <label className={typeBlockSpace1SmSecondary}>
             <span>{copy.formerRole}</span>
             <select
               className={platformFieldClass}
@@ -151,7 +154,7 @@ export function OrganizationOwnershipTransfer({
               <option value="admin">{teamCopy.admin}</option>
             </select>
           </label>
-          <label className="block space-y-1 text-sm text-secondary">
+          <label className={typeBlockSpace1SmSecondary}>
             <span>{copy.confirmation}</span>
             <input
               className={platformFieldClass}
@@ -162,7 +165,7 @@ export function OrganizationOwnershipTransfer({
               disabled={busy}
               onChange={(event) => setSlug(event.target.value)}
             />
-            <span className="block break-all text-xs text-muted">
+            <span className={typeBlockBreakAllXsMuted}>
               {copy.confirmHelp}: {data.organization.slug}
             </span>
           </label>

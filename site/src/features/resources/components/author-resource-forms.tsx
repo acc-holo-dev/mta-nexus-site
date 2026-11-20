@@ -7,8 +7,10 @@ import { type FormEvent, useEffect, useId, useState } from "react";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import {
+  typeBlockXsMuted,
   typeFileInputInset,
   typeLabelBlockUpperSecondary,
+  typeMt3Space3,
   typeSmMuted,
   typeSmSecondary,
   typeSmSuccess,
@@ -582,7 +584,7 @@ export function AuthorResourceForms({
               accept=".zip,.rar,.7z,.lua"
               className={typeFileInputInset}
             />
-            <span className="block text-xs text-muted">
+            <span className={typeBlockXsMuted}>
               {publishing.buildFileRequirements.replace("{maxFileSize}", maxFileSizeMb)}
             </span>
           </div>
@@ -666,7 +668,7 @@ export function RetireBuildForm({
       <summary className="cursor-pointer">
         {copy.retire} · {version}
       </summary>
-      <form onSubmit={retire} className="mt-3 space-y-3">
+      <form onSubmit={retire} className={typeMt3Space3}>
         <p>{copy.retireHint}</p>
         <div className="space-y-1.5">
           <label htmlFor={reasonId} className={typeLabelBlockUpperSecondary}>

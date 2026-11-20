@@ -14,7 +14,7 @@ import {
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { panelSpace4P5 } from "../../shell/panel-shell";
-import { typeBreakAllXs } from "../../shell/type-shell";
+import { typeBreakAllXs, typeGridGap1 } from "../../shell/type-shell";
 import { LibraryCollectionBatchForm } from "../collection-batch";
 import { libraryCollectionManifestsCopy } from "../library-collection-manifests-i18n";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
@@ -150,7 +150,7 @@ export function LibraryCollectionImport({
       <p>{mode ? m.reconcileNote : m.note}</p>
       <form onSubmit={inspect} className={panelSpace4P5}>
         <fieldset disabled={frozen} className="space-y-3">
-          <label className="grid gap-1">
+          <label className={typeGridGap1}>
             {m.choose}
             <input
               type="file"
@@ -158,7 +158,7 @@ export function LibraryCollectionImport({
               onChange={(event) => void readFile(event.target.files?.[0])}
             />
           </label>
-          <label className="grid gap-1">
+          <label className={typeGridGap1}>
             {m.paste}
             <textarea
               value={source}

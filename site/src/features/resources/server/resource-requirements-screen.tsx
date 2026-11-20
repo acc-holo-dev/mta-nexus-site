@@ -13,6 +13,7 @@ import { linkAccent } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelFlexWrapEndP4, panelP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeBorderInsetP2, typeGridGap1 } from "../../shell/type-shell";
 import { ResourceRequirementsReportBody } from "../components/resource-requirements-report-body";
 import { resourceRequirementsCopy } from "../resource-requirements-i18n";
 import { resourceRequirementsQuery } from "../resource-requirements-query";
@@ -146,14 +147,14 @@ export async function ResourceRequirementsScreen({
         </p>
       )}
       <form className={panelFlexWrapEndP4}>
-        <label className="grid gap-1">
+        <label className={typeGridGap1}>
           {copy.target}
           <input
             name="targetMta"
             maxLength={64}
             placeholder={copy.targetPlaceholder}
             defaultValue={query.targetMta}
-            className="border border-base bg-inset p-2"
+            className={typeBorderInsetP2}
             required
           />
         </label>

@@ -12,6 +12,7 @@ import {
   typeLgBoldPrimary,
   typeMinFlex1,
   typeMinSpace4,
+  typeMt1XsSecondary,
   typeXsSecondary,
   typeXsSecondaryAnywhere,
 } from "../../shell/type-shell";
@@ -79,9 +80,7 @@ function ServerCard({
             {[server.gameMode, server.mapName, server.version].filter(Boolean).join(" / ") ||
               copy.noDetails}
           </p>
-          {server.passworded && (
-            <p className="mt-1 text-xs text-secondary">{copy.passwordRequired}</p>
-          )}
+          {server.passworded && <p className={typeMt1XsSecondary}>{copy.passwordRequired}</p>}
         </div>
         <div className="flex shrink-0 items-center gap-1.5 text-sm text-secondary">
           <Users className="h-4 w-4" aria-hidden="true" />
@@ -254,11 +253,11 @@ export function MtaMasterServerDirectory({
         <div>
           <h2 className={typeLgBoldPrimary}>{copy.network}</h2>
           {loading ? (
-            <p role="status" aria-live="polite" className="mt-1 text-xs text-secondary">
+            <p role="status" aria-live="polite" className={typeMt1XsSecondary}>
               {copy.loading}
             </p>
           ) : directory ? (
-            <p role="status" aria-live="polite" className="mt-1 text-xs text-secondary">
+            <p role="status" aria-live="polite" className={typeMt1XsSecondary}>
               {directory.total.toLocaleString(dateLocale)} {copy.publicServersLabel}.{" "}
               {validDate ? (
                 <>

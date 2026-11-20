@@ -26,6 +26,7 @@ import {
   typeFlexMinWrapEndGap3,
   typeFlexMinWrapGap3,
   typeFlexMinWrapGap4Sm,
+  typeGridGap1,
   typeGridMinGap4ClipSm2,
   typeMinBreakDisplayPrimary,
   typeSmSecondary,
@@ -148,7 +149,7 @@ export async function LibraryWatchesScreen({
       </Link>
       <form className={typeFlexMinWrapEndGap3}>
         <input type="hidden" name="filter" value={query.filter} />
-        <label className="grid gap-1">
+        <label className={typeGridGap1}>
           {copy.search}
           <input
             name="query"

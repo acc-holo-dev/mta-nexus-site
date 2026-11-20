@@ -15,6 +15,7 @@ import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeBreakDisplayPrimary,
+  typeBreakSmPrimary,
   typeFlexWrapGap4Sm,
   typeMinSpace4,
   typePrewrapSmSecondary,
@@ -144,7 +145,7 @@ export async function CommercialPlanAdminDetailScreen({
               <time dateTime={version.createdAt.toISOString()} className={typeSmMuted}>
                 {formatHistoryDate(version.createdAt, locale)}
               </time>
-              <p className="break-words text-sm text-primary">
+              <p className={typeBreakSmPrimary}>
                 {locale === "ru" ? version.terms.titleRu : version.terms.titleEn}
               </p>
               <p className={typePrewrapSmSecondary}>

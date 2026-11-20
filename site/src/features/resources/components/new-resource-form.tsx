@@ -11,6 +11,7 @@ import {
   typeFileInputInset,
   typeLabelBlockUpperSecondary,
   typeMaxXlSmLeadingMuted,
+  typeMinH11SmCol2,
   typeSmColSpan2,
   typeSmSecondary,
   typeSpace15SmCol2,
@@ -581,7 +582,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
             type="submit"
             isLoading={loading}
             disabled={!draftReady}
-            className="min-h-11 sm:col-span-2"
+            className={typeMinH11SmCol2}
           >
             {!draftReady
               ? copy.checkingDraft

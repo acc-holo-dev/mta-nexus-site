@@ -16,8 +16,10 @@ import { contentService } from "../../../lib/services/community/content-service"
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax4xlLoose } from "../../shell/page-shell";
 import {
+  typeCoverFull,
   typeFlexWrapCenterGap2,
   typeH35W35Shrink,
+  typeTruncateSmBoldPrimary,
   typeTruncateXsFaint,
 } from "../../shell/type-shell";
 import { parseDiscussionQuery } from "../content-discussion-contract";
@@ -192,7 +194,7 @@ export async function ArticleDetailPage({
               fallback={author.displayName || author.username}
             />
             <div className="min-w-0">
-              <div className="truncate text-sm font-bold text-primary">{author.displayName}</div>
+              <div className={typeTruncateSmBoldPrimary}>{author.displayName}</div>
               <div className={typeTruncateXsFaint}>@{author.username}</div>
             </div>
           </div>
@@ -208,7 +210,7 @@ export async function ArticleDetailPage({
             width={1120}
             height={480}
             decoding="async"
-            className="h-full w-full object-cover"
+            className={typeCoverFull}
           />
         </div>
       )}

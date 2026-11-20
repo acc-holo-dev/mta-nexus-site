@@ -28,6 +28,8 @@ import {
 } from "../../shell/link-shell";
 import {
   typeFlexWrapEndGap3,
+  typeIcon4ShrinkSuccess,
+  typeListDiscInsideSpace1,
   typeMinH11Semibold,
   typeSemiboldPrimary,
   typeSmMuted,
@@ -287,7 +289,7 @@ export async function DirectoryResults({
           {hasActiveDiscoverFilters(state) && (
             <div className="nexus-panel space-y-2 p-4 text-sm text-secondary">
               <p className={typeSemiboldPrimary}>{copy.activeFilters}</p>
-              <ul className="list-inside list-disc space-y-1">
+              <ul className={typeListDiscInsideSpace1}>
                 {state.query ? (
                   <li>
                     {copy.query}: {state.query}
@@ -500,7 +502,7 @@ function DirectoryIdentity({
           <span className="truncate">{title}</span>
           {verified && (
             <ShieldCheck
-              className="h-4 w-4 shrink-0 text-success"
+              className={typeIcon4ShrinkSuccess}
               aria-label={getDictionary(locale).discover.verified}
             />
           )}

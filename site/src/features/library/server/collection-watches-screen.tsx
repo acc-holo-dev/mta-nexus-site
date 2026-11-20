@@ -18,7 +18,13 @@ import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeFlexWrapEndGap3, typeFlexWrapGap4, typeGrid2Gap4 } from "../../shell/type-shell";
+import {
+  typeFlexGap4,
+  typeFlexWrapEndGap3,
+  typeFlexWrapGap4,
+  typeGrid2Gap4,
+  typeGridGap1,
+} from "../../shell/type-shell";
 import { collectionReleasesCopy } from "../collection-releases-i18n";
 import { collectionHref, collectionPageParams } from "../library-collections-query";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
@@ -140,7 +146,7 @@ export async function CollectionWatchesScreen({
       {result.collection.status === "archived" && <p role="note">{copy.archivedCollection}</p>}
       <form className={typeFlexWrapEndGap3}>
         <input type="hidden" name="filter" value={query.filter} />
-        <label className="grid gap-1">
+        <label className={typeGridGap1}>
           {copy.search}
           <input
             name="query"
@@ -238,7 +244,7 @@ export async function CollectionWatchesScreen({
         </ul>
       )}
       {result.totalPages > 1 && (
-        <nav className="flex gap-4" aria-label={copy.page}>
+        <nav className={typeFlexGap4} aria-label={copy.page}>
           {result.page > 1 && (
             <Link href={href(result.page - 1)} className={linkAccentSmRounded}>
               {copy.previous}

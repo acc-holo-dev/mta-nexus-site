@@ -30,6 +30,7 @@ import { panelFlexBetweenP4, panelP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeCaptionMuted,
+  typeCursorAccent,
   typeFlexCenterGap2,
   typeMinSpace1,
   typeMt3FlexCenterGap3Xs,
@@ -324,7 +325,7 @@ export async function AdminHomeScreen({
                     <p className="truncate font-caption text-faint">{item.excerpt}</p>
                   )}
                   <details className="max-w-prose font-caption text-muted">
-                    <summary className="cursor-pointer text-accent">{copy.readDraft}</summary>
+                    <summary className={typeCursorAccent}>{copy.readDraft}</summary>
                     <div className="mt-2 max-h-96 overflow-y-auto whitespace-pre-wrap break-words rounded-md border border-base bg-inset p-3 text-xs text-secondary">
                       {item.body}
                     </div>

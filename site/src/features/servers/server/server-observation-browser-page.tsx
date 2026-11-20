@@ -22,8 +22,12 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   type2xlBoldPrimary,
   typeBorderTSecondary,
+  typeBreakLgPrimary,
   typeFlexWrapGap4,
+  typeH40RoundedInset,
+  typeMin24Max60BreakP2,
   typeMinH11Semibold,
+  typeNowrapP2Normal,
   typeSmMuted,
   typeSpace1XsMuted,
   typeWFullLeftSm,
@@ -190,7 +194,7 @@ function ServerObservationBrowserPanel({
           {managed ? stats.management : stats.back}
         </Link>
         <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
-        <p className="break-words text-lg text-primary">{report.server.name}</p>
+        <p className={typeBreakLgPrimary}>{report.server.name}</p>
         <p className={typeSmMuted}>{copy.description}</p>
         {managed && <p className={typeXsMuted}>{stats.private}</p>}
         <Link
@@ -333,7 +337,7 @@ function ServerObservationBrowserPanel({
             <tbody>
               {report.observations.map((item) => (
                 <tr key={item.id} className={typeBorderTSecondary}>
-                  <th scope="row" className="whitespace-nowrap p-2 font-normal">
+                  <th scope="row" className={typeNowrapP2Normal}>
                     <time dateTime={item.observedAt} className="font-mono text-xs">
                       {item.observedAt}
                     </time>
@@ -341,7 +345,7 @@ function ServerObservationBrowserPanel({
                   <td className="p-2">{metric(item.currentPlayers)}</td>
                   <td className="p-2">{metric(item.maxPlayers)}</td>
                   {(["gameMode", "mapName", "mtaVersion"] as const).map((key) => (
-                    <td key={key} className="min-w-24 max-w-60 break-words p-2">
+                    <td key={key} className={typeMin24Max60BreakP2}>
                       {item[key] ?? stats.unknown}
                     </td>
                   ))}
@@ -397,7 +401,7 @@ export async function ServerObservationBrowserLoading() {
     headingId: "server-observations-loading-heading",
     className: pageShellMax6xlDense,
     rows: 0,
-    leading: <div className="h-40 rounded-lg bg-inset" />,
+    leading: <div className={typeH40RoundedInset} />,
     load: (locale) => {
       const copy = serverObservationBrowserCopy(locale);
       return {

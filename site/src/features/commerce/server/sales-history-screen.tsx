@@ -15,6 +15,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeBreakPrimary,
   typeMinBreakBaseSemiboldPrimary,
+  typeNumericSemiboldPrimary,
   typeSmMuted,
 } from "../../shell/type-shell";
 import {
@@ -121,7 +122,7 @@ export async function SalesHistoryScreen({ query }: { query: { page?: string | s
                   </div>
                   <div className="min-w-0">
                     <dt className="text-muted">{copy.grossPrice}</dt>
-                    <dd className="font-numeric font-semibold text-primary">
+                    <dd className={typeNumericSemiboldPrimary}>
                       {formatHistoryAmount(sale.unitPrice, sale.currency, typedLocale)}
                     </dd>
                   </div>

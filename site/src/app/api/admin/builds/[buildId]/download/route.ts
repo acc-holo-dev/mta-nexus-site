@@ -131,6 +131,7 @@ export async function GET(
           build.fileName,
         )}"`,
         "Content-Length": String(contentLength),
+        "X-Resource-Content-Length": String(contentLength),
         "X-Content-SHA256": build.sha256Hash,
         "X-Content-Type-Options": "nosniff",
         [REQUEST_ID_HEADER]: context.requestId,

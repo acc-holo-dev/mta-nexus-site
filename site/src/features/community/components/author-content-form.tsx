@@ -19,6 +19,7 @@ import { pageShellStack4 } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { surfaceInsetP4TextSmMuted } from "../../shell/surface-shell";
 import {
+  typeBlockSpace1SmSecondary,
   typeFlexWrapCenterGap4Sm,
   typeFlexWrapGap3,
   typeGrid2Gap4,
@@ -396,7 +397,7 @@ export function AuthorContentForm({
         <fieldset disabled={busy || archived} className="space-y-4">
           {!saved && (
             <div className={typeGrid2Gap4}>
-              <label className="block space-y-1 text-sm text-secondary">
+              <label className={typeBlockSpace1SmSecondary}>
                 <span>{copy.type}</span>
                 <select name="type" className={platformFieldClass}>
                   {(server ? editorialTypes : writerTypes).map((type) => (
@@ -406,7 +407,7 @@ export function AuthorContentForm({
                   ))}
                 </select>
               </label>
-              <label className="block space-y-1 text-sm text-secondary">
+              <label className={typeBlockSpace1SmSecondary}>
                 <span>{copy.slug}</span>
                 <input
                   name="slug"
@@ -419,7 +420,7 @@ export function AuthorContentForm({
               </label>
             </div>
           )}
-          <label className="block space-y-1 text-sm text-secondary">
+          <label className={typeBlockSpace1SmSecondary}>
             <span>{copy.title}</span>
             <input
               name="title"
@@ -430,7 +431,7 @@ export function AuthorContentForm({
               className={platformFieldClass}
             />
           </label>
-          <label className="block space-y-1 text-sm text-secondary">
+          <label className={typeBlockSpace1SmSecondary}>
             <span>{copy.excerpt}</span>
             <textarea
               name="excerpt"
@@ -440,7 +441,7 @@ export function AuthorContentForm({
               className={platformFieldClass}
             />
           </label>
-          <label className="block space-y-1 text-sm text-secondary">
+          <label className={typeBlockSpace1SmSecondary}>
             <span>{copy.body}</span>
             <textarea
               name="body"
@@ -453,7 +454,7 @@ export function AuthorContentForm({
             />
           </label>
           <div className={typeGrid2Gap4}>
-            <label className="block space-y-1 text-sm text-secondary">
+            <label className={typeBlockSpace1SmSecondary}>
               <span>{copy.tags}</span>
               <input
                 name="tags"
@@ -462,7 +463,7 @@ export function AuthorContentForm({
                 className={platformFieldClass}
               />
             </label>
-            <label className="block space-y-1 text-sm text-secondary">
+            <label className={typeBlockSpace1SmSecondary}>
               <span>{copy.cover}</span>
               <input
                 name="coverImageUrl"

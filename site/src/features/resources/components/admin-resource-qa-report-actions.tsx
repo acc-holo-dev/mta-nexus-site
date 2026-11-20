@@ -11,6 +11,7 @@ import { confirmsAdminAction } from "../../moderation/admin-action-confirmation"
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
 import { skelH4W4Spin } from "../../shell/skeleton-shell";
+import { typeMinH11DangerSoftXs } from "../../shell/type-shell";
 import { resourceQaCopy, resourceQaError } from "../resource-qa-i18n";
 
 /**
@@ -112,7 +113,7 @@ export function AdminResourceQaReportActions({
       <Button
         type="button"
         variant="outline"
-        className="min-h-11 gap-1.5 bg-danger-soft text-danger text-xs"
+        className={typeMinH11DangerSoftXs}
         disabled={pending}
         onClick={() => void removeAndResolve()}
       >

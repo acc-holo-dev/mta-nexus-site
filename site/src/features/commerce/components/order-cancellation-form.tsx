@@ -8,7 +8,7 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
-import { typeSmSuccess, typeXlSemiboldPrimary } from "../../shell/type-shell";
+import { typeBlockSpace2, typeSmSuccess, typeXlSemiboldPrimary } from "../../shell/type-shell";
 import { confirmedOrderCancellation } from "../commercial-confirmation";
 import { commercialError, getCommercialCopy } from "../commercial-i18n";
 
@@ -194,7 +194,7 @@ export function OrderCancellationForm({
         />
       ) : null}
       <fieldset disabled={busy || retry || saved || ready !== scope} className="space-y-4">
-        <label htmlFor={`${field}-reason`} className="block space-y-2">
+        <label htmlFor={`${field}-reason`} className={typeBlockSpace2}>
           <span className="text-sm">{copy.reason}</span>
           <textarea
             id={`${field}-reason`}

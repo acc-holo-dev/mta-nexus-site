@@ -15,13 +15,16 @@ import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax4xlDenseTight, pageShellMax4xlTight } from "../../shell/page-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
 import {
+  typeBlockSpace15,
   typeDisplayPrimary,
   typeFlexCenterBetweenGap3,
   typeFlexWrapStartBetweenGap3,
+  typeIcon35,
   typeLabelSecondary,
   typeLabelUpperMuted,
   typeNumericElevenFaint,
   typePrewrapSmLeadingSecondary,
+  typePulseSpace3,
   typeSmSecondary,
   typeSmSuccess,
   typeSpace2BorderBPb5,
@@ -325,7 +328,7 @@ export function SupportCaseThread({
         loadingLabel={copy.caseLoading}
         headerClassName="space-y-2 border-b border-base pb-5"
       >
-        <div className="animate-pulse space-y-3" aria-hidden="true">
+        <div className={typePulseSpace3} aria-hidden="true">
           <div className="h-8 max-w-lg rounded bg-inset" />
           {[1, 2, 3].map((key) => (
             <div key={key} className="h-16 rounded bg-inset" />
@@ -374,7 +377,7 @@ export function SupportCaseThread({
         href={backHref}
         className="inline-flex min-h-11 items-center gap-1 text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
-        <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+        <ArrowLeft className={typeIcon35} aria-hidden="true" />
         {copy.back}
       </Link>
 
@@ -510,7 +513,7 @@ export function SupportCaseThread({
           aria-busy={sending}
           className={panelSpace3P4}
         >
-          <label className="block space-y-1.5">
+          <label className={typeBlockSpace15}>
             <span className={typeLabelSecondary}>{copy.reply}</span>
             <textarea
               value={reply}
