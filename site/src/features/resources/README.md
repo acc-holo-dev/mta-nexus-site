@@ -32,6 +32,7 @@ Services и repositories не дублируются и не переносят�
 | `cart-controls.ts`                             | `ResourceCartControls`; client UI корзины                                                                   |
 | `cart-view.ts`                                 | `ResourceCartReviewEvidence`; представление метаданных корзины                                              |
 | `delivery-server.ts`                           | `ResourceDeliveryEvidence`; server-only представление выдачи                                                |
+| `staff-resources-server.ts`                    | `StaffResourcesScreen`; server-only `/admin/resources` moderation list                                      |
 | `review-controls.ts`                           | `ResourceReviewEditor`, `ResourceReviewDecisionForm`; клиентские формы для library и moderation             |
 | `reviews-view.ts`                              | `ResourceReviewPager`; общая пагинация для workspace                                                        |
 | `release-watch.ts`                             | `ResourceReleaseWatchControl`; клиентская подписка для detail и library                                     |
