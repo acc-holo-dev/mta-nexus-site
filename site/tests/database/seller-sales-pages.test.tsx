@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { AppError } from "@nexus/domain";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";

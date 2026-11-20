@@ -5,15 +5,18 @@ import { expect, it } from "vitest";
 
 let root = dirname(fileURLToPath(import.meta.url));
 while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
-const source = readFileSync(join(root, "site/src/app/workspace/sales/report/page.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "site/src/features/commerce/server/license-detail-page-screen.tsx"),
+  "utf8",
+);
 
 /** Honesty lock: session probe failure → PlatformSessionError, not guest sign-in. */
 it("locks session probe failure to PlatformSessionError without guest-lie", () => {
   expect(source).toContain("PlatformSessionError");
   expect(source).toMatch(
-    /try \{\s*actor = await authService\.getSession\([\s\S]*?\}\s*catch \{[\s\S]*?<PlatformSessionError/u,
+    /try \{\s*user = await authService\.getSession\([\s\S]*?\}\s*catch \{[\s\S]*?<PlatformSessionError/u,
   );
   expect(source).toContain("title={getDictionary(locale).errors.title}");
-  expect(source).toContain("message={c.loadUnavailable}");
+  expect(source).toContain("message={copy.loadUnavailable}");
   expect(source).toContain("PlatformSignIn");
 });

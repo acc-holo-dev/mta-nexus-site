@@ -67,7 +67,7 @@ it.each(["en", "ru"] as const)(
 );
 
 it("locks sales honesty chrome with ErrorState EmptyState clip and touch", () => {
-  const source = read("site/src/app/workspace/sales/page.tsx");
+  const source = read("site/src/features/commerce/server/sales-history-screen.tsx");
   expect(source).toContain("ErrorState");
   expect(source).toContain("EmptyState");
   expect(source).toContain("overflow-x-clip");
@@ -82,7 +82,7 @@ it("locks sales honesty chrome with ErrorState EmptyState clip and touch", () =>
 });
 
 it("locks sales report honesty chrome with ErrorState recovery and no plain alert", () => {
-  const source = read("site/src/app/workspace/sales/report/page.tsx");
+  const source = read("site/src/features/commerce/server/seller-sales-report-screen.tsx");
   expect(source).toContain("ErrorState");
   expect(source).toContain("overflow-x-clip");
   expect(source).toContain("min-w-0");

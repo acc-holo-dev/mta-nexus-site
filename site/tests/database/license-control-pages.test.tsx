@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
@@ -40,6 +42,12 @@ vi.mock("../../src/lib/services/commerce/license-control-service", () => ({
   },
 }));
 vi.mock("../../src/features/commerce/license-controls", () => ({
+  LicenseControlPanel: (props: unknown) => {
+    state.panel(props);
+    return <section>Controls</section>;
+  },
+}));
+vi.mock("../../src/features/commerce/components/license-control-panel", () => ({
   LicenseControlPanel: (props: unknown) => {
     state.panel(props);
     return <section>Controls</section>;

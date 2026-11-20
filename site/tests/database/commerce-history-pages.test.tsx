@@ -1,3 +1,5 @@
+vi.mock("server-only", () => ({}));
+
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -45,15 +47,33 @@ vi.mock("next/link", async () => {
 });
 
 import LicensesLoading from "../../src/app/workspace/licenses/loading";
-import Licenses, { generateMetadata as licensesMeta } from "../../src/app/workspace/licenses/page";
 import PurchasesLoading from "../../src/app/workspace/purchases/loading";
 import Purchases, {
   generateMetadata as purchasesMeta,
 } from "../../src/app/workspace/purchases/page";
-import Sales, { generateMetadata as salesMeta } from "../../src/app/workspace/sales/page";
 import { getCommerceHistoryCopy } from "../../src/features/commerce/commerce-history-i18n";
 import { getLicenseMaintenanceCopy } from "../../src/features/commerce/license-maintenance-i18n";
+import {
+  LicensesHistoryScreen,
+  licensesHistoryMetadata as licensesMeta,
+} from "../../src/features/commerce/licenses-history-server";
+import {
+  SalesHistoryScreen,
+  salesHistoryMetadata as salesMeta,
+} from "../../src/features/commerce/sales-history-server";
 import { getDictionary } from "../../src/lib/i18n";
+
+async function Licenses({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return LicensesHistoryScreen({ query: await searchParams });
+}
+
+async function Sales({ searchParams }: { searchParams: Promise<{ page?: string | string[] }> }) {
+  return SalesHistoryScreen({ query: await searchParams });
+}
 
 const date = new Date("2026-10-09T10:00:00.000Z");
 const input = (page = "2") => ({ searchParams: Promise.resolve({ page }) });

@@ -8,8 +8,8 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 const pages: Array<[string, string]> = [
-  ["site/src/app/workspace/licenses/page.tsx", "copy.loadUnavailableHint"],
-  ["site/src/app/workspace/licenses/[id]/page.tsx", "copy.loadUnavailableHint"],
+  ["site/src/features/commerce/server/licenses-history-screen.tsx", "copy.loadUnavailableHint"],
+  ["site/src/features/commerce/server/license-detail-page-screen.tsx", "copy.loadUnavailableHint"],
   ["site/src/app/admin/licenses/page.tsx", "copy.loadUnavailableHint"],
   ["site/src/app/admin/licenses/[id]/page.tsx", "copy.loadUnavailableHint"],
   ["site/src/features/library/server/library-download-detail-page.tsx", "copy.loadUnavailableHint"],
@@ -18,7 +18,10 @@ const pages: Array<[string, string]> = [
     "copy.loadUnavailableHint",
   ],
   ["site/src/features/resources/server/resource-variants-screen.tsx", "copy.loadUnavailableHint"],
-  ["site/src/app/workspace/sales/report/[id]/page.tsx", "c.loadUnavailableHint"],
+  [
+    "site/src/features/commerce/server/seller-sales-report-detail-screen.tsx",
+    "c.loadUnavailableHint",
+  ],
   ["site/src/features/accounts/server/developer-profile-screen.tsx", "copy.loadUnavailableHint"],
   ["site/src/features/accounts/server/user-profile-screen.tsx", "copy.loadUnavailableHint"],
   [
