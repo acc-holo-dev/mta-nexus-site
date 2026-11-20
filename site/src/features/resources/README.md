@@ -39,6 +39,12 @@ Services и repositories не дублируются и не переносят�
 | `resource-publisher-history-server.ts`         | `ResourcePublisherHistoryScreen`; server-only `/workspace/resources/[id]/history`                           |
 | `publisher-deliveries-server.ts`               | `PublisherDeliveriesScreen`; server-only `/workspace/resources/[id]/deliveries`                             |
 | `resource-copies-server.ts`                    | `ResourceCopiesScreen`; server-only `/workspace/resources/[id]/copies`                                      |
+| `resource-activity-server.ts`                  | `ResourceActivityScreen`; server-only `/workspace/resources/[id]/activity`                                  |
+| `resource-publisher-moderation-server.ts`      | `ResourcePublisherModerationScreen`; server-only `/workspace/resources/[id]/moderation`                     |
+| `resource-copy-receipt-server.ts`              | `ResourceCopyReceiptScreen`; server-only `/workspace/resources/[id]/copies/[receiptId]`                     |
+| `resource-copy-create-server.ts`               | `ResourceCopyCreateScreen`; server-only `/workspace/resources/[id]/copy`                                    |
+| `resource-variants-server.ts`                  | `ResourceVariantsScreen`; server-only `/workspace/resources/[id]/variants`                                  |
+| `resource-compatibility-server.ts`             | `ResourceCompatibilityScreen`; server-only `/workspace/resources/[id]/compatibility`                        |
 | `review-controls.ts`                           | `ResourceReviewEditor`, `ResourceReviewDecisionForm`; клиентские формы для library и moderation             |
 | `reviews-view.ts`                              | `ResourceReviewPager`; общая пагинация для workspace                                                        |
 | `release-watch.ts`                             | `ResourceReleaseWatchControl`; клиентская подписка для detail и library                                     |

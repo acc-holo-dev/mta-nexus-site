@@ -24,15 +24,18 @@ const pages: Array<[string, string]> = [
   ["site/src/app/admin/commerce/reconciliation/page.tsx", "copy.loadUnavailableHint"],
   ["site/src/app/admin/commerce/reconciliation/[id]/page.tsx", "copy.loadUnavailableHint"],
   ["site/src/app/admin/commerce/reconciliation/[id]/terms/page.tsx", "c.loadUnavailableHint"],
-  ["site/src/app/workspace/resources/[id]/activity/page.tsx", "copy.loadUnavailableHint"],
+  ["site/src/features/resources/server/resource-activity-screen.tsx", "copy.loadUnavailableHint"],
   [
     "site/src/features/resources/server/resource-publisher-history-screen.tsx",
     "copy.loadUnavailableHint",
   ],
-  ["site/src/app/workspace/resources/[id]/moderation/page.tsx", "copy.loadUnavailableHint"],
+  [
+    "site/src/features/resources/server/resource-publisher-moderation-screen.tsx",
+    "copy.loadUnavailableHint",
+  ],
   ["site/src/features/resources/server/resource-copies-screen.tsx", "c.loadUnavailableHint"],
-  ["site/src/app/workspace/resources/[id]/copy/page.tsx", "c.loadUnavailableHint"],
-  ["site/src/app/workspace/resources/[id]/copies/[receiptId]/page.tsx", "c.loadUnavailableHint"],
+  ["site/src/features/resources/server/resource-copy-create-screen.tsx", "c.loadUnavailableHint"],
+  ["site/src/features/resources/server/resource-copy-receipt-screen.tsx", "c.loadUnavailableHint"],
   ["site/src/app/workspace/purchases/[id]/operations/page.tsx", "copy.loadUnavailableHint"],
   ["site/src/app/workspace/purchases/[id]/terms/page.tsx", "c.loadUnavailableHint"],
 ];

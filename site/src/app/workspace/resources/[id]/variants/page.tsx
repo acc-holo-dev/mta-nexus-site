@@ -1,109 +1,17 @@
-import { NotFoundError } from "@nexus/domain";
-import { ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
-import Link from "next/link";
-import { notFound } from "next/navigation";
 import { getResourceManagementCopy } from "../../../../../features/resources/resource-management-i18n";
-import { ResourceVariantsForm } from "../../../../../features/resources/variant-controls";
-import { PlatformSignIn } from "../../../../../features/shell/guest-auth";
-import { PlatformSessionError } from "../../../../../features/shell/session-error";
-import { getDictionary } from "../../../../../lib/i18n";
+import { ResourceVariantsScreen } from "../../../../../features/resources/resource-variants-server";
 import { getRequestLocale } from "../../../../../lib/i18n/server";
-import { authService } from "../../../../../lib/services/accounts/auth-service";
-import { productService } from "../../../../../lib/services/commerce/product-service";
-import { resourceManagementService } from "../../../../../lib/services/resources/resource-management-service";
-
-const pageShellClass = "mx-auto min-w-0 max-w-5xl space-y-6 overflow-x-clip py-8";
-const navLinkClass =
-  "inline-flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export const dynamic = "force-dynamic";
+
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: `${getResourceManagementCopy(await getRequestLocale()).variants} | MTA NEXUS`,
     robots: { index: false, follow: false },
   };
 }
-export default async function ResourceVariantsPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const [locale, store, { id }] = await Promise.all([getRequestLocale(), cookies(), params]);
-  const copy = getResourceManagementCopy(locale);
-  const dictionary = getDictionary(locale);
-  const returnPath = `/workspace/resources/${encodeURIComponent(id)}/variants`;
-  let actor: Awaited<ReturnType<typeof authService.getSession>>;
-  try {
-    actor = await authService.getSession(store.get("nexus_session")?.value);
-  } catch {
-    return (
-      <PlatformSessionError
-        locale={locale}
-        title={getDictionary(locale).errors.title}
-        message={copy.loadUnavailable}
-        retryHref={returnPath}
-      />
-    );
-  }
-  if (!actor) return <PlatformSignIn locale={locale} returnPath={returnPath} />;
-  const product = await productService.getManagedProduct(id, actor);
-  if (!product) notFound();
-  const managed = await resourceManagementService.managedVariants(id, actor).catch((error) => {
-    if (error instanceof NotFoundError) notFound();
-    return null;
-  });
-  if (!managed) {
-    return (
-      <div className={pageShellClass}>
-        <Link href={`/workspace/resources/${encodeURIComponent(id)}`} className={navLinkClass}>
-          {copy.back}
-        </Link>
-        <ErrorState
-          title={copy.loadUnavailable}
-          description={copy.loadUnavailableHint}
-          action={
-            <Link href={returnPath} className={navLinkClass}>
-              {dictionary.errors.retry}
-            </Link>
-          }
-        />
-      </div>
-    );
-  }
-  const candidates =
-    managed.anchorProductId === product.id
-      ? await resourceManagementService.variantCandidates(product.id, actor, 1).catch(() => null)
-      : null;
-  return (
-    <div className={pageShellClass}>
-      <Link href={`/workspace/resources/${product.id}`} className={navLinkClass}>
-        {copy.back}
-      </Link>
-      <header>
-        <h1 className="font-display text-primary">{copy.variants}</h1>
-        <p className="break-words text-secondary">{product.title}</p>
-      </header>
-      {candidates ? (
-        <ResourceVariantsForm
-          key={`${actor.id}:${product.id}`}
-          actorId={actor.id}
-          product={{ id: product.id, title: product.title }}
-          managed={managed}
-          initialCandidates={candidates}
-        />
-      ) : (
-        <section className="nexus-panel space-y-3 p-5">
-          <p className="text-secondary">{copy.anchorNote}</p>
-          <Link
-            href={`/workspace/resources/${managed.anchorProductId}/variants`}
-            className={navLinkClass}
-          >
-            {copy.manageAnchor}
-          </Link>
-        </section>
-      )}
-    </div>
-  );
+
+export default async function Page(props: { params: Promise<{ id: string }> }) {
+  return ResourceVariantsScreen(props);
 }

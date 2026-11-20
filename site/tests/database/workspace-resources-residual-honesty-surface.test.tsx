@@ -73,7 +73,9 @@ it("locks residual resources page sources to ErrorState/EmptyState honesty chrom
   expect(inventory).toContain("emptyFilterHint");
   expect(inventory).not.toContain('role="alert"');
 
-  const compatibility = read("site/src/app/workspace/resources/[id]/compatibility/page.tsx");
+  const compatibility = read(
+    "site/src/features/resources/server/resource-compatibility-screen.tsx",
+  );
   expect(compatibility).toContain("ErrorState");
   expect(compatibility).toContain("overflow-x-clip");
   expect(compatibility).toContain("min-w-0");

@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
+vi.mock("server-only", () => ({}));
+
 const state = vi.hoisted(() => ({
   user: { id: "usr_a", role: "user" } as null | { id: string; role: "user" },
   locale: "en" as "en" | "ru",
