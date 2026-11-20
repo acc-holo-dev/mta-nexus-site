@@ -38,7 +38,7 @@
     "site/src/features/resources/components/resource-media-editor.tsx"
   ],
   "scope": "Git-tracked member/workspace surfaces — workspace, admin, settings, auth, security app trees; library/commerce/moderation/organizations/notifications/accounts components; selective author/report/server/resource publisher forms (excluding feature server/ and *-server ports) — hard-coded member-facing literals + locale copy ternaries.",
-  "source_sha": "3233c87d2519d4fec938b0311513f7c1eab1d370",
+  "source_sha": "cec52c337317549e81102a1a986ffe8ad1e11cfb",
   "summary": {
     "allowlisted": 0,
     "findings": 0,
