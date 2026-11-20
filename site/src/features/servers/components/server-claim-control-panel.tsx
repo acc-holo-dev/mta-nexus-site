@@ -11,7 +11,14 @@ import { authEntryHref } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace4P5 } from "../../shell/panel-shell";
-import { typeFlexWrapGap2, typeLabelUpperMuted } from "../../shell/type-shell";
+import {
+  typeFlexStartGap3,
+  typeFlexWrapGap2,
+  typeLabelUpperMuted,
+  typeSmBoldPrimary,
+  typeTenFaint,
+  typeTenLeadingFaint,
+} from "../../shell/type-shell";
 import {
   confirmsServerClaimVerification,
   type IssuedServerClaimChallenge,
@@ -302,17 +309,17 @@ export function ServerClaimControlPanel({
           <h2 className="text-sm font-bold">{copy.verifiedTitle}</h2>
         </div>
         <p className="text-xs leading-relaxed text-muted">{copy.verifiedDescription}</p>
-        <p className="text-[10px] text-faint">{copy.moderationSeparate}</p>
+        <p className={typeTenFaint}>{copy.moderationSeparate}</p>
       </section>
     );
   }
 
   return (
     <section className={panelSpace4P5} aria-labelledby="server-control-proof-heading">
-      <div className="flex items-start gap-3">
+      <div className={typeFlexStartGap3}>
         <KeyRound className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
         <div>
-          <h2 id="server-control-proof-heading" className="text-sm font-bold text-primary">
+          <h2 id="server-control-proof-heading" className={typeSmBoldPrimary}>
             {copy.title}
           </h2>
           <p className="mt-1 text-xs leading-relaxed text-muted">{copy.description}</p>
@@ -364,7 +371,7 @@ export function ServerClaimControlPanel({
             <li>{copy.stepVerify}</li>
           </ol>
 
-          <p className="text-[10px] text-faint">
+          <p className={typeTenFaint}>
             {copy.expires}{" "}
             {new Date(challenge.expiresAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US")}.{" "}
             {copy.tokenEphemeral}
@@ -417,7 +424,7 @@ export function ServerClaimControlPanel({
 
       {error ? <ErrorState title={error} description={dictionary.errors.formErrorHint} /> : null}
 
-      <p className="text-[10px] leading-relaxed text-faint">{copy.exactEndpoint}</p>
+      <p className={typeTenLeadingFaint}>{copy.exactEndpoint}</p>
     </section>
   );
 }

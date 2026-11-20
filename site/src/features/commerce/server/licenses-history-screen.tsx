@@ -15,6 +15,7 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellClip as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeBreakPrimary } from "../../shell/type-shell";
 import {
   effectiveLicenseStatus,
   formatHistoryDate,
@@ -179,9 +180,7 @@ export async function LicensesHistoryScreen({ query }: { query: Query }) {
                   </div>
                   <div className="min-w-0">
                     <dt className="text-muted">{copy.model}</dt>
-                    <dd className="break-words text-primary">
-                      {license.model.replaceAll("_", " ")}
-                    </dd>
+                    <dd className={typeBreakPrimary}>{license.model.replaceAll("_", " ")}</dd>
                   </div>
                   <div className="min-w-0">
                     <dt className="text-muted">{copy.binding}</dt>

@@ -16,6 +16,7 @@ import {
   showGuestSignInCta,
   showWorkspaceTools,
 } from "../session";
+import { typeMinBreakWords } from "../type-shell";
 import { shellNavigation } from "./shell-navigation";
 import { ShellSessionUnavailable } from "./shell-session-unavailable";
 import { clickedDialogBackdrop, useModalDialog } from "./use-modal-dialog";
@@ -203,7 +204,7 @@ export function MobileNav({ locale }: { locale: Locale }) {
                     }`}
                   >
                     <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-                    <span className="min-w-0 break-words">{item.label}</span>
+                    <span className={typeMinBreakWords}>{item.label}</span>
                   </Link>
                 );
               })}
@@ -222,7 +223,7 @@ export function MobileNav({ locale }: { locale: Locale }) {
                   }`}
                 >
                   <ShieldAlert className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  <span className="min-w-0 break-words">{dictionary.nav.admin}</span>
+                  <span className={typeMinBreakWords}>{dictionary.nav.admin}</span>
                 </Link>
               )}
             </div>

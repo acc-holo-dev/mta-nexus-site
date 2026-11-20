@@ -11,6 +11,7 @@ import { pageShellMax5xlCompact as pageShellClass } from "../../shell/page-shell
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import {
   typeDisplayPrimary,
+  typeFlexWrapBetweenGap3,
   typeFlexWrapGap4Sm,
   typeSmSecondary,
   typeSmSemiboldPrimary,
@@ -101,7 +102,7 @@ export function ProfileChangeHistoryView({
           )}
           {data.items.map((item) => (
             <article key={item.id} className={panelClipSpace3P5}>
-              <div className="flex flex-wrap justify-between gap-3">
+              <div className={typeFlexWrapBetweenGap3}>
                 <h2 className={typeSmSemiboldPrimary}>{copy.actions[item.action]}</h2>
                 <time dateTime={item.createdAt} className="text-xs text-muted">
                   {new Date(item.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {

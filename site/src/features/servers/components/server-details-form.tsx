@@ -8,7 +8,7 @@ import { z } from "zod";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { useNexusLocale } from "../../shell/locale";
 import { surfaceSpace2P4TextSm } from "../../shell/surface-shell";
-import { typePrewrapBreak } from "../../shell/type-shell";
+import { typePrewrapBreak, typeXsSuccess } from "../../shell/type-shell";
 import { confirmedUpdatedServer } from "../server-mutation-confirmation";
 import { serverMutationErrorMessage } from "../server-mutation-errors";
 
@@ -547,7 +547,7 @@ export function ServerDetailsForm({
               {loading ? copy.saving : copy.save}
             </Button>
             {notice && !notice.error && (
-              <span role="status" className="text-xs text-success">
+              <span role="status" className={typeXsSuccess}>
                 {notice.text}
               </span>
             )}

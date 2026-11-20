@@ -7,7 +7,16 @@ import { linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceInsetP3 } from "../../shell/surface-shell";
-import { typeLabelUpperFaint, typeXsSecondary } from "../../shell/type-shell";
+import {
+  typeFlexStartGap3,
+  typeItemsStretchPy4,
+  typeLabelUpperFaint,
+  typeMonoSecondary,
+  typeSmBoldPrimary,
+  typeTenFaint,
+  typeTenLeadingFaint,
+  typeXsSecondary,
+} from "../../shell/type-shell";
 import { getMtaMetaInspectorIssueMessage } from "../mta-meta-inspector-messages";
 import { getMtaVersionTargetSuggestion } from "../mta-version-target";
 export type InspectionResponse = {
@@ -148,10 +157,10 @@ export function MtaMetaInspectorPanel({
 
   return (
     <section className={panelSpace4P5} aria-labelledby="meta-inspector-heading">
-      <div className="flex items-start gap-3">
+      <div className={typeFlexStartGap3}>
         <FileSearch className="mt-0.5 h-5 w-5 text-accent" aria-hidden="true" />
         <div>
-          <h2 id="meta-inspector-heading" className="text-sm font-bold text-primary">
+          <h2 id="meta-inspector-heading" className={typeSmBoldPrimary}>
             {copy.title}
           </h2>
           <p className="mt-1 text-xs leading-relaxed text-muted">{copy.description}</p>
@@ -188,7 +197,7 @@ export function MtaMetaInspectorPanel({
         <ErrorState
           title={result.error}
           description={copy.formErrorHint}
-          className="items-stretch py-4"
+          className={typeItemsStretchPy4}
           action={
             <Button
               type="button"
@@ -211,7 +220,7 @@ export function MtaMetaInspectorPanel({
               <div className="mt-1 text-lg font-black text-primary">
                 {inspection.summary.scriptCount}
               </div>
-              <div className="text-[10px] text-faint">
+              <div className={typeTenFaint}>
                 {inspection.summary.serverScripts} {copy.server} ·{" "}
                 {inspection.summary.clientScripts} {copy.client} ·{" "}
                 {inspection.summary.sharedScripts} {copy.shared}
@@ -224,7 +233,7 @@ export function MtaMetaInspectorPanel({
                 {inspection.summary.fileCount}
               </div>
               {inspection.summary.mapCount > 0 && (
-                <div className="text-[10px] text-faint">
+                <div className={typeTenFaint}>
                   {inspection.summary.mapCount} {copy.maps}
                 </div>
               )}
@@ -236,7 +245,7 @@ export function MtaMetaInspectorPanel({
                 {inspection.summary.dependencyCount}
               </div>
               {(inspection.summary.settingCount ?? 0) > 0 && (
-                <div className="text-[10px] text-faint">
+                <div className={typeTenFaint}>
                   {inspection.summary.settingCount} {copy.settings}
                 </div>
               )}
@@ -274,7 +283,7 @@ export function MtaMetaInspectorPanel({
               {inspection.minMtaVersion && (
                 <>
                   <dt className="text-faint">{copy.minimumMta}</dt>
-                  <dd className="font-mono text-secondary">
+                  <dd className={typeMonoSecondary}>
                     {inspection.minMtaVersion.both ||
                       [
                         inspection.minMtaVersion.server &&
@@ -331,7 +340,7 @@ export function MtaMetaInspectorPanel({
                 <h3 id="meta-inspector-scripts-heading" className={typeLabelUpperFaint}>
                   {copy.scriptsDetails}
                 </h3>
-                <span className="text-[10px] text-faint">
+                <span className={typeTenFaint}>
                   {copy.manifestEntriesCount
                     .replace(
                       "{shown}",
@@ -361,7 +370,7 @@ export function MtaMetaInspectorPanel({
                   </li>
                 ))}
               </ul>
-              <p className="text-[10px] leading-relaxed text-faint">{copy.scriptsNote}</p>
+              <p className={typeTenLeadingFaint}>{copy.scriptsNote}</p>
             </section>
           )}
 
@@ -371,7 +380,7 @@ export function MtaMetaInspectorPanel({
                 <h3 id="meta-inspector-files-heading" className={typeLabelUpperFaint}>
                   {copy.filesDetails}
                 </h3>
-                <span className="text-[10px] text-faint">
+                <span className={typeTenFaint}>
                   {copy.manifestEntriesCount
                     .replace(
                       "{shown}",
@@ -394,7 +403,7 @@ export function MtaMetaInspectorPanel({
                   </li>
                 ))}
               </ul>
-              <p className="text-[10px] leading-relaxed text-faint">{copy.filesNote}</p>
+              <p className={typeTenLeadingFaint}>{copy.filesNote}</p>
             </section>
           )}
 
@@ -404,7 +413,7 @@ export function MtaMetaInspectorPanel({
                 <h3 id="meta-inspector-maps-heading" className={typeLabelUpperFaint}>
                   {copy.mapsDetails}
                 </h3>
-                <span className="text-[10px] text-faint">
+                <span className={typeTenFaint}>
                   {copy.manifestEntriesCount
                     .replace(
                       "{shown}",
@@ -427,7 +436,7 @@ export function MtaMetaInspectorPanel({
                   </li>
                 ))}
               </ul>
-              <p className="text-[10px] leading-relaxed text-faint">{copy.mapsNote}</p>
+              <p className={typeTenLeadingFaint}>{copy.mapsNote}</p>
             </section>
           )}
 
@@ -437,7 +446,7 @@ export function MtaMetaInspectorPanel({
                 <h3 id="meta-inspector-settings-heading" className={typeLabelUpperFaint}>
                   {copy.settingsDetails}
                 </h3>
-                <span className="text-[10px] text-faint">
+                <span className={typeTenFaint}>
                   {copy.manifestEntriesCount
                     .replace(
                       "{shown}",
@@ -463,7 +472,7 @@ export function MtaMetaInspectorPanel({
                   </li>
                 ))}
               </ul>
-              <p className="text-[10px] leading-relaxed text-faint">{copy.settingsNote}</p>
+              <p className={typeTenLeadingFaint}>{copy.settingsNote}</p>
             </section>
           )}
 
@@ -473,7 +482,7 @@ export function MtaMetaInspectorPanel({
                 <h3 id="meta-inspector-acl-heading" className={typeLabelUpperFaint}>
                   {copy.aclRights}
                 </h3>
-                <span className="text-[10px] text-faint">
+                <span className={typeTenFaint}>
                   {copy.aclRightsCount
                     .replace(
                       "{shown}",
@@ -504,7 +513,7 @@ export function MtaMetaInspectorPanel({
                   </li>
                 ))}
               </ul>
-              <p className="text-[10px] leading-relaxed text-faint">{copy.aclRightsNote}</p>
+              <p className={typeTenLeadingFaint}>{copy.aclRightsNote}</p>
             </section>
           )}
 
@@ -514,7 +523,7 @@ export function MtaMetaInspectorPanel({
                 <h3 id="meta-inspector-exports-heading" className={typeLabelUpperFaint}>
                   {copy.exportsDetails}
                 </h3>
-                <span className="text-[10px] text-faint">
+                <span className={typeTenFaint}>
                   {copy.manifestEntriesCount
                     .replace(
                       "{shown}",
@@ -547,7 +556,7 @@ export function MtaMetaInspectorPanel({
                   </li>
                 ))}
               </ul>
-              <p className="text-[10px] leading-relaxed text-faint">{copy.exportsNote}</p>
+              <p className={typeTenLeadingFaint}>{copy.exportsNote}</p>
             </section>
           )}
 
@@ -570,7 +579,7 @@ export function MtaMetaInspectorPanel({
             </div>
           )}
 
-          <p className="text-[10px] leading-relaxed text-faint">{copy.note}</p>
+          <p className={typeTenLeadingFaint}>{copy.note}</p>
         </div>
       )}
     </section>

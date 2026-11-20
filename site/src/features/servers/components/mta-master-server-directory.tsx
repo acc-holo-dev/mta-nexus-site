@@ -6,7 +6,11 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { panelSpace3P4 } from "../../shell/panel-shell";
-import { typeFlexWrapGap2, typeXsSecondary } from "../../shell/type-shell";
+import {
+  typeFlexWrapCenterBetweenGap3,
+  typeFlexWrapGap2,
+  typeXsSecondary,
+} from "../../shell/type-shell";
 import { mtaEndpointKey } from "../model/mta-listing-profile-map";
 import type { MtaMasterServer } from "../model/mta-master-directory-shared";
 
@@ -366,10 +370,7 @@ export function MtaMasterServerDirectory({
       )}
 
       {!error && !loading && directory && directory.total > PAGE_SIZE && (
-        <nav
-          className="flex flex-wrap items-center justify-between gap-3"
-          aria-label={copy.directory}
-        >
+        <nav className={typeFlexWrapCenterBetweenGap3} aria-label={copy.directory}>
           <Button
             type="button"
             variant="secondary"

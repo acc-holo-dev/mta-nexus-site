@@ -13,7 +13,7 @@ import { linkAccentSmRounded, linkAccentTightRounded } from "../../shell/link-sh
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeFlexWrapGap4, typePrewrapBreak } from "../../shell/type-shell";
+import { typeFlexWrapGap4, typePrewrapBreak, typeWFullLeftSm } from "../../shell/type-shell";
 import { LibraryReleaseComparisonSelection } from "../components/library-release-comparison-selection";
 import { collectionPageParams } from "../library-collections-query";
 import { libraryReleaseComparisonCopy } from "../library-release-comparison-i18n";
@@ -131,7 +131,7 @@ export async function LibraryReleaseComparisonScreen({
         {c.delta}: {result.sizeDeltaBytes}
       </p>
       <section aria-labelledby="library-release-comparison-heading" className="overflow-x-auto">
-        <table className="w-full text-left text-sm">
+        <table className={typeWFullLeftSm}>
           <caption className="sr-only">{c.title}</caption>
           <thead>
             <tr>

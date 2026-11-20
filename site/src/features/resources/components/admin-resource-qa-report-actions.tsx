@@ -10,6 +10,7 @@ import { adminActionClientError } from "../../moderation/admin-action-client-err
 import { confirmsAdminAction } from "../../moderation/admin-action-confirmation";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
+import { skelH4W4Spin } from "../../shell/skeleton-shell";
 import { resourceQaCopy, resourceQaError } from "../resource-qa-i18n";
 
 /**
@@ -116,7 +117,7 @@ export function AdminResourceQaReportActions({
         onClick={() => void removeAndResolve()}
       >
         {pending ? (
-          <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
+          <LoaderCircle className={skelH4W4Spin} aria-hidden="true" />
         ) : (
           <Trash2 className="h-4 w-4" aria-hidden="true" />
         )}

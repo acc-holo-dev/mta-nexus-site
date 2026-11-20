@@ -16,6 +16,7 @@ import { panelMinSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeDisplayPrimary,
+  typeFlexWrapCenterBetweenGap3,
   typeFlexWrapGap3,
   typeFlexWrapGap4Sm,
   typeSmPrimary,
@@ -103,7 +104,7 @@ export async function CommercialPlansAdminScreen({
       <Link href="/admin" className={linkAccentSm}>
         {copy.adminBack}
       </Link>
-      <header className="flex flex-wrap items-center justify-between gap-3">
+      <header className={typeFlexWrapCenterBetweenGap3}>
         <h1 className={typeDisplayPrimary}>{copy.admin}</h1>
         <Link
           href="/admin/commerce/plans/new"

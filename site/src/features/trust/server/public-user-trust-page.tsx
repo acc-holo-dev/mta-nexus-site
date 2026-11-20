@@ -9,6 +9,7 @@ import { publicUserTrustService } from "../../../lib/services/trust/public-user-
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax4xlTight as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace3P6 } from "../../shell/panel-shell";
+import { typeXlBoldPrimary } from "../../shell/type-shell";
 import { PublicUserTrustPanel } from "../public-user-trust";
 import { trustCopy } from "../public-user-trust-copy";
 
@@ -42,7 +43,7 @@ export async function TrustPage({ params }: { params: Promise<{ username: string
     return (
       <div className={pageShellClass}>
         <header className={panelClipSpace3P6}>
-          <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
+          <h1 className={typeXlBoldPrimary}>{copy.title}</h1>
         </header>
         <ErrorState
           title={copy.unavailable}

@@ -4,7 +4,7 @@ import { formatUnknown } from "../../../lib/i18n/unknown";
 import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
 import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelSpace2P4 } from "../../shell/panel-shell";
-import { typeDisplayPrimary } from "../../shell/type-shell";
+import { typeBreakAllXsMuted, typeDisplayPrimary } from "../../shell/type-shell";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import {
   collectionReceiptHref,
@@ -140,7 +140,7 @@ export async function LibraryCollectionsHistoryView({
               {c.created}:{" "}
               <time dateTime={item.createdAt.toISOString()}>{item.createdAt.toISOString()}</time>
             </p>
-            <p className="break-all text-xs text-muted">
+            <p className={typeBreakAllXsMuted}>
               {c.receipt}: {item.id} · {c.request}: {item.requestId}
             </p>
           </li>

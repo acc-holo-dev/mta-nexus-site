@@ -5,7 +5,12 @@ import { MailCheck } from "lucide-react";
 import type { FormEvent } from "react";
 import type { getDictionary } from "../../../lib/i18n";
 import { panelSpace4P5Shadow } from "../../shell/panel-shell";
-import { typeFlexCenterGap2, typeSmSemiboldPrimary } from "../../shell/type-shell";
+import {
+  typeBlockSmPrimary,
+  typeFlexCenterGap2,
+  typeIconAccent,
+  typeSmSemiboldPrimary,
+} from "../../shell/type-shell";
 import type { SettingsRecoveryEmail } from "../settings-client-api";
 
 type SettingsCopy = ReturnType<typeof getDictionary>["settings"];
@@ -32,7 +37,7 @@ export function SettingsRecoveryEmailSection({
   return (
     <section aria-labelledby="recovery-email-heading" className={panelSpace4P5Shadow}>
       <div className={typeFlexCenterGap2}>
-        <MailCheck className="h-4 w-4 text-accent" aria-hidden="true" />
+        <MailCheck className={typeIconAccent} aria-hidden="true" />
         <h2 id="recovery-email-heading" className={typeSmSemiboldPrimary}>
           {copy.recoveryEmail}
         </h2>
@@ -74,7 +79,7 @@ export function SettingsRecoveryEmailSection({
               </p>
 
               <div className="max-w-sm space-y-1">
-                <label htmlFor="recovery-current-password" className="block text-sm text-primary">
+                <label htmlFor="recovery-current-password" className={typeBlockSmPrimary}>
                   {copy.recoveryPassword}
                 </label>
                 <input

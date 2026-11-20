@@ -17,6 +17,7 @@ import {
   type2xlBoldPrimary,
   typeBreakSemiboldPrimary,
   typeFlexWrapGap4,
+  typeSmBoldPrimary,
   typeSmPrimary,
 } from "../../shell/type-shell";
 import { getManagedServerCopy } from "../managed-server-view";
@@ -181,9 +182,7 @@ async function ServerWorkspaceHistoryScreen({
             <ol className="space-y-3">
               {data.events.map((event) => (
                 <li key={event.id} className={panelClipSpace2P5}>
-                  <h2 className="text-sm font-bold text-primary">
-                    {history.actions[event.action]}
-                  </h2>
+                  <h2 className={typeSmBoldPrimary}>{history.actions[event.action]}</h2>
                   <time dateTime={event.createdAt} className="text-xs text-muted">
                     {new Date(event.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-GB", {
                       timeZone: "UTC",

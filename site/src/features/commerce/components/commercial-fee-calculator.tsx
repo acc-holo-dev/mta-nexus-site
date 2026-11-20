@@ -6,7 +6,12 @@ import { type FormEvent, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
-import { typeNumericPrimary, typeSmSecondary, typeXlSemiboldPrimary } from "../../shell/type-shell";
+import {
+  typeGridGap3Sm2,
+  typeNumericPrimary,
+  typeSmSecondary,
+  typeXlSemiboldPrimary,
+} from "../../shell/type-shell";
 import { formatHistoryAmount } from "../commerce-history-format";
 import { confirmedCommercialEstimate, parseCommercialAmount } from "../commercial-confirmation";
 import { commercialError, getCommercialCopy } from "../commercial-i18n";
@@ -132,7 +137,7 @@ export function CommercialFeeCalculator({ plans }: { plans: Plan[] }) {
       {error ? <ErrorState title={error} description={copy.formErrorHint} /> : null}
       {result ? (
         <div role="status">
-          <dl className="grid gap-3 text-sm sm:grid-cols-2">
+          <dl className={typeGridGap3Sm2}>
             <div>
               <dt className="text-muted">{copy.fee}</dt>
               <dd className={typeNumericPrimary}>

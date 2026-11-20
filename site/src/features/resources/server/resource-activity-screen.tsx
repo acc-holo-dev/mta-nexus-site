@@ -14,7 +14,12 @@ import { linkAccent } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace2P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeDisplayPrimary, typeFlexWrapGap3, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapGap3,
+  typeSmSecondary,
+  typeWFullLeftSm,
+} from "../../shell/type-shell";
 import { getResourceActivityCopy } from "../resource-activity-i18n";
 import { resourceActivityDays } from "../resource-activity-view";
 export async function resourceActivityMetadata(): Promise<Metadata> {
@@ -131,7 +136,7 @@ export async function ResourceActivityScreen({
         ))}
       </dl>
       <div className="overflow-x-auto rounded-lg border border-base">
-        <table className="w-full text-left text-sm">
+        <table className={typeWFullLeftSm}>
           <caption className="p-4 text-left font-semibold">{copy.timeline}</caption>
           <thead>
             <tr>

@@ -19,7 +19,12 @@ import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace3P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeBreakDisplayPrimary, typeMt2SmMuted, typeXsSecondary } from "../../shell/type-shell";
+import {
+  typeBreakDisplayPrimary,
+  typeFlexWrapBetweenGap2,
+  typeMt2SmMuted,
+  typeXsSecondary,
+} from "../../shell/type-shell";
 import { serverContentId } from "../server-content-api";
 import { serverContentCopy } from "../server-content-copy";
 import { serverPublicationHistoryCopy } from "../server-publication-history-copy";
@@ -113,7 +118,7 @@ export async function ServerPublicationsScreen({
             <div className="space-y-3">
               {result.items.map((item) => (
                 <article key={item.id} className={panelClipSpace3P4}>
-                  <div className="flex flex-wrap justify-between gap-2">
+                  <div className={typeFlexWrapBetweenGap2}>
                     <h2 className="break-words font-heading text-primary">
                       <Link
                         href={`${path}/${encodeURIComponent(item.id)}`}

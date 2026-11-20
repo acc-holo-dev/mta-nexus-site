@@ -12,6 +12,7 @@ import { surfaceBgP4TextSmSecondary } from "../../shell/surface-shell";
 import {
   typeDisplayPrimary,
   typeFlexMinWrapGap3,
+  typeFlexMinWrapGap4,
   typeFlexMinWrapGap4Sm,
   typeNumericPrimary,
   typePrewrapSmSecondary,
@@ -80,7 +81,7 @@ export async function PublicSubscriptionsScreen({
   return (
     <div className={shellClass}>
       <h1 className={typeDisplayPrimary}>{copy.catalog}</h1>
-      <nav className="flex min-w-0 flex-wrap gap-4" aria-label={copy.catalog}>
+      <nav className={typeFlexMinWrapGap4} aria-label={copy.catalog}>
         <Link href="/workspace/subscriptions" className={linkAccentSm}>
           {subscriptions.title}
         </Link>

@@ -7,6 +7,7 @@ import { pageShellMax4xlCompactTight } from "../../shell/page-shell";
 import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import {
   typeDisplayPrimary,
+  typeFlexWrapBetweenGap3,
   typePrewrapSmSecondary,
   typeSemiboldPrimary,
 } from "../../shell/type-shell";
@@ -143,7 +144,7 @@ export function SupportMessageBrowser({
           ))}
         </section>
       )}
-      <nav aria-label={copy.navigation} className="flex flex-wrap justify-between gap-3">
+      <nav aria-label={copy.navigation} className={typeFlexWrapBetweenGap3}>
         {page.olderCursor && (
           <Link
             href={supportMessageHref(path, filters, {

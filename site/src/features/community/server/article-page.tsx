@@ -15,7 +15,7 @@ import { contentReactionService } from "../../../lib/services/community/content-
 import { contentService } from "../../../lib/services/community/content-service";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax4xlLoose } from "../../shell/page-shell";
-import { typeFlexWrapCenterGap2 } from "../../shell/type-shell";
+import { typeFlexWrapCenterGap2, typeTruncateXsFaint } from "../../shell/type-shell";
 import { parseDiscussionQuery } from "../content-discussion-contract";
 import { discussionError, getDiscussionCopy } from "../content-discussion-copy";
 import { ContentDiscussion } from "../discussion";
@@ -189,7 +189,7 @@ export async function ArticleDetailPage({
             />
             <div className="min-w-0">
               <div className="truncate text-sm font-bold text-primary">{author.displayName}</div>
-              <div className="truncate text-xs text-faint">@{author.username}</div>
+              <div className={typeTruncateXsFaint}>@{author.username}</div>
             </div>
           </div>
         )}

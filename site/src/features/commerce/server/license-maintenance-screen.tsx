@@ -14,7 +14,12 @@ import { linkAccent, linkAccentSm, linkAccentSmRounded, linkMinH } from "../../s
 import { pageShellMax4xl } from "../../shell/page-shell";
 import { panelMinSpace2P4, panelP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeDisplayPrimary, typeFlexWrapGap4Sm, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapGap4Sm,
+  typeSmSecondary,
+  typeXlPrimary,
+} from "../../shell/type-shell";
 import { formatHistoryDate, licenseStatusLabel } from "../commerce-history-format";
 import { getCommerceHistoryCopy } from "../commerce-history-i18n";
 import { getLicenseMaintenanceCopy } from "../license-maintenance-i18n";
@@ -109,7 +114,7 @@ export async function LicenseMaintenanceScreen({
         ].map(([label, total]) => (
           <div className={panelP4} key={label}>
             <dt className="text-sm text-muted">{label}</dt>
-            <dd className="text-xl text-primary">{total}</dd>
+            <dd className={typeXlPrimary}>{total}</dd>
           </div>
         ))}
       </dl>

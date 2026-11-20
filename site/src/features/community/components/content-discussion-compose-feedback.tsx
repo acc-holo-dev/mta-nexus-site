@@ -2,6 +2,7 @@ import { ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import { GuestAuthLinks, platformSignInFocusClass } from "../../shell/guest-auth";
+import { typeItemsStretchPy4 } from "../../shell/type-shell";
 import { getDiscussionCopy } from "../content-discussion-copy";
 
 export function DiscussionComposeWriteFeedback({
@@ -29,7 +30,7 @@ export function DiscussionComposeWriteFeedback({
     <ErrorState
       title={error}
       description={copy.formErrorHint}
-      className="items-stretch py-4"
+      className={typeItemsStretchPy4}
       action={
         needsSignIn ? (
           registerHref && registerLabel ? (

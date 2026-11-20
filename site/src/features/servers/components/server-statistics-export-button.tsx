@@ -3,6 +3,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { linkGhostAccentSm, linkMinHAccentSemibold } from "../../shell/link-shell";
+import { typeItemsStretchPy4 } from "../../shell/type-shell";
 import { serverStatisticsCopy, serverStatisticsError } from "../server-statistics-copy";
 import { fetchServerStatisticsCsv } from "../server-statistics-download";
 export function ServerStatisticsExportButton({
@@ -68,7 +69,7 @@ export function ServerStatisticsExportButton({
         <ErrorState
           title={error}
           description={copy.exportErrorHint}
-          className="items-stretch py-4"
+          className={typeItemsStretchPy4}
           action={
             <Button
               type="button"

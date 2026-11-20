@@ -1,7 +1,11 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { surfaceBgP4TextSmMuted } from "../../shell/surface-shell";
-import { typeDisplayPrimary, typeFlexWrapGap2 } from "../../shell/type-shell";
+import { surfaceBgP4TextSmMuted, surfaceSpace3BorderBPb6 } from "../../shell/surface-shell";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapGap2,
+  typeMax2xlSmSecondary,
+} from "../../shell/type-shell";
 
 const filterNavLinkClass = linkFocusRing;
 
@@ -32,12 +36,12 @@ export function HistoryShell({
   };
   return (
     <div className={pageShellMax5xlMid}>
-      <header className="space-y-3 border-b border-base pb-6">
+      <header className={surfaceSpace3BorderBPb6}>
         <Link href="/workspace" className={linkAccentTightSmRounded}>
           {copy.back}
         </Link>
         <h1 className={typeDisplayPrimary}>{titles[area]}</h1>
-        <p className="max-w-2xl text-sm text-secondary">{descriptions[area]}</p>
+        <p className={typeMax2xlSmSecondary}>{descriptions[area]}</p>
       </header>
       <nav aria-label={copy.navigation} className={typeFlexWrapGap2}>
         {(Object.keys(titles) as HistoryArea[]).map((key) => (

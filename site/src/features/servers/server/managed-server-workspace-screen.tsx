@@ -12,6 +12,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeSmBoldPrimary } from "../../shell/type-shell";
 import { ServerClaimStatusPanel } from "../claim-status-server";
 import { ServerDetailsForm } from "../details-controls";
 import { getManagedServerCopy } from "../managed-server-view";
@@ -70,7 +71,7 @@ export async function ServerManagementScreen({ params }: { params: Promise<{ id:
       <div className="nexus-panel flex items-start gap-3 p-4">
         <Server className="mt-0.5 h-5 w-5 shrink-0 text-success" aria-hidden="true" />
         <div className="min-w-0">
-          <h2 className="text-sm font-bold text-primary">{copy.ownerManaged}</h2>
+          <h2 className={typeSmBoldPrimary}>{copy.ownerManaged}</h2>
           <p className="mt-1 text-xs leading-relaxed text-muted">{copy.ownerManagedDescription}</p>
         </div>
       </div>

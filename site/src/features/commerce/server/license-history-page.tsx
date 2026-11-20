@@ -14,7 +14,12 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace2P4TextSm } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeBreakSecondary, typeDisplayPrimary } from "../../shell/type-shell";
+import {
+  typeBreakSecondary,
+  typeDisplayPrimary,
+  typeFlexGap4Sm,
+  typePrewrapBreakSecondary,
+} from "../../shell/type-shell";
 import { formatHistoryDate } from "../commerce-history-format";
 import { getLicenseControlCopy, licenseActionLabel } from "../license-control-i18n";
 import { licenseRuntimePage } from "../license-runtime-query";
@@ -137,9 +142,7 @@ export async function LicenseHistoryPage({
                     ? copy.system
                     : copy.owner}
               </p>
-              {event.reason && (
-                <p className="whitespace-pre-wrap break-words text-secondary">{event.reason}</p>
-              )}
+              {event.reason && <p className={typePrewrapBreakSecondary}>{event.reason}</p>}
               {event.fromEndpointRevision !== null && event.toEndpointRevision !== null && (
                 <p className="text-xs text-muted">
                   {copy.endpointRevision}: {event.fromEndpointRevision} → {event.toEndpointRevision}
@@ -155,7 +158,7 @@ export async function LicenseHistoryPage({
         <EmptyState title={copy.noHistory} description={copy.noHistoryHint} />
       )}
       {result.totalPages > 1 && (
-        <nav aria-label={copy.fullHistory} className="flex gap-4 text-sm">
+        <nav aria-label={copy.fullHistory} className={typeFlexGap4Sm}>
           {result.page > 1 && (
             <Link href={`?page=${result.page - 1}`} className={linkAccentSmRounded}>
               {copy.previous}

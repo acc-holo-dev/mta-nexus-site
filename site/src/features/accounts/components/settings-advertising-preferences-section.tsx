@@ -5,8 +5,10 @@ import { useCallback, useState } from "react";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace4P5Shadow } from "../../shell/panel-shell";
 import {
+  typeBlockSmPrimary,
   typeCaptionFaint,
   typeFlexCenterGap2,
+  typeIconAccent,
   typeSmSemiboldPrimary,
 } from "../../shell/type-shell";
 import { type AdPreference, adPreferenceCookie, parseAdPreference } from "../ad-preference";
@@ -50,7 +52,7 @@ export function SettingsAdvertisingPreferencesSection({
   return (
     <section aria-labelledby="advertising-preferences-heading" className={panelSpace4P5Shadow}>
       <div className={typeFlexCenterGap2}>
-        <BellOff className="h-4 w-4 text-accent" aria-hidden="true" />
+        <BellOff className={typeIconAccent} aria-hidden="true" />
         <h2 id="advertising-preferences-heading" className={typeSmSemiboldPrimary}>
           {copy.heading}
         </h2>
@@ -58,7 +60,7 @@ export function SettingsAdvertisingPreferencesSection({
       <p className="text-xs text-muted">{copy.description}</p>
       <div className="flex cursor-pointer items-center justify-between gap-4 py-3">
         <span>
-          <span className="block text-sm text-primary">{toggleLabel}</span>
+          <span className={typeBlockSmPrimary}>{toggleLabel}</span>
           <span className="mt-0.5 block text-xs text-muted">{status}</span>
         </span>
         <input

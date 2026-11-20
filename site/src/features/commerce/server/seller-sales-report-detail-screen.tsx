@@ -13,7 +13,7 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax3xl } from "../../shell/page-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeDisplayPrimary, typeSmSecondary } from "../../shell/type-shell";
+import { typeBreakPrimary, typeDisplayPrimary, typeSmSecondary } from "../../shell/type-shell";
 import { formatFinancialMinor } from "../financial-i18n";
 import { sellerSalesCopy, sellerSalesTime } from "../seller-sales-i18n";
 import { sellerSalesDetailQuery, sellerSalesUrl } from "../seller-sales-query";
@@ -137,7 +137,7 @@ async function SellerSalesReportDetailScreen({ saleId, query }: { saleId: string
         ].map(([label, value]) => (
           <div key={label}>
             <dt className="text-sm text-muted">{label}</dt>
-            <dd className="break-words text-primary">{value}</dd>
+            <dd className={typeBreakPrimary}>{value}</dd>
           </div>
         ))}
       </dl>

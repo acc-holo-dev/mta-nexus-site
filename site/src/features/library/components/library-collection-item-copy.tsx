@@ -9,7 +9,7 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 import { linkAccentTightRounded, linkGhostAccentRounded } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
-import { typeBreakAllXs, typeSmSecondary } from "../../shell/type-shell";
+import { typeBreakAllXs, typeFlexStartGap3, typeSmSecondary } from "../../shell/type-shell";
 import { confirmedCollectionCommand } from "../library-collections-confirmation";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../library-collections-query";
@@ -222,7 +222,7 @@ export function LibraryCollectionItemCopyForm({
         <ul className="space-y-3">
           {shownItems.map((item) => (
             <li key={item.productId}>
-              <label className="flex items-start gap-3">
+              <label className={typeFlexStartGap3}>
                 <input
                   type="checkbox"
                   checked={ids.includes(item.productId)}

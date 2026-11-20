@@ -16,10 +16,12 @@ import { GuestAuthLinks } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xlMid as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
-import { surfaceBgP4TextSmMuted } from "../../shell/surface-shell";
+import { surfaceBgP4TextSmMuted, surfaceSpace3BorderBPb6 } from "../../shell/surface-shell";
 import {
   typeBreakSecondary,
   typeDisplayPrimary,
+  typeFlexWrapStartBetweenGap3,
+  typeMax2xlSmSecondary,
   typePrewrapSmSecondary,
   typeSmSecondary,
 } from "../../shell/type-shell";
@@ -71,9 +73,9 @@ export async function PublicResourceVersionsPage({
   } catch {
     return (
       <div className={pageShellClass}>
-        <header className="space-y-3 border-b border-base pb-6">
+        <header className={surfaceSpace3BorderBPb6}>
           <h1 className={typeDisplayPrimary}>{copy.title}</h1>
-          <p className="max-w-2xl text-sm text-secondary">{copy.intro}</p>
+          <p className={typeMax2xlSmSecondary}>{copy.intro}</p>
         </header>
         <ErrorState
           title={copy.loadUnavailable}
@@ -104,14 +106,14 @@ export async function PublicResourceVersionsPage({
   if (!history) {
     return (
       <div className={pageShellClass}>
-        <header className="space-y-3 border-b border-base pb-6">
+        <header className={surfaceSpace3BorderBPb6}>
           <Link href={back} className={linkAccentSmRounded}>
             {copy.back}
           </Link>
           <h1 className={typeDisplayPrimary}>
             {product.title} — {copy.title}
           </h1>
-          <p className="max-w-2xl text-sm text-secondary">{copy.intro}</p>
+          <p className={typeMax2xlSmSecondary}>{copy.intro}</p>
         </header>
         <ErrorState
           title={copy.loadUnavailable}
@@ -149,14 +151,14 @@ export async function PublicResourceVersionsPage({
 
   return (
     <div className={pageShellClass}>
-      <header className="space-y-3 border-b border-base pb-6">
+      <header className={surfaceSpace3BorderBPb6}>
         <Link href={back} className={linkAccentSmRounded}>
           {copy.back}
         </Link>
         <h1 className={typeDisplayPrimary}>
           {product.title} — {copy.title}
         </h1>
-        <p className="max-w-2xl text-sm text-secondary">{copy.intro}</p>
+        <p className={typeMax2xlSmSecondary}>{copy.intro}</p>
       </header>
 
       <p role="note" className={surfaceBgP4TextSmMuted}>
@@ -169,7 +171,7 @@ export async function PublicResourceVersionsPage({
         <ol className={pageShellStack4}>
           {history.releases.map((release) => (
             <li key={release.id} className={panelClipSpace4P5}>
-              <header className="flex flex-wrap items-start justify-between gap-3">
+              <header className={typeFlexWrapStartBetweenGap3}>
                 <div className="min-w-0 space-y-1">
                   <h2 className="text-base font-semibold text-primary">
                     {copy.version} {release.version}

@@ -6,7 +6,13 @@ import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelMinSpace4P5 } from "../../shell/panel-shell";
 import { surfaceP4TextSmSecondary } from "../../shell/surface-shell";
-import { typeDisplayPrimary, typeFlexWrapGap4Sm, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapGap4Sm,
+  typeGridGap3Sm2,
+  typeLgSemibold,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { formatFinancialMinor } from "../financial-i18n";
 import { orderTermsCopy, orderTermsLicenseLabel } from "../order-terms-i18n";
 import { sellerSalesTime } from "../seller-sales-i18n";
@@ -59,7 +65,7 @@ export function OrderTermsReportView({
         {c.notice}
       </p>
       <section className={panelMinSpace4P5}>
-        <h2 className="text-lg font-semibold">{c.check}</h2>
+        <h2 className={typeLgSemibold}>{c.check}</h2>
         <p className={typeSmSecondary}>{c.consistencyNotice}</p>
         <dl className="grid gap-3 text-sm sm:grid-cols-3">
           <div>
@@ -122,7 +128,7 @@ export function OrderTermsReportView({
               </p>
               {line.terms ? (
                 <>
-                  <dl className="grid gap-3 text-sm sm:grid-cols-2">
+                  <dl className={typeGridGap3Sm2}>
                     <div>
                       <dt className="text-muted">{c.date}</dt>
                       <dd>

@@ -28,7 +28,12 @@ import {
   pageShellStack6,
 } from "../../shell/page-shell";
 import { panelHeroBetween } from "../../shell/panel-shell";
-import { typeFlexWrapCenterGap2, typeHeadingPrimary } from "../../shell/type-shell";
+import {
+  typeFlexWrapCenterGap2,
+  typeHeadingPrimary,
+  typeMaxXlSmLeadingMuted,
+  typeTruncateXsFaint,
+} from "../../shell/type-shell";
 import { contextTrustCopy } from "../../trust/public-context-trust-copy";
 
 const getProfile = cache((slug: string) => organizationRepository.findBySlug(slug));
@@ -169,11 +174,9 @@ export async function OrganizationProfilePage({
               </span>
             </div>
 
-            <div className="truncate text-xs text-faint">@{organization.slug}</div>
+            <div className={typeTruncateXsFaint}>@{organization.slug}</div>
 
-            <p className="max-w-xl text-sm leading-relaxed text-muted">
-              {organization.description || copy.fallback}
-            </p>
+            <p className={typeMaxXlSmLeadingMuted}>{organization.description || copy.fallback}</p>
 
             <FollowButton
               targetType="organization"

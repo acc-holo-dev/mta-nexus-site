@@ -6,7 +6,12 @@ import { useEffect, useState } from "react";
 import { HonestLoadingShell } from "../../shell/honest-loading";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace3P5 } from "../../shell/panel-shell";
-import { typeSmSemiboldPrimary } from "../../shell/type-shell";
+import {
+  typeElevenFaint,
+  typeItemsStretchPy4,
+  typeMt1XsMuted,
+  typeSmSemiboldPrimary,
+} from "../../shell/type-shell";
 
 type ContextOption = {
   id: string;
@@ -129,7 +134,7 @@ export function ContextSwitcher() {
         headingId="workspace-context-loading-heading"
         headingLevel={2}
         title={copy.title}
-        description={<p className="mt-1 text-xs text-muted">{copy.description}</p>}
+        description={<p className={typeMt1XsMuted}>{copy.description}</p>}
         loadingLabel={loadingLabel}
         titleClassName="text-sm font-semibold text-primary"
         statusClassName="text-xs text-muted"
@@ -144,7 +149,7 @@ export function ContextSwitcher() {
     <section aria-busy={saving ? true : undefined} className={panelSpace3P5}>
       <div>
         <h2 className={typeSmSemiboldPrimary}>{copy.title}</h2>
-        <p className="mt-1 text-xs text-muted">{copy.description}</p>
+        <p className={typeMt1XsMuted}>{copy.description}</p>
       </div>
 
       {contexts.length > 1 && (
@@ -172,7 +177,7 @@ export function ContextSwitcher() {
         <ErrorState
           title={error}
           description={copy.errorHint}
-          className="items-stretch py-4"
+          className={typeItemsStretchPy4}
           action={
             <Button
               type="button"
@@ -187,7 +192,7 @@ export function ContextSwitcher() {
         />
       ) : null}
 
-      <p className="text-[11px] text-faint">{copy.note}</p>
+      <p className={typeElevenFaint}>{copy.note}</p>
     </section>
   );
 }

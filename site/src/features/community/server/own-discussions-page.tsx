@@ -14,6 +14,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   type2xlExtraboldPrimary,
   typeFlexMinWrapGap3,
+  typeMinH11Semibold,
   typePrewrapSmSecondary,
   typeSpace1XsMuted,
 } from "../../shell/type-shell";
@@ -110,7 +111,7 @@ export async function OwnDiscussionsPage({
               <option value="unavailable">{copy.unavailable}</option>
             </select>
           </label>
-          <Button type="submit" className="min-h-11 font-semibold">
+          <Button type="submit" className={typeMinH11Semibold}>
             {copy.search}
           </Button>
           <Link href="/workspace/discussions" className={linkAccentSm}>

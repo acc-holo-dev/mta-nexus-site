@@ -18,7 +18,12 @@ import { linkAccentSmRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
 import { panelClipSpace3P5, panelFlexClipWrapEndGap4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeBreakAllXs, typeFlexMinWrapGap4Sm } from "../../shell/type-shell";
+import {
+  typeBreakAllXs,
+  typeBreakAllXsMuted,
+  typeFlexMinWrapGap4Sm,
+  typeMinFlex1Space15SmSecondary,
+} from "../../shell/type-shell";
 import { libraryCollectionHistoryCopy } from "../library-collection-history-i18n";
 import {
   libraryCollectionHistoryQuery,
@@ -125,7 +130,7 @@ export async function CollectionHistoryPage({
           action="/workspace/library/collections/history"
           className={panelFlexClipWrapEndGap4}
         >
-          <label className="min-w-0 flex-1 space-y-1.5 text-sm text-secondary">
+          <label className={typeMinFlex1Space15SmSecondary}>
             <span className={labelClass}>{h.days}</span>
             <select name="days" defaultValue={result.days} className={selectClass}>
               {LIBRARY_COLLECTION_HISTORY_DAYS.map((days) => (
@@ -135,7 +140,7 @@ export async function CollectionHistoryPage({
               ))}
             </select>
           </label>
-          <label className="min-w-0 flex-1 space-y-1.5 text-sm text-secondary">
+          <label className={typeMinFlex1Space15SmSecondary}>
             <span className={labelClass}>{h.action}</span>
             <select name="action" defaultValue={result.action} className={selectClass}>
               {LIBRARY_COLLECTION_HISTORY_ACTIONS.map((action) => (
@@ -206,7 +211,7 @@ export async function CollectionHistoryPage({
                 <p className="text-sm">
                   {h.time}: <time dateTime={item.createdAt}>{item.createdAt}</time>
                 </p>
-                <p className="break-all text-xs text-muted">
+                <p className={typeBreakAllXsMuted}>
                   {c.receipt}: {item.id}
                   {receipt ? ` · ${c.request}: ${receipt.requestId}` : ""}
                 </p>

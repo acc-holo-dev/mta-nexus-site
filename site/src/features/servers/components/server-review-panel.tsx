@@ -12,6 +12,7 @@ import { useNexusLocale } from "../../shell/locale";
 import { panelSpace2P4TextSm, panelSpace4P5 } from "../../shell/panel-shell";
 import {
   typePrewrapBreak,
+  typePrewrapBreakSecondary,
   typePrewrapSmSecondary,
   typeSmSemiboldPrimary,
   typeXsSecondary,
@@ -378,7 +379,7 @@ export function ServerReviewPanel({
                       {copy.rating}: {review.rating}/5 · {copy.follow}
                     </span>
                   </div>
-                  <p className="whitespace-pre-wrap break-words text-secondary">{review.text}</p>
+                  <p className={typePrewrapBreakSecondary}>{review.text}</p>
                 </li>
               ))}
             </ul>

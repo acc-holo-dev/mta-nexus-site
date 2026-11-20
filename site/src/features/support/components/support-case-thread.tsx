@@ -16,6 +16,8 @@ import { pageShellMax4xlDenseTight, pageShellMax4xlTight } from "../../shell/pag
 import { panelSpace3P4 } from "../../shell/panel-shell";
 import {
   typeDisplayPrimary,
+  typeFlexWrapStartBetweenGap3,
+  typeLabelSecondary,
   typeLabelUpperMuted,
   typeSmSecondary,
   typeSmSuccess,
@@ -373,7 +375,7 @@ export function SupportCaseThread({
       </Link>
 
       <header className="space-y-2 border-b border-base pb-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className={typeFlexWrapStartBetweenGap3}>
           <div>
             <p className={typeLabelUpperMuted}>
               {categories[supportCase.category] ?? supportCase.category}
@@ -510,7 +512,7 @@ export function SupportCaseThread({
           className={panelSpace3P4}
         >
           <label className="block space-y-1.5">
-            <span className="font-label text-secondary">{copy.reply}</span>
+            <span className={typeLabelSecondary}>{copy.reply}</span>
             <textarea
               value={reply}
               disabled={sending || updatingStatus || !supportCase.updatedAt}

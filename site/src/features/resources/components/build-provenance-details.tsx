@@ -1,7 +1,7 @@
 import { ErrorState } from "@nexus/ui";
 import { Fingerprint, ShieldCheck } from "lucide-react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
-import { typeFlexCenterGap2 } from "../../shell/type-shell";
+import { typeFlexCenterGap2, typeMonoSecondary, typeTenLeadingFaint } from "../../shell/type-shell";
 import { getBuildProvenance } from "../model/build-provenance";
 
 const toneClass = {
@@ -114,7 +114,7 @@ export function BuildProvenanceDetails({
           {build.version ? (
             <>
               <dt className="text-faint">{copy.version}</dt>
-              <dd className="font-mono text-secondary">{build.version}</dd>
+              <dd className={typeMonoSecondary}>{build.version}</dd>
             </>
           ) : null}
 
@@ -126,9 +126,7 @@ export function BuildProvenanceDetails({
           </dd>
 
           <dt className="text-faint">{copy.scanTime}</dt>
-          <dd className="font-mono text-secondary">
-            {provenance.scannedAtLabel || copy.notRecorded}
-          </dd>
+          <dd className={typeMonoSecondary}>{provenance.scannedAtLabel || copy.notRecorded}</dd>
 
           <dt className="text-faint">{copy.artifactFile}</dt>
           <dd className="break-all text-secondary">{build.fileName}</dd>
@@ -136,17 +134,17 @@ export function BuildProvenanceDetails({
           {typeof build.fileSizeBytes === "number" ? (
             <>
               <dt className="text-faint">{copy.fileSize}</dt>
-              <dd className="font-mono text-secondary">
+              <dd className={typeMonoSecondary}>
                 {build.fileSizeBytes.toLocaleString(numberLocale)} B
               </dd>
             </>
           ) : null}
 
           <dt className="text-faint">{copy.mimeType}</dt>
-          <dd className="font-mono text-secondary">{build.mimeType?.trim() || copy.notRecorded}</dd>
+          <dd className={typeMonoSecondary}>{build.mimeType?.trim() || copy.notRecorded}</dd>
 
           <dt className="text-faint">{copy.mtaTarget}</dt>
-          <dd className="font-mono text-secondary">
+          <dd className={typeMonoSecondary}>
             {build.mtaVersionTarget ? `>= ${build.mtaVersionTarget}` : copy.notDeclared}
           </dd>
 
@@ -159,7 +157,7 @@ export function BuildProvenanceDetails({
           <dd className="text-secondary">{publicationState}</dd>
         </dl>
 
-        <p className="text-[10px] leading-relaxed text-faint">{copy.explanation}</p>
+        <p className={typeTenLeadingFaint}>{copy.explanation}</p>
       </div>
     </details>
   );

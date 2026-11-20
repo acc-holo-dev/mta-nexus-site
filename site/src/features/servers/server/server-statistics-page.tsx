@@ -17,6 +17,7 @@ import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax6xl as pageShellClass, pageShellMax6xlDense } from "../../shell/page-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeXlBoldPrimary } from "../../shell/type-shell";
 import { parseServerStatisticsQuery, serverStatisticsHref } from "../server-statistics-contract";
 import { serverStatisticsCopy, serverStatisticsError } from "../server-statistics-copy";
 import { ServerStatisticsPanel } from "./server-statistics-panel";
@@ -101,7 +102,7 @@ export async function ServerStatisticsPage({
     const title = serverStatisticsError(locale, code);
     return (
       <div className={pageShellClass}>
-        <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
+        <h1 className={typeXlBoldPrimary}>{copy.title}</h1>
         <ErrorState
           title={title}
           description={title === copy.unavailable ? copy.unavailableHint : undefined}

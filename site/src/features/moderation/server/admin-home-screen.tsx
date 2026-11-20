@@ -28,7 +28,7 @@ import { linkAccentSmRounded, linkAccentTight, linkAccentXs } from "../../shell/
 import { pageShellMaxMdGuest, pageShellStack6, pageShellStack8 } from "../../shell/page-shell";
 import { panelFlexBetweenP4, panelP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeFlexCenterGap2, typeSemiboldPrimary } from "../../shell/type-shell";
+import { typeCaptionMuted, typeFlexCenterGap2, typeSemiboldPrimary } from "../../shell/type-shell";
 import {
   AdminAdPlacementSection,
   AdminBuildsQuarantineSection,
@@ -310,7 +310,7 @@ export async function AdminHomeScreen({
                     </span>
                     <span className="truncate text-xs font-heading text-primary">{item.title}</span>
                   </div>
-                  <p className="font-caption text-muted">
+                  <p className={typeCaptionMuted}>
                     {copy.author} {item.authorId} •{" "}
                     {new Date(item.createdAt).toLocaleDateString(dateLocale)}
                   </p>

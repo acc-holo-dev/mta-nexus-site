@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { platformSignInFocusClass } from "../../shell/guest-auth";
+import { typeSmLeadingMuted } from "../../shell/type-shell";
 
 export function ResourceSubmissionSuccess({
   resultId,
@@ -19,7 +20,7 @@ export function ResourceSubmissionSuccess({
           {dictionary.nav.openFreeBeta}
         </div>
         <h1 className="text-2xl font-black text-primary">{copy.submittedTitle}</h1>
-        <p className="text-sm leading-relaxed text-muted">{copy.submittedDescription}</p>
+        <p className={typeSmLeadingMuted}>{copy.submittedDescription}</p>
         <Link
           href={`/workspace/resources/${encodeURIComponent(resultId)}#publication-readiness`}
           className={`inline-flex rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] ${platformSignInFocusClass}`}

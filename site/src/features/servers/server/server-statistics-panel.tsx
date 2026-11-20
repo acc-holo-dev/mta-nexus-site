@@ -6,7 +6,12 @@ import type { ServerStatisticsResult } from "../../../lib/services/servers/serve
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellStack6 } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
-import { typeFlexWrapGap3, typeSemiboldPrimary, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeFlexWrapGap3,
+  typeSemiboldPrimary,
+  typeSmSecondary,
+  typeWFullLeftSm,
+} from "../../shell/type-shell";
 import { serverHistoryBarPercent } from "../server-history-presentation";
 import { serverObservationBrowserCopy } from "../server-observation-browser-copy";
 import { serverStatisticsHref } from "../server-statistics-contract";
@@ -104,7 +109,7 @@ export function ServerStatisticsPanel({
           />
         ) : null}
         <StatisticsScrollArea labelledBy="server-statistics-comparison">
-          <table className="w-full text-left text-sm">
+          <table className={typeWFullLeftSm}>
             <caption className="sr-only">{copy.comparison}</caption>
             <thead>
               <tr className="text-muted">
@@ -213,7 +218,7 @@ export function ServerStatisticsPanel({
           />
         ) : (
           <StatisticsScrollArea labelledBy="server-statistics-observations">
-            <table className="w-full text-left text-sm">
+            <table className={typeWFullLeftSm}>
               <caption className="sr-only">{copy.observations}</caption>
               <thead>
                 <tr className="text-muted">

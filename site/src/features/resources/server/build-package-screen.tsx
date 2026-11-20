@@ -13,7 +13,7 @@ import { linkAccent } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceSpace2P4TextSm } from "../../shell/surface-shell";
-import { typeDisplayPrimary } from "../../shell/type-shell";
+import { typeDisplayPrimary, typeFlexGap4Sm } from "../../shell/type-shell";
 import { buildPackageCopy } from "../build-package-i18n";
 import { buildPackageQueryHref, parseBuildPackageQuery } from "../build-package-query";
 
@@ -243,7 +243,7 @@ export async function BuildPackageScreen({
         />
       )}
       {detail.totalPages > 1 && (
-        <nav className="flex gap-4 text-sm" aria-label={copy.inventory}>
+        <nav className={typeFlexGap4Sm} aria-label={copy.inventory}>
           {detail.page > 1 && (
             <Link
               className={linkAccent}

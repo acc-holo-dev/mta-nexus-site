@@ -17,7 +17,12 @@ import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeDisplayPrimary, typeMt2SmMuted, typeXsSecondary } from "../../shell/type-shell";
+import {
+  typeDisplayPrimary,
+  typeFlexWrapBetweenGap2,
+  typeMt2SmMuted,
+  typeXsSecondary,
+} from "../../shell/type-shell";
 import { organizationContentId } from "../organization-content-api";
 import { organizationContentCopy } from "../organization-content-copy";
 import { organizationPublicationHistoryCopy } from "../organization-publication-history-copy";
@@ -112,7 +117,7 @@ export async function OrganizationPublications({
             <div className="space-y-3">
               {result.items.map((item) => (
                 <article key={item.id} className={panelSpace3P4}>
-                  <div className="flex flex-wrap justify-between gap-2">
+                  <div className={typeFlexWrapBetweenGap2}>
                     <h2 className="break-words font-heading text-primary">
                       <Link
                         href={`${path}/${encodeURIComponent(item.id)}`}

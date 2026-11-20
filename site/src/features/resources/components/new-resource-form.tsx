@@ -6,7 +6,11 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax2xlStandard } from "../../shell/page-shell";
 import { panelGridClipShadow } from "../../shell/panel-shell";
-import { typeDisplayPrimary, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeDisplayPrimary,
+  typeMaxXlSmLeadingMuted,
+  typeSmSecondary,
+} from "../../shell/type-shell";
 import { confirmedAuthorBuild } from "../author-resource-response";
 import { MAX_BUILD_FILE_SIZE_BYTES, validateBuildFileSelection } from "../build-file-validation";
 import { buildPackageCopy } from "../build-package-i18n";
@@ -387,7 +391,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
     <div className={pageShellMax2xlStandard}>
       <div className="space-y-1.5">
         <h1 className={typeDisplayPrimary}>{copy.resourceTitle}</h1>
-        <p className="max-w-xl text-sm leading-relaxed text-muted">{copy.resourceDescription}</p>
+        <p className={typeMaxXlSmLeadingMuted}>{copy.resourceDescription}</p>
       </div>
 
       {intent ? (

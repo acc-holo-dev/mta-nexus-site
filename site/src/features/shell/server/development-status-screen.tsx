@@ -10,6 +10,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { pageShellMax5xlLoose as pageShellClass } from "../page-shell";
 import { panelClipSpace2P5 } from "../panel-shell";
+import { typeIconAccent } from "../type-shell";
 
 export async function DevelopmentStatusScreen() {
   if (process.env.NODE_ENV === "production") {
@@ -101,7 +102,7 @@ export async function DevelopmentStatusScreen() {
           id="dev-app-url-heading"
           className="flex items-center gap-2 text-sm font-semibold text-primary"
         >
-          <Globe2 className="h-4 w-4 text-accent" aria-hidden="true" />
+          <Globe2 className={typeIconAccent} aria-hidden="true" />
           {copy.appUrl}
         </h2>
         <a

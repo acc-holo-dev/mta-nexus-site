@@ -2,7 +2,7 @@ import { EmptyState, ErrorState } from "@nexus/ui";
 import { GitBranch } from "lucide-react";
 import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
-import { typeFlexWrapGap2 } from "../../shell/type-shell";
+import { typeFlexWrapGap2, typeTenFaint } from "../../shell/type-shell";
 import type { ReverseDependencySummary } from "../reverse-dependency-summary";
 
 export function ReverseDependencyList({
@@ -49,7 +49,7 @@ export function ReverseDependencyList({
           description={copy.limitReachedHint}
         />
       ) : null}
-      <p className="text-[10px] text-faint">{copy.reverseNotice}</p>
+      <p className={typeTenFaint}>{copy.reverseNotice}</p>
     </div>
   );
 }

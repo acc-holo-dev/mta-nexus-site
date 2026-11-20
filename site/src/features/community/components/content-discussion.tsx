@@ -21,6 +21,7 @@ import {
   typeFlexMinWrapEndGap3,
   typeFlexWrapGap3,
   typeFlexWrapGap4,
+  typeMinBreakWords,
   typeSmSecondary,
 } from "../../shell/type-shell";
 import {
@@ -507,7 +508,7 @@ export function ContentDiscussion({
         ) : null}
         {reply && (
           <div className="flex min-w-0 flex-wrap items-center gap-3 rounded-lg bg-accent-soft p-3 text-sm text-secondary">
-            <span className="min-w-0 break-words">
+            <span className={typeMinBreakWords}>
               {copy.replying} {reply.name}
             </span>
             <Button

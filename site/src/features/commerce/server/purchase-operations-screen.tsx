@@ -17,6 +17,8 @@ import { surfaceBgP4TextSmSecondary } from "../../shell/surface-shell";
 import {
   typeBreakSecondary,
   typeDisplayPrimary,
+  typeFlexGap4Sm,
+  typeGridGap3Sm2,
   typeXlSemiboldPrimary,
 } from "../../shell/type-shell";
 import {
@@ -149,7 +151,7 @@ export async function PurchaseOperationsScreen({
                 <p className="font-numeric text-secondary">
                   {copy.amount}: {formatHistoryAmount(attempt.amount, attempt.currency, locale)}
                 </p>
-                <dl className="grid gap-3 text-sm sm:grid-cols-2">
+                <dl className={typeGridGap3Sm2}>
                   {(["createdAt", "updatedAt"] as const).map((key) => (
                     <div key={key}>
                       <dt className="text-muted">{copy[key]}</dt>
@@ -169,7 +171,7 @@ export async function PurchaseOperationsScreen({
         )}
       </section>
       {result.totalPages > 1 ? (
-        <nav aria-label={copy.page} className="flex gap-4 text-sm">
+        <nav aria-label={copy.page} className={typeFlexGap4Sm}>
           {result.page > 1 ? (
             <Link href={`?page=${result.page - 1}`} className={linkAccentSmRounded}>
               {copy.previous}

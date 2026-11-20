@@ -9,7 +9,7 @@ import { getDictionary, type Locale } from "../../../lib/i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { linkAccentSm, linkAccentTightSm, linkAccentTightSmPlain } from "../../shell/link-shell";
-import { typeSmSemiboldPrimary } from "../../shell/type-shell";
+import { typeFlexWrapCenterBetweenGap3, typeSmSemiboldPrimary } from "../../shell/type-shell";
 import { communityReportCreateSchema, REPORT_TYPES } from "../community-report-contract";
 import { communityReportCopy, communityReportMutationError } from "../community-report-copy";
 import { platformFieldClass } from "../user-platform-client";
@@ -224,7 +224,7 @@ export function CommunityReportForm({
       className="w-full space-y-3 rounded-lg border border-base bg-inset p-4"
       aria-label={copy.reportTitle}
     >
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className={typeFlexWrapCenterBetweenGap3}>
         <h3 className={typeSmSemiboldPrimary}>{copy.reportTitle}</h3>
         <Button
           type="button"

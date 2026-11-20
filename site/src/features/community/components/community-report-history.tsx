@@ -16,6 +16,8 @@ import { pageShellMax4xlCompactTight } from "../../shell/page-shell";
 import { panelFlexMinWrapEndP4, panelMinSpace2P4 } from "../../shell/panel-shell";
 import {
   typeDisplayPrimary,
+  typeFlexWrapBetweenGap2,
+  typeMinW40Flex1Space1SmSecondary,
   typePrewrapSmSecondary,
   typeSmSecondary,
   typeSmSemiboldPrimary,
@@ -61,7 +63,7 @@ export function CommunityReportHistory({
         </p>
       </header>
       <form method="get" action={path} className={panelFlexMinWrapEndP4}>
-        <label className="min-w-40 flex-1 space-y-1 text-sm text-secondary">
+        <label className={typeMinW40Flex1Space1SmSecondary}>
           <span>{copy.period}</span>
           <select name="period" defaultValue={filters.period} className={platformFieldClass}>
             {CHANGE_HISTORY_PERIODS.map((period) => (
@@ -71,7 +73,7 @@ export function CommunityReportHistory({
             ))}
           </select>
         </label>
-        <label className="min-w-40 flex-1 space-y-1 text-sm text-secondary">
+        <label className={typeMinW40Flex1Space1SmSecondary}>
           <span>{copy.group}</span>
           <select name="group" defaultValue={filters.group} className={platformFieldClass}>
             {REPORT_HISTORY_GROUPS.map((group) => (
@@ -121,7 +123,7 @@ export function CommunityReportHistory({
         <ol className="min-w-0 space-y-3" aria-label={copy.title}>
           {page.items.map((event) => (
             <li key={event.id} className={panelMinSpace2P4}>
-              <div className="flex flex-wrap justify-between gap-2">
+              <div className={typeFlexWrapBetweenGap2}>
                 <h2 className={typeSmSemiboldPrimary}>{copy.actions[event.action]}</h2>
                 <time dateTime={event.createdAt} className="text-xs text-muted">
                   {new Date(event.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {

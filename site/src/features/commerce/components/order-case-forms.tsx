@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { linkAccentRounded, linkGhostAccentSmRounded } from "../../shell/link-shell";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
-import { typeFlexWrapGap3, typeSmSuccess } from "../../shell/type-shell";
+import { typeFlexWrapGap3, typeLgSemibold, typeSmSuccess } from "../../shell/type-shell";
 import {
   clearSupportRetry,
   reserveSupportCaseRetry,
@@ -360,7 +360,7 @@ export function OrderCaseReviewForm({
   if (ready.current !== identity) return null;
   return (
     <section className={panelClipSpace4P5} aria-busy={busy}>
-      <h2 className="text-lg font-semibold">{copy.review}</h2>
+      <h2 className={typeLgSemibold}>{copy.review}</h2>
       <label className="block space-y-2">
         <span>{copy.notes}</span>
         <textarea

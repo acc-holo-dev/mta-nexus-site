@@ -2,7 +2,12 @@ import type { ManagedServerItem } from "@nexus/db";
 import { StatusBadge } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
-import { typeFlexWrapCenterGap2, typeFlexWrapGap3, typeXsSecondary } from "../../shell/type-shell";
+import {
+  typeFlexWrapCenterGap2,
+  typeFlexWrapGap3,
+  typeXsFaint,
+  typeXsSecondary,
+} from "../../shell/type-shell";
 import { getManagedServerCopy } from "../managed-server-view";
 import { type MtaMasterServer, mtaLiveStatus } from "../model";
 import { getServerActivityCopy } from "../server-activity-view";
@@ -53,7 +58,7 @@ export function ManagedServerCard({
           {copy[server.status as "active" | "inactive" | "maintenance" | "suspended"] ??
             copy.unknown}
         </p>
-        <p className="text-xs text-faint">
+        <p className={typeXsFaint}>
           {copy.updated}: <time dateTime={server.updatedAt.toISOString()}>{updated} UTC</time>
         </p>
       </div>

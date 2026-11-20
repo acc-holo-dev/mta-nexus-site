@@ -11,7 +11,7 @@ import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return
 import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { linkAccentSm } from "../../shell/link-shell";
-import { typeFlexWrapGap2, typeSmSecondary } from "../../shell/type-shell";
+import { typeFlexWrapGap2, typeSmSecondary, typeXsSuccess } from "../../shell/type-shell";
 import {
   confirmedReactionMutation,
   type ReactionState,
@@ -226,7 +226,7 @@ export function ContentReactions({
         />
       ) : null}
       {message && !blocked ? (
-        <p role="status" className="text-xs text-success">
+        <p role="status" className={typeXsSuccess}>
           {message}
         </p>
       ) : null}

@@ -19,7 +19,9 @@ import { surfaceP4TextSmSecondary } from "../../shell/surface-shell";
 import {
   typeBreakDisplayPrimary,
   typeDisplayPrimary,
+  typeFlexGap4Sm,
   typeFlexWrapEndGap3,
+  typeLgSemibold,
   typePrewrapSmSecondary,
   typeSmSecondary,
 } from "../../shell/type-shell";
@@ -88,7 +90,7 @@ function Evidence({
   const copy = orderCaseCopy(locale);
   return (
     <section className={panelSpace3P5}>
-      <h2 className="text-lg font-semibold">{title}</h2>
+      <h2 className={typeLgSemibold}>{title}</h2>
       <p>
         {financialOrderLabel(locale, data.orderStatus)} ·{" "}
         {formatHistoryAmount(data.totalAmount, data.currency, locale)}
@@ -148,7 +150,7 @@ function Pagination({
       return `?${params}`;
     };
   return (
-    <nav aria-label={copy.page} className="flex gap-4 text-sm">
+    <nav aria-label={copy.page} className={typeFlexGap4Sm}>
       {page > 1 && (
         <Link href={href(page - 1)} className={linkAccentSmRounded}>
           {copy.previous}
@@ -510,7 +512,7 @@ export async function OrderCaseDetailPage({
           <p className={typeSmSecondary}>{copy.independent}</p>
         ))}
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">{copy.history}</h2>
+        <h2 className={typeLgSemibold}>{copy.history}</h2>
         <ol className="space-y-3">
           {result.history.map((event) => (
             <li key={event.id} className={panelSpace2P4}>

@@ -6,7 +6,7 @@ import { formatUnknown } from "../../../lib/i18n/unknown";
 import type { ServerHistoryResult } from "../../../lib/services/servers/server-history-service";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellStack3 } from "../../shell/page-shell";
-import { typeFlexCenterGap2, typeLabelUpperFaint } from "../../shell/type-shell";
+import { typeFlexCenterGap2, typeIconAccent, typeLabelUpperFaint } from "../../shell/type-shell";
 import {
   formatHistoryIntervalUtc,
   serverHistoryBarPercent,
@@ -73,7 +73,7 @@ export function ServerHistoryPanel({
       <div className="flex min-w-0 flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0 space-y-1">
           <div className={typeFlexCenterGap2}>
-            <BarChart3 className="h-4 w-4 text-accent" aria-hidden="true" />
+            <BarChart3 className={typeIconAccent} aria-hidden="true" />
             <h2
               id="server-history-title"
               className="text-sm font-bold uppercase tracking-wider text-primary"

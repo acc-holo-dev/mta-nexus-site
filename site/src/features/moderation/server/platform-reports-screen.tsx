@@ -15,6 +15,7 @@ import {
   typeFlexWrapCenterGap2,
   typeSmSecondary,
   typeSmSemiboldPrimary,
+  typeXsFaint,
 } from "../../shell/type-shell";
 import { platformReportCopy } from "../platform-report-i18n";
 
@@ -111,11 +112,11 @@ export async function PlatformReportsScreen({
             <p className={typeSmSecondary}>{report.targetPreview.detail}</p>
           ) : null}
           <p className={typeSmSecondary}>{report.reason}</p>
-          <p className="text-xs text-faint">
+          <p className={typeXsFaint}>
             {copy.submitted}: {new Date(report.createdAt).toLocaleString(dateLocale)}
           </p>
           {report.resolvedAt ? (
-            <p className="text-xs text-faint">
+            <p className={typeXsFaint}>
               {copy.decided}: {new Date(report.resolvedAt).toLocaleString(dateLocale)}
             </p>
           ) : null}
@@ -188,9 +189,7 @@ export async function PlatformReportsScreen({
                 </span>
               </div>
               <p className="line-clamp-2 text-sm text-secondary">{report.reason}</p>
-              <p className="text-xs text-faint">
-                {new Date(report.createdAt).toLocaleString(dateLocale)}
-              </p>
+              <p className={typeXsFaint}>{new Date(report.createdAt).toLocaleString(dateLocale)}</p>
             </Link>
           ))}
         </div>

@@ -8,7 +8,12 @@ import { licenseModelLabel } from "../../commerce/license-model-i18n";
 import { CopyablePlainCodeBlock } from "../../shell/copyable-plain-code-block";
 import { linkAccentTightSemiboldHover } from "../../shell/link-shell";
 import { panelSpace4P6 } from "../../shell/panel-shell";
-import { typeSmSecondary, typeSmSemiboldPrimary } from "../../shell/type-shell";
+import {
+  typeIconAccent,
+  typeMt1XsMuted,
+  typeSmSecondary,
+  typeSmSemiboldPrimary,
+} from "../../shell/type-shell";
 import { ResourceVersionHelpSupportLink } from "./resource-version-help-support-link";
 
 function renderSectionBody({
@@ -71,10 +76,10 @@ export function ResourceVersionHelpSection({
           id="resource-version-help-heading"
           className="flex items-center gap-2 text-base font-bold text-primary"
         >
-          <BookOpen className="h-4 w-4 text-accent" aria-hidden="true" />
+          <BookOpen className={typeIconAccent} aria-hidden="true" />
           <span>{copy.title.replace("{version}", projection.version)}</span>
         </h2>
-        <p className="mt-1 text-xs text-muted">{copy.versionScope}</p>
+        <p className={typeMt1XsMuted}>{copy.versionScope}</p>
       </div>
 
       {projection.missingAuthorContent ? (

@@ -14,6 +14,7 @@ import { panelMinSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   type2xlExtraboldPrimary,
+  typeFlexWrapBetweenGap3,
   typeSmSecondary,
   typeSmSemiboldPrimary,
 } from "../../shell/type-shell";
@@ -159,7 +160,7 @@ export async function PublicationHistoryPage({
           <ol className="min-w-0 space-y-3">
             {report.events.map((event) => (
               <li key={event.id} className={panelMinSpace2P4}>
-                <div className="flex flex-wrap justify-between gap-3">
+                <div className={typeFlexWrapBetweenGap3}>
                   <span className={typeSmSemiboldPrimary}>{action(event.kind)}</span>
                   <time dateTime={event.createdAt} className="text-xs text-muted">
                     {new Date(event.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {

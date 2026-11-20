@@ -4,6 +4,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useRef, useState } from "react";
 import { useNexusLocale } from "../../shell/locale";
+import { typeLabelSecondary } from "../../shell/type-shell";
 import { createCommentIntentKey, submitContentCommentRequest } from "../content-comment-client";
 import { getDiscussionCopy } from "../content-discussion-copy";
 import { getUserPlatformCopy } from "../user-platform-copy";
@@ -62,7 +63,7 @@ export function ContentCommentForm({ slug, actorId }: { slug: string; actorId: s
   return (
     <form onSubmit={submit} className="space-y-3" aria-busy={submitting}>
       <label className="block space-y-1.5">
-        <span className="font-label text-secondary">{copy.joinDiscussion}</span>
+        <span className={typeLabelSecondary}>{copy.joinDiscussion}</span>
         <textarea
           value={text}
           onChange={(event) => setText(event.target.value)}

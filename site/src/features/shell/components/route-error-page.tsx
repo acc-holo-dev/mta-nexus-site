@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useNexusLocale } from "../locale";
 import { readSafePublicErrorReference } from "../safe-public-error-reference";
-import { typeDisplayPrimary } from "../type-shell";
+import { typeCaptionMuted, typeDisplayPrimary } from "../type-shell";
 
 export function RouteErrorPage({
   error,
@@ -56,7 +56,7 @@ export function RouteErrorPage({
           >
             {reference}
           </code>
-          <p className="font-caption text-muted">{dictionary.errors.referenceHint}</p>
+          <p className={typeCaptionMuted}>{dictionary.errors.referenceHint}</p>
           <Button
             type="button"
             size="touch"
@@ -67,7 +67,7 @@ export function RouteErrorPage({
             {dictionary.errors.copyReference}
           </Button>
           {copyMessage ? (
-            <p role="status" className="font-caption text-muted">
+            <p role="status" className={typeCaptionMuted}>
               {copyMessage}
             </p>
           ) : null}

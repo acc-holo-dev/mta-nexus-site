@@ -5,7 +5,12 @@ import { KeyRound } from "lucide-react";
 import type { FormEvent } from "react";
 import type { getDictionary } from "../../../lib/i18n";
 import { panelSpace4P5Shadow } from "../../shell/panel-shell";
-import { typeFlexCenterGap2, typeSmSemiboldPrimary } from "../../shell/type-shell";
+import {
+  typeBlockSmPrimary,
+  typeFlexCenterGap2,
+  typeIconAccent,
+  typeSmSemiboldPrimary,
+} from "../../shell/type-shell";
 
 type SettingsCopy = ReturnType<typeof getDictionary>["settings"];
 
@@ -32,7 +37,7 @@ export function SettingsPasswordForm({
   return (
     <section aria-labelledby="password-heading" className={panelSpace4P5Shadow}>
       <div className={typeFlexCenterGap2}>
-        <KeyRound className="h-4 w-4 text-accent" aria-hidden="true" />
+        <KeyRound className={typeIconAccent} aria-hidden="true" />
         <h2 id="password-heading" className={typeSmSemiboldPrimary}>
           {copy.changePassword}
         </h2>
@@ -49,7 +54,7 @@ export function SettingsPasswordForm({
         className="grid gap-3 sm:grid-cols-2"
       >
         <div className="min-w-0 space-y-1">
-          <label htmlFor="current-password" className="block text-sm text-primary">
+          <label htmlFor="current-password" className={typeBlockSmPrimary}>
             {copy.currentPassword}
           </label>
           <input
@@ -76,7 +81,7 @@ export function SettingsPasswordForm({
         </div>
 
         <div className="min-w-0 space-y-1">
-          <label htmlFor="new-password" className="block text-sm text-primary">
+          <label htmlFor="new-password" className={typeBlockSmPrimary}>
             {copy.newPassword}
           </label>
           <input

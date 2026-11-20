@@ -16,12 +16,15 @@ import { linkFocusRing, linkGhostAccentSm, linkMuted } from "../../shell/link-sh
 import { pageShellStack6 as pageShellClass } from "../../shell/page-shell";
 import { panelMinSpace3P5, panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
 import {
+  typeBreakAllXsMuted,
   typeBreakSmSecondary,
   typeFlexMinWrapEndGap3,
+  typeFlexWrapBetweenGap3,
   typeFlexWrapGap3,
   typeFlexWrapGap4,
   typeFlexWrapGap4Sm,
   typeHeadingPrimary,
+  typeMinW40Flex1Space1SmSecondary,
   typePrewrapSmSecondary,
   typeSmSecondary,
   typeSmSemiboldPrimary,
@@ -486,7 +489,7 @@ export function VerificationWorkspace({
           <input type="hidden" name="view" value={filters.view} />
           <input type="hidden" name="page" value={filters.page} />
           {filters.type ? <input type="hidden" name="type" value={filters.type} /> : null}
-          <label className="min-w-40 flex-1 space-y-1 text-sm text-secondary">
+          <label className={typeMinW40Flex1Space1SmSecondary}>
             <span>{copy.query}</span>
             <input
               className={`${platformFieldClass} min-h-11`}
@@ -683,7 +686,7 @@ export function VerificationWorkspace({
         <form method="GET" action="/workspace/verification" className={typeFlexMinWrapEndGap3}>
           <input type="hidden" name="view" value={filters.view} />
           <input type="hidden" name="teamsQ" value={teamFilters.query} />
-          <label className="min-w-40 flex-1 space-y-1 text-sm text-secondary">
+          <label className={typeMinW40Flex1Space1SmSecondary}>
             <span>{copy.type}</span>
             <select
               className={`${platformFieldClass} min-h-11`}
@@ -739,13 +742,13 @@ export function VerificationWorkspace({
             id={`verification-${application.id}`}
             className="nexus-panel min-w-0 scroll-mt-20 space-y-3 p-5"
           >
-            <div className="flex flex-wrap justify-between gap-3">
+            <div className={typeFlexWrapBetweenGap3}>
               <h3 className="min-w-0 break-words text-sm font-semibold text-primary">
                 {copy[application.targetType]}
               </h3>
               <span className={typeXsSecondary}>{copy[application.status]}</span>
             </div>
-            <p className="break-all text-xs text-muted">{application.targetId}</p>
+            <p className={typeBreakAllXsMuted}>{application.targetId}</p>
             <Link
               prefetch={false}
               href={`/workspace/verification/${encodeURIComponent(application.id)}`}

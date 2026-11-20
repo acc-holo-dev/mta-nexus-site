@@ -101,7 +101,7 @@ it("locks collection requirements back/check touch targets and withheld ErrorSta
   expect(source).toContain("unavailableItemCount");
   expect(source).toContain("c.unavailable");
   expect(source).toContain("description={c.withheld}");
-  expect(source).toContain('className="items-stretch py-4"');
+  expect(source).toMatch(/className=\{?(?:"items-stretch py-4"|typeItemsStretchPy4)\}?/);
   expect(source).toMatch(
     /unavailableItemCount > 0 && \(\s*<ErrorState[\s\S]*?title=\{`\$\{c\.unavailable\}: \$\{result\.unavailableItemCount\}`\}/u,
   );

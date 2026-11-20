@@ -13,6 +13,7 @@ import {
   requestShellSessionRefresh,
   SHELL_SESSION_REFRESH_EVENT,
 } from "../../shell/session";
+import { typeItemsStretchPy4 } from "../../shell/type-shell";
 
 type Account = { id: string; username: string };
 
@@ -197,7 +198,7 @@ export function AccountControls() {
 
       {error ? (
         <div className="absolute right-0 top-full z-50 mt-2 w-72 max-w-[85vw] shadow-nexus">
-          <ErrorState title={error} description={copy.errorHint} className="items-stretch py-4" />
+          <ErrorState title={error} description={copy.errorHint} className={typeItemsStretchPy4} />
         </div>
       ) : null}
     </div>

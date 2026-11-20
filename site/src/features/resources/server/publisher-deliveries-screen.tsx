@@ -14,7 +14,13 @@ import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeDisplayPrimary, typeFlexWrapEndGap3, typeSmSecondary } from "../../shell/type-shell";
+import {
+  typeDisplayPrimary,
+  typeFlexGap4Sm,
+  typeFlexWrapEndGap3,
+  typeSmSecondary,
+  typeWFullLeftSm,
+} from "../../shell/type-shell";
 import { resourceDeliveriesCopy } from "../resource-deliveries-i18n";
 import { deliverySearchParams, publisherDeliveriesQuery } from "../resource-deliveries-query";
 
@@ -145,7 +151,7 @@ export async function PublisherDeliveriesScreen({
       </dl>
       {result.items.length ? (
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className={typeWFullLeftSm}>
             <caption className="py-3 text-left font-semibold">{copy.versions}</caption>
             <thead>
               <tr>
@@ -202,7 +208,7 @@ export async function PublisherDeliveriesScreen({
         />
       )}
       {result.totalPages > 1 ? (
-        <nav aria-label={copy.page} className="flex gap-4 text-sm">
+        <nav aria-label={copy.page} className={typeFlexGap4Sm}>
           {result.page > 1 ? (
             <Link href={href(result.page - 1)} className={linkAccentSm}>
               {copy.previous}

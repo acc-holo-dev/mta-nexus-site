@@ -4,6 +4,7 @@ import { Button, ErrorState } from "@nexus/ui";
 import { Copy } from "lucide-react";
 import { useId, useRef, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
+import { typeElevenFaint } from "../../shell/type-shell";
 
 /**
  * Honest MTA connect intent: protocol link may open the client, but never proves
@@ -102,7 +103,7 @@ export function ServerConnectControls({
         </label>
       ) : null}
       {connectHint ? (
-        <p id={connectHintId} className="text-[11px] text-faint">
+        <p id={connectHintId} className={typeElevenFaint}>
           {connectHint}
         </p>
       ) : null}

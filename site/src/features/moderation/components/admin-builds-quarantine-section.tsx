@@ -7,6 +7,7 @@ import { linkAccent } from "../../shell/link-shell";
 import { panelFlexBetweenP4 } from "../../shell/panel-shell";
 import {
   typeCaptionFaint,
+  typeCaptionMuted,
   typeFlexCenterGap2,
   typeFlexWrapCenterGap2,
 } from "../../shell/type-shell";
@@ -98,7 +99,7 @@ export function AdminBuildsQuarantineSection({
                       {build.fileName} · v{build.version}
                     </span>
                   </div>
-                  <p className="font-caption text-muted">
+                  <p className={typeCaptionMuted}>
                     {copy.resource} {build.productId} •{" "}
                     {(build.fileSizeBytes / 1024 / 1024).toFixed(1)} MB
                   </p>
@@ -116,7 +117,7 @@ export function AdminBuildsQuarantineSection({
                       </>
                     )}
                   </p>
-                  <p className="font-caption text-muted">
+                  <p className={typeCaptionMuted}>
                     {copy.resourcePublisher}:{" "}
                     <Link
                       className={linkAccent}
@@ -215,7 +216,7 @@ export function AdminBuildsQuarantineSection({
                       </>
                     )}
                   </p>
-                  <p className="font-caption text-muted">
+                  <p className={typeCaptionMuted}>
                     {copy.resourcePublisher}:{" "}
                     <Link
                       className={linkAccent}

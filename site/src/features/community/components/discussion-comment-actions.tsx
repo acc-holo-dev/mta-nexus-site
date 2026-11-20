@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentSm } from "../../shell/link-shell";
-import { typeFlexWrapGap3, typeSmSecondary } from "../../shell/type-shell";
+import { typeFlexWrapGap3, typeSmSecondary, typeXsSuccess } from "../../shell/type-shell";
 import type { DiscussionPage } from "../content-discussion-contract";
 import { discussionMutationError, getDiscussionCopy } from "../content-discussion-copy";
 import { confirmsDiscussionMutation } from "../discussion-mutation-confirmation";
@@ -285,7 +285,7 @@ export function DiscussionCommentActions({
             {copy.copyDraft}
           </Button>
           {draftNotice && (
-            <p role="status" className="text-xs text-success">
+            <p role="status" className={typeXsSuccess}>
               {draftNotice}
             </p>
           )}

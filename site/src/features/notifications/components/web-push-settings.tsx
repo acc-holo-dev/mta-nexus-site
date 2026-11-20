@@ -5,6 +5,7 @@ import { BellRing } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
+import { typeIconAccent, typeMt1XsMuted } from "../../shell/type-shell";
 import { notificationInboxCopy } from "../notification-inbox-copy";
 
 type PushStatus =
@@ -426,7 +427,7 @@ export function WebPushSettings({ expectedIdentity }: { expectedIdentity: PushId
         className="mt-4 flex flex-col gap-3 rounded-lg border border-base bg-inset p-4"
       >
         <h3 id={titleId} className="flex items-center gap-2 text-sm font-semibold text-primary">
-          <BellRing className="h-4 w-4 text-accent" aria-hidden="true" />
+          <BellRing className={typeIconAccent} aria-hidden="true" />
           <span>{copy.webPush}</span>
         </h3>
         <ErrorState
@@ -454,17 +455,17 @@ export function WebPushSettings({ expectedIdentity }: { expectedIdentity: PushId
     >
       <div className="min-w-0">
         <h3 id={titleId} className="flex items-center gap-2 text-sm font-semibold text-primary">
-          <BellRing className="h-4 w-4 text-accent" aria-hidden="true" />
+          <BellRing className={typeIconAccent} aria-hidden="true" />
           <span>{copy.webPush}</span>
         </h3>
-        <p id={descriptionId} className="mt-1 text-xs text-muted">
+        <p id={descriptionId} className={typeMt1XsMuted}>
           {description}
         </p>
-        <p id={openBetaNoteId} className="mt-1 text-xs text-muted">
+        <p id={openBetaNoteId} className={typeMt1XsMuted}>
           {openBetaNote}
         </p>
         {shownStatus === "disabled" && unregisteredLocal && (
-          <p className="mt-1 text-xs text-muted">{copy.webPushCleanupHint}</p>
+          <p className={typeMt1XsMuted}>{copy.webPushCleanupHint}</p>
         )}
         <span role="status" aria-live="polite" aria-atomic="true" className="sr-only">
           {description}

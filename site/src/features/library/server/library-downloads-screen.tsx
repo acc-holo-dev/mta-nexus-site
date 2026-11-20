@@ -23,6 +23,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeBreakSemiboldPrimary,
   typeDisplayPrimary,
+  typeFlexWrapBetweenGap2,
   typeFlexWrapEndGap3,
   typeFlexWrapGap3,
   typeFlexWrapGap4,
@@ -180,7 +181,7 @@ export async function LibraryDownloadsScreen({
         <ol className="space-y-4">
           {result.items.map((receipt) => (
             <li key={receipt.id} className={panelSpace4P5}>
-              <div className="flex flex-wrap justify-between gap-2">
+              <div className={typeFlexWrapBetweenGap2}>
                 <h2 className={typeBreakSemiboldPrimary}>
                   {receipt.title ?? copy.privateResource}
                 </h2>

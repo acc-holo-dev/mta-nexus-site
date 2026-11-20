@@ -8,7 +8,7 @@ import { getDictionary, type Locale } from "../../../lib/i18n";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { linkGhostAccentSmBare } from "../../shell/link-shell";
 import { surfaceMinSpace2BgP3 } from "../../shell/surface-shell";
-import { typeBlockMinSpace1XsMuted, typeFlexWrapGap2 } from "../../shell/type-shell";
+import { typeBlockMinSpace1XsMuted, typeFlexWrapGap2, typeXsSuccess } from "../../shell/type-shell";
 import { resourceQaCopy, resourceQaError } from "../resource-qa-i18n";
 
 const REPORT_TYPES = createReportSchema.shape.type.options;
@@ -123,7 +123,7 @@ export function ResourceQaReportForm({
   }
 
   if (resultId) {
-    return <p className="text-xs text-success">{copy.reportSubmitted}</p>;
+    return <p className={typeXsSuccess}>{copy.reportSubmitted}</p>;
   }
 
   if (!open) {

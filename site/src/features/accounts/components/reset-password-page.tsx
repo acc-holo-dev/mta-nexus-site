@@ -8,7 +8,12 @@ import { linkAccentSmSemibold } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMaxMd as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace5P6Shadow } from "../../shell/panel-shell";
-import { typeDisplayPrimary, typeSmSuccess } from "../../shell/type-shell";
+import {
+  typeDisplayPrimary,
+  typeFlexCenterGap3,
+  typeSmLeadingMuted,
+  typeSmSuccess,
+} from "../../shell/type-shell";
 import {
   type AccountRecoveryProof,
   readAccountRecoveryProofFromWindow,
@@ -100,7 +105,7 @@ export function ResetPasswordPage() {
   return (
     <div className={pageShellClass}>
       <section aria-labelledby="reset-heading" className={panelClipSpace5P6Shadow}>
-        <div className="flex items-center gap-3">
+        <div className={typeFlexCenterGap3}>
           <ShieldCheck className="h-5 w-5 text-accent" aria-hidden="true" />
           <h1 id="reset-heading" className={typeDisplayPrimary}>
             {copy.resetTitle}
@@ -132,7 +137,7 @@ export function ResetPasswordPage() {
             aria-busy={state.kind === "submitting" ? true : undefined}
             className="space-y-4"
           >
-            <p className="text-sm leading-relaxed text-muted">{copy.resetDescription}</p>
+            <p className={typeSmLeadingMuted}>{copy.resetDescription}</p>
 
             {state.kind === "error" && (
               <ErrorState title={state.message} description={copy.resetErrorHint} />

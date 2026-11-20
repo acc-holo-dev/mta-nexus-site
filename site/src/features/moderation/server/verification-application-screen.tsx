@@ -14,6 +14,8 @@ import { panelMinSpace2P5, panelMinSpace4P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   type2xlBoldPrimary,
+  typeBreakAllXsMuted,
+  typeFlexWrapBetweenGap3,
   typeMt2SmMuted,
   typePrewrapSmSecondary,
   typeSemiboldPrimary,
@@ -102,13 +104,13 @@ export async function VerificationApplicationScreen({
       {application ? (
         <>
           <article className={panelMinSpace4P5}>
-            <div className="flex flex-wrap justify-between gap-3">
+            <div className={typeFlexWrapBetweenGap3}>
               <h2 className="min-w-0 break-words font-semibold text-primary">
                 {labels[application.targetType]}
               </h2>
               <span className={typeSmSecondary}>{labels[application.status]}</span>
             </div>
-            <p className="break-all text-xs text-muted">{application.id}</p>
+            <p className={typeBreakAllXsMuted}>{application.id}</p>
             <p className="text-xs text-muted">
               {labels.submittedAt}: {time(application.createdAt)}
             </p>

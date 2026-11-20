@@ -6,7 +6,11 @@ import { useState } from "react";
 import type { Locale } from "../../../lib/i18n";
 import { platformFieldClass } from "../../community/user-platform-client";
 import { linkAccentSmMinWBreak, linkGhostAccentSm } from "../../shell/link-shell";
-import { typeFlexWrapEndGap3, typeSpace1SmSecondary } from "../../shell/type-shell";
+import {
+  typeFlexCenterGap3,
+  typeFlexWrapEndGap3,
+  typeSpace1SmSecondary,
+} from "../../shell/type-shell";
 import { organizationGovernanceCopy } from "../organization-governance-copy";
 import { organizationTeamCopy } from "../organization-team-copy";
 import type { OrganizationWorkspace } from "../organization-workspace-contract";
@@ -43,7 +47,7 @@ export function OrganizationMemberEditor({
       }}
       className="space-y-3 rounded-lg border border-base bg-inset p-4"
     >
-      <div className="flex items-center gap-3">
+      <div className={typeFlexCenterGap3}>
         <Avatar
           src={member.avatarUrl ?? undefined}
           alt={member.displayName}

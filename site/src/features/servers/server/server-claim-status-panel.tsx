@@ -5,7 +5,7 @@ import type { Locale } from "../../../lib/i18n";
 import { linkAccentSmSemibold } from "../../shell/link-shell";
 import { pageShellStack4 } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
-import { typeSmSemiboldPrimary } from "../../shell/type-shell";
+import { typeSmBoldPrimary, typeSmSemiboldPrimary } from "../../shell/type-shell";
 import { ServerClaimControlPanel } from "../components/server-claim-control-panel";
 import { getServerClaimStatusCopy } from "../server-claim-status-view";
 export function ServerClaimStatusPanel({
@@ -29,7 +29,7 @@ export function ServerClaimStatusPanel({
     <div className={pageShellStack4}>
       {(status.isVerified || request) && (
         <section className={panelClipSpace3P5} aria-labelledby="server-claim-status-heading">
-          <h2 id="server-claim-status-heading" className="text-sm font-bold text-primary">
+          <h2 id="server-claim-status-heading" className={typeSmBoldPrimary}>
             {copy.title}
           </h2>
           {status.isVerified && (

@@ -6,7 +6,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { contentService } from "../../../lib/services/community/content-service";
 import { linkAccentSm, linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellStack6 } from "../../shell/page-shell";
-import { typeFlexWrapGap4 } from "../../shell/type-shell";
+import { typeFlexWrapGap4, typeIcon6Accent } from "../../shell/type-shell";
 import { ContentCatalogControls, ContentPageNavigation } from "../catalog-controls";
 import { publicationCopy } from "../publication-feed-copy";
 import { communityTypes, contentPageHref, parseContentPage } from "../user-platform-contract";
@@ -36,7 +36,7 @@ export async function CommunityPage({
       <header className="flex flex-col justify-between gap-4 border-b border-base pb-5 sm:flex-row sm:items-center">
         <div className="min-w-0">
           <h1 className="flex items-center gap-2 font-display text-primary">
-            <MessageSquare className="h-6 w-6 shrink-0 text-accent" aria-hidden="true" />
+            <MessageSquare className={typeIcon6Accent} aria-hidden="true" />
             <span>{copy.title}</span>
           </h1>
           <p className="mt-1 text-sm text-muted">{copy.description}</p>

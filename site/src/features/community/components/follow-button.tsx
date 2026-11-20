@@ -9,6 +9,8 @@ import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return
 import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { LocaleProvider, useNexusLocale } from "../../shell/locale";
+import { skelH4W4Spin } from "../../shell/skeleton-shell";
+import { typeItemsStretchPy4 } from "../../shell/type-shell";
 import { confirmsFollowMutation } from "../follow-confirmation";
 import type { FollowTargetType } from "../follow-workspace-contract";
 import { followActionCopy, followCopy, followError } from "../follow-workspace-copy";
@@ -240,7 +242,7 @@ function FollowControl({
         <ErrorState
           title={message || shared.error}
           description={shared.errorHint}
-          className="items-stretch py-4"
+          className={typeItemsStretchPy4}
           action={
             <Button
               type="button"
@@ -266,7 +268,7 @@ function FollowControl({
           aria-label={`${state === "following" ? copy.unfollow : copy.follow}: ${targetName}`}
         >
           {pending || state === "checking" ? (
-            <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
+            <LoaderCircle className={skelH4W4Spin} aria-hidden="true" />
           ) : state === "following" ? (
             <BookmarkCheck className="h-4 w-4" aria-hidden="true" />
           ) : (

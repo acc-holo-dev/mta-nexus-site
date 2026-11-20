@@ -25,7 +25,7 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { PlatformSignIn, platformSignInFocusClass } from "../guest-auth";
 import { pageShellStack8 as pageShellClass } from "../page-shell";
 import { PlatformSessionError } from "../session-error";
-import { typeDisplayPrimary, typeFlexWrapGap2 } from "../type-shell";
+import { typeDisplayPrimary, typeFlexWrapGap2, typeXsFaint } from "../type-shell";
 export async function workspaceHubMetadata(): Promise<Metadata> {
   return {
     title: `${getDictionary(await getRequestLocale()).workspace.title} | MTA NEXUS`,
@@ -218,7 +218,7 @@ export async function WorkspaceHubPage() {
                         ? entitlement.title
                         : libraryCopy.unavailableResource}
                     </div>
-                    <div className="text-xs text-faint">
+                    <div className={typeXsFaint}>
                       {dictionary.workspace.added}{" "}
                       <time dateTime={new Date(entitlement.addedAt).toISOString()}>
                         {formatHistoryDate(new Date(entitlement.addedAt), locale)}

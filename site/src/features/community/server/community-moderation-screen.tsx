@@ -41,6 +41,7 @@ import {
   typePrewrapSmSecondary,
   typeSmPrimary,
   typeSpace1XsMuted,
+  typeXlBoldPrimary,
 } from "../../shell/type-shell";
 import { moderationCopy, moderationError } from "../community-moderation-copy";
 import { ContentModerationControls } from "../content-moderation";
@@ -84,7 +85,7 @@ export async function CommunityModerationScreen({
   if (!can(actor, "admin.moderation")) {
     return (
       <div className={pageShellMaxMdDense}>
-        <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
+        <h1 className={typeXlBoldPrimary}>{copy.title}</h1>
         <ErrorState
           title={copy.denied}
           description={copy.deniedHint}

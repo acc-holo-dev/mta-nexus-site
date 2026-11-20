@@ -28,3 +28,5 @@ export const surfaceMinSpace2BgP3 =
   "min-w-0 space-y-2 rounded-lg border border-base bg-surface p-3";
 
 export const surfaceInsetP3 = "rounded-lg border border-base bg-inset p-3";
+
+export const surfaceSpace3BorderBPb6 = "space-y-3 border-b border-base pb-6";

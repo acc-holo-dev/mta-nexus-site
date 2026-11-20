@@ -14,7 +14,12 @@ import { linkAccentTightSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace4P5Shadow } from "../../shell/panel-shell";
 import { surfaceSpace2P4 } from "../../shell/surface-shell";
-import { typePrewrapBreak, typeSmSemiboldPrimary, typeSmSuccess } from "../../shell/type-shell";
+import {
+  typeFlexCenterGap3,
+  typePrewrapBreak,
+  typeSmSemiboldPrimary,
+  typeSmSuccess,
+} from "../../shell/type-shell";
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
@@ -186,7 +191,7 @@ export function PublicProfileForm() {
       ) : null}
       {profile && (
         <form key={profile.id} onSubmit={save} aria-busy={busy || loading} className="space-y-4">
-          <div className="flex items-center gap-3">
+          <div className={typeFlexCenterGap3}>
             <Avatar
               src={profile.avatarUrl || undefined}
               alt={profile.displayName}

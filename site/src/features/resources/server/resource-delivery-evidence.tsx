@@ -2,6 +2,7 @@ import type { ResourceDeliveryReceipt } from "@nexus/domain";
 import type { Locale } from "../../../lib/i18n";
 import { unknownMarker } from "../../../lib/i18n/unknown";
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
+import { typeBreakPrimary, typeGridGap3Sm2 } from "../../shell/type-shell";
 import { resourceDeliveriesCopy } from "../resource-deliveries-i18n";
 /** Server-only evidence projection; never serialize account/storage context. */
 export function ResourceDeliveryEvidence({
@@ -13,10 +14,10 @@ export function ResourceDeliveryEvidence({
 }) {
   const copy = resourceDeliveriesCopy(locale);
   return (
-    <dl className="grid gap-3 text-sm sm:grid-cols-2">
+    <dl className={typeGridGap3Sm2}>
       <div>
         <dt className="text-muted">{copy.version}</dt>
-        <dd className="break-words text-primary">{receipt.version}</dd>
+        <dd className={typeBreakPrimary}>{receipt.version}</dd>
       </div>
       <div>
         <dt className="text-muted">{copy.receipt}</dt>

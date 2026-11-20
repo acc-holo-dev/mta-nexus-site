@@ -7,7 +7,11 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax2xlPadded } from "../../shell/page-shell";
 import { panelGridClipShadow } from "../../shell/panel-shell";
-import { typeDisplayPrimary } from "../../shell/type-shell";
+import {
+  typeDisplayPrimary,
+  typeItemsStretchPy4,
+  typeMaxXlSmLeadingMuted,
+} from "../../shell/type-shell";
 import { confirmedCreatedServer } from "../server-mutation-confirmation";
 import { serverMutationErrorMessage } from "../server-mutation-errors";
 import {
@@ -248,7 +252,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
     <div className={pageShellMax2xlPadded}>
       <div className="space-y-1.5">
         <h1 className={typeDisplayPrimary}>{copy.title}</h1>
-        <p className="max-w-xl text-sm leading-relaxed text-muted">{copy.description}</p>
+        <p className={typeMaxXlSmLeadingMuted}>{copy.description}</p>
       </div>
 
       {error ? <ErrorState title={error} description={copy.errorMayBeUnconfirmed} /> : null}
@@ -308,7 +312,7 @@ export function RegisterServerForm({ actorId }: { actorId: string }) {
             <ErrorState
               title={copy.organizationsUnavailable}
               description={copy.organizationsUnavailableHint}
-              className="items-stretch py-4"
+              className={typeItemsStretchPy4}
               action={
                 <Button
                   type="button"

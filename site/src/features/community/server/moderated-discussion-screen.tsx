@@ -26,6 +26,7 @@ import {
   typePrewrapBreak,
   typeSemiboldPrimary,
   typeSpace1SmPrimary,
+  typeXlBoldPrimary,
 } from "../../shell/type-shell";
 import { moderationCopy } from "../community-moderation-copy";
 import { ModeratedDiscussionRemoval } from "../components/moderated-discussion-removal";
@@ -51,7 +52,7 @@ function ModeratedDiscussionLoadError({
     dictionary = getDictionary(locale);
   return (
     <section className={`${panelSpace3P5} ${pageShellClass}`}>
-      <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
+      <h1 className={typeXlBoldPrimary}>{copy.title}</h1>
       <ErrorState
         title={copy.loadUnavailable}
         description={copy.loadUnavailableHint}

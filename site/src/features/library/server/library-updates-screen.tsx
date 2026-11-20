@@ -18,6 +18,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeBreakSemiboldPrimary,
   typeDisplayPrimary,
+  typeFlexGap4Sm,
   typeFlexWrapGap3,
   typeFlexWrapGap4,
   typeGrid2Gap4,
@@ -211,7 +212,7 @@ export async function LibraryUpdatesScreen({
         />
       )}
       {result.totalPages > 1 ? (
-        <nav aria-label={copy.page} className="flex gap-4 text-sm">
+        <nav aria-label={copy.page} className={typeFlexGap4Sm}>
           {result.page > 1 ? (
             <Link href={href(result.page - 1)} className={linkAccentSm}>
               {copy.previous}

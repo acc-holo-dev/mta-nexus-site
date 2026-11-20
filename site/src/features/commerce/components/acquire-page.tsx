@@ -22,9 +22,13 @@ import {
 import { skelH12W48, skelH28 } from "../../shell/skeleton-shell";
 import {
   typeDisplayPrimary,
+  typeIcon6Accent,
   typeLabelUpperMuted,
+  typeMinBreakWords,
   typeMt2SmMuted,
   typeNumericPrimary,
+  typeSmBoldPrimary,
+  typeSmLeadingMuted,
 } from "../../shell/type-shell";
 import { licenseModelLabel } from "../license-model-i18n";
 
@@ -312,8 +316,8 @@ function AcquireContent() {
     <div className={shellClass}>
       <header className="min-w-0 border-b border-base pb-5">
         <h1 className="flex min-w-0 items-center gap-2.5 font-display text-primary">
-          <Library className="h-6 w-6 shrink-0 text-accent" aria-hidden="true" />
-          <span className="min-w-0 break-words">{copy.title}</span>
+          <Library className={typeIcon6Accent} aria-hidden="true" />
+          <span className={typeMinBreakWords}>{copy.title}</span>
         </h1>
         <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted">{copy.description}</p>
       </header>
@@ -379,10 +383,10 @@ function AcquireContent() {
         aria-describedby={accessDescriptionId}
         className="nexus-panel min-w-0 space-y-2 overflow-x-clip p-6"
       >
-        <h2 id={accessHeadingId} className="text-sm font-bold text-primary">
+        <h2 id={accessHeadingId} className={typeSmBoldPrimary}>
           {product.price === 0 ? copy.freeResource : copy.paidCheckout}
         </h2>
-        <p id={accessDescriptionId} className="text-sm leading-relaxed text-muted">
+        <p id={accessDescriptionId} className={typeSmLeadingMuted}>
           {product.price === 0 ? copy.noPaymentRequired : copy.paidDisabled}
         </p>
       </section>

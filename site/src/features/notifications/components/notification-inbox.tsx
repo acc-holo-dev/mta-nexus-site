@@ -16,7 +16,11 @@ import {
 } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { panelSpace2P4 } from "../../shell/panel-shell";
-import { typeFlexWrapGap4, typePrewrapSmSecondary } from "../../shell/type-shell";
+import {
+  typeFlexStartGap3,
+  typeFlexWrapGap4,
+  typePrewrapSmSecondary,
+} from "../../shell/type-shell";
 import {
   confirmedNotificationInboxCommand,
   NOTIFICATION_INBOX_SELECTION_LIMIT,
@@ -425,7 +429,7 @@ export function NotificationInbox({
             <article
               className={`rounded-xl border p-4 ${item.isRead ? "border-base bg-surface" : "border-[color:var(--nexus-accent)]/25 bg-accent-soft"}`}
             >
-              <div className="flex items-start gap-3">
+              <div className={typeFlexStartGap3}>
                 <label className="inline-flex min-h-11 min-w-6 items-center">
                   <span className="sr-only">
                     {copy.select}: {item.title}

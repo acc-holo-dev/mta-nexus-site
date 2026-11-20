@@ -13,7 +13,7 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 import { linkAccentSmRounded, linkAccentTight } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
-import { typeBreakAllXs, typeSmSecondary } from "../../shell/type-shell";
+import { typeBreakAllXs, typeFlexStartGap3, typeSmSecondary } from "../../shell/type-shell";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../library-collections-query";
 import { confirmedMembershipBatch } from "../library-membership-batch-confirmation";
@@ -193,7 +193,7 @@ export function LibraryMembershipBatchForm({
                 (!report.resource.canAdd || collection.itemCount >= report.itemLimit);
               return (
                 <li key={collection.id} className="space-y-1 border-t border-base pt-3">
-                  <label className="flex items-start gap-3">
+                  <label className={typeFlexStartGap3}>
                     <input
                       type="checkbox"
                       checked={value}

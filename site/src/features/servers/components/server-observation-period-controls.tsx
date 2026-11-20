@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import { linkAccentSm, linkFocusRing } from "../../shell/link-shell";
 import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
-import { typeFlexWrapGap2, typeFlexWrapGap4 } from "../../shell/type-shell";
+import { typeFlexWrapGap2, typeFlexWrapGap4, typeMinH11Semibold } from "../../shell/type-shell";
 import { type ServerHistoryWindow, serverHistoryWindows } from "../server-history-window";
 import { serverStatisticsHref } from "../server-statistics-contract";
 import { serverStatisticsCopy } from "../server-statistics-copy";
@@ -82,7 +82,7 @@ export function ServerObservationPeriodControls({
             className={`${platformFieldClass} min-h-11`}
           />
         </label>
-        <Button type="submit" className="min-h-11 font-semibold">
+        <Button type="submit" className={typeMinH11Semibold}>
           {copy.choosePeriod}
         </Button>
         <p className="w-full text-xs text-muted">{copy.periodScope}</p>

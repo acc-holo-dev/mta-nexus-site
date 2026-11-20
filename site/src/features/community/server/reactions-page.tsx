@@ -12,7 +12,12 @@ import { linkAccentSm, linkSecondaryBorder } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace3P5, panelFlexMinWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { type2xlExtraboldPrimary, typeMt2SmMuted, typeSpace1XsMuted } from "../../shell/type-shell";
+import {
+  type2xlExtraboldPrimary,
+  typeMinH11Semibold,
+  typeMt2SmMuted,
+  typeSpace1XsMuted,
+} from "../../shell/type-shell";
 import { parseReactionPage, reactionPageHref } from "../content-reaction-contract";
 import { reactionCopy, reactionError } from "../content-reaction-copy";
 import { ReactionRemoval } from "../reaction-removal";
@@ -105,7 +110,7 @@ export async function ReactionsPageScreen({
               ))}
             </select>
           </label>
-          <Button type="submit" className="min-h-11 font-semibold">
+          <Button type="submit" className={typeMinH11Semibold}>
             {copy.search}
           </Button>
           <Link href="/workspace/reactions" className={linkAccentSm}>

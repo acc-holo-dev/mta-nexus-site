@@ -8,7 +8,13 @@ import { confirmsAdminAction } from "../../moderation/admin-action-confirmation"
 import { confirmAction } from "../../shell/confirm-action";
 import { linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
-import { typeFlexWrapGap2, typeLabelUpperMuted } from "../../shell/type-shell";
+import { skelH35W35Spin } from "../../shell/skeleton-shell";
+import {
+  typeFlexWrapGap2,
+  typeLabelUpperMuted,
+  typeTenFaint,
+  typeWFullMaxSmSpace2Md80,
+} from "../../shell/type-shell";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
 import { buildModerationUiState } from "../build-moderation-ui";
 import { getResourceBuildWorkspaceCopy } from "../resource-build-workspace-i18n";
@@ -117,7 +123,7 @@ export function BuildModerationControls({
   }
 
   return (
-    <div className="w-full max-w-sm space-y-2 md:w-80" aria-busy={pending !== null}>
+    <div className={typeWFullMaxSmSpace2Md80} aria-busy={pending !== null}>
       <label className="block space-y-1">
         <span className={typeLabelUpperMuted}>{copy.reviewNote}</span>
         <textarea
@@ -158,7 +164,7 @@ export function BuildModerationControls({
           variant="outline"
         >
           {pending === "approve" ? (
-            <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+            <LoaderCircle className={skelH35W35Spin} aria-hidden="true" />
           ) : (
             <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
           )}
@@ -173,7 +179,7 @@ export function BuildModerationControls({
           variant="outline"
         >
           {pending === "reject" ? (
-            <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+            <LoaderCircle className={skelH35W35Spin} aria-hidden="true" />
           ) : (
             <XCircle className="h-3.5 w-3.5" aria-hidden="true" />
           )}
@@ -200,7 +206,7 @@ export function BuildModerationControls({
         />
       ) : null}
       {!hasNotes && (
-        <p className="text-[10px] text-faint" aria-live="polite">
+        <p className={typeTenFaint} aria-live="polite">
           {copy.reviewNoteHint}
         </p>
       )}

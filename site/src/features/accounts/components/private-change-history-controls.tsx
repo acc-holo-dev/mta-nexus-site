@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
 import { linkAccentSm } from "../../shell/link-shell";
 import { panelFlexWrapEndGap4P4 } from "../../shell/panel-shell";
+import { typeMinFlex1Space15SmSecondary } from "../../shell/type-shell";
 import { privateChangeHistoryCopy } from "../private-change-history-copy";
 
 const selectClass =
@@ -29,7 +30,7 @@ export function PrivateChangeHistoryFilters<
   return (
     <search aria-label={search ? copy.search : copy.apply}>
       <form method="get" action={path} className={panelFlexWrapEndGap4P4}>
-        <label className="min-w-0 flex-1 space-y-1.5 text-sm text-secondary">
+        <label className={typeMinFlex1Space15SmSecondary}>
           <span className={labelClass}>{copy.period}</span>
           <select name="period" className={selectClass} defaultValue={filters.period}>
             {CHANGE_HISTORY_PERIODS.map((period) => (
@@ -39,7 +40,7 @@ export function PrivateChangeHistoryFilters<
             ))}
           </select>
         </label>
-        <label className="min-w-0 flex-1 space-y-1.5 text-sm text-secondary">
+        <label className={typeMinFlex1Space15SmSecondary}>
           <span className={labelClass}>{copy.group}</span>
           <select name="group" className={selectClass} defaultValue={filters.group}>
             {groups.map((group) => (

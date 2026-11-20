@@ -7,6 +7,7 @@ import { linkGhostAccent } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellStack3 } from "../../shell/page-shell";
 import { panelClipSpace3P4 } from "../../shell/panel-shell";
+import { typeFlexMinWrapGap4 } from "../../shell/type-shell";
 import { supportActivitySchema } from "../support-workspace-contract";
 import { supportWorkspaceCopy, supportWorkspaceError } from "../support-workspace-copy";
 
@@ -119,7 +120,7 @@ export function SupportStatusHistory({
               ))}
             </ol>
           )}
-          <nav className="flex min-w-0 flex-wrap gap-4" aria-label={copy.history}>
+          <nav className={typeFlexMinWrapGap4} aria-label={copy.history}>
             {before && (
               <Button
                 type="button"

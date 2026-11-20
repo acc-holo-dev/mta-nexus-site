@@ -16,6 +16,7 @@ import { linkAccent } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeItemsStretchPy4 } from "../../shell/type-shell";
 import { collectionRequirementsCopy } from "../collection-requirements-i18n";
 import { collectionId, collectionPageParams } from "../library-collections-query";
 export async function collectionRequirementsMetadata(): Promise<Metadata> {
@@ -155,7 +156,7 @@ export async function CollectionRequirementsScreen({
         <ErrorState
           title={`${c.unavailable}: ${result.unavailableItemCount}`}
           description={c.withheld}
-          className="items-stretch py-4"
+          className={typeItemsStretchPy4}
         />
       )}
       <ResourceRequirementsReportBody

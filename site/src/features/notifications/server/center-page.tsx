@@ -12,7 +12,12 @@ import { linkAccentSm, linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xlTight } from "../../shell/page-shell";
 import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { type2xlExtraboldPrimary, typeSpace1XsMuted } from "../../shell/type-shell";
+import { surfaceSpace3BorderBPb6 } from "../../shell/surface-shell";
+import {
+  type2xlExtraboldPrimary,
+  typeMinH11Semibold,
+  typeSpace1XsMuted,
+} from "../../shell/type-shell";
 import { NotificationCenterTabs } from "../components/notification-center-tabs";
 import { NotificationInbox } from "../components/notification-inbox";
 import {
@@ -82,7 +87,7 @@ export async function NotificationCenterPage({
   })();
   return (
     <div className={pageShellMax4xlTight}>
-      <header className="space-y-3 border-b border-base pb-6">
+      <header className={surfaceSpace3BorderBPb6}>
         <Link href="/workspace" className={linkAccentSm}>
           {copy.workspace}
         </Link>
@@ -146,7 +151,7 @@ export async function NotificationCenterPage({
                 ))}
               </select>
             </label>
-            <Button type="submit" className="min-h-11 font-semibold">
+            <Button type="submit" className={typeMinH11Semibold}>
               {copy.search}
             </Button>
             {filtersActive ? (

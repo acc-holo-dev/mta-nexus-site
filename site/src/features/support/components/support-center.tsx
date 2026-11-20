@@ -13,8 +13,13 @@ import { panelSpace4P5 } from "../../shell/panel-shell";
 import { surfaceInsetP3TextSmSecondary } from "../../shell/surface-shell";
 import {
   typeFlexCenterGap2,
+  typeFlexWrapStartBetweenGap3,
   typeHeadingPrimary,
+  typeIcon6Accent,
+  typeIconAccent,
+  typeLabelSecondary,
   typeLabelUpperMuted,
+  typeMt1XsMuted,
   typeSmSecondary,
 } from "../../shell/type-shell";
 import {
@@ -312,7 +317,7 @@ export function SupportCenter({
     <div className={pageShellMax5xlLooseTight}>
       <header className="space-y-2 border-b border-base pb-6">
         <h1 className="flex min-w-0 items-center gap-2.5 font-display text-primary">
-          <LifeBuoy className="h-6 w-6 shrink-0 text-accent" aria-hidden="true" />
+          <LifeBuoy className={typeIcon6Accent} aria-hidden="true" />
           <span>{staffMode ? copy.staffQueue : copy.title}</span>
         </h1>
         <p className="max-w-3xl text-sm text-muted">
@@ -334,12 +339,12 @@ export function SupportCenter({
           className={panelSpace4P5}
         >
           <div className={typeFlexCenterGap2}>
-            <Plus className="h-4 w-4 text-accent" aria-hidden="true" />
+            <Plus className={typeIconAccent} aria-hidden="true" />
             <h2 className={typeHeadingPrimary}>{copy.newCase}</h2>
           </div>
 
           <label className="block space-y-1.5">
-            <span className="font-label text-secondary">{copy.category}</span>
+            <span className={typeLabelSecondary}>{copy.category}</span>
             <select
               value={category}
               disabled={creating}
@@ -402,7 +407,7 @@ export function SupportCenter({
           />
 
           <label className="block space-y-1.5">
-            <span className="font-label text-secondary">{copy.message}</span>
+            <span className={typeLabelSecondary}>{copy.message}</span>
             <textarea
               value={message}
               disabled={creating}
@@ -461,7 +466,7 @@ export function SupportCenter({
         <form action={basePath} method="get">
           <fieldset className="nexus-panel grid min-w-0 gap-4 p-4 sm:grid-cols-2">
             <label className="block min-w-0 space-y-1.5 sm:col-span-2">
-              <span className="font-label text-secondary">{workspaceCopy.search}</span>
+              <span className={typeLabelSecondary}>{workspaceCopy.search}</span>
               <input
                 type="search"
                 name="q"
@@ -471,7 +476,7 @@ export function SupportCenter({
               />
             </label>
             <label className="block space-y-1.5">
-              <span className="font-label text-secondary">{copy.filterStatus}</span>
+              <span className={typeLabelSecondary}>{copy.filterStatus}</span>
               <select
                 name="status"
                 value={staffStatus}
@@ -487,7 +492,7 @@ export function SupportCenter({
               </select>
             </label>
             <label className="block space-y-1.5">
-              <span className="font-label text-secondary">{copy.category}</span>
+              <span className={typeLabelSecondary}>{copy.category}</span>
               <select
                 name="category"
                 value={staffCategory}
@@ -569,13 +574,13 @@ export function SupportCenter({
               href={`${basePath}/${encodeURIComponent(supportCase.id)}`}
               className="nexus-panel block min-w-0 space-y-2 p-4 transition-colors hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
-              <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className={typeFlexWrapStartBetweenGap3}>
                 <div className="min-w-0">
                   <h3 className="break-words text-sm font-bold text-primary">
                     {supportCase.subject}
                   </h3>
                   {staffMode && supportCase.requesterUsername && (
-                    <p className="mt-1 text-xs text-muted">
+                    <p className={typeMt1XsMuted}>
                       {copy.requester}: @{supportCase.requesterUsername}
                     </p>
                   )}

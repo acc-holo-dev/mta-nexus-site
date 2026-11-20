@@ -15,10 +15,14 @@ import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeDisplayPrimary,
+  typeFlexGap4Sm,
   typeFlexWrapGap4,
   typeFlexWrapGap4Sm,
+  typeLgSemibold,
   typeNumericPrimary,
   typeSemiboldPrimary,
+  typeWFullLeftSm,
+  typeXlPrimary,
 } from "../../shell/type-shell";
 import { formatHistoryDate, parseHistoryPage } from "../commerce-history-format";
 import { financialReferenceLabel, formatFinancialMinor, getFinancialCopy } from "../financial-i18n";
@@ -122,7 +126,7 @@ export async function WorkspaceFinanceScreen({
         {copy.back}
       </Link>
       <h1 className={typeDisplayPrimary}>{copy.title}</h1>
-      <h2 className="text-xl text-primary">{result.scope.name ?? copy.personal}</h2>
+      <h2 className={typeXlPrimary}>{result.scope.name ?? copy.personal}</h2>
       <p role="note" className="rounded-md border border-base p-4 text-sm text-secondary">
         {copy.note}
       </p>
@@ -179,7 +183,7 @@ export async function WorkspaceFinanceScreen({
       )}
       {result.entries.length ? (
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className={typeWFullLeftSm}>
             <caption className="sr-only">{copy.title}</caption>
             <thead>
               <tr>
@@ -217,7 +221,7 @@ export async function WorkspaceFinanceScreen({
         </div>
       ) : null}
       {result.totalPages > 1 ? (
-        <nav aria-label={copy.page} className="flex gap-4 text-sm">
+        <nav aria-label={copy.page} className={typeFlexGap4Sm}>
           {result.page > 1 ? (
             <Link href={href(result.page - 1)} className={linkAccentSmRounded}>
               {copy.previous}
@@ -234,7 +238,7 @@ export async function WorkspaceFinanceScreen({
         </nav>
       ) : null}
       <section className="space-y-3 border-t border-base pt-5">
-        <h2 className="text-lg font-semibold">{copy.organizations}</h2>
+        <h2 className={typeLgSemibold}>{copy.organizations}</h2>
         <Link href="/workspace/finance" className={linkAccentSmRounded}>
           {copy.personal}
         </Link>
@@ -248,7 +252,7 @@ export async function WorkspaceFinanceScreen({
           ))}
         </ul>
         {scopes.totalPages > 1 ? (
-          <nav aria-label={copy.organizations} className="flex gap-4 text-sm">
+          <nav aria-label={copy.organizations} className={typeFlexGap4Sm}>
             {scopes.page > 1 ? (
               <Link
                 href={href(result.page, currency, organizationId, scopes.page - 1)}

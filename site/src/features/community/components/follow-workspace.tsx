@@ -13,7 +13,12 @@ import {
   linkMinHAccentFocus,
 } from "../../shell/link-shell";
 import { pageShellStack5 } from "../../shell/page-shell";
-import { typeFlexWrapEndGap3, typeSmSuccess } from "../../shell/type-shell";
+import {
+  typeFlexWrapCenterBetweenGap3,
+  typeFlexWrapEndGap3,
+  typeSmSuccess,
+  typeXsFaint,
+} from "../../shell/type-shell";
 import { confirmsFollowMutation } from "../follow-confirmation";
 import {
   FOLLOW_TYPES,
@@ -325,7 +330,7 @@ export function FollowWorkspace({
                 }}
               />
             ) : null}
-            <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className={typeFlexWrapCenterBetweenGap3}>
               {item.href && item.targetType === "product" && (
                 <span className="space-y-1">
                   <Link
@@ -353,7 +358,7 @@ export function FollowWorkspace({
                   {publicationCopy(locale).targetFeed}
                 </Link>
               )}
-              <time dateTime={item.createdAt} className="text-xs text-faint">
+              <time dateTime={item.createdAt} className={typeXsFaint}>
                 {copy.savedAt}:{" "}
                 {new Date(item.createdAt).toLocaleDateString(locale === "ru" ? "ru-RU" : "en-US", {
                   timeZone: "UTC",

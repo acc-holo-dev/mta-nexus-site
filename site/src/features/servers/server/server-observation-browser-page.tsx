@@ -19,7 +19,14 @@ import { pageShellMax6xl as pageShellClass, pageShellMax6xlDense } from "../../s
 import { panelFlexWrapEndP4, panelSpace3P5 } from "../../shell/panel-shell";
 import { LocaleCopyRouteLoading } from "../../shell/route-honest-loading-server";
 import { PlatformSessionError } from "../../shell/session-error";
-import { type2xlBoldPrimary, typeFlexWrapGap4, typeSpace1XsMuted } from "../../shell/type-shell";
+import {
+  type2xlBoldPrimary,
+  typeFlexWrapGap4,
+  typeMinH11Semibold,
+  typeSpace1XsMuted,
+  typeWFullLeftSm,
+  typeXlBoldPrimary,
+} from "../../shell/type-shell";
 import {
   parseServerObservationBrowserQuery,
   type ServerObservationBrowserQuery,
@@ -61,7 +68,7 @@ export async function ServerObservationBrowserPage({
         : "/servers";
   const failure = (text: string, href = path) => (
     <div className={pageShellClass}>
-      <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
+      <h1 className={typeXlBoldPrimary}>{copy.title}</h1>
       <ErrorState
         title={text}
         description={
@@ -249,7 +256,7 @@ function ServerObservationBrowserPanel({
               </select>
             </label>
           ))}
-          <Button type="submit" className="min-h-11 font-semibold">
+          <Button type="submit" className={typeMinH11Semibold}>
             {copy.apply}
           </Button>
           {observationFiltersActive ? (
@@ -300,7 +307,7 @@ function ServerObservationBrowserPanel({
           <h2 id="observation-browser-table" className="sr-only">
             {stats.observations}
           </h2>
-          <table className="w-full text-left text-sm">
+          <table className={typeWFullLeftSm}>
             <caption className="sr-only">{copy.scope}</caption>
             <thead>
               <tr>

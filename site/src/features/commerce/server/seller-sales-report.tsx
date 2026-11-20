@@ -14,9 +14,13 @@ import { surfaceP4TextSmSecondary } from "../../shell/surface-shell";
 import {
   typeBreakSemiboldPrimary,
   typeDisplayPrimary,
+  typeFlexGap4Sm,
   typeFlexWrapGap4Sm,
+  typeLgSemibold,
   typeNumericPrimary,
   typeSmSecondary,
+  typeWFullLeftSm,
+  typeXlPrimary,
 } from "../../shell/type-shell";
 import { formatFinancialMinor } from "../financial-i18n";
 import { sellerSalesCopy, sellerSalesTime } from "../seller-sales-i18n";
@@ -60,7 +64,7 @@ export function SellerSalesReportView({
       </Link>
       <header className="space-y-2">
         <h1 className={typeDisplayPrimary}>{c.title}</h1>
-        <h2 className="text-xl text-primary">{report.scope.name ?? c.personal}</h2>
+        <h2 className={typeXlPrimary}>{report.scope.name ?? c.personal}</h2>
         <p className="text-sm text-muted">
           {c.observed}:{" "}
           <time dateTime={report.observedAt.toISOString()}>
@@ -187,7 +191,7 @@ export function SellerSalesReportView({
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {report.totals.map((total) => (
             <li key={total.currency} className={panelSpace3P4}>
-              <h2 className="text-lg font-semibold">{total.currency}</h2>
+              <h2 className={typeLgSemibold}>{total.currency}</h2>
               <dl className="space-y-2 text-sm">
                 <div>
                   <dt>{c.gross}</dt>
@@ -260,7 +264,7 @@ export function SellerSalesReportView({
         />
       )}
       {report.totalPages > 1 ? (
-        <nav aria-label={c.page} className="flex gap-4 text-sm">
+        <nav aria-label={c.page} className={typeFlexGap4Sm}>
           {report.page > 1 ? (
             <Link
               href={sellerSalesUrl(query, report.page - 1, scopes.page)}
@@ -284,10 +288,10 @@ export function SellerSalesReportView({
       ) : null}
       {report.periods.length ? (
         <section className="space-y-3">
-          <h2 className="text-xl text-primary">{c.periods}</h2>
+          <h2 className={typeXlPrimary}>{c.periods}</h2>
           <p className={typeSmSecondary}>{c.periodNotice}</p>
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className={typeWFullLeftSm}>
               <caption className="sr-only">{c.periods}</caption>
               <thead>
                 <tr>
@@ -341,7 +345,7 @@ export function SellerSalesReportView({
           ))}
         </nav>
         {scopes.totalPages > 1 ? (
-          <nav aria-label={c.organizations} className="flex gap-4 text-sm">
+          <nav aria-label={c.organizations} className={typeFlexGap4Sm}>
             {scopes.page > 1 ? (
               <Link
                 href={sellerSalesUrl(query, report.page, scopes.page - 1)}

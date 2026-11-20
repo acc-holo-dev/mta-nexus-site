@@ -1,5 +1,5 @@
 import { panelP5 } from "../panel-shell";
-import { typeCaptionFaint } from "../type-shell";
+import { typeCaptionFaint, typeSmBoldPrimary } from "../type-shell";
 
 type LegalSection = Readonly<{
   title: string;
@@ -47,7 +47,7 @@ export function LegalDocument({
       ))}
 
       <section className={panelP5}>
-        <h2 className="text-sm font-bold text-primary">{contactLabel}</h2>
+        <h2 className={typeSmBoldPrimary}>{contactLabel}</h2>
         <a
           className="mt-1 inline-block font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           href={`mailto:${contactEmail}`}

@@ -9,6 +9,7 @@ import { pageShellStack5 } from "../../shell/page-shell";
 import { panelFlexMinWrapEndP4, panelMinSpace2P4 } from "../../shell/panel-shell";
 import {
   typeFlexMinWrapGap3,
+  typeMinW40Flex1Space1SmSecondary,
   typePrewrapSmSecondary,
   typeXsSecondary,
 } from "../../shell/type-shell";
@@ -116,7 +117,7 @@ export function CommunityReportList({
               {copy.searchHint}
             </span>
           </label>
-          <label className="min-w-40 flex-1 space-y-1 text-sm text-secondary">
+          <label className={typeMinW40Flex1Space1SmSecondary}>
             <span>{copy.target}</span>
             <select
               name="target"
@@ -128,7 +129,7 @@ export function CommunityReportList({
               <option value="comment">{copy.comment}</option>
             </select>
           </label>
-          <label className="min-w-40 flex-1 space-y-1 text-sm text-secondary">
+          <label className={typeMinW40Flex1Space1SmSecondary}>
             <span>{copy.category}</span>
             <select name="type" defaultValue={filters.type ?? ""} className={platformFieldClass}>
               <option value="">{copy.all}</option>

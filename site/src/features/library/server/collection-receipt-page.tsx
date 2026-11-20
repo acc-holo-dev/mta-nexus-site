@@ -14,7 +14,7 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass, pageShellStack3 } from "../../shell/page-shell";
 import { panelClipSpace2P4, panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeBreakAllXs } from "../../shell/type-shell";
+import { typeBreakAllXs, typeFlexMinWrapGap4, typeMinBreakWords } from "../../shell/type-shell";
 import { LibraryCollectionRestoreControls } from "../collection-restore";
 import {
   collectionReceiptHref,
@@ -86,7 +86,7 @@ export async function CollectionReceiptPage({
     const receipt = report.receipt;
     return (
       <div className={pageShellClass}>
-        <nav className="flex min-w-0 flex-wrap gap-4">
+        <nav className={typeFlexMinWrapGap4}>
           <Link href="/workspace/library/collections/history" className={linkAccentSmRounded}>
             {c.history}
           </Link>
@@ -94,7 +94,7 @@ export async function CollectionReceiptPage({
             {c.title}
           </Link>
         </nav>
-        <h1 className="min-w-0 break-words">{r.title}</h1>
+        <h1 className={typeMinBreakWords}>{r.title}</h1>
         <p>{r.note}</p>
         <code className={typeBreakAllXs}>
           {c.receipt}: {report.id}

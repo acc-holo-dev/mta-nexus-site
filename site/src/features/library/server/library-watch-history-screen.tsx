@@ -23,7 +23,7 @@ import {
 } from "../../shell/page-shell";
 import { panelClipSpace3P5, panelFlexClipWrapEndGap4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeFlexMinWrapGap4Sm } from "../../shell/type-shell";
+import { typeFlexMinWrapGap4Sm, typeMinFlex1Space15SmSecondary } from "../../shell/type-shell";
 import { collectionPageParams } from "../library-collections-query";
 
 const selectClass =
@@ -128,7 +128,7 @@ export async function LibraryWatchHistoryScreen({
       <h1 className="min-w-0 break-words font-display">{c.title}</h1>
       <p className="text-secondary">{c.note}</p>
       <form method="get" className={panelFlexClipWrapEndGap4}>
-        <label className="min-w-0 flex-1 space-y-1.5 text-sm text-secondary">
+        <label className={typeMinFlex1Space15SmSecondary}>
           <span className={labelClass}>{c.days}</span>
           <select name="days" className={selectClass} defaultValue={result.days}>
             {LIBRARY_RELEASE_HISTORY_DAYS.map((days) => (
@@ -138,7 +138,7 @@ export async function LibraryWatchHistoryScreen({
             ))}
           </select>
         </label>
-        <label className="min-w-0 flex-1 space-y-1.5 text-sm text-secondary">
+        <label className={typeMinFlex1Space15SmSecondary}>
           <span className={labelClass}>{c.source}</span>
           <select name="source" className={selectClass} defaultValue={result.source}>
             {RESOURCE_RELEASE_WATCH_HISTORY_SOURCES.map((source) => (

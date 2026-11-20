@@ -15,7 +15,7 @@ import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax6xl as pageShellClass } from "../../shell/page-shell";
 import { panelFlexWrapEndGap4P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeDisplayPrimary, typeSmSecondary } from "../../shell/type-shell";
+import { typeDisplayPrimary, typeMinH11Semibold, typeSmSecondary } from "../../shell/type-shell";
 import { ManagedServerCard } from "../managed-card-server";
 import {
   getManagedServerCopy,
@@ -163,7 +163,7 @@ export async function ManagedServersScreen({
               ))}
             </select>
           </label>
-          <Button type="submit" className="min-h-11 font-semibold">
+          <Button type="submit" className={typeMinH11Semibold}>
             {copy.apply}
           </Button>
           {filtered && (

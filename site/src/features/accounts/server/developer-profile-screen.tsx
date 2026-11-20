@@ -17,7 +17,12 @@ import { publicationCopy } from "../../community/publication-feed-copy";
 import { ProductCard } from "../../resources/view";
 import { pageShellStack10 as pageShellClass, pageShellStack6 } from "../../shell/page-shell";
 import { panelHeroBetween } from "../../shell/panel-shell";
-import { typeFlexCenterGap2, typeHeadingPrimary } from "../../shell/type-shell";
+import {
+  typeFlexCenterGap2,
+  typeHeadingPrimary,
+  typeMaxXlSmLeadingMuted,
+  typeTruncateXsFaint,
+} from "../../shell/type-shell";
 import { trustCopy } from "../../trust/public-user-trust-copy";
 import { DeveloperExperience } from "../developer-experience";
 import { ProfileResourcePagination, parseProfilePage } from "../profile-pagination";
@@ -133,10 +138,8 @@ export async function DeveloperProfileScreen({
                 </span>
               )}
             </div>
-            <div className="truncate text-xs text-faint">@{user.username}</div>
-            <p className="max-w-xl text-sm leading-relaxed text-muted">
-              {user.bio || copy.bioFallback}
-            </p>
+            <div className={typeTruncateXsFaint}>@{user.username}</div>
+            <p className={typeMaxXlSmLeadingMuted}>{user.bio || copy.bioFallback}</p>
             <FollowButton
               targetType="user"
               targetId={user.id}

@@ -26,8 +26,10 @@ import { linkAccentTightHover } from "../../shell/link-shell";
 import { pageShellStack8 } from "../../shell/page-shell";
 import { panelSpace3P6, panelSpace4P5, panelSpace4P6 } from "../../shell/panel-shell";
 import {
+  typeElevenFaint,
   typeFlexCenterGap2,
   typeFlexWrapCenterGap2,
+  typeIconAccent,
   typeSmSemiboldPrimary,
 } from "../../shell/type-shell";
 import { contextTrustCopy } from "../../trust/public-context-trust-copy";
@@ -393,7 +395,7 @@ export async function ServerDetailScreen({
               aria-hidden={occupancyPercent == null}
             />
           </div>
-          {!observedServer && <div className="text-[11px] text-faint">{copy.noObservation}</div>}
+          {!observedServer && <div className={typeElevenFaint}>{copy.noObservation}</div>}
           {directoryIsStale ? (
             <ErrorState
               id="server-directory-stale-snapshot"
@@ -410,7 +412,7 @@ export async function ServerDetailScreen({
           <div className="select-all rounded border border-base bg-inset p-2.5 font-mono text-base text-primary">
             {connectAddress}
           </div>
-          <div className="text-[11px] text-faint">{copy.selectHint}</div>
+          <div className={typeElevenFaint}>{copy.selectHint}</div>
         </div>
 
         <div className={panelSpace3P6}>
@@ -418,7 +420,7 @@ export async function ServerDetailScreen({
             {copy.runtime}
           </div>
           <div className={typeFlexCenterGap2}>
-            <Cpu className="h-4 w-4 text-accent" aria-hidden="true" />
+            <Cpu className={typeIconAccent} aria-hidden="true" />
             <span className={typeSmSemiboldPrimary}>{copy.officialDirectory}</span>
           </div>
           <div className="text-[11px] leading-relaxed text-muted">{copy.runtimeDescription}</div>

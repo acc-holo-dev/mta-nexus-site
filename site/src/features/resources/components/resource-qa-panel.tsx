@@ -22,7 +22,9 @@ import { panelClipSpace4P6 } from "../../shell/panel-shell";
 import {
   typeBlockMinSpace1XsMuted,
   typeBreakSmSecondary,
+  typeElevenFaint,
   typeFlexWrapGap2,
+  typeXsFaint,
 } from "../../shell/type-shell";
 import { resourceQaCopy, resourceQaError } from "../resource-qa-i18n";
 import { ResourceQaReportForm } from "./resource-qa-report-form";
@@ -474,7 +476,7 @@ export function ResourceQaPanel({
               ) : null}
             </div>
             <p className={typeBreakSmSecondary}>{detail.thread.body}</p>
-            <p className="text-xs text-faint">
+            <p className={typeXsFaint}>
               {formatUnknown(
                 locale,
                 detail.thread.author?.displayName ?? detail.thread.author?.username,
@@ -508,7 +510,7 @@ export function ResourceQaPanel({
                   </Button>
                 ) : null}
               </div>
-              <p className="text-[11px] text-faint">{copy.followingHelp}</p>
+              <p className={typeElevenFaint}>{copy.followingHelp}</p>
               <ResourceQaReportForm
                 threadId={detail.thread.id}
                 locale={locale}
@@ -686,7 +688,7 @@ export function ResourceQaPanel({
           ) : null}
 
           {loadingDetail ? (
-            <p role="status" className="text-xs text-faint">
+            <p role="status" className={typeXsFaint}>
               {copy.loadingThread}
             </p>
           ) : null}

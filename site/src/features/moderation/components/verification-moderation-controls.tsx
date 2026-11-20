@@ -10,7 +10,13 @@ import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { confirmAction } from "../../shell/confirm-action";
 import { linkGhostAccentSm } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
-import { typeFlexWrapGap2, typeLabelUpperMuted } from "../../shell/type-shell";
+import { skelH35W35Spin } from "../../shell/skeleton-shell";
+import {
+  typeFlexWrapGap2,
+  typeLabelUpperMuted,
+  typeTenFaint,
+  typeWFullMaxSmSpace2Md80,
+} from "../../shell/type-shell";
 import {
   verificationCopy,
   verificationDecisionError,
@@ -114,7 +120,7 @@ export function VerificationModerationControls({
   }
 
   return (
-    <div className="w-full max-w-sm space-y-2 md:w-80" aria-busy={pending !== null}>
+    <div className={typeWFullMaxSmSpace2Md80} aria-busy={pending !== null}>
       <label className="block space-y-1">
         <span className={typeLabelUpperMuted}>{copy.reviewNote}</span>
         <textarea
@@ -138,7 +144,7 @@ export function VerificationModerationControls({
           variant="outline"
         >
           {pending === "approve" ? (
-            <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+            <LoaderCircle className={skelH35W35Spin} aria-hidden="true" />
           ) : (
             <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />
           )}
@@ -153,7 +159,7 @@ export function VerificationModerationControls({
           variant="outline"
         >
           {pending === "reject" ? (
-            <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+            <LoaderCircle className={skelH35W35Spin} aria-hidden="true" />
           ) : (
             <XCircle className="h-3.5 w-3.5" aria-hidden="true" />
           )}
@@ -161,7 +167,7 @@ export function VerificationModerationControls({
         </Button>
       </div>
 
-      {!hasNotes && <p className="text-[10px] text-faint">{copy.reviewNoteHint}</p>}
+      {!hasNotes && <p className={typeTenFaint}>{copy.reviewNoteHint}</p>}
       {error ? (
         <ErrorState
           title={error}

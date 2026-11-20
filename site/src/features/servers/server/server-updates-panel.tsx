@@ -7,6 +7,7 @@ import { ArticleCard } from "../../community/article-view";
 import { publicationCopy } from "../../community/publication-feed-copy";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellStack4 } from "../../shell/page-shell";
+import { typeMt1XsMuted } from "../../shell/type-shell";
 export function ServerUpdatesPanel({
   updates,
   locale = "en",
@@ -31,7 +32,7 @@ export function ServerUpdatesPanel({
             <Newspaper className="h-4 w-4 shrink-0 text-warning" aria-hidden="true" />
             {copy.title}
           </h2>
-          <p className="mt-1 text-xs text-muted">{copy.description}</p>
+          <p className={typeMt1XsMuted}>{copy.description}</p>
         </div>
         <span className="shrink-0 font-label uppercase text-faint">{copy.moderated}</span>
       </div>

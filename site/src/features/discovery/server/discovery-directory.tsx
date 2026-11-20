@@ -26,7 +26,12 @@ import {
   linkMinHContentAccentSmPlain,
   linkMinHContentAccentSmRounded,
 } from "../../shell/link-shell";
-import { typeFlexWrapEndGap3, typeSemiboldPrimary } from "../../shell/type-shell";
+import {
+  typeFlexWrapEndGap3,
+  typeMinH11Semibold,
+  typeSemiboldPrimary,
+  typeTruncateXsFaint,
+} from "../../shell/type-shell";
 import { DISCOVER_CONTENT_TYPES, type DiscoverQuery, discoverHref } from "../discover-query";
 import { discoveryCopy } from "../discovery-copy";
 import { type DiscoveryStreamQuery, discoveryStreamHref } from "../discovery-stream-contract";
@@ -89,7 +94,7 @@ export function DirectoryFilters({
             </select>
           </label>
         )}
-        <Button type="submit" className="min-h-11 font-semibold">
+        <Button type="submit" className={typeMinH11Semibold}>
           {dictionary.searchButton}
         </Button>
         {state.query ? (
@@ -498,7 +503,7 @@ function DirectoryIdentity({
             />
           )}
         </h2>
-        <p className="truncate text-xs text-faint">{subtitle}</p>
+        <p className={typeTruncateXsFaint}>{subtitle}</p>
         <p className="mt-2 line-clamp-3 text-sm text-muted">{description}</p>
       </div>
     </Link>

@@ -15,6 +15,8 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   type2xlExtraboldPrimary,
   typeFlexWrapGap4,
+  typeFlexWrapStartBetweenGap3,
+  typeMinH11Semibold,
   typeMt2SmMuted,
   typePrewrapSmSecondary,
   typeSpace1XsMuted,
@@ -169,7 +171,7 @@ export async function AuthorContentPage({
               className={`${platformFieldClass} block min-h-11`}
             />
           </label>
-          <Button type="submit" className="min-h-11 font-semibold">
+          <Button type="submit" className={typeMinH11Semibold}>
             {copy.search}
           </Button>
           <Link href="/workspace/content" className={linkAccentSm}>
@@ -221,7 +223,7 @@ export async function AuthorContentPage({
           report?.items.map((item) => (
             <li key={item.id}>
               <article className={panelMinSpace3P5}>
-                <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className={typeFlexWrapStartBetweenGap3}>
                   <h2 className="min-w-0 break-words font-semibold text-primary">
                     <Link
                       prefetch={false}

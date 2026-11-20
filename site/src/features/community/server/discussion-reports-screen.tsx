@@ -18,7 +18,13 @@ import {
 } from "../../shell/page-shell";
 import { panelGrid2P5, panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { type2xlBoldPrimary, typeFlexWrapGap4, typeSpace1SmPrimary } from "../../shell/type-shell";
+import {
+  type2xlBoldPrimary,
+  typeBreakPrimary,
+  typeFlexWrapGap4,
+  typeSpace1SmPrimary,
+  typeXlBoldPrimary,
+} from "../../shell/type-shell";
 import { moderationCopy } from "../community-moderation-copy";
 import { REPORT_TYPES } from "../community-report-contract";
 import { communityReportCopy } from "../community-report-copy";
@@ -37,7 +43,7 @@ function DiscussionReportsLoadError({ locale, retryHref }: { locale: Locale; ret
     dictionary = getDictionary(locale);
   return (
     <section className={`${panelSpace3P5} ${pageShellClass}`}>
-      <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
+      <h1 className={typeXlBoldPrimary}>{copy.title}</h1>
       <ErrorState
         title={copy.loadUnavailable}
         description={copy.loadUnavailableHint}
@@ -157,7 +163,7 @@ export async function DiscussionReportsScreen({
       <header className="space-y-3">
         <h1 className={type2xlBoldPrimary}>{copy.title}</h1>
         <p className="text-sm text-muted">{copy.description}</p>
-        <p className="break-words text-primary">
+        <p className={typeBreakPrimary}>
           {data.publication.title} · {general[data.publication.status]}
         </p>
         <Link

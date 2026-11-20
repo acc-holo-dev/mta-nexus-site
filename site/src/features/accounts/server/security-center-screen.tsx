@@ -10,7 +10,13 @@ import { securityCenterService } from "../../../lib/services/accounts/security-c
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax4xlRoomy as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeFlexCenterGap2, typeSmSemiboldPrimary } from "../../shell/type-shell";
+import {
+  typeFlexCenterGap2,
+  typeIcon6Accent,
+  typeIconAccent,
+  typeMt1XsMuted,
+  typeSmSemiboldPrimary,
+} from "../../shell/type-shell";
 import { securityActivityLabelKey } from "../security-activity";
 
 const recoveryPanelClass = "nexus-panel min-w-0 overflow-x-clip p-5 shadow-nexus-sm";
@@ -62,7 +68,7 @@ export async function SecurityCenterScreen() {
       <div className="flex min-w-0 flex-col justify-between gap-4 overflow-x-clip border-b border-base pb-6 sm:flex-row sm:items-start">
         <div className="min-w-0">
           <h1 className="flex min-w-0 items-center gap-2.5 break-words font-display text-primary">
-            <ShieldCheck className="h-6 w-6 shrink-0 text-accent" aria-hidden="true" />
+            <ShieldCheck className={typeIcon6Accent} aria-hidden="true" />
             {copy.title}
           </h1>
           <p className="mt-1 max-w-2xl font-caption text-muted">{copy.description}</p>
@@ -75,7 +81,7 @@ export async function SecurityCenterScreen() {
 
       <section aria-labelledby="security-recovery-heading" className={recoveryPanelClass}>
         <div className={typeFlexCenterGap2}>
-          <MailCheck className="h-4 w-4 text-accent" aria-hidden="true" />
+          <MailCheck className={typeIconAccent} aria-hidden="true" />
           <h2 id="security-recovery-heading" className={typeSmSemiboldPrimary}>
             {copy.recovery}
           </h2>
@@ -83,7 +89,7 @@ export async function SecurityCenterScreen() {
         <p className="mt-3 break-all text-sm text-primary">{recoveryEmail?.email ?? user.email}</p>
         {recoveryEmail ? (
           recoveryEmail.verified ? (
-            <p className="mt-1 text-xs text-muted">{copy.recoveryVerified}</p>
+            <p className={typeMt1XsMuted}>{copy.recoveryVerified}</p>
           ) : (
             <ErrorState
               id="security-recovery-needs-verification"
@@ -102,7 +108,7 @@ export async function SecurityCenterScreen() {
 
       <section aria-labelledby="security-sessions-heading" className={panelShellClass}>
         <div className={typeFlexCenterGap2}>
-          <Monitor className="h-4 w-4 text-accent" aria-hidden="true" />
+          <Monitor className={typeIconAccent} aria-hidden="true" />
           <h2 id="security-sessions-heading" className={typeSmSemiboldPrimary}>
             {copy.sessions}
           </h2>
@@ -139,7 +145,7 @@ export async function SecurityCenterScreen() {
 
       <section aria-labelledby="security-activity-heading" className={panelShellClass}>
         <div className={typeFlexCenterGap2}>
-          <Clock3 className="h-4 w-4 text-accent" aria-hidden="true" />
+          <Clock3 className={typeIconAccent} aria-hidden="true" />
           <h2 id="security-activity-heading" className={typeSmSemiboldPrimary}>
             {copy.activity}
           </h2>

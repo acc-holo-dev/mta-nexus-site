@@ -9,7 +9,12 @@ import { formatUnknown } from "../../../lib/i18n/unknown";
 import { productService } from "../../../lib/services/commerce/product-service";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellStack6 } from "../../shell/page-shell";
-import { typeFlexWrapGap2, typeSemiboldPrimary } from "../../shell/type-shell";
+import {
+  typeFlexWrapGap2,
+  typeIcon6Accent,
+  typeMinBreakWords,
+  typeSemiboldPrimary,
+} from "../../shell/type-shell";
 import { MARKET_PAGE_SIZE, MAX_MARKET_PAGE, marketHref, parseMarketQuery } from "../model";
 import { PRODUCT_CATEGORY_KEYS } from "../product-type-labels";
 import { ProductCard } from "../view";
@@ -88,8 +93,8 @@ export async function MarketPage({
       <div className="flex min-w-0 flex-col justify-between gap-3 pb-1 md:flex-row md:items-center">
         <div className="min-w-0">
           <h1 className="flex min-w-0 items-center gap-2.5 font-display text-primary">
-            <ShoppingBag className="h-6 w-6 shrink-0 text-accent" />
-            <span className="min-w-0 break-words">{dictionary.market.title}</span>
+            <ShoppingBag className={typeIcon6Accent} />
+            <span className={typeMinBreakWords}>{dictionary.market.title}</span>
           </h1>
           <p className="mt-0.5 font-caption text-muted">
             {dictionary.market.showing} {formatUnknown(locale, catalog?.products.length)}

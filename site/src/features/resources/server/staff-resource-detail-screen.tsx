@@ -22,6 +22,7 @@ import { panelMinSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeBreakDisplayPrimary,
+  typeFlexMinWrapGap4,
   typeFlexWrapGap4Sm,
   typeLgSemiboldPrimary,
   typePrewrapSmSecondary,
@@ -118,7 +119,7 @@ export async function StaffResourceDetailScreen({
       <p role="note" className={typeSmSecondary}>
         {copy.moderationNote}
       </p>
-      <div className="flex min-w-0 flex-wrap gap-4">
+      <div className={typeFlexMinWrapGap4}>
         <Link href={`/admin/resources/${encodeURIComponent(id)}/media`} className={linkAccentSm}>
           {resourceMediaCopy(locale).title}
         </Link>

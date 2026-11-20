@@ -35,3 +35,6 @@ export const skelH64 = "h-64 rounded bg-inset";
 export const skelH28Max = "h-28 max-w-full rounded bg-inset";
 
 export const skelH40Max = "h-40 max-w-full rounded bg-inset";
+
+export const skelH35W35Spin = "h-3.5 w-3.5 animate-spin";
+export const skelH4W4Spin = "h-4 w-4 animate-spin";

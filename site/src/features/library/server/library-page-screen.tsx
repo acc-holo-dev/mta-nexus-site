@@ -31,11 +31,12 @@ import {
 import { pageShellMax5xlMid } from "../../shell/page-shell";
 import { panelFlexColGap3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { surfaceBgP4TextSmMuted } from "../../shell/surface-shell";
+import { surfaceBgP4TextSmMuted, surfaceSpace3BorderBPb6 } from "../../shell/surface-shell";
 import {
   typeDisplayPrimary,
   typeFlexWrapGap2,
   typeFlexWrapGap4,
+  typeMax2xlSmSecondary,
   typeXsSecondary,
 } from "../../shell/type-shell";
 import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
@@ -89,7 +90,7 @@ export async function LibraryPageScreen({
 
   return (
     <div className={pageShellMax5xlMid}>
-      <header className="space-y-3 border-b border-base pb-6">
+      <header className={surfaceSpace3BorderBPb6}>
         <Link
           href="/workspace"
           className="text-sm text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
@@ -97,7 +98,7 @@ export async function LibraryPageScreen({
           {copy.back}
         </Link>
         <h1 className={typeDisplayPrimary}>{copy.title}</h1>
-        <p className="max-w-2xl text-sm text-secondary">{copy.subtitle}</p>
+        <p className={typeMax2xlSmSecondary}>{copy.subtitle}</p>
       </header>
 
       <div className="flex min-w-0 flex-wrap gap-2">

@@ -9,7 +9,8 @@ import { confirmsAdminAction } from "../../moderation/admin-action-confirmation"
 import { actionConfirmCheckboxFocusClass } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
-import { typeLabelUpperMuted } from "../../shell/type-shell";
+import { skelH35W35Spin } from "../../shell/skeleton-shell";
+import { typeLabelUpperMuted, typeWFullMaxSmSpace2Md80 } from "../../shell/type-shell";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
 
 export function BuildQuarantineControls({
@@ -83,7 +84,7 @@ export function BuildQuarantineControls({
   const action = status === "quarantined" ? "restore" : "quarantine";
 
   return (
-    <div className="w-full max-w-sm space-y-2 md:w-80" aria-busy={pending !== null}>
+    <div className={typeWFullMaxSmSpace2Md80} aria-busy={pending !== null}>
       <label className="block space-y-1">
         <span className={typeLabelUpperMuted}>
           {status === "quarantined" ? copy.restoreReason : copy.quarantineReason}
@@ -122,7 +123,7 @@ export function BuildQuarantineControls({
         }
       >
         {pending ? (
-          <LoaderCircle className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+          <LoaderCircle className={skelH35W35Spin} aria-hidden="true" />
         ) : action === "quarantine" ? (
           <ShieldOff className="h-3.5 w-3.5" aria-hidden="true" />
         ) : (

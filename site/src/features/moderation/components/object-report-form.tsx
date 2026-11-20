@@ -8,7 +8,7 @@ import { getDictionary, type Locale } from "../../../lib/i18n";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { linkAccent, linkGhostAccentSmBare } from "../../shell/link-shell";
 import { surfaceMinSpace2BgP3 } from "../../shell/surface-shell";
-import { typeBlockMinSpace1XsMuted, typeFlexWrapGap2 } from "../../shell/type-shell";
+import { typeBlockMinSpace1XsMuted, typeFlexWrapGap2, typeXsSuccess } from "../../shell/type-shell";
 import { platformReportCopy, platformReportError } from "../platform-report-i18n";
 
 const REPORT_TYPES = createReportSchema.shape.type.options;
@@ -139,7 +139,7 @@ export function ObjectReportForm({
 
   if (resultId) {
     return (
-      <p className="text-xs text-success">
+      <p className={typeXsSuccess}>
         {copy.reportSubmitted}{" "}
         <a
           href={`/workspace/platform-reports/${encodeURIComponent(resultId)}`}

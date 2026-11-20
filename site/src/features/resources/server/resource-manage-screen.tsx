@@ -15,6 +15,8 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { surfaceP4TextSmSecondary } from "../../shell/surface-shell";
 import {
   typeBreakDisplayPrimary,
+  typeFlexGap4Sm,
+  typeFlexWrapBetweenGap2,
   typePrewrapBreak,
   typePrewrapSmSecondary,
   typeSemiboldPrimary,
@@ -172,7 +174,7 @@ export async function ResourceManageScreen({
           <ul className="space-y-4">
             {history.builds.map((build) => (
               <li key={build.id} className="space-y-3 rounded-lg border border-base bg-surface p-5">
-                <div className="flex flex-wrap justify-between gap-2">
+                <div className={typeFlexWrapBetweenGap2}>
                   <h3 className={typeSemiboldPrimary}>{build.version}</h3>
                   <time
                     dateTime={new Date(build.createdAt).toISOString()}
@@ -241,7 +243,7 @@ export async function ResourceManageScreen({
           </ul>
         )}
         {history.totalPages > 1 && (
-          <nav aria-label={copy.page} className="flex gap-4 text-sm">
+          <nav aria-label={copy.page} className={typeFlexGap4Sm}>
             {history.page > 1 && (
               <Link href={`?page=${history.page - 1}`} className={linkAccentSm}>
                 {copy.previous}

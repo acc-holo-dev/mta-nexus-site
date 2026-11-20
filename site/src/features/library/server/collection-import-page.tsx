@@ -12,6 +12,7 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import { typeFlexMinWrapGap4, typeMinBreakWords } from "../../shell/type-shell";
 import { LibraryCollectionImport } from "../collection-import";
 import { libraryCollectionManifestsCopy } from "../library-collection-manifests-i18n";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
@@ -90,7 +91,7 @@ export async function CollectionImportPage({
     const collection = manifest.collection;
     return (
       <div className={pageShellClass}>
-        <nav className="flex min-w-0 flex-wrap gap-4">
+        <nav className={typeFlexMinWrapGap4}>
           <Link href={collectionHref(collection.id)} className={linkAccentSmRounded}>
             {c.back}
           </Link>
@@ -101,7 +102,7 @@ export async function CollectionImportPage({
             {m.export}
           </a>
         </nav>
-        <h1 className="min-w-0 break-words">
+        <h1 className={typeMinBreakWords}>
           {m.title}: {collection.name}
         </h1>
         <p>

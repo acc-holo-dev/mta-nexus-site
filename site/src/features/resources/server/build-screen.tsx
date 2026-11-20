@@ -19,8 +19,10 @@ import { surfaceP4 } from "../../shell/surface-shell";
 import {
   typeBreakSmSecondary,
   typeDisplayPrimary,
+  typePrewrapBreakSecondary,
   typeSemiboldPrimary,
   typeSmSecondary,
+  typeXlPrimary,
   typeXlSemiboldPrimary,
 } from "../../shell/type-shell";
 import { buildPackageCopy } from "../build-package-i18n";
@@ -161,11 +163,9 @@ export async function ResourceBuildScreen({
           <p className="text-sm text-muted">{publisherCopy.reviewNote}</p>
           <h2 className={typeXlSemiboldPrimary}>{publisherCopy.description}</h2>
           {product.shortDescription && (
-            <p className="whitespace-pre-wrap break-words text-secondary">
-              {product.shortDescription}
-            </p>
+            <p className={typePrewrapBreakSecondary}>{product.shortDescription}</p>
           )}
-          <p className="whitespace-pre-wrap break-words text-secondary">{product.description}</p>
+          <p className={typePrewrapBreakSecondary}>{product.description}</p>
           <p className={typeBreakSmSecondary}>
             {publisherCopy.tags}: {formatUnknown(locale, (product.tags ?? []).join(", "))}
           </p>
@@ -200,8 +200,8 @@ export async function ResourceBuildScreen({
       />
       {build.releaseNotes && (
         <section className="space-y-2">
-          <h2 className="text-xl text-primary">{copy.notes}</h2>
-          <p className="whitespace-pre-wrap break-words text-secondary">{build.releaseNotes}</p>
+          <h2 className={typeXlPrimary}>{copy.notes}</h2>
+          <p className={typePrewrapBreakSecondary}>{build.releaseNotes}</p>
         </section>
       )}
       <Link
@@ -244,7 +244,7 @@ export async function ResourceBuildScreen({
         />
       )}
       <section className="space-y-3">
-        <h2 className="text-xl text-primary">{copy.history}</h2>
+        <h2 className={typeXlPrimary}>{copy.history}</h2>
         {history.length === 0 ? (
           <EmptyState
             title={copy.noHistory}
@@ -256,9 +256,7 @@ export async function ResourceBuildScreen({
             {history.map((event) => (
               <li key={event.id} className={surfaceP4}>
                 <p>{copy.actions[event.action as keyof typeof copy.actions] ?? event.action}</p>
-                {event.reason && (
-                  <p className="whitespace-pre-wrap break-words text-secondary">{event.reason}</p>
-                )}
+                {event.reason && <p className={typePrewrapBreakSecondary}>{event.reason}</p>}
                 <time
                   dateTime={new Date(event.createdAt).toISOString()}
                   className="text-sm text-muted"

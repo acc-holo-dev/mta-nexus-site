@@ -15,7 +15,7 @@ import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xlCompact as pageShellClass } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
-import { typeSmSecondary } from "../../shell/type-shell";
+import { typeMinBreakWords, typeSmSecondary } from "../../shell/type-shell";
 export async function libraryReviewsMetadata(): Promise<Metadata> {
   return {
     title: `${resourceReviewCopy(await getRequestLocale()).own} | MTA NEXUS`,
@@ -95,7 +95,7 @@ export async function LibraryReviewsScreen({
       {result.items.length ? (
         result.items.map((review) => (
           <article key={review.id} className={panelClipSpace3P5}>
-            <h2 className="min-w-0 break-words">{review.title ?? copy.unavailable}</h2>
+            <h2 className={typeMinBreakWords}>{review.title ?? copy.unavailable}</h2>
             <p>
               {resourceReviewState(typedLocale, review.status)} · {copy.rating}:{" "}
               {formatUnknown(typedLocale, review.rating)}/5

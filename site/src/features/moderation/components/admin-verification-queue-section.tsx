@@ -4,7 +4,13 @@ import { BadgeCheck } from "lucide-react";
 import Link from "next/link";
 import type { getDictionary, Locale } from "../../../lib/i18n";
 import { linkAccentTight, linkAccentXsBlock } from "../../shell/link-shell";
-import { typeCaptionFaint, typeFlexWrapCenterGap2, typeXsSecondary } from "../../shell/type-shell";
+import {
+  typeCaptionFaint,
+  typeCaptionMuted,
+  typeFlexWrapCenterGap2,
+  typeIconAccent,
+  typeXsSecondary,
+} from "../../shell/type-shell";
 import { verificationCopy } from "../../trust/verification-workspace-copy";
 import { adminStatusLabel, adminStatusTone } from "../admin-status-labels";
 import { verificationApplicationsCopy } from "../verification-applications-copy";
@@ -63,7 +69,7 @@ export function AdminVerificationQueueSection({
       <SectionHeader
         title={copy.verificationQueue}
         description={`${pendingVerificationCount} ${copy.pendingRequests}`}
-        action={<BadgeCheck className="h-4 w-4 text-accent" />}
+        action={<BadgeCheck className={typeIconAccent} />}
       />
       <nav aria-label={copy.verificationQueue} className="mb-3 flex gap-2">
         <Link
@@ -108,7 +114,7 @@ export function AdminVerificationQueueSection({
                     {request.targetId}
                   </span>
                 </div>
-                <p className="font-caption text-muted">
+                <p className={typeCaptionMuted}>
                   {copy.requester} {request.requesterId} •{" "}
                   {new Date(request.createdAt).toLocaleDateString(dateLocale)}
                 </p>

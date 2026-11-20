@@ -14,6 +14,7 @@ import {
   typeBreakSemiboldPrimary,
   typeGrid2Gap4,
   typeHeadingPrimary,
+  typeMinH11Semibold,
   typeSemiboldPrimary,
   typeSmSecondary,
   typeSpace1XsMuted,
@@ -120,7 +121,7 @@ export async function ApprovalHistoryPage({
             <option value="developer">{copy.developer}</option>
           </select>
         </label>
-        <Button type="submit" className="min-h-11 font-semibold">
+        <Button type="submit" className={typeMinH11Semibold}>
           {copy.filter}
         </Button>
         <Link href={approvalPageHref(username)} className={linkAccentSm}>

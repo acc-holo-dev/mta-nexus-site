@@ -19,7 +19,9 @@ it("locks security recovery unavailable and needs-verification to ErrorState", (
   expect(source).toContain("title={copy.recoveryNeedsVerification}");
   expect(source).toContain("description={copy.recoveryNeedsVerificationHint}");
   expect(source).toContain("description={copy.recoveryUnavailableHint}");
-  expect(source).toContain('className="mt-1 text-xs text-muted">{copy.recoveryVerified}</p>');
+  expect(source).toMatch(
+    /className=\{?(?:"mt-1 text-xs text-muted"|typeMt1XsMuted)\}?>\{copy\.recoveryVerified\}<\/p>/,
+  );
   expect(source).not.toContain(": copy.recoveryNeedsVerification");
   expect(source).not.toContain(": copy.recoveryUnavailable}");
 });

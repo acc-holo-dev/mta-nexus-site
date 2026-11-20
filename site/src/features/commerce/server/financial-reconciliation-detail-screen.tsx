@@ -16,6 +16,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeBreakDisplayPrimary,
   typeFlexWrapGap4Sm,
+  typeLgSemibold,
   typeSmSecondary,
 } from "../../shell/type-shell";
 import { formatHistoryDate, parseHistoryPage } from "../commerce-history-format";
@@ -132,7 +133,7 @@ export async function FinancialReconciliationDetailScreen({
             <li key={flag}>{copy[flag]}</li>
           ))}
       </ul>
-      <h2 className="text-lg font-semibold">{copy.details}</h2>
+      <h2 className={typeLgSemibold}>{copy.details}</h2>
       {result.attempts.length ? (
         <ol className="space-y-3">
           {result.attempts.map((attempt) => (
@@ -167,7 +168,7 @@ export async function FinancialReconciliationDetailScreen({
           ) : null}
         </nav>
       ) : null}
-      <h2 className="text-lg font-semibold">{copy.ledger}</h2>
+      <h2 className={typeLgSemibold}>{copy.ledger}</h2>
       <ul className="space-y-2 text-sm">
         {result.ledgerTotals.map((total) => (
           <li key={total.currency}>

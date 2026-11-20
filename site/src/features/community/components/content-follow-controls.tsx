@@ -9,7 +9,8 @@ import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return
 import { confirmAction } from "../../shell/confirm-action";
 import { GuestAuthLinks } from "../../shell/guest-auth";
 import { LocaleProvider, useNexusLocale } from "../../shell/locale";
-import { typeFlexWrapGap2, typeXsSecondary } from "../../shell/type-shell";
+import { skelH4W4Spin } from "../../shell/skeleton-shell";
+import { typeFlexWrapGap2, typeItemsStretchPy4, typeXsSecondary } from "../../shell/type-shell";
 import { confirmsFollowMutation } from "../follow-confirmation";
 import type { ObjectMuteDuration } from "../follow-workspace-contract";
 import { followCopy, followError } from "../follow-workspace-copy";
@@ -259,7 +260,7 @@ function ContentFollowControl({
       <ErrorState
         title={message || copy.error}
         description={copy.errorHint}
-        className="items-stretch py-4"
+        className={typeItemsStretchPy4}
         action={
           <Button
             type="button"
@@ -282,7 +283,7 @@ function ContentFollowControl({
       <ErrorState
         title={message || copy.error}
         description={copy.errorHint}
-        className="items-stretch py-4"
+        className={typeItemsStretchPy4}
         action={
           <Button
             type="button"
@@ -327,7 +328,7 @@ function ContentFollowControl({
           onClick={() => void mutateFollow(!following, following ? notifyComments : false)}
         >
           {pending || !ready ? (
-            <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
+            <LoaderCircle className={skelH4W4Spin} aria-hidden="true" />
           ) : following ? (
             <BookmarkCheck className="h-4 w-4" aria-hidden="true" />
           ) : (
@@ -345,7 +346,7 @@ function ContentFollowControl({
           onClick={() => void mutateFollow(true, !notifyComments)}
         >
           {pending || !ready ? (
-            <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
+            <LoaderCircle className={skelH4W4Spin} aria-hidden="true" />
           ) : notifyComments ? (
             <Bell className="h-4 w-4" aria-hidden="true" />
           ) : (

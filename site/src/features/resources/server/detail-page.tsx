@@ -27,7 +27,12 @@ import { authEntryHref } from "../../shell/auth-return";
 import { linkAccentSmRounded, linkAccentTightSemiboldHover } from "../../shell/link-shell";
 import { pageShellStack10 as pageShellClass, pageShellStack4 } from "../../shell/page-shell";
 import { panelSpace4P6 } from "../../shell/panel-shell";
-import { typeFlexWrapCenterGap2 } from "../../shell/type-shell";
+import {
+  typeFlexWrapCenterGap2,
+  typeIconAccent,
+  typeMonoSecondary,
+  typeMt1XsMuted,
+} from "../../shell/type-shell";
 import { buildPackageCopy } from "../build-package-i18n";
 import { BuildProvenanceDetails } from "../components/build-provenance-details";
 import { ProductDependencyList } from "../components/product-dependency-list";
@@ -351,7 +356,7 @@ export async function ProductDetailPage({
           <div className="nexus-panel sticky top-24 space-y-6 p-6 shadow-nexus-sm">
             <div>
               <div className="text-3xl font-black text-primary">{formattedPrice}</div>
-              <div className="mt-1 text-xs text-muted">
+              <div className={typeMt1XsMuted}>
                 {copy.licenseModel}: <span>{licenseModelLabel(locale, product.licenseModel)}</span>
               </div>
             </div>
@@ -492,7 +497,7 @@ export async function ProductDetailPage({
               <div className="space-y-2">
                 <div className="flex justify-between gap-4 border-b border-base py-1">
                   <span className="text-muted">{copy.mtaVersion}</span>
-                  <span className="font-mono text-secondary">
+                  <span className={typeMonoSecondary}>
                     {product.compatibility.mtaMinVersion
                       ? `>= ${product.compatibility.mtaMinVersion}`
                       : copy.notDeclared}
@@ -508,7 +513,7 @@ export async function ProductDetailPage({
                 </div>
                 <div className="flex justify-between gap-4 border-b border-base py-1">
                   <span className="text-muted">{copy.libraryAdditions}</span>
-                  <span className="font-mono text-secondary">{product.salesCount}</span>
+                  <span className={typeMonoSecondary}>{product.salesCount}</span>
                 </div>
                 <div className="flex justify-between gap-4 border-b border-base py-1">
                   <span className="text-muted">{copy.rating}</span>
@@ -574,7 +579,7 @@ export async function ProductDetailPage({
           <section className={panelSpace4P6}>
             <div className="flex flex-col justify-between gap-2 border-b border-base pb-3 sm:flex-row sm:items-center">
               <h2 className="flex items-center gap-2 text-base font-bold text-primary">
-                <Layers className="h-4 w-4 text-accent" aria-hidden="true" />
+                <Layers className={typeIconAccent} aria-hidden="true" />
                 <span>{copy.releaseHistory}</span>
               </h2>
               <span className="font-numeric text-[11px] text-faint">{copy.shaRecorded}</span>

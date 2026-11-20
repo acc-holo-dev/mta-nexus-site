@@ -9,7 +9,7 @@ import {
   linkGhostAccentSm,
   linkGhostAccentSmNoUnderline,
 } from "../../shell/link-shell";
-import { typeSemiboldPrimary, typeSmSecondary } from "../../shell/type-shell";
+import { typeFlexGap4Sm, typeSemiboldPrimary, typeSmSecondary } from "../../shell/type-shell";
 import { getLicenseControlCopy } from "../license-control-i18n";
 import {
   confirmLicenseRelease,
@@ -170,7 +170,7 @@ export function LicenseRuntimeProbe({
             {busy ? copy.pending : copy.probe}
           </Button>
           {context.totalPages > 1 && (
-            <div className="flex gap-4 text-sm">
+            <div className={typeFlexGap4Sm}>
               <Button
                 type="button"
                 variant="ghost"

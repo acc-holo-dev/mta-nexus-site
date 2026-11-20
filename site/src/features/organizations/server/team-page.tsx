@@ -14,6 +14,7 @@ import { PlatformSessionError } from "../../shell/session-error";
 import {
   type2xlExtraboldPrimary,
   typeBreakSemiboldPrimary,
+  typeMinH11Semibold,
   typeSpace1XsMuted,
 } from "../../shell/type-shell";
 import {
@@ -137,7 +138,7 @@ export async function TeamPage({
                   <option value="no">{copy.no}</option>
                 </select>
               </label>
-              <Button type="submit" className="min-h-11 font-semibold">
+              <Button type="submit" className={typeMinH11Semibold}>
                 {team.filter}
               </Button>
               <Link href={organizationTeamHref(id, { query: "" })} className={linkAccentSm}>

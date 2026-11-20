@@ -30,7 +30,12 @@ import { authEntryHref } from "../../shell/auth-return";
 import { linkAccentSm, linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellStack6, pageShellStack10 } from "../../shell/page-shell";
 import { surfaceInsetP4TextSmMuted } from "../../shell/surface-shell";
-import { typeFlexWrapCenterGap2, typeHeadingPrimary } from "../../shell/type-shell";
+import {
+  typeFlexWrapCenterGap2,
+  typeHeadingPrimary,
+  typeMaxXlSmLeadingMuted,
+  typeTruncateXsFaint,
+} from "../../shell/type-shell";
 import { trustCopy } from "../../trust/public-user-trust-copy";
 import { DeveloperExperience } from "../developer-experience";
 import { ProfileResourcePagination, parseProfilePage } from "../profile-pagination";
@@ -179,10 +184,8 @@ export async function UserProfileScreen({
                 {user.role}
               </span>
             </div>
-            <div className="truncate text-xs text-faint">@{user.username}</div>
-            <p className="max-w-xl text-sm leading-relaxed text-muted">
-              {user.bio || copy.memberFallback}
-            </p>
+            <div className={typeTruncateXsFaint}>@{user.username}</div>
+            <p className={typeMaxXlSmLeadingMuted}>{user.bio || copy.memberFallback}</p>
             {!guestPreview && (
               <div className="space-y-1">
                 <FollowButton

@@ -14,6 +14,7 @@ import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
+  typeBreakAllXsMuted,
   typeBreakSemibold,
   typeDisplayPrimary,
   typeFlexWrapGap4Sm,
@@ -124,7 +125,7 @@ export async function ResourceCollectionsPage({
         <h2 className="break-words text-xl">
           {result.resource.available ? (result.resource.title ?? c.unavailable) : c.unavailable}
         </h2>
-        <p className="break-all text-xs text-muted">{id}</p>
+        <p className={typeBreakAllXsMuted}>{id}</p>
         <p role="note" className={typeSmSecondary}>
           {c.membershipNote}
         </p>

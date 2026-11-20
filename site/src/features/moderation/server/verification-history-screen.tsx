@@ -15,6 +15,8 @@ import { panelFlexMinWrapEndP4, panelMinSpace3P5 } from "../../shell/panel-shell
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   type2xlBoldPrimary,
+  typeBreakAllXsMuted,
+  typeFlexWrapStartBetweenGap3,
   typeMt2SmMuted,
   typePrewrapSmSecondary,
   typeSpace1XsMuted,
@@ -198,7 +200,7 @@ export async function VerificationHistoryScreen({
         {report?.items.map((item) => (
           <li key={item.id}>
             <article className={panelMinSpace3P5}>
-              <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className={typeFlexWrapStartBetweenGap3}>
                 <h2 className="min-w-0 break-words font-semibold text-primary">
                   <Link
                     prefetch={false}
@@ -210,7 +212,7 @@ export async function VerificationHistoryScreen({
                 <span className="text-xs text-muted">{labels[item.status]}</span>
               </div>
               <p className={typePrewrapSmSecondary}>{item.notes}</p>
-              <p className="break-all text-xs text-muted">{item.id}</p>
+              <p className={typeBreakAllXsMuted}>{item.id}</p>
               <p className="text-xs text-muted">
                 {labels.submittedAt}:{" "}
                 <time dateTime={item.createdAt}>
