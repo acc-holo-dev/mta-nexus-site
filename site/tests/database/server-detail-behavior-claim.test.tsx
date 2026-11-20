@@ -107,7 +107,7 @@ vi.mock("../../src/features/servers/follow", async () => {
   };
 });
 
-vi.mock("../../src/features/servers/server/server-history-panel", async () => {
+vi.mock("../../src/features/servers/history-server", async () => {
   const React = await import("react");
   return {
     ServerHistoryPanel: ({ history, locale }: { history: unknown; locale: string }) =>
@@ -119,7 +119,7 @@ vi.mock("../../src/features/servers/server/server-history-panel", async () => {
   };
 });
 
-vi.mock("../../src/features/servers/server/server-updates-panel", async () => {
+vi.mock("../../src/features/servers/updates-server", async () => {
   const React = await import("react");
   return {
     ServerUpdatesPanel: ({ updates }: { updates: unknown }) =>

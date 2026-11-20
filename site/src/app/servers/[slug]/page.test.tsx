@@ -133,14 +133,14 @@ vi.mock("../../../features/servers/follow", async () => {
   };
 });
 
-vi.mock("../../../features/servers/server/server-history-panel", async () => {
+vi.mock("../../../features/servers/history-server", async () => {
   const React = await import("react");
   return {
     ServerHistoryPanel: () => React.createElement("div", { "data-testid": "server-history" }),
   };
 });
 
-vi.mock("../../../features/servers/server/server-updates-panel", async () => {
+vi.mock("../../../features/servers/updates-server", async () => {
   const React = await import("react");
   return {
     ServerUpdatesPanel: ({ updates }: { updates: unknown }) =>
