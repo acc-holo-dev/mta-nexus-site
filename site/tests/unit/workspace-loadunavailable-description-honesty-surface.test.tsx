@@ -18,7 +18,10 @@ const pages: Array<[string, string]> = [
   ["site/src/app/workspace/sales/report/[id]/page.tsx", "c.loadUnavailableHint"],
   ["site/src/features/accounts/server/developer-profile-screen.tsx", "copy.loadUnavailableHint"],
   ["site/src/features/accounts/server/user-profile-screen.tsx", "copy.loadUnavailableHint"],
-  ["site/src/features/resources/server/resource-manage-screen.tsx", "publisherCopy.loadUnavailableHint"],
+  [
+    "site/src/features/resources/server/resource-manage-screen.tsx",
+    "publisherCopy.loadUnavailableHint",
+  ],
 ];
 
 it("locks workspace/admin loadUnavailable ErrorStates to recovery hints", () => {

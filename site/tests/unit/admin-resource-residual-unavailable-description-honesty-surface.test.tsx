@@ -15,7 +15,10 @@ const pages: Array<[string, string]> = [
     "copy.loadUnavailableHint",
   ],
   ["site/src/features/moderation/server/staff-storage-screen.tsx", "copy.loadUnavailableHint"],
-  ["site/src/features/moderation/server/staff-storage-object-screen.tsx", "copy.loadUnavailableHint"],
+  [
+    "site/src/features/moderation/server/staff-storage-object-screen.tsx",
+    "copy.loadUnavailableHint",
+  ],
   ["site/src/app/admin/commerce/plans/page.tsx", "copy.loadUnavailableHint"],
   ["site/src/app/admin/commerce/plans/[id]/page.tsx", "copy.loadUnavailableHint"],
   ["site/src/app/admin/commerce/reconciliation/page.tsx", "copy.loadUnavailableHint"],
