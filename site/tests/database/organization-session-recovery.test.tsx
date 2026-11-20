@@ -28,7 +28,7 @@ vi.mock("../../src/lib/services/organizations/organization-workspace-service", (
 import NewOrganization from "../../src/app/workspace/organizations/new/page";
 import { getOrganizationCopy } from "../../src/features/organizations/organization-workspace-copy";
 import { OrganizationsPage as Directory } from "../../src/features/organizations/server/directory-page";
-import Workspace from "../../src/features/organizations/server/workspace-page";
+import { OrganizationPage as Workspace } from "../../src/features/organizations/server/workspace-page";
 
 beforeEach(() => {
   vi.resetAllMocks();

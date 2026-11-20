@@ -18,7 +18,7 @@ import type { OrganizationHistory } from "../organization-governance-contract";
 import { organizationGovernanceCopy } from "../organization-governance-copy";
 import { getOrganizationCopy } from "../organization-workspace-copy";
 
-import { linkAccentSm } from "../../shell/link-shell";
+import { linkAccentSm, linkAccentTight } from "../../shell/link-shell";
 export function OrganizationHistoryView({
   data,
   id,
@@ -119,7 +119,7 @@ export function OrganizationHistoryView({
             {copy.by}:{" "}
             {item.actorUsername ? (
               <Link
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentTight}
                 href={`/users/${encodeURIComponent(item.actorUsername)}`}
               >
                 {item.actorName} (@{item.actorUsername})
@@ -132,7 +132,7 @@ export function OrganizationHistoryView({
             <p className="text-sm text-secondary">
               {copy.subject}:{" "}
               <Link
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentTight}
                 href={`/users/${encodeURIComponent(item.subjectUsername)}`}
               >
                 {item.subjectName} (@{item.subjectUsername})

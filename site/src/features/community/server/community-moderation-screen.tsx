@@ -39,7 +39,7 @@ import { moderatedDiscussionCopy } from "../moderated-discussion-copy";
 import { PUBLICATION_TYPES } from "../publication-feed-contract";
 import { platformFieldClass } from "../user-platform-client";
 
-import { linkAccentSm } from "../../shell/link-shell";
+import { linkAccentSm, linkAccentTightSm } from "../../shell/link-shell";
 export async function communityModerationMetadata(): Promise<Metadata> {
   return {
     title: moderationCopy(await getRequestLocale()).title,
@@ -152,7 +152,7 @@ export async function CommunityModerationScreen({
             {types[item.type]} · {copy[item.status]}
           </p>
           <Link
-            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentTightSm}
             href={`/users/${encodeURIComponent(item.author.username)}`}
           >
             {item.author.name} (@{item.author.username})

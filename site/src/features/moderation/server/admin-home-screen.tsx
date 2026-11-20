@@ -24,7 +24,7 @@ import { moderationCopy } from "../../community/community-moderation-copy";
 import { ContentModerationControls } from "../../community/content-moderation";
 import { getResourceReleaseControlCopy } from "../../library/resource-release-control-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkAccentSmRounded, linkAccentXs } from "../../shell/link-shell";
+import { linkAccentSmRounded, linkAccentTight, linkAccentXs } from "../../shell/link-shell";
 import { pageShellMaxMdGuest, pageShellStack6, pageShellStack8 } from "../../shell/page-shell";
 import { panelFlexBetweenP4, panelP4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -341,10 +341,7 @@ export async function AdminHomeScreen({
         {(contentPage > 1 || moreContent) && (
           <nav aria-label={copy.contentPages} className="mt-3 flex items-center gap-3 text-xs">
             {contentPage > 1 && (
-              <Link
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                href={adminHref({ contentPage: contentPage - 1 })}
-              >
+              <Link className={linkAccentTight} href={adminHref({ contentPage: contentPage - 1 })}>
                 {copy.previous}
               </Link>
             )}
@@ -352,10 +349,7 @@ export async function AdminHomeScreen({
               {copy.reportPage} {contentPage}
             </span>
             {moreContent && contentPage < 99_999 && (
-              <Link
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                href={adminHref({ contentPage: contentPage + 1 })}
-              >
+              <Link className={linkAccentTight} href={adminHref({ contentPage: contentPage + 1 })}>
                 {copy.next}
               </Link>
             )}

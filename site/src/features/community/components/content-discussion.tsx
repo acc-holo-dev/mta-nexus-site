@@ -9,7 +9,12 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { authEntryHref, currentBrowserReturnPath } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
-import { linkAccentSm, linkAccentXs, linkGhostAccentSm } from "../../shell/link-shell";
+import {
+  linkAccentSm,
+  linkAccentTight,
+  linkAccentXs,
+  linkGhostAccentSm,
+} from "../../shell/link-shell";
 import { panelClipSpace3P4 } from "../../shell/panel-shell";
 import {
   ContentCommentSubmitError,
@@ -638,7 +643,7 @@ export function ContentDiscussion({
             {comment.parentId && (
               <blockquote className="border-l-2 border-base pl-3 text-xs text-muted">
                 <Link
-                  className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={linkAccentTight}
                   href={`/articles/${encodeURIComponent(slug)}?comment=${encodeURIComponent(comment.parentId)}#comment-${encodeURIComponent(comment.parentId)}`}
                 >
                   {copy.parent}{" "}

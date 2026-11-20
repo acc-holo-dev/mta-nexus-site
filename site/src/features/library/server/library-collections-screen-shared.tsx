@@ -3,6 +3,10 @@ import Link from "next/link";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref, collectionPageParams } from "../library-collections-query";
 
+import { linkAccentTight as libraryCollectionsLinkClass } from "../../shell/link-shell";
+
+export { libraryCollectionsLinkClass };
+
 /** Authenticated session user passed from `authService.getSession`. */
 export type LibraryCollectionsActor = User;
 
@@ -16,9 +20,6 @@ export type LibraryCollectionsView =
   | "copy"
   | "copy-items"
   | "move-items";
-
-export const libraryCollectionsLinkClass =
-  "text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
 export const libraryCollectionsFieldClass =
   "rounded border border-base bg-inset px-3 py-2 transition-colors hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";

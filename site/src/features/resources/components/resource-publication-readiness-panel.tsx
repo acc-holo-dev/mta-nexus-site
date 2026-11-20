@@ -10,6 +10,7 @@ import {
 } from "../resource-publication-readiness-i18n";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 
+import { linkAccentTight, linkAccentTightSm } from "../../shell/link-shell";
 const stateTone: Partial<
   Record<ResourcePublicationReadinessSummary["items"][number]["state"], string>
 > = {
@@ -74,10 +75,7 @@ export function ResourcePublicationReadinessPanel({
                   title={copy.states[item.state]}
                   description={publicationReadinessDetail(locale, item)}
                   action={
-                    <Link
-                      href={item.actionPath}
-                      className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                    >
+                    <Link href={item.actionPath} className={linkAccentTightSm}>
                       {copy.fix}
                     </Link>
                   }
@@ -101,10 +99,7 @@ export function ResourcePublicationReadinessPanel({
         <p>{copy.checklistNote}</p>
         <p>
           {copy.previewNote}{" "}
-          <Link
-            href={previewHref}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href={previewHref} className={linkAccentTight}>
             {copy.openPreview}
           </Link>
         </p>

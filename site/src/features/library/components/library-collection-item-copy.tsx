@@ -12,6 +12,7 @@ import { confirmedCollectionCommand } from "../library-collections-confirmation"
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../library-collections-query";
 
+import { linkAccentTightRounded } from "../../shell/link-shell";
 type CopyCommand = Extract<LibraryCollectionCommand, { action: "copy-items" | "move-items" }>;
 type Destination = LibraryCollectionSnapshot & { itemCount: number; presentProductIds: string[] };
 export function LibraryCollectionItemCopyForm({
@@ -326,17 +327,11 @@ export function LibraryCollectionItemCopyForm({
         <div className="space-y-2">
           <p role="status">{c.saved}</p>
           {shownMove && (
-            <a
-              href={collectionHref(savedSourceId)}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <a href={collectionHref(savedSourceId)} className={linkAccentTightRounded}>
               {c.back}
             </a>
           )}
-          <a
-            href={collectionHref(savedDestinationId)}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <a href={collectionHref(savedDestinationId)} className={linkAccentTightRounded}>
             {c.openDestination}
           </a>
         </div>

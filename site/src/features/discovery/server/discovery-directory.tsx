@@ -19,7 +19,7 @@ import { FollowButton } from "../../community/follow";
 import type { PublicResourceAttribution } from "../../resources/public-resource-attribution";
 import { ProductCard } from "../../resources/view";
 import { ServerCard } from "../../servers/client";
-import { linkAccentRounded, linkAccentSm } from "../../shell/link-shell";
+import { linkAccentRounded, linkAccentSm, linkAccentTightRounded } from "../../shell/link-shell";
 import { DISCOVER_CONTENT_TYPES, type DiscoverQuery, discoverHref } from "../discover-query";
 import { discoveryCopy } from "../discovery-copy";
 import { type DiscoveryStreamQuery, discoveryStreamHref } from "../discovery-stream-contract";
@@ -248,10 +248,7 @@ export async function DirectoryResults({
       {state.type === "servers" && (
         <p className="text-sm text-muted">
           {copy.serversHint}{" "}
-          <Link
-            href="/servers"
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href="/servers" className={linkAccentTightRounded}>
             {copy.master}
           </Link>
         </p>
@@ -313,14 +310,14 @@ export async function DirectoryResults({
               <div className="flex flex-wrap gap-3 pt-1">
                 {state.query ? (
                   <Link
-                    className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={linkAccentTightRounded}
                     href={discoverHref({ ...state, query: "", page: 1 }, path)}
                   >
                     {copy.clearQuery}
                   </Link>
                 ) : null}
                 <Link
-                  className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={linkAccentTightRounded}
                   href={discoverHref({ type: state.type }, path)}
                 >
                   {copy.reset}

@@ -10,14 +10,14 @@ import { AuthorContentForm } from "../author-content-form";
 import { getUserPlatformCopy } from "../user-platform-copy";
 
 import { linkAccentSm } from "../../shell/link-shell";
-export async function generateMetadata(): Promise<Metadata> {
+export async function newPublicationMetadata(): Promise<Metadata> {
   return {
     title: getUserPlatformCopy(await getRequestLocale()).create,
     robots: { index: false, follow: false },
   };
 }
 
-export default async function NewPublicationPage() {
+export async function NewPublicationPage() {
   const locale = await getRequestLocale();
   const copy = getUserPlatformCopy(locale);
   let actor: Awaited<ReturnType<typeof authService.getSession>>;

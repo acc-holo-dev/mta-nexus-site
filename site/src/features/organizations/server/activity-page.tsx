@@ -17,13 +17,13 @@ import {
 } from "../organization-governance-copy";
 import { organizationReturnPath } from "./organization-return-path";
 
-export async function generateMetadata() {
+export async function organizationHistoryMetadata() {
   return {
     title: organizationGovernanceCopy(await getRequestLocale()).history,
     robots: { index: false, follow: false },
   };
 }
-export default async function OrganizationHistoryPage({
+export async function OrganizationHistoryPage({
   params,
   searchParams,
 }: {

@@ -12,7 +12,7 @@ import { ResourceDownloadButton } from "../../resources/download";
 import { ResourceReleaseWatchControl } from "../../resources/release-watch";
 import { resourceReleaseWatchesCopy } from "../../resources/resource-release-watches-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkAccentSmRounded } from "../../shell/link-shell";
+import { linkAccentSmRounded, linkAccentTightRounded } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -93,10 +93,7 @@ export async function CollectionReleasesScreen({
   if (!result) {
     return (
       <div className={pageShellMax5xl}>
-        <Link
-          href={collectionHref(path.id)}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={collectionHref(path.id)} className={linkAccentTightRounded}>
           {cc.back}
         </Link>
         <h1 className="font-display">{c.title}</h1>
@@ -122,10 +119,7 @@ export async function CollectionReleasesScreen({
     `${collectionHref(path.id, "releases")}?${suffix(page, filter)}`;
   return (
     <div className={pageShellMax5xl}>
-      <Link
-        href={collectionHref(path.id)}
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href={collectionHref(path.id)} className={linkAccentTightRounded}>
         {cc.back}
       </Link>
       <h1 className="font-display">{c.title}</h1>
@@ -134,15 +128,12 @@ export async function CollectionReleasesScreen({
         {cc.revision}: {result.collection.revision} · {cc.items}: {result.itemCount}
       </p>
       <p className="text-secondary">{c.note}</p>
-      <Link
-        href={collectionInventoryHref(path.id, "attention")}
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href={collectionInventoryHref(path.id, "attention")} className={linkAccentTightRounded}>
         {libraryCollectionInventoryCopy(locale).versionOverview}
       </Link>
       <Link
         href={`/workspace/library/collections/${encodeURIComponent(path.id)}/watches`}
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className={linkAccentTightRounded}
       >
         {resourceReleaseWatchesCopy(locale).collectionTitle}
       </Link>
@@ -151,7 +142,7 @@ export async function CollectionReleasesScreen({
       ) : (
         <Link
           href={collectionHref(path.id, "versions", result.q ? { q: result.q } : {})}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentTightRounded}
         >
           {librarySelectionBatchesCopy(locale).title}
         </Link>
@@ -178,7 +169,7 @@ export async function CollectionReleasesScreen({
           {result.q && (
             <Link
               href={collectionHref(path.id, "releases", { filter: result.filter })}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentTightRounded}
             >
               {cc.clear}
             </Link>
@@ -191,7 +182,7 @@ export async function CollectionReleasesScreen({
             key={filter}
             href={href(1, filter)}
             aria-current={filter === result.filter ? "page" : undefined}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentTightRounded}
           >
             {filter === "updates" ? copy.update_available : copy[filter]} ({result.counts[filter]})
           </Link>
@@ -271,7 +262,7 @@ export async function CollectionReleasesScreen({
                 {item.slug && item.state !== "unavailable" ? (
                   <Link
                     href={`/market/${encodeURIComponent(item.slug)}`}
-                    className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={linkAccentTightRounded}
                   >
                     {copy.open}
                   </Link>
@@ -287,7 +278,7 @@ export async function CollectionReleasesScreen({
                         to: item.latestBuildId,
                       },
                     )}`}
-                    className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={linkAccentTightRounded}
                   >
                     {copy.compare}
                   </Link>
@@ -295,7 +286,7 @@ export async function CollectionReleasesScreen({
                 {item.hasAccess && item.title !== null ? (
                   <Link
                     href={`/workspace/library/${encodeURIComponent(item.productId)}/versions`}
-                    className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={linkAccentTightRounded}
                   >
                     {copy.manage}
                   </Link>
@@ -307,10 +298,7 @@ export async function CollectionReleasesScreen({
       </ol>
       <nav aria-label={cc.page} className="flex gap-4">
         {result.page > 1 && (
-          <Link
-            href={href(result.page - 1)}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href={href(result.page - 1)} className={linkAccentTightRounded}>
             {cc.previous}
           </Link>
         )}
@@ -318,10 +306,7 @@ export async function CollectionReleasesScreen({
           {cc.page} {result.page} {cc.of} {result.totalPages}
         </span>
         {result.page < result.totalPages && (
-          <Link
-            href={href(result.page + 1)}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href={href(result.page + 1)} className={linkAccentTightRounded}>
             {cc.next}
           </Link>
         )}
@@ -331,7 +316,7 @@ export async function CollectionReleasesScreen({
       </p>
       <a
         href={`/api/library/collections/${encodeURIComponent(path.id)}/releases/export?${suffix()}`}
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className={linkAccentTightRounded}
       >
         {c.export}
       </a>

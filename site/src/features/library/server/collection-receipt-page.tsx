@@ -22,13 +22,13 @@ import { libraryCollectionError, libraryCollectionsCopy } from "../library-colle
 import { collectionHref, collectionPageParams } from "../library-collections-query";
 
 import { linkAccentSmRounded } from "../../shell/link-shell";
-export async function generateMetadata(): Promise<Metadata> {
+export async function collectionReceiptMetadata(): Promise<Metadata> {
   return {
     title: `${libraryCollectionReceiptsCopy(await getRequestLocale()).title} | MTA NEXUS`,
     robots: { index: false, follow: false },
   };
 }
-export default async function Page({
+export async function CollectionReceiptPage({
   params,
   searchParams,
 }: {

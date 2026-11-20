@@ -9,7 +9,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryReleaseService } from "../../../lib/services/resources/resource-release-control-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkAccentSmRounded } from "../../shell/link-shell";
+import { linkAccentSmRounded, linkAccentTightRounded } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -83,7 +83,7 @@ export async function LibraryReleaseComparisonScreen({
       <div className={pageShellMax5xl}>
         <Link
           href={`/workspace/library/${encodeURIComponent(path.id)}/versions?page=${query.returnPage}`}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentTightRounded}
         >
           {c.back}
         </Link>
@@ -115,10 +115,7 @@ export async function LibraryReleaseComparisonScreen({
   ];
   return (
     <div className={pageShellMax5xl}>
-      <Link
-        href={`${base}?page=${query.returnPage}`}
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href={`${base}?page=${query.returnPage}`} className={linkAccentTightRounded}>
         {c.back}
       </Link>
       <h1 id="library-release-comparison-heading" className="font-display">
@@ -163,7 +160,7 @@ export async function LibraryReleaseComparisonScreen({
             </h2>
             <Link
               href={`/workspace/library/${encodeURIComponent(path.id)}/requirements?${new URLSearchParams({ previewBuildId: release.id, returnFrom: index === 0 ? result.to.id : result.from.id, returnPage: String(query.returnPage) })}`}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentTightRounded}
             >
               {c.preparation}
             </Link>
@@ -216,13 +213,13 @@ export async function LibraryReleaseComparisonScreen({
       <nav className="flex flex-wrap gap-4">
         <Link
           href={`${base}/compare?${new URLSearchParams({ ...values, from: query.to, to: query.from })}`}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentTightRounded}
         >
           {c.swap}
         </Link>
         <a
           href={`/api/library/releases/${encodeURIComponent(path.id)}/compare/export?${suffix}`}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentTightRounded}
         >
           {c.export}
         </a>

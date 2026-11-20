@@ -19,7 +19,13 @@ import { resourceDeliveriesCopy } from "../../resources/resource-deliveries-i18n
 import { resourceReleaseWatchesCopy } from "../../resources/resource-release-watches-i18n";
 import { resourceReviewCopy } from "../../resources/resource-review-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkAccentBorder, linkAccentSm, linkAccentSmRounded } from "../../shell/link-shell";
+import {
+  linkAccentBorder,
+  linkAccentSm,
+  linkAccentSmRounded,
+  linkAccentTight,
+  linkAccentTightSm,
+} from "../../shell/link-shell";
 import { pageShellMax5xlMid } from "../../shell/page-shell";
 import { panelFlexColGap3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -222,19 +228,19 @@ export async function LibraryPageScreen({
                   )}
                   <Link
                     href={`/workspace/library/${encodeURIComponent(item.resourceId)}/versions`}
-                    className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={linkAccentTightSm}
                   >
                     {getResourceReleaseControlCopy(locale).manage}
                   </Link>
                   <Link
                     href={`/workspace/library/${encodeURIComponent(item.resourceId)}/collections`}
-                    className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={linkAccentTightSm}
                   >
                     {libraryCollectionsCopy(locale).toCollection}
                   </Link>
                   <Link
                     href={`/workspace/library/review/${encodeURIComponent(item.resourceId)}`}
-                    className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={linkAccentTightSm}
                   >
                     {resourceReviewCopy(locale).write}
                   </Link>
@@ -250,10 +256,7 @@ export async function LibraryPageScreen({
             {result.totalPages > 1 && (
               <nav aria-label={copy.page} className="flex flex-wrap items-center gap-4">
                 {result.page > 1 ? (
-                  <Link
-                    href={libraryHref(filter, result.page - 1)}
-                    className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                  >
+                  <Link href={libraryHref(filter, result.page - 1)} className={linkAccentTight}>
                     {copy.previous}
                   </Link>
                 ) : null}
@@ -261,10 +264,7 @@ export async function LibraryPageScreen({
                   {copy.page} {result.page} {copy.of} {result.totalPages}
                 </span>
                 {result.page < result.totalPages ? (
-                  <Link
-                    href={libraryHref(filter, result.page + 1)}
-                    className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                  >
+                  <Link href={libraryHref(filter, result.page + 1)} className={linkAccentTight}>
                     {copy.next}
                   </Link>
                 ) : null}

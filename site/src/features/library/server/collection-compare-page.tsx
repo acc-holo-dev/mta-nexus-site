@@ -26,13 +26,13 @@ import {
   collectionId as parseCollectionId,
 } from "../library-collections-query";
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function collectionCompareMetadata(): Promise<Metadata> {
   return {
     title: `${libraryCollectionComparisonCopy(await getRequestLocale()).title} | MTA NEXUS`,
     robots: { index: false, follow: false },
   };
 }
-export default async function Page({
+export async function CollectionComparePage({
   params,
   searchParams,
 }: {

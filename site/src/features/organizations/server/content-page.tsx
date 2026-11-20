@@ -23,13 +23,13 @@ import { organizationError } from "../organization-workspace-copy";
 import { organizationReturnPath } from "./organization-return-path";
 
 import { linkAccentSm } from "../../shell/link-shell";
-export async function generateMetadata() {
+export async function organizationPublicationsMetadata() {
   return {
     title: organizationContentCopy(await getRequestLocale()).title,
     robots: { index: false, follow: false },
   };
 }
-export default async function OrganizationPublications({
+export async function OrganizationPublications({
   params,
   searchParams,
 }: {

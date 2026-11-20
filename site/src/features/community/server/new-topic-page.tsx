@@ -8,7 +8,7 @@ import { pageShellMax3xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { CommunityTopicForm } from "../topic-form";
 
-export default async function NewCommunityTopicPage() {
+export async function NewCommunityTopicPage() {
   const locale = await getRequestLocale();
   const copy = getDictionary(locale).community;
   let actor: Awaited<ReturnType<typeof authService.getSession>>;

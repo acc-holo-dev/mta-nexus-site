@@ -7,6 +7,7 @@ import { libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../library-collections-query";
 import { libraryMembershipHistoryCopy } from "../library-membership-history-i18n";
 import { membershipHistoryHref } from "../library-membership-history-query";
+import { linkAccentTight } from "../../shell/link-shell";
 export function LibraryMembershipHistoryEntry({
   item,
   locale,
@@ -22,10 +23,7 @@ export function LibraryMembershipHistoryEntry({
   return (
     <article className={panelSpace4P5}>
       <h2>
-        <Link
-          href={membershipHistoryHref(item.id)}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={membershipHistoryHref(item.id)} className={linkAccentTight}>
           {m.detail}
         </Link>
       </h2>
@@ -69,7 +67,7 @@ export function LibraryMembershipHistoryEntry({
               {resource.currentAvailable && (
                 <Link
                   href={`/workspace/library/${encodeURIComponent(resource.productId)}/collections`}
-                  className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={linkAccentTight}
                 >
                   {c.resourceCollections}
                 </Link>
@@ -96,10 +94,7 @@ export function LibraryMembershipHistoryEntry({
                     <>
                       <p className="break-words">
                         {h.current}:{" "}
-                        <Link
-                          href={collectionHref(now.current.id)}
-                          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                        >
+                        <Link href={collectionHref(now.current.id)} className={linkAccentTight}>
                           {now.current.name}
                         </Link>{" "}
                         · {c[now.current.status]} · {c.revision} {now.current.revision}
@@ -122,7 +117,7 @@ export function LibraryMembershipHistoryEntry({
                   )}
                   <Link
                     href={collectionHref(child.collection.id, "history")}
-                    className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                    className={linkAccentTight}
                   >
                     {c.history}
                   </Link>

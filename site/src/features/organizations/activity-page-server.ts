@@ -1,3 +1,3 @@
 import "server-only";
 
-export { default, generateMetadata } from "./server/activity-page";
+export { OrganizationHistoryPage, organizationHistoryMetadata } from "./server/activity-page";

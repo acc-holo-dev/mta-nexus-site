@@ -7,6 +7,7 @@ import type { Locale } from "../../../lib/i18n";
 import { formatUnknown } from "../../../lib/i18n/unknown";
 import { confirmAction } from "../../shell/confirm-action";
 import { panelSpace3P5, panelSpace4P5 } from "../../shell/panel-shell";
+import { linkAccentTight } from "../../shell/link-shell";
 import {
   confirmedReview,
   confirmedReviewDecision,
@@ -373,15 +374,12 @@ export function ResourceReviewReportForm({
       {id ? (
         <Link
           href={`/workspace/review-reports/${encodeURIComponent(id)}`}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentTight}
         >
           {copy.detail}
         </Link>
       ) : (
-        <Link
-          href="/workspace/review-reports"
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href="/workspace/review-reports" className={linkAccentTight}>
           {copy.reports}
         </Link>
       )}

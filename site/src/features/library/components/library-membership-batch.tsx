@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
-import { linkAccentSmRounded } from "../../shell/link-shell";
+import { linkAccentSmRounded, linkAccentTight } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { libraryCollectionError, libraryCollectionsCopy } from "../library-collections-i18n";
 import { collectionHref } from "../library-collections-query";
@@ -302,15 +302,12 @@ export function LibraryMembershipBatchForm({
       {saved && (
         <div className="space-y-2">
           <p role="status">{h.success}</p>
-          <a
-            href={membershipHistoryHref(saved.id)}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <a href={membershipHistoryHref(saved.id)} className={linkAccentTight}>
             {libraryMembershipHistoryCopy(locale).detail}
           </a>
           <a
             href={`/workspace/library/${encodeURIComponent(pending.current?.productId ?? report.resource.productId)}/collections`}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentTight}
           >
             {c.reload}
           </a>
@@ -322,7 +319,7 @@ export function LibraryMembershipBatchForm({
               <li key={child.id}>
                 <a
                   href={collectionHref(child.collection.id, "history")}
-                  className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={linkAccentTight}
                 >
                   {child.collection.name}
                 </a>{" "}

@@ -5,6 +5,7 @@ import { panelSpace4P5 } from "../../shell/panel-shell";
 import { formatHistoryAmount, formatHistoryDate } from "../commerce-history-format";
 import { PlanReviewTerms } from "../components/plan-review-terms";
 import { planReviewsCopy } from "../plan-reviews-i18n";
+import { linkAccentTightRounded } from "../../shell/link-shell";
 export function PlanReviewDetailView({
   detail,
   locale,
@@ -19,10 +20,7 @@ export function PlanReviewDetailView({
     context = organizationId ? `?${new URLSearchParams({ organizationId })}` : "";
   return (
     <div className={pageShellMax5xl}>
-      <Link
-        href={`/workspace/subscriptions/reviews${context}`}
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href={`/workspace/subscriptions/reviews${context}`} className={linkAccentTightRounded}>
         {c.history}
       </Link>
       <h1 className="font-display">{c.saved}</h1>
@@ -69,7 +67,7 @@ export function PlanReviewDetailView({
             <PlanReviewTerms terms={detail.current.terms} locale={locale} />
             <Link
               href={`/workspace/subscriptions/reviews/new?${new URLSearchParams({ planId: r.planId, revision: String(detail.current.revision) })}`}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentTightRounded}
             >
               {c.newReview}
             </Link>
@@ -78,7 +76,7 @@ export function PlanReviewDetailView({
       </section>
       <a
         href={`/api/subscriptions/reviews/${encodeURIComponent(r.id)}/export${context}`}
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+        className={linkAccentTightRounded}
       >
         {c.export}
       </a>

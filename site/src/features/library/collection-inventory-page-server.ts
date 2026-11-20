@@ -1,3 +1,6 @@
 import "server-only";
 
-export { default, generateMetadata } from "./server/collection-inventory-page";
+export {
+  CollectionInventoryPage,
+  collectionInventoryMetadata,
+} from "./server/collection-inventory-page";

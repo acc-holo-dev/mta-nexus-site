@@ -21,13 +21,13 @@ import {
   collectionId as parseCollectionId,
 } from "../library-collections-query";
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function collectionReconcileMetadata(): Promise<Metadata> {
   return {
     title: `${libraryCollectionManifestsCopy(await getRequestLocale()).reconcileTitle} | MTA NEXUS`,
     robots: { index: false, follow: false },
   };
 }
-export default async function Page({
+export async function CollectionReconcilePage({
   params,
   searchParams,
 }: {

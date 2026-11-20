@@ -14,14 +14,14 @@ import { ownDiscussionCopy } from "../discussion-workspace-copy";
 import { OwnDiscussionDetail } from "../own-discussion";
 
 import { linkAccentSm } from "../../shell/link-shell";
-export async function generateMetadata() {
+export async function ownCommentMetadata() {
   return {
     title: ownDiscussionCopy(await getRequestLocale()).open,
     robots: { index: false, follow: false },
   };
 }
 
-export default async function OwnCommentPage({ params }: { params: Promise<{ id: string }> }) {
+export async function OwnCommentPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params,
     locale = await getRequestLocale(),
     copy = ownDiscussionCopy(locale),

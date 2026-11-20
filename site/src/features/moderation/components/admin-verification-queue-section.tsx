@@ -8,6 +8,7 @@ import { adminStatusLabel, adminStatusTone } from "../admin-status-labels";
 import { verificationApplicationsCopy } from "../verification-applications-copy";
 import { VerificationModerationControls } from "../verification-controls";
 
+import { linkAccentTight } from "../../shell/link-shell";
 type AdminCopy = ReturnType<typeof getDictionary>["admin"];
 
 type VerificationRequest = {
@@ -233,7 +234,7 @@ export function AdminVerificationQueueSection({
         <nav aria-label={copy.verificationPages} className="mt-3 flex items-center gap-3 text-xs">
           {verificationPage > 1 && (
             <Link
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentTight}
               href={verificationHref(verificationView, verificationPage - 1)}
             >
               {copy.previous}
@@ -244,7 +245,7 @@ export function AdminVerificationQueueSection({
           </span>
           {moreVerifications && verificationPage < 99_999 && (
             <Link
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentTight}
               href={verificationHref(verificationView, verificationPage + 1)}
             >
               {copy.next}

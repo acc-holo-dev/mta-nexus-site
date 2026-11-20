@@ -6,6 +6,7 @@ import { ResourceDownloadButton } from "../download";
 import { resourceRequirementsCopy } from "../resource-requirements-i18n";
 import { AddResourceToCart } from "./resource-cart-controls";
 
+import { linkAccentTightRounded } from "../../shell/link-shell";
 export function ResourceRequirementsReportBody({
   report,
   scope,
@@ -58,10 +59,7 @@ export function ResourceRequirementsReportBody({
           {copy.size}: {report.downloadableBytes}
         </p>
       )}
-      <a
-        href={exportHref}
-        className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <a href={exportHref} className={linkAccentTightRounded}>
         {copy.export}
       </a>
       {(report.issues.length > 0 || !suppressEmptyIssues) && (
@@ -128,7 +126,7 @@ export function ResourceRequirementsReportBody({
               {node.published && (
                 <Link
                   href={`/market/${encodeURIComponent(node.slug)}`}
-                  className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={linkAccentTightRounded}
                 >
                   {copy.catalog}
                 </Link>
@@ -139,7 +137,7 @@ export function ResourceRequirementsReportBody({
               {scope === "library" && node.accessible && (
                 <Link
                   href={`/workspace/library/${encodeURIComponent(node.id)}/versions`}
-                  className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={linkAccentTightRounded}
                 >
                   {copy.inspect}
                 </Link>

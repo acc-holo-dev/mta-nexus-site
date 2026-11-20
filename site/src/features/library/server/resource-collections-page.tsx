@@ -21,13 +21,13 @@ import { membershipHistoryHref } from "../library-membership-history-query";
 import { LibraryMembershipBatchForm } from "../membership-batch";
 
 import { linkAccentSmRounded } from "../../shell/link-shell";
-export async function generateMetadata(): Promise<Metadata> {
+export async function resourceCollectionsMetadata(): Promise<Metadata> {
   return {
     title: `${libraryCollectionsCopy(await getRequestLocale()).resourceCollections} | MTA NEXUS`,
     robots: { index: false, follow: false },
   };
 }
-export default async function ResourceCollectionsPage({
+export async function ResourceCollectionsPage({
   params,
   searchParams,
 }: {

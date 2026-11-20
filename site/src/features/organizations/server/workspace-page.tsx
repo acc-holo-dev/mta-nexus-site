@@ -17,13 +17,13 @@ import { OrganizationWorkspacePanel } from "../workspace";
 import { organizationReturnPath } from "./organization-return-path";
 
 import { linkAccentSm } from "../../shell/link-shell";
-export async function generateMetadata() {
+export async function organizationMetadata() {
   return {
     title: getOrganizationCopy(await getRequestLocale()).title,
     robots: { index: false, follow: false },
   };
 }
-export default async function OrganizationPage({
+export async function OrganizationPage({
   params,
   searchParams,
 }: {

@@ -10,7 +10,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { resourceCopyService } from "../../../lib/services/resources/resource-copy-service";
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkAccentRounded, linkMinH } from "../../shell/link-shell";
+import { linkAccentRounded, linkAccentTightRounded, linkMinH } from "../../shell/link-shell";
 import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { panelSpace2P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -165,7 +165,7 @@ export async function ResourceCopiesScreen({
                 </p>
                 <Link
                   href={`/workspace/resources/${encodeURIComponent(row.target.id)}`}
-                  className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                  className={linkAccentTightRounded}
                 >
                   {c.target}
                 </Link>

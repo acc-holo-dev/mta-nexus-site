@@ -1,3 +1,3 @@
 import "server-only";
 
-export { default, generateMetadata } from "./server/collection-history-page";
+export { CollectionHistoryPage, collectionHistoryMetadata } from "./server/collection-history-page";

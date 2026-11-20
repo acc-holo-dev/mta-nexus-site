@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 
+import { linkAccentTightSm } from "../../shell/link-shell";
 export function ProfileResourcePagination({
   basePath,
   page,
@@ -44,11 +45,7 @@ export function ProfileResourcePagination({
   return (
     <nav aria-label={labels[section]} className="flex items-center justify-between gap-3">
       {page > 1 ? (
-        <Link
-          href={href(page - 1)}
-          rel="prev"
-          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={href(page - 1)} rel="prev" className={linkAccentTightSm}>
           {copy.previousPage}
         </Link>
       ) : (
@@ -58,11 +55,7 @@ export function ProfileResourcePagination({
         {copy.pageLabel} {page} / {totalPages}
       </span>
       {page < totalPages ? (
-        <Link
-          href={href(page + 1)}
-          rel="next"
-          className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={href(page + 1)} rel="next" className={linkAccentTightSm}>
           {copy.nextPage}
         </Link>
       ) : (

@@ -11,7 +11,7 @@ import { authService } from "../../../lib/services/accounts/auth-service";
 import { libraryCollectionsService } from "../../../lib/services/library/library-collections-service";
 import { librarySelectionBatchesService } from "../../../lib/services/library/library-selection-batches-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
-import { linkAccentSmRounded } from "../../shell/link-shell";
+import { linkAccentSmRounded, linkAccentTightRounded } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -98,10 +98,7 @@ export async function LibrarySelectionBatchScreen({
       if (!result) return loadFailure(retryHref);
       return (
         <div className={pageShellMax5xl}>
-          <Link
-            href={base}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <Link href={base} className={linkAccentTightRounded}>
             {c.title}
           </Link>
           <h1 className="font-display">
@@ -163,7 +160,7 @@ export async function LibrarySelectionBatchScreen({
           </nav>
           <a
             href={`/api/library/collections/${encodeURIComponent(id)}/versions/history/export?page=${result.page}`}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentTightRounded}
           >
             {c.export}
           </a>
@@ -183,17 +180,14 @@ export async function LibrarySelectionBatchScreen({
       <div className={pageShellMax5xl}>
         <Link
           href={`/workspace/library/collections/${encodeURIComponent(id)}`}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentTightRounded}
         >
           {c.back}
         </Link>
         <h1 className="font-display">
           {c.title}: {result.collection.name}
         </h1>
-        <Link
-          href={`${base}/history`}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={`${base}/history`} className={linkAccentTightRounded}>
           {c.history}
         </Link>
         {result.collection.status === "archived" ? (
@@ -213,10 +207,7 @@ export async function LibrarySelectionBatchScreen({
         )}
         <nav aria-label={cc.page} className="flex gap-4">
           {result.page > 1 && (
-            <Link
-              href={pageHref(result.page - 1)}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={pageHref(result.page - 1)} className={linkAccentTightRounded}>
               {cc.previous}
             </Link>
           )}
@@ -224,10 +215,7 @@ export async function LibrarySelectionBatchScreen({
             {cc.page} {result.page} {cc.of} {result.totalPages}
           </span>
           {result.page < result.totalPages && (
-            <Link
-              href={pageHref(result.page + 1)}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-            >
+            <Link href={pageHref(result.page + 1)} className={linkAccentTightRounded}>
               {cc.next}
             </Link>
           )}

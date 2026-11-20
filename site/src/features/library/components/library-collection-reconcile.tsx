@@ -9,7 +9,7 @@ import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
-import { linkAccentRounded, linkAccentSmRounded } from "../../shell/link-shell";
+import { linkAccentRounded, linkAccentSmRounded, linkAccentTight } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import { libraryCollectionManifestsCopy } from "../library-collection-manifests-i18n";
 import {
@@ -297,16 +297,10 @@ export function LibraryCollectionReconcileForm({
           <code className="block break-all text-xs">
             {c.receipt}: {saved}
           </code>
-          <a
-            href={collectionReceiptHref(saved)}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <a href={collectionReceiptHref(saved)} className={linkAccentTight}>
             {libraryCollectionReceiptsCopy(locale).open}
           </a>
-          <a
-            href={collectionHref(shown.collection.id, "history")}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <a href={collectionHref(shown.collection.id, "history")} className={linkAccentTight}>
             {c.history}
           </a>
         </div>

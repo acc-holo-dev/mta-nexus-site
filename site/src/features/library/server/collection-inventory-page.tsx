@@ -30,13 +30,13 @@ import { collectionHref, collectionPageParams } from "../library-collections-que
 import { LibraryReleaseFollowLatest } from "../release-follow";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function collectionInventoryMetadata(): Promise<Metadata> {
   return {
     title: `${libraryCollectionInventoryCopy(await getRequestLocale()).title} | MTA NEXUS`,
     robots: { index: false, follow: false },
   };
 }
-export default async function Page({
+export async function CollectionInventoryPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

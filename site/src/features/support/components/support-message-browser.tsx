@@ -2,7 +2,7 @@ import type { SupportMessageFilters } from "@nexus/domain";
 import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
-import { linkAccent } from "../../shell/link-shell";
+import { linkAccent, linkAccentTight } from "../../shell/link-shell";
 import { pageShellMax4xlCompactTight } from "../../shell/page-shell";
 import { panelFlexWrapEndP4 } from "../../shell/panel-shell";
 import { type SupportMessagePage, supportMessageHref } from "../support-message-discovery-contract";
@@ -27,10 +27,7 @@ export function SupportMessageBrowser({
     new Date(value).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", { timeZone: "UTC" });
   return (
     <div className={pageShellMax4xlCompactTight}>
-      <Link
-        href={base}
-        className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-      >
+      <Link href={base} className={linkAccentTight}>
         {copy.back}
       </Link>
       <header className="space-y-2">
@@ -83,17 +80,14 @@ export function SupportMessageBrowser({
         </form>
       </search>
       <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
-        <Link
-          href={supportMessageHref(path, filters, { fresh: true })}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={supportMessageHref(path, filters, { fresh: true })} className={linkAccentTight}>
           {copy.latest}
         </Link>
         <a
           href={supportMessageHref(`/api/support/${page.supportCase.id}/messages/export`, filters, {
             until: page.until,
           })}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentTight}
         >
           {copy.download}
         </a>
@@ -156,7 +150,7 @@ export function SupportMessageBrowser({
               cursor: page.olderCursor,
               until: page.until,
             })}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentTight}
           >
             {copy.older}
           </Link>
@@ -167,7 +161,7 @@ export function SupportMessageBrowser({
               cursor: page.newerCursor,
               until: page.until,
             })}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentTight}
           >
             {copy.newer}
           </Link>

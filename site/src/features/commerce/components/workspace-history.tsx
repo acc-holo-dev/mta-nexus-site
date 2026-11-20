@@ -7,6 +7,7 @@ const filterNavLinkClass =
 import { pageShellMax5xlMid } from "../../shell/page-shell";
 import type { getCommerceHistoryCopy } from "../commerce-history-i18n";
 
+import { linkAccentTight } from "../../shell/link-shell";
 export type HistoryArea = "purchases" | "licenses" | "sales";
 export type HistoryCopy = ReturnType<typeof getCommerceHistoryCopy>;
 
@@ -76,10 +77,7 @@ export function HistoryPagination({
   return (
     <nav aria-label={copy.page} className="flex items-center justify-between gap-4 text-sm">
       {page > 1 ? (
-        <Link
-          href={`/workspace/${area}?page=${page - 1}`}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={`/workspace/${area}?page=${page - 1}`} className={linkAccentTight}>
           {copy.previous}
         </Link>
       ) : (
@@ -89,10 +87,7 @@ export function HistoryPagination({
         {copy.page} {page} {copy.of} {totalPages}
       </span>
       {page < totalPages ? (
-        <Link
-          href={`/workspace/${area}?page=${page + 1}`}
-          className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-        >
+        <Link href={`/workspace/${area}?page=${page + 1}`} className={linkAccentTight}>
           {copy.next}
         </Link>
       ) : (

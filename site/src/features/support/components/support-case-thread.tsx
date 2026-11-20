@@ -4,7 +4,7 @@ import { ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { HonestLoadingShell } from "../../shell/honest-loading";
-import { linkAccentSm, linkAccentXs } from "../../shell/link-shell";
+import { linkAccentSm, linkAccentTight, linkAccentXs } from "../../shell/link-shell";
 import { useNexusLocale } from "../../shell/locale";
 import { pageShellMax4xlDenseTight, pageShellMax4xlTight } from "../../shell/page-shell";
 import { panelSpace3P4 } from "../../shell/panel-shell";
@@ -525,10 +525,7 @@ export function SupportCaseThread({
           {!staffMode && capabilities.requester ? (
             <p>
               {copy.closedNeedNewCase}{" "}
-              <Link
-                href={supportObjectContextHref(relatedContext)}
-                className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              >
+              <Link href={supportObjectContextHref(relatedContext)} className={linkAccentTight}>
                 {copy.openRelatedCase}
               </Link>
             </p>

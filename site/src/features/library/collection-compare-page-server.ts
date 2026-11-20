@@ -1,3 +1,3 @@
 import "server-only";
 
-export { default, generateMetadata } from "./server/collection-compare-page";
+export { CollectionComparePage, collectionCompareMetadata } from "./server/collection-compare-page";

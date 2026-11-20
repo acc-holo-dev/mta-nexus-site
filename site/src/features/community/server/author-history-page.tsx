@@ -21,7 +21,7 @@ import { AuthorPublicationRestore } from "../author-publication-restore";
 import { getUserPlatformCopy } from "../user-platform-copy";
 
 import { linkAccentSm } from "../../shell/link-shell";
-export async function generateMetadata(): Promise<Metadata> {
+export async function publicationHistoryMetadata(): Promise<Metadata> {
   const copy = authorPublicationDeskCopy(await getRequestLocale());
   return {
     title: copy.history,
@@ -30,7 +30,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function PublicationHistoryPage({
+export async function PublicationHistoryPage({
   params,
   searchParams,
 }: {

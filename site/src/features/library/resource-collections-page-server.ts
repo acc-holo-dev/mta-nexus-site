@@ -1,3 +1,6 @@
 import "server-only";
 
-export { default, generateMetadata } from "./server/resource-collections-page";
+export {
+  ResourceCollectionsPage,
+  resourceCollectionsMetadata,
+} from "./server/resource-collections-page";

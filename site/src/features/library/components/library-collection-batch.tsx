@@ -14,7 +14,7 @@ import {
   ActionConfirmCheckbox,
   actionConfirmCheckboxFocusClass,
 } from "../../shell/action-confirm-checkbox";
-import { linkAccentSmRounded } from "../../shell/link-shell";
+import { linkAccentSmRounded, linkAccentTight } from "../../shell/link-shell";
 import { panelSpace4P5 } from "../../shell/panel-shell";
 import {
   collectionReceiptHref,
@@ -321,22 +321,16 @@ export function LibraryCollectionBatchForm({
           <code className="block break-all text-xs">
             {c.receipt}: {receiptId}
           </code>
-          <a
-            href={collectionReceiptHref(receiptId)}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <a href={collectionReceiptHref(receiptId)} className={linkAccentTight}>
             {libraryCollectionReceiptsCopy(locale).open}
           </a>
           <a
             href={collectionHref(pending.current.collection.id, "history")}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentTight}
           >
             {c.history}
           </a>
-          <a
-            href={pending.current.reloadHref}
-            className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <a href={pending.current.reloadHref} className={linkAccentTight}>
             {c.reload}
           </a>
         </div>

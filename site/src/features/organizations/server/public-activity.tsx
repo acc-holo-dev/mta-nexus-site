@@ -3,10 +3,10 @@ import { PublicProfileActivity } from "../../accounts/public-profile-activity-se
 import { publicationCopy } from "../../community/publication-feed-copy";
 import { pageShellClip as pageShellClass } from "../../shell/page-shell";
 
-export async function generateMetadata() {
+export async function organizationActivityMetadata() {
   return { title: publicationCopy(await getRequestLocale()).activity };
 }
-export default async function OrganizationActivity({
+export async function OrganizationActivity({
   params,
   searchParams,
 }: {

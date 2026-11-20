@@ -39,3 +39,13 @@ export const linkGhostAccentSm =
 
 export const linkGhostAccentSmRounded =
   "h-auto min-h-11 rounded px-0 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+/** Compact accent underlines (no min-h-11); prefer linkAccent* when touch target is required. */
+export const linkAccentTight =
+  "text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export const linkAccentTightRounded =
+  "rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+
+export const linkAccentTightSm =
+  "text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";

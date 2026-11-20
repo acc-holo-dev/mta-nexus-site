@@ -9,6 +9,7 @@ import { formatUnknown } from "../../../lib/i18n/unknown";
 import { buildPackageCopy } from "../build-package-i18n";
 import { getMtaMetaInspectorIssueMessage } from "../mta-meta-inspector-messages";
 
+import { linkAccentTightSm } from "../../shell/link-shell";
 export function BuildPackageSummaryPanel({
   summary,
   locale,
@@ -114,10 +115,7 @@ export function BuildPackageEvidencePanel({
               {new Date(evidence.inspectedAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-GB")}
             </time>
           </p>
-          <a
-            href={reportHref}
-            className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-          >
+          <a href={reportHref} className={linkAccentTightSm}>
             {copy.export}
           </a>
           <p className="text-sm text-muted">{copy.note}</p>

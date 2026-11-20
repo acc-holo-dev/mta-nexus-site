@@ -36,13 +36,13 @@ const selectClass =
   "min-h-11 w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
 const labelClass = "block font-label uppercase text-secondary";
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function collectionHistoryMetadata(): Promise<Metadata> {
   return {
     title: `${libraryCollectionHistoryCopy(await getRequestLocale()).title} | MTA NEXUS`,
     robots: { index: false, follow: false },
   };
 }
-export default async function Page({
+export async function CollectionHistoryPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

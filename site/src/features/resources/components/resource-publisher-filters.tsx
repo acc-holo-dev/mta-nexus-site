@@ -6,6 +6,7 @@ import { PRODUCT_PUBLISHING_KEYS } from "../product-type-labels";
 import { getResourcePublisherCopy } from "../resource-publisher-i18n";
 import { resourcePublisherUrl } from "../resource-publisher-query";
 
+import { linkAccentTightSm } from "../../shell/link-shell";
 const filterNavLinkClass =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
@@ -115,10 +116,7 @@ export function ResourcePublisherFilters({
             <Button type="submit" className="min-h-11">
               {copy.apply}
             </Button>
-            <Link
-              className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              href="/workspace/resources"
-            >
+            <Link className={linkAccentTightSm} href="/workspace/resources">
               {copy.reset}
             </Link>
           </div>

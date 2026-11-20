@@ -11,7 +11,7 @@ import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { privateChangeHistoryCopy } from "../private-change-history-copy";
 import { changeHistoryHref } from "../private-change-history-query";
 import type { ProfileChangeHistory } from "../profile-change-history-contract";
-import { linkAccentSmRounded } from "../../shell/link-shell";
+import { linkAccentSmRounded, linkAccentTight } from "../../shell/link-shell";
 import {
   PrivateChangeHistoryCutoff,
   PrivateChangeHistoryFilters,
@@ -115,10 +115,7 @@ export function ProfileChangeHistoryView({
               {item.experienceVerificationInvalidated && (
                 <p className="text-sm text-muted">
                   {copy.invalidated}{" "}
-                  <Link
-                    href="/workspace/verification"
-                    className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                  >
+                  <Link href="/workspace/verification" className={linkAccentTight}>
                     {copy.verification}
                   </Link>
                 </p>

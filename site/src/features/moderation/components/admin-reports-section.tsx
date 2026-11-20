@@ -11,6 +11,7 @@ import { adminStatusLabel, adminStatusTone } from "../admin-status-labels";
 import { ReportModerationControls } from "../report-controls";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 
+import { linkAccentTight, linkAccentTightSm } from "../../shell/link-shell";
 type AdminCopy = ReturnType<typeof getDictionary>["admin"];
 
 type AdminReport = {
@@ -162,18 +163,12 @@ export function AdminReportsSection({
                   tone={adminStatusTone(report.status)}
                 />
                 {report.targetPreview?.href ? (
-                  <Link
-                    href={report.targetPreview.href}
-                    className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                  >
+                  <Link href={report.targetPreview.href} className={linkAccentTightSm}>
                     {copy.openReportedTarget}
                   </Link>
                 ) : null}
                 {report.targetPreview?.moderationHref ? (
-                  <Link
-                    href={report.targetPreview.moderationHref}
-                    className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                  >
+                  <Link href={report.targetPreview.moderationHref} className={linkAccentTightSm}>
                     {copy.openStaffModeration}
                   </Link>
                 ) : null}
@@ -181,7 +176,7 @@ export function AdminReportsSection({
                   (report.targetType === "review" ? (
                     <Link
                       href={`/admin/commerce/reviews/${encodeURIComponent(report.id)}`}
-                      className="text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                      className={linkAccentTightSm}
                     >
                       {resourceReviewCopy(locale).detail}
                     </Link>
@@ -215,10 +210,7 @@ export function AdminReportsSection({
       {(reportPage > 1 || moreReports) && (
         <nav aria-label={copy.reportPages} className="mt-3 flex items-center gap-3 text-xs">
           {reportPage > 1 && (
-            <Link
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              href={reportHref(reportView, reportPage - 1)}
-            >
+            <Link className={linkAccentTight} href={reportHref(reportView, reportPage - 1)}>
               {copy.previous}
             </Link>
           )}
@@ -226,10 +218,7 @@ export function AdminReportsSection({
             {copy.reportPage} {reportPage}
           </span>
           {moreReports && reportPage < 99_999 && (
-            <Link
-              className="text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-              href={reportHref(reportView, reportPage + 1)}
-            >
+            <Link className={linkAccentTight} href={reportHref(reportView, reportPage + 1)}>
               {copy.next}
             </Link>
           )}

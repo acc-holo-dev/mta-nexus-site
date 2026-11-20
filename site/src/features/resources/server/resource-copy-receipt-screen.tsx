@@ -14,7 +14,7 @@ import { pageShellMax4xl as pageShellClass } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { ResourceCopyMetadataView } from "../copy-view";
 import { resourceCopyCopy, resourceCopyError } from "../resource-copy-i18n";
-import { linkAccentRounded } from "../../shell/link-shell";
+import { linkAccentRounded, linkAccentTightRounded } from "../../shell/link-shell";
 import {
   resourceCopiesPageParams,
   resourceCopiesQuery,
@@ -93,7 +93,7 @@ export async function ResourceCopyReceiptScreen({
       <section className={pageShellClass}>
         <Link
           href={`/workspace/resources/${encodeURIComponent(id)}/copies`}
-          className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          className={linkAccentTightRounded}
         >
           {c.history}
         </Link>
@@ -119,13 +119,13 @@ export async function ResourceCopyReceiptScreen({
         <div className="flex flex-wrap gap-4">
           <Link
             href={`/workspace/resources/${encodeURIComponent(receipt.target.id)}`}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentTightRounded}
           >
             {c.target}
           </Link>
           <a
             href={`/api/products/${encodeURIComponent(id)}/copies/${encodeURIComponent(receipt.id)}/export`}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentTightRounded}
           >
             {c.export}
           </a>

@@ -9,7 +9,7 @@ import { formatFinancialMinor } from "../financial-i18n";
 import { sellerSalesCopy, sellerSalesTime } from "../seller-sales-i18n";
 import { sellerSalesUrl, sellerSaleUrl } from "../seller-sales-query";
 
-import { linkAccentSmRounded } from "../../shell/link-shell";
+import { linkAccentSmRounded, linkAccentTightRounded } from "../../shell/link-shell";
 type Scopes = { scopes: { id: string; name: string }[]; page: number; totalPages: number };
 export function SellerSalesReportView({
   report,
@@ -258,7 +258,7 @@ export function SellerSalesReportView({
           {report.page > 1 ? (
             <Link
               href={sellerSalesUrl(query, report.page - 1, scopes.page)}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentTightRounded}
             >
               {c.previous}
             </Link>
@@ -269,7 +269,7 @@ export function SellerSalesReportView({
           {report.page < report.totalPages ? (
             <Link
               href={sellerSalesUrl(query, report.page + 1, scopes.page)}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentTightRounded}
             >
               {c.next}
             </Link>
@@ -315,7 +315,7 @@ export function SellerSalesReportView({
         <nav aria-label={c.account} className="flex flex-wrap gap-4 text-sm">
           <Link
             href={sellerSalesUrl({ ...query, organizationId: undefined, productId: undefined }, 1)}
-            className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            className={linkAccentTightRounded}
           >
             {c.personal}
           </Link>
@@ -328,7 +328,7 @@ export function SellerSalesReportView({
                 scopes.page,
               )}
               aria-current={query.organizationId === scope.id ? "page" : undefined}
-              className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              className={linkAccentTightRounded}
             >
               {scope.name}
             </Link>
@@ -339,7 +339,7 @@ export function SellerSalesReportView({
             {scopes.page > 1 ? (
               <Link
                 href={sellerSalesUrl(query, report.page, scopes.page - 1)}
-                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentTightRounded}
               >
                 {c.previous}
               </Link>
@@ -350,7 +350,7 @@ export function SellerSalesReportView({
             {scopes.page < scopes.totalPages ? (
               <Link
                 href={sellerSalesUrl(query, report.page, scopes.page + 1)}
-                className="rounded text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+                className={linkAccentTightRounded}
               >
                 {c.next}
               </Link>
