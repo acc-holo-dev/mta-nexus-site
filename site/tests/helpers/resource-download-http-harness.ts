@@ -58,7 +58,7 @@ export function createResourceDownloadHttpProductServiceMock() {
   return {
     productService: {
       canManageProduct: vi.fn(async () => resourceDownloadHttpState.managementAccess),
-      getProductById: vi.fn(async () => resourceDownloadHttpState.product),
+      findProductRecord: vi.fn(async () => resourceDownloadHttpState.product),
       findLatestPublishedBuildByProduct: resourceDownloadHttpFindLatestPublishedBuild,
       findPublishedBuildByProductAndId: resourceDownloadHttpFindPinnedPublishedBuild,
       authorizeResourceDownload: async (input: unknown) => {

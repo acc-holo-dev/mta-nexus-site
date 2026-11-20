@@ -68,7 +68,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return json(context, { error: copy.rate }, 429);
     }
 
-    const product = await productService.getProductById(productId);
+    const product = await productService.findProductRecord(productId);
     if (!product) {
       return json(context, { error: copy.notFound }, 404);
     }

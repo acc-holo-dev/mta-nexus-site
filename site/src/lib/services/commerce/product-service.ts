@@ -247,6 +247,11 @@ export class ProductService {
     return build ? product : null;
   }
 
+  /** Unfiltered record read for authenticated HTTP commands (download, link auth). */
+  findProductRecord(id: string) {
+    return productRepository.findById(id);
+  }
+
   async getProductBuilds(productId: string, includeNonPublic = false): Promise<Build[]> {
     return includeNonPublic
       ? buildRepository.listByProduct(productId)

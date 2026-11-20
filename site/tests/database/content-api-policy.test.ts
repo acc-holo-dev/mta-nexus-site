@@ -46,7 +46,7 @@ vi.mock("../../src/lib/services/servers/server-service", () => ({
 vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: {
     canManageProduct: vi.fn(),
-    getProductById: mocks.findProduct,
+    findProductRecord: mocks.findProduct,
   },
 }));
 

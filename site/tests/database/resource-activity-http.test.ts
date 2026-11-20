@@ -47,7 +47,7 @@ const build = {
 vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: {
     canManageProduct: async () => false,
-    getProductById: async () => ({ id: "prd_a", slug: "resource", status: "published" }),
+    findProductRecord: async () => ({ id: "prd_a", slug: "resource", status: "published" }),
     findLatestPublishedBuildByProduct: async () => build,
     findPublishedBuildByProductAndId: async () => build,
     authorizeResourceDownload: state.authorize,

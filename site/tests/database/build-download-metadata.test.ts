@@ -31,7 +31,7 @@ const buildFixture = {
 vi.mock("../../src/lib/services/commerce/product-service", () => ({
   productService: {
     canManageProduct: async () => true,
-    getProductById: async () => ({ id: "product", slug: "product", status: "published" }),
+    findProductRecord: async () => ({ id: "product", slug: "product", status: "published" }),
     findBuildById: async () => ({ ...buildFixture, sha256Hash: mocks.hash }),
     findLatestPublishedBuildByProduct: async () => ({
       ...buildFixture,

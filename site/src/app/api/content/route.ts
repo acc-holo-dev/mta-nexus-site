@@ -129,7 +129,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     }
 
     if (parsed.data.productId) {
-      const linkedProduct = await productService.getProductById(parsed.data.productId);
+      const linkedProduct = await productService.findProductRecord(parsed.data.productId);
       if (!linkedProduct) {
         return privateJson(
           context,
