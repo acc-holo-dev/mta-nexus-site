@@ -8,6 +8,7 @@
 | `report-controls.ts`                                                             | `ReportModerationControls`                                                |
 | `verification-workspace.ts`, `verification-amend.ts`, `verification-controls.ts` | Верификация workspace                                                     |
 | `reports-server.ts`                                                              | Серверные экраны жалоб                                                    |
+| `admin-home-server.ts`                                                           | `AdminHomeScreen`; server-only хаб `/admin`                               |
 | `admin-home.ts`                                                                  | `Admin*Section` blocks для `/admin` overview                              |
 | `storage-maintenance.ts`                                                         | `StorageDiscoveryControls`, `StorageCleanupControls` для `/admin/storage` |
 | `admin-status-labels.ts`                                                         | `adminStatusLabel`, `adminStatusTone` (staff enum labels)                 |

@@ -52,7 +52,10 @@ const features = [
       "platform-reports-api-copy",
     ],
     privateClients: [],
-    servers: [["reports-server", "platform-reports-screen.tsx"]],
+    servers: [
+      ["reports-server", "platform-reports-screen.tsx"],
+      ["admin-home-server", "admin-home-screen.tsx"],
+    ],
     safe: "http/private-api-request|community-report-copy|order-case-i18n|resource-review-i18n|user-platform-copy|user-platform-client|user-platform-contract|verification-applications-contract|content-discussion-contract|verification-workspace-contract|verification-workspace-copy",
   },
   {
