@@ -5,12 +5,14 @@ import {
   buildVerifiedWithdrawalPayoutPosting,
   buildWalletHoldReleasePosting,
   buildWalletSpendPosting,
+  buildWithdrawalCancelPosting,
   buildWithdrawalHoldPosting,
   createTopUpIntent,
   createWithdrawalIntent,
   type LedgerPosting,
   markTopUpAwaitingProvider,
   markWithdrawalAwaitingProvider,
+  markWithdrawalCancelled,
   paymentProviderCapabilityMatrix,
   StubPaymentProvider,
   selectPaymentProvider,
@@ -235,6 +237,13 @@ describe("wallet payments domain", () => {
     expect(isWalletWithdrawEnabled({ NEXUS_WALLET_ENGINE: "1", NEXUS_WALLET_WITHDRAW: "1" })).toBe(
       true,
     );
+    const cancelled = buildWithdrawalCancelPosting({
+      intent: awaiting,
+      escrowEntryId: "ldg_w_esc_cancel",
+      userEntryId: "ldg_w_user_cancel",
+    });
+    expect(() => validateLedgerPosting(cancelled)).not.toThrow();
+    expect(markWithdrawalCancelled(awaiting).status).toBe("cancelled");
   });
 
   it("releases a matured seller hold from escrow to available", () => {

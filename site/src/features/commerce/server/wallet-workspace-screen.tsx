@@ -32,7 +32,7 @@ import { formatFinancialMinor } from "../financial-i18n";
 import { WalletHoldReleaseForm } from "../wallet-hold-release";
 import { getWalletCopy } from "../wallet-i18n";
 import { WalletTopUpForm } from "../wallet-topup";
-import { WalletWithdrawForm } from "../wallet-withdraw";
+import { WalletWithdrawCancelForm, WalletWithdrawForm } from "../wallet-withdraw";
 
 const walletPaymentService = new WalletPaymentService();
 const CURRENCIES = ["USD", "EUR", "RUB"] as const;
@@ -382,6 +382,13 @@ export async function WalletWorkspaceScreen({
                                 {formatHistoryDate(new Date(intent.createdAt), locale)} ·{" "}
                                 {intent.id}
                               </p>
+                              {intent.status === "awaiting_provider" ? (
+                                <WalletWithdrawCancelForm
+                                  actorId={user.id}
+                                  intentId={intent.id}
+                                  organizationId={org.organizationId}
+                                />
+                              ) : null}
                             </li>
                           ))}
                         </ul>
@@ -418,6 +425,9 @@ export async function WalletWorkspaceScreen({
                     {withdrawalStatusLabel(copy, intent.status)} · {copy.recordedAt}:{" "}
                     {formatHistoryDate(new Date(intent.createdAt), locale)} · {intent.id}
                   </p>
+                  {intent.status === "awaiting_provider" ? (
+                    <WalletWithdrawCancelForm actorId={user.id} intentId={intent.id} />
+                  ) : null}
                 </li>
               ))}
             </ul>

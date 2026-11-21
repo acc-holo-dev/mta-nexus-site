@@ -554,6 +554,52 @@ export function buildVerifiedWithdrawalRefundPosting(input: {
   return entries;
 }
 
+/** Return held withdrawal funds to available balance when the owner cancels before payout. */
+export function buildWithdrawalCancelPosting(input: {
+  intent: WithdrawalIntent;
+  escrowEntryId: string;
+  userEntryId: string;
+}): LedgerPosting[] {
+  const { intent } = input;
+  if (intent.status !== "awaiting_provider") {
+    throw new AppError("Withdrawal intent cannot be cancelled", 409, "WITHDRAWAL_INTENT_STATE");
+  }
+  assertWalletAccountId(intent.accountId);
+  assertEscrowAccountId(intent.escrowAccountId);
+  assertWalletAmount(intent.amount);
+  assertWalletCurrency(intent.currency);
+  const entries: LedgerPosting[] = [
+    {
+      id: input.escrowEntryId,
+      accountId: intent.escrowAccountId,
+      amount: -intent.amount,
+      currency: intent.currency,
+      referenceType: "withdrawal",
+      referenceId: intent.id,
+      description: `Release cancelled withdrawal escrow ${intent.id}`,
+    },
+    {
+      id: input.userEntryId,
+      accountId: intent.accountId,
+      amount: intent.amount,
+      currency: intent.currency,
+      referenceType: "withdrawal",
+      referenceId: intent.id,
+      description: `Return cancelled withdrawal ${intent.id}`,
+    },
+  ];
+  validateLedgerPosting(entries);
+  return entries;
+}
+
+export function markWithdrawalCancelled(intent: WithdrawalIntent): WithdrawalIntent {
+  if (intent.status === "cancelled") return intent;
+  if (intent.status !== "awaiting_provider") {
+    throw new AppError("Withdrawal intent cannot be cancelled", 409, "WITHDRAWAL_INTENT_STATE");
+  }
+  return { ...intent, status: "cancelled" };
+}
+
 /**
  * Split a wallet spend gross into platform fee + seller proceeds (ECON-001).
  * Seller proceeds are held in escrow for INITIAL_HOLD_DAYS (ECON-002) before release.

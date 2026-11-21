@@ -267,6 +267,57 @@ export class WalletWithdrawalRepository {
       return { intent: toIntent(row), entries: posted };
     });
   }
+
+  /** Cancel an awaiting withdrawal and return escrow to available balance. */
+  async cancelAwaiting(input: {
+    intentId: string;
+    accountId: string;
+    settleLedgerBatchId: string;
+    entries: LedgerPosting[];
+  }): Promise<{ intent: WithdrawalIntent; entries: LedgerEntry[] | null }> {
+    return db.transaction(async (tx) => {
+      await tx.execute(
+        sql`select pg_advisory_xact_lock(hashtext(${`wallet-withdraw:${input.intentId}`}))`,
+      );
+      const [current] = await tx
+        .select()
+        .from(walletWithdrawalIntents)
+        .where(eq(walletWithdrawalIntents.id, input.intentId))
+        .limit(1)
+        .for("update");
+      if (!current) throw new AppError("Withdrawal intent not found", 404, "WITHDRAWAL_NOT_FOUND");
+      if (current.accountId !== input.accountId) {
+        throw new AppError("Withdrawal intent account mismatch", 403, "FORBIDDEN");
+      }
+      if (current.status === "cancelled") {
+        return { intent: toIntent(current), entries: null };
+      }
+      if (current.status !== "awaiting_provider") {
+        throw new AppError("Withdrawal intent cannot be cancelled", 409, "WITHDRAWAL_INTENT_STATE");
+      }
+      const posted = await postLedgerBatchInTransaction(
+        tx,
+        input.settleLedgerBatchId,
+        input.entries,
+      );
+      const [row] = await tx
+        .update(walletWithdrawalIntents)
+        .set({
+          status: "cancelled",
+          settleLedgerBatchId: input.settleLedgerBatchId,
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(walletWithdrawalIntents.id, input.intentId),
+            eq(walletWithdrawalIntents.status, "awaiting_provider"),
+          ),
+        )
+        .returning();
+      if (!row) throw new AppError("Withdrawal cancel raced", 409, "WITHDRAWAL_CANCEL_RACE");
+      return { intent: toIntent(row), entries: posted };
+    });
+  }
 }
 
 export const walletWithdrawalRepository = new WalletWithdrawalRepository();

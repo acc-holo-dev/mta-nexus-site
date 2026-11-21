@@ -104,6 +104,7 @@ const REQUIRED_BROWSER = [
   "site/src/app/api/admin/commerce/wallet-holds/release-matured/route.ts",
   "site/src/app/api/wallet/topups/route.ts",
   "site/src/app/api/wallet/withdrawals/route.ts",
+  "site/src/app/api/wallet/withdrawals/[id]/cancel/route.ts",
   "site/src/app/api/wallet/holds/release-matured/route.ts",
   "site/src/app/api/orders/[id]/pay-with-wallet/route.ts",
   "site/src/app/api/checkout/wallet/route.ts",

@@ -107,3 +107,9 @@ export const walletWithdrawalQuerySchema = z
     organizationId: organizationId.optional(),
   })
   .strict();
+
+export const walletWithdrawalCancelSchema = z
+  .object({
+    organizationId: organizationId.optional(),
+  })
+  .strict();

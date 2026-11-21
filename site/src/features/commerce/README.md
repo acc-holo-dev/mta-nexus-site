@@ -29,10 +29,11 @@ intents (migration `0094_wallet_withdrawal_intents`) hold available balance in
 escrow until a verified payout event; HTTP `POST /api/wallet/withdrawals` also
 needs `NEXUS_WALLET_WITHDRAW=1` (live payout adapters stay off).
 `GET`/`POST /api/wallet/withdrawals` accept optional `organizationId`
-(owner/admin); `/workspace/wallet` shows personal and org stub withdraw forms
-plus recent intents when withdraw policy is on. When the engine is on, authors
-may create/release paid `single_server` listings (still not card checkout).
-Redirect never credits the wallet.
+(owner/admin); `POST /api/wallet/withdrawals/:id/cancel` returns escrow to
+available for awaiting intents. `/workspace/wallet` shows personal and org stub
+withdraw forms, recent intents, and cancel CTAs when withdraw policy is on.
+When the engine is on, authors may create/release paid `single_server` listings
+(still not card checkout). Redirect never credits the wallet.
 
 | Entry                             | Контракт                                                                                                          |
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------------- |

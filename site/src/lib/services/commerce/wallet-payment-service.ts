@@ -16,6 +16,7 @@ import {
   buildVerifiedWithdrawalPayoutPosting,
   buildVerifiedWithdrawalRefundPosting,
   buildWalletSpendPosting,
+  buildWithdrawalCancelPosting,
   buildWithdrawalHoldPosting,
   canManageOrganization,
   createTopUpIntent,
@@ -201,6 +202,37 @@ export class WalletPaymentService {
 
   async listRecentWithdrawals(accountId: string, limit = 20): Promise<WithdrawalIntent[]> {
     return this.withdrawals.listRecentByAccount(accountId, limit);
+  }
+
+  async cancelWithdrawal(input: {
+    intentId: string;
+    accountId: string;
+  }): Promise<{ intent: WithdrawalIntent }> {
+    if (!isWalletWithdrawEnabled()) {
+      throw new AppError("Wallet withdrawals are disabled", 404, "WALLET_WITHDRAW_DISABLED");
+    }
+    const stored = await this.withdrawals.findById(input.intentId);
+    if (!stored) {
+      throw new AppError("Withdrawal intent not found", 404, "WITHDRAWAL_NOT_FOUND");
+    }
+    if (stored.accountId !== input.accountId) {
+      throw new ForbiddenError("Not authorized for this withdrawal");
+    }
+    if (stored.status === "cancelled") {
+      return { intent: stored };
+    }
+    const entries = buildWithdrawalCancelPosting({
+      intent: stored,
+      escrowEntryId: generateId("ldg"),
+      userEntryId: generateId("ldg"),
+    });
+    const result = await this.withdrawals.cancelAwaiting({
+      intentId: stored.id,
+      accountId: input.accountId,
+      settleLedgerBatchId: `wwd_cancel_${stored.id}`,
+      entries,
+    });
+    return { intent: result.intent };
   }
 
   async applyVerifiedWebhook(

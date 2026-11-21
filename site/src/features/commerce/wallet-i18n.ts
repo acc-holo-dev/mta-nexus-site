@@ -82,6 +82,12 @@ const copy = {
     withdrawUnavailable: "Wallet withdrawals are not available in this environment.",
     withdrawEnabledNote:
       "Withdrawal policy is on in this environment. Starting a withdrawal holds available balance in escrow; live payout still requires a verified provider event.",
+    withdrawCancel: "Cancel withdrawal hold",
+    withdrawCancelling: "Cancelling withdrawal…",
+    withdrawCancelSuccess: "Withdrawal cancelled. Escrow returned to available balance.",
+    withdrawCancelFailed: "Withdrawal cancel was not confirmed. Retry the same request.",
+    withdrawCancelNote:
+      "Cancels an awaiting withdrawal hold and returns escrow to available site-wallet balance. This is not a payout.",
     held: "Seller holds",
     heldEmpty: "No seller proceeds on hold for this currency.",
     heldEmptyHint:
@@ -147,6 +153,8 @@ const copy = {
       WITHDRAWAL_IDEMPOTENCY_CONFLICT:
         "This withdrawal request was already used with different details.",
       WITHDRAWAL_INTENT_STATE: "This withdrawal cannot continue in its current state.",
+      WITHDRAWAL_NOT_FOUND: "Withdrawal intent was not found.",
+      WITHDRAWAL_CANCEL_RACE: "Withdrawal cancel raced with another update. Retry.",
       ORDER_NOT_PAYABLE: "This order cannot accept wallet settlement.",
       ORDER_STATE_CHANGED: "Order state changed. Refresh and try again.",
       ORDER_CATALOG_CHANGED: "Catalog terms changed. Refresh and try again.",
@@ -237,6 +245,12 @@ const copy = {
     withdrawUnavailable: "Вывод с кошелька недоступен в этой среде.",
     withdrawEnabledNote:
       "Политика вывода включена. Старт вывода удерживает available баланс в escrow; live payout всё ещё требует verified события провайдера.",
+    withdrawCancel: "Отменить холд вывода",
+    withdrawCancelling: "Отмена вывода…",
+    withdrawCancelSuccess: "Вывод отменён. Escrow возвращён в available баланс.",
+    withdrawCancelFailed: "Отмена вывода не подтверждена. Повторите тот же запрос.",
+    withdrawCancelNote:
+      "Отменяет ожидающий холд вывода и возвращает escrow в available баланс site wallet. Это не выплата.",
     held: "Холды продавца",
     heldEmpty: "По этой валюте нет поступлений продавца на холде.",
     heldEmptyHint:
@@ -300,6 +314,8 @@ const copy = {
       WALLET_WITHDRAW_INVALID: "Проверьте сумму, валюту и провайдера для вывода.",
       WITHDRAWAL_IDEMPOTENCY_CONFLICT: "Этот запрос вывода уже использован с другими данными.",
       WITHDRAWAL_INTENT_STATE: "Этот вывод нельзя продолжить в текущем состоянии.",
+      WITHDRAWAL_NOT_FOUND: "Намерение вывода не найдено.",
+      WITHDRAWAL_CANCEL_RACE: "Отмена вывода пересеклась с другим обновлением. Повторите.",
       ORDER_NOT_PAYABLE: "Этот заказ нельзя оплатить с кошелька.",
       ORDER_STATE_CHANGED: "Состояние заказа изменилось. Обновите страницу и повторите.",
       ORDER_CATALOG_CHANGED: "Условия каталога изменились. Обновите страницу и повторите.",
