@@ -258,7 +258,7 @@ Delist/archive UX: unlist доступен; history/buyer records survive; publi
 
 ## 8. Отказы и non-goals (ресурсы)
 
-Не начинать first commerce с: custom crypto custody; самодельный wallet без legal need; сложный ad auction; dozens unrelated categories; DRM с per-customer recompilation (commerce non-goals → COMMERCIAL-FUTURE).
+Не начинать first commerce с: custom crypto custody; unaudited balance без journal; сложный ad auction; dozens unrelated categories; DRM с per-customer recompilation. Audited site wallet (NX-015) — цель владельца, см. COMMERCIAL-FUTURE; legal/PSP gate до live top-up.
 
 Не делать:
 

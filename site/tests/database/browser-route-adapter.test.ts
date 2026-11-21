@@ -8,6 +8,10 @@ import {
   LICENSE_BEARER_ROUTE_ADAPTER,
   withLicenseBearerRoute,
 } from "../../src/lib/http/license-bearer-route-adapter";
+import {
+  PAYMENT_PROVIDER_WEBHOOK_ROUTE_ADAPTER,
+  withPaymentProviderWebhook,
+} from "../../src/lib/http/payment-provider-webhook-route-adapter";
 
 const licenseRuntimeRequest = vi.hoisted(() =>
   vi.fn(async (_request: NextRequest, operation: (digest: string) => Promise<unknown | null>) => {
@@ -36,6 +40,7 @@ describe("route adapter markers", () => {
   it("keeps the stable inventory ids", () => {
     expect(BROWSER_ROUTE_ADAPTER).toBe("browser-csrf-v1");
     expect(LICENSE_BEARER_ROUTE_ADAPTER).toBe("license-bearer-v1");
+    expect(PAYMENT_PROVIDER_WEBHOOK_ROUTE_ADAPTER).toBe("payment-provider-webhook-v1");
   });
 });
 
@@ -89,5 +94,20 @@ describe("withLicenseBearerRoute", () => {
     expect(operation).toHaveBeenCalledWith("digest_test", request);
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ digest: "digest_test", valid: true });
+  });
+});
+
+describe("withPaymentProviderWebhook", () => {
+  it("forwards the request without applying browser CSRF", async () => {
+    const handler = vi.fn(async () => NextResponse.json({ ok: true }));
+    const route = withPaymentProviderWebhook(handler);
+    const request = new NextRequest("https://nexus.test/api/wallet/providers/stub/webhook", {
+      method: "POST",
+      headers: { "content-type": "application/json", origin: "https://evil.test" },
+      body: "{}",
+    });
+    const response = await route(request);
+    expect(response.status).toBe(200);
+    expect(handler).toHaveBeenCalledOnce();
   });
 });

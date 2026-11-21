@@ -1066,6 +1066,58 @@ export const ledgerPostingBatches = pgTable(
   ],
 );
 
+/** NX-015 site-wallet top-up intents. Credit only after verified provider events. */
+export const walletTopupIntents = pgTable(
+  "wallet_topup_intents",
+  {
+    id: text("id").primaryKey(),
+    accountId: text("account_id").notNull(),
+    amount: integer("amount").notNull(),
+    currency: text("currency").notNull(),
+    providerId: text("provider_id").notNull(),
+    status: text("status").notNull().default("created"),
+    idempotencyKey: text("idempotency_key").notNull(),
+    providerSessionId: text("provider_session_id"),
+    providerEventId: text("provider_event_id"),
+    ledgerBatchId: text("ledger_batch_id").references(() => ledgerPostingBatches.id, {
+      onDelete: "restrict",
+    }),
+    returnPath: text("return_path").notNull().default("/"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    check(
+      "wallet_topup_intents_account_id_check",
+      sql`${table.accountId} ~ '^(user|org):[A-Za-z0-9_-]{1,128}$'`,
+    ),
+    check(
+      "wallet_topup_intents_amount_check",
+      sql`${table.amount} > 0 AND ${table.amount} <= 2147483647`,
+    ),
+    check("wallet_topup_intents_currency_check", sql`${table.currency} IN ('USD', 'EUR', 'RUB')`),
+    check(
+      "wallet_topup_intents_provider_id_check",
+      sql`${table.providerId} IN ('stub', 'stripe', 'yookassa', 'crypto')`,
+    ),
+    check(
+      "wallet_topup_intents_status_check",
+      sql`${table.status} IN ('created', 'awaiting_provider', 'succeeded', 'failed', 'cancelled')`,
+    ),
+    check(
+      "wallet_topup_intents_idempotency_key_check",
+      sql`${table.idempotencyKey} ~ '^[A-Za-z0-9_-]{8,128}$'`,
+    ),
+    uniqueIndex("wallet_topup_intents_idempotency_key_uidx").on(table.idempotencyKey),
+    index("wallet_topup_intents_account_created_idx").on(
+      table.accountId,
+      table.createdAt.desc(),
+      table.id.desc(),
+    ),
+    index("wallet_topup_intents_status_provider_idx").on(table.status, table.providerId),
+  ],
+);
+
 // 16. Append-Only Financial Ledger
 export const ledgerEntries = pgTable(
   "ledger_entries",

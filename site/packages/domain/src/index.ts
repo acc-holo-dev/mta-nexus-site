@@ -8,6 +8,7 @@ export * from "./entities";
 export * from "./errors";
 export * from "./events";
 export * from "./financial-journal";
+export * from "./wallet-payments";
 export * from "./library-collections";
 export * from "./library-release-comparison";
 export * from "./library-release-history";

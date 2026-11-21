@@ -110,6 +110,7 @@ export * from "./users";
 export * from "./verification";
 export * from "./verification-notification-delivery";
 export { verificationWorkspaceRepository } from "./verification-workspace";
+export * from "./wallet-topup";
 export * from "./web-push-dispatcher";
 export * from "./web-push-outbox";
 export * from "./web-push-subscriptions";

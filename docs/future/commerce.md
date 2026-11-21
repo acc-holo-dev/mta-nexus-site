@@ -53,15 +53,19 @@
 
 ## 3. Доменные границы checkout и выплат
 
-**цель владельца.** Разделять: `Order`, `Payment`, `Purchase`, `License/Entitlement`, `Ledger`, `Payout`, `Refund`, `Dispute`. Клиентский redirect **никогда** не доказывает оплату.
+**цель владельца.** Разделять: `Order`, `Payment`, `Purchase`, `License/Entitlement`, `Ledger`, `Payout`, `Refund`, `Dispute`, **`WalletTopUp`**, **`WalletSpend`**, **`Withdrawal`**. Клиентский redirect **никогда** не доказывает оплату и **никогда** не кредитует баланс.
 
-Поток: `Buy → immutable order snapshot → PSP checkout → verified webhook/API → payment succeeded → purchase → license/entitlement → accounting`.
+**Модель баланса (NX-015, 2026-11-21):** NEXUS ведёт **внутренний site wallet (stored value)** на double-entry ledger. Пользователь пополняет баланс через PSP → после _verified_ webhook/API средства становятся available на счёте `user:`/`org:` → тратит внутри площадки (orders/subscriptions/services). **Вывод** — отдельный flow позже, когда будут договоры с провайдерами payout; код и статусы готовятся как production-shaped, live adapter выключен. Это осознанный audited wallet NEXUS, не «поле balance в users» и не unaudited DIY cash.
 
-**Комиссия (ECON-001):** **10%** от суммы, реально оплаченной покупателем после скидок. PSP fees/tax/settlement — по provider/legal contract. Future Creator subscriptions могут снизить процент; exact rates **OPEN**.
+Поток пополнения: `TopUpIntent → provider session (hosted) → verified webhook/API → ledger topup credit → available balance`.  
+Поток покупки с баланса: `Buy → immutable order snapshot → wallet_spend posting → purchase → license/entitlement` (комиссия/hold — отдельные проводки).  
+Прямой PSP→Order без кошелька остаётся совместимым запасным путём; primary owner target — wallet.
 
-**Hold (ECON-002):** baseline нового seller — **7 дней** до payable/settled. Subscription / verification / healthy history могут сократить к ~1–3 дням. Никакой план не отменяет fraud/chargeback/dispute/compliance/provider reserve.
+**Комиссия (ECON-001):** **10%** от суммы, реально оплаченной покупателем после скидок (для wallet spend — от суммы списания с баланса по политике launch). PSP fees/tax/settlement — по provider/legal contract. Future Creator subscriptions могут снизить процент; exact rates **OPEN**.
 
-**Провайдеры (PAY-010):** multi-provider/multi-method через capability matrix. Предпочтение: marketplace-capable PSP со split/settlement/KYC/payout и минимумом ручных операций владельца. Internal ledger — fallback с большей legal/accounting нагрузкой.
+**Hold (ECON-002):** baseline нового seller — **7 дней** до payable/settled. Subscription / verification / healthy history могут сократить к ~1–3 дням. Никакой план не отменяет fraud/chargeback/dispute/compliance/provider reserve. Seller payable ≠ buyer wallet available.
+
+**Провайдеры (PAY-010 + NX-015):** multi-provider/multi-method через **capability matrix** (`topup` / `payout` / `webhook_verify` / `refund`). Порты: `stub` (единственный без контракта), `stripe`, `yookassa`, `crypto` (и дальше по мере договоров). Live credentials не требуются для каркаса; stub — production-shaped заглушка только на границе top-up/webhook. Internal ledger — **источник истины баланса**, не fallback.
 
 **Refund (COM-001):** digital download не означает автоматический no-refund. Минимум причин: materially не работает / не соответствует описанию; duplicate; fraud/unauthorized; staff-approved exceptions. Seller **не** имеет untracked unilateral refund. Windows/evidence/partial — launch policy (**OPEN**).
 
@@ -71,7 +75,8 @@
 
 **Tax:** где возможно — PSP/MoR/marketplace capability; NEXUS не становится налоговым движком без необходимости.
 
-**Seller balance UI:** pending / on hold / available / paid / refunded / disputed/reserved / commission / PSP fees. Не называть provider-held funds «банковским счётом NEXUS» или wallet, если это не wallet. Receipts/invoices — provider-backed, с immutable order/payment identifiers.
+**Buyer wallet UI:** available / pending top-up / held / spent; никогда не обещать withdrawable, пока payout adapter и policy не включены.  
+**Seller balance UI:** pending / on hold / available / paid / refunded / disputed/reserved / commission / PSP fees — отдельно от buyer wallet. Provider-held settlement funds не смешивать с site wallet без явной проводки. Receipts/invoices — provider-backed + immutable order/payment/top-up identifiers.
 
 **30-day delist/seller-ban access:** existing buyers получают **30 дней** redownload/hosting последней разрешённой версии. Исключения: malware/security — немедленное закрытие; legal/copyright/provider order — иной срок; уже полученный open-source copy физически не «отзывается». Правило заметно в Seller Agreement, purchase UI и Refund Policy. **Не путать** с сроком DRM-license (ниже).
 
@@ -138,7 +143,7 @@
 
 ## 6. Services, Deals и Guarantee
 
-**цель владельца.** Custom development/services + структурированный Deal/Guarantee. Funds flow — через PSP marketplace/escrow-like capabilities, **не** самодельный unaudited wallet.
+**цель владельца.** Custom development/services + структурированный Deal/Guarantee. Funds flow — через site wallet и/или PSP escrow-like capabilities с audited ledger (NX-015); **запрещён** unaudited balance без journal.
 
 Стабильные domain states: `DRAFT → PROPOSED → ACCEPTED → FUNDED/PROVIDER_SECURED → IN_PROGRESS → DELIVERY_SUBMITTED → ACCEPTED → SETTLEMENT_PENDING → COMPLETED` (или `DISPUTED → REVIEW → RESOLVED`). До оплаты фиксируются scope, deliverables, price, milestones, license/source/DRM, evidence policy, acceptance, refund/dispute. Существенные изменения после funding — explicit amendment обеих сторон.
 

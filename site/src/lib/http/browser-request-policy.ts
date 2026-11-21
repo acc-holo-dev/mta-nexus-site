@@ -20,6 +20,22 @@ export function isLicenseRuntimeRequest(pathname: string): boolean {
   return pathname === "/api/licenses/check" || pathname === "/api/licenses/check-release";
 }
 
+/**
+ * Exact payment-provider webhook routes. Provider signature verification replaces
+ * browser CSRF; cookies never authorize these paths.
+ */
+const PAYMENT_PROVIDER_WEBHOOK_IDS = new Set(["stub", "stripe", "yookassa", "crypto"]);
+
+export function isPaymentProviderWebhookRequest(pathname: string): boolean {
+  const match = /^\/api\/wallet\/providers\/([a-z0-9_-]+)\/webhook$/u.exec(pathname);
+  return match !== null && PAYMENT_PROVIDER_WEBHOOK_IDS.has(match[1] ?? "");
+}
+
+/** Machine routes that must skip the browser CSRF proxy gate. */
+export function isMachineApiRequest(pathname: string): boolean {
+  return isLicenseRuntimeRequest(pathname) || isPaymentProviderWebhookRequest(pathname);
+}
+
 function httpUrl(value: string): URL | null {
   try {
     const url = new URL(value);

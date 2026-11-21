@@ -171,4 +171,23 @@ describe("global API browser boundary", () => {
       expect(response.headers.get("x-middleware-next")).toBe("1");
     }
   });
+  it("leaves exact payment-provider webhook routes to provider signature checks", () => {
+    for (const path of [
+      "/api/wallet/providers/stub/webhook",
+      "/api/wallet/providers/stripe/webhook",
+      "/api/wallet/providers/yookassa/webhook",
+      "/api/wallet/providers/crypto/webhook",
+    ]) {
+      const response = proxy(new NextRequest(`https://nexus.test${path}`, { method: "POST" }));
+      expect(response.headers.get("x-middleware-next")).toBe("1");
+    }
+    expect(
+      proxy(
+        new NextRequest("https://nexus.test/api/wallet/topups", {
+          method: "POST",
+          headers: { origin: "https://evil.test" },
+        }),
+      ).status,
+    ).toBe(403);
+  });
 });

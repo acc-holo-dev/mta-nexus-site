@@ -6,12 +6,12 @@ import {
   PUBLIC_OFFLINE_CACHE_MARKER,
 } from "./features/shell/offline-cache-policy";
 import { rejectUnsafeBrowserRequest } from "./lib/http/browser-request-guard";
-import { isLicenseRuntimeRequest } from "./lib/http/browser-request-policy";
+import { isMachineApiRequest } from "./lib/http/browser-request-policy";
 
 export function proxy(request: NextRequest) {
   if (
     request.nextUrl.pathname.startsWith("/api/") &&
-    !isLicenseRuntimeRequest(request.nextUrl.pathname)
+    !isMachineApiRequest(request.nextUrl.pathname)
   ) {
     const rejected = rejectUnsafeBrowserRequest(request);
     if (rejected) return rejected;

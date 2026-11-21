@@ -1,6 +1,20 @@
 import type { LedgerEntry } from "./entities";
 import { AppError } from "./errors";
 export type LedgerPosting = Omit<LedgerEntry, "balanceAfter" | "createdAt">;
+
+/** Append-only journal reference kinds. Wallet top-up/spend/withdraw are first-class. */
+export const LEDGER_REFERENCE_TYPES = [
+  "order",
+  "fee",
+  "payout",
+  "refund",
+  "topup",
+  "wallet_spend",
+  "withdrawal",
+  "wallet_hold",
+] as const;
+export type LedgerReferenceType = (typeof LEDGER_REFERENCE_TYPES)[number];
+
 export function validateLedgerPosting(entries: LedgerPosting[]) {
   const invalid = () =>
     new AppError("A balanced bounded journal is required", 400, "LEDGER_POSTING_INVALID");
@@ -17,7 +31,7 @@ export function validateLedgerPosting(entries: LedgerPosting[]) {
       entry.amount < -2147483648 ||
       entry.amount > 2147483647 ||
       !["USD", "EUR", "RUB"].includes(entry.currency) ||
-      !["order", "fee", "payout", "refund"].includes(entry.referenceType) ||
+      !(LEDGER_REFERENCE_TYPES as readonly string[]).includes(entry.referenceType) ||
       !/^[A-Za-z0-9_-]{1,128}$/u.test(entry.referenceId) ||
       !entry.description.trim() ||
       entry.description.length > 1000
