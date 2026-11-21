@@ -18,6 +18,7 @@ import {
 export function WalletCheckoutButton({
   actorId,
   productId,
+  buildId,
   amountLabel,
   amountMinor,
   currency,
@@ -26,6 +27,8 @@ export function WalletCheckoutButton({
 }: {
   actorId: string | null;
   productId: string;
+  /** Optional published build evidence for single-product checkout. */
+  buildId?: string;
   amountLabel: string;
   amountMinor: number;
   currency: string;
@@ -69,7 +72,10 @@ export function WalletCheckoutButton({
       const response = await fetch("/api/checkout/wallet", {
         ...privateApiRequest({
           method: "POST",
-          json: { productIds: [productId] },
+          json: {
+            productIds: [productId],
+            ...(buildId ? { buildId } : {}),
+          },
           signal: abort.signal,
         }),
         headers: { "Content-Type": "application/json", "x-nexus-actor-id": actorId },

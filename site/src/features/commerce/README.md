@@ -18,6 +18,9 @@ Pending paid orders settle via `POST /api/orders/:id/pay-with-wallet` (atomic
 `wallet_spend` with ECON-001 platform fee + ECON-002 escrow holds, completed
 payment, order completion, download entitlement). Create+settle from catalog:
 `POST /api/checkout/wallet` (card `/api/checkout` stays `CHECKOUT_DISABLED`).
+Optional single-product `buildId` records published-build evidence on entitlement
+metadata and settle audit (`purchasedBuilds`); it does not pin OrderLineTerms or
+download selection yet.
 Ledger activity: `GET /api/wallet/activity`. Seller holds: `GET /api/wallet/held`,
 `POST /api/wallet/holds/release-matured` (migration `0093_wallet_seller_holds`,
 7-day baseline). Personal and organization seller accounts (`user:` / `org:`) —

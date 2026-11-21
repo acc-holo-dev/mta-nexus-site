@@ -122,6 +122,10 @@ const productId = z
   .string()
   .regex(/^[A-Za-z0-9_-]{1,160}$/u, "Product id must be 1–160 URL-safe characters");
 
+const buildId = z
+  .string()
+  .regex(/^[A-Za-z0-9_-]{1,128}$/u, "Build id must be 1–128 URL-safe characters");
+
 export const walletCheckoutSchema = z
   .object({
     productIds: z
@@ -129,8 +133,19 @@ export const walletCheckoutSchema = z
       .min(1)
       .max(20)
       .refine((ids) => new Set(ids).size === ids.length, "Product ids must be unique"),
+    /** Optional published build bind for single-product checkout evidence. */
+    buildId: buildId.optional(),
   })
-  .strict();
+  .strict()
+  .superRefine((value, ctx) => {
+    if (value.buildId && value.productIds.length !== 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "buildId requires exactly one productId",
+        path: ["buildId"],
+      });
+    }
+  });
 
 export const walletWithdrawalCreateSchema = z
   .object({

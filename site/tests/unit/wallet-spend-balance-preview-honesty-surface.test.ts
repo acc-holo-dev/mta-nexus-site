@@ -32,7 +32,11 @@ describe("wallet spend balance preview honesty", () => {
     const operations = read("site/src/features/commerce/server/purchase-operations-screen.tsx");
 
     expect(acquire).toContain("amountMinor={product.price}");
+    expect(acquire).toContain("buildId={buildId ?? undefined}");
     expect(detail).toContain("amountMinor={product.price}");
+    expect(detail).toMatch(
+      /buildId=\{\s*versionHelpBuild\?\.status === "published" \? versionHelpBuild\.id : undefined\s*\}/u,
+    );
     expect(purchase).toContain("amountMinor={order.totalAmount}");
     expect(operations).toContain("amountMinor={result.order.totalAmount}");
   });

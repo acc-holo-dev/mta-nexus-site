@@ -69,6 +69,8 @@ function AcquireContent({
 }: AcquirePageProps) {
   const searchParams = useSearchParams();
   const productId = searchParams.get("productId");
+  const rawBuildId = searchParams.get("buildId");
+  const buildId = rawBuildId && /^[A-Za-z0-9_-]{1,128}$/u.test(rawBuildId) ? rawBuildId : null;
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.checkout;
   const walletCopy = getWalletCopy(locale);
@@ -98,7 +100,9 @@ function AcquireContent({
   const [error, setError] = useState<string | null>(null);
   const [needsSignIn, setNeedsSignIn] = useState(false);
   const acquireReturnPath = productId
-    ? `/acquire?productId=${encodeURIComponent(productId)}`
+    ? `/acquire?productId=${encodeURIComponent(productId)}${
+        buildId ? `&buildId=${encodeURIComponent(buildId)}` : ""
+      }`
     : null;
 
   // biome-ignore lint/correctness/useExhaustiveDependencies(loadRevision): Explicit refresh trigger; changing it must restart this request.
@@ -400,6 +404,7 @@ function AcquireContent({
           <WalletCheckoutButton
             actorId={actorId}
             productId={product.id}
+            buildId={buildId ?? undefined}
             amountLabel={formattedPrice}
             amountMinor={product.price}
             currency={product.currency || "USD"}

@@ -471,7 +471,11 @@ export async function ProductDetailPage({
                       {commerceCopy.singleIntent}
                     </p>
                     <Link
-                      href={`/acquire?productId=${product.id}`}
+                      href={`/acquire?productId=${product.id}${
+                        versionHelpBuild?.status === "published"
+                          ? `&buildId=${encodeURIComponent(versionHelpBuild.id)}`
+                          : ""
+                      }`}
                       className="flex w-full items-center justify-center rounded-lg bg-accent py-3 text-sm font-bold text-white shadow-nexus transition-colors hover:bg-[var(--nexus-accent-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                     >
                       {copy.addToLibrary}
@@ -497,7 +501,11 @@ export async function ProductDetailPage({
                       available={false}
                       commerceEnabled={commerceEnabled}
                       hasAccess={false}
-                      acquireHref={`/acquire?productId=${product.id}`}
+                      acquireHref={`/acquire?productId=${product.id}${
+                        versionHelpBuild?.status === "published"
+                          ? `&buildId=${encodeURIComponent(versionHelpBuild.id)}`
+                          : ""
+                      }`}
                       guest={!user}
                       surface="detail"
                       returnPath={detailReturnPath}
@@ -509,6 +517,9 @@ export async function ProductDetailPage({
                   <WalletCheckoutButton
                     actorId={user?.id ?? null}
                     productId={product.id}
+                    buildId={
+                      versionHelpBuild?.status === "published" ? versionHelpBuild.id : undefined
+                    }
                     amountLabel={formattedPrice}
                     amountMinor={product.price}
                     currency={product.currency}

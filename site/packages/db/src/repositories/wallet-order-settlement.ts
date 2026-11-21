@@ -28,6 +28,12 @@ import {
 import { lockInitiatingSession } from "./initiating-session";
 import { accountBalanceInTransaction, postLedgerBatchInTransaction } from "./ledger-posting";
 
+export type WalletPurchasedBuild = {
+  productId: string;
+  buildId: string;
+  version: string;
+};
+
 export type WalletOrderSettlementResult = {
   orderId: string;
   paymentId: string;
@@ -39,6 +45,7 @@ export type WalletOrderSettlementResult = {
   alreadySettled: boolean;
   entitlementIds: string[];
   holdIds: string[];
+  purchasedBuilds: WalletPurchasedBuild[];
 };
 
 export type WalletOrderRefundResult = {
@@ -102,6 +109,7 @@ export class WalletOrderSettlementRepository {
     buyerId: string;
     currentToken: string;
     orderId: string;
+    purchasedBuilds?: readonly WalletPurchasedBuild[];
   }): Promise<WalletOrderSettlementResult> {
     if (!input.currentToken) throw new AppError("Authentication required", 401, "UNAUTHORIZED");
     if (!/^[A-Za-z0-9_-]{1,128}$/u.test(input.orderId))
@@ -180,6 +188,7 @@ export class WalletOrderSettlementRepository {
           alreadySettled: true,
           entitlementIds: [],
           holdIds: [],
+          purchasedBuilds: [...(input.purchasedBuilds ?? [])],
         };
       }
 
@@ -328,6 +337,10 @@ export class WalletOrderSettlementRepository {
         .returning({ id: orders.id });
       if (!updated) throw new AppError("Order settlement raced", 409, "ORDER_STATE_CHANGED");
 
+      const purchasedBuilds = [...(input.purchasedBuilds ?? [])];
+      const buildByProduct = new Map(
+        purchasedBuilds.map((entry) => [entry.productId, entry] as const),
+      );
       const granted: string[] = [];
       for (const line of lines) {
         const entitlementId = `ent_${createHash("sha256")
@@ -355,12 +368,14 @@ export class WalletOrderSettlementRepository {
           )
           .limit(1);
         if (!existingAccess) {
+          const purchased = buildByProduct.get(line.productId);
           await tx.insert(entitlements).values({
             id: entitlementId,
             subjectType: "user",
             subjectId: input.buyerId,
             permission: "product.download",
             resourceId: line.productId,
+            metadata: purchased ? { buildId: purchased.buildId, version: purchased.version } : {},
             createdAt: now,
           });
           await tx.insert(resourceAcquisitionEvents).values({
@@ -395,6 +410,7 @@ export class WalletOrderSettlementRepository {
           platformFee: split.platformFee,
           sellerHoldCount: holdIds.length,
           entitlementCount: granted.length,
+          purchasedBuilds,
         },
       });
 
@@ -409,6 +425,7 @@ export class WalletOrderSettlementRepository {
         alreadySettled: false,
         entitlementIds: granted,
         holdIds,
+        purchasedBuilds,
       };
     });
   }

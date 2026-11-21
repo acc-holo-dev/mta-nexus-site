@@ -63,6 +63,7 @@ describe("checkout/wallet HTTP", () => {
       alreadySettled: false,
       entitlementIds: ["ent_a"],
       entries: [],
+      purchasedBuilds: [],
     });
   });
 
@@ -94,6 +95,7 @@ describe("checkout/wallet HTTP", () => {
       status: "completed",
       totalAmount: 900,
       currency: "EUR",
+      purchasedBuilds: [],
       actorId: "usr_wallet",
     });
     expect(state.checkout).toHaveBeenCalledWith({
@@ -101,6 +103,49 @@ describe("checkout/wallet HTTP", () => {
       currentToken: "wallet-token",
       productIds: ["prd_paid_1"],
     });
+  });
+
+  it("forwards an optional published buildId for single-product checkout", async () => {
+    state.checkout.mockResolvedValueOnce({
+      orderId: "ord_wallet_1",
+      orderNumber: "NEXUS-WALLET01",
+      paymentId: "pay_wallet_ord_wallet_1",
+      ledgerBatchId: "wspend_ord_wallet_1",
+      status: "completed",
+      totalAmount: 900,
+      currency: "EUR",
+      alreadySettled: false,
+      entitlementIds: ["ent_a"],
+      entries: [],
+      purchasedBuilds: [{ productId: "prd_paid_1", buildId: "bld_paid_1", version: "1.2.0" }],
+    });
+    const response = await checkoutWallet(
+      checkoutRequest({ productIds: ["prd_paid_1"], buildId: "bld_paid_1" }, "usr_wallet"),
+    );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      purchasedBuilds: [{ productId: "prd_paid_1", buildId: "bld_paid_1", version: "1.2.0" }],
+    });
+    expect(state.checkout).toHaveBeenCalledWith({
+      user: state.user,
+      currentToken: "wallet-token",
+      productIds: ["prd_paid_1"],
+      buildId: "bld_paid_1",
+    });
+  });
+
+  it("rejects buildId when more than one product is checked out", async () => {
+    expect(
+      (
+        await checkoutWallet(
+          checkoutRequest(
+            { productIds: ["prd_paid_1", "prd_paid_2"], buildId: "bld_paid_1" },
+            "usr_wallet",
+          ),
+        )
+      ).status,
+    ).toBe(400);
+    expect(state.checkout).not.toHaveBeenCalled();
   });
 
   it("rejects empty product sets before service work", async () => {

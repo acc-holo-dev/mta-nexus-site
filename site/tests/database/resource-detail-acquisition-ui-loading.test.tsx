@@ -113,7 +113,7 @@ describe("resource detail acquisition loading", () => {
           expect(html).toContain(getDictionary("en").product.managementAccess);
           expect(html).toContain('data-testid="resource-download"');
         } else {
-          expect(html).toContain('href="/acquire?productId=prd_detail"');
+          expect(html).toContain('href="/acquire?productId=prd_detail&amp;buildId=bld_latest"');
           expect(html).not.toContain('data-testid="resource-download"');
         }
       }

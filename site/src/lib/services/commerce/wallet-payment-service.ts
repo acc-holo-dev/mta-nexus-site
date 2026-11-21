@@ -1,4 +1,5 @@
 import {
+  buildRepository,
   ledgerRepository,
   orderOperationsRepository,
   orderRepository,
@@ -7,6 +8,7 @@ import {
   type StaleUnpaidOrderExpiry,
   type WalletOrderRefundResult,
   type WalletOrderSettlementResult,
+  type WalletPurchasedBuild,
   walletOrderSettlementRepository,
   walletSellerHoldRepository,
   walletTopupRepository,
@@ -79,6 +81,7 @@ export class WalletPaymentService {
     private readonly products = productRepository,
     private readonly holds = walletSellerHoldRepository,
     private readonly orderOperations = orderOperationsRepository,
+    private readonly builds = buildRepository,
   ) {}
 
   /**
@@ -509,11 +512,17 @@ export class WalletPaymentService {
     });
   }
 
-  async settleOrderFromWallet(input: { user: User; currentToken: string; orderId: string }) {
+  async settleOrderFromWallet(input: {
+    user: User;
+    currentToken: string;
+    orderId: string;
+    purchasedBuilds?: readonly WalletPurchasedBuild[];
+  }) {
     return this.settlements.settle({
       buyerId: input.user.id,
       currentToken: input.currentToken,
       orderId: input.orderId,
+      purchasedBuilds: input.purchasedBuilds,
     });
   }
 
@@ -558,6 +567,7 @@ export class WalletPaymentService {
     user: User;
     currentToken: string;
     productIds: string[];
+    buildId?: string;
   }): Promise<WalletOrderSettlementResult & { orderNumber: string }> {
     const uniqueIds = [...new Set(input.productIds)];
     if (
@@ -565,6 +575,9 @@ export class WalletPaymentService {
       uniqueIds.length > ORDER_TERMS_LINE_LIMIT ||
       uniqueIds.length !== input.productIds.length
     ) {
+      throw new AppError("Invalid wallet checkout", 400, "WALLET_CHECKOUT_INVALID");
+    }
+    if (input.buildId && uniqueIds.length !== 1) {
       throw new AppError("Invalid wallet checkout", 400, "WALLET_CHECKOUT_INVALID");
     }
 
@@ -600,6 +613,19 @@ export class WalletPaymentService {
       throw new AppError("Order total is out of range", 400, "ORDER_NOT_PAYABLE");
     }
 
+    const purchasedBuilds: WalletPurchasedBuild[] = [];
+    if (input.buildId) {
+      const build = await this.builds.findPublishedByProductAndId(first.id, input.buildId);
+      if (!build) {
+        throw new AppError("Published build is unavailable", 409, "ORDER_CATALOG_CHANGED");
+      }
+      purchasedBuilds.push({
+        productId: first.id,
+        buildId: build.id,
+        version: build.version,
+      });
+    }
+
     const orderId = generateId("ord");
     const orderNumber = `NEXUS-${orderId.slice(4, 12).toUpperCase()}`;
     const order: Omit<Order, "createdAt" | "updatedAt"> = {
@@ -623,6 +649,7 @@ export class WalletPaymentService {
       user: input.user,
       currentToken: input.currentToken,
       orderId,
+      purchasedBuilds,
     });
     return { ...settled, orderNumber };
   }

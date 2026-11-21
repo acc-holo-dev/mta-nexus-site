@@ -27,6 +27,7 @@ export const POST = withBrowserMutation(function POST(request: NextRequest) {
       user: actor,
       currentToken: token,
       productIds: parsed.data.productIds,
+      ...(parsed.data.buildId ? { buildId: parsed.data.buildId } : {}),
     });
     return {
       orderId: settled.orderId,
@@ -37,6 +38,7 @@ export const POST = withBrowserMutation(function POST(request: NextRequest) {
       totalAmount: settled.totalAmount,
       currency: settled.currency,
       alreadySettled: settled.alreadySettled,
+      purchasedBuilds: settled.purchasedBuilds,
       actorId: actor.id,
     };
   });
