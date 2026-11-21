@@ -122,7 +122,7 @@ describe("ProductCard attribution and honest metrics", () => {
 
     const paidHtml = renderToStaticMarkup(
       <ProductCard
-        product={product({ price: 499, currency: "EUR", type: "single_server" })}
+        product={product({ price: 499, currency: "EUR", licenseModel: "single_server" })}
         locale="en"
       />,
     );
@@ -131,7 +131,7 @@ describe("ProductCard attribution and honest metrics", () => {
 
     const paidRu = renderToStaticMarkup(
       <ProductCard
-        product={product({ price: 25000, currency: "RUB", type: "single_server" })}
+        product={product({ price: 25000, currency: "RUB", licenseModel: "single_server" })}
         locale="ru"
       />,
     );
