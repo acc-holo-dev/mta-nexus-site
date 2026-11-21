@@ -197,11 +197,15 @@ export async function WorkspaceFinanceScreen({
             const heldLabel =
               walletEnabled && walletBalance && walletBalance.held !== null
                 ? formatFinancialMinor(walletBalance.held, total.currency, locale)
-                : copy.unknown;
+                : walletEnabled
+                  ? copy.walletBalanceUnavailable
+                  : copy.unknown;
             const availableLabel =
               walletEnabled && walletBalance && walletBalance.available !== null
                 ? formatFinancialMinor(walletBalance.available, total.currency, locale)
-                : copy.unknown;
+                : walletEnabled
+                  ? copy.walletBalanceUnavailable
+                  : copy.unknown;
             return (
               <li key={total.currency} className={panelSpace3P5}>
                 <h3 className={typeSemiboldPrimary}>{total.currency}</h3>
@@ -239,7 +243,10 @@ export async function WorkspaceFinanceScreen({
           })}
         </ul>
       ) : (
-        <EmptyState title={copy.empty} description={copy.note} />
+        <EmptyState
+          title={copy.empty}
+          description={walletEnabled ? copy.emptyHintWallet : copy.note}
+        />
       )}
       {result.entries.length ? (
         <div className="overflow-x-auto">

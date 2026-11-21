@@ -23,9 +23,12 @@ const copy = {
     available: "Site wallet available",
     availableLegacy: "Available to withdraw",
     unknown: "Not reconciled",
+    walletBalanceUnavailable: "Site wallet balances are temporarily unavailable",
     journal: "Balanced journal",
     legacy: "Historical entry",
     empty: "No recorded financial operations.",
+    emptyHintWallet:
+      "No recorded financial operations for this scope yet. When the site wallet engine is on, held and available appear here after audited wallet ledger activity — empty is not a payout promise and not a load failure.",
     note: "Recorded balances are grouped by currency. They do not prove funds are held, available or withdrawable. The original hold is 7 days; payment confirmation, hold allocation and payouts require a payment provider. This page creates no purchase, payment or access right.",
     noteWallet:
       "When the site wallet engine is on, held is seller escrow from wallet purchases (ECON-002) and available is the audited ledger balance for this account. Available is not a payout promise until withdrawal policy and a live payout adapter are enabled. Open Site wallet to release matured holds or manage top-ups.",
@@ -86,9 +89,12 @@ const copy = {
     available: "Доступно в site wallet",
     availableLegacy: "Доступно к выводу",
     unknown: "Не сверено",
+    walletBalanceUnavailable: "Балансы site wallet временно недоступны",
     journal: "Сбалансированная проводка",
     legacy: "Историческая запись",
     empty: "Финансовых записей нет.",
+    emptyHintWallet:
+      "По этому scope пока нет финансовых записей. При включённом site wallet held и available появятся после аудируемой wallet ledger активности — пустой результат не обещает вывод и не означает сбой загрузки.",
     note: "Баланс показан отдельно по каждой валюте. Он не подтверждает удержание, доступность или возможность вывода средств. Исходное удержание — 7 дней; подтверждение платежа, распределение удержаний и выплаты требуют платёжного провайдера. Эта страница не создаёт покупки, платежи или права доступа.",
     noteWallet:
       "При включённом site wallet held — escrow продавца после покупок с кошелька (ECON-002), available — аудируемый ledger баланс этого счёта. Available не обещает вывод, пока не включены политика вывода и live payout adapter. Откройте «Кошелёк площадки», чтобы освободить созревшие холды или управлять пополнениями.",

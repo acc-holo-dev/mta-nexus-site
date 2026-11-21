@@ -178,6 +178,31 @@ it.each(["en", "ru"] as const)(
     expect(state.getHeldBalance).toHaveBeenCalledWith("user:usr_a", "EUR");
   },
 );
+it("shows wallet unavailable instead of Not reconciled when balance reads fail", async () => {
+  state.walletEnabled = true;
+  state.available = null;
+  state.held = null;
+  const copy = getFinancialCopy("en");
+  const html = renderToStaticMarkup(await Statement(input));
+  expect(html).toContain(copy.walletBalanceUnavailable);
+  expect(html).not.toContain(copy.unknown);
+});
+it("uses wallet empty hint when engine is on and there are no totals", async () => {
+  state.walletEnabled = true;
+  state.statement.mockResolvedValue({
+    scope: { id: "user:usr_a", name: null },
+    totals: [],
+    entries: [],
+    ...bounds,
+  });
+  const copy = getFinancialCopy("en");
+  const html = renderToStaticMarkup(await Statement(input));
+  expect(html).toContain(copy.empty);
+  expect(html).toContain(copy.emptyHintWallet);
+  expect(html).not.toContain(
+    "payment confirmation, hold allocation and payouts require a payment provider",
+  );
+});
 it("refuses financial review for general moderators", async () => {
   state.user = { id: "usr_a", role: "moderator" };
   await expect(Review(input)).rejects.toThrow("NEXT_NOT_FOUND");
