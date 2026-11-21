@@ -4,6 +4,7 @@ import {
   assertWalletAccountId,
   assertWalletAmount,
   assertWalletCurrency,
+  buildWithdrawalCancelPosting,
   type LedgerEntry,
   type LedgerPosting,
   type PaymentProviderId,
@@ -11,7 +12,7 @@ import {
   type WithdrawalIntent,
   type WithdrawalIntentStatus,
 } from "@nexus/domain";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, lte, sql } from "drizzle-orm";
 import { db } from "../client";
 import { ledgerEntries, walletWithdrawalIntents } from "../schema";
 import { postLedgerBatchInTransaction } from "./ledger-posting";
@@ -265,6 +266,67 @@ export class WalletWithdrawalRepository {
         .returning();
       if (!row) throw new AppError("Withdrawal fail raced", 409, "WITHDRAWAL_FAIL_RACE");
       return { intent: toIntent(row), entries: posted };
+    });
+  }
+
+  /**
+   * Ops-expire stale awaiting withdrawals: cancel and return escrow to available.
+   * Same ledger path as user cancel; limited per invocation.
+   */
+  async expireStaleAwaiting(input: {
+    olderThanIso: string;
+    limit?: number;
+  }): Promise<WithdrawalIntent[]> {
+    const olderThan = new Date(input.olderThanIso);
+    if (!Number.isFinite(olderThan.getTime())) {
+      throw new AppError("Stale intent timestamp is invalid", 400, "WALLET_INTENT_STALE_INVALID");
+    }
+    const bounded = Math.min(
+      Math.max(Number.isSafeInteger(input.limit) ? (input.limit as number) : 20, 1),
+      50,
+    );
+    return db.transaction(async (tx) => {
+      await tx.execute(sql`set local lock_timeout = '5s'`);
+      const candidates = await tx
+        .select()
+        .from(walletWithdrawalIntents)
+        .where(
+          and(
+            eq(walletWithdrawalIntents.status, "awaiting_provider"),
+            lte(walletWithdrawalIntents.createdAt, olderThan),
+          ),
+        )
+        .orderBy(asc(walletWithdrawalIntents.createdAt), asc(walletWithdrawalIntents.id))
+        .limit(bounded)
+        .for("update");
+      const expired: WithdrawalIntent[] = [];
+      const now = new Date();
+      for (const current of candidates) {
+        const intent = toIntent(current);
+        const settleLedgerBatchId = `wwd_expire_${intent.id}`;
+        const entries = buildWithdrawalCancelPosting({
+          intent,
+          escrowEntryId: `ldg_wwd_expire_${intent.id}_esc`,
+          userEntryId: `ldg_wwd_expire_${intent.id}_user`,
+        });
+        await postLedgerBatchInTransaction(tx, settleLedgerBatchId, entries);
+        const [row] = await tx
+          .update(walletWithdrawalIntents)
+          .set({
+            status: "cancelled",
+            settleLedgerBatchId,
+            updatedAt: now,
+          })
+          .where(
+            and(
+              eq(walletWithdrawalIntents.id, intent.id),
+              eq(walletWithdrawalIntents.status, "awaiting_provider"),
+            ),
+          )
+          .returning();
+        if (row) expired.push(toIntent(row));
+      }
+      return expired;
     });
   }
 

@@ -10,6 +10,7 @@ import {
   buildWithdrawalHoldPosting,
   createTopUpIntent,
   createWithdrawalIntent,
+  isWalletIntentStale,
   type LedgerPosting,
   markTopUpAwaitingProvider,
   markTopUpCancelled,
@@ -20,6 +21,7 @@ import {
   selectPaymentProvider,
   type TopUpIntent,
   validateLedgerPosting,
+  WALLET_INTENT_STALE_AFTER_MS,
   walletAccountIdForOrganization,
   walletAccountIdForUser,
   walletHoldReleaseAt,
@@ -154,6 +156,14 @@ describe("wallet payments domain", () => {
     expect(() => markTopUpCancelled({ ...awaiting, status: "succeeded" })).toThrow(
       /cannot be cancelled/i,
     );
+  });
+
+  it("detects stale wallet intents after the default age window", () => {
+    const createdAt = "2026-11-01T00:00:00.000Z";
+    const freshNow = "2026-11-02T00:00:00.000Z";
+    const staleNow = new Date(Date.parse(createdAt) + WALLET_INTENT_STALE_AFTER_MS).toISOString();
+    expect(isWalletIntentStale(createdAt, freshNow)).toBe(false);
+    expect(isWalletIntentStale(createdAt, staleNow)).toBe(true);
   });
 
   it("rejects amount mismatches and double credit", () => {

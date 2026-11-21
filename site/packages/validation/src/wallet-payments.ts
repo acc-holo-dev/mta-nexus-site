@@ -95,6 +95,19 @@ export const walletHoldReleaseBatchSchema = z
   })
   .strict();
 
+export const walletIntentExpireBatchSchema = z
+  .object({
+    nowIso: z.string().datetime().optional(),
+    maxAgeMs: z
+      .number()
+      .int()
+      .min(60_000)
+      .max(90 * 24 * 60 * 60 * 1000)
+      .optional(),
+    limit: z.number().int().min(1).max(50).optional(),
+  })
+  .strict();
+
 export const walletProviderIdSchema = providerId;
 
 export const walletPayOrderSchema = z

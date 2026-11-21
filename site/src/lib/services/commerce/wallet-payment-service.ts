@@ -36,6 +36,7 @@ import {
   type TopUpIntent,
   type User,
   type VerifiedProviderEvent,
+  WALLET_INTENT_STALE_AFTER_MS,
   type WalletCurrency,
   type WalletSellerHold,
   type WithdrawalIntent,
@@ -691,5 +692,43 @@ export class WalletPaymentService {
     limit?: number;
   }): Promise<WalletSellerHold[]> {
     return this.holds.releaseMaturedBatch(input);
+  }
+
+  /**
+   * Admin batch: mark stale awaiting/created top-ups failed (no ledger).
+   * Default age is WALLET_INTENT_STALE_AFTER_MS (7d).
+   */
+  async expireStaleTopUps(
+    input: { nowIso?: string; maxAgeMs?: number; limit?: number } = {},
+  ): Promise<TopUpIntent[]> {
+    if (!isWalletEngineEnabled()) {
+      throw new AppError("Wallet engine is disabled", 404, "WALLET_ENGINE_DISABLED");
+    }
+    const nowIso = input.nowIso ?? new Date().toISOString();
+    const maxAgeMs = input.maxAgeMs ?? WALLET_INTENT_STALE_AFTER_MS;
+    if (!Number.isSafeInteger(maxAgeMs) || maxAgeMs < 60_000) {
+      throw new AppError("Stale intent max age is invalid", 400, "WALLET_INTENT_STALE_INVALID");
+    }
+    const olderThanIso = new Date(Date.parse(nowIso) - maxAgeMs).toISOString();
+    return this.topups.expireStaleAwaiting({ olderThanIso, limit: input.limit });
+  }
+
+  /**
+   * Admin batch: cancel stale awaiting withdrawals and return escrow to available.
+   * Requires withdraw policy. Default age is WALLET_INTENT_STALE_AFTER_MS (7d).
+   */
+  async expireStaleWithdrawals(
+    input: { nowIso?: string; maxAgeMs?: number; limit?: number } = {},
+  ): Promise<WithdrawalIntent[]> {
+    if (!isWalletWithdrawEnabled()) {
+      throw new AppError("Wallet withdrawals are disabled", 404, "WALLET_WITHDRAW_DISABLED");
+    }
+    const nowIso = input.nowIso ?? new Date().toISOString();
+    const maxAgeMs = input.maxAgeMs ?? WALLET_INTENT_STALE_AFTER_MS;
+    if (!Number.isSafeInteger(maxAgeMs) || maxAgeMs < 60_000) {
+      throw new AppError("Stale intent max age is invalid", 400, "WALLET_INTENT_STALE_INVALID");
+    }
+    const olderThanIso = new Date(Date.parse(nowIso) - maxAgeMs).toISOString();
+    return this.withdrawals.expireStaleAwaiting({ olderThanIso, limit: input.limit });
   }
 }

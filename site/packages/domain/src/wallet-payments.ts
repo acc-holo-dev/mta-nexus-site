@@ -5,6 +5,25 @@ import { validateLedgerPosting } from "./financial-journal";
 
 export { INITIAL_HOLD_DAYS };
 
+/** Default age after which awaiting top-up/withdrawal intents may be ops-expired. */
+export const WALLET_INTENT_STALE_AFTER_MS = 7 * 24 * 60 * 60 * 1000;
+
+export function isWalletIntentStale(
+  createdAtIso: string,
+  nowIso: string,
+  maxAgeMs: number = WALLET_INTENT_STALE_AFTER_MS,
+): boolean {
+  if (!Number.isSafeInteger(maxAgeMs) || maxAgeMs < 60_000) {
+    throw new AppError("Stale intent max age is invalid", 400, "WALLET_INTENT_STALE_INVALID");
+  }
+  const createdMs = Date.parse(createdAtIso);
+  const nowMs = Date.parse(nowIso);
+  if (!Number.isFinite(createdMs) || !Number.isFinite(nowMs)) {
+    throw new AppError("Stale intent timestamp is invalid", 400, "WALLET_INTENT_STALE_INVALID");
+  }
+  return nowMs - createdMs >= maxAgeMs;
+}
+
 export type WalletSellerHoldStatus = "held" | "released" | "cancelled";
 
 export type WalletSellerHold = {

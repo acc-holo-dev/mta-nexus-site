@@ -10,7 +10,7 @@ import {
   type TopUpIntentStatus,
   type WalletCurrency,
 } from "@nexus/domain";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, lte, sql } from "drizzle-orm";
 import { db } from "../client";
 import { walletTopupIntents } from "../schema";
 import { postLedgerBatchInTransaction } from "./ledger-posting";
@@ -244,6 +244,60 @@ export class WalletTopupRepository {
         .returning();
       if (!row) throw new AppError("Top-up intent fail update missed", 409, "TOPUP_FAIL_RACE");
       return toIntent(row);
+    });
+  }
+
+  /**
+   * Ops-expire stale awaiting/created top-ups as failed (no ledger posting).
+   * Provider never credited; marks them failed with a deterministic expire event id.
+   */
+  async expireStaleAwaiting(input: {
+    olderThanIso: string;
+    limit?: number;
+  }): Promise<TopUpIntent[]> {
+    const olderThan = new Date(input.olderThanIso);
+    if (!Number.isFinite(olderThan.getTime())) {
+      throw new AppError("Stale intent timestamp is invalid", 400, "WALLET_INTENT_STALE_INVALID");
+    }
+    const bounded = Math.min(
+      Math.max(Number.isSafeInteger(input.limit) ? (input.limit as number) : 20, 1),
+      50,
+    );
+    return db.transaction(async (tx) => {
+      await tx.execute(sql`set local lock_timeout = '5s'`);
+      const candidates = await tx
+        .select()
+        .from(walletTopupIntents)
+        .where(
+          and(
+            inArray(walletTopupIntents.status, ["created", "awaiting_provider"]),
+            lte(walletTopupIntents.createdAt, olderThan),
+          ),
+        )
+        .orderBy(asc(walletTopupIntents.createdAt), asc(walletTopupIntents.id))
+        .limit(bounded)
+        .for("update");
+      const expired: TopUpIntent[] = [];
+      const now = new Date();
+      for (const current of candidates) {
+        const providerEventId = `ops_expire_${current.id}`;
+        const [row] = await tx
+          .update(walletTopupIntents)
+          .set({
+            status: "failed",
+            providerEventId,
+            updatedAt: now,
+          })
+          .where(
+            and(
+              eq(walletTopupIntents.id, current.id),
+              inArray(walletTopupIntents.status, ["created", "awaiting_provider"]),
+            ),
+          )
+          .returning();
+        if (row) expired.push(toIntent(row));
+      }
+      return expired;
     });
   }
 

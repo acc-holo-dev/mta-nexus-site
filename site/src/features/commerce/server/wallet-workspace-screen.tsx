@@ -70,6 +70,7 @@ function activityKindLabel(
   if (referenceType === "wallet_spend") return copy.activitySpend;
   if (referenceType === "wallet_hold") return copy.activityHold;
   if (referenceType === "withdrawal") return copy.activityWithdrawal;
+  if (referenceType === "refund") return copy.activityRefund;
   return copy.activityOther;
 }
 
@@ -153,21 +154,25 @@ export async function WalletWorkspaceScreen({
   const withdrawEnabled = isWalletWithdrawEnabled();
   const orgWalletSummaries = await Promise.all(
     orgSellerAccounts.map(async (org) => {
-      const [orgAvailable, held, holds, orgTopUps, orgWithdrawals] = await Promise.all([
-        walletPaymentService.getAvailableBalance(org.accountId, currency).catch(() => null),
-        walletPaymentService.getHeldBalance(org.accountId, currency).catch(() => null),
-        walletPaymentService.listHeld(org.accountId, 20).catch(() => null),
-        walletPaymentService.listRecentTopUps(org.accountId, 20).catch(() => null),
-        withdrawEnabled
-          ? walletPaymentService.listRecentWithdrawals(org.accountId, 20).catch(() => null)
-          : Promise.resolve(null),
-      ]);
+      const [orgAvailable, held, holds, orgTopUps, orgActivity, orgWithdrawals] = await Promise.all(
+        [
+          walletPaymentService.getAvailableBalance(org.accountId, currency).catch(() => null),
+          walletPaymentService.getHeldBalance(org.accountId, currency).catch(() => null),
+          walletPaymentService.listHeld(org.accountId, 20).catch(() => null),
+          walletPaymentService.listRecentTopUps(org.accountId, 20).catch(() => null),
+          walletPaymentService.listRecentActivity(org.accountId, currency, 20).catch(() => null),
+          withdrawEnabled
+            ? walletPaymentService.listRecentWithdrawals(org.accountId, 20).catch(() => null)
+            : Promise.resolve(null),
+        ],
+      );
       return {
         ...org,
         available: orgAvailable,
         held,
         holds,
         topUps: orgTopUps,
+        activity: orgActivity,
         withdrawals: orgWithdrawals,
       };
     }),
@@ -413,6 +418,32 @@ export async function WalletWorkspaceScreen({
                     organizationId={org.organizationId}
                     maturedCount={orgMatured}
                   />
+                  <h4 className={typeSemiboldPrimary}>{copy.orgActivity}</h4>
+                  {org.activity === null ? (
+                    <p className={typeXsMuted}>{copy.orgActivityUnavailable}</p>
+                  ) : org.activity.length === 0 ? (
+                    <EmptyState
+                      title={copy.orgActivityEmpty}
+                      description={copy.activityEmptyHint}
+                    />
+                  ) : (
+                    <ul className={typeSpace2Sm}>
+                      {org.activity.map((entry) => (
+                        <li key={entry.id}>
+                          <p className={typeNumericPrimary}>
+                            {entry.amount < 0 ? "−" : "+"}
+                            {formatFinancialMinor(Math.abs(entry.amount), entry.currency, locale)}
+                          </p>
+                          <p className={typeXsMuted}>
+                            {entry.amount < 0 ? copy.activityDebit : copy.activityCredit} ·{" "}
+                            {activityKindLabel(copy, entry.referenceType)} · {copy.recordedAt}:{" "}
+                            {formatHistoryDate(new Date(entry.createdAt), locale)} ·{" "}
+                            {entry.referenceId}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                   {withdrawEnabled ? (
                     <>
                       <h4 className={typeSemiboldPrimary}>{copy.orgWithdrawals}</h4>
