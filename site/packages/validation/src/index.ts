@@ -308,7 +308,7 @@ export const checkoutSchema = z.object({
       }),
     )
     .min(1, "At least one product is required for checkout"),
-  paymentProvider: z.enum(["mock", "stripe", "crypto"]).default("mock"),
+  paymentProvider: z.enum(["mock", "stub", "stripe", "yookassa", "crypto"]).default("mock"),
   serverId: z.string().optional(), // For auto-binding license to a specific server
 });
 

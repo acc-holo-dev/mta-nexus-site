@@ -351,7 +351,15 @@ export interface LedgerEntry {
   accountId: string; // user:id, org:id, platform:nexus, escrow:id
   amount: number; // positive for credit, negative for debit
   currency: string;
-  referenceType: "order" | "fee" | "payout" | "refund";
+  referenceType:
+    | "order"
+    | "fee"
+    | "payout"
+    | "refund"
+    | "topup"
+    | "wallet_spend"
+    | "withdrawal"
+    | "wallet_hold";
   referenceId: string;
   balanceAfter: number;
   description: string;
