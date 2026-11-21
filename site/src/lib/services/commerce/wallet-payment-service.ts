@@ -761,6 +761,44 @@ export class WalletPaymentService {
   }
 
   /**
+   * Admin read-only stale top-ups the next expireStaleTopUps batch would process.
+   * Does not mutate ledger or intents. Engine-gated. Default age WALLET_INTENT_STALE_AFTER_MS (7d).
+   */
+  async listAdminEligibleStaleTopUps(
+    input: { nowIso?: string; maxAgeMs?: number; limit?: number } = {},
+  ): Promise<TopUpIntent[]> {
+    if (!isWalletEngineEnabled()) {
+      throw new AppError("Wallet engine is disabled", 404, "WALLET_ENGINE_DISABLED");
+    }
+    const nowIso = input.nowIso ?? new Date().toISOString();
+    const maxAgeMs = input.maxAgeMs ?? WALLET_INTENT_STALE_AFTER_MS;
+    if (!Number.isSafeInteger(maxAgeMs) || maxAgeMs < 60_000) {
+      throw new AppError("Stale intent max age is invalid", 400, "WALLET_INTENT_STALE_INVALID");
+    }
+    const olderThanIso = new Date(Date.parse(nowIso) - maxAgeMs).toISOString();
+    return this.topups.listEligibleStaleAwaiting({ olderThanIso, limit: input.limit });
+  }
+
+  /**
+   * Admin read-only stale withdrawals the next expireStaleWithdrawals batch would process.
+   * Requires engine + withdraw policy. Does not mutate ledger or intents.
+   */
+  async listAdminEligibleStaleWithdrawals(
+    input: { nowIso?: string; maxAgeMs?: number; limit?: number } = {},
+  ): Promise<WithdrawalIntent[]> {
+    if (!isWalletWithdrawEnabled()) {
+      throw new AppError("Wallet withdrawals are disabled", 404, "WALLET_WITHDRAW_DISABLED");
+    }
+    const nowIso = input.nowIso ?? new Date().toISOString();
+    const maxAgeMs = input.maxAgeMs ?? WALLET_INTENT_STALE_AFTER_MS;
+    if (!Number.isSafeInteger(maxAgeMs) || maxAgeMs < 60_000) {
+      throw new AppError("Stale intent max age is invalid", 400, "WALLET_INTENT_STALE_INVALID");
+    }
+    const olderThanIso = new Date(Date.parse(nowIso) - maxAgeMs).toISOString();
+    return this.withdrawals.listEligibleStaleAwaiting({ olderThanIso, limit: input.limit });
+  }
+
+  /**
    * Admin read-only recent top-up intents across accounts.
    * Does not mutate ledger or intents. Engine-gated.
    */

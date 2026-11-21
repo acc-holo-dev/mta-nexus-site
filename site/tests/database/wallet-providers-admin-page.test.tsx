@@ -95,6 +95,36 @@ vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
         createdAt: "2026-11-01T00:00:00.000Z",
       },
     ];
+    listAdminEligibleStaleTopUps = async () => [
+      {
+        id: "top_stale",
+        accountId: "user:usr_stale",
+        amount: 300,
+        currency: "USD",
+        providerId: "stub",
+        status: "awaiting_provider",
+        idempotencyKey: "idem_stale",
+        providerSessionId: "sess_stale",
+        createdAt: "2026-11-01T00:00:00.000Z",
+      },
+    ];
+    listAdminEligibleStaleWithdrawals = async () =>
+      state.withdraw
+        ? [
+            {
+              id: "wd_stale",
+              accountId: "org:org_stale",
+              amount: 150,
+              currency: "EUR",
+              providerId: "stub",
+              status: "awaiting_provider",
+              idempotencyKey: "idem_wd_stale",
+              providerSessionId: "sess_wd_stale",
+              escrowAccountId: "escrow:wd_stale",
+              createdAt: "2026-11-01T00:00:00.000Z",
+            },
+          ]
+        : [];
     listAdminRecentTopUps = async () => [
       {
         id: "top_a",
@@ -176,6 +206,12 @@ it("shows engine ops CTAs when the wallet engine is on", async () => {
   expect(html).toContain(copy.providersAdminUnpaidPreviewNote);
   expect(html).toContain("NX-STALE-1");
   expect(html).toContain("ord_stale");
+  expect(html).toContain(copy.providersAdminTopupPreviewTitle);
+  expect(html).toContain(copy.providersAdminTopupPreviewNote);
+  expect(html).toContain("top_stale");
+  expect(html).toContain("user:usr_stale");
+  expect(html).not.toContain(copy.providersAdminWithdrawPreviewTitle);
+  expect(html).not.toContain("wd_stale");
   expect(html).toContain(copy.providersAdminIntentsTitle);
   expect(html).toContain(copy.providersAdminIntentsNote);
   expect(html).toContain("user:usr_b");
@@ -195,6 +231,10 @@ it("shows withdrawal expiry when withdraw policy is on", async () => {
   expect(html).toContain(copy.providersAdminEligible.replace("{count}", "3"));
   expect(html).toContain("wd_a");
   expect(html).toContain("org:org_a");
+  expect(html).toContain(copy.providersAdminWithdrawPreviewTitle);
+  expect(html).toContain(copy.providersAdminWithdrawPreviewNote);
+  expect(html).toContain("wd_stale");
+  expect(html).toContain("org:org_stale");
   expect(html).not.toContain(copy.providersAdminWithdrawExpireDisabled);
   expect(html).not.toContain(copy.providersAdminOpsEngineOff);
 });

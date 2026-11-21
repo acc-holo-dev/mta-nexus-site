@@ -20,8 +20,9 @@ describe("OPERATIONS site-wallet companion honesty", () => {
     expect(operations).toContain("POST /api/admin/commerce/wallet-withdrawals/expire-stale");
     expect(operations).toContain("eligible-count preview");
     expect(operations).toContain("read-only recent top-up/withdrawal intent list");
-    expect(operations).toContain("read-only preview of matured holds");
-    expect(operations).toContain("read-only preview of unpaid pending orders");
+    expect(operations).toContain("read-only previews of the exact rows");
+    expect(operations).toContain("top-up expire");
+    expect(operations).toContain("withdrawal expire");
     expect(operations).toContain("not a production deploy");
     expect(operations).toContain("CHECKOUT_DISABLED");
 

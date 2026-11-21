@@ -41,7 +41,9 @@ describe("wallet admin batch eligible preview honesty", () => {
     expect(holdsCount).toBeTruthy();
     expect(holdsCount).not.toContain('for("update")');
     expect(topups).toContain("countEligibleStaleAwaiting");
+    expect(topups).toContain("listEligibleStaleAwaiting");
     expect(withdrawals).toContain("countEligibleStaleAwaiting");
+    expect(withdrawals).toContain("listEligibleStaleAwaiting");
     expect(orders).toContain("countEligibleStaleUnpaid");
     expect(orders).toContain("listEligibleStaleUnpaid");
     const unpaidListStart = orders.indexOf("async listEligibleStaleUnpaid");
@@ -55,5 +57,20 @@ describe("wallet admin batch eligible preview honesty", () => {
     const unpaidCount = orders.slice(unpaidCountStart, unpaidCountEnd);
     expect(unpaidCount).toContain("return (await this.listEligibleStaleUnpaid(input)).length;");
     expect(unpaidCount).not.toContain('for("update")');
+    for (const source of [topups, withdrawals]) {
+      const listStart = source.indexOf("async listEligibleStaleAwaiting");
+      const countStart = source.indexOf("async countEligibleStaleAwaiting");
+      expect(listStart).toBeGreaterThan(-1);
+      expect(countStart).toBeGreaterThan(listStart);
+      const listBody = source.slice(listStart, countStart);
+      expect(listBody).toContain("toIntent");
+      expect(listBody).not.toContain('for("update")');
+      const countBody = source.slice(
+        countStart,
+        source.indexOf("async expireStaleAwaiting", countStart),
+      );
+      expect(countBody).toContain("return (await this.listEligibleStaleAwaiting(input)).length;");
+      expect(countBody).not.toContain('for("update")');
+    }
   });
 });

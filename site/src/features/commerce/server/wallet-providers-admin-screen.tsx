@@ -105,6 +105,13 @@ export async function WalletProvidersAdminScreen() {
   const eligibleUnpaidOrders = engineOn
     ? await walletPaymentService.listAdminEligibleStaleUnpaidOrders().catch(() => null)
     : null;
+  const eligibleTopups = engineOn
+    ? await walletPaymentService.listAdminEligibleStaleTopUps().catch(() => null)
+    : null;
+  const eligibleWithdrawals =
+    engineOn && withdrawOn
+      ? await walletPaymentService.listAdminEligibleStaleWithdrawals().catch(() => null)
+      : null;
   const recentTopups = engineOn
     ? await walletPaymentService.listAdminRecentTopUps().catch(() => null)
     : null;
@@ -220,6 +227,39 @@ export async function WalletProvidersAdminScreen() {
                 successTemplate={copy.providersAdminTopupExpireSuccess}
                 failedLabel={copy.providersAdminTopupExpireFailed}
               />
+              <section
+                className={panelSpace3P5}
+                aria-labelledby="wallet-admin-topup-preview-heading"
+              >
+                <h4 id="wallet-admin-topup-preview-heading" className={typeSemiboldPrimary}>
+                  {copy.providersAdminTopupPreviewTitle}
+                </h4>
+                <p role="note" className={typeXsMuted}>
+                  {copy.providersAdminTopupPreviewNote}
+                </p>
+                {eligibleTopups === null ? (
+                  <p role="note" className={typeSmMuted}>
+                    {copy.providersAdminTopupPreviewUnavailable}
+                  </p>
+                ) : eligibleTopups.length ? (
+                  <ul className={typeSpace2Sm}>
+                    {eligibleTopups.map((intent) => (
+                      <li key={intent.id}>
+                        <p className={typeNumericPrimary}>
+                          {formatFinancialMinor(intent.amount, intent.currency, locale)} ·{" "}
+                          {intentStatusLabel(copy, intent.status)}
+                        </p>
+                        <p className={typeXsMuted}>
+                          {intent.accountId} · {intent.providerId} · {intent.createdAt} ·{" "}
+                          {intent.id}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className={typeSmMuted}>{copy.providersAdminTopupPreviewEmpty}</p>
+                )}
+              </section>
               <WalletAdminBatchForm
                 actorId={user.id}
                 path="/api/admin/commerce/wallet-orders/expire-stale"
@@ -265,21 +305,56 @@ export async function WalletProvidersAdminScreen() {
                 )}
               </section>
               {withdrawOn ? (
-                <WalletAdminBatchForm
-                  actorId={user.id}
-                  path="/api/admin/commerce/wallet-withdrawals/expire-stale"
-                  title={copy.providersAdminWithdrawExpireTitle}
-                  note={copy.providersAdminWithdrawExpireNote}
-                  eligibleLabel={
-                    eligible && eligible.withdrawals !== null
-                      ? eligibleLabel(eligible.withdrawals)
-                      : undefined
-                  }
-                  submitLabel={copy.providersAdminWithdrawExpireSubmit}
-                  busyLabel={copy.providersAdminWithdrawExpireBusy}
-                  successTemplate={copy.providersAdminWithdrawExpireSuccess}
-                  failedLabel={copy.providersAdminWithdrawExpireFailed}
-                />
+                <>
+                  <WalletAdminBatchForm
+                    actorId={user.id}
+                    path="/api/admin/commerce/wallet-withdrawals/expire-stale"
+                    title={copy.providersAdminWithdrawExpireTitle}
+                    note={copy.providersAdminWithdrawExpireNote}
+                    eligibleLabel={
+                      eligible && eligible.withdrawals !== null
+                        ? eligibleLabel(eligible.withdrawals)
+                        : undefined
+                    }
+                    submitLabel={copy.providersAdminWithdrawExpireSubmit}
+                    busyLabel={copy.providersAdminWithdrawExpireBusy}
+                    successTemplate={copy.providersAdminWithdrawExpireSuccess}
+                    failedLabel={copy.providersAdminWithdrawExpireFailed}
+                  />
+                  <section
+                    className={panelSpace3P5}
+                    aria-labelledby="wallet-admin-withdraw-preview-heading"
+                  >
+                    <h4 id="wallet-admin-withdraw-preview-heading" className={typeSemiboldPrimary}>
+                      {copy.providersAdminWithdrawPreviewTitle}
+                    </h4>
+                    <p role="note" className={typeXsMuted}>
+                      {copy.providersAdminWithdrawPreviewNote}
+                    </p>
+                    {eligibleWithdrawals === null ? (
+                      <p role="note" className={typeSmMuted}>
+                        {copy.providersAdminWithdrawPreviewUnavailable}
+                      </p>
+                    ) : eligibleWithdrawals.length ? (
+                      <ul className={typeSpace2Sm}>
+                        {eligibleWithdrawals.map((intent) => (
+                          <li key={intent.id}>
+                            <p className={typeNumericPrimary}>
+                              {formatFinancialMinor(intent.amount, intent.currency, locale)} ·{" "}
+                              {intentStatusLabel(copy, intent.status)}
+                            </p>
+                            <p className={typeXsMuted}>
+                              {intent.accountId} · {intent.providerId} · {intent.createdAt} ·{" "}
+                              {intent.id}
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className={typeSmMuted}>{copy.providersAdminWithdrawPreviewEmpty}</p>
+                    )}
+                  </section>
+                </>
               ) : (
                 <p role="note" className={typeSmMuted}>
                   {copy.providersAdminWithdrawExpireDisabled}

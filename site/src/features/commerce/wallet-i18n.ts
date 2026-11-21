@@ -231,6 +231,12 @@ const copy = {
     providersAdminTopupExpireSuccess: "Expired {count} top-up intent(s).",
     providersAdminTopupExpireFailed:
       "Top-up expiry batch was not confirmed. Retry the same request.",
+    providersAdminTopupPreviewTitle: "Eligible stale top-ups",
+    providersAdminTopupPreviewNote:
+      "Read-only preview of awaiting/created top-ups the next expire batch would fail under the default age window and limit. Not a cron and not a live PSP action. This list does not expire intents.",
+    providersAdminTopupPreviewEmpty: "No stale top-ups are eligible for the next batch.",
+    providersAdminTopupPreviewUnavailable:
+      "Eligible stale top-ups are temporarily unavailable. The expire CTA above is unchanged.",
     providersAdminWithdrawExpireTitle: "Expire stale withdrawal intents",
     providersAdminWithdrawExpireNote:
       "Cancels awaiting withdrawals older than the default age window and returns escrow to available. Requires withdrawal policy. Not a payout.",
@@ -241,6 +247,12 @@ const copy = {
       "Withdrawal expiry batch was not confirmed. Retry the same request.",
     providersAdminWithdrawExpireDisabled:
       "Withdrawal policy is off. Withdrawal expiry stays unavailable until NEXUS_WALLET_WITHDRAW=1.",
+    providersAdminWithdrawPreviewTitle: "Eligible stale withdrawals",
+    providersAdminWithdrawPreviewNote:
+      "Read-only preview of awaiting withdrawals the next expire batch would cancel under the default age window and limit. Not a cron and not a payout. This list does not cancel intents.",
+    providersAdminWithdrawPreviewEmpty: "No stale withdrawals are eligible for the next batch.",
+    providersAdminWithdrawPreviewUnavailable:
+      "Eligible stale withdrawals are temporarily unavailable. The expire CTA above is unchanged.",
     providersAdminOrderExpireTitle: "Expire stale unpaid pending orders",
     providersAdminOrderExpireNote:
       "Cancels pending orders older than the default age window with no payments and no ledger rows. Covers orphans from create-then-settle wallet checkout. Not a refund.",
@@ -536,6 +548,12 @@ const copy = {
     providersAdminTopupExpireSuccess: "Истекло top-up намерений: {count}.",
     providersAdminTopupExpireFailed:
       "Batch истечения top-up не подтверждён. Повторите тот же запрос.",
+    providersAdminTopupPreviewTitle: "Eligible устаревшие top-up",
+    providersAdminTopupPreviewNote:
+      "Read-only preview awaiting/created top-up, которые пометит failed следующий expire batch при окне и лимите по умолчанию. Это не cron и не live PSP. Список не истекает намерения.",
+    providersAdminTopupPreviewEmpty: "Нет устаревших top-up для следующего batch.",
+    providersAdminTopupPreviewUnavailable:
+      "Eligible устаревшие top-up временно недоступны. CTA истечения выше не изменился.",
     providersAdminWithdrawExpireTitle: "Истечение устаревших выводов",
     providersAdminWithdrawExpireNote:
       "Отменяет awaiting выводы старше окна по умолчанию и возвращает escrow в available. Нужна политика вывода. Это не выплата.",
@@ -546,6 +564,12 @@ const copy = {
       "Batch истечения выводов не подтверждён. Повторите тот же запрос.",
     providersAdminWithdrawExpireDisabled:
       "Политика вывода выключена. Истечение выводов недоступно, пока NEXUS_WALLET_WITHDRAW=1.",
+    providersAdminWithdrawPreviewTitle: "Eligible устаревшие выводы",
+    providersAdminWithdrawPreviewNote:
+      "Read-only preview awaiting выводов, которые отменит следующий expire batch при окне и лимите по умолчанию. Это не cron и не выплата. Список не отменяет намерения.",
+    providersAdminWithdrawPreviewEmpty: "Нет устаревших выводов для следующего batch.",
+    providersAdminWithdrawPreviewUnavailable:
+      "Eligible устаревшие выводы временно недоступны. CTA истечения выше не изменился.",
     providersAdminOrderExpireTitle: "Истечение устаревших неоплаченных заказов",
     providersAdminOrderExpireNote:
       "Отменяет pending-заказы старше окна по умолчанию без платежей и без ledger. Закрывает orphans после create-then-settle wallet checkout. Это не refund.",
