@@ -60,7 +60,7 @@
     "site/src/features/trust/components/public-user-trust.tsx"
   ],
   "scope": "Git-tracked feature server/ RSC screens plus residual interactive components not covered by shell-home / public-guest / workspace-member inventories — hard-coded member/staff-facing literals + locale copy ternaries.",
-  "source_sha": "1f4f8d9b48281dcebe1604e9dbff842f5fc59708",
+  "source_sha": "0ec069ddc8368c809b4b415392a304d2b3964830",
   "summary": {
     "allowlisted": 1,
     "findings": 1,
