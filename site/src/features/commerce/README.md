@@ -9,8 +9,9 @@ panel and runtime probe live here too. Services, repositories, routes and
 `site/src/lib/services/commerce/wallet-payment-service.ts`. Site stored-value balance
 uses the existing double-entry ledger; multi-provider capability matrix; stub top-up
 only until PSP contracts. Top-up intents persist in `wallet_topup_intents` (migration
-`0091_wallet_topup_intents`) via `walletTopupRepository`. HTTP/UI stay off unless
-`NEXUS_WALLET_ENGINE=1` and a later route slice lands. Redirect never credits the wallet.
+`0091_wallet_topup_intents`) via `walletTopupRepository`. HTTP routes under
+`/api/wallet/*` stay dark unless `NEXUS_WALLET_ENGINE=1`. UI still deferred.
+Redirect never credits the wallet.
 
 | Entry                             | Контракт                                                                               |
 | --------------------------------- | -------------------------------------------------------------------------------------- |
@@ -63,6 +64,8 @@ only until PSP contracts. Top-up intents persist in `wallet_topup_intents` (migr
 | `checkout-api-copy.ts`            | util port `checkout-api-copy`                                                          |
 | `commercial-public-http.ts`       | util port `commercial-public-http`                                                     |
 | `license-runtime-http.ts`         | util port `license-runtime-http`                                                       |
+| `wallet-http.ts`                  | util port `wallet-http`; `/api/wallet/{balance,topups,providers/.../webhook}`          |
+| `wallet-i18n.ts`                  | util port `wallet-i18n`                                                                |
 
 Внутренние `components/` и `server/` не являются публичным API. Границы — dependency-cruiser
 и `scripts/tests/commerce-feature-boundaries.node-test.mjs`.

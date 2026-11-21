@@ -21,7 +21,7 @@ import { generateId } from "@nexus/security";
  * Wallet + multi-provider payment engine.
  *
  * Live PSP adapters are not wired. The stub provider is the only default port.
- * HTTP/UI remain disabled until NEXUS_WALLET_ENGINE=1 and a later route slice.
+ * HTTP routes exist under `/api/wallet/*` but stay dark unless NEXUS_WALLET_ENGINE=1.
  * Browser redirects never credit the wallet — only verified provider events do.
  */
 export function isWalletEngineEnabled(

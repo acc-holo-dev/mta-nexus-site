@@ -21,6 +21,7 @@ export * from "./license-control";
 export * from "./mta-version";
 export * from "./resource-commerce";
 export * from "./resource-management";
+export * from "./wallet-payments";
 
 /** New resource release version: SemVer-like; optional leading `v` stripped for storage/uniqueness. */
 export const resourceVersionSchema = z
