@@ -18,13 +18,14 @@ payment, order completion, download entitlement). Create+settle from catalog:
 Ledger activity: `GET /api/wallet/activity`. Seller holds: `GET /api/wallet/held`,
 `POST /api/wallet/holds/release-matured` (migration `0093_wallet_seller_holds`,
 7-day baseline). Personal and organization seller accounts (`user:` / `org:`) —
-org inspect/release requires owner/admin membership. HTTP routes under
-`/api/wallet/*`, pay-with-wallet, checkout/wallet, and `/workspace/wallet` stay
-dark unless `NEXUS_WALLET_ENGINE=1`. Withdrawal intents (migration
-`0094_wallet_withdrawal_intents`) hold available balance in escrow until a
-verified payout event; HTTP `POST /api/wallet/withdrawals` also needs
-`NEXUS_WALLET_WITHDRAW=1` (live payout adapters stay off). When the engine is
-on, authors may create/release paid `single_server` listings (still not card
+org inspect/release requires owner/admin membership. Admin batch release:
+`POST /api/admin/commerce/wallet-holds/release-matured` (across sellers).
+HTTP routes under `/api/wallet/*`, pay-with-wallet, checkout/wallet, and
+`/workspace/wallet` stay dark unless `NEXUS_WALLET_ENGINE=1`. Withdrawal
+intents (migration `0094_wallet_withdrawal_intents`) hold available balance in
+escrow until a verified payout event; HTTP `POST /api/wallet/withdrawals` also
+needs `NEXUS_WALLET_WITHDRAW=1` (live payout adapters stay off). When the engine
+is on, authors may create/release paid `single_server` listings (still not card
 checkout). Redirect never credits the wallet.
 
 | Entry                             | Контракт                                                                                                          |

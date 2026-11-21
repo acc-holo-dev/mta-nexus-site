@@ -510,4 +510,12 @@ export class WalletPaymentService {
     assertSellerAccountId(sellerAccountId);
     return this.holds.releaseMaturedForSeller({ sellerAccountId, nowIso });
   }
+
+  /** Operator/admin batch: release matured holds across all seller accounts. */
+  async releaseMaturedHoldsBatch(input: {
+    nowIso?: string;
+    limit?: number;
+  }): Promise<WalletSellerHold[]> {
+    return this.holds.releaseMaturedBatch(input);
+  }
 }

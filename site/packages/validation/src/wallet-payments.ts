@@ -56,6 +56,13 @@ export const walletHoldReleaseSchema = z
   })
   .strict();
 
+export const walletHoldReleaseBatchSchema = z
+  .object({
+    nowIso: z.string().datetime().optional(),
+    limit: z.number().int().min(1).max(50).optional(),
+  })
+  .strict();
+
 export const walletProviderIdSchema = providerId;
 
 export const walletPayOrderSchema = z

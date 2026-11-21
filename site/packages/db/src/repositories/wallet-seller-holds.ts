@@ -68,6 +68,32 @@ export class WalletSellerHoldRepository {
     nowIso?: string;
     limit?: number;
   }): Promise<WalletSellerHold[]> {
+    return this.releaseMatured({
+      sellerAccountId: input.sellerAccountId,
+      nowIso: input.nowIso,
+      limit: input.limit,
+    });
+  }
+
+  /**
+   * Release matured holds across sellers (operator/admin batch).
+   * Same ledger posting as the seller-scoped path; limited per invocation.
+   */
+  async releaseMaturedBatch(input: {
+    nowIso?: string;
+    limit?: number;
+  }): Promise<WalletSellerHold[]> {
+    return this.releaseMatured({
+      nowIso: input.nowIso,
+      limit: input.limit,
+    });
+  }
+
+  private async releaseMatured(input: {
+    sellerAccountId?: string;
+    nowIso?: string;
+    limit?: number;
+  }): Promise<WalletSellerHold[]> {
     const nowIso = input.nowIso ?? new Date().toISOString();
     const now = new Date(nowIso);
     if (!Number.isFinite(now.getTime())) {
@@ -81,16 +107,17 @@ export class WalletSellerHoldRepository {
 
     return db.transaction(async (tx) => {
       await tx.execute(sql`set local lock_timeout = '5s'`);
+      const predicates = [
+        eq(walletSellerHolds.status, "held"),
+        lte(walletSellerHolds.releaseAt, now),
+      ];
+      if (input.sellerAccountId) {
+        predicates.unshift(eq(walletSellerHolds.sellerAccountId, input.sellerAccountId));
+      }
       const candidates = await tx
         .select()
         .from(walletSellerHolds)
-        .where(
-          and(
-            eq(walletSellerHolds.sellerAccountId, input.sellerAccountId),
-            eq(walletSellerHolds.status, "held"),
-            lte(walletSellerHolds.releaseAt, now),
-          ),
-        )
+        .where(and(...predicates))
         .orderBy(asc(walletSellerHolds.releaseAt), asc(walletSellerHolds.id))
         .limit(bounded)
         .for("update");
