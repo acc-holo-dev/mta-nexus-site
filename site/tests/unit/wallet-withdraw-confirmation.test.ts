@@ -6,6 +6,7 @@ describe("confirmedWalletWithdrawal", () => {
     expect(
       confirmedWalletWithdrawal(
         {
+          organizationId: null,
           intent: {
             id: "wwd_test_wallet_1",
             status: "awaiting_provider",
@@ -19,6 +20,7 @@ describe("confirmedWalletWithdrawal", () => {
         { amount: 1000, currency: "EUR", providerId: "stub" },
       ),
     ).toMatchObject({
+      organizationId: null,
       intent: {
         id: "wwd_test_wallet_1",
         status: "awaiting_provider",
@@ -27,10 +29,38 @@ describe("confirmedWalletWithdrawal", () => {
     });
   });
 
+  it("accepts a matching organization withdrawal response", () => {
+    expect(
+      confirmedWalletWithdrawal(
+        {
+          organizationId: "org_sellers",
+          intent: {
+            id: "wwd_test_org_1",
+            status: "awaiting_provider",
+            amount: 2500,
+            currency: "EUR",
+            providerId: "stub",
+            escrowAccountId: "escrow:wwithdraw_wwd_test_org_1",
+          },
+        },
+        {
+          amount: 2500,
+          currency: "EUR",
+          providerId: "stub",
+          organizationId: "org_sellers",
+        },
+      ),
+    ).toMatchObject({
+      organizationId: "org_sellers",
+      intent: { id: "wwd_test_org_1" },
+    });
+  });
+
   it("rejects amount or currency mismatch", () => {
     expect(
       confirmedWalletWithdrawal(
         {
+          organizationId: null,
           intent: {
             id: "wwd_test_wallet_2",
             status: "awaiting_provider",
@@ -45,10 +75,35 @@ describe("confirmedWalletWithdrawal", () => {
     ).toBeNull();
   });
 
+  it("rejects organization mismatch", () => {
+    expect(
+      confirmedWalletWithdrawal(
+        {
+          organizationId: "org_other",
+          intent: {
+            id: "wwd_test_org_2",
+            status: "awaiting_provider",
+            amount: 1000,
+            currency: "EUR",
+            providerId: "stub",
+            escrowAccountId: "escrow:wwithdraw_wwd_test_org_2",
+          },
+        },
+        {
+          amount: 1000,
+          currency: "EUR",
+          providerId: "stub",
+          organizationId: "org_sellers",
+        },
+      ),
+    ).toBeNull();
+  });
+
   it("rejects missing escrow account id", () => {
     expect(
       confirmedWalletWithdrawal(
         {
+          organizationId: null,
           intent: {
             id: "wwd_test_wallet_3",
             status: "awaiting_provider",

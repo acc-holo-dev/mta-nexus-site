@@ -1,3 +1,4 @@
+import { ForbiddenError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
@@ -12,6 +13,7 @@ const state = vi.hoisted(() => ({
   withdraw: false,
   startWithdrawal: vi.fn(),
   listRecentWithdrawals: vi.fn(),
+  resolveSellerAccountId: vi.fn(),
 }));
 
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
@@ -24,6 +26,7 @@ vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
   WalletPaymentService: class {
     startWithdrawal = state.startWithdrawal;
     listRecentWithdrawals = state.listRecentWithdrawals;
+    resolveSellerAccountId = state.resolveSellerAccountId;
   },
 }));
 
@@ -65,6 +68,9 @@ describe("wallet withdrawal HTTP", () => {
     state.withdraw = false;
     state.startWithdrawal.mockReset();
     state.listRecentWithdrawals.mockReset();
+    state.resolveSellerAccountId.mockReset().mockImplementation(async (_actor, organizationId) => {
+      return organizationId ? `org:${organizationId}` : "user:usr_wallet";
+    });
   });
 
   it("keeps withdrawal history dark when withdraw policy is off", async () => {
@@ -91,9 +97,36 @@ describe("wallet withdrawal HTTP", () => {
     expect(response.status).toBe(200);
     expect(await response.json()).toMatchObject({
       accountId: "user:usr_wallet",
+      organizationId: null,
       currency: "EUR",
       withdrawals: [{ id: "wwd_1", status: "awaiting_provider", amount: 100 }],
     });
+  });
+
+  it("lists organization withdrawal intents for owner/admin", async () => {
+    state.withdraw = true;
+    state.listRecentWithdrawals.mockResolvedValueOnce([
+      {
+        id: "wwd_org_1",
+        status: "awaiting_provider",
+        amount: 250,
+        currency: "EUR",
+        providerId: "stub",
+        escrowAccountId: "escrow:wwithdraw_wwd_org_1",
+        createdAt: "2026-11-21T08:10:00.000Z",
+      },
+    ]);
+    const response = await listWithdrawals(listRequest("currency=EUR&organizationId=org_sellers"));
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      accountId: "org:org_sellers",
+      organizationId: "org_sellers",
+      withdrawals: [{ id: "wwd_org_1", amount: 250 }],
+    });
+    expect(state.resolveSellerAccountId).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "usr_wallet" }),
+      "org_sellers",
+    );
   });
 
   afterEach(() => {
@@ -137,8 +170,61 @@ describe("wallet withdrawal HTTP", () => {
     );
     expect(response.status).toBe(200);
     expect(await response.json()).toMatchObject({
+      accountId: "user:usr_wallet",
+      organizationId: null,
       intent: { id: "wwd_1", status: "awaiting_provider" },
       actorId: "usr_wallet",
     });
+  });
+
+  it("starts an organization withdrawal hold for owner/admin", async () => {
+    state.withdraw = true;
+    state.startWithdrawal.mockResolvedValueOnce({
+      intent: {
+        id: "wwd_org_2",
+        status: "awaiting_provider",
+        amount: 300,
+        currency: "EUR",
+        providerId: "stub",
+        escrowAccountId: "escrow:wwithdraw_wwd_org_2",
+      },
+    });
+
+    const response = await withdrawals(
+      request({
+        amount: 300,
+        currency: "EUR",
+        providerId: "stub",
+        idempotencyKey: "idem_wdraw_org_1",
+        organizationId: "org_sellers",
+      }),
+    );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      accountId: "org:org_sellers",
+      organizationId: "org_sellers",
+      intent: { id: "wwd_org_2", amount: 300 },
+    });
+    expect(state.startWithdrawal).toHaveBeenCalledWith(
+      expect.objectContaining({ accountId: "org:org_sellers", amount: 300 }),
+    );
+  });
+
+  it("rejects organization withdrawal when membership is insufficient", async () => {
+    state.withdraw = true;
+    state.resolveSellerAccountId.mockRejectedValueOnce(
+      new ForbiddenError("Not authorized for organization seller holds"),
+    );
+    const response = await withdrawals(
+      request({
+        amount: 100,
+        currency: "EUR",
+        providerId: "stub",
+        idempotencyKey: "idem_wdraw_org_denied",
+        organizationId: "org_sellers",
+      }),
+    );
+    expect(response.status).toBe(403);
+    expect(state.startWithdrawal).not.toHaveBeenCalled();
   });
 });

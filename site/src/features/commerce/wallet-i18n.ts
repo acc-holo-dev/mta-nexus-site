@@ -70,6 +70,11 @@ const copy = {
     withdraw: "Start withdrawal hold",
     withdrawFormNote:
       "Moves available balance into withdrawal escrow and records a stub payout session. Live payout adapters stay off — funds leave available balance but are not paid out until a verified provider event.",
+    orgWithdraw: "Start organization withdrawal hold",
+    orgWithdrawFormNote:
+      "Owner/admin only. Moves organization available balance into withdrawal escrow with a stub payout session. Live payout adapters stay off.",
+    orgWithdrawals: "Organization withdrawal intents",
+    orgWithdrawalsEmpty: "No organization withdrawal intents for this currency yet.",
     withdrawSubmit: "Create withdrawal intent",
     withdrawSubmitting: "Creating withdrawal intent…",
     withdrawSuccess: "Withdrawal intent recorded (escrow hold).",
@@ -220,6 +225,11 @@ const copy = {
     withdraw: "Начать холд вывода",
     withdrawFormNote:
       "Переводит available баланс в escrow вывода и записывает stub payout session. Live payout adapters выключены — средства уходят из available, но не выплачиваются до verified события провайдера.",
+    orgWithdraw: "Начать холд вывода организации",
+    orgWithdrawFormNote:
+      "Только owner/admin. Переводит available баланс организации в escrow вывода со stub payout session. Live payout adapters выключены.",
+    orgWithdrawals: "Намерения вывода организации",
+    orgWithdrawalsEmpty: "По этой валюте пока нет намерений вывода организации.",
     withdrawSubmit: "Создать намерение вывода",
     withdrawSubmitting: "Создание намерения вывода…",
     withdrawSuccess: "Намерение вывода записано (холд escrow).",

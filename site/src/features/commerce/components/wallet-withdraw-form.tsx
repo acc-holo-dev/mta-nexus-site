@@ -26,9 +26,11 @@ import {
 export function WalletWithdrawForm({
   actorId,
   currency,
+  organizationId,
 }: {
   actorId: string;
   currency: "USD" | "EUR" | "RUB";
+  organizationId?: string;
 }) {
   const { locale } = useNexusLocale();
   const copy = getWalletCopy(locale);
@@ -55,6 +57,7 @@ export function WalletWithdrawForm({
       currency,
       providerId: "stub",
       idempotencyKey,
+      ...(organizationId ? { organizationId } : {}),
     });
     if (!parsed.success) {
       setError(copy.invalid);
@@ -76,6 +79,7 @@ export function WalletWithdrawForm({
             amount: minor,
             currency,
             providerId: "stub",
+            ...(organizationId ? { organizationId } : {}),
           })
         : null;
       if (!confirmed) {
@@ -115,9 +119,9 @@ export function WalletWithdrawForm({
 
   return (
     <form className={panelClipSpace4P5} onSubmit={submit}>
-      <h2 className={typeXlSemiboldPrimary}>{copy.withdraw}</h2>
+      <h2 className={typeXlSemiboldPrimary}>{organizationId ? copy.orgWithdraw : copy.withdraw}</h2>
       <p className={typeSmSecondary} role="note">
-        {copy.withdrawFormNote}
+        {organizationId ? copy.orgWithdrawFormNote : copy.withdrawFormNote}
       </p>
       <fieldset disabled={busy} className={typeGrid2Gap4}>
         <label htmlFor={`${field}-amount`}>

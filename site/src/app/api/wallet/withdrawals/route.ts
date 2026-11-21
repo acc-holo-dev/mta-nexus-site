@@ -2,7 +2,6 @@ import { AppError } from "@nexus/domain";
 import { walletWithdrawalCreateSchema, walletWithdrawalQuerySchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import {
-  walletAccountIdForUser,
   walletPaymentService,
   walletSessionRequest,
 } from "../../../../features/commerce/wallet-http";
@@ -11,8 +10,8 @@ import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter"
 import { isWalletWithdrawEnabled } from "../../../../lib/services/commerce/wallet-payment-service";
 
 /**
- * List recent withdrawal intents for the personal site wallet.
- * Dark unless NEXUS_WALLET_ENGINE=1 and NEXUS_WALLET_WITHDRAW=1.
+ * List recent withdrawal intents for personal or organization wallets.
+ * Org requires owner/admin. Dark unless NEXUS_WALLET_ENGINE=1 and NEXUS_WALLET_WITHDRAW=1.
  */
 export function GET(request: NextRequest) {
   return walletSessionRequest(request, false, async (actor) => {
@@ -22,17 +21,22 @@ export function GET(request: NextRequest) {
     const parsed = walletWithdrawalQuerySchema.safeParse({
       currency: request.nextUrl.searchParams.get("currency") ?? undefined,
       limit: request.nextUrl.searchParams.get("limit") ?? undefined,
+      organizationId: request.nextUrl.searchParams.get("organizationId") ?? undefined,
     });
     if (!parsed.success) {
       throw new AppError("Invalid wallet withdrawal query", 400, "WALLET_WITHDRAW_INVALID");
     }
-    const accountId = walletAccountIdForUser(actor.id);
+    const accountId = await walletPaymentService.resolveSellerAccountId(
+      actor,
+      parsed.data.organizationId,
+    );
     const intents = await walletPaymentService.listRecentWithdrawals(
       accountId,
       parsed.data.limit ?? 20,
     );
     return {
       accountId,
+      organizationId: parsed.data.organizationId ?? null,
       currency: parsed.data.currency,
       withdrawals: intents
         .filter((intent) => intent.currency === parsed.data.currency)
@@ -50,8 +54,9 @@ export function GET(request: NextRequest) {
 }
 
 /**
- * Start a production-shaped withdrawal hold. Dark unless
- * NEXUS_WALLET_ENGINE=1 and NEXUS_WALLET_WITHDRAW=1. Live payout adapters stay off.
+ * Start a production-shaped withdrawal hold for personal or organization wallets.
+ * Org requires owner/admin. Dark unless NEXUS_WALLET_ENGINE=1 and NEXUS_WALLET_WITHDRAW=1.
+ * Live payout adapters stay off.
  */
 export const POST = withBrowserMutation(function POST(request: NextRequest) {
   return walletSessionRequest(request, true, async (actor) => {
@@ -65,7 +70,10 @@ export const POST = withBrowserMutation(function POST(request: NextRequest) {
     if (!parsed.success) {
       throw new AppError("Invalid wallet withdrawal", 400, "WALLET_WITHDRAW_INVALID");
     }
-    const accountId = walletAccountIdForUser(actor.id);
+    const accountId = await walletPaymentService.resolveSellerAccountId(
+      actor,
+      parsed.data.organizationId,
+    );
     const { intent } = await walletPaymentService.startWithdrawal({
       accountId,
       amount: parsed.data.amount,
@@ -74,6 +82,8 @@ export const POST = withBrowserMutation(function POST(request: NextRequest) {
       idempotencyKey: parsed.data.idempotencyKey,
     });
     return {
+      accountId,
+      organizationId: parsed.data.organizationId ?? null,
       intent: {
         id: intent.id,
         status: intent.status,

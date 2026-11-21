@@ -146,17 +146,20 @@ export async function WalletWorkspaceScreen({
     available === null
       ? []
       : await walletPaymentService.listManageableOrganizationSellerAccounts(user).catch(() => []);
+  const withdrawEnabled = isWalletWithdrawEnabled();
   const orgWalletSummaries = await Promise.all(
     orgSellerAccounts.map(async (org) => {
-      const [orgAvailable, held, holds] = await Promise.all([
+      const [orgAvailable, held, holds, orgWithdrawals] = await Promise.all([
         walletPaymentService.getAvailableBalance(org.accountId, currency).catch(() => null),
         walletPaymentService.getHeldBalance(org.accountId, currency).catch(() => null),
         walletPaymentService.listHeld(org.accountId, 20).catch(() => null),
+        withdrawEnabled
+          ? walletPaymentService.listRecentWithdrawals(org.accountId, 20).catch(() => null)
+          : Promise.resolve(null),
       ]);
-      return { ...org, available: orgAvailable, held, holds };
+      return { ...org, available: orgAvailable, held, holds, withdrawals: orgWithdrawals };
     }),
   );
-  const withdrawEnabled = isWalletWithdrawEnabled();
   const withdrawals =
     available === null || !withdrawEnabled
       ? null
@@ -301,6 +304,8 @@ export async function WalletWorkspaceScreen({
                 org.holds?.filter((hold) => hold.currency === currency) ??
                 ([] as NonNullable<typeof org.holds>);
               const orgMatured = maturedHoldCount(org.holds, currency, nowMs);
+              const orgRecentWithdrawals =
+                org.withdrawals?.filter((intent) => intent.currency === currency) ?? [];
               return (
                 <li key={org.organizationId}>
                   <p className={typeSemiboldPrimary}>{org.accountId}</p>
@@ -350,6 +355,39 @@ export async function WalletWorkspaceScreen({
                     organizationId={org.organizationId}
                     maturedCount={orgMatured}
                   />
+                  {withdrawEnabled ? (
+                    <>
+                      <h4 className={typeSemiboldPrimary}>{copy.orgWithdrawals}</h4>
+                      <WalletWithdrawForm
+                        actorId={user.id}
+                        currency={currency}
+                        organizationId={org.organizationId}
+                      />
+                      {org.withdrawals === null ? (
+                        <p className={typeXsMuted}>{copy.withdrawalsUnavailable}</p>
+                      ) : orgRecentWithdrawals.length === 0 ? (
+                        <EmptyState
+                          title={copy.orgWithdrawalsEmpty}
+                          description={copy.withdrawalsNote}
+                        />
+                      ) : (
+                        <ul className={typeSpace2Sm}>
+                          {orgRecentWithdrawals.map((intent) => (
+                            <li key={intent.id}>
+                              <p className={typeNumericPrimary}>
+                                {formatFinancialMinor(intent.amount, intent.currency, locale)}
+                              </p>
+                              <p className={typeXsMuted}>
+                                {withdrawalStatusLabel(copy, intent.status)} · {copy.recordedAt}:{" "}
+                                {formatHistoryDate(new Date(intent.createdAt), locale)} ·{" "}
+                                {intent.id}
+                              </p>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </>
+                  ) : null}
                 </li>
               );
             })}

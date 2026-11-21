@@ -96,6 +96,7 @@ export const walletWithdrawalCreateSchema = z
     currency,
     providerId,
     idempotencyKey,
+    organizationId: organizationId.optional(),
   })
   .strict();
 
@@ -103,5 +104,6 @@ export const walletWithdrawalQuerySchema = z
   .object({
     currency,
     limit: z.coerce.number().int().min(1).max(100).optional(),
+    organizationId: organizationId.optional(),
   })
   .strict();
