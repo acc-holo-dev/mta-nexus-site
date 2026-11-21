@@ -7,10 +7,15 @@ import { beforeEach, expect, it, vi } from "vitest";
 const state = vi.hoisted(() => ({
   user: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
   locale: "en" as "en" | "ru",
+  walletEnabled: false,
+  available: 450 as number | null,
+  held: 120 as number | null,
   statement: vi.fn(),
   scopes: vi.fn(),
   page: vi.fn(),
   detail: vi.fn(),
+  getAvailableBalance: vi.fn(),
+  getHeldBalance: vi.fn(),
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
@@ -31,6 +36,13 @@ vi.mock("../../src/lib/services/accounts/auth-service", () => ({
 }));
 vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
+}));
+vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
+  isWalletEngineEnabled: () => state.walletEnabled,
+  WalletPaymentService: class {
+    getAvailableBalance = state.getAvailableBalance;
+    getHeldBalance = state.getHeldBalance;
+  },
 }));
 vi.mock("@nexus/db", () => ({
   financialStatementsRepository: { statement: state.statement, scopes: state.scopes },
@@ -56,8 +68,13 @@ beforeEach(() => {
   vi.clearAllMocks();
   state.user = { id: "usr_a", role: "user" };
   state.locale = "en";
+  state.walletEnabled = false;
+  state.available = 450;
+  state.held = 120;
+  state.getAvailableBalance.mockReset().mockImplementation(async () => state.available);
+  state.getHeldBalance.mockReset().mockImplementation(async () => state.held);
   state.statement.mockReset().mockResolvedValue({
-    scope: { name: null },
+    scope: { id: "user:usr_a", name: null },
     totals: [
       {
         currency: "EUR",
@@ -134,11 +151,30 @@ it.each(["en", "ru"] as const)(
     const html = renderToStaticMarkup(await Statement(input));
     expect(html).toContain(locale === "ru" ? "1,23 EUR" : "1.23 EUR");
     expect(html).toContain(locale === "ru" ? "Не сверено" : "Not reconciled");
+    expect(html).toContain(locale === "ru" ? "Доступно к выводу" : "Available to withdraw");
     expect(html).not.toContain("SECRET-DESCRIPTION");
     expect(html).toContain("&lt;Organization&gt;");
     expect(html).toContain("currency=EUR");
+    expect(state.getAvailableBalance).not.toHaveBeenCalled();
     // The all-currencies link actually clears a previous currency filter.
     expect(html).toMatch(/href="\/workspace\/finance\?page=1&amp;scopePage=2"/u);
+  },
+);
+it.each(["en", "ru"] as const)(
+  "surfaces wallet held and available balances when the engine is on in %s",
+  async (locale) => {
+    state.locale = locale;
+    state.walletEnabled = true;
+    const copy = getFinancialCopy(locale);
+    const html = renderToStaticMarkup(await Statement(input));
+    expect(html).toContain(copy.noteWallet);
+    expect(html).toContain(copy.held);
+    expect(html).toContain(copy.available);
+    expect(html).toContain(locale === "ru" ? "4,50 EUR" : "4.50 EUR");
+    expect(html).toContain(locale === "ru" ? "1,20 EUR" : "1.20 EUR");
+    expect(html).toContain("/workspace/wallet");
+    expect(state.getAvailableBalance).toHaveBeenCalledWith("user:usr_a", "EUR");
+    expect(state.getHeldBalance).toHaveBeenCalledWith("user:usr_a", "EUR");
   },
 );
 it("refuses financial review for general moderators", async () => {
