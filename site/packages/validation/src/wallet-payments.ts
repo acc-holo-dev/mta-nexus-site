@@ -30,6 +30,13 @@ export const walletTopUpCreateSchema = z
   })
   .strict();
 
+export const walletTopUpStubCreditSchema = z
+  .object({
+    outcome: z.enum(["succeeded", "failed"]),
+    organizationId: organizationId.optional(),
+  })
+  .strict();
+
 export const walletBalanceQuerySchema = z
   .object({
     currency,

@@ -31,7 +31,7 @@ import { formatHistoryDate } from "../commerce-history-format";
 import { formatFinancialMinor } from "../financial-i18n";
 import { WalletHoldReleaseForm } from "../wallet-hold-release";
 import { getWalletCopy } from "../wallet-i18n";
-import { WalletTopUpForm } from "../wallet-topup";
+import { WalletTopUpForm, WalletTopUpStubCreditForm } from "../wallet-topup";
 import {
   WalletWithdrawCancelForm,
   WalletWithdrawForm,
@@ -246,6 +246,9 @@ export async function WalletWorkspaceScreen({
                 <p className={typeXsMuted}>
                   {statusLabel(copy, intent.status)} · {intent.id}
                 </p>
+                {intent.providerId === "stub" ? (
+                  <WalletTopUpStubCreditForm actorId={user.id} intentId={intent.id} />
+                ) : null}
               </li>
             ))}
           </ul>
@@ -497,6 +500,9 @@ export async function WalletWorkspaceScreen({
                   {statusLabel(copy, intent.status)} · {copy.recordedAt}:{" "}
                   {formatHistoryDate(new Date(intent.createdAt), locale)} · {intent.id}
                 </p>
+                {intent.status === "awaiting_provider" && intent.providerId === "stub" ? (
+                  <WalletTopUpStubCreditForm actorId={user.id} intentId={intent.id} />
+                ) : null}
               </li>
             ))}
           </ul>

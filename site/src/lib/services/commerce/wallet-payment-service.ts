@@ -282,6 +282,55 @@ export class WalletPaymentService {
     };
   }
 
+  /**
+   * Apply a stub-only verified top-up outcome for an awaiting intent.
+   * Goes through the same webhook verification path; live PSP adapters stay off.
+   */
+  async creditStubTopUp(input: {
+    intentId: string;
+    accountId: string;
+    outcome: "succeeded" | "failed";
+  }): Promise<{
+    intent: TopUpIntent;
+    kind: Extract<VerifiedProviderEvent["kind"], "topup_succeeded" | "topup_failed">;
+    credited: boolean;
+  }> {
+    if (!isWalletEngineEnabled()) {
+      throw new AppError("Wallet engine is disabled", 404, "WALLET_ENGINE_DISABLED");
+    }
+    const stored = await this.topups.findById(input.intentId);
+    if (!stored) {
+      throw new AppError("Top-up intent not found", 404, "TOPUP_NOT_FOUND");
+    }
+    if (stored.accountId !== input.accountId) {
+      throw new ForbiddenError("Not authorized for this top-up");
+    }
+    if (stored.providerId !== "stub") {
+      throw new AppError(
+        "Stub top-up credit is only available for the stub provider",
+        400,
+        "WALLET_STUB_CREDIT_PROVIDER",
+      );
+    }
+    const kind = input.outcome === "succeeded" ? "topup_succeeded" : "topup_failed";
+    const providerEventId = `stub_topup_${kind}_${stored.id}`;
+    const rawBody = JSON.stringify({
+      kind,
+      intentId: stored.id,
+      amount: stored.amount,
+      currency: stored.currency,
+      providerEventId,
+    });
+    const result = await this.applyVerifiedWebhook("stub", rawBody, {
+      "x-nexus-stub-signature": "stub-ok",
+    });
+    return {
+      intent: result.intent as TopUpIntent,
+      kind: result.kind as "topup_succeeded" | "topup_failed",
+      credited: result.kind === "topup_succeeded" && result.entries !== null,
+    };
+  }
+
   async applyVerifiedWebhook(
     providerId: PaymentProviderId,
     rawBody: string,

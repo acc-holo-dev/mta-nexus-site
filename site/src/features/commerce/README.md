@@ -9,7 +9,9 @@ panel and runtime probe live here too. Services, repositories, routes and
 `site/src/lib/services/commerce/wallet-payment-service.ts`. Site stored-value balance
 uses the existing double-entry ledger; multi-provider capability matrix; stub top-up
 only until PSP contracts. Top-up intents persist in `wallet_topup_intents` (migration
-`0091_wallet_topup_intents`) via `walletTopupRepository`. Ledger wallet reference
+`0091_wallet_topup_intents`) via `walletTopupRepository`. Stub credit:
+`POST /api/wallet/topups/:id/stub-credit` applies a stub-only verified outcome.
+Ledger wallet reference
 kinds (`topup` / `wallet_spend` / …) require migration `0092_ledger_wallet_reference_types`.
 Pending paid orders settle via `POST /api/orders/:id/pay-with-wallet` (atomic
 `wallet_spend` with ECON-001 platform fee + ECON-002 escrow holds, completed
