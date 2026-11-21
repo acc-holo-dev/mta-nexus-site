@@ -15,6 +15,8 @@ export const auth = {
     registerTitle: "Create your Nexus account",
     loginDescription: "Open your resource library and manage your server listings.",
     registerDescription: "Save free resources and manage your MTA server listings.",
+    registerWalletDescription:
+      "Save free and paid resources in your library and manage your MTA server listings. Site-wallet purchase can settle paid listings when the wallet engine is on; card checkout stays off.",
     email: "Email address",
     username: "Username",
     usernameHint: "3-32 letters, numbers, underscores or hyphens.",

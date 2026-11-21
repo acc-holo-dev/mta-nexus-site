@@ -56,10 +56,12 @@ export function AuthForm({
   mode,
   locale,
   initialReturnPath = null,
+  walletEnabled = false,
 }: {
   mode: AuthMode;
   locale: Locale;
   initialReturnPath?: string | null;
+  walletEnabled?: boolean;
 }) {
   const dictionary = getDictionary(locale);
   const copy = dictionary.auth;
@@ -67,6 +69,8 @@ export function AuthForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [returnPath, setReturnPath] = useState<string | null>(initialReturnPath);
+  const registerDescription =
+    walletEnabled && registering ? copy.registerWalletDescription : copy.registerDescription;
 
   useEffect(() => {
     setReturnPath(parseAuthReturnPath(new URLSearchParams(window.location.search).get("next")));
@@ -117,9 +121,7 @@ export function AuthForm({
     <div className={pageShellMaxMdAuth}>
       <div className="space-y-2">
         <h1 className={type2xlBoldPrimary}>{registering ? copy.registerTitle : copy.loginTitle}</h1>
-        <p className={typeSmMuted}>
-          {registering ? copy.registerDescription : copy.loginDescription}
-        </p>
+        <p className={typeSmMuted}>{registering ? registerDescription : copy.loginDescription}</p>
       </div>
       <form
         onSubmit={submit}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { parseAuthReturnPath } from "../../shell/auth-return";
 import { pageShellClip } from "../../shell/page-shell";
 import { AuthForm } from "../components/auth-form";
@@ -27,7 +28,12 @@ export async function RegisterScreen({
   const initialReturnPath = parseAuthReturnPath(nextRaw);
   return (
     <div className={pageShellClip}>
-      <AuthForm mode="register" locale={locale} initialReturnPath={initialReturnPath} />
+      <AuthForm
+        mode="register"
+        locale={locale}
+        initialReturnPath={initialReturnPath}
+        walletEnabled={isWalletEngineEnabled()}
+      />
     </div>
   );
 }
