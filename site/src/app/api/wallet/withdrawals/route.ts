@@ -1,5 +1,5 @@
 import { AppError } from "@nexus/domain";
-import { walletWithdrawalCreateSchema } from "@nexus/validation";
+import { walletWithdrawalCreateSchema, walletWithdrawalQuerySchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import {
   walletAccountIdForUser,
@@ -9,6 +9,45 @@ import {
 import { readBoundedJson } from "../../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../../lib/http/browser-route-adapter";
 import { isWalletWithdrawEnabled } from "../../../../lib/services/commerce/wallet-payment-service";
+
+/**
+ * List recent withdrawal intents for the personal site wallet.
+ * Dark unless NEXUS_WALLET_ENGINE=1 and NEXUS_WALLET_WITHDRAW=1.
+ */
+export function GET(request: NextRequest) {
+  return walletSessionRequest(request, false, async (actor) => {
+    if (!isWalletWithdrawEnabled()) {
+      throw new AppError("Wallet withdrawals are disabled", 404, "WALLET_WITHDRAW_DISABLED");
+    }
+    const parsed = walletWithdrawalQuerySchema.safeParse({
+      currency: request.nextUrl.searchParams.get("currency") ?? undefined,
+      limit: request.nextUrl.searchParams.get("limit") ?? undefined,
+    });
+    if (!parsed.success) {
+      throw new AppError("Invalid wallet withdrawal query", 400, "WALLET_WITHDRAW_INVALID");
+    }
+    const accountId = walletAccountIdForUser(actor.id);
+    const intents = await walletPaymentService.listRecentWithdrawals(
+      accountId,
+      parsed.data.limit ?? 20,
+    );
+    return {
+      accountId,
+      currency: parsed.data.currency,
+      withdrawals: intents
+        .filter((intent) => intent.currency === parsed.data.currency)
+        .map((intent) => ({
+          id: intent.id,
+          status: intent.status,
+          amount: intent.amount,
+          currency: intent.currency,
+          providerId: intent.providerId,
+          escrowAccountId: intent.escrowAccountId,
+          createdAt: intent.createdAt,
+        })),
+    };
+  });
+}
 
 /**
  * Start a production-shaped withdrawal hold. Dark unless

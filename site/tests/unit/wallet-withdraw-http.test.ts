@@ -11,6 +11,7 @@ const state = vi.hoisted(() => ({
   engine: true,
   withdraw: false,
   startWithdrawal: vi.fn(),
+  listRecentWithdrawals: vi.fn(),
 }));
 
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
@@ -22,6 +23,7 @@ vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
   isWalletWithdrawEnabled: () => state.engine && state.withdraw,
   WalletPaymentService: class {
     startWithdrawal = state.startWithdrawal;
+    listRecentWithdrawals = state.listRecentWithdrawals;
   },
 }));
 
@@ -30,7 +32,10 @@ vi.mock("@nexus/security", () => ({
   getClientIp: () => "127.0.0.1",
 }));
 
-import { POST as withdrawals } from "../../src/app/api/wallet/withdrawals/route";
+import {
+  GET as listWithdrawals,
+  POST as withdrawals,
+} from "../../src/app/api/wallet/withdrawals/route";
 
 function request(body: unknown) {
   return new NextRequest("https://nexus.test/api/wallet/withdrawals", {
@@ -45,6 +50,12 @@ function request(body: unknown) {
   });
 }
 
+function listRequest(query: string) {
+  return new NextRequest(`https://nexus.test/api/wallet/withdrawals?${query}`, {
+    headers: { cookie: "nexus_session=wallet-token" },
+  });
+}
+
 describe("wallet withdrawal HTTP", () => {
   beforeEach(() => {
     stubBrowserMutationOrigin();
@@ -53,6 +64,36 @@ describe("wallet withdrawal HTTP", () => {
     state.engine = true;
     state.withdraw = false;
     state.startWithdrawal.mockReset();
+    state.listRecentWithdrawals.mockReset();
+  });
+
+  it("keeps withdrawal history dark when withdraw policy is off", async () => {
+    const response = await listWithdrawals(listRequest("currency=EUR"));
+    expect(response.status).toBe(404);
+    expect(await response.json()).toMatchObject({ code: "WALLET_WITHDRAW_DISABLED" });
+    expect(state.listRecentWithdrawals).not.toHaveBeenCalled();
+  });
+
+  it("lists recent withdrawal intents when withdraw policy is on", async () => {
+    state.withdraw = true;
+    state.listRecentWithdrawals.mockResolvedValueOnce([
+      {
+        id: "wwd_1",
+        status: "awaiting_provider",
+        amount: 100,
+        currency: "EUR",
+        providerId: "stub",
+        escrowAccountId: "escrow:wwithdraw_wwd_1",
+        createdAt: "2026-11-21T08:00:00.000Z",
+      },
+    ]);
+    const response = await listWithdrawals(listRequest("currency=EUR"));
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      accountId: "user:usr_wallet",
+      currency: "EUR",
+      withdrawals: [{ id: "wwd_1", status: "awaiting_provider", amount: 100 }],
+    });
   });
 
   afterEach(() => {

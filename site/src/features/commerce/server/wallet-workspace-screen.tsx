@@ -1,4 +1,4 @@
-import { AppError, type LedgerEntry, type TopUpIntent } from "@nexus/domain";
+import { AppError, type LedgerEntry, type TopUpIntent, type WithdrawalIntent } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
@@ -9,6 +9,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import {
   isWalletEngineEnabled,
+  isWalletWithdrawEnabled,
   WalletPaymentService,
 } from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
@@ -62,7 +63,20 @@ function activityKindLabel(
 ): string {
   if (referenceType === "topup") return copy.activityTopUp;
   if (referenceType === "wallet_spend") return copy.activitySpend;
+  if (referenceType === "wallet_hold") return copy.activityHold;
+  if (referenceType === "withdrawal") return copy.activityWithdrawal;
   return copy.activityOther;
+}
+
+function withdrawalStatusLabel(
+  copy: ReturnType<typeof getWalletCopy>,
+  status: WithdrawalIntent["status"],
+): string {
+  if (status === "awaiting_provider") return copy.statusAwaiting;
+  if (status === "succeeded") return copy.statusSucceeded;
+  if (status === "failed") return copy.statusFailed;
+  if (status === "cancelled") return copy.statusCancelled;
+  return copy.statusCreated;
 }
 
 export async function walletWorkspaceMetadata(): Promise<Metadata> {
@@ -141,6 +155,11 @@ export async function WalletWorkspaceScreen({
       return { ...org, available: orgAvailable, held, holds };
     }),
   );
+  const withdrawEnabled = isWalletWithdrawEnabled();
+  const withdrawals =
+    available === null || !withdrawEnabled
+      ? null
+      : await walletPaymentService.listRecentWithdrawals(accountId, 20).catch(() => null);
 
   if (available === null) {
     return (
@@ -163,6 +182,7 @@ export async function WalletWorkspaceScreen({
 
   const pending = (history ?? []).filter((intent) => intent.status === "awaiting_provider");
   const recent = (history ?? []).filter((intent) => intent.currency === currency);
+  const recentWithdrawals = (withdrawals ?? []).filter((intent) => intent.currency === currency);
   const nowMs = Date.now();
   const personalMatured = maturedHoldCount(heldList, currency, nowMs);
 
@@ -333,6 +353,35 @@ export async function WalletWorkspaceScreen({
               );
             })}
           </ul>
+        </section>
+      ) : null}
+      {withdrawEnabled ? (
+        <section className={panelSpace3P5} aria-labelledby="wallet-withdrawals-heading">
+          <h3 id="wallet-withdrawals-heading" className={typeSemiboldPrimary}>
+            {copy.withdrawals}
+          </h3>
+          <p role="note" className={typeXsMuted}>
+            {copy.withdrawalsNote}
+          </p>
+          {withdrawals === null ? (
+            <p className={typeXsMuted}>{copy.withdrawalsUnavailable}</p>
+          ) : recentWithdrawals.length === 0 ? (
+            <EmptyState title={copy.withdrawalsEmpty} description={copy.withdrawNote} />
+          ) : (
+            <ul className={typeSpace2Sm}>
+              {recentWithdrawals.map((intent) => (
+                <li key={intent.id}>
+                  <p className={typeNumericPrimary}>
+                    {formatFinancialMinor(intent.amount, intent.currency, locale)}
+                  </p>
+                  <p className={typeXsMuted}>
+                    {withdrawalStatusLabel(copy, intent.status)} · {copy.recordedAt}:{" "}
+                    {formatHistoryDate(new Date(intent.createdAt), locale)} · {intent.id}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
       ) : null}
       <section className={panelSpace3P5} aria-labelledby="wallet-activity-heading">

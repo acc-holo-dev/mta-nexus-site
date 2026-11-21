@@ -98,3 +98,10 @@ export const walletWithdrawalCreateSchema = z
     idempotencyKey,
   })
   .strict();
+
+export const walletWithdrawalQuerySchema = z
+  .object({
+    currency,
+    limit: z.coerce.number().int().min(1).max(100).optional(),
+  })
+  .strict();

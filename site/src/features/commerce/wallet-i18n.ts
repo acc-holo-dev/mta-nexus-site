@@ -59,7 +59,14 @@ const copy = {
     activityDebit: "Debit",
     activityTopUp: "Top-up",
     activitySpend: "Wallet spend",
+    activityHold: "Seller hold",
+    activityWithdrawal: "Withdrawal",
     activityOther: "Ledger entry",
+    withdrawals: "Withdrawal intents",
+    withdrawalsNote:
+      "Withdrawal policy is enabled in this environment, but live payout adapters stay off. Held amounts sit in escrow until a verified payout event.",
+    withdrawalsEmpty: "No withdrawal intents for this currency yet.",
+    withdrawalsUnavailable: "Withdrawal history is temporarily unavailable.",
     held: "Seller holds",
     heldEmpty: "No seller proceeds on hold for this currency.",
     heldEmptyHint:
@@ -187,7 +194,14 @@ const copy = {
     activityDebit: "Списание",
     activityTopUp: "Пополнение",
     activitySpend: "Оплата с кошелька",
+    activityHold: "Холд продавца",
+    activityWithdrawal: "Вывод",
     activityOther: "Проводка",
+    withdrawals: "Намерения вывода",
+    withdrawalsNote:
+      "Политика вывода включена в этой среде, но live payout adapters выключены. Суммы держатся в escrow до verified payout события.",
+    withdrawalsEmpty: "По этой валюте пока нет намерений вывода.",
+    withdrawalsUnavailable: "История выводов временно недоступна.",
     held: "Холды продавца",
     heldEmpty: "По этой валюте нет поступлений продавца на холде.",
     heldEmptyHint:
