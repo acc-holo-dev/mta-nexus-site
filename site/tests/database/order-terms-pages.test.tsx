@@ -9,6 +9,7 @@ const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
   locale: "en" as "en" | "ru",
   report: vi.fn(),
+  walletEnabled: false,
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
@@ -33,12 +34,15 @@ vi.mock("../../src/lib/i18n/server", () => ({
 vi.mock("../../src/lib/services/commerce/order-terms-service", () => ({
   orderTermsService: { report: state.report },
 }));
+vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
+  isWalletEngineEnabled: () => state.walletEnabled,
+}));
 
 import TermsLoading from "../../src/app/admin/commerce/reconciliation/[id]/terms/loading";
 import Admin from "../../src/app/admin/commerce/reconciliation/[id]/terms/page";
 import BuyerTermsLoading from "../../src/app/workspace/purchases/[id]/terms/loading";
 import Buyer, { generateMetadata } from "../../src/app/workspace/purchases/[id]/terms/page";
-import { orderTermsCopy } from "../../src/features/commerce/order-terms-i18n";
+import { orderTermsCopy, orderTermsNotice } from "../../src/features/commerce/order-terms-i18n";
 
 const input = {
     params: Promise.resolve({ id: "ord_a" }),
@@ -48,6 +52,7 @@ const input = {
 beforeEach(() => {
   vi.clearAllMocks();
   state.actor = { id: "usr_a", role: "user" };
+  state.walletEnabled = false;
   state.locale = "en";
   state.report.mockResolvedValue({
     order: {
@@ -124,7 +129,9 @@ it.each(["en", "ru"] as const)(
       c = orderTermsCopy(locale);
     expect(state.report).toHaveBeenCalledWith(state.actor, "ord_a", "buyer", 2);
     expect(html).toContain(c.title);
+    expect(html).toContain(orderTermsNotice(locale, false));
     expect(html).toContain(c.notice);
+    expect(html).not.toContain(c.walletNotice);
     expect(html).toContain(c.legacy);
     expect(html).toContain("&lt;script&gt;frozen&lt;/script&gt;");
     expect(html).not.toContain("<script>");
@@ -137,6 +144,15 @@ it.each(["en", "ru"] as const)(
     expect(html).not.toContain('name="pay"');
   },
 );
+it("uses wallet order-terms honesty when the engine is on", async () => {
+  state.walletEnabled = true;
+  const html = renderToStaticMarkup(await Buyer(input));
+  const copy = orderTermsCopy("en");
+  expect(html).toContain(orderTermsNotice("en", true));
+  expect(html).toContain(copy.walletNotice);
+  expect(html).not.toContain("Paid checkout remains unavailable");
+  expect(html).toContain("audited site-wallet ledger spend");
+});
 it("admin pages retain explicit financial scope and their own navigation", async () => {
   state.actor = { id: "usr_a", role: "admin" };
   const html = renderToStaticMarkup(await Admin(input));

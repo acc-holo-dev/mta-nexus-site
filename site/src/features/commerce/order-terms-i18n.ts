@@ -46,6 +46,8 @@ const copies = {
     empty: "No order lines recorded.",
     notice:
       "Snapshots record the resource title, seller and line value when a line is inserted. They survive later resource changes. Older lines retain unknown terms; current catalog data cannot reconstruct them. Baseline commission and hold rules do not prove an applied fee, held funds, provider capture, refund or license issuance. License declarations do not grant a license or change its term. Paid checkout remains unavailable.",
+    walletNotice:
+      "Snapshots record the resource title, seller and line value when a line is inserted. They survive later resource changes. Older lines retain unknown terms; current catalog data cannot reconstruct them. Baseline commission and hold rules do not prove an applied fee, held funds, provider capture, refund or license issuance. License declarations do not grant a license or change its term. When the site wallet engine is on, paid lines can settle through audited site-wallet ledger spend. Card checkout and live payment-provider adapters stay off. These snapshots still do not prove settle, refund or license issuance.",
     consistencyNotice:
       "Checks compare stored order totals and line values only. They do not verify payment, delivery, access or external settlement. No currency conversion is performed.",
   },
@@ -94,12 +96,19 @@ const copies = {
     empty: "Строки заказа отсутствуют.",
     notice:
       "Снимок фиксирует название ресурса, продавца и стоимость при добавлении строки. Последующие изменения ресурса его не меняют. У старых строк условия неизвестны: текущий каталог не позволяет восстановить их. Базовая комиссия и срок удержания не подтверждают применённую комиссию, удержанные средства, списание, возврат или выдачу лицензии. Запись лицензионной модели не выдаёт лицензию и не меняет её срок. Платное оформление пока недоступно.",
+    walletNotice:
+      "Снимок фиксирует название ресурса, продавца и стоимость при добавлении строки. Последующие изменения ресурса его не меняют. У старых строк условия неизвестны: текущий каталог не позволяет восстановить их. Базовая комиссия и срок удержания не подтверждают применённую комиссию, удержанные средства, списание, возврат или выдачу лицензии. Запись лицензионной модели не выдаёт лицензию и не меняет её срок. При включённом site wallet платные строки могут закрываться аудируемым ledger spend. Card checkout и live адаптеры платёжных провайдеров остаются выключены. Эти снимки по-прежнему не подтверждают settle, возврат или выдачу лицензии.",
     consistencyNotice:
       "Проверки сопоставляют только записанные суммы заказа и его строк. Они не подтверждают оплату, доставку, доступ или внешние расчёты. Пересчёта валют нет.",
   },
 };
 export function orderTermsCopy(locale: string) {
   return copies[locale === "ru" ? "ru" : "en"];
+}
+
+export function orderTermsNotice(locale: string, walletEnabled: boolean) {
+  const copy = orderTermsCopy(locale);
+  return walletEnabled ? copy.walletNotice : copy.notice;
 }
 
 export function orderTermsLicenseLabel(locale: string, model: string) {

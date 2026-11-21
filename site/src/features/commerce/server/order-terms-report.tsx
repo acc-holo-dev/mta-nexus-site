@@ -19,7 +19,7 @@ import {
   typeSmSecondary,
 } from "../../shell/type-shell";
 import { formatFinancialMinor } from "../financial-i18n";
-import { orderTermsCopy, orderTermsLicenseLabel } from "../order-terms-i18n";
+import { orderTermsCopy, orderTermsLicenseLabel, orderTermsNotice } from "../order-terms-i18n";
 import { sellerSalesTime } from "../seller-sales-i18n";
 
 // Honesty residual: consistency flags via ErrorState.
@@ -34,12 +34,15 @@ export function OrderTermsReportView({
   report,
   scope,
   locale,
+  walletEnabled = false,
 }: {
   report: OrderTermsReport;
   scope: "buyer" | "admin";
   locale: "en" | "ru";
+  walletEnabled?: boolean;
 }) {
   const c = orderTermsCopy(locale),
+    notice = orderTermsNotice(locale, walletEnabled),
     base =
       scope === "buyer"
         ? `/workspace/purchases/${encodeURIComponent(report.order.id)}`
@@ -67,7 +70,7 @@ export function OrderTermsReportView({
         </p>
       </header>
       <p role="note" className={surfaceP4TextSmSecondary}>
-        {c.notice}
+        {notice}
       </p>
       <section className={panelMinSpace4P5}>
         <h2 className={typeLgSemibold}>{c.check}</h2>
@@ -173,7 +176,7 @@ export function OrderTermsReportView({
       ) : (
         <EmptyState
           title={c.empty}
-          description={c.notice}
+          description={notice}
           icon={<ScrollText className="h-6 w-6" aria-hidden="true" />}
         />
       )}

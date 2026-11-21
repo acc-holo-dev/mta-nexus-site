@@ -8,6 +8,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { orderTermsService } from "../../../lib/services/commerce/order-terms-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
@@ -70,7 +71,14 @@ export async function PurchaseTermsScreen({
       if (value !== undefined) values.set(key, value);
     }
     const report = await orderTermsService.report(actor, id, "buyer", orderTermsPageQuery(values));
-    return <OrderTermsReportView report={report} scope="buyer" locale={locale} />;
+    return (
+      <OrderTermsReportView
+        report={report}
+        scope="buyer"
+        locale={locale}
+        walletEnabled={isWalletEngineEnabled()}
+      />
+    );
   } catch (error) {
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     if (error instanceof AppError && error.statusCode === 400)
