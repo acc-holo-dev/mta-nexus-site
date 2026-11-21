@@ -23,7 +23,7 @@ const en = {
   emptyHint:
     "Activate a currently published free plan from the catalog when you want benefits for this account.",
   notice:
-    "Published free plans can be activated without payment. Paid activation awaits a payment provider. One plan may be active per personal or organization account. The recorded terms last for the fixed period; renewal is manual after expiry. Resource licenses, payments, holds and balances are separate.",
+    "Published free plans can be activated without payment. Paid subscription plans are not settled through the site wallet or a live payment provider yet. One plan may be active per personal or organization account. The recorded terms last for the fixed period; renewal is manual after expiry. Resource licenses, payments, holds and balances are separate.",
   feeNote:
     "This is an estimate using the account's current subscription rate. It does not charge a commission, settle funds or grant access. The initial hold remains seven days.",
   expiredNote:
@@ -56,7 +56,7 @@ const en = {
   alreadyActive:
     "This account already has an active subscription. End it or wait for expiry before choosing a new plan.",
   paymentRequired:
-    "Only free plans can currently be activated. This paid plan requires a payment provider.",
+    "Only free plans can currently be activated. Paid subscription plans are not settled through the site wallet or a live payment provider yet.",
   conflict: "This request has already been used with different details. Check history.",
   stateChanged: "The subscription state changed or its term ended. Reload its current state.",
   limit: "This account has reached its limit of 500 subscription periods.",
@@ -110,7 +110,7 @@ const ru: typeof en = {
   emptyHint:
     "Подключите актуальный опубликованный бесплатный тариф из каталога, когда нужны преимущества для этого аккаунта.",
   notice:
-    "Опубликованные бесплатные тарифы можно подключить без оплаты. Платное подключение ожидает интеграции провайдера. У личного аккаунта или организации может действовать один тариф. Зафиксированные условия действуют до окончания срока; новый период подключается вручную после истечения. Лицензии ресурсов, платежи, удержания и баланс учитываются отдельно.",
+    "Опубликованные бесплатные тарифы можно подключить без оплаты. Платные тарифы подписки пока не проводятся через site wallet и не через live платёжного провайдера. У личного аккаунта или организации может действовать один тариф. Зафиксированные условия действуют до окончания срока; новый период подключается вручную после истечения. Лицензии ресурсов, платежи, удержания и баланс учитываются отдельно.",
   feeNote:
     "Это расчёт по текущей ставке подписки аккаунта. Он не списывает комиссию, не переводит деньги и не выдаёт доступ. Начальное удержание остаётся семь дней.",
   expiredNote:
@@ -143,7 +143,7 @@ const ru: typeof en = {
   alreadyActive:
     "У этого аккаунта уже есть действующая подписка. Прекратите её или дождитесь окончания срока перед выбором нового тарифа.",
   paymentRequired:
-    "Сейчас можно подключить только бесплатный тариф. Для этого платного тарифа нужен провайдер платежей.",
+    "Сейчас можно подключить только бесплатный тариф. Платные тарифы подписки пока не проводятся через site wallet и не через live платёжного провайдера.",
   conflict: "Этот запрос уже использован с другими данными. Проверьте историю.",
   stateChanged: "Состояние подписки изменилось или её срок истёк. Обновите актуальное состояние.",
   limit: "Аккаунт достиг предела в 500 периодов подписки.",

@@ -46,7 +46,7 @@ const copy = {
     of: "of",
     adminBack: "Back to administration",
     planNote:
-      "Published terms are announcements. Subscription purchase and activation are unavailable until a payment provider is integrated. These terms do not issue or extend resource licenses. Personal subscriptions will be limited to one active plan.",
+      "Published terms are announcements. Paid subscription purchase and activation are not settled through the site wallet or a live payment provider yet. These terms do not issue or extend resource licenses. Personal subscriptions will be limited to one active plan.",
     editNote:
       "Saving terms creates an immutable version and returns the plan to draft. Publish it again after review. Previous versions remain in history.",
     dirtyNote: "Save or discard your edits before changing publication state.",
@@ -180,7 +180,7 @@ const copy = {
     of: "из",
     adminBack: "Назад в администрирование",
     planNote:
-      "Опубликованные условия являются анонсом. Покупка и активация подписок недоступны до подключения платёжного провайдера. Тарифы не выдают и не продлевают лицензии на ресурсы. Личная подписка будет ограничена одним активным тарифом.",
+      "Опубликованные условия являются анонсом. Платная покупка и активация подписок пока не проводятся через site wallet и не через live платёжного провайдера. Тарифы не выдают и не продлевают лицензии на ресурсы. Личная подписка будет ограничена одним активным тарифом.",
     editNote:
       "Сохранение условий создаёт неизменяемую версию и возвращает тариф в черновик. После проверки опубликуйте его повторно. Предыдущие версии остаются в истории.",
     dirtyNote: "Сохраните или отмените правки перед изменением состояния публикации.",
