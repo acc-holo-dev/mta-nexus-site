@@ -38,12 +38,12 @@
     "site/src/features/resources/components/resource-media-editor.tsx"
   ],
   "scope": "Git-tracked member/workspace surfaces — workspace, admin, settings, auth, security app trees; library/commerce/moderation/organizations/notifications/accounts components; selective author/report/server/resource publisher forms (excluding feature server/ and *-server ports) — hard-coded member-facing literals + locale copy ternaries.",
-  "source_sha": "fb19e753164507b4c731b2790306040b1e13305d",
+  "source_sha": "8f5c3f0e8a907eb8c37814e61e143eeb6ffa8dd5",
   "summary": {
     "allowlisted": 0,
     "findings": 0,
     "locale_copy_ternaries": 0,
-    "scanned_files": 424,
+    "scanned_files": 425,
     "unallowlisted": 0
   }
 }
