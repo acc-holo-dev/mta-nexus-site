@@ -36,7 +36,7 @@ const fullAcceptancePaths = [
   /^packages\/db\/src\/repositories\/(?:organization-workspace|follow-workspace|product-mutation-authority|products|content-creation-authority|resource-qa|resource-reviews|builds-moderation|web-push-subscriptions|support-access|support-activity|support-message-discovery)\.ts$/,
   /^apps\/web\/src\/app\/api\/auth\//,
   /^apps\/web\/src\/app\/api\/(?:follow|object-mute|products|support|workspace\/(?:organizations|reports))(?:\/|$)/,
-  /^apps\/web\/src\/lib\/(?:http\/)?(?:browser-(?:request-policy|request-guard|route-adapter)|license-bearer-route-adapter)\.ts$/,
+  /^apps\/web\/src\/lib\/(?:http\/)?(?:browser-(?:request-policy|request-guard|route-adapter)|license-bearer-route-adapter|payment-provider-webhook-route-adapter)\.ts$/,
   // Guard inventories that encode production/upload/API surface contracts.
   /^tests\/unit\/(?:j4-production-upload-integration|browser-api-route-inventory)\.test\.ts$/,
 ];

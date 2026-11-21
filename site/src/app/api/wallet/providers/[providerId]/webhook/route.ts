@@ -7,10 +7,14 @@ import {
   walletWebhookRequest,
 } from "../../../../../../features/commerce/wallet-http";
 import { readBoundedText } from "../../../../../../lib/http/bounded-json";
+import { withPaymentProviderWebhook } from "../../../../../../lib/http/payment-provider-webhook-route-adapter";
 
 type RouteContext = { params: Promise<{ providerId: string }> };
 
-export async function POST(request: NextRequest, context: RouteContext) {
+export const POST = withPaymentProviderWebhook(async function POST(
+  request: NextRequest,
+  context: RouteContext,
+) {
   return walletWebhookRequest(request, async () => {
     const { providerId: rawProviderId } = await context.params;
     const parsedProvider = walletProviderIdSchema.safeParse(rawProviderId);
@@ -34,4 +38,4 @@ export async function POST(request: NextRequest, context: RouteContext) {
       credited: result.entries !== null,
     };
   });
-}
+});

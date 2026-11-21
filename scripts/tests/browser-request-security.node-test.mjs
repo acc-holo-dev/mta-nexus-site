@@ -5,6 +5,8 @@ import { SESSION_LIFETIME_SECONDS } from "../../site/src/features/shell/session-
 import {
   browserRequestDecision,
   isLicenseRuntimeRequest,
+  isMachineApiRequest,
+  isPaymentProviderWebhookRequest,
 } from "../../site/src/lib/http/browser-request-policy.ts";
 
 const env = { NODE_ENV: "production", NEXT_PUBLIC_APP_URL: "https://nexus.test" };
@@ -148,6 +150,20 @@ test("machine exceptions are exact paths, not a prefix or a header", () => {
   ]) {
     assert.equal(isLicenseRuntimeRequest(path), false);
   }
+  assert.equal(isPaymentProviderWebhookRequest("/api/wallet/providers/stub/webhook"), true);
+  assert.equal(isPaymentProviderWebhookRequest("/api/wallet/providers/stripe/webhook"), true);
+  for (const path of [
+    "/api/wallet/providers/stub/webhook/extra",
+    "/api/wallet/providers/paypal/webhook",
+    "/api/wallet/providers/stub/webhook/",
+    "/api/wallet/topups",
+    "/api/wallet/providers/stub",
+  ]) {
+    assert.equal(isPaymentProviderWebhookRequest(path), false);
+  }
+  assert.equal(isMachineApiRequest("/api/licenses/check"), true);
+  assert.equal(isMachineApiRequest("/api/wallet/providers/yookassa/webhook"), true);
+  assert.equal(isMachineApiRequest("/api/wallet/topups"), false);
 });
 test("cookie issuance and deletion share host-only scope and production security", () => {
   const previous = process.env.NODE_ENV;

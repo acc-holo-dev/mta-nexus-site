@@ -101,11 +101,16 @@ const REQUIRED_BROWSER = [
   "site/src/app/api/admin/community/[id]/discussion/[commentId]/route.ts",
   "site/src/app/api/admin/community/[id]/discussion/[commentId]/reports/batch/route.ts",
   "site/src/app/api/admin/community/[id]/discussion/[commentId]/reports/batch/preview/route.ts",
+  "site/src/app/api/wallet/topups/route.ts",
 ] as const;
 
 const REQUIRED_BEARER = [
   "site/src/app/api/licenses/check/route.ts",
   "site/src/app/api/licenses/check-release/route.ts",
+] as const;
+
+const REQUIRED_WEBHOOK = [
+  "site/src/app/api/wallet/providers/[providerId]/webhook/route.ts",
 ] as const;
 
 function listRouteFiles(dir: string): string[] {
@@ -121,7 +126,7 @@ function listRouteFiles(dir: string): string[] {
 
 function mutationAdapters(source: string, file: string) {
   const ast = parseSync(source, { syntax: "typescript" });
-  const imports = new Map<string, "browser" | "bearer">();
+  const imports = new Map<string, "browser" | "bearer" | "webhook">();
   for (const node of ast.body) {
     if (node.type !== "ImportDeclaration") continue;
     const target = path.resolve(
@@ -141,9 +146,15 @@ function mutationAdapters(source: string, file: string) {
         target === path.join(repoRoot, "site/src/lib/http/license-bearer-route-adapter.ts")
       )
         imports.set(specifier.local.value, "bearer");
+      if (
+        name === "withPaymentProviderWebhook" &&
+        target ===
+          path.join(repoRoot, "site/src/lib/http/payment-provider-webhook-route-adapter.ts")
+      )
+        imports.set(specifier.local.value, "webhook");
     }
   }
-  const handlers: { method: string; adapter: "browser" | "bearer" | null }[] = [];
+  const handlers: { method: string; adapter: "browser" | "bearer" | "webhook" | null }[] = [];
   for (const node of ast.body) {
     if (node.type === "ExportAllDeclaration") handlers.push({ method: "*", adapter: null });
     if (node.type === "ExportNamedDeclaration") {
@@ -193,7 +204,9 @@ describe("browser API route adapter inventory", () => {
           ? "browser"
           : handlers.every((handler) => handler.adapter === "bearer")
             ? "bearer"
-            : "unprotected";
+            : handlers.every((handler) => handler.adapter === "webhook")
+              ? "webhook"
+              : "unprotected";
     return { rel, source, kind, handlers };
   });
 
@@ -216,14 +229,26 @@ describe("browser API route adapter inventory", () => {
     }
   });
 
+  it("keeps exact payment-provider webhooks on the independent webhook adapter", () => {
+    for (const rel of REQUIRED_WEBHOOK) {
+      const route = routes.find((entry) => entry.rel === rel);
+      expect(route, rel).toBeTruthy();
+      expect(route?.kind).toBe("webhook");
+      expect(route?.source).toContain("withPaymentProviderWebhook");
+      expect(route?.source).not.toContain("withBrowserMutation");
+      expect(route?.source).not.toContain("withLicenseBearerRoute");
+    }
+  });
+
   it("requires every exported mutation to use its actual shared adapter without exceptions", () => {
     for (const route of routes) {
       for (const handler of route.handlers) {
         const bearer = (REQUIRED_BEARER as readonly string[]).includes(route.rel);
+        const webhook = (REQUIRED_WEBHOOK as readonly string[]).includes(route.rel);
         expect(handler.adapter, `${route.rel} ${handler.method}`).toBe(
-          bearer ? "bearer" : "browser",
+          webhook ? "webhook" : bearer ? "bearer" : "browser",
         );
-        if (bearer) expect(handler.method).toBe("POST");
+        if (bearer || webhook) expect(handler.method).toBe("POST");
       }
     }
   });

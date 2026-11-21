@@ -40,6 +40,7 @@ const utilPorts = [
   "seller-sales-query",
   "subscriptions-query",
   "checkout-api-copy",
+  "wallet-i18n",
 ];
 const clientPorts = [
   "acquire-page",
