@@ -28,9 +28,11 @@ HTTP routes under `/api/wallet/*`, pay-with-wallet, checkout/wallet, and
 intents (migration `0094_wallet_withdrawal_intents`) hold available balance in
 escrow until a verified payout event; HTTP `POST /api/wallet/withdrawals` also
 needs `NEXUS_WALLET_WITHDRAW=1` (live payout adapters stay off).
-`GET /api/wallet/withdrawals` lists recent intents under the same flag. When the
-engine is on, authors may create/release paid `single_server` listings (still
-not card checkout). Redirect never credits the wallet.
+`GET /api/wallet/withdrawals` lists recent intents under the same flag;
+`/workspace/wallet` shows a stub withdraw form and recent intents when withdraw
+policy is on. When the engine is on, authors may create/release paid
+`single_server` listings (still not card checkout). Redirect never credits the
+wallet.
 
 | Entry                             | Контракт                                                                                                          |
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------------- |

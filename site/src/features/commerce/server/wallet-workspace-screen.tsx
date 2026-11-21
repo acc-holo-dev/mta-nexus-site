@@ -32,6 +32,7 @@ import { formatFinancialMinor } from "../financial-i18n";
 import { WalletHoldReleaseForm } from "../wallet-hold-release";
 import { getWalletCopy } from "../wallet-i18n";
 import { WalletTopUpForm } from "../wallet-topup";
+import { WalletWithdrawForm } from "../wallet-withdraw";
 
 const walletPaymentService = new WalletPaymentService();
 const CURRENCIES = ["USD", "EUR", "RUB"] as const;
@@ -197,7 +198,7 @@ export async function WalletWorkspaceScreen({
         {copy.note}
       </p>
       <p role="note" className={typeXsMuted}>
-        {copy.withdrawNote}
+        {withdrawEnabled ? copy.withdrawEnabledNote : copy.withdrawNote}
       </p>
       <nav aria-label={copy.currency} className={typeFlexWrapGap4Sm}>
         {CURRENCIES.map((value) => (
@@ -363,10 +364,11 @@ export async function WalletWorkspaceScreen({
           <p role="note" className={typeXsMuted}>
             {copy.withdrawalsNote}
           </p>
+          <WalletWithdrawForm actorId={user.id} currency={currency} />
           {withdrawals === null ? (
             <p className={typeXsMuted}>{copy.withdrawalsUnavailable}</p>
           ) : recentWithdrawals.length === 0 ? (
-            <EmptyState title={copy.withdrawalsEmpty} description={copy.withdrawNote} />
+            <EmptyState title={copy.withdrawalsEmpty} description={copy.withdrawalsNote} />
           ) : (
             <ul className={typeSpace2Sm}>
               {recentWithdrawals.map((intent) => (
