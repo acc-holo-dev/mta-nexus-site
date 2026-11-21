@@ -204,6 +204,31 @@ export class WalletPaymentService {
     return this.withdrawals.listRecentByAccount(accountId, limit);
   }
 
+  /** Cancel an awaiting/created top-up before a verified provider credit. No ledger posting. */
+  async cancelTopUp(input: {
+    intentId: string;
+    accountId: string;
+  }): Promise<{ intent: TopUpIntent }> {
+    if (!isWalletEngineEnabled()) {
+      throw new AppError("Wallet engine is disabled", 404, "WALLET_ENGINE_DISABLED");
+    }
+    const stored = await this.topups.findById(input.intentId);
+    if (!stored) {
+      throw new AppError("Top-up intent not found", 404, "TOPUP_NOT_FOUND");
+    }
+    if (stored.accountId !== input.accountId) {
+      throw new ForbiddenError("Not authorized for this top-up");
+    }
+    if (stored.status === "cancelled") {
+      return { intent: stored };
+    }
+    const intent = await this.topups.cancelAwaiting({
+      intentId: stored.id,
+      accountId: input.accountId,
+    });
+    return { intent };
+  }
+
   async cancelWithdrawal(input: {
     intentId: string;
     accountId: string;

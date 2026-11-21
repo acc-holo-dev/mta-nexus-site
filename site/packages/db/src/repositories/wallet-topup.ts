@@ -246,6 +246,44 @@ export class WalletTopupRepository {
       return toIntent(row);
     });
   }
+
+  /** Cancel an awaiting/created top-up before a verified provider credit. No ledger posting. */
+  async cancelAwaiting(input: { intentId: string; accountId: string }): Promise<TopUpIntent> {
+    return db.transaction(async (tx) => {
+      await tx.execute(
+        sql`select pg_advisory_xact_lock(hashtext(${`wallet-topup:${input.intentId}`}))`,
+      );
+      const [current] = await tx
+        .select()
+        .from(walletTopupIntents)
+        .where(eq(walletTopupIntents.id, input.intentId))
+        .limit(1)
+        .for("update");
+      if (!current) throw new AppError("Top-up intent not found", 404, "TOPUP_NOT_FOUND");
+      if (current.accountId !== input.accountId) {
+        throw new AppError("Top-up intent account mismatch", 403, "FORBIDDEN");
+      }
+      if (current.status === "cancelled") return toIntent(current);
+      if (current.status !== "awaiting_provider" && current.status !== "created") {
+        throw new AppError("Top-up intent cannot be cancelled", 409, "TOPUP_INTENT_STATE");
+      }
+      const [row] = await tx
+        .update(walletTopupIntents)
+        .set({
+          status: "cancelled",
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(walletTopupIntents.id, input.intentId),
+            eq(walletTopupIntents.status, current.status),
+          ),
+        )
+        .returning();
+      if (!row) throw new AppError("Top-up cancel raced", 409, "TOPUP_CANCEL_RACE");
+      return toIntent(row);
+    });
+  }
 }
 
 export const walletTopupRepository = new WalletTopupRepository();

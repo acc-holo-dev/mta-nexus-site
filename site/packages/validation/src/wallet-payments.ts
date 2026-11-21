@@ -37,6 +37,12 @@ export const walletTopUpStubCreditSchema = z
   })
   .strict();
 
+export const walletTopUpCancelSchema = z
+  .object({
+    organizationId: organizationId.optional(),
+  })
+  .strict();
+
 export const walletBalanceQuerySchema = z
   .object({
     currency,

@@ -11,6 +11,7 @@ import {
   createWithdrawalIntent,
   type LedgerPosting,
   markTopUpAwaitingProvider,
+  markTopUpCancelled,
   markWithdrawalAwaitingProvider,
   markWithdrawalCancelled,
   paymentProviderCapabilityMatrix,
@@ -143,6 +144,15 @@ describe("wallet payments domain", () => {
       "platform:psp_clearing_stub",
       "user:usr_buyer",
     ]);
+  });
+
+  it("cancels an awaiting top-up without ledger posting", () => {
+    const awaiting = markTopUpAwaitingProvider(baseIntent(), "stub_sess_wtop_cancel");
+    expect(markTopUpCancelled(awaiting).status).toBe("cancelled");
+    expect(markTopUpCancelled({ ...awaiting, status: "cancelled" }).status).toBe("cancelled");
+    expect(() => markTopUpCancelled({ ...awaiting, status: "succeeded" })).toThrow(
+      /cannot be cancelled/i,
+    );
   });
 
   it("rejects amount mismatches and double credit", () => {

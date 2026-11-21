@@ -336,6 +336,14 @@ export function buildVerifiedTopUpCreditPosting(input: {
   };
 }
 
+export function markTopUpCancelled(intent: TopUpIntent): TopUpIntent {
+  if (intent.status === "cancelled") return intent;
+  if (intent.status !== "awaiting_provider" && intent.status !== "created") {
+    throw new AppError("Top-up intent cannot be cancelled", 409, "TOPUP_INTENT_STATE");
+  }
+  return { ...intent, status: "cancelled" };
+}
+
 export function markTopUpFailed(intent: TopUpIntent, event: VerifiedProviderEvent): TopUpIntent {
   if (event.kind !== "topup_failed" || event.intentId !== intent.id) {
     throw new AppError(

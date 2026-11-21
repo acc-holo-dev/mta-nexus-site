@@ -31,7 +31,7 @@ import { formatHistoryDate } from "../commerce-history-format";
 import { formatFinancialMinor } from "../financial-i18n";
 import { WalletHoldReleaseForm } from "../wallet-hold-release";
 import { getWalletCopy } from "../wallet-i18n";
-import { WalletTopUpForm, WalletTopUpStubCreditForm } from "../wallet-topup";
+import { WalletTopUpCancelForm, WalletTopUpForm, WalletTopUpStubCreditForm } from "../wallet-topup";
 import {
   WalletWithdrawCancelForm,
   WalletWithdrawForm,
@@ -153,15 +153,23 @@ export async function WalletWorkspaceScreen({
   const withdrawEnabled = isWalletWithdrawEnabled();
   const orgWalletSummaries = await Promise.all(
     orgSellerAccounts.map(async (org) => {
-      const [orgAvailable, held, holds, orgWithdrawals] = await Promise.all([
+      const [orgAvailable, held, holds, orgTopUps, orgWithdrawals] = await Promise.all([
         walletPaymentService.getAvailableBalance(org.accountId, currency).catch(() => null),
         walletPaymentService.getHeldBalance(org.accountId, currency).catch(() => null),
         walletPaymentService.listHeld(org.accountId, 20).catch(() => null),
+        walletPaymentService.listRecentTopUps(org.accountId, 20).catch(() => null),
         withdrawEnabled
           ? walletPaymentService.listRecentWithdrawals(org.accountId, 20).catch(() => null)
           : Promise.resolve(null),
       ]);
-      return { ...org, available: orgAvailable, held, holds, withdrawals: orgWithdrawals };
+      return {
+        ...org,
+        available: orgAvailable,
+        held,
+        holds,
+        topUps: orgTopUps,
+        withdrawals: orgWithdrawals,
+      };
     }),
   );
   const withdrawals =
@@ -246,8 +254,13 @@ export async function WalletWorkspaceScreen({
                 <p className={typeXsMuted}>
                   {statusLabel(copy, intent.status)} · {intent.id}
                 </p>
-                {intent.providerId === "stub" ? (
-                  <WalletTopUpStubCreditForm actorId={user.id} intentId={intent.id} />
+                {intent.status === "awaiting_provider" || intent.status === "created" ? (
+                  <>
+                    <WalletTopUpCancelForm actorId={user.id} intentId={intent.id} />
+                    {intent.providerId === "stub" ? (
+                      <WalletTopUpStubCreditForm actorId={user.id} intentId={intent.id} />
+                    ) : null}
+                  </>
                 ) : null}
               </li>
             ))}
@@ -311,6 +324,8 @@ export async function WalletWorkspaceScreen({
                 org.holds?.filter((hold) => hold.currency === currency) ??
                 ([] as NonNullable<typeof org.holds>);
               const orgMatured = maturedHoldCount(org.holds, currency, nowMs);
+              const orgRecentTopUps =
+                org.topUps?.filter((intent) => intent.currency === currency) ?? [];
               const orgRecentWithdrawals =
                 org.withdrawals?.filter((intent) => intent.currency === currency) ?? [];
               return (
@@ -328,11 +343,47 @@ export async function WalletWorkspaceScreen({
                       </div>
                     </dl>
                   )}
+                  <h4 className={typeSemiboldPrimary}>{copy.orgTopUps}</h4>
                   <WalletTopUpForm
                     actorId={user.id}
                     currency={currency}
                     organizationId={org.organizationId}
                   />
+                  {org.topUps === null ? (
+                    <p className={typeXsMuted}>{copy.orgTopUpsUnavailable}</p>
+                  ) : orgRecentTopUps.length === 0 ? (
+                    <EmptyState title={copy.orgTopUpsEmpty} description={copy.orgTopUpNote} />
+                  ) : (
+                    <ul className={typeSpace2Sm}>
+                      {orgRecentTopUps.map((intent) => (
+                        <li key={intent.id}>
+                          <p className={typeNumericPrimary}>
+                            {formatFinancialMinor(intent.amount, intent.currency, locale)}
+                          </p>
+                          <p className={typeXsMuted}>
+                            {statusLabel(copy, intent.status)} · {copy.recordedAt}:{" "}
+                            {formatHistoryDate(new Date(intent.createdAt), locale)} · {intent.id}
+                          </p>
+                          {intent.status === "awaiting_provider" || intent.status === "created" ? (
+                            <>
+                              <WalletTopUpCancelForm
+                                actorId={user.id}
+                                intentId={intent.id}
+                                organizationId={org.organizationId}
+                              />
+                              {intent.providerId === "stub" ? (
+                                <WalletTopUpStubCreditForm
+                                  actorId={user.id}
+                                  intentId={intent.id}
+                                  organizationId={org.organizationId}
+                                />
+                              ) : null}
+                            </>
+                          ) : null}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                   {org.held === null || org.holds === null ? (
                     <p className={typeXsMuted}>{copy.heldUnavailable}</p>
                   ) : holds.length === 0 ? (
@@ -500,8 +551,13 @@ export async function WalletWorkspaceScreen({
                   {statusLabel(copy, intent.status)} · {copy.recordedAt}:{" "}
                   {formatHistoryDate(new Date(intent.createdAt), locale)} · {intent.id}
                 </p>
-                {intent.status === "awaiting_provider" && intent.providerId === "stub" ? (
-                  <WalletTopUpStubCreditForm actorId={user.id} intentId={intent.id} />
+                {intent.status === "awaiting_provider" || intent.status === "created" ? (
+                  <>
+                    <WalletTopUpCancelForm actorId={user.id} intentId={intent.id} />
+                    {intent.providerId === "stub" ? (
+                      <WalletTopUpStubCreditForm actorId={user.id} intentId={intent.id} />
+                    ) : null}
+                  </>
                 ) : null}
               </li>
             ))}
