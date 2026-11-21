@@ -28,7 +28,7 @@ export function isWalletEngineEnabled(
   return env.NEXUS_WALLET_ENGINE === "1";
 }
 
-export function defaultPaymentProviders(): PaymentProviderPort[] {
+function defaultPaymentProviders(): PaymentProviderPort[] {
   return [new StubPaymentProvider()];
 }
 
@@ -111,5 +111,3 @@ export class WalletPaymentService {
     });
   }
 }
-
-export const walletPaymentService = new WalletPaymentService();
