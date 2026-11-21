@@ -75,7 +75,7 @@
     "site/packages/ui/src/brand-mark.tsx"
   ],
   "scope": "Git-tracked shell feature (excluding server/ and *-server ports), home page/panels, root layout metadata, and BrandMark — hard-coded guest-facing literals + locale copy ternaries.",
-  "source_sha": "226ee0a38e278d9a95dc70ccb1d9abda510a520d",
+  "source_sha": "16bd8b166f2cf34e30512d9cc22e226f3378623e",
   "summary": {
     "allowlisted": 5,
     "findings": 5,
