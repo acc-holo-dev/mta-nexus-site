@@ -132,6 +132,8 @@ const copy = {
       ORDER_STATE_CHANGED: "The order changed. Reload its current state.",
       ORDER_RECONCILIATION_REQUIRED:
         "This order has payment or financial records. Provider reconciliation is required.",
+      ORDER_RECONCILIATION_REQUIRED_WALLET:
+        "This order has payment or ledger records. Staff ledger review is required — not provider reconciliation and not a buyer cancel form.",
       ORDER_REQUEST_CONFLICT:
         "This request identifier was already used with different cancellation details.",
       UNAUTHORIZED: "Sign in again to continue.",
@@ -279,6 +281,8 @@ const copy = {
       ORDER_STATE_CHANGED: "Заказ изменился. Обновите его состояние.",
       ORDER_RECONCILIATION_REQUIRED:
         "У заказа есть платёжные или финансовые записи. Требуется сверка с провайдером.",
+      ORDER_RECONCILIATION_REQUIRED_WALLET:
+        "У заказа есть платёжные или ledger-записи. Нужна staff-проверка ledger — не сверка с провайдером и не форма отмены покупателя.",
       ORDER_REQUEST_CONFLICT: "Идентификатор запроса уже использован с другими данными отмены.",
       UNAUTHORIZED: "Войдите снова, чтобы продолжить.",
       ACTOR_ID_REQUIRED: "Обновите страницу и подтвердите аккаунт перед продолжением.",

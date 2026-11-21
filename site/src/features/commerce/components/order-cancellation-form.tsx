@@ -17,11 +17,14 @@ export function OrderCancellationForm({
   orderId,
   expectedUpdatedAt,
   canCancel,
+  walletEnabled = false,
 }: {
   actorId: string;
   orderId: string;
   expectedUpdatedAt: string;
   canCancel: boolean;
+  /** When the site wallet engine is on, remaps reconciliation failures to ledger dialect. */
+  walletEnabled?: boolean;
 }) {
   const { locale } = useNexusLocale(),
     copy = getCommercialCopy(locale),
@@ -158,7 +161,14 @@ export function OrderCancellationForm({
           }
         }
         if (response.status === 401 || value?.code === "ACTOR_CHANGED") setReady("");
-        setError(commercialError(locale, value?.code));
+        setError(
+          commercialError(
+            locale,
+            walletEnabled && value?.code === "ORDER_RECONCILIATION_REQUIRED"
+              ? "ORDER_RECONCILIATION_REQUIRED_WALLET"
+              : value?.code,
+          ),
+        );
         return;
       }
       try {

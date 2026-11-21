@@ -146,6 +146,7 @@ export async function PurchaseOperationsScreen({
         orderId={id}
         expectedUpdatedAt={result.order.updatedAt.toISOString()}
         canCancel={result.canCancel}
+        walletEnabled={walletEnabled}
       />
       {!result.canCancel ? (
         <ErrorState

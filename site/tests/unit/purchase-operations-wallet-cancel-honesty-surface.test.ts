@@ -34,6 +34,25 @@ describe("purchase operations wallet cancel honesty", () => {
     expect(ru.cannotCancelWallet).not.toContain("требуют сверки с провайдером");
   });
 
+  it("remaps ORDER_RECONCILIATION_REQUIRED to ledger dialect when wallet engine is on", () => {
+    const screen = read("site/src/features/commerce/server/purchase-operations-screen.tsx");
+    const form = read("site/src/features/commerce/components/order-cancellation-form.tsx");
+    const en = getCommercialCopy("en");
+    const ru = getCommercialCopy("ru");
+
+    expect(screen).toContain("walletEnabled={walletEnabled}");
+    expect(form).toContain("walletEnabled");
+    expect(form).toContain("ORDER_RECONCILIATION_REQUIRED_WALLET");
+    expect(en.errors.ORDER_RECONCILIATION_REQUIRED).toContain("Provider reconciliation");
+    expect(en.errors.ORDER_RECONCILIATION_REQUIRED_WALLET).toContain("Staff ledger review");
+    expect(en.errors.ORDER_RECONCILIATION_REQUIRED_WALLET).not.toContain(
+      "Provider reconciliation is required",
+    );
+    expect(en.errors.ORDER_RECONCILIATION_REQUIRED_WALLET).toContain("not provider reconciliation");
+    expect(ru.errors.ORDER_RECONCILIATION_REQUIRED_WALLET).toContain("ledger");
+    expect(ru.errors.ORDER_RECONCILIATION_REQUIRED_WALLET).toContain("не сверка с провайдером");
+  });
+
   it("uses EmptyState for empty payment attempts with wallet empty ≠ load-failure hint", () => {
     const screen = read("site/src/features/commerce/server/purchase-operations-screen.tsx");
     const en = getCommercialCopy("en");

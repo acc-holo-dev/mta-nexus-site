@@ -17,6 +17,7 @@ type OrderCancellationFormComponent = (props: {
   orderId: string;
   expectedUpdatedAt: string;
   canCancel: boolean;
+  walletEnabled?: boolean;
 }) => ReactNode;
 
 export const reply = (body: unknown, status = 200) =>
