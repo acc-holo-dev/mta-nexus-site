@@ -114,4 +114,29 @@ describe("ProductCard attribution and honest metrics", () => {
     expect(html).toContain(getDictionary("en").market.publisherUnavailable);
     expect(html).not.toContain("usr_author");
   });
+
+  it("keeps Free for zero-price listings and never labels paid lines Free", () => {
+    const free = getDictionary("en").market.free;
+    const freeHtml = renderToStaticMarkup(<ProductCard product={product()} locale="en" />);
+    expect(freeHtml).toContain(free);
+
+    const paidHtml = renderToStaticMarkup(
+      <ProductCard
+        product={product({ price: 499, currency: "EUR", type: "single_server" })}
+        locale="en"
+      />,
+    );
+    expect(paidHtml).toContain("€4.99");
+    expect(paidHtml).not.toContain(free);
+
+    const paidRu = renderToStaticMarkup(
+      <ProductCard
+        product={product({ price: 25000, currency: "RUB", type: "single_server" })}
+        locale="ru"
+      />,
+    );
+    expect(paidRu).toContain("250,00");
+    expect(paidRu).toContain("₽");
+    expect(paidRu).not.toContain(getDictionary("ru").market.free);
+  });
 });

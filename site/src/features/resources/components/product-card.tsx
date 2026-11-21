@@ -2,6 +2,7 @@ import type { Product } from "@nexus/domain";
 import { Library, Star, Tag } from "lucide-react";
 import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
+import { formatHistoryAmount } from "../../commerce/commerce-history-format";
 import { panelGroupHoverCol } from "../../shell/panel-shell";
 import {
   typeClamp1XsHeadingPrimary,
@@ -70,6 +71,10 @@ export function ProductCard({
   );
   const hasReviews = product.ratingCount > 0;
   const libraryLabel = market.libraryAdditions;
+  const priceLabel =
+    product.price === 0
+      ? market.free
+      : formatHistoryAmount(product.price, product.currency, locale);
 
   return (
     <article className={panelGroupHoverCol}>
@@ -89,7 +94,7 @@ export function ProductCard({
           </span>
         </div>
         <div className="absolute bottom-2 right-2 rounded bg-black/70 px-2 py-0.5 font-numeric text-xs font-bold text-white">
-          {market.free}
+          {priceLabel}
         </div>
       </Link>
 
