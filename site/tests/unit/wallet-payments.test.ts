@@ -80,16 +80,30 @@ function memoryTopups() {
 
 function memoryLedger() {
   const batches = new Map<string, LedgerPosting[]>();
+  const lines: Array<LedgerPosting & { balanceAfter: number; createdAt: string }> = [];
   return {
     async post(idempotencyKey: string, entries: LedgerPosting[]) {
       validateLedgerPosting(entries);
       const existing = batches.get(idempotencyKey);
       if (existing) return existing;
       batches.set(idempotencyKey, entries);
+      for (const entry of entries) {
+        lines.push({
+          ...entry,
+          balanceAfter: entry.amount,
+          createdAt: "2026-11-21T02:00:00.000Z",
+        });
+      }
       return entries;
     },
     async getAccountBalance() {
       return 0;
+    },
+    async listRecentByAccount(accountId: string, currency: string, limit = 20) {
+      return lines
+        .filter((entry) => entry.accountId === accountId && entry.currency === currency)
+        .slice(-limit)
+        .reverse();
     },
   };
 }
@@ -292,5 +306,8 @@ describe("wallet payment service", () => {
     const history = await service.listRecentTopUps("user:usr_buyer");
     expect(history).toHaveLength(1);
     expect(history[0]?.id).toBe(started.intent.id);
+
+    const activity = await service.listRecentActivity("user:usr_buyer", "EUR");
+    expect(activity.some((entry) => entry.referenceType === "topup")).toBe(true);
   });
 });

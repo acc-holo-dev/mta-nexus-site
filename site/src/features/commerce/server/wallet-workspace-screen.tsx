@@ -1,4 +1,4 @@
-import { AppError, type TopUpIntent } from "@nexus/domain";
+import { AppError, type LedgerEntry, type TopUpIntent } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
@@ -43,6 +43,15 @@ function statusLabel(
   if (status === "failed") return copy.statusFailed;
   if (status === "cancelled") return copy.statusCancelled;
   return copy.statusCreated;
+}
+
+function activityKindLabel(
+  copy: ReturnType<typeof getWalletCopy>,
+  referenceType: LedgerEntry["referenceType"],
+): string {
+  if (referenceType === "topup") return copy.activityTopUp;
+  if (referenceType === "wallet_spend") return copy.activitySpend;
+  return copy.activityOther;
 }
 
 export async function walletWorkspaceMetadata(): Promise<Metadata> {
@@ -95,6 +104,10 @@ export async function WalletWorkspaceScreen({
     available === null
       ? null
       : await walletPaymentService.listRecentTopUps(accountId, 20).catch(() => null);
+  const activity =
+    available === null
+      ? null
+      : await walletPaymentService.listRecentActivity(accountId, currency, 20).catch(() => null);
 
   if (available === null) {
     return (
@@ -173,6 +186,32 @@ export async function WalletWorkspaceScreen({
         </section>
       ) : null}
       <WalletTopUpForm actorId={user.id} currency={currency} />
+      <section className={panelSpace3P5} aria-labelledby="wallet-activity-heading">
+        <h3 id="wallet-activity-heading" className={typeSemiboldPrimary}>
+          {copy.activity}
+        </h3>
+        {activity === null ? (
+          <p className={typeXsMuted}>{copy.activityUnavailable}</p>
+        ) : activity.length === 0 ? (
+          <EmptyState title={copy.activityEmpty} description={copy.activityEmptyHint} />
+        ) : (
+          <ul className={typeSpace2Sm}>
+            {activity.map((entry) => (
+              <li key={entry.id}>
+                <p className={typeNumericPrimary}>
+                  {entry.amount < 0 ? "−" : "+"}
+                  {formatFinancialMinor(Math.abs(entry.amount), entry.currency, locale)}
+                </p>
+                <p className={typeXsMuted}>
+                  {entry.amount < 0 ? copy.activityDebit : copy.activityCredit} ·{" "}
+                  {activityKindLabel(copy, entry.referenceType)} · {copy.recordedAt}:{" "}
+                  {formatHistoryDate(new Date(entry.createdAt), locale)} · {entry.referenceId}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
       <section className={panelSpace3P5} aria-labelledby="wallet-history-heading">
         <h3 id="wallet-history-heading" className={typeSemiboldPrimary}>
           {copy.history}

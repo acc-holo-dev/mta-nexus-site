@@ -35,6 +35,11 @@ vi.mock("@nexus/security", () => ({
   can: mocks.can,
 }));
 
+const walletState = vi.hoisted(() => ({ engine: false }));
+vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
+  isWalletEngineEnabled: () => walletState.engine,
+}));
+
 import { ProductService } from "../../src/lib/services/commerce/product-service";
 
 const actor = {
@@ -89,6 +94,7 @@ describe("open free-beta product behavior", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    walletState.engine = false;
     mocks.can.mockReturnValue(true);
     mocks.list.mockResolvedValue([]);
     mocks.findLatestPublishedByProduct.mockResolvedValue({ id: "bld_1" });
@@ -126,6 +132,27 @@ describe("open free-beta product behavior", () => {
       expect.objectContaining({
         minPrice: 0,
         maxPrice: 0,
+        includeWalletPaidSingleServer: false,
+        sort: "price_desc",
+        query: "resource",
+      }),
+    );
+  });
+
+  it("exposes paid single_server listings when the wallet engine is on", async () => {
+    walletState.engine = true;
+    await service.listProducts({
+      minPrice: 100,
+      maxPrice: 9999,
+      sort: "price_desc",
+      query: "resource",
+    });
+
+    expect(mocks.list).toHaveBeenCalledWith(
+      expect.objectContaining({
+        minPrice: 100,
+        maxPrice: 9999,
+        includeWalletPaidSingleServer: true,
         sort: "price_desc",
         query: "resource",
       }),
@@ -137,6 +164,15 @@ describe("open free-beta product behavior", () => {
 
     await expect(service.getProductBySlug("resource")).resolves.toBeNull();
     expect(mocks.findLatestPublishedByProduct).not.toHaveBeenCalled();
+  });
+
+  it("surfaces a published paid single_server product by slug when the wallet engine is on", async () => {
+    walletState.engine = true;
+    const paid = product({ price: 500, licenseModel: "single_server" });
+    mocks.findBySlug.mockResolvedValue(paid);
+
+    await expect(service.getProductBySlug("resource")).resolves.toBe(paid);
+    expect(mocks.findLatestPublishedByProduct).toHaveBeenCalledWith("prd_1");
   });
 
   it("keeps a published free product available when a published build exists", async () => {

@@ -147,11 +147,14 @@ export class ProductService {
   }
 
   async listProducts(filters: ProductFilters = {}): Promise<Product[]> {
+    const walletCatalog = isWalletEngineEnabled();
     return productRepository.list({
       type: filters.type,
       featuredOnly: filters.featuredOnly,
-      minPrice: 0,
-      maxPrice: 0,
+      // Free beta stays free-only unless the wallet engine exposes paid single_server.
+      minPrice: walletCatalog ? filters.minPrice : 0,
+      maxPrice: walletCatalog ? filters.maxPrice : 0,
+      includeWalletPaidSingleServer: walletCatalog,
       sort: filters.sort,
       query: filters.query,
       limit: filters.limit,

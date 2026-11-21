@@ -14,9 +14,10 @@ kinds (`topup` / `wallet_spend` / …) require migration `0092_ledger_wallet_ref
 Pending paid orders settle via `POST /api/orders/:id/pay-with-wallet` (atomic
 `wallet_spend` + completed payment + order completion + download entitlement).
 Create+settle from catalog: `POST /api/checkout/wallet` (card `/api/checkout`
-stays `CHECKOUT_DISABLED`). HTTP routes under `/api/wallet/*`, pay-with-wallet,
-checkout/wallet, and `/workspace/wallet` stay dark unless `NEXUS_WALLET_ENGINE=1`.
-Redirect never credits the wallet.
+stays `CHECKOUT_DISABLED`). Ledger activity: `GET /api/wallet/activity` (credits
+and spends for the caller's account). HTTP routes under `/api/wallet/*`,
+pay-with-wallet, checkout/wallet, and `/workspace/wallet` stay dark unless
+`NEXUS_WALLET_ENGINE=1`. Redirect never credits the wallet.
 
 | Entry                             | Контракт                                                                               |
 | --------------------------------- | -------------------------------------------------------------------------------------- |
@@ -69,7 +70,7 @@ Redirect never credits the wallet.
 | `checkout-api-copy.ts`            | util port `checkout-api-copy`                                                          |
 | `commercial-public-http.ts`       | util port `commercial-public-http`                                                     |
 | `license-runtime-http.ts`         | util port `license-runtime-http`                                                       |
-| `wallet-http.ts`                  | util port `wallet-http`; `/api/wallet/{balance,topups,providers/.../webhook}`          |
+| `wallet-http.ts`                  | util port `wallet-http`; `/api/wallet/{balance,activity,topups,providers/.../webhook}` |
 | `wallet-i18n.ts`                  | util port `wallet-i18n`                                                                |
 | `wallet-topup.ts`                 | `WalletTopUpForm` (client); stub top-up against `/api/wallet/topups`                   |
 | `wallet-topup-confirmation.ts`    | util port `wallet-topup-confirmation`                                                  |

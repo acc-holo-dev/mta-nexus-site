@@ -35,6 +35,26 @@ export class LedgerRepository {
     >;
   }
 
+  /** Recent journal lines for one account+currency (wallet activity / spend history). */
+  async listRecentByAccount(
+    accountId: string,
+    currency: string,
+    limit = 20,
+  ): Promise<LedgerEntry[]> {
+    if (!["USD", "EUR", "RUB"].includes(currency))
+      throw new AppError("Choose a ledger currency", 400, "LEDGER_CURRENCY_REQUIRED");
+    if (typeof accountId !== "string" || accountId.length < 3 || accountId.length > 160) {
+      throw new AppError("Ledger account is invalid", 400, "LEDGER_ACCOUNT_INVALID");
+    }
+    const bounded = Math.min(Math.max(Number.isSafeInteger(limit) ? limit : 20, 1), 100);
+    return db
+      .select()
+      .from(ledgerEntries)
+      .where(and(eq(ledgerEntries.accountId, accountId), eq(ledgerEntries.currency, currency)))
+      .orderBy(desc(ledgerEntries.createdAt), desc(ledgerEntries.id))
+      .limit(bounded) as Promise<LedgerEntry[]>;
+  }
+
   async getAccountBalance(accountId: string, currency: string): Promise<number> {
     if (!["USD", "EUR", "RUB"].includes(currency))
       throw new AppError("Choose a ledger currency", 400, "LEDGER_CURRENCY_REQUIRED");

@@ -11,6 +11,7 @@ const state = vi.hoisted(() => ({
   allowed: true,
   startTopUp: vi.fn(),
   getAvailableBalance: vi.fn(),
+  listRecentActivity: vi.fn(),
   applyVerifiedWebhook: vi.fn(),
   engine: true,
 }));
@@ -24,6 +25,7 @@ vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
   WalletPaymentService: class {
     startTopUp = state.startTopUp;
     getAvailableBalance = state.getAvailableBalance;
+    listRecentActivity = state.listRecentActivity;
     applyVerifiedWebhook = state.applyVerifiedWebhook;
   },
 }));
@@ -33,6 +35,7 @@ vi.mock("@nexus/security", () => ({
   getClientIp: () => "127.0.0.1",
 }));
 
+import { GET as activity } from "../../src/app/api/wallet/activity/route";
 import { GET as balance } from "../../src/app/api/wallet/balance/route";
 import { POST as webhook } from "../../src/app/api/wallet/providers/[providerId]/webhook/route";
 import { POST as topups } from "../../src/app/api/wallet/topups/route";
@@ -51,6 +54,12 @@ function topUpRequest(body: unknown) {
 
 function balanceRequest(query: string) {
   return new NextRequest(`https://nexus.test/api/wallet/balance?${query}`, {
+    headers: { cookie: "nexus_session=wallet-token" },
+  });
+}
+
+function activityRequest(query: string) {
+  return new NextRequest(`https://nexus.test/api/wallet/activity?${query}`, {
     headers: { cookie: "nexus_session=wallet-token" },
   });
 }
@@ -85,6 +94,18 @@ describe("wallet HTTP", () => {
       redirectUrl: null,
     });
     state.getAvailableBalance.mockReset().mockResolvedValue(1200);
+    state.listRecentActivity.mockReset().mockResolvedValue([
+      {
+        id: "ldg_spend_1",
+        amount: -400,
+        currency: "EUR",
+        referenceType: "wallet_spend",
+        referenceId: "ord_1",
+        balanceAfter: 800,
+        description: "Wallet spend",
+        createdAt: "2026-11-21T04:00:00.000Z",
+      },
+    ]);
     state.applyVerifiedWebhook.mockReset().mockResolvedValue({
       intent: {
         id: "pay_test_1",
@@ -104,6 +125,7 @@ describe("wallet HTTP", () => {
   it("hides wallet routes when the engine flag is off", async () => {
     state.engine = false;
     expect((await balance(balanceRequest("currency=EUR"))).status).toBe(404);
+    expect((await activity(activityRequest("currency=EUR"))).status).toBe(404);
     expect((await topups(topUpRequest({}))).status).toBe(404);
     expect(
       (
@@ -118,8 +140,10 @@ describe("wallet HTTP", () => {
   it("requires a session for balance and top-up", async () => {
     state.user = null;
     expect((await balance(balanceRequest("currency=EUR"))).status).toBe(401);
+    expect((await activity(activityRequest("currency=EUR"))).status).toBe(401);
     expect((await topups(topUpRequest({}))).status).toBe(401);
     expect(state.getAvailableBalance).not.toHaveBeenCalled();
+    expect(state.listRecentActivity).not.toHaveBeenCalled();
   });
 
   it("returns available ledger balance for the signed-in user account", async () => {
@@ -133,9 +157,36 @@ describe("wallet HTTP", () => {
     expect(state.getAvailableBalance).toHaveBeenCalledWith("user:usr_wallet", "EUR");
   });
 
+  it("returns recent ledger activity for the signed-in user account", async () => {
+    const response = await activity(activityRequest("currency=EUR&limit=10"));
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+      accountId: "user:usr_wallet",
+      currency: "EUR",
+      entries: [
+        {
+          id: "ldg_spend_1",
+          amount: -400,
+          currency: "EUR",
+          referenceType: "wallet_spend",
+          referenceId: "ord_1",
+          balanceAfter: 800,
+          description: "Wallet spend",
+          createdAt: "2026-11-21T04:00:00.000Z",
+        },
+      ],
+    });
+    expect(state.listRecentActivity).toHaveBeenCalledWith("user:usr_wallet", "EUR", 10);
+  });
+
   it("rejects unsupported balance currency", async () => {
     expect((await balance(balanceRequest("currency=BTC"))).status).toBe(400);
     expect(state.getAvailableBalance).not.toHaveBeenCalled();
+  });
+
+  it("rejects unsupported activity currency", async () => {
+    expect((await activity(activityRequest("currency=BTC"))).status).toBe(400);
+    expect(state.listRecentActivity).not.toHaveBeenCalled();
   });
 
   it("starts a stub top-up for the signed-in account", async () => {
@@ -222,8 +273,10 @@ describe("wallet HTTP", () => {
   it("rate limits wallet reads and mutations before service work", async () => {
     state.allowed = false;
     expect((await balance(balanceRequest("currency=EUR"))).status).toBe(429);
+    expect((await activity(activityRequest("currency=EUR"))).status).toBe(429);
     expect((await topups(topUpRequest({ amount: 1 }))).status).toBe(429);
     expect(state.getAvailableBalance).not.toHaveBeenCalled();
+    expect(state.listRecentActivity).not.toHaveBeenCalled();
     expect(state.startTopUp).not.toHaveBeenCalled();
   });
 });

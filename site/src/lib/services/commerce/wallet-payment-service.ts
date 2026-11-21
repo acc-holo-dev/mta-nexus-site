@@ -297,4 +297,9 @@ export class WalletPaymentService {
   async listRecentTopUps(accountId: string, limit = 20): Promise<TopUpIntent[]> {
     return this.topups.listRecentByAccount(accountId, limit);
   }
+
+  /** Audited ledger lines for the account (top-up credits and wallet spends). */
+  async listRecentActivity(accountId: string, currency: WalletCurrency, limit = 20) {
+    return this.ledger.listRecentByAccount(accountId, currency, limit);
+  }
 }

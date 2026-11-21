@@ -120,6 +120,34 @@ it("sums only the requested account and currency", async () => {
   expect(state.queries[0].params).toEqual(["user:usr_a", "EUR"]);
   expect(state.queries[0].sql).toContain("sum(");
 });
+it("lists recent account activity scoped by account and currency", async () => {
+  state.results = [
+    [
+      {
+        id: "leg_spend",
+        account_id: "user:usr_a",
+        amount: -40,
+        currency: "EUR",
+        reference_type: "wallet_spend",
+        reference_id: "ord_a",
+        balance_after: 50,
+        description: "Wallet spend",
+        created_at: new Date("2026-11-21T04:00:00.000Z"),
+      },
+    ],
+  ];
+  const rows = await ledger.listRecentByAccount("user:usr_a", "EUR", 10);
+  expect(rows).toHaveLength(1);
+  expect(state.queries[0].params).toEqual(["user:usr_a", "EUR", 10]);
+  expect(state.queries[0].sql).toContain('"account_id"');
+  expect(state.queries[0].sql).toContain('"currency"');
+});
+it("rejects unsupported currency for account activity", async () => {
+  await expect(ledger.listRecentByAccount("user:usr_a", "BTC")).rejects.toMatchObject({
+    code: "LEDGER_CURRENCY_REQUIRED",
+  });
+  expect(state.queries).toHaveLength(0);
+});
 it("scopes statements in SQL and leaves hold/withdrawable totals unknown", async () => {
   state.results = [[["usr_a"]], [["USD", "90", "100", "-10", 21, 1]], []];
   const result = await statements.statement("usr_a", 2, "USD");

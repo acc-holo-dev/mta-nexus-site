@@ -59,6 +59,11 @@ export interface ProductQueryOptions {
   featuredOnly?: boolean;
   minPrice?: number;
   maxPrice?: number;
+  /**
+   * When true, include published paid `single_server` lines alongside free ones.
+   * Used only while NEXUS_WALLET_ENGINE=1 so wallet checkout has a public market surface.
+   */
+  includeWalletPaidSingleServer?: boolean;
   sort?: "popular" | "newest" | "price_asc" | "price_desc" | "rating" | "relevance";
   query?: string;
   limit?: number;
@@ -228,11 +233,13 @@ export class ProductRepository {
   }
 
   async list(options: ProductQueryOptions = {}): Promise<Product[]> {
-    const conditions = [
-      eq(products.status, "published"),
-      eq(products.price, 0),
-      hasSafePublishedBuild(),
-    ];
+    const priceCondition = options.includeWalletPaidSingleServer
+      ? or(
+          eq(products.price, 0),
+          and(sql`${products.price} > 0`, eq(products.licenseModel, "single_server")),
+        )
+      : eq(products.price, 0);
+    const conditions = [eq(products.status, "published"), priceCondition, hasSafePublishedBuild()];
     if (options.type) conditions.push(eq(products.type, options.type));
     if (options.featuredOnly) conditions.push(eq(products.isFeatured, true));
     if (options.minPrice !== undefined) conditions.push(gte(products.price, options.minPrice));

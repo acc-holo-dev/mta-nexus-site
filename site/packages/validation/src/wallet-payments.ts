@@ -31,6 +31,13 @@ export const walletBalanceQuerySchema = z
   })
   .strict();
 
+export const walletActivityQuerySchema = z
+  .object({
+    currency,
+    limit: z.coerce.number().int().min(1).max(100).optional(),
+  })
+  .strict();
+
 export const walletProviderIdSchema = providerId;
 
 export const walletPayOrderSchema = z
