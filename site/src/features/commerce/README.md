@@ -100,6 +100,8 @@ wallet.
 | `wallet-checkout.ts`                 | `WalletCheckoutButton` (client); create+settle via `/api/checkout/wallet`                                         |
 | `wallet-checkout-confirmation.ts`    | util port `wallet-checkout-confirmation`                                                                          |
 | `wallet-workspace-server.ts`         | `WalletWorkspaceScreen`, metadata; `/workspace/wallet`                                                            |
+| `acquire-page.ts`                    | `AcquirePage` (client); free claim + wallet checkout when engine on                                               |
+| `acquire-page-server.ts`             | `AcquirePageScreen`; RSC shell for `/acquire` session + wallet flag                                               |
 | `wallet-providers-admin-server.ts`   | `WalletProvidersAdminScreen`, metadata; `/admin/commerce/wallet-providers`                                        |
 | `wallet-admin-ops.ts`                | `WalletAdminBatchForm` (client); admin hold-release / stale top-up / withdrawal expiry batches                    |
 | `wallet-admin-batch-confirmation.ts` | util port `wallet-admin-batch-confirmation`                                                                       |

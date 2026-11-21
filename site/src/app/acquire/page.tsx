@@ -1,3 +1,3 @@
-"use client";
+export const dynamic = "force-dynamic";
 
-export { AcquirePage as default } from "../../features/commerce/acquire-page";
+export { AcquirePageScreen as default } from "../../features/commerce/acquire-page-server";

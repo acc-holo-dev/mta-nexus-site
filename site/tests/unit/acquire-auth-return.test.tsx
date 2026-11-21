@@ -49,4 +49,18 @@ describe("acquire guest auth return (FLOW-01)", () => {
     );
     expect(page).toContain("setLoadRevision");
   });
+
+  it("routes paid acquire through wallet checkout when the engine flag is on", () => {
+    const page = read("site/src/features/commerce/components/acquire-page.tsx");
+    const screen = read("site/src/features/commerce/server/acquire-page-screen.tsx");
+    const route = read("site/src/app/acquire/page.tsx");
+    expect(page).toContain("WalletCheckoutButton");
+    expect(page).toContain('data-acquire-intent="wallet"');
+    expect(page).toContain("walletEnabled && product.price > 0");
+    expect(page).toContain("copy.paidDisabled");
+    expect(screen).toContain("isWalletEngineEnabled");
+    expect(screen).toContain("authService.getSession");
+    expect(route).toContain("acquire-page-server");
+    expect(route).not.toContain("use client");
+  });
 });
