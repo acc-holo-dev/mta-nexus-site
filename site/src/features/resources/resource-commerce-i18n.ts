@@ -5,6 +5,8 @@ const copy = {
     cart: "Resource cart",
     loading: "Loading your resource cart…",
     subtitle: "Collect up to 20 free resources and add them to your library together.",
+    walletSubtitle:
+      "This cart is for free library claims only (up to 20). Paid listings settle with site wallet from the market or acquire page — not from this cart.",
     add: "Add to cart",
     added: "In cart",
     openCart: "Open cart",
@@ -30,8 +32,12 @@ const copy = {
     owned: "Already in your library",
     done: "Resources added to your library.",
     note: "No payment is required. Access is granted only after every selected resource passes the server checks.",
+    walletNote:
+      "Cart confirmation claims free resources only. Site-wallet purchase for paid listings happens on the market or acquire page. Card checkout stays off.",
     batchIntent:
       "Batch acquire: collect free resources, then confirm the cart. Nothing is claimed until you confirm.",
+    walletBatchIntent:
+      "Free batch claim only: collect free resources, then confirm the cart. Paid site-wallet checkout is not available in this cart.",
     singleIntent: "Single acquire: claim this free resource for your library.",
     guestReturnNote:
       "After sign-in you return here. Cart or claim actions are not started automatically.",
@@ -105,6 +111,8 @@ const copy = {
     cart: "Корзина ресурсов",
     loading: "Загрузка корзины ресурсов…",
     subtitle: "Соберите до 20 бесплатных ресурсов и добавьте их в библиотеку вместе.",
+    walletSubtitle:
+      "Эта корзина только для бесплатного получения в библиотеку (до 20). Платные листинги рассчитываются через site wallet на маркете или странице acquire — не из этой корзины.",
     add: "В корзину",
     added: "В корзине",
     openCart: "Открыть корзину",
@@ -130,8 +138,12 @@ const copy = {
     owned: "Уже в библиотеке",
     done: "Ресурсы добавлены в библиотеку.",
     note: "Оплата не требуется. Права выдаются после проверки каждого выбранного ресурса на сервере.",
+    walletNote:
+      "Подтверждение корзины получает только бесплатные ресурсы. Покупка через site wallet для платных листингов выполняется на маркете или странице acquire. Карточный checkout остаётся выключенным.",
     batchIntent:
       "Пакетное получение: соберите бесплатные ресурсы, затем подтвердите корзину. Без подтверждения claim не выполняется.",
+    walletBatchIntent:
+      "Только бесплатный пакетный claim: соберите бесплатные ресурсы, затем подтвердите корзину. Платный checkout через site wallet в этой корзине недоступен.",
     singleIntent: "Одиночное получение: добавить этот бесплатный ресурс в библиотеку.",
     guestReturnNote: "После входа вы вернётесь сюда. Корзина или claim сами не запускаются.",
     working: "Сохранение…",
@@ -206,6 +218,15 @@ const copy = {
 
 export function getResourceCommerceCopy(locale: Locale) {
   return copy[locale];
+}
+
+export function resourceCartHonestyCopy(locale: Locale, walletEnabled: boolean) {
+  const base = copy[locale];
+  return {
+    subtitle: walletEnabled ? base.walletSubtitle : base.subtitle,
+    note: walletEnabled ? base.walletNote : base.note,
+    batchIntent: walletEnabled ? base.walletBatchIntent : base.batchIntent,
+  };
 }
 export function resourceCommerceError(locale: Locale, code: unknown) {
   const errors = copy[locale].errors;

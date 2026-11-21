@@ -484,6 +484,7 @@ export async function ProductDetailPage({
                       productId={product.id}
                       signedIn={!!user}
                       returnPath={detailReturnPath}
+                      walletEnabled={walletEnabled}
                     />
                   )}
                   <section className="space-y-2 rounded-lg border border-base bg-surface p-3">
