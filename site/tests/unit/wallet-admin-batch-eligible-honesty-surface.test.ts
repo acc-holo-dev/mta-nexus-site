@@ -29,11 +29,17 @@ describe("wallet admin batch eligible preview honesty", () => {
     expect(screen).toContain("eligibleLabel");
     expect(form).toContain("eligibleLabel");
     expect(holds).toContain("countEligibleMatured");
-    const holdsPreview = holds.match(
-      /async countEligibleMatured[\s\S]*?return rows\.length;\s*\}/u,
+    expect(holds).toContain("listEligibleMatured");
+    const holdsList = holds.match(
+      /async listEligibleMatured[\s\S]*?return rows\.map\(mapHold\);\s*\}/u,
     )?.[0];
-    expect(holdsPreview).toBeTruthy();
-    expect(holdsPreview).not.toContain('for("update")');
+    expect(holdsList).toBeTruthy();
+    expect(holdsList).not.toContain('for("update")');
+    const holdsCount = holds.match(
+      /async countEligibleMatured[\s\S]*?return \(await this\.listEligibleMatured\(input\)\)\.length;\s*\}/u,
+    )?.[0];
+    expect(holdsCount).toBeTruthy();
+    expect(holdsCount).not.toContain('for("update")');
     expect(topups).toContain("countEligibleStaleAwaiting");
     expect(withdrawals).toContain("countEligibleStaleAwaiting");
     expect(orders).toContain("countEligibleStaleUnpaid");
