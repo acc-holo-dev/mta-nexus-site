@@ -147,6 +147,7 @@ beforeEach(() => {
     attempts: [
       {
         id: "pay_a",
+        provider: "wallet",
         status: "unrecognized-private-state",
         amount: 999,
         currency: "USD",
@@ -219,6 +220,8 @@ it("preserves immutable draft editor semantics and escapes historical reasons", 
 it("masks unknown attempt states, keeps private metadata out, and blocks cancellation after an attempt", async () => {
   const html = markup(await Operations(input));
   expect(html).toContain("Unknown state");
+  expect(html).toContain("Site wallet");
+  expect(html).toContain("audited ledger settle");
   expect(html).toContain("provider reconciliation");
   expect(html).not.toContain("PRIVATE-");
   expect(html).not.toContain("unrecognized-private-state");

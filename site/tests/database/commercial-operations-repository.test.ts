@@ -202,18 +202,19 @@ it("bounds payment archive and never selects provider transactions, failures or 
     [["ord_a", "N-1", "pending", now]],
     [[21]],
     [],
-    [["pay_a", "failed", 999, "USD", now, now]],
+    [["pay_a", "wallet", "failed", 999, "USD", now, now]],
   ];
   expect(await operations.buyerDetail("usr_buyer", "ord_a", 2)).toMatchObject({
     canCancel: false,
     page: 2,
     total: 21,
-    attempts: [{ id: "pay_a", status: "failed" }],
+    attempts: [{ id: "pay_a", provider: "wallet", status: "failed" }],
   });
   expect(state.options).toEqual([{ isolationLevel: "repeatable read", accessMode: "read only" }]);
   const query = state.queries.at(-1);
   expect(query?.params.slice(-2)).toEqual([20, 20]);
-  for (const column of ["provider_transaction_id", "failure_reason", "provider", "buyer_id"])
+  expect(query?.sql).toContain('"provider"');
+  for (const column of ["provider_transaction_id", "failure_reason", "buyer_id"])
     expect(query?.sql).not.toContain(`"${column}"`);
 });
 it("cancels once and saves the durable result with atomic audit, without access or refund writes", async () => {

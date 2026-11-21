@@ -158,17 +158,20 @@ export function financialPaymentLabel(locale: Locale, status: string) {
   return known ? labels[known] : labels.unknown;
 }
 
-export function financialProviderLabel(locale: Locale, provider: string) {
+export function financialProviderLabel(locale: Locale, provider: string | null | undefined) {
   const labels = getFinancialCopy(locale);
   if (provider === "wallet") return labels.providerWallet;
-  if (provider.trim()) return provider;
+  if (typeof provider === "string" && provider.trim()) return provider;
   return labels.providerUnknown;
 }
 
-export function commercialProviderLabel(locale: Locale, provider: string): string {
+export function commercialProviderLabel(
+  locale: Locale,
+  provider: string | null | undefined,
+): string {
   const labels = getCommercialCopy(locale);
   if (provider === "wallet") return labels.providerWallet;
-  if (provider.trim()) return provider;
+  if (typeof provider === "string" && provider.trim()) return provider;
   return labels.providerUnknown;
 }
 export function financialReferenceLabel(locale: Locale, reference: string) {

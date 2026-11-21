@@ -126,6 +126,7 @@ beforeEach(() => {
     attempts: [
       {
         id: "pay_a",
+        provider: "wallet",
         status: "completed",
         amount: 123,
         currency: "EUR",
@@ -189,6 +190,7 @@ it("shows recorded discrepancies and safe attempts without settlement actions or
   expect(queue).toContain("Paid order has no recorded capture");
   expect(html).toContain("&lt;ORDER&gt;");
   expect(html).toContain("Completed (record)");
+  expect(html).toContain("Site wallet");
   expect(html).not.toContain("SECRET-PROVIDER");
   expect(html).not.toContain("SECRET-FAILURE");
   expect(html).not.toContain("<form");
