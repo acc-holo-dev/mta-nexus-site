@@ -8,7 +8,7 @@ import {
   type TopUpIntentStatus,
   type WalletCurrency,
 } from "@nexus/domain";
-import { and, eq, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { db } from "../client";
 import { walletTopupIntents } from "../schema";
 
@@ -45,6 +45,20 @@ export class WalletTopupRepository {
       .where(eq(walletTopupIntents.idempotencyKey, idempotencyKey))
       .limit(1);
     return row ? toIntent(row) : null;
+  }
+
+  async listRecentByAccount(accountId: string, limit = 20): Promise<TopUpIntent[]> {
+    assertWalletAccountId(accountId);
+    if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
+      throw new AppError("Top-up history limit is invalid", 400, "TOPUP_HISTORY_LIMIT_INVALID");
+    }
+    const rows = await db
+      .select()
+      .from(walletTopupIntents)
+      .where(eq(walletTopupIntents.accountId, accountId))
+      .orderBy(desc(walletTopupIntents.createdAt), desc(walletTopupIntents.id))
+      .limit(limit);
+    return rows.map(toIntent);
   }
 
   async insertAwaiting(input: { intent: TopUpIntent; returnPath: string }): Promise<TopUpIntent> {

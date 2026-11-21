@@ -160,4 +160,8 @@ export class WalletPaymentService {
   async getAvailableBalance(accountId: string, currency: WalletCurrency): Promise<number> {
     return this.ledger.getAccountBalance(accountId, currency);
   }
+
+  async listRecentTopUps(accountId: string, limit = 20): Promise<TopUpIntent[]> {
+    return this.topups.listRecentByAccount(accountId, limit);
+  }
 }

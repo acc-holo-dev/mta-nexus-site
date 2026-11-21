@@ -1,5 +1,5 @@
-import { AppError } from "@nexus/domain";
-import { ErrorState } from "@nexus/ui";
+import { AppError, type TopUpIntent } from "@nexus/domain";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -24,13 +24,26 @@ import {
   typeSemiboldPrimary,
   typeSpace2Sm,
   typeXlPrimary,
+  typeXsMuted,
 } from "../../shell/type-shell";
+import { formatHistoryDate } from "../commerce-history-format";
 import { formatFinancialMinor } from "../financial-i18n";
 import { getWalletCopy } from "../wallet-i18n";
 import { WalletTopUpForm } from "../wallet-topup";
 
 const walletPaymentService = new WalletPaymentService();
 const CURRENCIES = ["USD", "EUR", "RUB"] as const;
+
+function statusLabel(
+  copy: ReturnType<typeof getWalletCopy>,
+  status: TopUpIntent["status"],
+): string {
+  if (status === "awaiting_provider") return copy.statusAwaiting;
+  if (status === "succeeded") return copy.statusSucceeded;
+  if (status === "failed") return copy.statusFailed;
+  if (status === "cancelled") return copy.statusCancelled;
+  return copy.statusCreated;
+}
 
 export async function walletWorkspaceMetadata(): Promise<Metadata> {
   return {
@@ -70,13 +83,18 @@ export async function WalletWorkspaceScreen({
     return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
 
+  const accountId = `user:${user.id}`;
   let available: number | null = null;
   try {
-    available = await walletPaymentService.getAvailableBalance(`user:${user.id}`, currency);
+    available = await walletPaymentService.getAvailableBalance(accountId, currency);
   } catch (error) {
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
     available = null;
   }
+  const history =
+    available === null
+      ? null
+      : await walletPaymentService.listRecentTopUps(accountId, 20).catch(() => null);
 
   if (available === null) {
     return (
@@ -96,6 +114,9 @@ export async function WalletWorkspaceScreen({
       </div>
     );
   }
+
+  const pending = (history ?? []).filter((intent) => intent.status === "awaiting_provider");
+  const recent = (history ?? []).filter((intent) => intent.currency === currency);
 
   return (
     <div className={pageShellMax6xl}>
@@ -132,7 +153,50 @@ export async function WalletWorkspaceScreen({
           </div>
         </dl>
       </section>
+      {pending.length > 0 ? (
+        <section className={panelSpace3P5} aria-labelledby="wallet-pending-heading">
+          <h3 id="wallet-pending-heading" className={typeSemiboldPrimary}>
+            {copy.pending}
+          </h3>
+          <ul className={typeSpace2Sm}>
+            {pending.map((intent) => (
+              <li key={intent.id}>
+                <p className={typeNumericPrimary}>
+                  {formatFinancialMinor(intent.amount, intent.currency, locale)}
+                </p>
+                <p className={typeXsMuted}>
+                  {statusLabel(copy, intent.status)} · {intent.id}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
       <WalletTopUpForm actorId={user.id} currency={currency} />
+      <section className={panelSpace3P5} aria-labelledby="wallet-history-heading">
+        <h3 id="wallet-history-heading" className={typeSemiboldPrimary}>
+          {copy.history}
+        </h3>
+        {history === null ? (
+          <p className={typeXsMuted}>{copy.historyUnavailable}</p>
+        ) : recent.length === 0 ? (
+          <EmptyState title={copy.historyEmpty} description={copy.historyEmptyHint} />
+        ) : (
+          <ul className={typeSpace2Sm}>
+            {recent.map((intent) => (
+              <li key={intent.id}>
+                <p className={typeNumericPrimary}>
+                  {formatFinancialMinor(intent.amount, intent.currency, locale)}
+                </p>
+                <p className={typeXsMuted}>
+                  {statusLabel(copy, intent.status)} · {copy.recordedAt}:{" "}
+                  {formatHistoryDate(new Date(intent.createdAt), locale)} · {intent.id}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   );
 }

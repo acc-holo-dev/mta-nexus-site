@@ -134,3 +134,20 @@ it("marks failed without touching a succeeded intent", async () => {
     code: "TOPUP_INTENT_STATE",
   });
 });
+
+it("lists recent top-ups for an account newest first", async () => {
+  state.results = [
+    [
+      row({
+        id: "pay_topup_2",
+        idempotencyKey: "idem_topup_repo_2",
+        createdAt: new Date("2026-11-21T03:00:00.000Z"),
+      }),
+      row(),
+    ],
+  ];
+  const intents = await repo.listRecentByAccount("user:usr_buyer", 20);
+  expect(intents.map((intent) => intent.id)).toEqual(["pay_topup_2", "pay_topup_1"]);
+  expect(state.queries[0].sql).toContain('from "wallet_topup_intents"');
+  expect(state.queries[0].sql).toContain("order by");
+});

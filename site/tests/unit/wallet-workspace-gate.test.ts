@@ -27,6 +27,7 @@ vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
   isWalletEngineEnabled: () => state.engine,
   WalletPaymentService: class {
     getAvailableBalance = async () => 0;
+    listRecentTopUps = async () => [];
   },
 }));
 
