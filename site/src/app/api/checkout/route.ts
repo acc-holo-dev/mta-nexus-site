@@ -5,8 +5,8 @@ import { resolveLocale } from "../../../lib/i18n";
 import { createRequestLogContext, jsonWithRequestId } from "../../../lib/platform/observability";
 
 /**
- * Paid checkout is intentionally unavailable in the player-first open free beta.
- * Do not add a provider here until the legal, refund and payout flows are ready.
+ * Card / live PSP checkout stays intentionally disabled.
+ * Site-wallet create+settle lives on POST /api/checkout/wallet under NEXUS_WALLET_ENGINE.
  */
 export const POST = withBrowserMutation(async function POST(request: NextRequest) {
   const context = createRequestLogContext(request);

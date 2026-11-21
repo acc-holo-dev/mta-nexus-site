@@ -46,7 +46,7 @@ export const publishing = {
     resourceNotFound: "Ресурс не найден.",
     buildForbidden: "У вас нет прав отправлять сборки этого ресурса.",
     paidPublishingUnavailable:
-      "Публикация платных ресурсов недоступна в открытой бесплатной бета-версии.",
+      "Публикация платного ресурса требует включённый site wallet engine и single-server листинг в USD, EUR или RUB. Карточный checkout остаётся выключен.",
     pricingMode: "Цена листинга",
     freeListing: "Бесплатно",
     paidListing: "Платно (site wallet, single-server)",

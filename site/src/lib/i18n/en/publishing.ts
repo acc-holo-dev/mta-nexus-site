@@ -46,7 +46,8 @@ export const publishing = {
     uploadRateLimited: "Too many upload attempts. Wait a moment and try again.",
     resourceNotFound: "The resource was not found.",
     buildForbidden: "You do not have permission to submit builds for this resource.",
-    paidPublishingUnavailable: "Paid resource publishing is unavailable during the open free beta.",
+    paidPublishingUnavailable:
+      "Paid resource publishing needs the site wallet engine and a single-server listing in USD, EUR, or RUB. Card checkout stays disabled.",
     pricingMode: "Listing price",
     freeListing: "Free",
     paidListing: "Paid (site wallet, single-server)",

@@ -306,7 +306,7 @@ export class ProductService {
       ["USD", "EUR", "RUB"].includes(input.currency);
     if (input.price !== 0 && !walletPaid) {
       throw new AppError(
-        "Paid resources are disabled during the open free beta",
+        "Paid resource create is limited to single-server listings when the site wallet engine is on",
         422,
         "PAID_RESOURCES_DISABLED",
       );
@@ -374,7 +374,7 @@ export class ProductService {
       isWalletEngineEnabled() && product.price > 0 && product.licenseModel === "single_server";
     if (product.price !== 0 && !walletPaid) {
       throw new AppError(
-        "Build releases for paid resources are disabled during the open free beta",
+        "Build releases for paid resources require the site wallet engine and a single-server listing",
         422,
         "PAID_RESOURCES_DISABLED",
       );

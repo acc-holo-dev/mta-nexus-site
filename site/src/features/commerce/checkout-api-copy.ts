@@ -1,11 +1,13 @@
 import type { Locale } from "../../lib/i18n";
 
 const en = {
-  disabled: "Paid checkout is not available during the open free beta.",
+  disabled:
+    "Card and live payment-provider checkout stays disabled. Paid site-wallet create+settle is a separate path when the wallet engine is on.",
 };
 
 const ru: Record<keyof typeof en, string> = {
-  disabled: "Платный заказ недоступен в открытой бесплатной бете.",
+  disabled:
+    "Карточный и live checkout платёжного провайдера остаётся выключен. Платный site-wallet create+settle — отдельный путь при включённом wallet engine.",
 };
 
 export const checkoutApiCopy = (locale: Locale) => (locale === "ru" ? ru : en);

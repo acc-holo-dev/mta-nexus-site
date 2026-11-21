@@ -11,7 +11,11 @@ describe("products API copy honesty surface", () => {
     expect(Object.keys(ru)).toEqual(Object.keys(en));
     expect(en.catalogUnavailable).toContain("temporarily unavailable");
     expect(ru.catalogUnavailable).toContain("недоступен");
-    expect(en.paidDisabled).toContain("Paid resources are disabled");
+    expect(en.paidDisabled).toContain("single-server listings");
+    expect(en.paidDisabled).toContain("site wallet engine");
+    expect(en.paidDisabled).not.toMatch(/payment provider is configured/i);
+    expect(ru.paidDisabled).toContain("single-server");
+    expect(ru.paidDisabled).not.toMatch(/пока не настроен платёжный провайдер/i);
     expect(ru.createFailed).toContain("создать ресурс");
     expect(en.notFound).toBe("Product not found");
     expect(ru.detailsUnavailable).toContain("временно недоступны");

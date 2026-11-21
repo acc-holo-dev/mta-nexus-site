@@ -12,7 +12,8 @@ const en = {
   requestBodyTimeout: "Request body timed out",
   creationLimitExceeded: "Resource creation limit exceeded",
   invalidDetails: "Invalid resource details",
-  paidDisabled: "Paid resources are disabled until a payment provider is configured",
+  paidDisabled:
+    "Paid resource create is limited to single-server listings in USD, EUR, or RUB when the site wallet engine is on. Other paid shapes stay disabled; this gate does not wait on a live payment provider.",
   slugExists: "A resource with this slug already exists",
   createFailed: "Could not create resource",
   notFound: "Product not found",
@@ -36,7 +37,8 @@ const ru: Record<keyof typeof en, string> = {
   requestBodyTimeout: "Истекло время ожидания тела запроса",
   creationLimitExceeded: "Превышен лимит создания ресурсов",
   invalidDetails: "Некорректные данные ресурса",
-  paidDisabled: "Платные ресурсы отключены, пока не настроен платёжный провайдер",
+  paidDisabled:
+    "Создание платного ресурса ограничено single-server листингами в USD, EUR или RUB при включённом site wallet engine. Другие платные формы остаются выключены; этот gate не ждёт live платёжного провайдера.",
   slugExists: "Ресурс с таким slug уже существует",
   createFailed: "Не удалось создать ресурс",
   notFound: "Продукт не найден",
