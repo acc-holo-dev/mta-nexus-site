@@ -392,7 +392,7 @@ export async function WalletWorkspaceScreen({
                   {org.held === null || org.holds === null ? (
                     <p className={typeXsMuted}>{copy.heldUnavailable}</p>
                   ) : holds.length === 0 ? (
-                    <p className={typeXsMuted}>{copy.heldOrgEmpty}</p>
+                    <EmptyState title={copy.heldOrgEmpty} description={copy.heldOrgEmptyHint} />
                   ) : (
                     <>
                       <p className={typeNumericPrimary}>

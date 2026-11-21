@@ -32,12 +32,40 @@ vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
     listRecentActivity = async () => [];
     getHeldBalance = async () => 0;
     listHeld = async () => [];
-    listManageableOrganizationSellerAccounts = async () => [];
+    listManageableOrganizationSellerAccounts = async () => [
+      { organizationId: "org_a", accountId: "org:org_a" },
+    ];
     listRecentWithdrawals = async () => [];
   },
 }));
 
+vi.mock("../../src/features/shell/locale", () => ({
+  useNexusLocale: () => ({ locale: "en" }),
+}));
+vi.mock("next/link", async () => {
+  const React = await import("react");
+  return {
+    default: ({ href, children, ...props }: { href: string; children: React.ReactNode }) =>
+      React.createElement("a", { href, ...props }, children),
+  };
+});
+vi.mock("../../src/features/commerce/wallet-topup", () => ({
+  WalletTopUpForm: () => null,
+  WalletTopUpCancelForm: () => null,
+  WalletTopUpStubCreditForm: () => null,
+}));
+vi.mock("../../src/features/commerce/wallet-hold-release", () => ({
+  WalletHoldReleaseForm: () => null,
+}));
+vi.mock("../../src/features/commerce/wallet-withdraw", () => ({
+  WalletWithdrawForm: () => null,
+  WalletWithdrawalCancelForm: () => null,
+  WalletWithdrawalStubSettleForm: () => null,
+}));
+
+import { renderToStaticMarkup } from "react-dom/server";
 import { WalletWorkspaceScreen } from "../../src/features/commerce/server/wallet-workspace-screen";
+import { getWalletCopy } from "../../src/features/commerce/wallet-i18n";
 
 describe("wallet workspace gate", () => {
   beforeEach(() => {
@@ -49,5 +77,16 @@ describe("wallet workspace gate", () => {
     await expect(
       WalletWorkspaceScreen({ searchParams: Promise.resolve({ currency: "EUR" }) }),
     ).rejects.toThrow("NEXT_NOT_FOUND");
+  });
+
+  it("renders org held empty as EmptyState, not unavailable copy", async () => {
+    state.engine = true;
+    const copy = getWalletCopy("en");
+    const html = renderToStaticMarkup(
+      await WalletWorkspaceScreen({ searchParams: Promise.resolve({ currency: "USD" }) }),
+    );
+    expect(html).toContain(copy.heldOrgEmpty);
+    expect(html).toContain(copy.heldOrgEmptyHint);
+    expect(html).not.toContain(copy.heldUnavailable);
   });
 });

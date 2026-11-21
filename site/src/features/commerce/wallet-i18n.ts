@@ -160,6 +160,8 @@ const copy = {
     heldOrgNote:
       "Proceeds for organization-owned listings. Owner and admin members can inspect and release matured holds.",
     heldOrgEmpty: "No organization seller holds for this currency.",
+    heldOrgEmptyHint:
+      "After a wallet purchase of an organization listing, seller proceeds sit in escrow for 7 days before they become available to the organization. This empty result is not a load failure.",
     pending: "Pending provider confirmation",
     historyEmpty: "No top-up intents recorded yet.",
     historyEmptyHint:
@@ -480,6 +482,8 @@ const copy = {
     heldOrgNote:
       "Поступления по листингам организации. Owner и admin могут смотреть и освобождать созревшие холды.",
     heldOrgEmpty: "Нет холдов продавца организации по этой валюте.",
+    heldOrgEmptyHint:
+      "После покупки листинга организации с кошелька поступления 7 дней держатся в escrow, затем становятся available организации. Пустой результат — не сбой загрузки.",
     pending: "Ожидает подтверждения провайдера",
     historyEmpty: "Намерений пополнения пока нет.",
     historyEmptyHint:
