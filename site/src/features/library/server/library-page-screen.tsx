@@ -5,6 +5,7 @@ import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import {
   type UserLibraryFilter,
   userLibraryService,
@@ -47,7 +48,13 @@ import {
 import { libraryCollectionInventoryCopy } from "../library-collection-inventory-i18n";
 import { collectionInventoryHref } from "../library-collection-inventory-query";
 import { libraryCollectionsCopy } from "../library-collections-i18n";
-import { getLibraryCopy, libraryHref, parseLibraryFilter, parseLibraryPage } from "../library-view";
+import {
+  getLibraryCopy,
+  libraryHref,
+  libraryMarketHref,
+  parseLibraryFilter,
+  parseLibraryPage,
+} from "../library-view";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
 
 export async function libraryPageMetadata(): Promise<Metadata> {
@@ -73,6 +80,8 @@ export async function LibraryPageScreen({
   const copy = getLibraryCopy(locale);
   const dictionary = getDictionary(locale);
   const releaseCopy = getReleaseHistoryCopy(locale);
+  const walletEnabled = isWalletEngineEnabled();
+  const marketHref = libraryMarketHref(walletEnabled);
   const filter = parseLibraryFilter(query.filter);
   const page = parseLibraryPage(query.page);
   let user: Awaited<ReturnType<typeof authService.getSession>>;
@@ -167,11 +176,17 @@ export async function LibraryPageScreen({
           {result.items.length === 0 ? (
             <EmptyState
               title={result.counts.all === 0 ? copy.empty : copy.emptyFilter}
-              description={result.counts.all === 0 ? copy.emptyHint : copy.emptyFilterHint}
+              description={
+                result.counts.all === 0
+                  ? walletEnabled
+                    ? copy.emptyHintWallet
+                    : copy.emptyHint
+                  : copy.emptyFilterHint
+              }
               action={
                 result.counts.all === 0 ? (
-                  <Link href="/market?maxPrice=0" className={linkAccentTightSmMedium}>
-                    {copy.browse}
+                  <Link href={marketHref} className={linkAccentTightSmMedium}>
+                    {walletEnabled ? copy.browseMarket : copy.browse}
                   </Link>
                 ) : (
                   <Link href={libraryHref("all", 1)} className={linkAccentTightSmMedium}>

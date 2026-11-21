@@ -6,6 +6,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { formatUnknown } from "../../../lib/i18n/unknown";
 import { authService } from "../../../lib/services/accounts/auth-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { resourceReviewService } from "../../../lib/services/resources/resource-review-service";
 import { resourceReviewCopy, resourceReviewState } from "../../resources/resource-review-i18n";
 import { resourceReviewPageQuery } from "../../resources/resource-review-query";
@@ -16,6 +17,7 @@ import { pageShellMax4xlCompact } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import { typeMinBreakDisplay, typeMinBreakWords, typeSmSecondary } from "../../shell/type-shell";
+import { libraryMarketHref } from "../library-view";
 export async function libraryReviewsMetadata(): Promise<Metadata> {
   return {
     title: `${resourceReviewCopy(await getRequestLocale()).own} | MTA NEXUS`,
@@ -37,6 +39,8 @@ export async function LibraryReviewsScreen({
   const copy = resourceReviewCopy(typedLocale),
     workspace = getDictionary(typedLocale).workspace,
     dictionary = getDictionary(typedLocale);
+  const walletEnabled = isWalletEngineEnabled();
+  const marketHref = libraryMarketHref(walletEnabled);
   let actor: Awaited<ReturnType<typeof authService.getSession>>;
   try {
     actor = await authService.getSession(cookieStore.get("nexus_session")?.value);
@@ -115,8 +119,8 @@ export async function LibraryReviewsScreen({
           description={copy.ownEmptyHint}
           action={
             <>
-              <Link href="/market?maxPrice=0" className={linkAccentSmRounded}>
-                {workspace.browseResources}
+              <Link href={marketHref} className={linkAccentSmRounded}>
+                {walletEnabled ? workspace.browseMarketResources : workspace.browseResources}
               </Link>
               <Link href="/workspace/review-reports" className={`${linkAccentSmRounded} mt-3`}>
                 {copy.reports}

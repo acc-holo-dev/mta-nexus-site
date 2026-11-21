@@ -65,6 +65,7 @@ const en = {
   empty: "No collections here yet.",
   emptyHint: "Create a collection from the library to group resources you have acquired.",
   browseLibrary: "Browse free resources",
+  browseLibraryMarket: "Browse resources",
   emptyFiltered: "No collections in this status filter.",
   emptyItems: "This collection has no resources yet.",
   emptyItemsHint:
@@ -201,6 +202,7 @@ const ru: typeof en = {
   empty: "Здесь пока нет коллекций.",
   emptyHint: "Создайте коллекцию в библиотеке, чтобы группировать полученные ресурсы.",
   browseLibrary: "Смотреть бесплатные ресурсы",
+  browseLibraryMarket: "Смотреть ресурсы",
   emptyFiltered: "В этом фильтре статуса коллекций нет.",
   emptyItems: "В этой коллекции пока нет ресурсов.",
   emptyItemsHint:

@@ -1,6 +1,7 @@
 import { EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { libraryCollectionsService as service } from "../../../lib/services/library/library-collections-service";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
@@ -25,6 +26,7 @@ import {
 } from "../library-collections-query";
 import { libraryMembershipHistoryCopy } from "../library-membership-history-i18n";
 import { membershipHistoryHref } from "../library-membership-history-query";
+import { libraryMarketHref } from "../library-view";
 import {
   type LibraryCollectionsActor,
   LibraryCollectionsPagination,
@@ -43,6 +45,8 @@ export async function LibraryCollectionsListView({
 }) {
   const c = libraryCollectionsCopy(locale);
   const dictionary = getDictionary(locale);
+  const walletEnabled = isWalletEngineEnabled();
+  const marketHref = libraryMarketHref(walletEnabled);
   const query = collectionsQuery(collectionPageParams(queryValues), "list");
   const retryHref = collectionHref(undefined, "", {
     status: query.status,
@@ -120,10 +124,10 @@ export async function LibraryCollectionsListView({
               </Link>
             ) : (
               <Link
-                href="/market?maxPrice=0"
+                href={marketHref}
                 className={`inline-flex min-h-11 items-center ${libraryCollectionsLinkClass}`}
               >
-                {c.browseLibrary}
+                {walletEnabled ? c.browseLibraryMarket : c.browseLibrary}
               </Link>
             )
           }

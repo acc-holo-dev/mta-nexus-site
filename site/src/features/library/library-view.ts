@@ -18,6 +18,7 @@ export const libraryCopy = {
     signIn: "Sign in",
     back: "Back to workspace",
     browse: "Browse free resources",
+    browseMarket: "Browse resources",
     all: "All",
     ready: "Available",
     unavailable: "Unavailable",
@@ -26,6 +27,8 @@ export const libraryCopy = {
     empty: "Your resource library is empty.",
     emptyHint:
       "Free resources and active grants show up here after they are added to your account.",
+    emptyHintWallet:
+      "Free and paid resources with active grants show up here after they are added to your account. Site-wallet settle can grant paid library access; this list is grants, not a payment ledger.",
     emptyFilter: "There are no resources matching this filter.",
     emptyFilterHint:
       "Switch to All or another availability filter to see the rest of your library.",
@@ -54,6 +57,7 @@ export const libraryCopy = {
     signIn: "Войти",
     back: "Вернуться в кабинет",
     browse: "Каталог бесплатных ресурсов",
+    browseMarket: "Каталог ресурсов",
     all: "Все",
     ready: "Доступны",
     unavailable: "Недоступны",
@@ -61,6 +65,8 @@ export const libraryCopy = {
     of: "из",
     empty: "В вашей библиотеке пока нет ресурсов.",
     emptyHint: "Бесплатные ресурсы и действующие права появятся здесь после добавления в аккаунт.",
+    emptyHintWallet:
+      "Бесплатные и платные ресурсы с действующими правами появятся здесь после добавления в аккаунт. Settle через site wallet может выдать платный доступ в библиотеку; этот список — права, а не платёжный ledger.",
     emptyFilter: "Нет ресурсов с выбранным статусом.",
     emptyFilterHint:
       "Выберите «Все» или другой фильтр доступности, чтобы увидеть остальные ресурсы.",
@@ -85,6 +91,11 @@ export const libraryCopy = {
 
 export function getLibraryCopy(locale: "en" | "ru") {
   return libraryCopy[locale];
+}
+
+/** Free-filtered market when the wallet engine is off; full market when it is on. */
+export function libraryMarketHref(walletEnabled: boolean) {
+  return walletEnabled ? "/market" : "/market?maxPrice=0";
 }
 
 export function libraryHref(filter: UserLibraryFilter, page: number) {
