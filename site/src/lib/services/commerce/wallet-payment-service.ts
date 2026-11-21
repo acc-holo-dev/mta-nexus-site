@@ -1,4 +1,6 @@
+import { ledgerRepository, walletTopupRepository } from "@nexus/db";
 import {
+  AppError,
   buildVerifiedTopUpCreditPosting,
   buildWalletSpendPosting,
   createTopUpIntent,
@@ -35,6 +37,8 @@ function defaultPaymentProviders(): PaymentProviderPort[] {
 export class WalletPaymentService {
   constructor(
     private readonly providers: readonly PaymentProviderPort[] = defaultPaymentProviders(),
+    private readonly topups = walletTopupRepository,
+    private readonly ledger = ledgerRepository,
   ) {}
 
   capabilityMatrix(liveConfigured: Readonly<Partial<Record<PaymentProviderId, boolean>>> = {}) {
@@ -50,6 +54,23 @@ export class WalletPaymentService {
     returnPath: string;
     nowIso?: string;
   }): Promise<{ intent: TopUpIntent; redirectUrl: string | null }> {
+    const existing = await this.topups.findByIdempotencyKey(input.idempotencyKey);
+    if (existing) {
+      if (
+        existing.accountId !== input.accountId ||
+        existing.amount !== input.amount ||
+        existing.currency !== input.currency ||
+        existing.providerId !== input.providerId
+      ) {
+        throw new AppError(
+          "Top-up idempotency key already used",
+          409,
+          "TOPUP_IDEMPOTENCY_CONFLICT",
+        );
+      }
+      return { intent: existing, redirectUrl: null };
+    }
+
     const provider = selectPaymentProvider(this.providers, input.providerId, "topup");
     const intent = createTopUpIntent({
       id: generateId("pay"),
@@ -68,8 +89,13 @@ export class WalletPaymentService {
       idempotencyKey: intent.idempotencyKey,
       returnPath: input.returnPath,
     });
+    const awaiting = markTopUpAwaitingProvider(intent, session.providerSessionId);
+    const stored = await this.topups.insertAwaiting({
+      intent: awaiting,
+      returnPath: input.returnPath,
+    });
     return {
-      intent: markTopUpAwaitingProvider(intent, session.providerSessionId),
+      intent: stored,
       redirectUrl: session.redirectUrl,
     };
   }
@@ -78,23 +104,43 @@ export class WalletPaymentService {
     providerId: PaymentProviderId,
     rawBody: string,
     headers: Readonly<Record<string, string>>,
-    intent: TopUpIntent,
+    intentId?: string,
   ): Promise<{
     intent: TopUpIntent;
     entries: ReturnType<typeof buildVerifiedTopUpCreditPosting>["entries"] | null;
   }> {
     const provider = selectPaymentProvider(this.providers, providerId, "webhook_verify");
     const event: VerifiedProviderEvent = await provider.verifyWebhook({ rawBody, headers });
-    if (event.kind === "topup_failed") {
-      return { intent: markTopUpFailed(intent, event), entries: null };
+    const targetId = intentId ?? event.intentId;
+    const stored = await this.topups.findById(targetId);
+    if (!stored) {
+      throw new AppError("Top-up intent not found", 404, "TOPUP_NOT_FOUND");
     }
+
+    if (event.kind === "topup_failed") {
+      const failedDomain = markTopUpFailed(stored, event);
+      const failed = await this.topups.markFailed(failedDomain.id, event.providerEventId);
+      return { intent: failed, entries: null };
+    }
+
+    if (stored.status === "succeeded") {
+      return { intent: stored, entries: null };
+    }
+
     const credited = buildVerifiedTopUpCreditPosting({
-      intent,
+      intent: stored,
       event,
       userEntryId: generateId("ldg"),
       clearingEntryId: generateId("ldg"),
     });
-    return credited;
+    const batchId = `topup_${stored.id}`;
+    await this.ledger.post(batchId, credited.entries);
+    const intent = await this.topups.markSucceeded({
+      intentId: stored.id,
+      providerEventId: event.providerEventId,
+      ledgerBatchId: batchId,
+    });
+    return { intent, entries: credited.entries };
   }
 
   spendFromWallet(input: {
@@ -109,5 +155,9 @@ export class WalletPaymentService {
       userEntryId: generateId("ldg"),
       marketplaceEntryId: generateId("ldg"),
     });
+  }
+
+  async getAvailableBalance(accountId: string, currency: WalletCurrency): Promise<number> {
+    return this.ledger.getAccountBalance(accountId, currency);
   }
 }

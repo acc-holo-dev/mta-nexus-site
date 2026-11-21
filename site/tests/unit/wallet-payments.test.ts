@@ -2,10 +2,12 @@ import {
   buildVerifiedTopUpCreditPosting,
   buildWalletSpendPosting,
   createTopUpIntent,
+  type LedgerPosting,
   markTopUpAwaitingProvider,
   paymentProviderCapabilityMatrix,
   StubPaymentProvider,
   selectPaymentProvider,
+  type TopUpIntent,
   validateLedgerPosting,
 } from "@nexus/domain";
 import { describe, expect, it } from "vitest";
@@ -24,6 +26,67 @@ const baseIntent = () =>
     idempotencyKey: "idem_topup_test_1",
     nowIso: "2026-11-21T01:00:00.000Z",
   });
+
+function memoryTopups() {
+  const byId = new Map<
+    string,
+    TopUpIntent & { providerEventId?: string; ledgerBatchId?: string }
+  >();
+  const byKey = new Map<string, string>();
+  return {
+    async findById(id: string) {
+      return byId.get(id) ?? null;
+    },
+    async findByIdempotencyKey(key: string) {
+      const id = byKey.get(key);
+      return id ? (byId.get(id) ?? null) : null;
+    },
+    async insertAwaiting(input: { intent: TopUpIntent }) {
+      byId.set(input.intent.id, input.intent);
+      byKey.set(input.intent.idempotencyKey, input.intent.id);
+      return input.intent;
+    },
+    async markSucceeded(input: {
+      intentId: string;
+      providerEventId: string;
+      ledgerBatchId: string;
+    }) {
+      const current = byId.get(input.intentId);
+      if (!current) throw new Error("missing");
+      const next = {
+        ...current,
+        status: "succeeded" as const,
+        providerEventId: input.providerEventId,
+        ledgerBatchId: input.ledgerBatchId,
+      };
+      byId.set(input.intentId, next);
+      return next;
+    },
+    async markFailed(intentId: string, providerEventId: string) {
+      const current = byId.get(intentId);
+      if (!current) throw new Error("missing");
+      const next = { ...current, status: "failed" as const, providerEventId };
+      byId.set(intentId, next);
+      return next;
+    },
+  };
+}
+
+function memoryLedger() {
+  const batches = new Map<string, LedgerPosting[]>();
+  return {
+    async post(idempotencyKey: string, entries: LedgerPosting[]) {
+      validateLedgerPosting(entries);
+      const existing = batches.get(idempotencyKey);
+      if (existing) return existing;
+      batches.set(idempotencyKey, entries);
+      return entries;
+    },
+    async getAccountBalance() {
+      return 0;
+    },
+  };
+}
 
 describe("wallet payments domain", () => {
   it("credits the wallet only from a verified top-up event", () => {
@@ -176,8 +239,12 @@ describe("wallet payment service", () => {
     expect(isWalletEngineEnabled({ NEXUS_WALLET_ENGINE: "1" })).toBe(true);
   });
 
-  it("starts a stub top-up and credits only after verified webhook", async () => {
-    const service = new WalletPaymentService();
+  it("persists stub top-up and credits only after verified webhook", async () => {
+    const service = new WalletPaymentService(
+      [new StubPaymentProvider()],
+      memoryTopups() as never,
+      memoryLedger() as never,
+    );
     const started = await service.startTopUp({
       accountId: "user:usr_buyer",
       amount: 250,
@@ -200,7 +267,6 @@ describe("wallet payment service", () => {
         providerEventId: "stub_evt_service_1",
       }),
       { "x-nexus-stub-signature": "stub-ok" },
-      started.intent,
     );
     expect(credited.intent.status).toBe("succeeded");
     const entries = credited.entries;
