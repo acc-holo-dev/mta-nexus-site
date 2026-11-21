@@ -6,15 +6,17 @@ import { getDictionary } from "../../src/lib/i18n";
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
 describe("shell wallet discovery honesty", () => {
-  it("gates home, hub, nav, and footer copy on the wallet engine flag", () => {
+  it("gates home, hub, nav, footer, and document meta copy on the wallet engine flag", () => {
     const home = read("site/src/features/shell/server/home-page.tsx");
     const hub = read("site/src/features/shell/server/workspace-hub-page.tsx");
     const nav = read("site/src/features/shell/components/shell-navigation.ts");
     const footer = read("site/src/features/shell/components/footer.tsx");
     const layout = read("site/src/features/shell/server/root-layout.tsx");
+    const metadata = read("site/src/features/shell/server/root-layout-metadata.tsx");
 
     expect(home).toContain("isWalletEngineEnabled");
     expect(home).toContain("browseMarketResources");
+    expect(home).toContain("walletTitle");
     expect(home).toContain('"/market"');
     expect(home).toContain('"/market?maxPrice=0"');
     expect(hub).toContain("isWalletEngineEnabled");
@@ -26,18 +28,29 @@ describe("shell wallet discovery honesty", () => {
     expect(footer).toContain("marketResources");
     expect(layout).toContain("isWalletEngineEnabled");
     expect(layout).toContain("walletEnabled={walletEnabled}");
+    expect(metadata).toContain("isWalletEngineEnabled");
+    expect(metadata).toContain("walletTitle");
+    expect(metadata).toContain("walletDescription");
   });
 
-  it("keeps localized wallet-aware discovery strings", () => {
+  it("keeps localized wallet-aware discovery and meta strings", () => {
     const en = getDictionary("en");
     const ru = getDictionary("ru");
     expect(en.home.browseMarketResources).toBe("Browse resources");
+    expect(en.home.walletTitle).toBe("Live servers, community, and resources");
+    expect(en.home.walletTitle).not.toContain("free resources");
     expect(en.home.walletDescription).toContain("Site-wallet");
+    expect(en.meta.walletTitle).toContain("Resources");
+    expect(en.meta.walletTitle).not.toContain("Free Resources");
+    expect(en.meta.walletDescription).toContain("Site-wallet");
+    expect(en.meta.walletDescription).not.toContain("Paid commerce is not enabled");
     expect(en.nav.marketResources).toBe("Resources");
     expect(en.footer.walletSummary).toContain("Site-wallet");
     expect(en.workspace.browseMarketResources).toBe("Browse resources");
     expect(ru.home.browseMarketResources).toBe("Смотреть ресурсы");
+    expect(ru.home.walletTitle).toBe("Живые серверы, сообщество и ресурсы");
     expect(ru.home.walletDescription).toContain("site wallet");
+    expect(ru.meta.walletDescription).toContain("site wallet");
     expect(ru.footer.walletSummary).toContain("site wallet");
   });
 });

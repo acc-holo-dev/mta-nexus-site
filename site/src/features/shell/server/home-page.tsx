@@ -130,7 +130,7 @@ export async function HomePage() {
           </Rise>
           <Rise delay="short">
             <p className="max-w-2xl text-lg font-semibold text-primary sm:text-xl">
-              {dictionary.home.title}
+              {walletEnabled ? dictionary.home.walletTitle : dictionary.home.title}
             </p>
           </Rise>
           <Rise delay="medium">

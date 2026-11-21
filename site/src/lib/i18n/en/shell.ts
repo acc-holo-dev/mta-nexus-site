@@ -1,8 +1,11 @@
 export const shell = {
   meta: {
     title: "MTA NEXUS — Live Servers, Community & Free Resources",
+    walletTitle: "MTA NEXUS — Live Servers, Community & Resources",
     description:
       "Discover live Multi Theft Auto servers, community updates, and free resources during the MTA Nexus open free beta.",
+    walletDescription:
+      "Discover live Multi Theft Auto servers, community updates, and the resource market. Site-wallet purchase can settle paid listings when the wallet engine is on; card checkout stays off.",
   },
   nav: {
     ecosystem: "Ecosystem",

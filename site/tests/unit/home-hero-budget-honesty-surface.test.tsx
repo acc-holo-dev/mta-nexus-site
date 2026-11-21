@@ -15,7 +15,9 @@ it("locks Home hero budget without liveEcosystem eyebrow", () => {
   expect(page).toContain("nexus-hero-atmosphere");
   expect(page).toContain("dictionary.home.brand");
   expect(page).toContain("dictionary.home.title");
+  expect(page).toContain("dictionary.home.walletTitle");
   expect(page).toContain("dictionary.home.description");
+  expect(page).toContain("dictionary.home.walletDescription");
   expect(page).toContain("dictionary.home.exploreServers");
   expect(page).toContain("dictionary.home.browseResources");
   expect(page).toContain("<Rise");

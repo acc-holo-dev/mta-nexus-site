@@ -2,6 +2,7 @@ export const discovery = {
   home: {
     brand: "MTA NEXUS",
     title: "Живые серверы, сообщество и бесплатные ресурсы",
+    walletTitle: "Живые серверы, сообщество и ресурсы",
     description:
       "MTA Nexus — открытая бесплатная бета. Официальный каталог серверов MTA, обновления сообщества и бесплатные ресурсы без оплаты.",
     walletDescription:
