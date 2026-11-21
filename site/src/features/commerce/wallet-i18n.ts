@@ -180,6 +180,36 @@ const copy = {
     providersAdminCapPayout: "payout",
     providersAdminCapWebhook: "webhook verify",
     providersAdminCapRefund: "refund",
+    providersAdminOpsTitle: "Wallet operator batches",
+    providersAdminOpsNote:
+      "Admin-only batch actions for the site wallet engine. These call the existing admin HTTP endpoints. They are not a cron and do not talk to a live PSP. Empty batches are a successful no-op.",
+    providersAdminOpsEngineOff:
+      "Wallet engine is off in this environment. Operator batch CTAs stay hidden until NEXUS_WALLET_ENGINE=1.",
+    providersAdminHoldTitle: "Release matured seller holds",
+    providersAdminHoldNote:
+      "Releases matured ECON-002 escrow holds across seller accounts into available balance. Not a payout.",
+    providersAdminHoldSubmit: "Release matured holds",
+    providersAdminHoldBusy: "Releasing matured holds…",
+    providersAdminHoldSuccess: "Released {count} hold(s) into available balance.",
+    providersAdminHoldFailed: "Hold batch release was not confirmed. Retry the same request.",
+    providersAdminTopupExpireTitle: "Expire stale top-up intents",
+    providersAdminTopupExpireNote:
+      "Marks awaiting/created top-ups older than the default age window as failed. No ledger posting — those intents never credited.",
+    providersAdminTopupExpireSubmit: "Expire stale top-ups",
+    providersAdminTopupExpireBusy: "Expiring stale top-ups…",
+    providersAdminTopupExpireSuccess: "Expired {count} top-up intent(s).",
+    providersAdminTopupExpireFailed:
+      "Top-up expiry batch was not confirmed. Retry the same request.",
+    providersAdminWithdrawExpireTitle: "Expire stale withdrawal intents",
+    providersAdminWithdrawExpireNote:
+      "Cancels awaiting withdrawals older than the default age window and returns escrow to available. Requires withdrawal policy. Not a payout.",
+    providersAdminWithdrawExpireSubmit: "Expire stale withdrawals",
+    providersAdminWithdrawExpireBusy: "Expiring stale withdrawals…",
+    providersAdminWithdrawExpireSuccess: "Expired {count} withdrawal intent(s).",
+    providersAdminWithdrawExpireFailed:
+      "Withdrawal expiry batch was not confirmed. Retry the same request.",
+    providersAdminWithdrawExpireDisabled:
+      "Withdrawal policy is off. Withdrawal expiry stays unavailable until NEXUS_WALLET_WITHDRAW=1.",
     errors: {
       WALLET_ENGINE_DISABLED: "Wallet top-up is not available in this environment.",
       WALLET_TOPUP_INVALID: "Check amount, currency, provider and return path.",
@@ -408,6 +438,36 @@ const copy = {
     providersAdminCapPayout: "выплата",
     providersAdminCapWebhook: "проверка webhook",
     providersAdminCapRefund: "возврат",
+    providersAdminOpsTitle: "Операторские batch-действия кошелька",
+    providersAdminOpsNote:
+      "Только admin. Вызывают существующие admin HTTP endpoints site wallet. Это не cron и не live PSP. Пустой batch — успешный no-op.",
+    providersAdminOpsEngineOff:
+      "Движок кошелька выключен. Operator batch CTA скрыты, пока NEXUS_WALLET_ENGINE=1.",
+    providersAdminHoldTitle: "Освободить созревшие холды продавцов",
+    providersAdminHoldNote:
+      "Освобождает созревшие ECON-002 escrow-холды по счетам продавцов в available баланс. Это не выплата.",
+    providersAdminHoldSubmit: "Освободить созревшие холды",
+    providersAdminHoldBusy: "Освобождение холдов…",
+    providersAdminHoldSuccess: "Освобождено холдов: {count}. Средства в available балансе.",
+    providersAdminHoldFailed: "Batch освобождения холдов не подтверждён. Повторите тот же запрос.",
+    providersAdminTopupExpireTitle: "Истечение устаревших top-up",
+    providersAdminTopupExpireNote:
+      "Помечает awaiting/created top-up старше окна по умолчанию как failed. Без ledger — эти намерения не зачислялись.",
+    providersAdminTopupExpireSubmit: "Истечь устаревшие top-up",
+    providersAdminTopupExpireBusy: "Истечение устаревших top-up…",
+    providersAdminTopupExpireSuccess: "Истекло top-up намерений: {count}.",
+    providersAdminTopupExpireFailed:
+      "Batch истечения top-up не подтверждён. Повторите тот же запрос.",
+    providersAdminWithdrawExpireTitle: "Истечение устаревших выводов",
+    providersAdminWithdrawExpireNote:
+      "Отменяет awaiting выводы старше окна по умолчанию и возвращает escrow в available. Нужна политика вывода. Это не выплата.",
+    providersAdminWithdrawExpireSubmit: "Истечь устаревшие выводы",
+    providersAdminWithdrawExpireBusy: "Истечение устаревших выводов…",
+    providersAdminWithdrawExpireSuccess: "Истекло намерений вывода: {count}.",
+    providersAdminWithdrawExpireFailed:
+      "Batch истечения выводов не подтверждён. Повторите тот же запрос.",
+    providersAdminWithdrawExpireDisabled:
+      "Политика вывода выключена. Истечение выводов недоступно, пока NEXUS_WALLET_WITHDRAW=1.",
     errors: {
       WALLET_ENGINE_DISABLED: "Пополнение кошелька недоступно в этой среде.",
       WALLET_TOPUP_INVALID: "Проверьте сумму, валюту, провайдера и путь возврата.",

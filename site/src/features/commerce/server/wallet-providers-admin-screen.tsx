@@ -21,8 +21,11 @@ import {
   typeSemiboldPrimary,
   typeSmMuted,
   typeSpace2Sm,
+  typeSpace3BorderTPt5,
+  typeXlPrimary,
   typeXsMuted,
 } from "../../shell/type-shell";
+import { WalletAdminBatchForm } from "../wallet-admin-ops";
 import { getWalletCopy } from "../wallet-i18n";
 
 const walletPaymentService = new WalletPaymentService();
@@ -119,6 +122,60 @@ export async function WalletProvidersAdminScreen() {
           </li>
         ))}
       </ul>
+      <section className={typeSpace3BorderTPt5} aria-labelledby="wallet-admin-ops-heading">
+        <h2 id="wallet-admin-ops-heading" className={typeXlPrimary}>
+          {copy.providersAdminOpsTitle}
+        </h2>
+        {engineOn ? (
+          <>
+            <p role="note" className={typeRoundedBorderP4SmSecondary}>
+              {copy.providersAdminOpsNote}
+            </p>
+            <div className="grid gap-4">
+              <WalletAdminBatchForm
+                actorId={user.id}
+                path="/api/admin/commerce/wallet-holds/release-matured"
+                title={copy.providersAdminHoldTitle}
+                note={copy.providersAdminHoldNote}
+                submitLabel={copy.providersAdminHoldSubmit}
+                busyLabel={copy.providersAdminHoldBusy}
+                successTemplate={copy.providersAdminHoldSuccess}
+                failedLabel={copy.providersAdminHoldFailed}
+              />
+              <WalletAdminBatchForm
+                actorId={user.id}
+                path="/api/admin/commerce/wallet-topups/expire-stale"
+                title={copy.providersAdminTopupExpireTitle}
+                note={copy.providersAdminTopupExpireNote}
+                submitLabel={copy.providersAdminTopupExpireSubmit}
+                busyLabel={copy.providersAdminTopupExpireBusy}
+                successTemplate={copy.providersAdminTopupExpireSuccess}
+                failedLabel={copy.providersAdminTopupExpireFailed}
+              />
+              {withdrawOn ? (
+                <WalletAdminBatchForm
+                  actorId={user.id}
+                  path="/api/admin/commerce/wallet-withdrawals/expire-stale"
+                  title={copy.providersAdminWithdrawExpireTitle}
+                  note={copy.providersAdminWithdrawExpireNote}
+                  submitLabel={copy.providersAdminWithdrawExpireSubmit}
+                  busyLabel={copy.providersAdminWithdrawExpireBusy}
+                  successTemplate={copy.providersAdminWithdrawExpireSuccess}
+                  failedLabel={copy.providersAdminWithdrawExpireFailed}
+                />
+              ) : (
+                <p role="note" className={typeSmMuted}>
+                  {copy.providersAdminWithdrawExpireDisabled}
+                </p>
+              )}
+            </div>
+          </>
+        ) : (
+          <p role="note" className={typeSmMuted}>
+            {copy.providersAdminOpsEngineOff}
+          </p>
+        )}
+      </section>
     </div>
   );
 }

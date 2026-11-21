@@ -40,6 +40,7 @@ vi.mock("next/navigation", () => ({
     throw new Error("NEXT_NOT_FOUND");
   },
   usePathname: () => "/admin/commerce/wallet-providers",
+  useRouter: () => ({ refresh: vi.fn() }),
 }));
 vi.mock("next/link", async () => {
   const React = await import("react");
@@ -48,6 +49,9 @@ vi.mock("next/link", async () => {
       React.createElement("a", { href, ...props }, children),
   };
 });
+vi.mock("../../src/features/shell/locale", () => ({
+  useNexusLocale: () => ({ locale: state.locale }),
+}));
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
@@ -83,17 +87,33 @@ it("authenticates admins and lists the dark provider matrix", async () => {
   expect(html).toContain("crypto");
   expect(html).toContain(copy.providersAdminLiveNo);
   expect(html).toContain(copy.providersAdminOff);
+  expect(html).toContain(copy.providersAdminOpsEngineOff);
+  expect(html).not.toContain(copy.providersAdminHoldSubmit);
   expect(html).toContain('href="/admin"');
   expect((await generateMetadata()).robots).toMatchObject({ index: false, follow: false });
 });
 
-it("shows engine and withdraw flags when enabled", async () => {
+it("shows engine ops CTAs when the wallet engine is on", async () => {
+  state.engine = true;
+  state.withdraw = false;
+  const copy = getWalletCopy("en");
+  const html = renderToStaticMarkup(await Page());
+  expect(html).toContain(copy.providersAdminOn);
+  expect(html).toContain(copy.providersAdminOpsNote);
+  expect(html).toContain(copy.providersAdminHoldSubmit);
+  expect(html).toContain(copy.providersAdminTopupExpireSubmit);
+  expect(html).toContain(copy.providersAdminWithdrawExpireDisabled);
+  expect(html).not.toContain(copy.providersAdminWithdrawExpireSubmit);
+});
+
+it("shows withdrawal expiry when withdraw policy is on", async () => {
   state.engine = true;
   state.withdraw = true;
   const copy = getWalletCopy("en");
   const html = renderToStaticMarkup(await Page());
-  expect(html).toContain(copy.providersAdminOn);
-  expect(html).not.toContain(copy.providersAdminOff);
+  expect(html).toContain(copy.providersAdminWithdrawExpireSubmit);
+  expect(html).not.toContain(copy.providersAdminWithdrawExpireDisabled);
+  expect(html).not.toContain(copy.providersAdminOpsEngineOff);
 });
 
 it("refuses the matrix for non-admins", async () => {
