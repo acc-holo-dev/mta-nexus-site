@@ -36,7 +36,10 @@ beforeEach(() => {
 });
 it("passes authenticated actor identity to the publishing form and disables indexing", async () => {
   renderToStaticMarkup(await Page());
-  expect(mocks.forms).toHaveBeenCalledWith({ actorId: "author" });
+  expect(mocks.forms).toHaveBeenCalledWith({
+    actorId: "author",
+    walletPaidPublishing: false,
+  });
   expect((await generateMetadata()).robots).toMatchObject({ index: false, follow: false });
 });
 it.each(["en", "ru"] as const)("requires sign-in before showing the form in %s", async (locale) => {
