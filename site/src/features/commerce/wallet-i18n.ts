@@ -88,6 +88,15 @@ const copy = {
     withdrawCancelFailed: "Withdrawal cancel was not confirmed. Retry the same request.",
     withdrawCancelNote:
       "Cancels an awaiting withdrawal hold and returns escrow to available site-wallet balance. This is not a payout.",
+    withdrawStubSettle: "Stub payout settle",
+    withdrawStubSettleNote:
+      "Stub-only verified payout event. Succeeded pays out escrow to PSP clearing; failed returns escrow to available. Live payout adapters stay off.",
+    withdrawStubSettlePaid: "Mark stub payout succeeded",
+    withdrawStubSettleFailedOutcome: "Mark stub payout failed",
+    withdrawStubSettling: "Settling stub payout…",
+    withdrawStubSettleSuccessPaid: "Stub payout succeeded. Escrow moved to PSP clearing.",
+    withdrawStubSettleSuccessFailed: "Stub payout failed. Escrow returned to available balance.",
+    withdrawStubSettleFailed: "Stub payout settle was not confirmed. Retry the same request.",
     held: "Seller holds",
     heldEmpty: "No seller proceeds on hold for this currency.",
     heldEmptyHint:
@@ -155,6 +164,7 @@ const copy = {
       WITHDRAWAL_INTENT_STATE: "This withdrawal cannot continue in its current state.",
       WITHDRAWAL_NOT_FOUND: "Withdrawal intent was not found.",
       WITHDRAWAL_CANCEL_RACE: "Withdrawal cancel raced with another update. Retry.",
+      WALLET_STUB_SETTLE_PROVIDER: "Stub payout settle is only available for the stub provider.",
       ORDER_NOT_PAYABLE: "This order cannot accept wallet settlement.",
       ORDER_STATE_CHANGED: "Order state changed. Refresh and try again.",
       ORDER_CATALOG_CHANGED: "Catalog terms changed. Refresh and try again.",
@@ -251,6 +261,15 @@ const copy = {
     withdrawCancelFailed: "Отмена вывода не подтверждена. Повторите тот же запрос.",
     withdrawCancelNote:
       "Отменяет ожидающий холд вывода и возвращает escrow в available баланс site wallet. Это не выплата.",
+    withdrawStubSettle: "Stub payout settle",
+    withdrawStubSettleNote:
+      "Только stub: verified payout событие. Succeeded переводит escrow в PSP clearing; failed возвращает escrow в available. Live payout adapters выключены.",
+    withdrawStubSettlePaid: "Отметить stub payout как succeeded",
+    withdrawStubSettleFailedOutcome: "Отметить stub payout как failed",
+    withdrawStubSettling: "Расчёт stub payout…",
+    withdrawStubSettleSuccessPaid: "Stub payout succeeded. Escrow переведён в PSP clearing.",
+    withdrawStubSettleSuccessFailed: "Stub payout failed. Escrow возвращён в available баланс.",
+    withdrawStubSettleFailed: "Stub payout settle не подтверждён. Повторите тот же запрос.",
     held: "Холды продавца",
     heldEmpty: "По этой валюте нет поступлений продавца на холде.",
     heldEmptyHint:
@@ -316,6 +335,7 @@ const copy = {
       WITHDRAWAL_INTENT_STATE: "Этот вывод нельзя продолжить в текущем состоянии.",
       WITHDRAWAL_NOT_FOUND: "Намерение вывода не найдено.",
       WITHDRAWAL_CANCEL_RACE: "Отмена вывода пересеклась с другим обновлением. Повторите.",
+      WALLET_STUB_SETTLE_PROVIDER: "Stub payout settle доступен только для stub-провайдера.",
       ORDER_NOT_PAYABLE: "Этот заказ нельзя оплатить с кошелька.",
       ORDER_STATE_CHANGED: "Состояние заказа изменилось. Обновите страницу и повторите.",
       ORDER_CATALOG_CHANGED: "Условия каталога изменились. Обновите страницу и повторите.",

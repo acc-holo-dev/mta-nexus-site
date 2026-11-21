@@ -113,3 +113,10 @@ export const walletWithdrawalCancelSchema = z
     organizationId: organizationId.optional(),
   })
   .strict();
+
+export const walletWithdrawalStubSettleSchema = z
+  .object({
+    outcome: z.enum(["succeeded", "failed"]),
+    organizationId: organizationId.optional(),
+  })
+  .strict();

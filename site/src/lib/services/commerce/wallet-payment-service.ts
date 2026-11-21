@@ -235,6 +235,53 @@ export class WalletPaymentService {
     return { intent: result.intent };
   }
 
+  /**
+   * Apply a stub-only verified payout outcome for an awaiting withdrawal.
+   * Live payout adapters stay off — this closes the escrow loop in development/CI.
+   */
+  async settleStubWithdrawal(input: {
+    intentId: string;
+    accountId: string;
+    outcome: "succeeded" | "failed";
+  }): Promise<{
+    intent: WithdrawalIntent;
+    kind: Extract<VerifiedProviderEvent["kind"], "payout_succeeded" | "payout_failed">;
+    settled: boolean;
+  }> {
+    if (!isWalletWithdrawEnabled()) {
+      throw new AppError("Wallet withdrawals are disabled", 404, "WALLET_WITHDRAW_DISABLED");
+    }
+    const stored = await this.withdrawals.findById(input.intentId);
+    if (!stored) {
+      throw new AppError("Withdrawal intent not found", 404, "WITHDRAWAL_NOT_FOUND");
+    }
+    if (stored.accountId !== input.accountId) {
+      throw new ForbiddenError("Not authorized for this withdrawal");
+    }
+    if (stored.providerId !== "stub") {
+      throw new AppError(
+        "Stub payout settle is only available for the stub provider",
+        400,
+        "WALLET_STUB_SETTLE_PROVIDER",
+      );
+    }
+    const kind = input.outcome === "succeeded" ? "payout_succeeded" : "payout_failed";
+    const event: VerifiedProviderEvent = {
+      providerId: "stub",
+      providerEventId: `stub_payout_${kind}_${stored.id}`,
+      kind,
+      intentId: stored.id,
+      amount: stored.amount,
+      currency: stored.currency,
+    };
+    const result = await this.applyVerifiedPayoutEvent(event, stored.id);
+    return {
+      intent: result.intent,
+      kind: result.kind as "payout_succeeded" | "payout_failed",
+      settled: result.entries !== null,
+    };
+  }
+
   async applyVerifiedWebhook(
     providerId: PaymentProviderId,
     rawBody: string,
