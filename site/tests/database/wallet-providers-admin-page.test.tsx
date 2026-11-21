@@ -69,6 +69,36 @@ vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
       unpaidOrders: 0,
       withdrawals: state.withdraw ? 3 : null,
     });
+    listAdminRecentTopUps = async () => [
+      {
+        id: "top_a",
+        accountId: "user:usr_b",
+        amount: 500,
+        currency: "USD",
+        providerId: "stub",
+        status: "awaiting_provider",
+        idempotencyKey: "idem_a",
+        providerSessionId: "sess_a",
+        createdAt: "2026-11-21T12:00:00.000Z",
+      },
+    ];
+    listAdminRecentWithdrawals = async () =>
+      state.withdraw
+        ? [
+            {
+              id: "wd_a",
+              accountId: "org:org_a",
+              amount: 200,
+              currency: "EUR",
+              providerId: "stub",
+              status: "awaiting_provider",
+              idempotencyKey: "idem_w",
+              providerSessionId: "sess_w",
+              escrowAccountId: "escrow:wd_a",
+              createdAt: "2026-11-21T12:05:00.000Z",
+            },
+          ]
+        : [];
   },
 }));
 
@@ -112,9 +142,14 @@ it("shows engine ops CTAs when the wallet engine is on", async () => {
   expect(html).toContain(copy.providersAdminEligible.replace("{count}", "2"));
   expect(html).toContain(copy.providersAdminEligible.replace("{count}", "1"));
   expect(html).toContain(copy.providersAdminEligible.replace("{count}", "0"));
+  expect(html).toContain(copy.providersAdminIntentsTitle);
+  expect(html).toContain(copy.providersAdminIntentsNote);
+  expect(html).toContain("user:usr_b");
+  expect(html).toContain("top_a");
   expect(html).toContain(copy.providersAdminWithdrawExpireDisabled);
   expect(html).not.toContain(copy.providersAdminWithdrawExpireSubmit);
   expect(html).not.toContain(copy.providersAdminEligible.replace("{count}", "3"));
+  expect(html).not.toContain("wd_a");
 });
 
 it("shows withdrawal expiry when withdraw policy is on", async () => {
@@ -124,6 +159,8 @@ it("shows withdrawal expiry when withdraw policy is on", async () => {
   const html = renderToStaticMarkup(await Page());
   expect(html).toContain(copy.providersAdminWithdrawExpireSubmit);
   expect(html).toContain(copy.providersAdminEligible.replace("{count}", "3"));
+  expect(html).toContain("wd_a");
+  expect(html).toContain("org:org_a");
   expect(html).not.toContain(copy.providersAdminWithdrawExpireDisabled);
   expect(html).not.toContain(copy.providersAdminOpsEngineOff);
 });

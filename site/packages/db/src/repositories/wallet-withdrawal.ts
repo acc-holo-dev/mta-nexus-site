@@ -85,6 +85,17 @@ export class WalletWithdrawalRepository {
     return rows.map(toIntent);
   }
 
+  /** Admin read-only: recent withdrawals across accounts (no secrets). */
+  async listRecentAcrossAccounts(limit = 20): Promise<WithdrawalIntent[]> {
+    const bounded = Math.min(Math.max(Number.isSafeInteger(limit) ? (limit as number) : 20, 1), 50);
+    const rows = await db
+      .select()
+      .from(walletWithdrawalIntents)
+      .orderBy(desc(walletWithdrawalIntents.createdAt), desc(walletWithdrawalIntents.id))
+      .limit(bounded);
+    return rows.map(toIntent);
+  }
+
   /**
    * Persist awaiting withdrawal and hold available balance in one transaction.
    */

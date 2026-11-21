@@ -30,8 +30,9 @@ org inspect/release requires owner/admin membership. Admin batch release:
 `POST /api/admin/commerce/wallet-holds/release-matured` (across sellers).
 Admin stale unpaid order expiry:
 `POST /api/admin/commerce/wallet-orders/expire-stale` (pending, no payments/ledger;
-default 7d; admin providers page CTA). Workspace wallet shows a release CTA for
-matured personal/org holds.
+default 7d; admin providers page CTA). The providers admin page also shows a
+read-only recent top-up/withdrawal intent list across accounts (inspect before
+expire). Workspace wallet shows a release CTA for matured personal/org holds.
 Organization owner/admin can inspect available balance and stub-top-up
 `org:` accounts via optional `organizationId` on balance/activity/topups.
 `GET /api/wallet/providers` returns the session capability matrix

@@ -195,6 +195,18 @@ const copy = {
     providersAdminOpsEngineOff:
       "Wallet engine is off in this environment. Operator batch CTAs stay hidden until NEXUS_WALLET_ENGINE=1.",
     providersAdminEligible: "{count} eligible for the next batch",
+    providersAdminIntentsTitle: "Recent wallet intents",
+    providersAdminIntentsNote:
+      "Read-only recent top-up and withdrawal intents across accounts. Inspect before running expire batches. This list does not credit, cancel, or settle intents.",
+    providersAdminIntentsUnavailable:
+      "Recent wallet intents are temporarily unavailable. Batch CTAs above are unchanged.",
+    providersAdminTopupsEmpty: "No recent top-up intents.",
+    providersAdminWithdrawalsEmpty: "No recent withdrawal intents.",
+    providersAdminIntentAccount: "Account",
+    providersAdminIntentAmount: "Amount",
+    providersAdminIntentStatus: "Status",
+    providersAdminIntentProvider: "Provider",
+    providersAdminIntentCreated: "Created (UTC)",
     providersAdminHoldTitle: "Release matured seller holds",
     providersAdminHoldNote:
       "Releases matured ECON-002 escrow holds across seller accounts into available balance. Not a payout.",
@@ -471,6 +483,18 @@ const copy = {
     providersAdminOpsEngineOff:
       "Движок кошелька выключен. Operator batch CTA скрыты, пока NEXUS_WALLET_ENGINE=1.",
     providersAdminEligible: "Подходит для следующего batch: {count}",
+    providersAdminIntentsTitle: "Недавние wallet intents",
+    providersAdminIntentsNote:
+      "Read-only недавние top-up и withdrawal intents по всем счетам. Смотрите их перед expire batch. Список не зачисляет, не отменяет и не settle intents.",
+    providersAdminIntentsUnavailable:
+      "Недавние wallet intents временно недоступны. Batch CTA выше не изменились.",
+    providersAdminTopupsEmpty: "Недавних top-up intents нет.",
+    providersAdminWithdrawalsEmpty: "Недавних withdrawal intents нет.",
+    providersAdminIntentAccount: "Счёт",
+    providersAdminIntentAmount: "Сумма",
+    providersAdminIntentStatus: "Статус",
+    providersAdminIntentProvider: "Провайдер",
+    providersAdminIntentCreated: "Создано (UTC)",
     providersAdminHoldTitle: "Освободить созревшие холды продавцов",
     providersAdminHoldNote:
       "Освобождает созревшие ECON-002 escrow-холды по счетам продавцов в available баланс. Это не выплата.",

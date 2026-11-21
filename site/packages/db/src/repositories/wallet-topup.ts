@@ -64,6 +64,17 @@ export class WalletTopupRepository {
     return rows.map(toIntent);
   }
 
+  /** Admin read-only: recent top-ups across accounts (no return paths / secrets). */
+  async listRecentAcrossAccounts(limit = 20): Promise<TopUpIntent[]> {
+    const bounded = Math.min(Math.max(Number.isSafeInteger(limit) ? (limit as number) : 20, 1), 50);
+    const rows = await db
+      .select()
+      .from(walletTopupIntents)
+      .orderBy(desc(walletTopupIntents.createdAt), desc(walletTopupIntents.id))
+      .limit(bounded);
+    return rows.map(toIntent);
+  }
+
   async insertAwaiting(input: { intent: TopUpIntent; returnPath: string }): Promise<TopUpIntent> {
     const { intent, returnPath } = input;
     assertWalletAccountId(intent.accountId);

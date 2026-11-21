@@ -725,6 +725,28 @@ export class WalletPaymentService {
   }
 
   /**
+   * Admin read-only recent top-up intents across accounts.
+   * Does not mutate ledger or intents. Engine-gated.
+   */
+  async listAdminRecentTopUps(limit = 20): Promise<TopUpIntent[]> {
+    if (!isWalletEngineEnabled()) {
+      throw new AppError("Wallet engine is disabled", 404, "WALLET_ENGINE_DISABLED");
+    }
+    return this.topups.listRecentAcrossAccounts(limit);
+  }
+
+  /**
+   * Admin read-only recent withdrawal intents across accounts.
+   * Requires engine + withdraw policy. Does not mutate ledger or intents.
+   */
+  async listAdminRecentWithdrawals(limit = 20): Promise<WithdrawalIntent[]> {
+    if (!isWalletWithdrawEnabled()) {
+      throw new AppError("Wallet withdrawals are disabled", 404, "WALLET_WITHDRAW_DISABLED");
+    }
+    return this.withdrawals.listRecentAcrossAccounts(limit);
+  }
+
+  /**
    * Read-only preview of how many rows the next admin batch CTAs would process
    * under the default age window and batch limit. Not a cron and not a PSP action.
    */

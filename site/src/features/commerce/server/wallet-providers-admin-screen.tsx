@@ -1,4 +1,4 @@
-import type { PaymentProviderCapability } from "@nexus/domain";
+import type { PaymentProviderCapability, TopUpIntent, WithdrawalIntent } from "@nexus/domain";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -17,6 +17,7 @@ import { panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeDisplayPrimary,
+  typeNumericPrimary,
   typeRoundedBorderP4SmSecondary,
   typeSemiboldPrimary,
   typeSmMuted,
@@ -25,6 +26,7 @@ import {
   typeXlPrimary,
   typeXsMuted,
 } from "../../shell/type-shell";
+import { formatFinancialMinor } from "../financial-i18n";
 import { WalletAdminBatchForm } from "../wallet-admin-ops";
 import { getWalletCopy } from "../wallet-i18n";
 
@@ -48,6 +50,17 @@ function capabilityLabel(
       return _exhaustive;
     }
   }
+}
+
+function intentStatusLabel(
+  copy: ReturnType<typeof getWalletCopy>,
+  status: TopUpIntent["status"] | WithdrawalIntent["status"],
+): string {
+  if (status === "awaiting_provider") return copy.statusAwaiting;
+  if (status === "succeeded") return copy.statusSucceeded;
+  if (status === "failed") return copy.statusFailed;
+  if (status === "cancelled") return copy.statusCancelled;
+  return copy.statusCreated;
 }
 
 export async function walletProvidersAdminMetadata(): Promise<Metadata> {
@@ -86,6 +99,15 @@ export async function WalletProvidersAdminScreen() {
     : null;
   const eligibleLabel = (count: number) =>
     copy.providersAdminEligible.replace("{count}", String(count));
+  const recentTopups = engineOn
+    ? await walletPaymentService.listAdminRecentTopUps().catch(() => null)
+    : null;
+  const recentWithdrawals =
+    engineOn && withdrawOn
+      ? await walletPaymentService.listAdminRecentWithdrawals().catch(() => null)
+      : null;
+  const intentsUnavailable =
+    engineOn && (recentTopups === null || (withdrawOn && recentWithdrawals === null));
 
   return (
     <div className={pageShellMax5xl}>
@@ -192,6 +214,80 @@ export async function WalletProvidersAdminScreen() {
                 </p>
               )}
             </div>
+            <section
+              className={typeSpace3BorderTPt5}
+              aria-labelledby="wallet-admin-intents-heading"
+            >
+              <h3 id="wallet-admin-intents-heading" className={typeXlPrimary}>
+                {copy.providersAdminIntentsTitle}
+              </h3>
+              <p role="note" className={typeRoundedBorderP4SmSecondary}>
+                {copy.providersAdminIntentsNote}
+              </p>
+              {intentsUnavailable ? (
+                <p role="note" className={typeSmMuted}>
+                  {copy.providersAdminIntentsUnavailable}
+                </p>
+              ) : (
+                <div className="grid gap-4">
+                  <section className={panelSpace3P5} aria-labelledby="wallet-admin-topups-heading">
+                    <h4 id="wallet-admin-topups-heading" className={typeSemiboldPrimary}>
+                      {copy.providersAdminTopupExpireTitle}
+                    </h4>
+                    {recentTopups?.length ? (
+                      <ul className={typeSpace2Sm}>
+                        {recentTopups.map((intent) => (
+                          <li key={intent.id}>
+                            <p className={typeNumericPrimary}>
+                              {formatFinancialMinor(intent.amount, intent.currency, locale)}
+                            </p>
+                            <p className={typeXsMuted}>
+                              {copy.providersAdminIntentAccount}: {intent.accountId} ·{" "}
+                              {copy.providersAdminIntentStatus}:{" "}
+                              {intentStatusLabel(copy, intent.status)} ·{" "}
+                              {copy.providersAdminIntentProvider}: {intent.providerId} ·{" "}
+                              {copy.providersAdminIntentCreated}: {intent.createdAt} · {intent.id}
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className={typeSmMuted}>{copy.providersAdminTopupsEmpty}</p>
+                    )}
+                  </section>
+                  {withdrawOn ? (
+                    <section
+                      className={panelSpace3P5}
+                      aria-labelledby="wallet-admin-withdrawals-heading"
+                    >
+                      <h4 id="wallet-admin-withdrawals-heading" className={typeSemiboldPrimary}>
+                        {copy.providersAdminWithdrawExpireTitle}
+                      </h4>
+                      {recentWithdrawals?.length ? (
+                        <ul className={typeSpace2Sm}>
+                          {recentWithdrawals.map((intent) => (
+                            <li key={intent.id}>
+                              <p className={typeNumericPrimary}>
+                                {formatFinancialMinor(intent.amount, intent.currency, locale)}
+                              </p>
+                              <p className={typeXsMuted}>
+                                {copy.providersAdminIntentAccount}: {intent.accountId} ·{" "}
+                                {copy.providersAdminIntentStatus}:{" "}
+                                {intentStatusLabel(copy, intent.status)} ·{" "}
+                                {copy.providersAdminIntentProvider}: {intent.providerId} ·{" "}
+                                {copy.providersAdminIntentCreated}: {intent.createdAt} · {intent.id}
+                              </p>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className={typeSmMuted}>{copy.providersAdminWithdrawalsEmpty}</p>
+                      )}
+                    </section>
+                  ) : null}
+                </div>
+              )}
+            </section>
           </>
         ) : (
           <p role="note" className={typeSmMuted}>

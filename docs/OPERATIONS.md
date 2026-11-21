@@ -328,6 +328,9 @@ age window (7d) and limit (20, max 50):
 - `POST /api/admin/commerce/wallet-orders/expire-stale` — stale unpaid pending orders (no payments/ledger) → cancelled
 - `POST /api/admin/commerce/wallet-withdrawals/expire-stale` — stale awaiting withdrawals → cancelled with escrow return (needs withdraw flag)
 
+The same admin page also shows a read-only recent top-up/withdrawal intent list
+across accounts (inspect before expire; no credit/cancel/settle from that list).
+
 Staff wallet refund remains on purchase cases
 (`POST /api/admin/commerce/wallet-orders/:orderId/refund`), not on the
 reconciliation queue. Feature map: `site/src/features/commerce/README.md`.
