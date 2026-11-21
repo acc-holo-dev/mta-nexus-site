@@ -15,6 +15,10 @@ const returnPath = z
     "Return path must be a same-origin absolute path",
   );
 
+const organizationId = z
+  .string()
+  .regex(/^[A-Za-z0-9_-]{3,128}$/u, "Organization id must be 3–128 URL-safe characters");
+
 export const walletTopUpCreateSchema = z
   .object({
     amount: z.number().int().positive().max(2_147_483_647),
@@ -22,12 +26,14 @@ export const walletTopUpCreateSchema = z
     providerId,
     idempotencyKey,
     returnPath,
+    organizationId: organizationId.optional(),
   })
   .strict();
 
 export const walletBalanceQuerySchema = z
   .object({
     currency,
+    organizationId: organizationId.optional(),
   })
   .strict();
 
@@ -35,12 +41,9 @@ export const walletActivityQuerySchema = z
   .object({
     currency,
     limit: z.coerce.number().int().min(1).max(100).optional(),
+    organizationId: organizationId.optional(),
   })
   .strict();
-
-const organizationId = z
-  .string()
-  .regex(/^[A-Za-z0-9_-]{3,128}$/u, "Organization id must be 3–128 URL-safe characters");
 
 export const walletHeldQuerySchema = z
   .object({

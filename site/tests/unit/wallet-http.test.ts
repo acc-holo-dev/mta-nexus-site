@@ -13,6 +13,7 @@ const state = vi.hoisted(() => ({
   getAvailableBalance: vi.fn(),
   listRecentActivity: vi.fn(),
   applyVerifiedWebhook: vi.fn(),
+  resolveSellerAccountId: vi.fn(),
   engine: true,
 }));
 
@@ -27,6 +28,7 @@ vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
     getAvailableBalance = state.getAvailableBalance;
     listRecentActivity = state.listRecentActivity;
     applyVerifiedWebhook = state.applyVerifiedWebhook;
+    resolveSellerAccountId = state.resolveSellerAccountId;
   },
 }));
 
@@ -82,6 +84,9 @@ describe("wallet HTTP", () => {
     state.user = { id: "usr_wallet", role: "user" };
     state.allowed = true;
     state.engine = true;
+    state.resolveSellerAccountId.mockReset().mockImplementation(async (_actor, organizationId) => {
+      return organizationId ? `org:${organizationId}` : "user:usr_wallet";
+    });
     state.startTopUp.mockReset().mockResolvedValue({
       intent: {
         id: "pay_test_1",
@@ -152,6 +157,7 @@ describe("wallet HTTP", () => {
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({
       accountId: "user:usr_wallet",
+      organizationId: null,
       currency: "EUR",
       available: 1200,
     });
@@ -163,6 +169,7 @@ describe("wallet HTTP", () => {
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({
       accountId: "user:usr_wallet",
+      organizationId: null,
       currency: "EUR",
       entries: [
         {
@@ -213,6 +220,31 @@ describe("wallet HTTP", () => {
       idempotencyKey: "idem_http_topup_1",
       returnPath: "/workspace/finance",
     });
+  });
+
+  it("starts an organization top-up for a managed org account", async () => {
+    const response = await topups(
+      topUpRequest({
+        amount: 500,
+        currency: "EUR",
+        providerId: "stub",
+        idempotencyKey: "idem_http_topup_org_1",
+        returnPath: "/workspace/wallet",
+        organizationId: "org_sellers",
+      }),
+    );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      accountId: "org:org_sellers",
+      organizationId: "org_sellers",
+    });
+    expect(state.resolveSellerAccountId).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "usr_wallet" }),
+      "org_sellers",
+    );
+    expect(state.startTopUp).toHaveBeenCalledWith(
+      expect.objectContaining({ accountId: "org:org_sellers", amount: 500 }),
+    );
   });
 
   it("rejects open-redirect return paths", async () => {

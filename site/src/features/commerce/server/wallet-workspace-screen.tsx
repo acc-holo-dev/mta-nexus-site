@@ -131,13 +131,14 @@ export async function WalletWorkspaceScreen({
     available === null
       ? []
       : await walletPaymentService.listManageableOrganizationSellerAccounts(user).catch(() => []);
-  const orgHeldSummaries = await Promise.all(
+  const orgWalletSummaries = await Promise.all(
     orgSellerAccounts.map(async (org) => {
-      const [held, holds] = await Promise.all([
+      const [orgAvailable, held, holds] = await Promise.all([
+        walletPaymentService.getAvailableBalance(org.accountId, currency).catch(() => null),
         walletPaymentService.getHeldBalance(org.accountId, currency).catch(() => null),
         walletPaymentService.listHeld(org.accountId, 20).catch(() => null),
       ]);
-      return { ...org, held, holds };
+      return { ...org, available: orgAvailable, held, holds };
     }),
   );
 
@@ -265,7 +266,7 @@ export async function WalletWorkspaceScreen({
           </>
         )}
       </section>
-      {orgHeldSummaries.length > 0 ? (
+      {orgWalletSummaries.length > 0 ? (
         <section className={panelSpace3P5} aria-labelledby="wallet-org-held-heading">
           <h3 id="wallet-org-held-heading" className={typeSemiboldPrimary}>
             {copy.heldOrg}
@@ -274,7 +275,7 @@ export async function WalletWorkspaceScreen({
             {copy.heldOrgNote}
           </p>
           <ul className={typeSpace2Sm}>
-            {orgHeldSummaries.map((org) => {
+            {orgWalletSummaries.map((org) => {
               const holds =
                 org.holds?.filter((hold) => hold.currency === currency) ??
                 ([] as NonNullable<typeof org.holds>);
@@ -282,6 +283,23 @@ export async function WalletWorkspaceScreen({
               return (
                 <li key={org.organizationId}>
                   <p className={typeSemiboldPrimary}>{org.accountId}</p>
+                  {org.available === null ? (
+                    <p className={typeXsMuted}>{copy.loadUnavailable}</p>
+                  ) : (
+                    <dl className={typeSpace2Sm}>
+                      <div>
+                        <dt className="text-muted">{copy.orgAvailable}</dt>
+                        <dd className={typeNumericPrimary}>
+                          {formatFinancialMinor(org.available, currency, locale)}
+                        </dd>
+                      </div>
+                    </dl>
+                  )}
+                  <WalletTopUpForm
+                    actorId={user.id}
+                    currency={currency}
+                    organizationId={org.organizationId}
+                  />
                   {org.held === null || org.holds === null ? (
                     <p className={typeXsMuted}>{copy.heldUnavailable}</p>
                   ) : holds.length === 0 ? (

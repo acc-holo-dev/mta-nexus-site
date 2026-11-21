@@ -10,6 +10,10 @@ const copy = {
     topUp: "Top up with stub provider",
     topUpNote:
       "Stub creates a top-up intent only. It does not open a hosted checkout. Balance updates after a verified provider webhook, not after this form.",
+    orgTopUp: "Top up organization wallet",
+    orgTopUpNote:
+      "Credits the organization site-wallet account after a verified provider event. Owner/admin only. Not a payout.",
+    orgAvailable: "Organization available balance",
     amount: "Amount",
     submit: "Create top-up intent",
     submitting: "Creating top-up intent…",
@@ -134,6 +138,10 @@ const copy = {
     topUp: "Пополнить через stub-провайдер",
     topUpNote:
       "Stub только создаёт намерение пополнения. Hosted checkout не открывается. Баланс обновится после verified webhook провайдера, а не после этой формы.",
+    orgTopUp: "Пополнить кошелёк организации",
+    orgTopUpNote:
+      "Зачисление на org site-wallet после verified события провайдера. Только owner/admin. Это не вывод.",
+    orgAvailable: "Available баланс организации",
     amount: "Сумма",
     submit: "Создать намерение пополнения",
     submitting: "Создание намерения…",

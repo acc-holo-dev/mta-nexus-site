@@ -22,9 +22,11 @@ import { type ConfirmedWalletTopUp, confirmedWalletTopUp } from "../wallet-topup
 export function WalletTopUpForm({
   actorId,
   currency,
+  organizationId,
 }: {
   actorId: string;
   currency: "USD" | "EUR" | "RUB";
+  organizationId?: string;
 }) {
   const { locale } = useNexusLocale(),
     copy = getWalletCopy(locale),
@@ -51,7 +53,10 @@ export function WalletTopUpForm({
       currency,
       providerId: "stub",
       idempotencyKey,
-      returnPath: "/workspace/wallet",
+      returnPath: organizationId
+        ? `/workspace/wallet?currency=${currency}`
+        : `/workspace/wallet?currency=${currency}`,
+      ...(organizationId ? { organizationId } : {}),
     });
     if (!parsed.success) {
       setError(copy.invalid);
@@ -103,9 +108,9 @@ export function WalletTopUpForm({
 
   return (
     <form className={panelClipSpace4P5} onSubmit={submit}>
-      <h2 className={typeXlSemiboldPrimary}>{copy.topUp}</h2>
+      <h2 className={typeXlSemiboldPrimary}>{organizationId ? copy.orgTopUp : copy.topUp}</h2>
       <p className={typeSmSecondary} role="note">
-        {copy.topUpNote}
+        {organizationId ? copy.orgTopUpNote : copy.topUpNote}
       </p>
       <fieldset disabled={busy} className={typeGrid2Gap4}>
         <label htmlFor={`${field}-amount`}>
