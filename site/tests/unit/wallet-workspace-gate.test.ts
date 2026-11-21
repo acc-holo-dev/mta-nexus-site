@@ -31,6 +31,7 @@ vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
     listRecentActivity = async () => [];
     getHeldBalance = async () => 0;
     listHeld = async () => [];
+    listManageableOrganizationSellerAccounts = async () => [];
   },
 }));
 

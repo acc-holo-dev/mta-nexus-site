@@ -116,6 +116,19 @@ export async function WalletWorkspaceScreen({
     heldBalance === null
       ? null
       : await walletPaymentService.listHeld(accountId, 20).catch(() => null);
+  const orgSellerAccounts =
+    available === null
+      ? []
+      : await walletPaymentService.listManageableOrganizationSellerAccounts(user).catch(() => []);
+  const orgHeldSummaries = await Promise.all(
+    orgSellerAccounts.map(async (org) => {
+      const [held, holds] = await Promise.all([
+        walletPaymentService.getHeldBalance(org.accountId, currency).catch(() => null),
+        walletPaymentService.listHeld(org.accountId, 20).catch(() => null),
+      ]);
+      return { ...org, held, holds };
+    }),
+  );
 
   if (available === null) {
     return (
@@ -235,6 +248,52 @@ export async function WalletWorkspaceScreen({
           </>
         )}
       </section>
+      {orgHeldSummaries.length > 0 ? (
+        <section className={panelSpace3P5} aria-labelledby="wallet-org-held-heading">
+          <h3 id="wallet-org-held-heading" className={typeSemiboldPrimary}>
+            {copy.heldOrg}
+          </h3>
+          <p role="note" className={typeXsMuted}>
+            {copy.heldOrgNote}
+          </p>
+          <ul className={typeSpace2Sm}>
+            {orgHeldSummaries.map((org) => {
+              const holds =
+                org.holds?.filter((hold) => hold.currency === currency) ??
+                ([] as NonNullable<typeof org.holds>);
+              return (
+                <li key={org.organizationId}>
+                  <p className={typeSemiboldPrimary}>{org.accountId}</p>
+                  {org.held === null || org.holds === null ? (
+                    <p className={typeXsMuted}>{copy.heldUnavailable}</p>
+                  ) : holds.length === 0 ? (
+                    <p className={typeXsMuted}>{copy.heldOrgEmpty}</p>
+                  ) : (
+                    <>
+                      <p className={typeNumericPrimary}>
+                        {formatFinancialMinor(org.held, currency, locale)}
+                      </p>
+                      <ul className={typeSpace2Sm}>
+                        {holds.map((hold) => (
+                          <li key={hold.id}>
+                            <p className={typeNumericPrimary}>
+                              {formatFinancialMinor(hold.amount, hold.currency, locale)}
+                            </p>
+                            <p className={typeXsMuted}>
+                              {copy.heldReleaseAt}:{" "}
+                              {formatHistoryDate(new Date(hold.releaseAt), locale)} · {hold.orderId}
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ) : null}
       <section className={panelSpace3P5} aria-labelledby="wallet-activity-heading">
         <h3 id="wallet-activity-heading" className={typeSemiboldPrimary}>
           {copy.activity}

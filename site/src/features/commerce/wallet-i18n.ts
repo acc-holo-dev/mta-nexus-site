@@ -64,6 +64,10 @@ const copy = {
     heldReleaseAt: "Releases at (UTC)",
     heldNote:
       "Held amounts are not available to spend and are not withdrawable. Release runs after the hold window.",
+    heldOrg: "Organization seller holds",
+    heldOrgNote:
+      "Proceeds for organization-owned listings. Owner and admin members can inspect and release matured holds.",
+    heldOrgEmpty: "No organization seller holds for this currency.",
     pending: "Pending provider confirmation",
     historyEmpty: "No top-up intents recorded yet.",
     historyEmptyHint:
@@ -171,6 +175,10 @@ const copy = {
     heldUnavailable: "Баланс холдов продавца временно недоступен.",
     heldReleaseAt: "Освобождение (UTC)",
     heldNote: "Суммы на холде нельзя тратить и нельзя вывести. Освобождение — после окна холда.",
+    heldOrg: "Холды продавца организации",
+    heldOrgNote:
+      "Поступления по листингам организации. Owner и admin могут смотреть и освобождать созревшие холды.",
+    heldOrgEmpty: "Нет холдов продавца организации по этой валюте.",
     pending: "Ожидает подтверждения провайдера",
     historyEmpty: "Намерений пополнения пока нет.",
     historyEmptyHint:

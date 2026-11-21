@@ -38,15 +38,21 @@ export const walletActivityQuerySchema = z
   })
   .strict();
 
+const organizationId = z
+  .string()
+  .regex(/^[A-Za-z0-9_-]{3,128}$/u, "Organization id must be 3–128 URL-safe characters");
+
 export const walletHeldQuerySchema = z
   .object({
     currency,
+    organizationId: organizationId.optional(),
   })
   .strict();
 
 export const walletHoldReleaseSchema = z
   .object({
     nowIso: z.string().datetime().optional(),
+    organizationId: organizationId.optional(),
   })
   .strict();
 

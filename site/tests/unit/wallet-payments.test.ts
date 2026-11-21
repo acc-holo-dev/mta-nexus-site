@@ -1,5 +1,6 @@
 import {
   allocateWalletSpendCommission,
+  assertSellerAccountId,
   buildVerifiedTopUpCreditPosting,
   buildWalletHoldReleasePosting,
   buildWalletSpendPosting,
@@ -11,6 +12,8 @@ import {
   selectPaymentProvider,
   type TopUpIntent,
   validateLedgerPosting,
+  walletAccountIdForOrganization,
+  walletAccountIdForUser,
   walletHoldReleaseAt,
 } from "@nexus/domain";
 import { describe, expect, it } from "vitest";
@@ -181,6 +184,14 @@ describe("wallet payments domain", () => {
         clearingEntryId: "leg_f",
       }),
     ).toThrow(/already credited/i);
+  });
+
+  it("builds personal and organization seller account ids for holds", () => {
+    expect(walletAccountIdForUser("usr_seller")).toBe("user:usr_seller");
+    expect(walletAccountIdForOrganization("org_sellers")).toBe("org:org_sellers");
+    expect(() => assertSellerAccountId("user:usr_seller")).not.toThrow();
+    expect(() => assertSellerAccountId("org:org_sellers")).not.toThrow();
+    expect(() => assertSellerAccountId("escrow:wspend_1")).toThrow(/seller account/i);
   });
 
   it("releases a matured seller hold from escrow to available", () => {

@@ -1,6 +1,7 @@
 import {
   ledgerRepository,
   orderRepository,
+  organizationRepository,
   productRepository,
   type WalletOrderSettlementResult,
   walletOrderSettlementRepository,
@@ -9,9 +10,12 @@ import {
 } from "@nexus/db";
 import {
   AppError,
+  assertSellerAccountId,
   buildVerifiedTopUpCreditPosting,
   buildWalletSpendPosting,
+  canManageOrganization,
   createTopUpIntent,
+  ForbiddenError,
   markTopUpAwaitingProvider,
   markTopUpFailed,
   ORDER_TERMS_LINE_LIMIT,
@@ -26,6 +30,8 @@ import {
   type VerifiedProviderEvent,
   type WalletCurrency,
   type WalletSellerHold,
+  walletAccountIdForOrganization,
+  walletAccountIdForUser,
 } from "@nexus/domain";
 import { generateId } from "@nexus/security";
 
@@ -321,15 +327,52 @@ export class WalletPaymentService {
     return this.ledger.listRecentByAccount(accountId, currency, limit);
   }
 
+  /**
+   * Resolve the seller ledger account the actor may inspect or release.
+   * Personal account by default; organization account when the actor is owner/admin.
+   */
+  async resolveSellerAccountId(actor: User, organizationId?: string): Promise<string> {
+    if (!organizationId) {
+      const accountId = walletAccountIdForUser(actor.id);
+      assertSellerAccountId(accountId);
+      return accountId;
+    }
+    const membership = await organizationRepository.findServerMembershipForUser(
+      organizationId,
+      actor.id,
+    );
+    if (!membership || !canManageOrganization(membership.role)) {
+      throw new ForbiddenError("Not authorized for organization seller holds");
+    }
+    const accountId = walletAccountIdForOrganization(organizationId);
+    assertSellerAccountId(accountId);
+    return accountId;
+  }
+
+  async listManageableOrganizationSellerAccounts(
+    actor: User,
+  ): Promise<Array<{ organizationId: string; accountId: string }>> {
+    const memberships = await organizationRepository.listUserMemberships(actor.id);
+    return memberships
+      .filter((membership) => canManageOrganization(membership.role))
+      .map((membership) => ({
+        organizationId: membership.organizationId,
+        accountId: walletAccountIdForOrganization(membership.organizationId),
+      }));
+  }
+
   async getHeldBalance(sellerAccountId: string, currency: WalletCurrency): Promise<number> {
+    assertSellerAccountId(sellerAccountId);
     return this.holds.sumHeldBySeller(sellerAccountId, currency);
   }
 
   async listHeld(sellerAccountId: string, limit = 20): Promise<WalletSellerHold[]> {
+    assertSellerAccountId(sellerAccountId);
     return this.holds.listHeldBySeller(sellerAccountId, limit);
   }
 
   async releaseMaturedHolds(sellerAccountId: string, nowIso?: string): Promise<WalletSellerHold[]> {
+    assertSellerAccountId(sellerAccountId);
     return this.holds.releaseMaturedForSeller({ sellerAccountId, nowIso });
   }
 }

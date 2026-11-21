@@ -2,7 +2,6 @@ import { AppError } from "@nexus/domain";
 import { walletHoldReleaseSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import {
-  walletAccountIdForUser,
   walletPaymentService,
   walletSessionRequest,
 } from "../../../../../features/commerce/wallet-http";
@@ -10,8 +9,8 @@ import { readBoundedJson } from "../../../../../lib/http/bounded-json";
 import { withBrowserMutation } from "../../../../../lib/http/browser-route-adapter";
 
 /**
- * Release matured seller holds for the caller's personal seller account.
- * Dark unless NEXUS_WALLET_ENGINE=1. Org-seller release is a later slice.
+ * Release matured seller holds for the caller's personal or organization seller account.
+ * Organization release requires owner/admin membership. Dark unless NEXUS_WALLET_ENGINE=1.
  */
 export const POST = withBrowserMutation(function POST(request: NextRequest) {
   return walletSessionRequest(request, true, async (actor) => {
@@ -22,13 +21,17 @@ export const POST = withBrowserMutation(function POST(request: NextRequest) {
     if (!parsed.success) {
       throw new AppError("Invalid wallet hold release", 400, "WALLET_HOLD_INVALID");
     }
-    const sellerAccountId = walletAccountIdForUser(actor.id);
+    const sellerAccountId = await walletPaymentService.resolveSellerAccountId(
+      actor,
+      parsed.data.organizationId,
+    );
     const released = await walletPaymentService.releaseMaturedHolds(
       sellerAccountId,
       parsed.data.nowIso,
     );
     return {
       accountId: sellerAccountId,
+      organizationId: parsed.data.organizationId ?? null,
       released: released.map((hold) => ({
         id: hold.id,
         orderId: hold.orderId,

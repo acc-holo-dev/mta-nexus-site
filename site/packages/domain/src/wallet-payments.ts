@@ -27,6 +27,27 @@ export function assertEscrowAccountId(accountId: string): void {
   }
 }
 
+/** Personal or organization seller ledger accounts used for ECON-002 holds. */
+export function assertSellerAccountId(accountId: string): void {
+  if (!/^(?:user|org):[A-Za-z0-9_-]{1,160}$/u.test(accountId)) {
+    throw new AppError("Seller account id is invalid", 400, "WALLET_ACCOUNT_INVALID");
+  }
+}
+
+export function walletAccountIdForUser(userId: string): string {
+  if (!/^[A-Za-z0-9_-]{1,160}$/u.test(userId)) {
+    throw new AppError("User id is invalid", 400, "WALLET_ACCOUNT_INVALID");
+  }
+  return `user:${userId}`;
+}
+
+export function walletAccountIdForOrganization(organizationId: string): string {
+  if (!/^[A-Za-z0-9_-]{3,128}$/u.test(organizationId)) {
+    throw new AppError("Organization id is invalid", 400, "WALLET_ACCOUNT_INVALID");
+  }
+  return `org:${organizationId}`;
+}
+
 export function walletHoldReleaseAt(heldAtIso: string, holdDays = INITIAL_HOLD_DAYS): string {
   if (!Number.isSafeInteger(holdDays) || holdDays < 1 || holdDays > 365) {
     throw new AppError("Hold days are out of range", 400, "WALLET_HOLD_INVALID");

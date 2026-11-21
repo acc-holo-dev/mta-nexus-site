@@ -1,4 +1,10 @@
-import { AppError, RateLimitExceededError, UnauthorizedError, type User } from "@nexus/domain";
+import {
+  AppError,
+  walletAccountIdForUser as domainWalletAccountIdForUser,
+  RateLimitExceededError,
+  UnauthorizedError,
+  type User,
+} from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { requireServerJsonContentType } from "../../lib/http/bounded-json";
@@ -26,7 +32,7 @@ function requireWalletEngineEnabled(): void {
 }
 
 export function walletAccountIdForUser(userId: string): string {
-  return `user:${userId}`;
+  return domainWalletAccountIdForUser(userId);
 }
 
 export function requestHeaderRecord(request: NextRequest): Record<string, string> {
