@@ -8,6 +8,7 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
@@ -28,6 +29,7 @@ import {
   financialOrderLabel,
   financialPaymentLabel,
   financialProviderLabel,
+  financialReviewNote,
   formatFinancialMinor,
   getFinancialCopy,
 } from "../financial-i18n";
@@ -91,6 +93,7 @@ export async function FinancialReconciliationDetailScreen({
     return null;
   });
   if (missing) notFound();
+  const walletEnabled = isWalletEngineEnabled();
 
   if (!result) {
     return (
@@ -124,8 +127,18 @@ export async function FinancialReconciliationDetailScreen({
         {orderTermsCopy(locale).title}
       </Link>
       <p role="note" className={typeSmSecondary}>
-        {copy.reviewNote}
+        {financialReviewNote(locale, walletEnabled)}
       </p>
+      {walletEnabled ? (
+        <nav className={typeFlexWrapGap4Sm} aria-label={copy.walletProvidersLink}>
+          <Link href="/admin/commerce/order-cases" className={linkAccentSm}>
+            {copy.orderCasesLink}
+          </Link>
+          <Link href="/admin/commerce/wallet-providers" className={linkAccentSm}>
+            {copy.walletProvidersLink}
+          </Link>
+        </nav>
+      ) : null}
       <p>
         {financialOrderLabel(locale, result.order.status)} ·{" "}
         {formatFinancialMinor(result.order.amount, result.order.currency, locale)}

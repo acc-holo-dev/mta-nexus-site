@@ -41,6 +41,10 @@ const copy = {
     allOrders: "All recorded orders",
     reviewNote:
       "These signals compare database records. A completed payment status is not external provider verification. This view cannot settle, refund or repair an order.",
+    walletReviewNote:
+      "These signals compare database records. A completed site-wallet payment is an audited ledger settle, not live PSP verification. This view stays read-only. Staff wallet refund and wallet ops batch tools live on purchase cases and wallet providers when the engine is on.",
+    orderCasesLink: "Purchase cases",
+    walletProvidersLink: "Wallet providers",
     unsupportedCurrency: "Unsupported recorded currency",
     amountMismatch: "Payment amount/currency mismatch",
     missingCapture: "Paid order has no recorded capture",
@@ -99,6 +103,10 @@ const copy = {
     allOrders: "Все записанные заказы",
     reviewNote:
       "Сигналы сопоставляют записи БД. Состояние завершённого платежа не является внешним подтверждением провайдера. Здесь нельзя оплатить, вернуть деньги или исправить заказ.",
+    walletReviewNote:
+      "Сигналы сопоставляют записи БД. Completed платёж site wallet — аудируемый ledger settle, а не live PSP verification. Эта страница остаётся только для чтения. Staff wallet refund и batch-операции wallet живут в обращениях по покупкам и на странице wallet providers, когда engine включён.",
+    orderCasesLink: "Обращения по покупкам",
+    walletProvidersLink: "Wallet providers",
     unsupportedCurrency: "Неподдерживаемая валюта записи",
     amountMismatch: "Сумма/валюта платежа не совпадает",
     missingCapture: "У платного заказа нет записи списания",
@@ -134,6 +142,11 @@ export const financialFlags = [
 ] as const;
 export function getFinancialCopy(locale: Locale) {
   return locale === "ru" ? copy.ru : copy.en;
+}
+
+export function financialReviewNote(locale: Locale, walletEnabled: boolean) {
+  const labels = getFinancialCopy(locale);
+  return walletEnabled ? labels.walletReviewNote : labels.reviewNote;
 }
 export function financialOrderLabel(locale: Locale, status: string) {
   const labels = getCommerceHistoryCopy(locale === "ru" ? "ru" : "en").orderStatuses;

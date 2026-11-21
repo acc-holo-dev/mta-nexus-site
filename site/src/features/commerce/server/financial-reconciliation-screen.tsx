@@ -9,6 +9,7 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm, linkAccentTightBreakSemibold, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
@@ -25,6 +26,7 @@ import { parseHistoryPage } from "../commerce-history-format";
 import {
   financialFlags,
   financialOrderLabel,
+  financialReviewNote,
   formatFinancialMinor,
   getFinancialCopy,
 } from "../financial-i18n";
@@ -82,6 +84,8 @@ export async function FinancialReconciliationScreen({
     });
   if (forbidden) notFound();
   const href = (page: number) => `?${new URLSearchParams({ filter, page: String(page) })}`;
+  const walletEnabled = isWalletEngineEnabled();
+  const reviewNote = financialReviewNote(locale, walletEnabled);
 
   if (!result) {
     return (
@@ -109,8 +113,18 @@ export async function FinancialReconciliationScreen({
       </Link>
       <h1 className={typeDisplayPrimary}>{copy.review}</h1>
       <p role="note" className={typeSmSecondary}>
-        {copy.reviewNote}
+        {reviewNote}
       </p>
+      {walletEnabled ? (
+        <nav className={typeFlexWrapGap4Sm} aria-label={copy.walletProvidersLink}>
+          <Link href="/admin/commerce/order-cases" className={linkAccentSm}>
+            {copy.orderCasesLink}
+          </Link>
+          <Link href="/admin/commerce/wallet-providers" className={linkAccentSm}>
+            {copy.walletProvidersLink}
+          </Link>
+        </nav>
+      ) : null}
       <nav className={typeFlexWrapGap4Sm} aria-label={copy.review}>
         <Link href="?filter=review" className={linkAccentSm}>
           {copy.reviewOnly}
@@ -154,7 +168,7 @@ export async function FinancialReconciliationScreen({
       ) : (
         <EmptyState
           title={copy.empty}
-          description={filtersActive ? copy.clearFilters : copy.reviewNote}
+          description={filtersActive ? copy.clearFilters : reviewNote}
           icon={<Receipt className="h-6 w-6" aria-hidden="true" />}
           action={
             filtersActive ? (

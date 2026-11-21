@@ -185,17 +185,39 @@ it("refuses financial review for general moderators", async () => {
 });
 it("shows recorded discrepancies and safe attempts without settlement actions or secrets", async () => {
   state.user = { id: "usr_a", role: "admin" };
+  const copy = getFinancialCopy("en");
   const queue = renderToStaticMarkup(await Review(input)),
     html = renderToStaticMarkup(await Detail(input));
   expect(queue).toContain("Paid order has no recorded capture");
+  expect(queue).toContain(copy.reviewNote);
+  expect(queue).not.toContain(copy.walletReviewNote);
+  expect(queue).not.toContain("/admin/commerce/order-cases");
+  expect(queue).not.toContain("/admin/commerce/wallet-providers");
   expect(html).toContain("&lt;ORDER&gt;");
   expect(html).toContain("Completed (record)");
   expect(html).toContain("Site wallet");
+  expect(html).toContain(copy.reviewNote);
+  expect(html).not.toContain(copy.walletReviewNote);
   expect(html).not.toContain("SECRET-PROVIDER");
   expect(html).not.toContain("SECRET-FAILURE");
   expect(html).not.toContain("<form");
   expect(html).toContain("page=3");
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
+});
+it("points staff to wallet ops when the engine is on", async () => {
+  state.user = { id: "usr_a", role: "admin" };
+  state.walletEnabled = true;
+  const copy = getFinancialCopy("en");
+  const queue = renderToStaticMarkup(await Review(input)),
+    html = renderToStaticMarkup(await Detail(input));
+  expect(queue).toContain(copy.walletReviewNote);
+  expect(queue).not.toContain("This view cannot settle, refund or repair an order.");
+  expect(queue).toContain("/admin/commerce/order-cases");
+  expect(queue).toContain("/admin/commerce/wallet-providers");
+  expect(html).toContain(copy.walletReviewNote);
+  expect(html).toContain("/admin/commerce/order-cases");
+  expect(html).toContain("/admin/commerce/wallet-providers");
+  expect(html).not.toContain("<form");
 });
 it("shows an honest recovery state when the reconciliation queue fails", async () => {
   state.user = { id: "usr_a", role: "admin" };
