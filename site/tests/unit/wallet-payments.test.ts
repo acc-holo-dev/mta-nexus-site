@@ -69,6 +69,12 @@ function memoryTopups() {
       byId.set(intentId, next);
       return next;
     },
+    async listRecentByAccount(accountId: string, limit = 20) {
+      return [...byId.values()]
+        .filter((intent) => intent.accountId === accountId)
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id))
+        .slice(0, limit);
+    },
   };
 }
 
@@ -282,5 +288,9 @@ describe("wallet payment service", () => {
       availableBalance: 250,
     });
     expect(() => validateLedgerPosting(spend)).not.toThrow();
+
+    const history = await service.listRecentTopUps("user:usr_buyer");
+    expect(history).toHaveLength(1);
+    expect(history[0]?.id).toBe(started.intent.id);
   });
 });
