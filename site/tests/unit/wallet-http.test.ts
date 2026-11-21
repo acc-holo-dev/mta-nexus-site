@@ -15,7 +15,9 @@ const state = vi.hoisted(() => ({
   listRecentActivity: vi.fn(),
   applyVerifiedWebhook: vi.fn(),
   resolveSellerAccountId: vi.fn(),
+  capabilityMatrix: vi.fn(),
   engine: true,
+  withdraw: false,
 }));
 
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
@@ -24,6 +26,7 @@ vi.mock("../../src/lib/services/accounts/auth-service", () => ({
 
 vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
   isWalletEngineEnabled: () => state.engine,
+  isWalletWithdrawEnabled: () => state.engine && state.withdraw,
   WalletPaymentService: class {
     startTopUp = state.startTopUp;
     listRecentTopUps = state.listRecentTopUps;
@@ -31,6 +34,7 @@ vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
     listRecentActivity = state.listRecentActivity;
     applyVerifiedWebhook = state.applyVerifiedWebhook;
     resolveSellerAccountId = state.resolveSellerAccountId;
+    capabilityMatrix = state.capabilityMatrix;
   },
 }));
 
@@ -42,6 +46,7 @@ vi.mock("@nexus/security", () => ({
 import { GET as activity } from "../../src/app/api/wallet/activity/route";
 import { GET as balance } from "../../src/app/api/wallet/balance/route";
 import { POST as webhook } from "../../src/app/api/wallet/providers/[providerId]/webhook/route";
+import { GET as providers } from "../../src/app/api/wallet/providers/route";
 import { GET as listTopUps, POST as topups } from "../../src/app/api/wallet/topups/route";
 
 function topUpRequest(body: unknown) {
@@ -86,9 +91,22 @@ describe("wallet HTTP", () => {
     state.user = { id: "usr_wallet", role: "user" };
     state.allowed = true;
     state.engine = true;
+    state.withdraw = false;
     state.resolveSellerAccountId.mockReset().mockImplementation(async (_actor, organizationId) => {
       return organizationId ? `org:${organizationId}` : "user:usr_wallet";
     });
+    state.capabilityMatrix.mockReset().mockReturnValue([
+      {
+        id: "stub",
+        capabilities: ["topup", "payout", "webhook_verify", "refund"],
+        liveConfigured: false,
+      },
+      {
+        id: "stripe",
+        capabilities: ["topup", "payout", "webhook_verify", "refund"],
+        liveConfigured: false,
+      },
+    ]);
     state.startTopUp.mockReset().mockResolvedValue({
       intent: {
         id: "pay_test_1",
@@ -146,10 +164,17 @@ describe("wallet HTTP", () => {
     });
   }
 
+  function providersRequest() {
+    return new NextRequest("https://nexus.test/api/wallet/providers", {
+      headers: { cookie: "nexus_session=wallet-token" },
+    });
+  }
+
   it("hides wallet routes when the engine flag is off", async () => {
     state.engine = false;
     expect((await balance(balanceRequest("currency=EUR"))).status).toBe(404);
     expect((await activity(activityRequest("currency=EUR"))).status).toBe(404);
+    expect((await providers(providersRequest())).status).toBe(404);
     expect((await listTopUps(listTopUpsRequest("currency=EUR"))).status).toBe(404);
     expect((await topups(topUpRequest({}))).status).toBe(404);
     expect(
@@ -166,9 +191,21 @@ describe("wallet HTTP", () => {
     state.user = null;
     expect((await balance(balanceRequest("currency=EUR"))).status).toBe(401);
     expect((await activity(activityRequest("currency=EUR"))).status).toBe(401);
+    expect((await providers(providersRequest())).status).toBe(401);
     expect((await topups(topUpRequest({}))).status).toBe(401);
     expect(state.getAvailableBalance).not.toHaveBeenCalled();
     expect(state.listRecentActivity).not.toHaveBeenCalled();
+    expect(state.capabilityMatrix).not.toHaveBeenCalled();
+  });
+
+  it("returns the dark provider capability matrix for the signed-in session", async () => {
+    const response = await providers(providersRequest());
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+      providers: state.capabilityMatrix.mock.results[0]?.value,
+      withdrawEnabled: false,
+    });
+    expect(state.capabilityMatrix).toHaveBeenCalledOnce();
   });
 
   it("returns available ledger balance for the signed-in user account", async () => {

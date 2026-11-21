@@ -22,6 +22,7 @@ import {
   type ConfirmedWalletWithdrawal,
   confirmedWalletWithdrawal,
 } from "../wallet-withdraw-confirmation";
+import { useWalletProviderSelection } from "./use-wallet-provider-selection";
 
 export function WalletWithdrawForm({
   actorId,
@@ -37,6 +38,7 @@ export function WalletWithdrawForm({
   const field = useId();
   const router = useRouter();
   const lock = useRef(false);
+  const provider = useWalletProviderSelection(actorId, "payout");
   const [amount, setAmount] = useState("10.00");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -45,6 +47,11 @@ export function WalletWithdrawForm({
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (lock.current) return;
+    if (provider.status !== "ready") {
+      setError(copy.withdrawUnavailable);
+      setResult(null);
+      return;
+    }
     const minor = parseCommercialAmount(amount);
     if (minor === null || minor <= 0 || minor > 100_000_000) {
       setError(copy.invalid);
@@ -55,7 +62,7 @@ export function WalletWithdrawForm({
     const parsed = walletWithdrawalCreateSchema.safeParse({
       amount: minor,
       currency,
-      providerId: "stub",
+      providerId: provider.providerId,
       idempotencyKey,
       ...(organizationId ? { organizationId } : {}),
     });
@@ -78,7 +85,7 @@ export function WalletWithdrawForm({
         ? confirmedWalletWithdrawal(body, {
             amount: minor,
             currency,
-            providerId: "stub",
+            providerId: provider.providerId,
             ...(organizationId ? { organizationId } : {}),
           })
         : null;
@@ -123,7 +130,15 @@ export function WalletWithdrawForm({
       <p className={typeSmSecondary} role="note">
         {organizationId ? copy.orgWithdrawFormNote : copy.withdrawFormNote}
       </p>
-      <fieldset disabled={busy} className={typeGrid2Gap4}>
+      {provider.status === "loading" ? (
+        <p role="status" className={typeSmSecondary}>
+          {copy.providersLoading}
+        </p>
+      ) : null}
+      {provider.status === "unavailable" ? (
+        <ErrorState title={copy.withdrawUnavailable} description={copy.providersUnavailable} />
+      ) : null}
+      <fieldset disabled={busy || provider.status !== "ready"} className={typeGrid2Gap4}>
         <label htmlFor={`${field}-amount`}>
           <span className="block">{copy.amount}</span>
           <input
@@ -161,7 +176,7 @@ export function WalletWithdrawForm({
           <p>{formatFinancialMinor(result.intent.amount, result.intent.currency, locale)}</p>
         </div>
       ) : null}
-      <Button type="submit" disabled={busy}>
+      <Button type="submit" disabled={busy || provider.status !== "ready"}>
         {busy ? copy.withdrawSubmitting : copy.withdrawSubmit}
       </Button>
     </form>

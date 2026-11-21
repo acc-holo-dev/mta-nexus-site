@@ -29,6 +29,8 @@ const copy = {
     rateLimited: "Too many requests. Wait a moment and try again.",
     stateChanged: "Your session changed. Refresh and try again.",
     unavailable: "Wallet top-up is not available.",
+    providersLoading: "Loading payment providers…",
+    providersUnavailable: "No usable payment provider is available for this action.",
     topUpFailed: "Top-up intent was not confirmed. Retry the same request.",
     topUpStubCredit: "Stub top-up credit",
     topUpStubCreditNote:
@@ -303,6 +305,8 @@ const copy = {
     rateLimited: "Слишком много запросов. Подождите немного и повторите.",
     stateChanged: "Сессия изменилась. Обновите страницу и повторите.",
     unavailable: "Пополнение кошелька недоступно.",
+    providersLoading: "Загрузка платёжных провайдеров…",
+    providersUnavailable: "Нет доступного платёжного провайдера для этого действия.",
     topUpFailed: "Намерение пополнения не подтверждено. Повторите тот же запрос.",
     topUpStubCredit: "Stub зачисление top-up",
     topUpStubCreditNote:

@@ -29,8 +29,12 @@ default 7d; admin providers page CTA). Workspace wallet shows a release CTA for
 matured personal/org holds.
 Organization owner/admin can inspect available balance and stub-top-up
 `org:` accounts via optional `organizationId` on balance/activity/topups.
-HTTP routes under `/api/wallet/*`, pay-with-wallet, checkout/wallet, and
-`/workspace/wallet` stay dark unless `NEXUS_WALLET_ENGINE=1`. Withdrawal
+`GET /api/wallet/providers` returns the session capability matrix
+(`liveConfigured` stays false until PSP adapters) plus withdraw policy flag;
+workspace top-up/withdraw forms pick a usable provider from that matrix instead
+of hardcoding stub. HTTP routes under `/api/wallet/*`, pay-with-wallet,
+checkout/wallet, and `/workspace/wallet` stay dark unless
+`NEXUS_WALLET_ENGINE=1`. Withdrawal
 intents (migration `0094_wallet_withdrawal_intents`) hold available balance in
 escrow until a verified payout event; HTTP `POST /api/wallet/withdrawals` also
 needs `NEXUS_WALLET_WITHDRAW=1` (live payout adapters stay off).
