@@ -8,6 +8,7 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax6xl } from "../../shell/page-shell";
@@ -33,6 +34,7 @@ import {
 } from "../../shell/type-shell";
 import { formatHistoryDate, parseHistoryPage } from "../commerce-history-format";
 import { financialReferenceLabel, formatFinancialMinor, getFinancialCopy } from "../financial-i18n";
+import { getWalletCopy } from "../wallet-i18n";
 export async function workspaceFinanceMetadata(): Promise<Metadata> {
   return {
     title: `${getFinancialCopy(await getRequestLocale()).title} | MTA NEXUS`,
@@ -127,6 +129,8 @@ export async function WorkspaceFinanceScreen({
     scopePage = scopes.page,
   ) =>
     `/workspace/finance?${new URLSearchParams({ page: String(page), scopePage: String(scopePage), ...(selectedCurrency ? { currency: selectedCurrency } : {}), ...(selectedScope ? { organizationId: selectedScope } : {}) })}`;
+  const walletEnabled = isWalletEngineEnabled();
+  const walletCopy = walletEnabled ? getWalletCopy(locale) : null;
   return (
     <div className={pageShellMax6xl}>
       <Link href="/workspace/sales" className={linkAccentSmRounded}>
@@ -137,6 +141,13 @@ export async function WorkspaceFinanceScreen({
       <p role="note" className={typeRoundedBorderP4SmSecondary}>
         {copy.note}
       </p>
+      {walletCopy ? (
+        <p>
+          <Link href="/workspace/wallet" className={linkAccentSmRounded}>
+            {walletCopy.walletNav}
+          </Link>
+        </p>
+      ) : null}
       <nav aria-label={copy.currency} className={typeFlexWrapGap4Sm}>
         <Link href={href(1, null)} className={linkAccentSmRounded}>
           {copy.all}
