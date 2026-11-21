@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { LegalDocument } from "../legal-document";
 import { pageShellClip } from "../page-shell";
 
@@ -22,9 +23,17 @@ async function legalDocumentMetadata(kind: LegalKind): Promise<Metadata> {
 async function LegalDocumentPage({ kind }: { kind: LegalKind }) {
   const locale = await getRequestLocale();
   const legal = getDictionary(locale).legal;
+  const walletEnabled = isWalletEngineEnabled();
   const document =
     kind === "terms"
-      ? legal.terms
+      ? walletEnabled
+        ? {
+            ...legal.terms,
+            lead: legal.terms.walletLead,
+            updated: legal.terms.walletUpdated,
+            sections: legal.terms.walletSections,
+          }
+        : legal.terms
       : kind === "privacy"
         ? legal.privacy
         : kind === "copyright"

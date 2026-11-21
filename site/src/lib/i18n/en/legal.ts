@@ -25,6 +25,31 @@ export const legal = {
           body: "We may remove content, limit access, or suspend accounts when needed to protect users, the platform, or rights holders. We will use reasonable judgment and keep an audit trail for moderation actions.",
         },
       ],
+      walletLead:
+        "Effective for the MTA Nexus open free beta when the site-wallet engine is enabled in this environment. These product terms are published for users; they are not a substitute for counsel-reviewed contracts.",
+      walletUpdated: "21 November 2026",
+      walletSections: [
+        {
+          title: "What the beta provides",
+          body: "MTA Nexus provides discovery features, community content, server listings, free resources, and an optional site-wallet path for Multi Theft Auto. When the wallet engine is on, site-wallet top-up and purchase settlement can credit or debit audited ledger balances for eligible paid listings. Card checkout, live payment-service-provider adapters, live payouts, and cryptocurrency settlement stay off until those surfaces are enabled.",
+        },
+        {
+          title: "Site wallet stored value",
+          body: "Site-wallet available balance is audited stored value on the platform ledger. It is not a bank account and is not withdrawable unless a separate withdrawal policy and a live payout adapter are enabled. Seller proceeds from site-wallet sales may sit in escrow before release into available balance. Browser returns from a payment provider never credit the wallet — only a verified provider event does.",
+        },
+        {
+          title: "Your account and content",
+          body: "You are responsible for activity under your account and for content you submit. Do not upload malware, stolen resources, personal data you do not have the right to share, or content that infringes intellectual-property rights.",
+        },
+        {
+          title: "Beta availability",
+          body: "The service is experimental and may change, be paused, or have data removed while it is being developed. Keep your own copy of every uploaded resource. We do not promise uninterrupted availability during the open free beta.",
+        },
+        {
+          title: "Moderation",
+          body: "We may remove content, limit access, or suspend accounts when needed to protect users, the platform, or rights holders. We will use reasonable judgment and keep an audit trail for moderation actions.",
+        },
+      ],
       contactLabel: "Questions about these terms",
       contactEmail: "legal@nexus-mta.com",
     },
