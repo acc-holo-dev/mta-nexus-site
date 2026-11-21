@@ -115,6 +115,7 @@ describe("wallet HTTP", () => {
         providerId: "stub",
       },
       entries: [{ id: "ldg_1" }],
+      kind: "topup_succeeded",
     });
   });
 

@@ -2,11 +2,15 @@ import {
   allocateWalletSpendCommission,
   assertSellerAccountId,
   buildVerifiedTopUpCreditPosting,
+  buildVerifiedWithdrawalPayoutPosting,
   buildWalletHoldReleasePosting,
   buildWalletSpendPosting,
+  buildWithdrawalHoldPosting,
   createTopUpIntent,
+  createWithdrawalIntent,
   type LedgerPosting,
   markTopUpAwaitingProvider,
+  markWithdrawalAwaitingProvider,
   paymentProviderCapabilityMatrix,
   StubPaymentProvider,
   selectPaymentProvider,
@@ -19,6 +23,7 @@ import {
 import { describe, expect, it } from "vitest";
 import {
   isWalletEngineEnabled,
+  isWalletWithdrawEnabled,
   WalletPaymentService,
 } from "../../src/lib/services/commerce/wallet-payment-service";
 
@@ -192,6 +197,44 @@ describe("wallet payments domain", () => {
     expect(() => assertSellerAccountId("user:usr_seller")).not.toThrow();
     expect(() => assertSellerAccountId("org:org_sellers")).not.toThrow();
     expect(() => assertSellerAccountId("escrow:wspend_1")).toThrow(/seller account/i);
+  });
+
+  it("holds available balance for a withdrawal until verified payout", () => {
+    const created = createWithdrawalIntent({
+      id: "wwd_test_intent_1",
+      accountId: "user:usr_buyer",
+      amount: 500,
+      currency: "EUR",
+      providerId: "stub",
+      idempotencyKey: "idem_withdraw_1",
+      nowIso: "2026-11-21T08:00:00.000Z",
+    });
+    const awaiting = markWithdrawalAwaitingProvider(created, "stub_payout_wwd_test_intent_1");
+    const hold = buildWithdrawalHoldPosting({
+      intent: awaiting,
+      availableBalance: 500,
+      userEntryId: "ldg_w_user",
+      escrowEntryId: "ldg_w_esc",
+    });
+    expect(() => validateLedgerPosting(hold)).not.toThrow();
+    const settle = buildVerifiedWithdrawalPayoutPosting({
+      intent: awaiting,
+      event: {
+        providerId: "stub",
+        providerEventId: "stub_evt_pay_1",
+        kind: "payout_succeeded",
+        intentId: awaiting.id,
+        amount: 500,
+        currency: "EUR",
+      },
+      escrowEntryId: "ldg_w_esc2",
+      clearingEntryId: "ldg_w_clr",
+    });
+    expect(() => validateLedgerPosting(settle)).not.toThrow();
+    expect(isWalletWithdrawEnabled({ NEXUS_WALLET_ENGINE: "1" })).toBe(false);
+    expect(isWalletWithdrawEnabled({ NEXUS_WALLET_ENGINE: "1", NEXUS_WALLET_WITHDRAW: "1" })).toBe(
+      true,
+    );
   });
 
   it("releases a matured seller hold from escrow to available", () => {

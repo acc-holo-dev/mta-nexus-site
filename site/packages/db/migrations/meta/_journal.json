@@ -659,6 +659,13 @@
       "when": 1794394800000,
       "tag": "0093_wallet_seller_holds",
       "breakpoints": true
+    },
+    {
+      "idx": 94,
+      "version": "7",
+      "when": 1794481200000,
+      "tag": "0094_wallet_withdrawal_intents",
+      "breakpoints": true
     }
   ]
 }

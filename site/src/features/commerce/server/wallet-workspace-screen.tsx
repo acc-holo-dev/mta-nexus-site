@@ -162,6 +162,9 @@ export async function WalletWorkspaceScreen({
       <p role="note" className={typeRoundedBorderP4SmSecondary}>
         {copy.note}
       </p>
+      <p role="note" className={typeXsMuted}>
+        {copy.withdrawNote}
+      </p>
       <nav aria-label={copy.currency} className={typeFlexWrapGap4Sm}>
         {CURRENCIES.map((value) => (
           <Link

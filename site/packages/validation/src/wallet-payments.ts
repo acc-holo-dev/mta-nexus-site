@@ -79,3 +79,12 @@ export const walletCheckoutSchema = z
       .refine((ids) => new Set(ids).size === ids.length, "Product ids must be unique"),
   })
   .strict();
+
+export const walletWithdrawalCreateSchema = z
+  .object({
+    amount: z.number().int().positive().max(2_147_483_647),
+    currency,
+    providerId,
+    idempotencyKey,
+  })
+  .strict();

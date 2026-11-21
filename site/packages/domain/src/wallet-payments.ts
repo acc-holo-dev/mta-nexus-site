@@ -97,6 +97,34 @@ export type TopUpIntent = {
   createdAt: string;
 };
 
+/** Withdrawal intents debit available balance into escrow until a verified payout event. */
+export type WithdrawalIntentStatus =
+  | "created"
+  | "awaiting_provider"
+  | "succeeded"
+  | "failed"
+  | "cancelled";
+
+export type WithdrawalIntent = {
+  id: string;
+  accountId: string;
+  amount: number;
+  currency: WalletCurrency;
+  providerId: PaymentProviderId;
+  status: WithdrawalIntentStatus;
+  idempotencyKey: string;
+  providerSessionId: string | null;
+  escrowAccountId: string;
+  createdAt: string;
+};
+
+export function withdrawalEscrowAccountId(intentId: string): string {
+  if (!/^[A-Za-z0-9_-]{8,128}$/u.test(intentId)) {
+    throw new AppError("Withdrawal intent id is invalid", 400, "WITHDRAWAL_INTENT_INVALID");
+  }
+  return `escrow:wwithdraw_${intentId}`;
+}
+
 export type VerifiedProviderEventKind =
   | "topup_succeeded"
   | "topup_failed"
@@ -130,6 +158,18 @@ export type CreateTopUpSessionResult = {
   redirectUrl: string | null;
 };
 
+export type CreatePayoutSessionInput = {
+  intentId: string;
+  accountId: string;
+  amount: number;
+  currency: WalletCurrency;
+  idempotencyKey: string;
+};
+
+export type CreatePayoutSessionResult = {
+  providerSessionId: string;
+};
+
 export type VerifyWebhookInput = {
   rawBody: string;
   headers: Readonly<Record<string, string>>;
@@ -139,6 +179,7 @@ export interface PaymentProviderPort {
   readonly id: PaymentProviderId;
   readonly capabilities: readonly PaymentProviderCapability[];
   createTopUpSession(input: CreateTopUpSessionInput): Promise<CreateTopUpSessionResult>;
+  createPayoutSession(input: CreatePayoutSessionInput): Promise<CreatePayoutSessionResult>;
   /**
    * Authenticate and normalize a provider callback. Implementations must reject
    * unsigned or replayed payloads before returning a VerifiedProviderEvent.
@@ -307,6 +348,210 @@ export function markTopUpFailed(intent: TopUpIntent, event: VerifiedProviderEven
     throw new AppError("Succeeded top-up cannot fail", 409, "TOPUP_INTENT_STATE");
   }
   return { ...intent, status: "failed" };
+}
+
+export function createWithdrawalIntent(input: {
+  id: string;
+  accountId: string;
+  amount: number;
+  currency: WalletCurrency;
+  providerId: PaymentProviderId;
+  idempotencyKey: string;
+  nowIso: string;
+}): WithdrawalIntent {
+  assertWalletAccountId(input.accountId);
+  assertWalletAmount(input.amount);
+  assertWalletCurrency(input.currency);
+  if (!/^[A-Za-z0-9_-]{8,128}$/u.test(input.id)) {
+    throw new AppError("Withdrawal intent id is invalid", 400, "WITHDRAWAL_INTENT_INVALID");
+  }
+  if (!/^[A-Za-z0-9_-]{8,128}$/u.test(input.idempotencyKey)) {
+    throw new AppError(
+      "Withdrawal idempotency key is invalid",
+      400,
+      "WITHDRAWAL_IDEMPOTENCY_INVALID",
+    );
+  }
+  if (!(PAYMENT_PROVIDER_IDS as readonly string[]).includes(input.providerId)) {
+    throw new AppError("Payment provider is unknown", 400, "PAYMENT_PROVIDER_UNKNOWN");
+  }
+  return {
+    id: input.id,
+    accountId: input.accountId,
+    amount: input.amount,
+    currency: input.currency,
+    providerId: input.providerId,
+    status: "created",
+    idempotencyKey: input.idempotencyKey,
+    providerSessionId: null,
+    escrowAccountId: withdrawalEscrowAccountId(input.id),
+    createdAt: input.nowIso,
+  };
+}
+
+export function markWithdrawalAwaitingProvider(
+  intent: WithdrawalIntent,
+  providerSessionId: string,
+): WithdrawalIntent {
+  if (intent.status !== "created") {
+    throw new AppError(
+      "Withdrawal intent cannot start a provider session",
+      409,
+      "WITHDRAWAL_INTENT_STATE",
+    );
+  }
+  if (!/^[A-Za-z0-9_-]{1,128}$/u.test(providerSessionId)) {
+    throw new AppError("Provider session id is invalid", 400, "PROVIDER_SESSION_INVALID");
+  }
+  return {
+    ...intent,
+    status: "awaiting_provider",
+    providerSessionId,
+  };
+}
+
+/** Hold available balance in withdrawal escrow until a verified payout event. */
+export function buildWithdrawalHoldPosting(input: {
+  intent: WithdrawalIntent;
+  availableBalance: number;
+  userEntryId: string;
+  escrowEntryId: string;
+}): LedgerPosting[] {
+  const { intent } = input;
+  assertWalletAccountId(intent.accountId);
+  assertEscrowAccountId(intent.escrowAccountId);
+  assertWalletAmount(intent.amount);
+  assertWalletCurrency(intent.currency);
+  if (input.availableBalance < intent.amount) {
+    throw new AppError(
+      "Available wallet balance is insufficient",
+      409,
+      "WALLET_INSUFFICIENT_FUNDS",
+    );
+  }
+  if (intent.status !== "awaiting_provider") {
+    throw new AppError("Withdrawal intent is not ready to hold", 409, "WITHDRAWAL_INTENT_STATE");
+  }
+  const entries: LedgerPosting[] = [
+    {
+      id: input.userEntryId,
+      accountId: intent.accountId,
+      amount: -intent.amount,
+      currency: intent.currency,
+      referenceType: "withdrawal",
+      referenceId: intent.id,
+      description: `Withdrawal hold via ${intent.providerId}`,
+    },
+    {
+      id: input.escrowEntryId,
+      accountId: intent.escrowAccountId,
+      amount: intent.amount,
+      currency: intent.currency,
+      referenceType: "withdrawal",
+      referenceId: intent.id,
+      description: `Escrow for withdrawal ${intent.id}`,
+    },
+  ];
+  validateLedgerPosting(entries);
+  return entries;
+}
+
+/** Move held withdrawal funds to PSP payout clearing after verified success. */
+export function buildVerifiedWithdrawalPayoutPosting(input: {
+  intent: WithdrawalIntent;
+  event: VerifiedProviderEvent;
+  escrowEntryId: string;
+  clearingEntryId: string;
+}): LedgerPosting[] {
+  const { intent, event } = input;
+  if (event.kind !== "payout_succeeded") {
+    throw new AppError("Provider event is not a successful payout", 400, "PAYOUT_EVENT_KIND");
+  }
+  if (event.intentId !== intent.id) {
+    throw new AppError("Provider event intent mismatch", 400, "PAYOUT_EVENT_INTENT_MISMATCH");
+  }
+  if (event.providerId !== intent.providerId) {
+    throw new AppError("Provider event provider mismatch", 400, "PAYOUT_EVENT_PROVIDER_MISMATCH");
+  }
+  if (event.amount !== intent.amount || event.currency !== intent.currency) {
+    throw new AppError("Provider event amount or currency mismatch", 400, "PAYOUT_EVENT_AMOUNT");
+  }
+  if (intent.status === "succeeded") {
+    throw new AppError("Withdrawal already paid out", 409, "WITHDRAWAL_ALREADY_PAID");
+  }
+  if (intent.status !== "awaiting_provider") {
+    throw new AppError("Withdrawal intent cannot be paid out", 409, "WITHDRAWAL_INTENT_STATE");
+  }
+  assertEscrowAccountId(intent.escrowAccountId);
+  const clearingAccount = `platform:psp_payout_clearing_${intent.providerId}`;
+  const entries: LedgerPosting[] = [
+    {
+      id: input.escrowEntryId,
+      accountId: intent.escrowAccountId,
+      amount: -intent.amount,
+      currency: intent.currency,
+      referenceType: "withdrawal",
+      referenceId: intent.id,
+      description: `Payout settle for withdrawal ${intent.id}`,
+    },
+    {
+      id: input.clearingEntryId,
+      accountId: clearingAccount,
+      amount: intent.amount,
+      currency: intent.currency,
+      referenceType: "withdrawal",
+      referenceId: intent.id,
+      description: `PSP payout clearing for ${intent.id}`,
+    },
+  ];
+  validateLedgerPosting(entries);
+  return entries;
+}
+
+/** Return held withdrawal funds to available balance after verified payout failure. */
+export function buildVerifiedWithdrawalRefundPosting(input: {
+  intent: WithdrawalIntent;
+  event: VerifiedProviderEvent;
+  escrowEntryId: string;
+  userEntryId: string;
+}): LedgerPosting[] {
+  const { intent, event } = input;
+  if (event.kind !== "payout_failed") {
+    throw new AppError("Provider event is not a failed payout", 400, "PAYOUT_EVENT_KIND");
+  }
+  if (event.intentId !== intent.id) {
+    throw new AppError("Provider event intent mismatch", 400, "PAYOUT_EVENT_INTENT_MISMATCH");
+  }
+  if (intent.status === "succeeded") {
+    throw new AppError("Succeeded withdrawal cannot fail", 409, "WITHDRAWAL_INTENT_STATE");
+  }
+  if (intent.status !== "awaiting_provider") {
+    throw new AppError("Withdrawal intent cannot fail", 409, "WITHDRAWAL_INTENT_STATE");
+  }
+  assertWalletAccountId(intent.accountId);
+  assertEscrowAccountId(intent.escrowAccountId);
+  const entries: LedgerPosting[] = [
+    {
+      id: input.escrowEntryId,
+      accountId: intent.escrowAccountId,
+      amount: -intent.amount,
+      currency: intent.currency,
+      referenceType: "withdrawal",
+      referenceId: intent.id,
+      description: `Release failed withdrawal escrow ${intent.id}`,
+    },
+    {
+      id: input.userEntryId,
+      accountId: intent.accountId,
+      amount: intent.amount,
+      currency: intent.currency,
+      referenceType: "withdrawal",
+      referenceId: intent.id,
+      description: `Return failed withdrawal ${intent.id}`,
+    },
+  ];
+  validateLedgerPosting(entries);
+  return entries;
 }
 
 /**
@@ -524,6 +769,15 @@ export class StubPaymentProvider implements PaymentProviderPort {
     return {
       providerSessionId: `stub_sess_${input.intentId}`,
       redirectUrl: null,
+    };
+  }
+
+  async createPayoutSession(input: CreatePayoutSessionInput): Promise<CreatePayoutSessionResult> {
+    assertWalletAccountId(input.accountId);
+    assertWalletAmount(input.amount);
+    assertWalletCurrency(input.currency);
+    return {
+      providerSessionId: `stub_payout_${input.intentId}`,
     };
   }
 

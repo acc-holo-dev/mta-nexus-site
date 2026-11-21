@@ -20,9 +20,12 @@ Ledger activity: `GET /api/wallet/activity`. Seller holds: `GET /api/wallet/held
 7-day baseline). Personal and organization seller accounts (`user:` / `org:`) —
 org inspect/release requires owner/admin membership. HTTP routes under
 `/api/wallet/*`, pay-with-wallet, checkout/wallet, and `/workspace/wallet` stay
-dark unless `NEXUS_WALLET_ENGINE=1`. When the engine is on, authors may
-create/release paid `single_server` listings (still not card checkout). Redirect
-never credits the wallet.
+dark unless `NEXUS_WALLET_ENGINE=1`. Withdrawal intents (migration
+`0094_wallet_withdrawal_intents`) hold available balance in escrow until a
+verified payout event; HTTP `POST /api/wallet/withdrawals` also needs
+`NEXUS_WALLET_WITHDRAW=1` (live payout adapters stay off). When the engine is
+on, authors may create/release paid `single_server` listings (still not card
+checkout). Redirect never credits the wallet.
 
 | Entry                             | Контракт                                                                                                          |
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
