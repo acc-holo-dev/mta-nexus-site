@@ -171,6 +171,15 @@ export async function WalletProvidersAdminScreen() {
             <p role="note" className={typeRoundedBorderP4SmSecondary}>
               {copy.providersAdminOpsNote}
             </p>
+            <p role="note" className={typeSmMuted}>
+              {copy.providersAdminRefundCasesNote}{" "}
+              <Link
+                href="/admin/commerce/order-cases?reviewStatus=refund_recommended"
+                className={linkAccentSmRounded}
+              >
+                {copy.providersAdminRefundCasesLink}
+              </Link>
+            </p>
             <div className="grid gap-4">
               <WalletAdminBatchForm
                 actorId={user.id}

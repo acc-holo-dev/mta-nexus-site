@@ -192,6 +192,9 @@ it("shows engine ops CTAs when the wallet engine is on", async () => {
   const html = renderToStaticMarkup(await Page());
   expect(html).toContain(copy.providersAdminOn);
   expect(html).toContain(copy.providersAdminOpsNote);
+  expect(html).toContain(copy.providersAdminRefundCasesNote);
+  expect(html).toContain(copy.providersAdminRefundCasesLink);
+  expect(html).toContain("/admin/commerce/order-cases?reviewStatus=refund_recommended");
   expect(html).toContain(copy.providersAdminHoldSubmit);
   expect(html).toContain(copy.providersAdminTopupExpireSubmit);
   expect(html).toContain(copy.providersAdminOrderExpireSubmit);

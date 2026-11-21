@@ -310,6 +310,11 @@ export async function OrderCaseListPage({
       <p role="note" className={typeSmSecondary}>
         {copy.financeNote}
       </p>
+      {staff && filters.reviewStatus === "refund_recommended" ? (
+        <p role="note" className={typeSmSecondary}>
+          {copy.refundInspectNote}
+        </p>
+      ) : null}
       <search aria-label={copy.filters}>
         <form action={base} className={typeFlexWrapEndGap3}>
           <label className="space-y-2">
@@ -352,32 +357,65 @@ export async function OrderCaseListPage({
       </search>
       {result.items.length ? (
         <ol className="space-y-3">
-          {result.items.map((item) => (
-            <li key={item.id} className={panelSpace2P5}>
-              <Link
-                href={`${base}/${encodeURIComponent(item.id)}`}
-                className={`break-words font-semibold ${linkAccentSmRounded}`}
-              >
-                {item.subject}
-              </Link>
-              <p className="text-sm">
-                {copy.order}: {item.orderNumber} · {orderCaseKindLabel(locale, item.kind)}
-              </p>
-              <p className={typeSmSecondary}>
-                {orderCaseStatusLabel(locale, item.reviewStatus)} · {copy.thread}:{" "}
-                {orderCaseThreadLabel(locale, item.threadStatus)}
-              </p>
-              {item.requestedAmount !== null && (
+          {result.items.map((item) => {
+            const engineOn = isWalletEngineEnabled();
+            const reconciliationEligible =
+              item.orderStatus === "completed" &&
+              item.currency === item.orderCurrency &&
+              item.requestedAmount !== null &&
+              item.requestedAmount <= item.orderTotalAmount &&
+              item.recordedCaptureCount === 1 &&
+              item.recordedMatchingCaptureCount === 1 &&
+              item.refundedRecordCount === 0 &&
+              item.disputedRecordCount === 0;
+            const walletExecutable =
+              reconciliationEligible && item.paymentProvider === "wallet" && engineOn;
+            return (
+              <li key={item.id} className={panelSpace2P5}>
+                <Link
+                  href={`${base}/${encodeURIComponent(item.id)}`}
+                  className={`break-words font-semibold ${linkAccentSmRounded}`}
+                >
+                  {item.subject}
+                </Link>
                 <p className="text-sm">
-                  {copy.requested}:{" "}
-                  {formatHistoryAmount(item.requestedAmount, item.currency, locale)}
+                  {copy.order}: {item.orderNumber} · {orderCaseKindLabel(locale, item.kind)}
                 </p>
-              )}
-              <time dateTime={item.createdAt.toISOString()} className={typeXsMuted}>
-                {formatHistoryDate(item.createdAt, locale)}
-              </time>
-            </li>
-          ))}
+                <p className={typeSmSecondary}>
+                  {orderCaseStatusLabel(locale, item.reviewStatus)} · {copy.thread}:{" "}
+                  {orderCaseThreadLabel(locale, item.threadStatus)}
+                </p>
+                {staff ? (
+                  <p className={typeSmSecondary}>
+                    {copy.orderStatus}: {financialOrderLabel(locale, item.orderStatus)}
+                    {item.paymentProvider
+                      ? ` · ${copy.provider}: ${commercialProviderLabel(locale, item.paymentProvider)}`
+                      : ""}
+                  </p>
+                ) : null}
+                {staff && item.reviewStatus === "refund_recommended" ? (
+                  <p role="note" className={typeXsMuted}>
+                    {!engineOn
+                      ? copy.walletRefundEngineOff
+                      : walletExecutable
+                        ? copy.walletRefundExecutable
+                        : item.paymentProvider && item.paymentProvider !== "wallet"
+                          ? copy.walletRefundNotWallet
+                          : copy.walletRefundNotExecutable}
+                  </p>
+                ) : null}
+                {item.requestedAmount !== null && (
+                  <p className="text-sm">
+                    {copy.requested}:{" "}
+                    {formatHistoryAmount(item.requestedAmount, item.currency, locale)}
+                  </p>
+                )}
+                <time dateTime={item.createdAt.toISOString()} className={typeXsMuted}>
+                  {formatHistoryDate(item.createdAt, locale)}
+                </time>
+              </li>
+            );
+          })}
         </ol>
       ) : (
         <EmptyState

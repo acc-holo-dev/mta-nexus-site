@@ -335,7 +335,11 @@ unpaid-order expire, and withdrawal expire batches would process.
 
 Staff wallet refund remains on purchase cases
 (`POST /api/admin/commerce/wallet-orders/:orderId/refund`), not on the
-reconciliation queue. Feature map: `site/src/features/commerce/README.md`.
+reconciliation queue. The staff purchase-case queue filtered to
+`reviewStatus=refund_recommended` shows recorded order status / payment
+provider and whether a site-wallet refund is executable from case detail;
+recommendation is never an executed refund. Feature map:
+`site/src/features/commerce/README.md`.
 
 ### Infrastructure directory migration
 

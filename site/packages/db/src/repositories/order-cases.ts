@@ -335,7 +335,13 @@ class OrderCasesRepository {
           .where(where);
         const bounds = historyPageBounds(summary?.total ?? 0, page);
         const rows = await tx
-          .select({ ...caseProjection, orderNumber: orders.orderNumber })
+          .select({
+            ...caseProjection,
+            orderNumber: orders.orderNumber,
+            orderStatus: orders.status,
+            orderTotalAmount: orders.totalAmount,
+            orderCurrency: orders.currency,
+          })
           .from(cases)
           .innerJoin(orders, eq(cases.orderId, orders.id))
           .innerJoin(supportCases, eq(cases.caseId, supportCases.id))
@@ -346,7 +352,97 @@ class OrderCasesRepository {
           )
           .limit(bounds.pageSize)
           .offset(bounds.offset);
-        return { items: rows as (OrderCaseView & { orderNumber: string })[], ...bounds };
+        type PageItem = OrderCaseView & {
+          orderNumber: string;
+          orderStatus: string;
+          orderTotalAmount: number;
+          orderCurrency: string;
+          paymentProvider: string | null;
+          recordedCaptureCount: number;
+          recordedMatchingCaptureCount: number;
+          refundedRecordCount: number;
+          disputedRecordCount: number;
+        };
+        if (!rows.length) {
+          return { items: [] as PageItem[], ...bounds };
+        }
+        const paymentRows = await tx
+          .select({
+            orderId: payments.orderId,
+            provider: payments.provider,
+            status: payments.status,
+            amount: payments.amount,
+            currency: payments.currency,
+          })
+          .from(payments)
+          .where(
+            inArray(
+              payments.orderId,
+              rows.map((row) => row.orderId),
+            ),
+          );
+        const byOrder = new Map<
+          string,
+          {
+            paymentProvider: string | null;
+            recordedCaptureCount: number;
+            recordedMatchingCaptureCount: number;
+            refundedRecordCount: number;
+            disputedRecordCount: number;
+          }
+        >();
+        for (const row of rows) {
+          byOrder.set(row.orderId, {
+            paymentProvider: null,
+            recordedCaptureCount: 0,
+            recordedMatchingCaptureCount: 0,
+            refundedRecordCount: 0,
+            disputedRecordCount: 0,
+          });
+        }
+        for (const payment of paymentRows) {
+          const bucket = byOrder.get(payment.orderId);
+          if (!bucket) continue;
+          if (payment.status === "completed") {
+            bucket.recordedCaptureCount += 1;
+            const order = rows.find((row) => row.orderId === payment.orderId);
+            if (
+              order &&
+              payment.amount === order.orderTotalAmount &&
+              payment.currency === order.orderCurrency
+            ) {
+              bucket.recordedMatchingCaptureCount += 1;
+              bucket.paymentProvider = payment.provider;
+            }
+          }
+          if (payment.status === "refunded" || payment.status === "partially_refunded") {
+            bucket.refundedRecordCount += 1;
+          }
+          if (payment.status === "disputed") {
+            bucket.disputedRecordCount += 1;
+          }
+        }
+        const items: PageItem[] = rows.map((row) => {
+          const payment = byOrder.get(row.orderId) ?? {
+            paymentProvider: null,
+            recordedCaptureCount: 0,
+            recordedMatchingCaptureCount: 0,
+            refundedRecordCount: 0,
+            disputedRecordCount: 0,
+          };
+          return {
+            ...(row as OrderCaseView & {
+              orderNumber: string;
+              orderStatus: string;
+              orderTotalAmount: number;
+              orderCurrency: string;
+            }),
+            ...payment,
+            paymentProvider:
+              payment.recordedMatchingCaptureCount === 1 ? payment.paymentProvider : null,
+          };
+        });
+        return { items, ...bounds };
       },
       { isolationLevel: "repeatable read", accessMode: "read only" },
     );

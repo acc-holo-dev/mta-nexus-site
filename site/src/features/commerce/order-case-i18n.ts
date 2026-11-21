@@ -15,6 +15,14 @@ const en = {
     "One case keeps the complete conversation and review history for this order. Continue or reopen it when you need further help.",
   financeNote:
     "These are recorded order and payment states, not verification from a live payment provider. A completed site-wallet row is an audited ledger settle. A refund recommendation does not transfer money, change access or record a successful refund.",
+  refundInspectNote:
+    "Refund recommended means staff recommended ledger reconciliation — it is not an executed site-wallet refund. Open the case to run the admin refund when the engine is on and the recorded payment is wallet-eligible. Live PSP refund adapters stay off.",
+  orderStatus: "Order status",
+  walletRefundExecutable: "Site-wallet refund executable from case detail",
+  walletRefundNotExecutable:
+    "Site-wallet refund not executable yet — open the case to reconcile evidence first",
+  walletRefundNotWallet: "Recorded payment is not site wallet — ledger refund CTA stays off",
+  walletRefundEngineOff: "Site-wallet refund CTA stays dark until NEXUS_WALLET_ENGINE=1",
   provider: "Provider",
   subject: "Subject",
   message: "Describe the issue",
@@ -94,6 +102,14 @@ const ru: typeof en = {
     "Одно обращение хранит всю переписку и историю разбора заказа. Продолжите или откройте его заново, если нужна дополнительная помощь.",
   financeNote:
     "Здесь показаны учётные состояния заказа и платежей, а не подтверждение от live платёжного провайдера. Completed строка site wallet — аудируемый ledger settle. Рекомендация возврата не переводит деньги, не меняет доступ и не регистрирует успешный возврат.",
+  refundInspectNote:
+    "Refund recommended означает рекомендацию сверки ledger, а не выполненный site-wallet refund. Откройте обращение, чтобы запустить admin refund, когда engine включён и recorded payment wallet-eligible. Live PSP refund adapters остаются выключены.",
+  orderStatus: "Статус заказа",
+  walletRefundExecutable: "Site-wallet refund доступен на карточке обращения",
+  walletRefundNotExecutable:
+    "Site-wallet refund пока недоступен — откройте обращение и сверните evidence",
+  walletRefundNotWallet: "Recorded payment не site wallet — CTA ledger refund остаётся выключен",
+  walletRefundEngineOff: "CTA site-wallet refund остаётся dark, пока NEXUS_WALLET_ENGINE=1",
   provider: "Провайдер",
   subject: "Тема",
   message: "Опишите проблему",

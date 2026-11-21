@@ -104,7 +104,20 @@ beforeEach(() => {
     canRecommendRefund: false,
   });
   state.page.mockReset().mockResolvedValue({
-    items: [{ ...savedCase, orderNumber: order.orderNumber }],
+    items: [
+      {
+        ...savedCase,
+        orderNumber: order.orderNumber,
+        orderStatus: order.status,
+        orderTotalAmount: order.totalAmount,
+        orderCurrency: order.currency,
+        paymentProvider: "wallet",
+        recordedCaptureCount: 1,
+        recordedMatchingCaptureCount: 1,
+        refundedRecordCount: 0,
+        disputedRecordCount: 0,
+      },
+    ],
     page: 1,
     totalPages: 2,
   });
@@ -159,6 +172,23 @@ it("preserves filters in archive pagination", async () => {
     1,
     expect.objectContaining({ threadStatus: "open" }),
   );
+});
+it("shows staff refund-recommended inspect fields without a list refund CTA", async () => {
+  process.env.NEXUS_WALLET_ENGINE = "1";
+  state.actor = { id: "usr_admin", role: "admin" };
+  const copy = orderCaseCopy("en");
+  const html = renderToStaticMarkup(
+    await OrderCaseListPage({
+      staff: true,
+      query: { reviewStatus: "refund_recommended" },
+    }),
+  );
+  expect(html).toContain(copy.refundInspectNote);
+  expect(html).toContain(copy.orderStatus);
+  expect(html).toContain(copy.provider);
+  expect(html).toContain(copy.walletRefundExecutable);
+  expect(html).not.toContain("/api/admin/commerce/wallet-orders/");
+  delete process.env.NEXUS_WALLET_ENGINE;
 });
 it.each(["en", "ru"] as const)(
   "names the order-case filter search landmark in %s",

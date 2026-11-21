@@ -23,6 +23,8 @@ describe("OPERATIONS site-wallet companion honesty", () => {
     expect(operations).toContain("read-only previews of the exact rows");
     expect(operations).toContain("top-up expire");
     expect(operations).toContain("withdrawal expire");
+    expect(operations).toContain("reviewStatus=refund_recommended");
+    expect(operations).toContain("recommendation is never an executed refund");
     expect(operations).toContain("not a production deploy");
     expect(operations).toContain("CHECKOUT_DISABLED");
 
