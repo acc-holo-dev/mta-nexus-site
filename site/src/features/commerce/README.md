@@ -23,7 +23,10 @@ Ledger activity: `GET /api/wallet/activity`. Seller holds: `GET /api/wallet/held
 7-day baseline). Personal and organization seller accounts (`user:` / `org:`) —
 org inspect/release requires owner/admin membership. Admin batch release:
 `POST /api/admin/commerce/wallet-holds/release-matured` (across sellers).
-Workspace wallet shows a release CTA for matured personal/org holds.
+Admin stale unpaid order expiry:
+`POST /api/admin/commerce/wallet-orders/expire-stale` (pending, no payments/ledger;
+default 7d; admin providers page CTA). Workspace wallet shows a release CTA for
+matured personal/org holds.
 Organization owner/admin can inspect available balance and stub-top-up
 `org:` accounts via optional `organizationId` on balance/activity/topups.
 HTTP routes under `/api/wallet/*`, pay-with-wallet, checkout/wallet, and

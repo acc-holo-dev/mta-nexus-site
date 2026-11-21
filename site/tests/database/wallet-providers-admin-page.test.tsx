@@ -102,6 +102,7 @@ it("shows engine ops CTAs when the wallet engine is on", async () => {
   expect(html).toContain(copy.providersAdminOpsNote);
   expect(html).toContain(copy.providersAdminHoldSubmit);
   expect(html).toContain(copy.providersAdminTopupExpireSubmit);
+  expect(html).toContain(copy.providersAdminOrderExpireSubmit);
   expect(html).toContain(copy.providersAdminWithdrawExpireDisabled);
   expect(html).not.toContain(copy.providersAdminWithdrawExpireSubmit);
 });

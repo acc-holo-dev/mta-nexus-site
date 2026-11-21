@@ -217,6 +217,14 @@ const copy = {
       "Withdrawal expiry batch was not confirmed. Retry the same request.",
     providersAdminWithdrawExpireDisabled:
       "Withdrawal policy is off. Withdrawal expiry stays unavailable until NEXUS_WALLET_WITHDRAW=1.",
+    providersAdminOrderExpireTitle: "Expire stale unpaid pending orders",
+    providersAdminOrderExpireNote:
+      "Cancels pending orders older than the default age window with no payments and no ledger rows. Covers orphans from create-then-settle wallet checkout. Not a refund.",
+    providersAdminOrderExpireSubmit: "Expire stale unpaid orders",
+    providersAdminOrderExpireBusy: "Expiring stale unpaid orders…",
+    providersAdminOrderExpireSuccess: "Expired {count} unpaid pending order(s).",
+    providersAdminOrderExpireFailed:
+      "Unpaid order expiry batch was not confirmed. Retry the same request.",
     errors: {
       WALLET_ENGINE_DISABLED: "Wallet top-up is not available in this environment.",
       WALLET_TOPUP_INVALID: "Check amount, currency, provider and return path.",
@@ -482,6 +490,14 @@ const copy = {
       "Batch истечения выводов не подтверждён. Повторите тот же запрос.",
     providersAdminWithdrawExpireDisabled:
       "Политика вывода выключена. Истечение выводов недоступно, пока NEXUS_WALLET_WITHDRAW=1.",
+    providersAdminOrderExpireTitle: "Истечение устаревших неоплаченных заказов",
+    providersAdminOrderExpireNote:
+      "Отменяет pending-заказы старше окна по умолчанию без платежей и без ledger. Закрывает orphans после create-then-settle wallet checkout. Это не refund.",
+    providersAdminOrderExpireSubmit: "Истечь устаревшие неоплаченные заказы",
+    providersAdminOrderExpireBusy: "Истечение устаревших неоплаченных заказов…",
+    providersAdminOrderExpireSuccess: "Истекло неоплаченных pending-заказов: {count}.",
+    providersAdminOrderExpireFailed:
+      "Batch истечения неоплаченных заказов не подтверждён. Повторите тот же запрос.",
     errors: {
       WALLET_ENGINE_DISABLED: "Пополнение кошелька недоступно в этой среде.",
       WALLET_TOPUP_INVALID: "Проверьте сумму, валюту, провайдера и путь возврата.",

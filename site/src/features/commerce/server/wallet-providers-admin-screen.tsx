@@ -152,6 +152,16 @@ export async function WalletProvidersAdminScreen() {
                 successTemplate={copy.providersAdminTopupExpireSuccess}
                 failedLabel={copy.providersAdminTopupExpireFailed}
               />
+              <WalletAdminBatchForm
+                actorId={user.id}
+                path="/api/admin/commerce/wallet-orders/expire-stale"
+                title={copy.providersAdminOrderExpireTitle}
+                note={copy.providersAdminOrderExpireNote}
+                submitLabel={copy.providersAdminOrderExpireSubmit}
+                busyLabel={copy.providersAdminOrderExpireBusy}
+                successTemplate={copy.providersAdminOrderExpireSuccess}
+                failedLabel={copy.providersAdminOrderExpireFailed}
+              />
               {withdrawOn ? (
                 <WalletAdminBatchForm
                   actorId={user.id}

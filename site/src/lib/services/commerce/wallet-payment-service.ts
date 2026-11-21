@@ -1,8 +1,10 @@
 import {
   ledgerRepository,
+  orderOperationsRepository,
   orderRepository,
   organizationRepository,
   productRepository,
+  type StaleUnpaidOrderExpiry,
   type WalletOrderRefundResult,
   type WalletOrderSettlementResult,
   walletOrderSettlementRepository,
@@ -76,6 +78,7 @@ export class WalletPaymentService {
     private readonly orders = orderRepository,
     private readonly products = productRepository,
     private readonly holds = walletSellerHoldRepository,
+    private readonly orderOperations = orderOperationsRepository,
   ) {}
 
   /**
@@ -730,5 +733,31 @@ export class WalletPaymentService {
     }
     const olderThanIso = new Date(Date.parse(nowIso) - maxAgeMs).toISOString();
     return this.withdrawals.expireStaleAwaiting({ olderThanIso, limit: input.limit });
+  }
+
+  /**
+   * Admin batch: cancel stale unpaid pending orders (no payments, no ledger).
+   * Covers orphans from create-then-settle wallet checkout. Default age 7d.
+   */
+  async expireStalePendingOrders(input: {
+    actorId: string;
+    nowIso?: string;
+    maxAgeMs?: number;
+    limit?: number;
+  }): Promise<StaleUnpaidOrderExpiry[]> {
+    if (!isWalletEngineEnabled()) {
+      throw new AppError("Wallet engine is disabled", 404, "WALLET_ENGINE_DISABLED");
+    }
+    const nowIso = input.nowIso ?? new Date().toISOString();
+    const maxAgeMs = input.maxAgeMs ?? WALLET_INTENT_STALE_AFTER_MS;
+    if (!Number.isSafeInteger(maxAgeMs) || maxAgeMs < 60_000) {
+      throw new AppError("Stale intent max age is invalid", 400, "WALLET_INTENT_STALE_INVALID");
+    }
+    const olderThanIso = new Date(Date.parse(nowIso) - maxAgeMs).toISOString();
+    return this.orderOperations.expireStaleUnpaid({
+      actorId: input.actorId,
+      olderThanIso,
+      limit: input.limit,
+    });
   }
 }

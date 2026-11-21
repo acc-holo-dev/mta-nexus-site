@@ -12,6 +12,7 @@ const state = vi.hoisted(() => ({
   withdraw: true,
   expireStaleTopUps: vi.fn(),
   expireStaleWithdrawals: vi.fn(),
+  expireStalePendingOrders: vi.fn(),
 }));
 
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
@@ -24,6 +25,7 @@ vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
   WalletPaymentService: class {
     expireStaleTopUps = state.expireStaleTopUps;
     expireStaleWithdrawals = state.expireStaleWithdrawals;
+    expireStalePendingOrders = state.expireStalePendingOrders;
   },
 }));
 
@@ -32,6 +34,7 @@ vi.mock("@nexus/security", () => ({
   getClientIp: () => "127.0.0.1",
 }));
 
+import { POST as expireOrders } from "../../src/app/api/admin/commerce/wallet-orders/expire-stale/route";
 import { POST as expireTopUps } from "../../src/app/api/admin/commerce/wallet-topups/expire-stale/route";
 import { POST as expireWithdrawals } from "../../src/app/api/admin/commerce/wallet-withdrawals/expire-stale/route";
 
@@ -57,6 +60,7 @@ describe("admin wallet intent expiry HTTP", () => {
     state.withdraw = true;
     state.expireStaleTopUps.mockReset();
     state.expireStaleWithdrawals.mockReset();
+    state.expireStalePendingOrders.mockReset();
   });
 
   afterEach(() => {
@@ -129,6 +133,55 @@ describe("admin wallet intent expiry HTTP", () => {
     expect(await response.json()).toMatchObject({
       count: 1,
       expired: [{ id: "wwd_stale_1", status: "cancelled" }],
+    });
+  });
+
+  it("rejects non-admin unpaid order expiry", async () => {
+    state.user = { id: "usr_user", role: "user" };
+    const response = await expireOrders(
+      request("/api/admin/commerce/wallet-orders/expire-stale", {}, "usr_user"),
+    );
+    expect(response.status).toBe(403);
+    expect(state.expireStalePendingOrders).not.toHaveBeenCalled();
+  });
+
+  it("expires stale unpaid pending orders for admins", async () => {
+    const createdAt = new Date("2026-11-01T00:00:00.000Z");
+    const cancelledAt = new Date("2026-11-08T00:00:00.000Z");
+    state.expireStalePendingOrders.mockResolvedValueOnce([
+      {
+        id: "ord_stale_1",
+        orderNumber: "N-1001",
+        buyerId: "usr_buyer",
+        status: "cancelled",
+        totalAmount: 500,
+        currency: "EUR",
+        createdAt,
+        cancelledAt,
+      },
+    ]);
+    const response = await expireOrders(
+      request("/api/admin/commerce/wallet-orders/expire-stale", { limit: 10 }),
+    );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      count: 1,
+      expired: [
+        {
+          id: "ord_stale_1",
+          orderNumber: "N-1001",
+          status: "cancelled",
+          createdAt: createdAt.toISOString(),
+          cancelledAt: cancelledAt.toISOString(),
+        },
+      ],
+      actorId: "usr_admin",
+    });
+    expect(state.expireStalePendingOrders).toHaveBeenCalledWith({
+      actorId: "usr_admin",
+      nowIso: undefined,
+      maxAgeMs: undefined,
+      limit: 10,
     });
   });
 });

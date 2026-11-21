@@ -5,7 +5,7 @@ import {
   type OrderCancellationReceipt,
   UnauthorizedError,
 } from "@nexus/domain";
-import { and, count, desc, eq, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, lte, notExists, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   auditEvents,
@@ -20,6 +20,18 @@ import { lockInitiatingSession } from "./initiating-session";
 
 const fail = (code: string) =>
   new AppError("Order operation cannot be applied without reconciliation", 409, code);
+
+export type StaleUnpaidOrderExpiry = {
+  id: string;
+  orderNumber: string;
+  buyerId: string;
+  status: "cancelled";
+  totalAmount: number;
+  currency: string;
+  createdAt: Date;
+  cancelledAt: Date;
+};
+
 export class OrderOperationsRepository {
   async buyerDetail(buyerId: string, orderId: string, page = 1) {
     return db.transaction(
@@ -180,6 +192,93 @@ export class OrderOperationsRepository {
         requestId: command.requestId,
         cancelledAt: cancelled.updatedAt,
       };
+    });
+  }
+
+  /**
+   * Ops-expire stale unpaid pending orders: no payments, no ledger rows.
+   * Mirrors buyer unpaid cancel guards without cancellation receipts.
+   * Limited per invocation; empty batch is a successful no-op.
+   */
+  async expireStaleUnpaid(input: {
+    actorId: string;
+    olderThanIso: string;
+    limit?: number;
+  }): Promise<StaleUnpaidOrderExpiry[]> {
+    const olderThan = new Date(input.olderThanIso);
+    if (!Number.isFinite(olderThan.getTime())) {
+      throw new AppError("Stale order timestamp is invalid", 400, "WALLET_INTENT_STALE_INVALID");
+    }
+    const bounded = Math.min(
+      Math.max(Number.isSafeInteger(input.limit) ? (input.limit as number) : 20, 1),
+      50,
+    );
+    return db.transaction(async (tx) => {
+      await tx.execute(sql`set local lock_timeout = '5s'`);
+      const candidates = await tx
+        .select({
+          id: orders.id,
+          orderNumber: orders.orderNumber,
+          buyerId: orders.buyerId,
+          totalAmount: orders.totalAmount,
+          currency: orders.currency,
+          createdAt: orders.createdAt,
+        })
+        .from(orders)
+        .where(
+          and(
+            eq(orders.status, "pending"),
+            lte(orders.createdAt, olderThan),
+            notExists(
+              tx.select({ id: payments.id }).from(payments).where(eq(payments.orderId, orders.id)),
+            ),
+            notExists(
+              tx
+                .select({ id: ledgerEntries.id })
+                .from(ledgerEntries)
+                .where(eq(ledgerEntries.referenceId, orders.id)),
+            ),
+          ),
+        )
+        .orderBy(asc(orders.createdAt), asc(orders.id))
+        .limit(bounded)
+        .for("update");
+      const expired: StaleUnpaidOrderExpiry[] = [];
+      for (const current of candidates) {
+        const [cancelled] = await tx
+          .update(orders)
+          .set({
+            status: "cancelled",
+            updatedAt: sql`greatest(date_trunc('milliseconds', clock_timestamp()), ${orders.updatedAt} + interval '1 millisecond')`,
+          })
+          .where(and(eq(orders.id, current.id), eq(orders.status, "pending")))
+          .returning({ updatedAt: orders.updatedAt });
+        if (!cancelled) continue;
+        await tx.insert(auditEvents).values({
+          id: `aud_worder_expire_${current.id}`,
+          actorId: input.actorId,
+          actorType: "user",
+          action: "order.unpaid_cancelled",
+          targetId: current.id,
+          targetType: "order",
+          details: {
+            reason: "ops_stale_expire",
+            olderThanIso: input.olderThanIso,
+            orderNumber: current.orderNumber,
+          },
+        });
+        expired.push({
+          id: current.id,
+          orderNumber: current.orderNumber,
+          buyerId: current.buyerId,
+          status: "cancelled",
+          totalAmount: current.totalAmount,
+          currency: current.currency,
+          createdAt: current.createdAt,
+          cancelledAt: cancelled.updatedAt,
+        });
+      }
+      return expired;
     });
   }
 }
