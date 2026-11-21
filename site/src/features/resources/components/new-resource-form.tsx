@@ -571,9 +571,11 @@ export function NewResourceForm({
                       disabled={Boolean(createdProduct || intent)}
                       defaultValue="EUR"
                     >
-                      <option value="EUR">EUR</option>
-                      <option value="USD">USD</option>
-                      <option value="RUB">RUB</option>
+                      {(["EUR", "USD", "RUB"] as const).map((code) => (
+                        <option key={code} value={code}>
+                          {code}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </>
