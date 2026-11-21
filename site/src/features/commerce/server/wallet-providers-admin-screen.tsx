@@ -102,6 +102,9 @@ export async function WalletProvidersAdminScreen() {
   const eligibleHolds = engineOn
     ? await walletPaymentService.listAdminEligibleMaturedHolds().catch(() => null)
     : null;
+  const eligibleUnpaidOrders = engineOn
+    ? await walletPaymentService.listAdminEligibleStaleUnpaidOrders().catch(() => null)
+    : null;
   const recentTopups = engineOn
     ? await walletPaymentService.listAdminRecentTopUps().catch(() => null)
     : null;
@@ -228,6 +231,39 @@ export async function WalletProvidersAdminScreen() {
                 successTemplate={copy.providersAdminOrderExpireSuccess}
                 failedLabel={copy.providersAdminOrderExpireFailed}
               />
+              <section
+                className={panelSpace3P5}
+                aria-labelledby="wallet-admin-unpaid-preview-heading"
+              >
+                <h4 id="wallet-admin-unpaid-preview-heading" className={typeSemiboldPrimary}>
+                  {copy.providersAdminUnpaidPreviewTitle}
+                </h4>
+                <p role="note" className={typeXsMuted}>
+                  {copy.providersAdminUnpaidPreviewNote}
+                </p>
+                {eligibleUnpaidOrders === null ? (
+                  <p role="note" className={typeSmMuted}>
+                    {copy.providersAdminUnpaidPreviewUnavailable}
+                  </p>
+                ) : eligibleUnpaidOrders.length ? (
+                  <ul className={typeSpace2Sm}>
+                    {eligibleUnpaidOrders.map((order) => (
+                      <li key={order.id}>
+                        <p className={typeNumericPrimary}>
+                          {order.orderNumber} ·{" "}
+                          {formatFinancialMinor(order.totalAmount, order.currency, locale)}
+                        </p>
+                        <p className={typeXsMuted}>
+                          {copy.providersAdminUnpaidBuyer}: {order.buyerId} ·{" "}
+                          {copy.providersAdminUnpaidCreatedAt}: {order.createdAt} · {order.id}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className={typeSmMuted}>{copy.providersAdminUnpaidPreviewEmpty}</p>
+                )}
+              </section>
               {withdrawOn ? (
                 <WalletAdminBatchForm
                   actorId={user.id}

@@ -32,6 +32,16 @@ export type StaleUnpaidOrderExpiry = {
   cancelledAt: Date;
 };
 
+export type EligibleStaleUnpaidOrder = {
+  id: string;
+  orderNumber: string;
+  buyerId: string;
+  status: "pending";
+  totalAmount: number;
+  currency: string;
+  createdAt: string;
+};
+
 export class OrderOperationsRepository {
   async buyerDetail(buyerId: string, orderId: string, page = 1) {
     return db.transaction(
@@ -201,8 +211,11 @@ export class OrderOperationsRepository {
    * Mirrors buyer unpaid cancel guards without cancellation receipts.
    * Limited per invocation; empty batch is a successful no-op.
    */
-  /** Read-only count of unpaid pending orders the next expireStaleUnpaid batch would process. */
-  async countEligibleStaleUnpaid(input: { olderThanIso: string; limit?: number }): Promise<number> {
+  /** Read-only list of unpaid pending orders the next expireStaleUnpaid batch would process. */
+  async listEligibleStaleUnpaid(input: {
+    olderThanIso: string;
+    limit?: number;
+  }): Promise<EligibleStaleUnpaidOrder[]> {
     const olderThan = new Date(input.olderThanIso);
     if (!Number.isFinite(olderThan.getTime())) {
       throw new AppError("Stale order timestamp is invalid", 400, "WALLET_INTENT_STALE_INVALID");
@@ -212,7 +225,14 @@ export class OrderOperationsRepository {
       50,
     );
     const rows = await db
-      .select({ id: orders.id })
+      .select({
+        id: orders.id,
+        orderNumber: orders.orderNumber,
+        buyerId: orders.buyerId,
+        totalAmount: orders.totalAmount,
+        currency: orders.currency,
+        createdAt: orders.createdAt,
+      })
       .from(orders)
       .where(
         and(
@@ -231,7 +251,20 @@ export class OrderOperationsRepository {
       )
       .orderBy(asc(orders.createdAt), asc(orders.id))
       .limit(bounded);
-    return rows.length;
+    return rows.map((row) => ({
+      id: row.id,
+      orderNumber: row.orderNumber,
+      buyerId: row.buyerId,
+      status: "pending" as const,
+      totalAmount: row.totalAmount,
+      currency: row.currency,
+      createdAt: row.createdAt.toISOString(),
+    }));
+  }
+
+  /** Read-only count of unpaid pending orders the next expireStaleUnpaid batch would process. */
+  async countEligibleStaleUnpaid(input: { olderThanIso: string; limit?: number }): Promise<number> {
+    return (await this.listEligibleStaleUnpaid(input)).length;
   }
 
   async expireStaleUnpaid(input: {

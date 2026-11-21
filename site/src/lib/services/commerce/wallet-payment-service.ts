@@ -1,5 +1,6 @@
 import {
   buildRepository,
+  type EligibleStaleUnpaidOrder,
   ledgerRepository,
   orderOperationsRepository,
   orderRepository,
@@ -735,6 +736,28 @@ export class WalletPaymentService {
       throw new AppError("Wallet engine is disabled", 404, "WALLET_ENGINE_DISABLED");
     }
     return this.holds.listEligibleMatured(input);
+  }
+
+  /**
+   * Admin read-only unpaid pending orders the next expireStalePendingOrders batch would process.
+   * Does not mutate orders or ledger. Engine-gated. Default age WALLET_INTENT_STALE_AFTER_MS (7d).
+   */
+  async listAdminEligibleStaleUnpaidOrders(
+    input: { nowIso?: string; maxAgeMs?: number; limit?: number } = {},
+  ): Promise<EligibleStaleUnpaidOrder[]> {
+    if (!isWalletEngineEnabled()) {
+      throw new AppError("Wallet engine is disabled", 404, "WALLET_ENGINE_DISABLED");
+    }
+    const nowIso = input.nowIso ?? new Date().toISOString();
+    const maxAgeMs = input.maxAgeMs ?? WALLET_INTENT_STALE_AFTER_MS;
+    if (!Number.isSafeInteger(maxAgeMs) || maxAgeMs < 60_000) {
+      throw new AppError("Stale intent max age is invalid", 400, "WALLET_INTENT_STALE_INVALID");
+    }
+    const olderThanIso = new Date(Date.parse(nowIso) - maxAgeMs).toISOString();
+    return this.orderOperations.listEligibleStaleUnpaid({
+      olderThanIso,
+      limit: input.limit,
+    });
   }
 
   /**

@@ -249,6 +249,14 @@ const copy = {
     providersAdminOrderExpireSuccess: "Expired {count} unpaid pending order(s).",
     providersAdminOrderExpireFailed:
       "Unpaid order expiry batch was not confirmed. Retry the same request.",
+    providersAdminUnpaidPreviewTitle: "Eligible stale unpaid orders",
+    providersAdminUnpaidPreviewNote:
+      "Read-only preview of unpaid pending orders the next expire batch would cancel under the default age window and limit. Not a cron and not a refund. This list does not cancel orders.",
+    providersAdminUnpaidPreviewEmpty: "No unpaid pending orders are eligible for the next batch.",
+    providersAdminUnpaidPreviewUnavailable:
+      "Eligible unpaid orders are temporarily unavailable. The expire CTA above is unchanged.",
+    providersAdminUnpaidBuyer: "Buyer",
+    providersAdminUnpaidCreatedAt: "Created at (UTC)",
     errors: {
       WALLET_ENGINE_DISABLED: "Wallet top-up is not available in this environment.",
       WALLET_TOPUP_INVALID: "Check amount, currency, provider and return path.",
@@ -546,6 +554,14 @@ const copy = {
     providersAdminOrderExpireSuccess: "Истекло неоплаченных pending-заказов: {count}.",
     providersAdminOrderExpireFailed:
       "Batch истечения неоплаченных заказов не подтверждён. Повторите тот же запрос.",
+    providersAdminUnpaidPreviewTitle: "Eligible устаревшие неоплаченные заказы",
+    providersAdminUnpaidPreviewNote:
+      "Read-only preview неоплаченных pending-заказов, которые отменит следующий expire batch при окне и лимите по умолчанию. Это не cron и не refund. Список не отменяет заказы.",
+    providersAdminUnpaidPreviewEmpty: "Нет неоплаченных pending-заказов для следующего batch.",
+    providersAdminUnpaidPreviewUnavailable:
+      "Eligible неоплаченные заказы временно недоступны. CTA истечения выше не изменился.",
+    providersAdminUnpaidBuyer: "Покупатель",
+    providersAdminUnpaidCreatedAt: "Created at (UTC)",
     errors: {
       WALLET_ENGINE_DISABLED: "Пополнение кошелька недоступно в этой среде.",
       WALLET_TOPUP_INVALID: "Проверьте сумму, валюту, провайдера и путь возврата.",

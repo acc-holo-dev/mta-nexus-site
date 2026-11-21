@@ -43,5 +43,17 @@ describe("wallet admin batch eligible preview honesty", () => {
     expect(topups).toContain("countEligibleStaleAwaiting");
     expect(withdrawals).toContain("countEligibleStaleAwaiting");
     expect(orders).toContain("countEligibleStaleUnpaid");
+    expect(orders).toContain("listEligibleStaleUnpaid");
+    const unpaidListStart = orders.indexOf("async listEligibleStaleUnpaid");
+    const unpaidCountStart = orders.indexOf("async countEligibleStaleUnpaid");
+    expect(unpaidListStart).toBeGreaterThan(-1);
+    expect(unpaidCountStart).toBeGreaterThan(unpaidListStart);
+    const unpaidList = orders.slice(unpaidListStart, unpaidCountStart);
+    expect(unpaidList).toContain("toISOString()");
+    expect(unpaidList).not.toContain('for("update")');
+    const unpaidCountEnd = orders.indexOf("async expireStaleUnpaid", unpaidCountStart);
+    const unpaidCount = orders.slice(unpaidCountStart, unpaidCountEnd);
+    expect(unpaidCount).toContain("return (await this.listEligibleStaleUnpaid(input)).length;");
+    expect(unpaidCount).not.toContain('for("update")');
   });
 });

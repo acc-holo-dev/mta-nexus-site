@@ -84,6 +84,17 @@ vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
         releaseLedgerBatchId: null,
       },
     ];
+    listAdminEligibleStaleUnpaidOrders = async () => [
+      {
+        id: "ord_stale",
+        orderNumber: "NX-STALE-1",
+        buyerId: "usr_buyer",
+        status: "pending",
+        totalAmount: 1200,
+        currency: "USD",
+        createdAt: "2026-11-01T00:00:00.000Z",
+      },
+    ];
     listAdminRecentTopUps = async () => [
       {
         id: "top_a",
@@ -161,6 +172,10 @@ it("shows engine ops CTAs when the wallet engine is on", async () => {
   expect(html).toContain(copy.providersAdminHoldsPreviewNote);
   expect(html).toContain("user:usr_seller");
   expect(html).toContain("hold_a");
+  expect(html).toContain(copy.providersAdminUnpaidPreviewTitle);
+  expect(html).toContain(copy.providersAdminUnpaidPreviewNote);
+  expect(html).toContain("NX-STALE-1");
+  expect(html).toContain("ord_stale");
   expect(html).toContain(copy.providersAdminIntentsTitle);
   expect(html).toContain(copy.providersAdminIntentsNote);
   expect(html).toContain("user:usr_b");
