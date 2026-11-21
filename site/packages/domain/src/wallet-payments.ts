@@ -755,6 +755,117 @@ export function buildWalletSpendPosting(input: {
   return entries;
 }
 
+/**
+ * Staff-executed full wallet order refund (COM-001 ledger path).
+ * Credits the buyer, debits platform fee and either seller escrow (held) or
+ * seller available (released). Live PSP refund adapters stay off.
+ */
+export function buildWalletOrderRefundPosting(input: {
+  orderId: string;
+  buyerAccountId: string;
+  amount: number;
+  currency: WalletCurrency;
+  platformFee: number;
+  buyerEntryId: string;
+  platformFeeEntryId: string;
+  holds: ReadonlyArray<{
+    id: string;
+    sellerAccountId: string;
+    escrowAccountId: string;
+    amount: number;
+    status: WalletSellerHoldStatus;
+    entryId: string;
+  }>;
+}): LedgerPosting[] {
+  assertWalletAccountId(input.buyerAccountId);
+  assertWalletAmount(input.amount);
+  assertWalletCurrency(input.currency);
+  if (!/^[A-Za-z0-9_-]{1,128}$/u.test(input.orderId)) {
+    throw new AppError("Order id is invalid", 400, "WALLET_ORDER_INVALID");
+  }
+  if (
+    !Number.isSafeInteger(input.platformFee) ||
+    input.platformFee < 0 ||
+    input.platformFee > input.amount
+  ) {
+    throw new AppError("Platform fee is out of range", 400, "WALLET_REFUND_INVALID");
+  }
+  if (input.holds.length === 0 && input.platformFee !== input.amount) {
+    throw new AppError(
+      "Wallet refund requires seller holds or full fee",
+      400,
+      "WALLET_REFUND_INVALID",
+    );
+  }
+
+  let holdTotal = 0;
+  const seenHolds = new Set<string>();
+  const seenEntryIds = new Set<string>([input.buyerEntryId, input.platformFeeEntryId]);
+  for (const hold of input.holds) {
+    if (hold.status === "cancelled") {
+      throw new AppError("Hold is already cancelled", 409, "WALLET_HOLD_STATE");
+    }
+    if (hold.status !== "held" && hold.status !== "released") {
+      throw new AppError("Hold cannot be refunded in its current state", 409, "WALLET_HOLD_STATE");
+    }
+    assertSellerAccountId(hold.sellerAccountId);
+    assertEscrowAccountId(hold.escrowAccountId);
+    if (
+      seenHolds.has(hold.id) ||
+      seenEntryIds.has(hold.entryId) ||
+      !Number.isSafeInteger(hold.amount) ||
+      hold.amount <= 0
+    ) {
+      throw new AppError("Wallet refund hold lines are invalid", 400, "WALLET_REFUND_INVALID");
+    }
+    seenHolds.add(hold.id);
+    seenEntryIds.add(hold.entryId);
+    holdTotal += hold.amount;
+  }
+  if (input.platformFee + holdTotal !== input.amount) {
+    throw new AppError("Wallet refund split does not balance", 400, "WALLET_REFUND_INVALID");
+  }
+
+  const entries: LedgerPosting[] = [
+    {
+      id: input.buyerEntryId,
+      accountId: input.buyerAccountId,
+      amount: input.amount,
+      currency: input.currency,
+      referenceType: "refund",
+      referenceId: input.orderId,
+      description: `Wallet refund for order ${input.orderId}`,
+    },
+  ];
+  if (input.platformFee > 0) {
+    entries.push({
+      id: input.platformFeeEntryId,
+      accountId: "platform:marketplace",
+      amount: -input.platformFee,
+      currency: input.currency,
+      referenceType: "refund",
+      referenceId: input.orderId,
+      description: `Reverse platform fee for order ${input.orderId}`,
+    });
+  }
+  for (const hold of input.holds) {
+    entries.push({
+      id: hold.entryId,
+      accountId: hold.status === "held" ? hold.escrowAccountId : hold.sellerAccountId,
+      amount: -hold.amount,
+      currency: input.currency,
+      referenceType: "refund",
+      referenceId: input.orderId,
+      description:
+        hold.status === "held"
+          ? `Cancel seller hold ${hold.id} for refund ${input.orderId}`
+          : `Clawback seller proceeds ${hold.id} for refund ${input.orderId}`,
+    });
+  }
+  validateLedgerPosting(entries);
+  return entries;
+}
+
 /** Release a matured seller hold from escrow into the seller available balance. */
 export function buildWalletHoldReleasePosting(input: {
   hold: Pick<

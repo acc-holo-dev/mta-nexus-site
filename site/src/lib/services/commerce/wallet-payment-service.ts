@@ -3,6 +3,7 @@ import {
   orderRepository,
   organizationRepository,
   productRepository,
+  type WalletOrderRefundResult,
   type WalletOrderSettlementResult,
   walletOrderSettlementRepository,
   walletSellerHoldRepository,
@@ -508,6 +509,26 @@ export class WalletPaymentService {
     return this.settlements.settle({
       buyerId: input.user.id,
       currentToken: input.currentToken,
+      orderId: input.orderId,
+    });
+  }
+
+  /**
+   * Staff-executed full wallet order refund. Dark unless NEXUS_WALLET_ENGINE=1.
+   * Live PSP refund adapters stay off — this only reverses the site-wallet ledger.
+   */
+  async refundWalletOrder(input: {
+    actor: User;
+    orderId: string;
+  }): Promise<WalletOrderRefundResult> {
+    if (!isWalletEngineEnabled()) {
+      throw new AppError("Wallet engine is disabled", 404, "WALLET_ENGINE_DISABLED");
+    }
+    if (input.actor.role !== "admin") {
+      throw new ForbiddenError();
+    }
+    return this.settlements.refund({
+      actorId: input.actor.id,
       orderId: input.orderId,
     });
   }

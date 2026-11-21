@@ -51,6 +51,14 @@ export const walletTopUpQuerySchema = z
   })
   .strict();
 
+export const walletOrderRefundSchema = z
+  .object({
+    orderId: z
+      .string()
+      .regex(/^[A-Za-z0-9_-]{1,128}$/u, "Order id must be 1–128 URL-safe characters"),
+  })
+  .strict();
+
 export const walletBalanceQuerySchema = z
   .object({
     currency,

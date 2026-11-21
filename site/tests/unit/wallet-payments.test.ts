@@ -4,6 +4,7 @@ import {
   buildVerifiedTopUpCreditPosting,
   buildVerifiedWithdrawalPayoutPosting,
   buildWalletHoldReleasePosting,
+  buildWalletOrderRefundPosting,
   buildWalletSpendPosting,
   buildWithdrawalCancelPosting,
   buildWithdrawalHoldPosting,
@@ -254,6 +255,60 @@ describe("wallet payments domain", () => {
     });
     expect(() => validateLedgerPosting(cancelled)).not.toThrow();
     expect(markWithdrawalCancelled(awaiting).status).toBe("cancelled");
+  });
+
+  it("refunds a wallet order from held escrow and platform fee", () => {
+    const entries = buildWalletOrderRefundPosting({
+      orderId: "ord_refund_1",
+      buyerAccountId: "user:usr_buyer",
+      amount: 1000,
+      currency: "EUR",
+      platformFee: 100,
+      buyerEntryId: "ldg_ref_buyer",
+      platformFeeEntryId: "ldg_ref_fee",
+      holds: [
+        {
+          id: "whold_1",
+          sellerAccountId: "user:usr_seller",
+          escrowAccountId: "escrow:wspend_ord_refund_1_seller",
+          amount: 900,
+          status: "held",
+          entryId: "ldg_ref_hold",
+        },
+      ],
+    });
+    expect(() => validateLedgerPosting(entries)).not.toThrow();
+    expect(entries.map((entry) => entry.accountId).sort()).toEqual([
+      "escrow:wspend_ord_refund_1_seller",
+      "platform:marketplace",
+      "user:usr_buyer",
+    ]);
+  });
+
+  it("claws back released seller available on wallet refund", () => {
+    const entries = buildWalletOrderRefundPosting({
+      orderId: "ord_refund_2",
+      buyerAccountId: "user:usr_buyer",
+      amount: 500,
+      currency: "EUR",
+      platformFee: 50,
+      buyerEntryId: "ldg_ref2_buyer",
+      platformFeeEntryId: "ldg_ref2_fee",
+      holds: [
+        {
+          id: "whold_2",
+          sellerAccountId: "org:org_sellers",
+          escrowAccountId: "escrow:wspend_ord_refund_2_seller",
+          amount: 450,
+          status: "released",
+          entryId: "ldg_ref2_hold",
+        },
+      ],
+    });
+    expect(() => validateLedgerPosting(entries)).not.toThrow();
+    expect(
+      entries.some((entry) => entry.accountId === "org:org_sellers" && entry.amount === -450),
+    ).toBe(true);
   });
 
   it("releases a matured seller hold from escrow to available", () => {

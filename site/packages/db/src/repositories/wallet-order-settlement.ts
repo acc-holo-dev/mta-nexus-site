@@ -2,11 +2,13 @@ import { createHash } from "node:crypto";
 import {
   AppError,
   allocateWalletSpendCommission,
+  buildWalletOrderRefundPosting,
   buildWalletSpendPosting,
   type LedgerEntry,
   type LedgerPosting,
   NotFoundError,
   type WalletCurrency,
+  walletAccountIdForUser,
   walletHoldReleaseAt,
 } from "@nexus/domain";
 import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
@@ -39,6 +41,20 @@ export type WalletOrderSettlementResult = {
   holdIds: string[];
 };
 
+export type WalletOrderRefundResult = {
+  orderId: string;
+  paymentId: string;
+  ledgerBatchId: string;
+  status: "refunded";
+  totalAmount: number;
+  currency: WalletCurrency;
+  entries: LedgerEntry[];
+  alreadyRefunded: boolean;
+  cancelledHoldIds: string[];
+  clawedBackHoldIds: string[];
+  expiredEntitlementIds: string[];
+};
+
 function sellerSuffix(sellerAccountId: string): string {
   return createHash("sha256").update(sellerAccountId).digest("hex").slice(0, 16);
 }
@@ -55,6 +71,17 @@ function walletSettleIds(orderId: string) {
     escrowAccountId: (sellerAccountId: string) =>
       `escrow:wspend_${orderId}_${sellerSuffix(sellerAccountId)}`,
     auditId: `aud_wspend_${orderId}`,
+  };
+}
+
+function walletRefundIds(orderId: string) {
+  return {
+    paymentId: `pay_wallet_${orderId}`,
+    ledgerBatchId: `wrefund_${orderId}`,
+    buyerEntryId: `ldg_wrefund_${orderId}_buyer`,
+    platformFeeEntryId: `ldg_wrefund_${orderId}_fee`,
+    holdEntryId: (holdId: string) => `ldg_wrefund_${orderId}_${holdId}`,
+    auditId: `aud_wrefund_${orderId}`,
   };
 }
 
@@ -382,6 +409,237 @@ export class WalletOrderSettlementRepository {
         alreadySettled: false,
         entitlementIds: granted,
         holdIds,
+      };
+    });
+  }
+
+  /**
+   * Staff full wallet refund: reverse spend ledger, cancel/clawback holds,
+   * mark payment+order refunded, expire download entitlements granted by settle.
+   * Live PSP refund adapters stay off.
+   */
+  async refund(input: { actorId: string; orderId: string }): Promise<WalletOrderRefundResult> {
+    if (!/^[A-Za-z0-9_-]{1,128}$/u.test(input.orderId)) {
+      throw new AppError("Order id is invalid", 400, "WALLET_ORDER_INVALID");
+    }
+    if (!/^[A-Za-z0-9_-]{1,128}$/u.test(input.actorId)) {
+      throw new AppError("Actor id is invalid", 400, "WALLET_REFUND_INVALID");
+    }
+    const settleIds = walletSettleIds(input.orderId);
+    const ids = walletRefundIds(input.orderId);
+
+    return db.transaction(async (tx) => {
+      await tx.execute(sql`set local lock_timeout = '5s'`);
+      await tx.execute(
+        sql`select pg_advisory_xact_lock(hashtext(${`wallet-refund:${input.orderId}`}))`,
+      );
+
+      const [order] = await tx
+        .select({
+          id: orders.id,
+          buyerId: orders.buyerId,
+          status: orders.status,
+          totalAmount: orders.totalAmount,
+          currency: orders.currency,
+        })
+        .from(orders)
+        .where(eq(orders.id, input.orderId))
+        .limit(1)
+        .for("update");
+      if (!order) throw new NotFoundError("Order", input.orderId);
+
+      const [payment] = await tx
+        .select({
+          id: payments.id,
+          status: payments.status,
+          amount: payments.amount,
+          currency: payments.currency,
+          provider: payments.provider,
+          providerTransactionId: payments.providerTransactionId,
+        })
+        .from(payments)
+        .where(and(eq(payments.orderId, order.id), eq(payments.id, settleIds.paymentId)))
+        .limit(1)
+        .for("update");
+      if (payment?.provider !== "wallet") {
+        throw new AppError("Order has no wallet payment to refund", 409, "WALLET_REFUND_STATE");
+      }
+      if (payment.status === "refunded" && order.status === "refunded") {
+        const entries = (await tx
+          .select()
+          .from(ledgerEntries)
+          .where(eq(ledgerEntries.batchId, ids.ledgerBatchId))
+          .orderBy(asc(ledgerEntries.id))) as LedgerEntry[];
+        return {
+          orderId: order.id,
+          paymentId: payment.id,
+          ledgerBatchId: ids.ledgerBatchId,
+          status: "refunded" as const,
+          totalAmount: order.totalAmount,
+          currency: order.currency as WalletCurrency,
+          entries,
+          alreadyRefunded: true,
+          cancelledHoldIds: [],
+          clawedBackHoldIds: [],
+          expiredEntitlementIds: [],
+        };
+      }
+      if (payment.status !== "completed" || order.status !== "completed") {
+        throw new AppError("Order cannot accept wallet refund", 409, "WALLET_REFUND_STATE");
+      }
+      if (
+        payment.amount !== order.totalAmount ||
+        payment.currency !== order.currency ||
+        payment.providerTransactionId !== settleIds.ledgerBatchId
+      ) {
+        throw new AppError("Wallet payment does not match order", 409, "WALLET_REFUND_STATE");
+      }
+
+      const holdRows = await tx
+        .select()
+        .from(walletSellerHolds)
+        .where(eq(walletSellerHolds.orderId, order.id))
+        .orderBy(asc(walletSellerHolds.id))
+        .for("update");
+      if (holdRows.some((row) => row.status === "cancelled")) {
+        throw new AppError("Seller hold already cancelled", 409, "WALLET_HOLD_STATE");
+      }
+
+      const currency = order.currency as WalletCurrency;
+      const holdTotal = holdRows.reduce((sum, row) => sum + row.amount, 0);
+      const platformFee = order.totalAmount - holdTotal;
+      if (!Number.isSafeInteger(platformFee) || platformFee < 0) {
+        throw new AppError("Wallet refund split does not balance", 400, "WALLET_REFUND_INVALID");
+      }
+
+      for (const row of holdRows) {
+        if (row.status === "released") {
+          const available = await accountBalanceInTransaction(tx, row.sellerAccountId, currency);
+          if (available < row.amount) {
+            throw new AppError(
+              "Seller available balance is insufficient for refund clawback",
+              409,
+              "WALLET_INSUFFICIENT_FUNDS",
+            );
+          }
+        }
+      }
+
+      const buyerAccountId = walletAccountIdForUser(order.buyerId);
+      const posting = buildWalletOrderRefundPosting({
+        orderId: order.id,
+        buyerAccountId,
+        amount: order.totalAmount,
+        currency,
+        platformFee,
+        buyerEntryId: ids.buyerEntryId,
+        platformFeeEntryId: ids.platformFeeEntryId,
+        holds: holdRows.map((row) => ({
+          id: row.id,
+          sellerAccountId: row.sellerAccountId,
+          escrowAccountId: row.escrowAccountId,
+          amount: row.amount,
+          status: row.status as "held" | "released",
+          entryId: ids.holdEntryId(row.id),
+        })),
+      });
+      const entries = await postLedgerBatchInTransaction(tx, ids.ledgerBatchId, posting);
+
+      const now = new Date();
+      const cancelledHoldIds: string[] = [];
+      const clawedBackHoldIds: string[] = [];
+      for (const row of holdRows) {
+        if (row.status === "held") {
+          const [updated] = await tx
+            .update(walletSellerHolds)
+            .set({ status: "cancelled", updatedAt: now })
+            .where(and(eq(walletSellerHolds.id, row.id), eq(walletSellerHolds.status, "held")))
+            .returning({ id: walletSellerHolds.id });
+          if (!updated) throw new AppError("Hold cancel raced", 409, "WALLET_HOLD_STATE");
+          cancelledHoldIds.push(row.id);
+        } else {
+          const [updated] = await tx
+            .update(walletSellerHolds)
+            .set({ status: "cancelled", updatedAt: now })
+            .where(and(eq(walletSellerHolds.id, row.id), eq(walletSellerHolds.status, "released")))
+            .returning({ id: walletSellerHolds.id });
+          if (!updated) throw new AppError("Hold clawback raced", 409, "WALLET_HOLD_STATE");
+          clawedBackHoldIds.push(row.id);
+        }
+      }
+
+      const [paymentUpdated] = await tx
+        .update(payments)
+        .set({ status: "refunded", updatedAt: now })
+        .where(and(eq(payments.id, payment.id), eq(payments.status, "completed")))
+        .returning({ id: payments.id });
+      if (!paymentUpdated) throw new AppError("Payment refund raced", 409, "WALLET_REFUND_STATE");
+
+      const [orderUpdated] = await tx
+        .update(orders)
+        .set({ status: "refunded", updatedAt: now })
+        .where(and(eq(orders.id, order.id), eq(orders.status, "completed")))
+        .returning({ id: orders.id });
+      if (!orderUpdated) throw new AppError("Order refund raced", 409, "WALLET_REFUND_STATE");
+
+      const lines = await tx
+        .select({ productId: orderItems.productId })
+        .from(orderItems)
+        .where(eq(orderItems.orderId, order.id));
+      const expiredEntitlementIds: string[] = [];
+      for (const line of lines) {
+        const entitlementId = `ent_${createHash("sha256")
+          .update(`wspend:${order.id}:${line.productId}`)
+          .digest("hex")
+          .slice(0, 32)}`;
+        const [expired] = await tx
+          .update(entitlements)
+          .set({ expiresAt: now })
+          .where(
+            and(
+              eq(entitlements.id, entitlementId),
+              eq(entitlements.subjectType, "user"),
+              eq(entitlements.subjectId, order.buyerId),
+              eq(entitlements.resourceId, line.productId),
+              eq(entitlements.permission, "product.download"),
+              or(sql`${entitlements.expiresAt} is null`, sql`${entitlements.expiresAt} > ${now}`),
+            ),
+          )
+          .returning({ id: entitlements.id });
+        if (expired) expiredEntitlementIds.push(expired.id);
+      }
+
+      await tx.insert(auditEvents).values({
+        id: ids.auditId,
+        actorId: input.actorId,
+        actorType: "user",
+        action: "order.wallet_refunded",
+        targetId: order.id,
+        targetType: "order",
+        details: {
+          paymentId: payment.id,
+          ledgerBatchId: ids.ledgerBatchId,
+          totalAmount: order.totalAmount,
+          currency: order.currency,
+          platformFee,
+          cancelledHoldCount: cancelledHoldIds.length,
+          clawedBackHoldCount: clawedBackHoldIds.length,
+          expiredEntitlementCount: expiredEntitlementIds.length,
+        },
+      });
+
+      return {
+        orderId: order.id,
+        paymentId: payment.id,
+        ledgerBatchId: ids.ledgerBatchId,
+        status: "refunded" as const,
+        totalAmount: order.totalAmount,
+        currency,
+        entries,
+        alreadyRefunded: false,
+        cancelledHoldIds,
+        clawedBackHoldIds,
+        expiredEntitlementIds,
       };
     });
   }

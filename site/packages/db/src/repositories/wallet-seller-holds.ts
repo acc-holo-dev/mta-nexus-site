@@ -43,6 +43,18 @@ export class WalletSellerHoldRepository {
     return rows.map(mapHold);
   }
 
+  async listByOrderId(orderId: string): Promise<WalletSellerHold[]> {
+    if (!/^[A-Za-z0-9_-]{1,128}$/u.test(orderId)) {
+      throw new AppError("Order id is invalid", 400, "WALLET_ORDER_INVALID");
+    }
+    const rows = await db
+      .select()
+      .from(walletSellerHolds)
+      .where(eq(walletSellerHolds.orderId, orderId))
+      .orderBy(asc(walletSellerHolds.id));
+    return rows.map(mapHold);
+  }
+
   async sumHeldBySeller(sellerAccountId: string, currency: WalletCurrency): Promise<number> {
     const [row] = await db
       .select({
