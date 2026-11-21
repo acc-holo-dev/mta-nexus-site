@@ -1,6 +1,9 @@
 import { type LedgerPosting, validateLedgerPosting } from "@nexus/domain";
 import { expect, it } from "vitest";
-import { formatFinancialMinor } from "../../src/features/commerce/financial-i18n";
+import {
+  financialReferenceLabel,
+  formatFinancialMinor,
+} from "../../src/features/commerce/financial-i18n";
 import {
   financialReviewQuery,
   financialStatementQuery,
@@ -80,4 +83,15 @@ it("formats large minor-unit balances without floating-point or currency mixing"
   expect(formatFinancialMinor("1", "BTC", "en")).toBe("—");
   expect(formatFinancialMinor(-1, "USD", "en")).toBe("−0.01 USD");
   expect(formatFinancialMinor("100", "RUB", "ru")).toBe("1,00 RUB");
+});
+it("labels wallet ledger reference types in EN and RU", () => {
+  expect(financialReferenceLabel("en", "wallet_spend")).toBe("Wallet spend");
+  expect(financialReferenceLabel("en", "wallet_hold")).toBe("Seller hold");
+  expect(financialReferenceLabel("en", "topup")).toBe("Top-up");
+  expect(financialReferenceLabel("en", "withdrawal")).toBe("Withdrawal");
+  expect(financialReferenceLabel("ru", "wallet_spend")).toBe("Оплата с кошелька");
+  expect(financialReferenceLabel("ru", "wallet_hold")).toBe("Холд продавца");
+  expect(financialReferenceLabel("ru", "topup")).toBe("Пополнение");
+  expect(financialReferenceLabel("ru", "withdrawal")).toBe("Вывод");
+  expect(financialReferenceLabel("en", "mystery")).toBe("Unknown state");
 });

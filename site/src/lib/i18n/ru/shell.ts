@@ -10,6 +10,7 @@ export const shell = {
     liveServers: "Серверы",
     explore: "Обзор",
     freeResources: "Ресурсы",
+    marketResources: "Ресурсы",
     community: "Сообщество",
     updates: "Обновления",
     creators: "Авторы",
@@ -44,10 +45,13 @@ export const shell = {
   footer: {
     summary:
       "Активность MTA-серверов, обновления сообщества и бесплатные ресурсы в одном месте. Платные операции в открытой бесплатной бете отключены.",
+    walletSummary:
+      "Активность MTA-серверов, обновления сообщества и маркет ресурсов в одном месте. Покупка через site wallet может рассчитать платные листинги, когда движок кошелька включён; карточный checkout и live-выплаты остаются выключенными.",
     discover: "Найти",
     contribute: "Добавить",
     liveServers: "Серверы",
     freeResources: "Бесплатные ресурсы",
+    marketResources: "Ресурсы",
     communityUpdates: "Обновления сообщества",
     registerServer: "Добавить сервер",
     publishResource: "Опубликовать ресурс",

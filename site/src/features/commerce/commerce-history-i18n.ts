@@ -8,6 +8,8 @@ export const commerceHistoryCopy = {
     back: "Back to workspace",
     betaNotice:
       "Existing records only. Paid checkout, payouts, invoices, new licenses and paid renewals are not available in this open free beta.",
+    walletBetaNotice:
+      "Existing records only. Site-wallet purchase and settlement can run when the wallet engine is on. Card checkout, live payouts, invoices, and paid renewals stay off until those surfaces are enabled.",
     page: "Page",
     of: "of",
     previous: "Previous",
@@ -33,6 +35,11 @@ export const commerceHistoryCopy = {
     linePrice: "Historical line price",
     receiptNote:
       "The stored order state and amount do not activate access or confirm a new payment. Resource details reflect current visibility and access; withdrawn resources are hidden.",
+    walletReceiptNote:
+      "This order has a completed site-wallet settlement recorded in the ledger. That is an audited wallet debit, not card checkout or an external PSP capture. Purchased build evidence below is recorded metadata only — it does not pin download selection.",
+    purchasedBuildEvidence: "Recorded purchased build",
+    purchasedBuildEvidenceHint:
+      "Evidence from wallet settle metadata. Download still follows current library selection or latest published build.",
     status: "Status",
     placed: "Placed",
     total: "Order total",
@@ -74,6 +81,8 @@ export const commerceHistoryCopy = {
     loading: "Loading history…",
     grossNotice:
       "Amounts below are historical gross line prices, not your withdrawable balance, fees, earnings or payout authorization.",
+    walletGrossNotice:
+      "Amounts below are historical gross line prices. Seller proceeds from site-wallet sales sit in escrow held balance for 7 days before release into available site-wallet balance. This list is not a payout authorization.",
     grossPrice: "Gross line price",
     orderStatuses: {
       pending: "Pending",
@@ -97,6 +106,8 @@ export const commerceHistoryCopy = {
     back: "Вернуться в кабинет",
     betaNotice:
       "Только существующие данные. Оплата, вывод средств, счета, новые лицензии и платное продление пока недоступны в открытой бесплатной бете.",
+    walletBetaNotice:
+      "Только существующие данные. Покупка и расчёт через site wallet доступны, когда движок кошелька включён. Карточный checkout, live-выплаты, счета и платное продление остаются выключенными, пока эти поверхности не включены.",
     page: "Страница",
     of: "из",
     previous: "Назад",
@@ -122,6 +133,11 @@ export const commerceHistoryCopy = {
     linePrice: "Сохранённая цена позиции",
     receiptNote:
       "Сохранённые состояние и сумма заказа не выдают права и не подтверждают новый платёж. Данные ресурсов учитывают их текущую видимость и права доступа; снятые с публикации ресурсы скрыты.",
+    walletReceiptNote:
+      "По этому заказу записан completed расчёт через site wallet в ledger. Это аудируемое списание с кошелька, а не карточный checkout и не внешний PSP capture. Сведения о купленной сборке ниже — только metadata evidence; они не закрепляют выбор скачивания.",
+    purchasedBuildEvidence: "Зафиксированная купленная сборка",
+    purchasedBuildEvidenceHint:
+      "Evidence из metadata wallet settle. Скачивание по-прежнему следует текущему выбору в библиотеке или последней опубликованной сборке.",
     status: "Статус",
     placed: "Оформлен",
     total: "Сумма заказа",
@@ -161,6 +177,8 @@ export const commerceHistoryCopy = {
     loading: "Загрузка истории…",
     grossNotice:
       "Показана полная цена позиции заказа, а не доступный к выводу баланс, прибыль, комиссия или разрешение на выплату.",
+    walletGrossNotice:
+      "Показана полная цена позиции заказа. Поступления продавца от продаж через site wallet держатся в escrow (held) 7 дней, затем попадают в available баланс site wallet. Этот список не является разрешением на выплату.",
     grossPrice: "Цена позиции",
     orderStatuses: {
       pending: "Ожидает",
@@ -180,4 +198,9 @@ export const commerceHistoryCopy = {
 
 export function getCommerceHistoryCopy(locale: "en" | "ru") {
   return commerceHistoryCopy[locale];
+}
+
+export function commerceHistoryBetaNotice(locale: "en" | "ru", walletEnabled: boolean): string {
+  const copy = commerceHistoryCopy[locale];
+  return walletEnabled ? copy.walletBetaNotice : copy.betaNotice;
 }

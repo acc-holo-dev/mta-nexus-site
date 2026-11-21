@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellClip } from "../../shell/page-shell";
@@ -35,7 +36,11 @@ export async function ResourceCreateScreen() {
   if (!actor) return <PlatformSignIn locale={locale} returnPath="/workspace/resources/new" />;
   return (
     <div className={pageShellClip}>
-      <NewResourceForm key={actor.id} actorId={actor.id} />
+      <NewResourceForm
+        key={actor.id}
+        actorId={actor.id}
+        walletPaidPublishing={isWalletEngineEnabled()}
+      />
     </div>
   );
 }

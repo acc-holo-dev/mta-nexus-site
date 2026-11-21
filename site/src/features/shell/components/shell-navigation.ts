@@ -23,13 +23,18 @@ import { getManagedServerCopy } from "../../servers/managed-server-copy";
 import { publicationDestinations } from "./shell-publication-destinations";
 
 /** A single source for shared destinations; layouts retain their own labels and ordering. */
-export function shellNavigation(locale: Locale) {
+export function shellNavigation(locale: Locale, options: { walletEnabled?: boolean } = {}) {
   const dictionary = getDictionary(locale);
+  const walletEnabled = options.walletEnabled === true;
   const common = {
     home: { href: "/", label: dictionary.nav.home, icon: Home },
     servers: { href: "/servers", label: dictionary.nav.liveServers, icon: Server },
     discover: { href: "/discover", label: dictionary.nav.explore, icon: Compass },
-    market: { href: "/market", label: dictionary.nav.freeResources, icon: Library },
+    market: {
+      href: "/market",
+      label: walletEnabled ? dictionary.nav.marketResources : dictionary.nav.freeResources,
+      icon: Library,
+    },
     community: { href: "/community", label: dictionary.nav.community, icon: MessageSquare },
     articles: { href: "/articles", label: dictionary.nav.updates, icon: BookOpen },
     developers: { href: "/developers", label: dictionary.nav.creators, icon: Code2 },

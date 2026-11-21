@@ -1,6 +1,6 @@
 export const RELEASE_UPGRADE_BASELINE_TAG = "0024_product_type_invariant";
 export const RELEASE_UPGRADE_FAILURE_TAG = "0027_build_quarantine";
-export const RELEASE_UPGRADE_TARGET_TAG = "0091_wallet_topup_intents";
+export const RELEASE_UPGRADE_TARGET_TAG = "0094_wallet_withdrawal_intents";
 
 /** Current written evidence schema. Legacy retained CI artifacts may omit this field. */
 export const RELEASE_UPGRADE_EVIDENCE_SCHEMA_VERSION = 1;

@@ -3,6 +3,7 @@ import { SELLER_SALES_EVIDENCE } from "@nexus/domain";
 import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import {
   linkAccentSmRounded,
   linkAccentTightRounded,
@@ -48,6 +49,7 @@ export function SellerSalesReportView({
   locale: Locale;
 }) {
   const c = sellerSalesCopy(locale);
+  const walletEnabled = isWalletEngineEnabled();
   const resetHref = sellerSalesUrl({
     page: 1,
     days: "all",
@@ -85,7 +87,7 @@ export function SellerSalesReportView({
         {query.attribution === "recorded" ? c.recordedNotice : c.notice}
       </p>
       <p role="note" className={typeSmSecondary}>
-        {c.paymentNotice}
+        {walletEnabled ? c.walletPaymentNotice : c.paymentNotice}
       </p>
       <Link
         href={`/workspace/finance${query.organizationId ? `?${new URLSearchParams({ organizationId: query.organizationId })}` : ""}`}
@@ -93,6 +95,11 @@ export function SellerSalesReportView({
       >
         {c.finance}
       </Link>
+      {walletEnabled ? (
+        <Link href="/workspace/wallet" className={linkAccentTightSmRounded}>
+          {c.wallet}
+        </Link>
+      ) : null}
       <search aria-label={c.filters}>
         <form
           action="/workspace/sales/report"

@@ -27,7 +27,13 @@ type NavItem = {
   icon: typeof Server;
 };
 
-export function MobileNav({ locale }: { locale: Locale }) {
+export function MobileNav({
+  locale,
+  walletEnabled = false,
+}: {
+  locale: Locale;
+  walletEnabled?: boolean;
+}) {
   const pathname = usePathname();
   const dictionary = getDictionary(locale);
   const session = useAuthSession();
@@ -65,7 +71,7 @@ export function MobileNav({ locale }: { locale: Locale }) {
     setLoginHref(authEntryHref("login", currentBrowserReturnPath()));
   }, [pathname]);
 
-  const navigation = shellNavigation(locale);
+  const navigation = shellNavigation(locale, { walletEnabled });
   const items = navigation.mobilePrimary;
   const publicMoreItems = navigation.mobilePublic;
   const workspaceMoreItems = navigation.mobileWorkspace;

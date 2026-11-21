@@ -19,6 +19,7 @@ assert.equal(
 assert(process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_ID);
 assert(process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_SLUG);
 assert(process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_TITLE);
+assert(process.env.NEXUS_RESOURCE_BROWSER_BUILD_ID);
 assert(process.env.NEXUS_RESOURCE_BROWSER_PAID_PRODUCT_ID);
 assert(process.env.NEXUS_RESOURCE_BROWSER_PAID_PRODUCT_SLUG);
 assert(process.env.NEXUS_RESOURCE_BROWSER_PAID_PRODUCT_TITLE);
@@ -30,6 +31,7 @@ const output = resolve(process.env.NEXUS_BROWSER_REPORT_DIR);
 const productId = process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_ID;
 const productSlug = process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_SLUG;
 const productTitle = process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_TITLE;
+const productBuildId = process.env.NEXUS_RESOURCE_BROWSER_BUILD_ID;
 const paidProductId = process.env.NEXUS_RESOURCE_BROWSER_PAID_PRODUCT_ID;
 const paidProductTitle = process.env.NEXUS_RESOURCE_BROWSER_PAID_PRODUCT_TITLE;
 const expectedSha256 = process.env.NEXUS_RESOURCE_BROWSER_EXPECTED_SHA256;
@@ -157,7 +159,9 @@ test("J5 claim -> workspace -> download exact published build", async ({ page, b
     await addToLibraryLink.focus();
     await expect(addToLibraryLink).toBeFocused();
     await page.keyboard.press("Enter");
-    await expect(page).toHaveURL(new RegExp(`/acquire\\?productId=${productId}$`, "u"));
+    await expect(page).toHaveURL(
+      new RegExp(`/acquire\\?productId=${productId}&buildId=${productBuildId}$`, "u"),
+    );
     await expect(
       page.getByRole("heading", { name: "Add resource to library", exact: true }),
     ).toBeVisible();

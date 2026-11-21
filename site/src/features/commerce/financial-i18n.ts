@@ -19,13 +19,16 @@ const copy = {
     balance: "Recorded balance",
     credits: "Recorded credits",
     debits: "Recorded debits",
-    held: "Held funds",
-    available: "Available to withdraw",
+    held: "Seller holds (escrow)",
+    available: "Site wallet available",
+    availableLegacy: "Available to withdraw",
     unknown: "Not reconciled",
     journal: "Balanced journal",
     legacy: "Historical entry",
     empty: "No recorded financial operations.",
     note: "Recorded balances are grouped by currency. They do not prove funds are held, available or withdrawable. The original hold is 7 days; payment confirmation, hold allocation and payouts require a payment provider. This page creates no purchase, payment or access right.",
+    noteWallet:
+      "When the site wallet engine is on, held is seller escrow from wallet purchases (ECON-002) and available is the audited ledger balance for this account. Available is not a payout promise until withdrawal policy and a live payout adapter are enabled. Open Site wallet to release matured holds or manage top-ups.",
     review: "Financial reconciliation",
     evidenceDocumentTitle: "Recorded financial evidence",
     reviewLoading: "Loading financial reconciliation…",
@@ -47,6 +50,9 @@ const copy = {
     missingLedger: "Paid order has no ledger references",
     clear: "No structural discrepancy detected",
     details: "Recorded payment attempts",
+    provider: "Provider",
+    providerWallet: "Site wallet",
+    providerUnknown: "Recorded provider",
     ledger: "Referenced ledger totals",
     reference: "Reference",
     date: "Recorded (UTC)",
@@ -72,13 +78,16 @@ const copy = {
     balance: "Баланс по записям",
     credits: "Записанные поступления",
     debits: "Записанные списания",
-    held: "Удержанные средства",
-    available: "Доступно к выводу",
+    held: "Холды продавца (escrow)",
+    available: "Доступно в site wallet",
+    availableLegacy: "Доступно к выводу",
     unknown: "Не сверено",
     journal: "Сбалансированная проводка",
     legacy: "Историческая запись",
     empty: "Финансовых записей нет.",
     note: "Баланс показан отдельно по каждой валюте. Он не подтверждает удержание, доступность или возможность вывода средств. Исходное удержание — 7 дней; подтверждение платежа, распределение удержаний и выплаты требуют платёжного провайдера. Эта страница не создаёт покупки, платежи или права доступа.",
+    noteWallet:
+      "При включённом site wallet held — escrow продавца после покупок с кошелька (ECON-002), available — аудируемый ledger баланс этого счёта. Available не обещает вывод, пока не включены политика вывода и live payout adapter. Откройте «Кошелёк площадки», чтобы освободить созревшие холды или управлять пополнениями.",
     review: "Сверка финансовых состояний",
     evidenceDocumentTitle: "Зафиксированные финансовые доказательства",
     reviewLoading: "Загрузка сверки финансовых состояний…",
@@ -99,6 +108,9 @@ const copy = {
     missingLedger: "У платного заказа нет проводок",
     clear: "Структурных расхождений не обнаружено",
     details: "Записанные попытки оплаты",
+    provider: "Провайдер",
+    providerWallet: "Site wallet",
+    providerUnknown: "Записанный провайдер",
     ledger: "Итоги связанных проводок",
     reference: "Основание",
     date: "Дата записи (UTC)",
@@ -145,11 +157,43 @@ export function financialPaymentLabel(locale: Locale, status: string) {
   ).find((value) => value === status);
   return known ? labels[known] : labels.unknown;
 }
+
+export function financialProviderLabel(locale: Locale, provider: string) {
+  const labels = getFinancialCopy(locale);
+  if (provider === "wallet") return labels.providerWallet;
+  if (provider.trim()) return provider;
+  return labels.providerUnknown;
+}
+
+export function commercialProviderLabel(locale: Locale, provider: string): string {
+  const labels = getCommercialCopy(locale);
+  if (provider === "wallet") return labels.providerWallet;
+  if (provider.trim()) return provider;
+  return labels.providerUnknown;
+}
 export function financialReferenceLabel(locale: Locale, reference: string) {
   const labels =
     locale === "ru"
-      ? { order: "Заказ", fee: "Комиссия", payout: "Выплата", refund: "Возврат" }
-      : { order: "Order", fee: "Fee", payout: "Payout", refund: "Refund" };
+      ? {
+          order: "Заказ",
+          fee: "Комиссия",
+          payout: "Выплата",
+          refund: "Возврат",
+          topup: "Пополнение",
+          wallet_spend: "Оплата с кошелька",
+          wallet_hold: "Холд продавца",
+          withdrawal: "Вывод",
+        }
+      : {
+          order: "Order",
+          fee: "Fee",
+          payout: "Payout",
+          refund: "Refund",
+          topup: "Top-up",
+          wallet_spend: "Wallet spend",
+          wallet_hold: "Seller hold",
+          withdrawal: "Withdrawal",
+        };
   return Object.hasOwn(labels, reference)
     ? labels[reference as keyof typeof labels]
     : getCommercialCopy(locale).unknown;

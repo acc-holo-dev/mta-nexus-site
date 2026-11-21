@@ -1,18 +1,37 @@
 import {
+  allocateWalletSpendCommission,
+  assertSellerAccountId,
   buildVerifiedTopUpCreditPosting,
+  buildVerifiedWithdrawalPayoutPosting,
+  buildWalletHoldReleasePosting,
+  buildWalletOrderRefundPosting,
   buildWalletSpendPosting,
+  buildWithdrawalCancelPosting,
+  buildWithdrawalHoldPosting,
   createTopUpIntent,
+  createWithdrawalIntent,
+  defaultWalletPaymentProviders,
+  isWalletIntentStale,
   type LedgerPosting,
   markTopUpAwaitingProvider,
+  markTopUpCancelled,
+  markWithdrawalAwaitingProvider,
+  markWithdrawalCancelled,
   paymentProviderCapabilityMatrix,
   StubPaymentProvider,
   selectPaymentProvider,
   type TopUpIntent,
+  UnconfiguredPaymentProvider,
   validateLedgerPosting,
+  WALLET_INTENT_STALE_AFTER_MS,
+  walletAccountIdForOrganization,
+  walletAccountIdForUser,
+  walletHoldReleaseAt,
 } from "@nexus/domain";
 import { describe, expect, it } from "vitest";
 import {
   isWalletEngineEnabled,
+  isWalletWithdrawEnabled,
   WalletPaymentService,
 } from "../../src/lib/services/commerce/wallet-payment-service";
 
@@ -80,16 +99,30 @@ function memoryTopups() {
 
 function memoryLedger() {
   const batches = new Map<string, LedgerPosting[]>();
+  const lines: Array<LedgerPosting & { balanceAfter: number; createdAt: string }> = [];
   return {
     async post(idempotencyKey: string, entries: LedgerPosting[]) {
       validateLedgerPosting(entries);
       const existing = batches.get(idempotencyKey);
       if (existing) return existing;
       batches.set(idempotencyKey, entries);
+      for (const entry of entries) {
+        lines.push({
+          ...entry,
+          balanceAfter: entry.amount,
+          createdAt: "2026-11-21T02:00:00.000Z",
+        });
+      }
       return entries;
     },
     async getAccountBalance() {
       return 0;
+    },
+    async listRecentByAccount(accountId: string, currency: string, limit = 20) {
+      return lines
+        .filter((entry) => entry.accountId === accountId && entry.currency === currency)
+        .slice(-limit)
+        .reverse();
     },
   };
 }
@@ -116,6 +149,23 @@ describe("wallet payments domain", () => {
       "platform:psp_clearing_stub",
       "user:usr_buyer",
     ]);
+  });
+
+  it("cancels an awaiting top-up without ledger posting", () => {
+    const awaiting = markTopUpAwaitingProvider(baseIntent(), "stub_sess_wtop_cancel");
+    expect(markTopUpCancelled(awaiting).status).toBe("cancelled");
+    expect(markTopUpCancelled({ ...awaiting, status: "cancelled" }).status).toBe("cancelled");
+    expect(() => markTopUpCancelled({ ...awaiting, status: "succeeded" })).toThrow(
+      /cannot be cancelled/i,
+    );
+  });
+
+  it("detects stale wallet intents after the default age window", () => {
+    const createdAt = "2026-11-01T00:00:00.000Z";
+    const freshNow = "2026-11-02T00:00:00.000Z";
+    const staleNow = new Date(Date.parse(createdAt) + WALLET_INTENT_STALE_AFTER_MS).toISOString();
+    expect(isWalletIntentStale(createdAt, freshNow)).toBe(false);
+    expect(isWalletIntentStale(createdAt, staleNow)).toBe(true);
   });
 
   it("rejects amount mismatches and double credit", () => {
@@ -166,7 +216,152 @@ describe("wallet payments domain", () => {
     ).toThrow(/already credited/i);
   });
 
-  it("spends available balance and refuses overdraft", () => {
+  it("builds personal and organization seller account ids for holds", () => {
+    expect(walletAccountIdForUser("usr_seller")).toBe("user:usr_seller");
+    expect(walletAccountIdForOrganization("org_sellers")).toBe("org:org_sellers");
+    expect(() => assertSellerAccountId("user:usr_seller")).not.toThrow();
+    expect(() => assertSellerAccountId("org:org_sellers")).not.toThrow();
+    expect(() => assertSellerAccountId("escrow:wspend_1")).toThrow(/seller account/i);
+  });
+
+  it("holds available balance for a withdrawal until verified payout", () => {
+    const created = createWithdrawalIntent({
+      id: "wwd_test_intent_1",
+      accountId: "user:usr_buyer",
+      amount: 500,
+      currency: "EUR",
+      providerId: "stub",
+      idempotencyKey: "idem_withdraw_1",
+      nowIso: "2026-11-21T08:00:00.000Z",
+    });
+    const awaiting = markWithdrawalAwaitingProvider(created, "stub_payout_wwd_test_intent_1");
+    const hold = buildWithdrawalHoldPosting({
+      intent: awaiting,
+      availableBalance: 500,
+      userEntryId: "ldg_w_user",
+      escrowEntryId: "ldg_w_esc",
+    });
+    expect(() => validateLedgerPosting(hold)).not.toThrow();
+    const settle = buildVerifiedWithdrawalPayoutPosting({
+      intent: awaiting,
+      event: {
+        providerId: "stub",
+        providerEventId: "stub_evt_pay_1",
+        kind: "payout_succeeded",
+        intentId: awaiting.id,
+        amount: 500,
+        currency: "EUR",
+      },
+      escrowEntryId: "ldg_w_esc2",
+      clearingEntryId: "ldg_w_clr",
+    });
+    expect(() => validateLedgerPosting(settle)).not.toThrow();
+    expect(isWalletWithdrawEnabled({ NEXUS_WALLET_ENGINE: "1" })).toBe(false);
+    expect(isWalletWithdrawEnabled({ NEXUS_WALLET_ENGINE: "1", NEXUS_WALLET_WITHDRAW: "1" })).toBe(
+      true,
+    );
+    const cancelled = buildWithdrawalCancelPosting({
+      intent: awaiting,
+      escrowEntryId: "ldg_w_esc_cancel",
+      userEntryId: "ldg_w_user_cancel",
+    });
+    expect(() => validateLedgerPosting(cancelled)).not.toThrow();
+    expect(markWithdrawalCancelled(awaiting).status).toBe("cancelled");
+  });
+
+  it("refunds a wallet order from held escrow and platform fee", () => {
+    const entries = buildWalletOrderRefundPosting({
+      orderId: "ord_refund_1",
+      buyerAccountId: "user:usr_buyer",
+      amount: 1000,
+      currency: "EUR",
+      platformFee: 100,
+      buyerEntryId: "ldg_ref_buyer",
+      platformFeeEntryId: "ldg_ref_fee",
+      holds: [
+        {
+          id: "whold_1",
+          sellerAccountId: "user:usr_seller",
+          escrowAccountId: "escrow:wspend_ord_refund_1_seller",
+          amount: 900,
+          status: "held",
+          entryId: "ldg_ref_hold",
+        },
+      ],
+    });
+    expect(() => validateLedgerPosting(entries)).not.toThrow();
+    expect(entries.map((entry) => entry.accountId).sort()).toEqual([
+      "escrow:wspend_ord_refund_1_seller",
+      "platform:marketplace",
+      "user:usr_buyer",
+    ]);
+  });
+
+  it("claws back released seller available on wallet refund", () => {
+    const entries = buildWalletOrderRefundPosting({
+      orderId: "ord_refund_2",
+      buyerAccountId: "user:usr_buyer",
+      amount: 500,
+      currency: "EUR",
+      platformFee: 50,
+      buyerEntryId: "ldg_ref2_buyer",
+      platformFeeEntryId: "ldg_ref2_fee",
+      holds: [
+        {
+          id: "whold_2",
+          sellerAccountId: "org:org_sellers",
+          escrowAccountId: "escrow:wspend_ord_refund_2_seller",
+          amount: 450,
+          status: "released",
+          entryId: "ldg_ref2_hold",
+        },
+      ],
+    });
+    expect(() => validateLedgerPosting(entries)).not.toThrow();
+    expect(
+      entries.some((entry) => entry.accountId === "org:org_sellers" && entry.amount === -450),
+    ).toBe(true);
+  });
+
+  it("releases a matured seller hold from escrow to available", () => {
+    const heldAt = "2026-11-01T00:00:00.000Z";
+    const releaseAt = walletHoldReleaseAt(heldAt, 7);
+    const entries = buildWalletHoldReleasePosting({
+      hold: {
+        id: "whold_1",
+        orderId: "ord_hold_1",
+        sellerAccountId: "user:usr_seller",
+        escrowAccountId: "escrow:wspend_ord_hold_1_seller",
+        amount: 360,
+        currency: "EUR",
+        status: "held",
+        releaseAt,
+      },
+      escrowEntryId: "ldg_rel_esc",
+      sellerEntryId: "ldg_rel_sel",
+      nowIso: releaseAt,
+    });
+    expect(() => validateLedgerPosting(entries)).not.toThrow();
+    expect(() =>
+      buildWalletHoldReleasePosting({
+        hold: {
+          id: "whold_1",
+          orderId: "ord_hold_1",
+          sellerAccountId: "user:usr_seller",
+          escrowAccountId: "escrow:wspend_ord_hold_1_seller",
+          amount: 360,
+          currency: "EUR",
+          status: "held",
+          releaseAt,
+        },
+        escrowEntryId: "ldg_rel_esc2",
+        sellerEntryId: "ldg_rel_sel2",
+        nowIso: heldAt,
+      }),
+    ).toThrow(/not matured/i);
+  });
+
+  it("spends available balance into escrow holds with commission and refuses overdraft", () => {
     const entries = buildWalletSpendPosting({
       accountId: "user:usr_buyer",
       amount: 400,
@@ -174,9 +369,24 @@ describe("wallet payments domain", () => {
       orderId: "ord_spend_1",
       availableBalance: 1500,
       userEntryId: "leg_spend_u",
-      marketplaceEntryId: "leg_spend_m",
+      platformFeeEntryId: "leg_spend_fee",
+      platformFee: 40,
+      sellerHolds: [
+        {
+          sellerAccountId: "user:usr_seller",
+          escrowAccountId: "escrow:wspend_ord_spend_1_seller",
+          amount: 360,
+          entryId: "leg_spend_h",
+        },
+      ],
     });
     expect(() => validateLedgerPosting(entries)).not.toThrow();
+    expect(entries.map((entry) => entry.accountId).sort()).toEqual([
+      "escrow:wspend_ord_spend_1_seller",
+      "platform:marketplace",
+      "user:usr_buyer",
+    ]);
+    expect(entries.some((entry) => entry.referenceType === "wallet_hold")).toBe(true);
     expect(() =>
       buildWalletSpendPosting({
         accountId: "user:usr_buyer",
@@ -185,7 +395,16 @@ describe("wallet payments domain", () => {
         orderId: "ord_spend_2",
         availableBalance: 1500,
         userEntryId: "leg_spend_u2",
-        marketplaceEntryId: "leg_spend_m2",
+        platformFeeEntryId: "leg_spend_fee2",
+        platformFee: 160,
+        sellerHolds: [
+          {
+            sellerAccountId: "user:usr_seller",
+            escrowAccountId: "escrow:wspend_ord_spend_2_seller",
+            amount: 1440,
+            entryId: "leg_spend_h2",
+          },
+        ],
       }),
     ).toThrow(/Insufficient wallet balance/i);
   });
@@ -201,6 +420,41 @@ describe("wallet payments domain", () => {
       },
     ]);
     expect(selectPaymentProvider([stub], "stub", "topup").id).toBe("stub");
+  });
+
+  it("registers stub plus dark live ports with liveConfigured false by default", () => {
+    const ports = defaultWalletPaymentProviders();
+    expect(ports.map((port) => port.id)).toEqual(["stub", "stripe", "yookassa", "crypto"]);
+    const matrix = paymentProviderCapabilityMatrix(ports);
+    expect(matrix.every((row) => row.liveConfigured === false)).toBe(true);
+    expect(matrix.map((row) => row.id)).toEqual(["stub", "stripe", "yookassa", "crypto"]);
+  });
+
+  it("dark live ports refuse sessions and webhooks as not configured", async () => {
+    const stripe = new UnconfiguredPaymentProvider("stripe");
+    await expect(
+      stripe.createTopUpSession({
+        intentId: "wtop_dark",
+        accountId: "user:usr_a",
+        amount: 100,
+        currency: "USD",
+        idempotencyKey: "idem_dark",
+        returnPath: "/workspace/wallet",
+      }),
+    ).rejects.toMatchObject({ code: "PAYMENT_PROVIDER_NOT_CONFIGURED" });
+    await expect(
+      stripe.createPayoutSession({
+        intentId: "wwithdraw_dark",
+        accountId: "user:usr_a",
+        amount: 100,
+        currency: "USD",
+        idempotencyKey: "idem_dark_payout",
+      }),
+    ).rejects.toMatchObject({ code: "PAYMENT_PROVIDER_NOT_CONFIGURED" });
+    await expect(stripe.verifyWebhook({ rawBody: "{}", headers: {} })).rejects.toMatchObject({
+      code: "PAYMENT_PROVIDER_NOT_CONFIGURED",
+    });
+    expect(selectPaymentProvider([stripe], "stripe", "topup").id).toBe("stripe");
   });
 
   it("stub provider rejects unsigned webhooks and accepts signed top-up success", async () => {
@@ -280,17 +534,32 @@ describe("wallet payment service", () => {
     if (entries === null) throw new Error("expected ledger entries");
     expect(() => validateLedgerPosting(entries)).not.toThrow();
 
+    const split = allocateWalletSpendCommission({
+      lines: [{ grossAmount: 100, sellerAccountId: "user:usr_seller" }],
+      currency: "EUR",
+    });
+    expect(split.platformFee + split.sellerCredits.reduce((sum, c) => sum + c.amount, 0)).toBe(100);
     const spend = service.spendFromWallet({
       accountId: "user:usr_buyer",
       amount: 100,
       currency: "EUR",
       orderId: "ord_wallet_1",
       availableBalance: 250,
+      platformFee: split.platformFee,
+      sellerHolds: split.sellerCredits.map((credit) => ({
+        sellerAccountId: credit.accountId,
+        escrowAccountId: `escrow:wspend_ord_wallet_1_${credit.accountId.slice(5)}`,
+        amount: credit.amount,
+      })),
     });
     expect(() => validateLedgerPosting(spend)).not.toThrow();
+    expect(spend.some((entry) => entry.referenceType === "wallet_hold")).toBe(true);
 
     const history = await service.listRecentTopUps("user:usr_buyer");
     expect(history).toHaveLength(1);
     expect(history[0]?.id).toBe(started.intent.id);
+
+    const activity = await service.listRecentActivity("user:usr_buyer", "EUR");
+    expect(activity.some((entry) => entry.referenceType === "topup")).toBe(true);
   });
 });

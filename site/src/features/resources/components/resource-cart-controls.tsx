@@ -24,7 +24,11 @@ import { resourceCartReceiptsCopy } from "../resource-cart-receipts-i18n";
 import { resourceCartReceiptUrl } from "../resource-cart-receipts-query";
 import { confirmedResourceCartReview } from "../resource-cart-review-confirmation";
 import { confirmedCartAcquisition, confirmedResourceCart } from "../resource-commerce-confirmation";
-import { getResourceCommerceCopy, resourceCommerceError } from "../resource-commerce-i18n";
+import {
+  getResourceCommerceCopy,
+  resourceCartHonestyCopy,
+  resourceCommerceError,
+} from "../resource-commerce-i18n";
 import { ResourceCartReviewEvidence } from "./resource-cart-review-evidence";
 
 const buttonClass =
@@ -36,14 +40,17 @@ export function AddResourceToCart({
   productId,
   signedIn,
   returnPath,
+  walletEnabled = false,
 }: {
   productId: string;
   signedIn: boolean;
   /** Guest return preserves cart intent without auto-claim after login. */
   returnPath?: string | null;
+  walletEnabled?: boolean;
 }) {
   const { locale } = useNexusLocale();
   const copy = getResourceCommerceCopy(locale);
+  const honesty = resourceCartHonestyCopy(locale, walletEnabled);
   const [busy, setBusy] = useState(false);
   const [added, setAdded] = useState(false);
   const [error, setError] = useState("");
@@ -59,7 +66,7 @@ export function AddResourceToCart({
   if (!signedIn)
     return (
       <div className="space-y-2">
-        <p className={typeXsMuted}>{copy.batchIntent}</p>
+        <p className={typeXsMuted}>{honesty.batchIntent}</p>
         <GuestAuthLinks
           loginHref={loginHref}
           registerHref={registerHref}
@@ -94,7 +101,7 @@ export function AddResourceToCart({
   }
   return (
     <div className="space-y-2" data-acquire-intent="batch">
-      <p className={typeXsMuted}>{copy.batchIntent}</p>
+      <p className={typeXsMuted}>{honesty.batchIntent}</p>
       {added ? (
         <Link href="/workspace/cart" className={`${buttonClass} w-full`}>
           {copy.added} · {copy.openCart}
@@ -116,9 +123,16 @@ export function AddResourceToCart({
   );
 }
 
-export function ResourceCartControls({ initialCart }: { initialCart: ResourceCart }) {
+export function ResourceCartControls({
+  initialCart,
+  walletEnabled = false,
+}: {
+  initialCart: ResourceCart;
+  walletEnabled?: boolean;
+}) {
   const { locale } = useNexusLocale();
   const copy = getResourceCommerceCopy(locale),
+    honesty = resourceCartHonestyCopy(locale, walletEnabled),
     receiptCopy = resourceCartReceiptsCopy(locale);
   function safeMessage(failure: unknown, fallback: string) {
     const text = failure instanceof Error ? failure.message : "";
@@ -276,7 +290,10 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
       <p aria-live="polite" className={typeSmSecondary}>
         {copy.cart}: {cart.items.length}/{cart.limit}
       </p>
-      <p className={typeSmSecondary}>{copy.batchIntent}</p>
+      <p className={typeSmSecondary}>{honesty.batchIntent}</p>
+      <p role="note" className={surfaceBgP4TextSmSecondary}>
+        {honesty.note}
+      </p>
       <p role="note" className={surfaceBgP4TextSmSecondary}>
         {receiptCopy.reviewNote}
       </p>
@@ -305,7 +322,7 @@ export function ResourceCartControls({ initialCart }: { initialCart: ResourceCar
       {!cart.items.length ? (
         <EmptyState
           title={copy.empty}
-          description={copy.subtitle}
+          description={honesty.subtitle}
           action={
             <Link href="/market" className={buttonClass}>
               {copy.browse}

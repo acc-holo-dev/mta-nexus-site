@@ -50,7 +50,7 @@ describe("resource detail acquisition surface", () => {
       expect(html).toContain("Detail Resource");
       expect(html).toContain(licenseModelLabel(locale, "unlimited"));
       expect(html).not.toContain("multiple_servers");
-      expect(html).toContain('href="/acquire?productId=prd_detail"');
+      expect(html).toContain('href="/acquire?productId=prd_detail&amp;buildId=bld_latest"');
       expect(html).toContain(copy.addToLibrary);
       expect(html).toContain(copy.latestBuildNotice);
       expect(html).toContain('href="/market/detail-resource/versions"');

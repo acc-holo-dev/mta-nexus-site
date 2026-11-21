@@ -645,6 +645,27 @@
       "when": 1794222000000,
       "tag": "0091_wallet_topup_intents",
       "breakpoints": true
+    },
+    {
+      "idx": 92,
+      "version": "7",
+      "when": 1794308400000,
+      "tag": "0092_ledger_wallet_reference_types",
+      "breakpoints": true
+    },
+    {
+      "idx": 93,
+      "version": "7",
+      "when": 1794394800000,
+      "tag": "0093_wallet_seller_holds",
+      "breakpoints": true
+    },
+    {
+      "idx": 94,
+      "version": "7",
+      "when": 1794481200000,
+      "tag": "0094_wallet_withdrawal_intents",
+      "breakpoints": true
     }
   ]
 }

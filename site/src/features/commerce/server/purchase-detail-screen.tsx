@@ -8,6 +8,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { commerceService } from "../../../lib/services/commerce/commerce-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { getResourceCommerceCopy } from "../../resources/resource-commerce-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
@@ -34,6 +35,8 @@ import { getCommerceHistoryCopy } from "../commerce-history-i18n";
 import { getCommercialCopy } from "../commercial-i18n";
 import { orderCaseCopy } from "../order-case-i18n";
 import { orderTermsCopy } from "../order-terms-i18n";
+import { getWalletCopy } from "../wallet-i18n";
+import { WalletPayOrderForm } from "../wallet-pay";
 export async function purchaseDetailMetadata(): Promise<Metadata> {
   return {
     title: `${getCommerceHistoryCopy(await getRequestLocale()).orderDetailsTitle} | MTA NEXUS`,
@@ -104,7 +107,10 @@ export async function PurchaseDetailScreen({
     );
   }
   if (!result) notFound();
-  const { order, items } = result;
+  const { order, items, walletSettled } = result;
+  const walletEnabled = isWalletEngineEnabled();
+  const canPayWithWallet = walletEnabled && order.status === "pending" && order.totalAmount > 0;
+  const walletCopy = getWalletCopy(typedLocale);
   return (
     <div className={pageShellMax4xl}>
       <header className="min-w-0 space-y-3 border-b border-base pb-5">
@@ -134,6 +140,17 @@ export async function PurchaseDetailScreen({
           </div>
         </dl>
       </header>
+      {canPayWithWallet ? (
+        <WalletPayOrderForm
+          key={`${actor.id}:${id}`}
+          actorId={actor.id}
+          orderId={id}
+          amountLabel={`${walletCopy.payTitle}: ${formatHistoryAmount(order.totalAmount, order.currency, typedLocale)}`}
+          amountMinor={order.totalAmount}
+          currency={order.currency}
+          canPay={canPayWithWallet}
+        />
+      ) : null}
       <Link
         href={`/workspace/purchases/${encodeURIComponent(id)}/operations`}
         className={linkAccentSmRounded}
@@ -153,7 +170,7 @@ export async function PurchaseDetailScreen({
         {orderTermsCopy(typedLocale).title}
       </Link>
       <p role="note" className={surfaceBgP4TextSmSecondary}>
-        {copy.receiptNote}
+        {walletSettled ? copy.walletReceiptNote : copy.receiptNote}
       </p>
       <section className={typeMinSpace4} aria-labelledby="order-items">
         <h2 id="order-items" className={typeXlSemiboldPrimary}>
@@ -179,6 +196,21 @@ export async function PurchaseDetailScreen({
                 <p className={typeSmMuted}>
                   {item.hasCurrentAccess ? copy.accessReady : copy.accessMissing}
                 </p>
+                {item.purchasedBuildId || item.purchasedVersion ? (
+                  <div className="space-y-1" data-purchased-build-evidence="">
+                    <p className={typeSmSecondary}>
+                      {copy.purchasedBuildEvidence}
+                      {item.purchasedVersion ? `: v${item.purchasedVersion}` : ""}
+                      {item.purchasedBuildId ? (
+                        <>
+                          {" "}
+                          <code className="break-all text-xs">{item.purchasedBuildId}</code>
+                        </>
+                      ) : null}
+                    </p>
+                    <p className={typeSmMuted}>{copy.purchasedBuildEvidenceHint}</p>
+                  </div>
+                ) : null}
                 {item.hasCurrentAccess && (
                   <Link href="/workspace/library" className={linkAccentSmRounded}>
                     {getResourceCommerceCopy(typedLocale).library}

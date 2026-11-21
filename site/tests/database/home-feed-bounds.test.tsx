@@ -132,6 +132,27 @@ describe("bounded home feed reads", () => {
     expect(html).toContain('href="/articles"');
   });
 
+  it("opens the full market from the hero when the wallet engine is on", async () => {
+    const previous = process.env.NEXUS_WALLET_ENGINE;
+    process.env.NEXUS_WALLET_ENGINE = "1";
+    try {
+      const html = renderToStaticMarkup(await HomePage());
+      expect(html).toContain('href="/market"');
+      expect(html).toContain("Browse resources");
+      expect(html).toContain("Site-wallet purchase");
+      // Free showcase section stays free-filtered.
+      expect(html).toContain('href="/market?maxPrice=0"');
+      expect(mocks.products).toHaveBeenCalledWith({
+        maxPrice: 0,
+        sort: "popular",
+        limit: 4,
+      });
+    } finally {
+      if (previous === undefined) delete process.env.NEXUS_WALLET_ENGINE;
+      else process.env.NEXUS_WALLET_ENGINE = previous;
+    }
+  });
+
   it("renders only the six bounded directory cards even if the snapshot is larger", async () => {
     mocks.directory.mockResolvedValue({
       isStale: false,

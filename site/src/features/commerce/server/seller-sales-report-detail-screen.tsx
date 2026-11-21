@@ -8,6 +8,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { sellerSalesService } from "../../../lib/services/commerce/seller-sales-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax3xl } from "../../shell/page-shell";
@@ -129,8 +130,13 @@ async function SellerSalesReportDetailScreen({ saleId, query }: { saleId: string
         {attribution === "recorded" ? c.recordedNotice : c.notice}
       </p>
       <p role="note" className={typeSmSecondary}>
-        {c.paymentNotice}
+        {isWalletEngineEnabled() ? c.walletPaymentNotice : c.paymentNotice}
       </p>
+      {isWalletEngineEnabled() ? (
+        <Link href="/workspace/wallet" className={linkAccentSmRounded}>
+          {c.wallet}
+        </Link>
+      ) : null}
       <dl className={panelSpace4P5}>
         {[
           [c.order, sale.orderNumber],

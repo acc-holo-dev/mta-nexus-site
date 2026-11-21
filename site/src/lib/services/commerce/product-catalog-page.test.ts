@@ -25,6 +25,7 @@ describe("free catalog page boundary", () => {
       featuredOnly: undefined,
       minPrice: 0,
       maxPrice: 0,
+      includeWalletPaidSingleServer: false,
       sort: "newest",
       query: "map",
       limit: 25,

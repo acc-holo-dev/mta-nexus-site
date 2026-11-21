@@ -170,6 +170,8 @@ describe("resource creation HTTP errors", () => {
       authorId: "usr_creator",
       status: "draft",
       price: 0,
+      currency: "USD",
+      licenseModel: "unlimited",
       tags: [],
       compatibility: { dependencies: [] },
     };

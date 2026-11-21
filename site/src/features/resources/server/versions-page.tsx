@@ -282,7 +282,9 @@ export async function PublicResourceVersionsPage({
             />
           ) : user ? (
             <Link
-              href={`/acquire?productId=${encodeURIComponent(product.id)}`}
+              href={`/acquire?productId=${encodeURIComponent(product.id)}${
+                history.releases[0] ? `&buildId=${encodeURIComponent(history.releases[0].id)}` : ""
+              }`}
               className={linkAccentSmRounded}
             >
               {copy.acquire}

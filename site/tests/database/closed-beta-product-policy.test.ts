@@ -7,6 +7,7 @@ const mocks = vi.hoisted(() => ({
   findBySlug: vi.fn(),
   createWithAudit: vi.fn(),
   findLatestPublishedByProduct: vi.fn(),
+  hasManagementAccess: vi.fn(),
   can: vi.fn(),
 }));
 
@@ -16,6 +17,7 @@ vi.mock("@nexus/db", () => ({
     findById: mocks.findById,
     findBySlug: mocks.findBySlug,
     createWithAudit: mocks.createWithAudit,
+    hasManagementAccess: mocks.hasManagementAccess,
     findPublishedFreeBySlugs: vi.fn(async () => []),
     listPublishedFreeDependingOnSlug: vi.fn(async () => []),
   },
@@ -33,6 +35,11 @@ vi.mock("@nexus/db", () => ({
 vi.mock("@nexus/security", () => ({
   generateId: vi.fn((prefix: string) => `${prefix}_test`),
   can: mocks.can,
+}));
+
+const walletState = vi.hoisted(() => ({ engine: false }));
+vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
+  isWalletEngineEnabled: () => walletState.engine,
 }));
 
 import { ProductService } from "../../src/lib/services/commerce/product-service";
@@ -89,6 +96,7 @@ describe("open free-beta product behavior", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    walletState.engine = false;
     mocks.can.mockReturnValue(true);
     mocks.list.mockResolvedValue([]);
     mocks.findLatestPublishedByProduct.mockResolvedValue({ id: "bld_1" });
@@ -104,6 +112,30 @@ describe("open free-beta product behavior", () => {
     expect(mocks.createWithAudit).not.toHaveBeenCalled();
   });
 
+  it("creates a paid single_server product when the wallet engine is on", async () => {
+    walletState.engine = true;
+    mocks.can.mockReturnValue(true);
+    const paidInput = {
+      ...createInput(1500),
+      currency: "EUR" as const,
+      licenseModel: "single_server" as const,
+    };
+    mocks.createWithAudit.mockResolvedValue(product({ ...paidInput, price: 1500 }));
+
+    await expect(service.createProduct(paidInput, actor, "session")).resolves.toMatchObject({
+      price: 1500,
+    });
+    expect(mocks.createWithAudit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        price: 1500,
+        currency: "EUR",
+        licenseModel: "single_server",
+      }),
+      expect.any(Object),
+      "session",
+    );
+  });
+
   it("rejects build release preflight for a legacy paid product", async () => {
     mocks.findById.mockResolvedValue(product({ price: 1000 }));
 
@@ -112,6 +144,16 @@ describe("open free-beta product behavior", () => {
       code: "PAID_RESOURCES_DISABLED",
     });
     expect(mocks.can).not.toHaveBeenCalled();
+  });
+
+  it("allows build release preflight for wallet paid single_server products", async () => {
+    walletState.engine = true;
+    mocks.findById.mockResolvedValue(product({ price: 1000, licenseModel: "single_server" }));
+    mocks.hasManagementAccess.mockResolvedValue(true);
+
+    await expect(service.assertCanReleaseBuild("prd_1", actor)).resolves.toMatchObject({
+      id: "prd_1",
+    });
   });
 
   it("forces public listing queries into the free-only range", async () => {
@@ -126,6 +168,27 @@ describe("open free-beta product behavior", () => {
       expect.objectContaining({
         minPrice: 0,
         maxPrice: 0,
+        includeWalletPaidSingleServer: false,
+        sort: "price_desc",
+        query: "resource",
+      }),
+    );
+  });
+
+  it("exposes paid single_server listings when the wallet engine is on", async () => {
+    walletState.engine = true;
+    await service.listProducts({
+      minPrice: 100,
+      maxPrice: 9999,
+      sort: "price_desc",
+      query: "resource",
+    });
+
+    expect(mocks.list).toHaveBeenCalledWith(
+      expect.objectContaining({
+        minPrice: 100,
+        maxPrice: 9999,
+        includeWalletPaidSingleServer: true,
         sort: "price_desc",
         query: "resource",
       }),
@@ -137,6 +200,15 @@ describe("open free-beta product behavior", () => {
 
     await expect(service.getProductBySlug("resource")).resolves.toBeNull();
     expect(mocks.findLatestPublishedByProduct).not.toHaveBeenCalled();
+  });
+
+  it("surfaces a published paid single_server product by slug when the wallet engine is on", async () => {
+    walletState.engine = true;
+    const paid = product({ price: 500, licenseModel: "single_server" });
+    mocks.findBySlug.mockResolvedValue(paid);
+
+    await expect(service.getProductBySlug("resource")).resolves.toBe(paid);
+    expect(mocks.findLatestPublishedByProduct).toHaveBeenCalledWith("prd_1");
   });
 
   it("keeps a published free product available when a published build exists", async () => {

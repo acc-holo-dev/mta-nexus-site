@@ -4,7 +4,13 @@ import { getDictionary, type Locale } from "../../../lib/i18n";
 import { typeFooterNavLink, typeSpace2Muted } from "../type-shell";
 import { FooterContribute } from "./footer-contribute";
 
-export function Footer({ locale }: { locale: Locale }) {
+export function Footer({
+  locale,
+  walletEnabled = false,
+}: {
+  locale: Locale;
+  walletEnabled?: boolean;
+}) {
   const dictionary = getDictionary(locale);
 
   return (
@@ -12,7 +18,9 @@ export function Footer({ locale }: { locale: Locale }) {
       <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-4 py-10 text-xs sm:px-6 lg:grid-cols-4 lg:px-8">
         <div className="col-span-2">
           <BrandMark href="/" size="sm" className="mb-3" />
-          <p className="max-w-sm leading-relaxed text-muted">{dictionary.footer.summary}</p>
+          <p className="max-w-sm leading-relaxed text-muted">
+            {walletEnabled ? dictionary.footer.walletSummary : dictionary.footer.summary}
+          </p>
         </div>
         <div>
           <h4 className="mb-3 font-label uppercase text-primary">{dictionary.footer.discover}</h4>
@@ -24,7 +32,9 @@ export function Footer({ locale }: { locale: Locale }) {
             </li>
             <li>
               <Link href="/market" className={typeFooterNavLink}>
-                {dictionary.footer.freeResources}
+                {walletEnabled
+                  ? dictionary.footer.marketResources
+                  : dictionary.footer.freeResources}
               </Link>
             </li>
             <li>

@@ -25,9 +25,15 @@ vi.mock("../../src/lib/services/accounts/auth-service", () => ({
 
 vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
   isWalletEngineEnabled: () => state.engine,
+  isWalletWithdrawEnabled: () => false,
   WalletPaymentService: class {
     getAvailableBalance = async () => 0;
     listRecentTopUps = async () => [];
+    listRecentActivity = async () => [];
+    getHeldBalance = async () => 0;
+    listHeld = async () => [];
+    listManageableOrganizationSellerAccounts = async () => [];
+    listRecentWithdrawals = async () => [];
   },
 }));
 

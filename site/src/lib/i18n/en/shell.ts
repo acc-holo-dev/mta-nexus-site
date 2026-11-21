@@ -10,6 +10,7 @@ export const shell = {
     liveServers: "Live Servers",
     explore: "Discover",
     freeResources: "Free Resources",
+    marketResources: "Resources",
     community: "Community",
     updates: "Updates",
     creators: "Creators",
@@ -44,10 +45,13 @@ export const shell = {
   footer: {
     summary:
       "Live MTA server activity, community updates, and free resources in one place. Paid commerce is not enabled during the open free beta.",
+    walletSummary:
+      "Live MTA server activity, community updates, and the resource market in one place. Site-wallet purchase can settle paid listings when the wallet engine is on; card checkout and live payouts stay off.",
     discover: "Discover",
     contribute: "Contribute",
     liveServers: "Live servers",
     freeResources: "Free resources",
+    marketResources: "Resources",
     communityUpdates: "Community updates",
     registerServer: "Register a server",
     publishResource: "Publish a resource",

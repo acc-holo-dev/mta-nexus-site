@@ -46,7 +46,7 @@ const copy = {
     of: "of",
     adminBack: "Back to administration",
     planNote:
-      "Published terms are announcements. Subscription purchase and activation are unavailable until a payment provider is integrated. These terms do not issue or extend resource licenses. Personal subscriptions will be limited to one active plan.",
+      "Published terms are announcements. Paid subscription purchase and activation are not settled through the site wallet or a live payment provider yet. These terms do not issue or extend resource licenses. Personal subscriptions will be limited to one active plan.",
     editNote:
       "Saving terms creates an immutable version and returns the plan to draft. Publish it again after review. Previous versions remain in history.",
     dirtyNote: "Save or discard your edits before changing publication state.",
@@ -83,6 +83,8 @@ const copy = {
     noAttempts: "No recorded payment attempts.",
     operationsNote:
       "This archive shows stored payment states; it does not independently confirm provider settlement. Cancellation is available only for a pending order with no payment attempts or financial entries. No refund or access grant is created.",
+    walletOperationsNote:
+      "Payment attempts list recorded providers. A completed site-wallet row is an audited ledger settle, not an external PSP capture. Cancellation remains only for unpaid pending orders with no attempts or ledger rows.",
     cannotCancel:
       "This order cannot be cancelled here. Orders with payment attempts require provider reconciliation.",
     cannotCancelHint:
@@ -104,6 +106,9 @@ const copy = {
     cancelledPayment: "Cancelled",
     status: "Status",
     amount: "Amount",
+    provider: "Provider",
+    providerWallet: "Site wallet",
+    providerUnknown: "Recorded provider",
     createdAt: "Created",
     updatedAt: "Updated",
     signIn: "Sign in",
@@ -180,7 +185,7 @@ const copy = {
     of: "из",
     adminBack: "Назад в администрирование",
     planNote:
-      "Опубликованные условия являются анонсом. Покупка и активация подписок недоступны до подключения платёжного провайдера. Тарифы не выдают и не продлевают лицензии на ресурсы. Личная подписка будет ограничена одним активным тарифом.",
+      "Опубликованные условия являются анонсом. Платная покупка и активация подписок пока не проводятся через site wallet и не через live платёжного провайдера. Тарифы не выдают и не продлевают лицензии на ресурсы. Личная подписка будет ограничена одним активным тарифом.",
     editNote:
       "Сохранение условий создаёт неизменяемую версию и возвращает тариф в черновик. После проверки опубликуйте его повторно. Предыдущие версии остаются в истории.",
     dirtyNote: "Сохраните или отмените правки перед изменением состояния публикации.",
@@ -217,6 +222,8 @@ const copy = {
     noAttempts: "Платёжных попыток не зафиксировано.",
     operationsNote:
       "Архив показывает сохранённые состояния платежей, а не независимое подтверждение расчёта провайдером. Отмена доступна только для ожидающего заказа без платёжных попыток и финансовых записей. Возврат денег и права доступа не создаются.",
+    walletOperationsNote:
+      "Список попыток показывает записанных провайдеров. Completed строка site wallet — аудируемый ledger settle, а не внешний PSP capture. Отмена по-прежнему только для неоплаченных pending-заказов без попыток и проводок.",
     cannotCancel:
       "Этот заказ нельзя отменить здесь. Заказы с платёжными попытками требуют сверки с провайдером.",
     cannotCancelHint:
@@ -238,6 +245,9 @@ const copy = {
     cancelledPayment: "Отменён",
     status: "Состояние",
     amount: "Сумма",
+    provider: "Провайдер",
+    providerWallet: "Site wallet",
+    providerUnknown: "Записанный провайдер",
     createdAt: "Создан",
     updatedAt: "Обновлён",
     signIn: "Войти",

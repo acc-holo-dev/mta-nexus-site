@@ -34,7 +34,10 @@ import {
   typeSmBoldPrimary,
   typeSmLeadingMuted,
 } from "../../shell/type-shell";
+import { formatHistoryAmount } from "../commerce-history-format";
 import { licenseModelLabel } from "../license-model-i18n";
+import { WalletCheckoutButton } from "../wallet-checkout";
+import { getWalletCopy } from "../wallet-i18n";
 
 interface ProductInfo {
   id: string;
@@ -46,6 +49,12 @@ interface ProductInfo {
   currentVersion: string;
 }
 
+export type AcquirePageProps = {
+  walletEnabled?: boolean;
+  actorId?: string | null;
+  signedIn?: boolean;
+};
+
 const shellClass = pageShellMax2xlStandard;
 const narrowShellClass = pageShellMaxXl;
 const primaryLinkClass =
@@ -53,11 +62,18 @@ const primaryLinkClass =
 const secondaryLinkClass =
   "inline-flex min-h-11 items-center justify-center rounded-lg border border-base bg-surface px-5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
-function AcquireContent() {
+function AcquireContent({
+  walletEnabled = false,
+  actorId = null,
+  signedIn = false,
+}: AcquirePageProps) {
   const searchParams = useSearchParams();
   const productId = searchParams.get("productId");
+  const rawBuildId = searchParams.get("buildId");
+  const buildId = rawBuildId && /^[A-Za-z0-9_-]{1,128}$/u.test(rawBuildId) ? rawBuildId : null;
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.checkout;
+  const walletCopy = getWalletCopy(locale);
   const authCopy = dictionary.auth;
   const claimCopy = resourceClaimApiCopy(locale);
   function safeMessage(failure: unknown, fallback: string) {
@@ -84,7 +100,9 @@ function AcquireContent() {
   const [error, setError] = useState<string | null>(null);
   const [needsSignIn, setNeedsSignIn] = useState(false);
   const acquireReturnPath = productId
-    ? `/acquire?productId=${encodeURIComponent(productId)}`
+    ? `/acquire?productId=${encodeURIComponent(productId)}${
+        buildId ? `&buildId=${encodeURIComponent(buildId)}` : ""
+      }`
     : null;
 
   // biome-ignore lint/correctness/useExhaustiveDependencies(loadRevision): Explicit refresh trigger; changing it must restart this request.
@@ -308,22 +326,24 @@ function AcquireContent() {
     );
   }
 
+  const walletPurchase = walletEnabled && product.price > 0;
   const formattedPrice =
     product.price === 0
       ? copy.free
-      : new Intl.NumberFormat(locale === "ru" ? "ru-RU" : "en-US", {
-          style: "currency",
-          currency: product.currency || "USD",
-        }).format(product.price / 100);
+      : formatHistoryAmount(product.price, product.currency || "USD", locale);
 
   return (
     <div className={shellClass}>
       <header className="min-w-0 border-b border-base pb-5">
         <h1 className={typeFlexMinCenterGap25Display}>
           <Library className={typeIcon6Accent} aria-hidden="true" />
-          <span className={typeMinBreakWords}>{copy.title}</span>
+          <span className={typeMinBreakWords}>
+            {walletPurchase ? walletCopy.checkoutTitle : copy.title}
+          </span>
         </h1>
-        <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted">{copy.description}</p>
+        <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted">
+          {walletPurchase ? walletCopy.checkoutNote : copy.description}
+        </p>
       </header>
 
       {error ? (
@@ -379,43 +399,60 @@ function AcquireContent() {
         </dl>
       </section>
 
-      <section
-        role={product.price > 0 ? "status" : undefined}
-        aria-live={product.price > 0 ? "polite" : undefined}
-        aria-atomic={product.price > 0 ? "true" : undefined}
-        aria-labelledby={accessHeadingId}
-        aria-describedby={accessDescriptionId}
-        className="nexus-panel min-w-0 space-y-2 overflow-x-clip p-6"
-      >
-        <h2 id={accessHeadingId} className={typeSmBoldPrimary}>
-          {product.price === 0 ? copy.freeResource : copy.paidCheckout}
-        </h2>
-        <p id={accessDescriptionId} className={typeSmLeadingMuted}>
-          {product.price === 0 ? copy.noPaymentRequired : copy.paidDisabled}
-        </p>
-      </section>
+      {walletPurchase ? (
+        <div className="space-y-3" data-acquire-intent="wallet">
+          <WalletCheckoutButton
+            actorId={actorId}
+            productId={product.id}
+            buildId={buildId ?? undefined}
+            amountLabel={formattedPrice}
+            amountMinor={product.price}
+            currency={product.currency || "USD"}
+            signedIn={signedIn}
+            signInHref={authEntryHref("login", acquireReturnPath ?? "/acquire")}
+          />
+        </div>
+      ) : (
+        <>
+          <section
+            role={product.price > 0 ? "status" : undefined}
+            aria-live={product.price > 0 ? "polite" : undefined}
+            aria-atomic={product.price > 0 ? "true" : undefined}
+            aria-labelledby={accessHeadingId}
+            aria-describedby={accessDescriptionId}
+            className="nexus-panel min-w-0 space-y-2 overflow-x-clip p-6"
+          >
+            <h2 id={accessHeadingId} className={typeSmBoldPrimary}>
+              {product.price === 0 ? copy.freeResource : copy.paidCheckout}
+            </h2>
+            <p id={accessDescriptionId} className={typeSmLeadingMuted}>
+              {product.price === 0 ? copy.noPaymentRequired : copy.paidDisabled}
+            </p>
+          </section>
 
-      <Button
-        type="button"
-        size="touch"
-        onClick={() => void handleClaim()}
-        disabled={product.price > 0}
-        aria-describedby={accessDescriptionId}
-        isLoading={loading}
-        className="w-full"
-      >
-        {loading ? copy.adding : product.price === 0 ? copy.addToLibrary : copy.paidUnavailable}
-      </Button>
+          <Button
+            type="button"
+            size="touch"
+            onClick={() => void handleClaim()}
+            disabled={product.price > 0}
+            aria-describedby={accessDescriptionId}
+            isLoading={loading}
+            className="w-full"
+          >
+            {loading ? copy.adding : product.price === 0 ? copy.addToLibrary : copy.paidUnavailable}
+          </Button>
 
-      <div role="note" className="flex items-center justify-center gap-2 text-xs text-muted">
-        <ShieldCheck className={typeIcon4Success} aria-hidden="true" />
-        <span>{copy.noSimulatedPayments}</span>
-      </div>
+          <div role="note" className="flex items-center justify-center gap-2 text-xs text-muted">
+            <ShieldCheck className={typeIcon4Success} aria-hidden="true" />
+            <span>{copy.noSimulatedPayments}</span>
+          </div>
+        </>
+      )}
     </div>
   );
 }
 
-export function AcquirePage() {
+export function AcquirePage(props: AcquirePageProps = {}) {
   const { dictionary } = useNexusLocale();
 
   return (
@@ -436,7 +473,7 @@ export function AcquirePage() {
         </HonestLoadingShell>
       }
     >
-      <AcquireContent />
+      <AcquireContent {...props} />
     </Suspense>
   );
 }

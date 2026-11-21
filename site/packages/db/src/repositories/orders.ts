@@ -15,6 +15,7 @@ import {
   licenses,
   orderItems,
   orders,
+  payments,
   products,
   users,
 } from "../schema";
@@ -40,6 +41,17 @@ export class OrderRepository {
           .where(and(eq(orders.id, orderId), eq(orders.buyerId, buyerId)))
           .limit(1);
         if (!order) return null;
+        const [walletSettle] = await tx
+          .select({ id: payments.id })
+          .from(payments)
+          .where(
+            and(
+              eq(payments.orderId, order.id),
+              eq(payments.provider, "wallet"),
+              eq(payments.status, "completed"),
+            ),
+          )
+          .limit(1);
         const [summary] = await tx
           .select({ total: count() })
           .from(orderItems)
@@ -57,6 +69,30 @@ export class OrderRepository {
         or exists (select 1 from ${licenses} where ${licenses.userId} = ${buyerId}
           and ${licenses.productId} = ${products.id} and ${licenses.status} = 'active'
           and (${licenses.expiresAt} is null or ${licenses.expiresAt} > ${now}))))`;
+        const purchasedBuildId = sql<string | null>`(
+          select ${entitlements.metadata}->>'buildId'
+          from ${entitlements}
+          where ${entitlements.subjectType} = 'user'
+            and ${entitlements.subjectId} = ${buyerId}
+            and ${entitlements.resourceId} = ${products.id}
+            and ${entitlements.permission} = 'product.download'
+            and (${entitlements.expiresAt} is null or ${entitlements.expiresAt} > ${now})
+            and coalesce(btrim(${entitlements.metadata}->>'buildId'), '') <> ''
+          order by ${entitlements.createdAt} desc, ${entitlements.id} desc
+          limit 1
+        )`;
+        const purchasedVersion = sql<string | null>`(
+          select ${entitlements.metadata}->>'version'
+          from ${entitlements}
+          where ${entitlements.subjectType} = 'user'
+            and ${entitlements.subjectId} = ${buyerId}
+            and ${entitlements.resourceId} = ${products.id}
+            and ${entitlements.permission} = 'product.download'
+            and (${entitlements.expiresAt} is null or ${entitlements.expiresAt} > ${now})
+            and coalesce(btrim(${entitlements.metadata}->>'version'), '') <> ''
+          order by ${entitlements.createdAt} desc, ${entitlements.id} desc
+          limit 1
+        )`;
         const items = await tx
           .select({
             id: orderItems.id,
@@ -70,6 +106,8 @@ export class OrderRepository {
               string | null
             >`case when (${available} and ${products.price} = 0) then ${products.slug} else null end`,
             hasCurrentAccess: sql<boolean>`coalesce(${currentAccess}, false)`,
+            purchasedBuildId,
+            purchasedVersion,
           })
           .from(orderItems)
           .innerJoin(products, eq(products.id, orderItems.productId))
@@ -77,7 +115,12 @@ export class OrderRepository {
           .orderBy(asc(orderItems.id))
           .limit(bounds.pageSize)
           .offset(bounds.offset);
-        return { order, items, ...bounds };
+        return {
+          order,
+          items,
+          walletSettled: Boolean(walletSettle),
+          ...bounds,
+        };
       },
       { isolationLevel: "repeatable read", accessMode: "read only" },
     );

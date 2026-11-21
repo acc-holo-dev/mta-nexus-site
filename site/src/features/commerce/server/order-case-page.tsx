@@ -10,6 +10,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { orderCaseService } from "../../../lib/services/commerce/order-case-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
@@ -31,6 +32,7 @@ import {
 import { SupportCaseThread } from "../../support/thread";
 import { formatHistoryAmount, formatHistoryDate } from "../commerce-history-format";
 import { OrderCaseCreateForm, OrderCaseReviewForm } from "../components/order-case-forms";
+import { WalletOrderRefundForm } from "../components/wallet-order-refund-form";
 import { financialOrderLabel, financialPaymentLabel } from "../financial-i18n";
 import {
   orderCaseCopy,
@@ -514,6 +516,13 @@ export async function OrderCaseDetailPage({
         ) : (
           <p className={typeSmSecondary}>{copy.independent}</p>
         ))}
+      {staff &&
+      actor.role === "admin" &&
+      isWalletEngineEnabled() &&
+      eligible &&
+      result.case.reviewStatus === "refund_recommended" ? (
+        <WalletOrderRefundForm actorId={actor.id} orderId={result.order.id} />
+      ) : null}
       <section className="space-y-3">
         <h2 className={typeLgSemibold}>{copy.history}</h2>
         <ol className="space-y-3">

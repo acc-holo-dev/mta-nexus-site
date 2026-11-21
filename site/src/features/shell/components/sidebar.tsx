@@ -31,10 +31,12 @@ export function Sidebar({
   locale,
   isCollapsed,
   onToggle,
+  walletEnabled = false,
 }: {
   locale: Locale;
   isCollapsed: boolean;
   onToggle: () => void;
+  walletEnabled?: boolean;
 }) {
   const pathname = usePathname();
   const [loginHref, setLoginHref] = useState(() => authEntryHref("login", pathname));
@@ -55,7 +57,7 @@ export function Sidebar({
     dictionary.nav.adminStaffHint,
   );
 
-  const navigation = shellNavigation(locale);
+  const navigation = shellNavigation(locale, { walletEnabled });
   const primaryNav = navigation.primary;
   const libraryNav = navigation.library;
   const serversNav = navigation.servers;

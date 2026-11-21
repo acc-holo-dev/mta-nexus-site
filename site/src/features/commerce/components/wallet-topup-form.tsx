@@ -18,19 +18,23 @@ import { parseCommercialAmount } from "../commercial-confirmation";
 import { formatFinancialMinor } from "../financial-i18n";
 import { getWalletCopy, walletError } from "../wallet-i18n";
 import { type ConfirmedWalletTopUp, confirmedWalletTopUp } from "../wallet-topup-confirmation";
+import { useWalletProviderSelection } from "./use-wallet-provider-selection";
 
 export function WalletTopUpForm({
   actorId,
   currency,
+  organizationId,
 }: {
   actorId: string;
   currency: "USD" | "EUR" | "RUB";
+  organizationId?: string;
 }) {
   const { locale } = useNexusLocale(),
     copy = getWalletCopy(locale),
     field = useId(),
     router = useRouter(),
     lock = useRef(false);
+  const provider = useWalletProviderSelection(actorId, "topup");
   const [amount, setAmount] = useState("10.00"),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
@@ -39,6 +43,11 @@ export function WalletTopUpForm({
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (lock.current) return;
+    if (provider.status !== "ready") {
+      setError(copy.unavailable);
+      setResult(null);
+      return;
+    }
     const minor = parseCommercialAmount(amount);
     if (minor === null || minor <= 0 || minor > 100_000_000) {
       setError(copy.invalid);
@@ -49,9 +58,12 @@ export function WalletTopUpForm({
     const parsed = walletTopUpCreateSchema.safeParse({
       amount: minor,
       currency,
-      providerId: "stub",
+      providerId: provider.providerId,
       idempotencyKey,
-      returnPath: "/workspace/wallet",
+      returnPath: organizationId
+        ? `/workspace/wallet?currency=${currency}`
+        : `/workspace/wallet?currency=${currency}`,
+      ...(organizationId ? { organizationId } : {}),
     });
     if (!parsed.success) {
       setError(copy.invalid);
@@ -72,7 +84,7 @@ export function WalletTopUpForm({
         ? confirmedWalletTopUp(body, {
             amount: minor,
             currency,
-            providerId: "stub",
+            providerId: provider.providerId,
           })
         : null;
       if (!confirmed) {
@@ -103,11 +115,19 @@ export function WalletTopUpForm({
 
   return (
     <form className={panelClipSpace4P5} onSubmit={submit}>
-      <h2 className={typeXlSemiboldPrimary}>{copy.topUp}</h2>
+      <h2 className={typeXlSemiboldPrimary}>{organizationId ? copy.orgTopUp : copy.topUp}</h2>
       <p className={typeSmSecondary} role="note">
-        {copy.topUpNote}
+        {organizationId ? copy.orgTopUpNote : copy.topUpNote}
       </p>
-      <fieldset disabled={busy} className={typeGrid2Gap4}>
+      {provider.status === "loading" ? (
+        <p role="status" className={typeSmSecondary}>
+          {copy.providersLoading}
+        </p>
+      ) : null}
+      {provider.status === "unavailable" ? (
+        <ErrorState title={copy.unavailable} description={copy.providersUnavailable} />
+      ) : null}
+      <fieldset disabled={busy || provider.status !== "ready"} className={typeGrid2Gap4}>
         <label htmlFor={`${field}-amount`}>
           <span className="block">{copy.amount}</span>
           <input
@@ -146,7 +166,7 @@ export function WalletTopUpForm({
           <p className={typeSmSecondary}>{result.redirectUrl ?? copy.redirectNone}</p>
         </div>
       ) : null}
-      <Button type="submit" disabled={busy}>
+      <Button type="submit" disabled={busy || provider.status !== "ready"}>
         {busy ? copy.submitting : copy.submit}
       </Button>
     </form>

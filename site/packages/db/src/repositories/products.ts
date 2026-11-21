@@ -59,6 +59,11 @@ export interface ProductQueryOptions {
   featuredOnly?: boolean;
   minPrice?: number;
   maxPrice?: number;
+  /**
+   * When true, include published paid `single_server` lines alongside free ones.
+   * Used only while NEXUS_WALLET_ENGINE=1 so wallet checkout has a public market surface.
+   */
+  includeWalletPaidSingleServer?: boolean;
   sort?: "popular" | "newest" | "price_asc" | "price_desc" | "rating" | "relevance";
   query?: string;
   limit?: number;
@@ -228,11 +233,13 @@ export class ProductRepository {
   }
 
   async list(options: ProductQueryOptions = {}): Promise<Product[]> {
-    const conditions = [
-      eq(products.status, "published"),
-      eq(products.price, 0),
-      hasSafePublishedBuild(),
-    ];
+    const priceCondition = options.includeWalletPaidSingleServer
+      ? or(
+          eq(products.price, 0),
+          and(sql`${products.price} > 0`, eq(products.licenseModel, "single_server")),
+        )
+      : eq(products.price, 0);
+    const conditions = [eq(products.status, "published"), priceCondition, hasSafePublishedBuild()];
     if (options.type) conditions.push(eq(products.type, options.type));
     if (options.featuredOnly) conditions.push(eq(products.isFeatured, true));
     if (options.minPrice !== undefined) conditions.push(gte(products.price, options.minPrice));
@@ -326,6 +333,32 @@ export class ProductRepository {
             inArray(products.id, uniqueIds.slice(offset, offset + 500)),
             eq(products.status, "published"),
             eq(products.price, 0),
+            hasSafePublishedBuild(),
+          ),
+        );
+      result.push(...(rows as unknown as Product[]));
+    }
+    return result;
+  }
+
+  /**
+   * Wallet checkout catalog: published paid single_server lines with a safe
+   * published build. Free products stay on the free claim/cart path.
+   */
+  async listPublishedPaidByIds(ids: readonly string[]): Promise<Product[]> {
+    const uniqueIds = [...new Set(ids)];
+    if (uniqueIds.length === 0) return [];
+    const result: Product[] = [];
+    for (let offset = 0; offset < uniqueIds.length; offset += 500) {
+      const rows = await db
+        .select()
+        .from(products)
+        .where(
+          and(
+            inArray(products.id, uniqueIds.slice(offset, offset + 500)),
+            eq(products.status, "published"),
+            sql`${products.price} > 0`,
+            eq(products.licenseModel, "single_server"),
             hasSafePublishedBuild(),
           ),
         );

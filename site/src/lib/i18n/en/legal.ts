@@ -25,6 +25,31 @@ export const legal = {
           body: "We may remove content, limit access, or suspend accounts when needed to protect users, the platform, or rights holders. We will use reasonable judgment and keep an audit trail for moderation actions.",
         },
       ],
+      walletLead:
+        "Effective for the MTA Nexus open free beta when the site-wallet engine is enabled in this environment. These product terms are published for users; they are not a substitute for counsel-reviewed contracts.",
+      walletUpdated: "21 November 2026",
+      walletSections: [
+        {
+          title: "What the beta provides",
+          body: "MTA Nexus provides discovery features, community content, server listings, free resources, and an optional site-wallet path for Multi Theft Auto. When the wallet engine is on, site-wallet top-up and purchase settlement can credit or debit audited ledger balances for eligible paid listings. Card checkout, live payment-service-provider adapters, live payouts, and cryptocurrency settlement stay off until those surfaces are enabled.",
+        },
+        {
+          title: "Site wallet stored value",
+          body: "Site-wallet available balance is audited stored value on the platform ledger. It is not a bank account and is not withdrawable unless a separate withdrawal policy and a live payout adapter are enabled. Seller proceeds from site-wallet sales may sit in escrow before release into available balance. Browser returns from a payment provider never credit the wallet — only a verified provider event does.",
+        },
+        {
+          title: "Your account and content",
+          body: "You are responsible for activity under your account and for content you submit. Do not upload malware, stolen resources, personal data you do not have the right to share, or content that infringes intellectual-property rights.",
+        },
+        {
+          title: "Beta availability",
+          body: "The service is experimental and may change, be paused, or have data removed while it is being developed. Keep your own copy of every uploaded resource. We do not promise uninterrupted availability during the open free beta.",
+        },
+        {
+          title: "Moderation",
+          body: "We may remove content, limit access, or suspend accounts when needed to protect users, the platform, or rights holders. We will use reasonable judgment and keep an audit trail for moderation actions.",
+        },
+      ],
       contactLabel: "Questions about these terms",
       contactEmail: "legal@nexus-mta.com",
     },
@@ -49,6 +74,31 @@ export const legal = {
         {
           title: "Your choices",
           body: "You may request access, correction, or deletion of your account data by contacting us. Some limited data may need to remain temporarily for security, fraud prevention, or legal claims.",
+        },
+      ],
+      walletLead:
+        "This notice describes the data used to operate and protect the MTA Nexus open free beta when the site-wallet engine is enabled in this environment. It is a product surface, not counsel certification.",
+      walletUpdated: "21 November 2026",
+      walletSections: [
+        {
+          title: "Data we use",
+          body: "We process account details such as email address, username, display name, password hash, session security data, and any profile, server, resource, or community content you choose to submit. Public server observations may include availability, player counts, MTA version, game mode, map, and the time and public source of the observation.",
+        },
+        {
+          title: "Site wallet ledger data",
+          body: "When the wallet engine is on, we also process audited ledger entries for personal and organization site-wallet accounts, including available and held balances, currency, top-up and withdrawal intents, order settlement identifiers, seller escrow holds, refund postings, and verified provider-event evidence used to credit or settle those intents. Site-wallet available balance is platform stored value, not a bank account. Card checkout and live payment-service-provider adapters stay off until those surfaces are enabled.",
+        },
+        {
+          title: "Why we use it",
+          body: "We use this data to operate accounts, prevent abuse, deliver requested resources, display public profiles and servers, maintain security logs, moderate content, and operate site-wallet top-up, purchase settlement, escrow release, and related audit trails. Passwords are never stored in readable form.",
+        },
+        {
+          title: "Visibility and retention",
+          body: "Profile, server, and published resource information can be public according to your chosen visibility settings. Site-wallet balances and ledger lines are private to the account holders and staff who need them for support or abuse response. Security, ledger, and audit records are retained only as long as reasonably needed to operate and protect the beta. We do not sell personal data.",
+        },
+        {
+          title: "Your choices",
+          body: "You may request access, correction, or deletion of your account data by contacting us. Some limited data, including ledger and payment-intent records, may need to remain temporarily for security, fraud prevention, reconciliation, or legal claims.",
         },
       ],
       contactLabel: "Privacy requests",

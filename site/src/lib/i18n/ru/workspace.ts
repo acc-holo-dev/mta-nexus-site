@@ -117,6 +117,7 @@ export const workspace = {
     libraryTitle: "Библиотека ресурсов",
     libraryDescription: "Добавленные вами бесплатные ресурсы",
     browseResources: "Открыть бесплатные ресурсы",
+    browseMarketResources: "Открыть ресурсы",
     unavailableResource: "Недоступный ресурс",
     added: "Добавлен",
     open: "Открыть",

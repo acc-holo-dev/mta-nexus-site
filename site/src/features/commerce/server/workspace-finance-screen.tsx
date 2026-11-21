@@ -8,7 +8,10 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
-import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax6xl } from "../../shell/page-shell";
@@ -35,6 +38,10 @@ import {
 import { formatHistoryDate, parseHistoryPage } from "../commerce-history-format";
 import { financialReferenceLabel, formatFinancialMinor, getFinancialCopy } from "../financial-i18n";
 import { getWalletCopy } from "../wallet-i18n";
+
+const walletPaymentService = new WalletPaymentService();
+const WALLET_CURRENCIES = ["USD", "EUR", "RUB"] as const;
+
 export async function workspaceFinanceMetadata(): Promise<Metadata> {
   return {
     title: `${getFinancialCopy(await getRequestLocale()).title} | MTA NEXUS`,
@@ -131,6 +138,26 @@ export async function WorkspaceFinanceScreen({
     `/workspace/finance?${new URLSearchParams({ page: String(page), scopePage: String(scopePage), ...(selectedCurrency ? { currency: selectedCurrency } : {}), ...(selectedScope ? { organizationId: selectedScope } : {}) })}`;
   const walletEnabled = isWalletEngineEnabled();
   const walletCopy = walletEnabled ? getWalletCopy(locale) : null;
+  const walletBalanceByCurrency = new Map<
+    string,
+    { available: number | null; held: number | null }
+  >();
+  if (walletEnabled) {
+    const currencies = result.totals
+      .map((total) => total.currency)
+      .filter((value): value is (typeof WALLET_CURRENCIES)[number] =>
+        (WALLET_CURRENCIES as readonly string[]).includes(value),
+      );
+    await Promise.all(
+      currencies.map(async (value) => {
+        const [available, held] = await Promise.all([
+          walletPaymentService.getAvailableBalance(result.scope.id, value).catch(() => null),
+          walletPaymentService.getHeldBalance(result.scope.id, value).catch(() => null),
+        ]);
+        walletBalanceByCurrency.set(value, { available, held });
+      }),
+    );
+  }
   return (
     <div className={pageShellMax6xl}>
       <Link href="/workspace/sales" className={linkAccentSmRounded}>
@@ -139,7 +166,7 @@ export async function WorkspaceFinanceScreen({
       <h1 className={typeDisplayPrimary}>{copy.title}</h1>
       <h2 className={typeXlPrimary}>{result.scope.name ?? copy.personal}</h2>
       <p role="note" className={typeRoundedBorderP4SmSecondary}>
-        {copy.note}
+        {walletEnabled ? copy.noteWallet : copy.note}
       </p>
       {walletCopy ? (
         <p>
@@ -165,36 +192,51 @@ export async function WorkspaceFinanceScreen({
       </nav>
       {result.totals.length ? (
         <ul className="grid gap-4 md:grid-cols-3">
-          {result.totals.map((total) => (
-            <li key={total.currency} className={panelSpace3P5}>
-              <h3 className={typeSemiboldPrimary}>{total.currency}</h3>
-              <dl className={typeSpace2Sm}>
-                {[
-                  [copy.balance, total.balance],
-                  [copy.credits, total.credits],
-                  [copy.debits, total.debits],
-                ].map(([label, amount]) => (
-                  <div key={label}>
-                    <dt className="text-muted">{label}</dt>
-                    <dd className={typeNumericPrimary}>
-                      {formatFinancialMinor(amount, total.currency, locale)}
+          {result.totals.map((total) => {
+            const walletBalance = walletBalanceByCurrency.get(total.currency);
+            const heldLabel =
+              walletEnabled && walletBalance && walletBalance.held !== null
+                ? formatFinancialMinor(walletBalance.held, total.currency, locale)
+                : copy.unknown;
+            const availableLabel =
+              walletEnabled && walletBalance && walletBalance.available !== null
+                ? formatFinancialMinor(walletBalance.available, total.currency, locale)
+                : copy.unknown;
+            return (
+              <li key={total.currency} className={panelSpace3P5}>
+                <h3 className={typeSemiboldPrimary}>{total.currency}</h3>
+                <dl className={typeSpace2Sm}>
+                  {[
+                    [copy.balance, total.balance],
+                    [copy.credits, total.credits],
+                    [copy.debits, total.debits],
+                  ].map(([label, amount]) => (
+                    <div key={label}>
+                      <dt className="text-muted">{label}</dt>
+                      <dd className={typeNumericPrimary}>
+                        {formatFinancialMinor(amount, total.currency, locale)}
+                      </dd>
+                    </div>
+                  ))}
+                  <div>
+                    <dt className="text-muted">{copy.held}</dt>
+                    <dd className={walletEnabled ? typeNumericPrimary : undefined}>{heldLabel}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-muted">
+                      {walletEnabled ? copy.available : copy.availableLegacy}
+                    </dt>
+                    <dd className={walletEnabled ? typeNumericPrimary : undefined}>
+                      {availableLabel}
                     </dd>
                   </div>
-                ))}
-                <div>
-                  <dt className="text-muted">{copy.held}</dt>
-                  <dd>{copy.unknown}</dd>
-                </div>
-                <div>
-                  <dt className="text-muted">{copy.available}</dt>
-                  <dd>{copy.unknown}</dd>
-                </div>
-              </dl>
-              <p className={typeXsMuted}>
-                {copy.legacy}: {total.legacyEntries}
-              </p>
-            </li>
-          ))}
+                </dl>
+                <p className={typeXsMuted}>
+                  {copy.legacy}: {total.legacyEntries}
+                </p>
+              </li>
+            );
+          })}
         </ul>
       ) : (
         <EmptyState title={copy.empty} description={copy.note} />

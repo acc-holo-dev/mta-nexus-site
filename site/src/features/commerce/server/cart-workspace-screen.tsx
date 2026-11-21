@@ -6,8 +6,12 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { commerceService } from "../../../lib/services/commerce/commerce-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { ResourceCartControls } from "../../resources/cart-controls";
-import { getResourceCommerceCopy } from "../../resources/resource-commerce-i18n";
+import {
+  getResourceCommerceCopy,
+  resourceCartHonestyCopy,
+} from "../../resources/resource-commerce-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
@@ -23,6 +27,8 @@ export async function cartWorkspaceMetadata(): Promise<Metadata> {
 export async function CartWorkspaceScreen() {
   const [locale, cookieStore] = await Promise.all([getRequestLocale(), cookies()]);
   const copy = getResourceCommerceCopy(locale);
+  const walletEnabled = isWalletEngineEnabled();
+  const honesty = resourceCartHonestyCopy(locale, walletEnabled);
   let actor: Awaited<ReturnType<typeof authService.getSession>>;
   try {
     actor = await authService.getSession(cookieStore.get("nexus_session")?.value);
@@ -43,7 +49,7 @@ export async function CartWorkspaceScreen() {
       <div className={pageShellMax4xl}>
         <header className={typeSpace2BorderBPb5}>
           <h1 className={typeDisplayPrimary}>{copy.cart}</h1>
-          <p className={typeSmSecondary}>{copy.subtitle}</p>
+          <p className={typeSmSecondary}>{honesty.subtitle}</p>
         </header>
         <ErrorState
           title={copy.loadUnavailable}
@@ -61,9 +67,9 @@ export async function CartWorkspaceScreen() {
     <div className={pageShellMax4xl}>
       <header className={typeSpace2BorderBPb5}>
         <h1 className={typeDisplayPrimary}>{copy.cart}</h1>
-        <p className={typeSmSecondary}>{copy.subtitle}</p>
+        <p className={typeSmSecondary}>{honesty.subtitle}</p>
       </header>
-      <ResourceCartControls key={actor.id} initialCart={cart} />
+      <ResourceCartControls key={actor.id} initialCart={cart} walletEnabled={walletEnabled} />
     </div>
   );
 }

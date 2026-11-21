@@ -11,7 +11,7 @@ describe("acquire guest auth return (FLOW-01)", () => {
     expect(source).toContain('authEntryHref("login", acquireReturnPath)');
     expect(source).toContain('authEntryHref("register", acquireReturnPath)');
     // biome-ignore lint/suspicious/noTemplateCurlyInString: assert acquire page source contains this template literal.
-    expect(source).toContain("`/acquire?productId=${encodeURIComponent(productId)}`");
+    expect(source).toContain("`/acquire?productId=${encodeURIComponent(productId)}${");
     expect(source).toContain("response.status === 401");
     expect(source).toContain('href="/workspace/library"');
     expect(source).not.toMatch(/href=["']\/workspace["']/u);
@@ -48,5 +48,33 @@ describe("acquire guest auth return (FLOW-01)", () => {
       /const notFound = productError === copy\.productNotFound;[\s\S]*?notFound \? \([\s\S]*?<EmptyState[\s\S]*?\) : \([\s\S]*?<ErrorState/u,
     );
     expect(page).toContain("setLoadRevision");
+  });
+
+  it("routes paid acquire through wallet checkout when the engine flag is on", () => {
+    const page = read("site/src/features/commerce/components/acquire-page.tsx");
+    const screen = read("site/src/features/commerce/server/acquire-page-screen.tsx");
+    const route = read("site/src/app/acquire/page.tsx");
+    expect(page).toContain("WalletCheckoutButton");
+    expect(page).toContain('data-acquire-intent="wallet"');
+    expect(page).toContain("walletEnabled && product.price > 0");
+    expect(page).toContain("copy.paidDisabled");
+    expect(screen).toContain("isWalletEngineEnabled");
+    expect(screen).toContain("authService.getSession");
+    expect(route).toContain("acquire-page-server");
+    expect(route).not.toContain("use client");
+  });
+
+  it("preserves optional buildId through acquire return and wallet checkout", () => {
+    const page = read("site/src/features/commerce/components/acquire-page.tsx");
+    const checkout = read("site/src/features/commerce/components/wallet-checkout-button.tsx");
+    const detail = read("site/src/features/resources/server/detail-page.tsx");
+    expect(page).toContain('searchParams.get("buildId")');
+    expect(page).toContain("buildId={buildId ?? undefined}");
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: assert acquire return preserves buildId query.
+    expect(page).toContain("`&buildId=${encodeURIComponent(buildId)}`");
+    expect(checkout).toContain("...(buildId ? { buildId } : {})");
+    expect(detail).toMatch(
+      /buildId=\{\s*versionHelpBuild\?\.status === "published" \? versionHelpBuild\.id : undefined\s*\}/u,
+    );
   });
 });

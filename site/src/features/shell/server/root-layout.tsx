@@ -1,6 +1,7 @@
 import Script from "next/script";
 import type { ReactNode } from "react";
 import { getRequestLocale } from "../../../lib/i18n/server";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { bodyFont, displayFont } from "../fonts";
 import { PwaServiceWorker } from "../pwa-service-worker";
 import { NexusShell } from "../shell";
@@ -8,6 +9,7 @@ import { themeInitScript } from "../theme-init-script";
 
 export async function RootLayout({ children }: { children: ReactNode }) {
   const locale = await getRequestLocale();
+  const walletEnabled = isWalletEngineEnabled();
 
   return (
     <html
@@ -23,7 +25,9 @@ export async function RootLayout({ children }: { children: ReactNode }) {
           dangerouslySetInnerHTML={{ __html: themeInitScript }}
         />
         <PwaServiceWorker />
-        <NexusShell locale={locale}>{children}</NexusShell>
+        <NexusShell locale={locale} walletEnabled={walletEnabled}>
+          {children}
+        </NexusShell>
       </body>
     </html>
   );

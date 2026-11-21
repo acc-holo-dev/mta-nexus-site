@@ -3,14 +3,17 @@ import {
   assertWalletAccountId,
   assertWalletAmount,
   assertWalletCurrency,
+  type LedgerEntry,
+  type LedgerPosting,
   type PaymentProviderId,
   type TopUpIntent,
   type TopUpIntentStatus,
   type WalletCurrency,
 } from "@nexus/domain";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, lte, sql } from "drizzle-orm";
 import { db } from "../client";
 import { walletTopupIntents } from "../schema";
+import { postLedgerBatchInTransaction } from "./ledger-posting";
 
 type WalletTopupRow = typeof walletTopupIntents.$inferSelect;
 
@@ -161,6 +164,59 @@ export class WalletTopupRepository {
     });
   }
 
+  /**
+   * Credit a verified top-up: ledger posting and intent success flip in one transaction.
+   */
+  async creditVerified(input: {
+    intentId: string;
+    providerEventId: string;
+    ledgerBatchId: string;
+    entries: LedgerPosting[];
+  }): Promise<{ intent: TopUpIntent; entries: LedgerEntry[] | null }> {
+    return db.transaction(async (tx) => {
+      await tx.execute(
+        sql`select pg_advisory_xact_lock(hashtext(${`wallet-topup:${input.intentId}`}))`,
+      );
+      const [current] = await tx
+        .select()
+        .from(walletTopupIntents)
+        .where(eq(walletTopupIntents.id, input.intentId))
+        .limit(1)
+        .for("update");
+      if (!current) throw new AppError("Top-up intent not found", 404, "TOPUP_NOT_FOUND");
+      if (current.status === "succeeded") {
+        if (
+          current.providerEventId === input.providerEventId &&
+          current.ledgerBatchId === input.ledgerBatchId
+        ) {
+          return { intent: toIntent(current), entries: null };
+        }
+        throw new AppError("Top-up intent already credited", 409, "TOPUP_ALREADY_CREDITED");
+      }
+      if (current.status !== "awaiting_provider" && current.status !== "created") {
+        throw new AppError("Top-up intent cannot be credited", 409, "TOPUP_INTENT_STATE");
+      }
+      const posted = await postLedgerBatchInTransaction(tx, input.ledgerBatchId, input.entries);
+      const [row] = await tx
+        .update(walletTopupIntents)
+        .set({
+          status: "succeeded",
+          providerEventId: input.providerEventId,
+          ledgerBatchId: input.ledgerBatchId,
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(walletTopupIntents.id, input.intentId),
+            eq(walletTopupIntents.status, current.status),
+          ),
+        )
+        .returning();
+      if (!row) throw new AppError("Top-up intent credit raced", 409, "TOPUP_CREDIT_RACE");
+      return { intent: toIntent(row), entries: posted };
+    });
+  }
+
   async markFailed(intentId: string, providerEventId: string): Promise<TopUpIntent> {
     return db.transaction(async (tx) => {
       await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`wallet-topup:${intentId}`}))`);
@@ -187,6 +243,98 @@ export class WalletTopupRepository {
         .where(eq(walletTopupIntents.id, intentId))
         .returning();
       if (!row) throw new AppError("Top-up intent fail update missed", 409, "TOPUP_FAIL_RACE");
+      return toIntent(row);
+    });
+  }
+
+  /**
+   * Ops-expire stale awaiting/created top-ups as failed (no ledger posting).
+   * Provider never credited; marks them failed with a deterministic expire event id.
+   */
+  async expireStaleAwaiting(input: {
+    olderThanIso: string;
+    limit?: number;
+  }): Promise<TopUpIntent[]> {
+    const olderThan = new Date(input.olderThanIso);
+    if (!Number.isFinite(olderThan.getTime())) {
+      throw new AppError("Stale intent timestamp is invalid", 400, "WALLET_INTENT_STALE_INVALID");
+    }
+    const bounded = Math.min(
+      Math.max(Number.isSafeInteger(input.limit) ? (input.limit as number) : 20, 1),
+      50,
+    );
+    return db.transaction(async (tx) => {
+      await tx.execute(sql`set local lock_timeout = '5s'`);
+      const candidates = await tx
+        .select()
+        .from(walletTopupIntents)
+        .where(
+          and(
+            inArray(walletTopupIntents.status, ["created", "awaiting_provider"]),
+            lte(walletTopupIntents.createdAt, olderThan),
+          ),
+        )
+        .orderBy(asc(walletTopupIntents.createdAt), asc(walletTopupIntents.id))
+        .limit(bounded)
+        .for("update");
+      const expired: TopUpIntent[] = [];
+      const now = new Date();
+      for (const current of candidates) {
+        const providerEventId = `ops_expire_${current.id}`;
+        const [row] = await tx
+          .update(walletTopupIntents)
+          .set({
+            status: "failed",
+            providerEventId,
+            updatedAt: now,
+          })
+          .where(
+            and(
+              eq(walletTopupIntents.id, current.id),
+              inArray(walletTopupIntents.status, ["created", "awaiting_provider"]),
+            ),
+          )
+          .returning();
+        if (row) expired.push(toIntent(row));
+      }
+      return expired;
+    });
+  }
+
+  /** Cancel an awaiting/created top-up before a verified provider credit. No ledger posting. */
+  async cancelAwaiting(input: { intentId: string; accountId: string }): Promise<TopUpIntent> {
+    return db.transaction(async (tx) => {
+      await tx.execute(
+        sql`select pg_advisory_xact_lock(hashtext(${`wallet-topup:${input.intentId}`}))`,
+      );
+      const [current] = await tx
+        .select()
+        .from(walletTopupIntents)
+        .where(eq(walletTopupIntents.id, input.intentId))
+        .limit(1)
+        .for("update");
+      if (!current) throw new AppError("Top-up intent not found", 404, "TOPUP_NOT_FOUND");
+      if (current.accountId !== input.accountId) {
+        throw new AppError("Top-up intent account mismatch", 403, "FORBIDDEN");
+      }
+      if (current.status === "cancelled") return toIntent(current);
+      if (current.status !== "awaiting_provider" && current.status !== "created") {
+        throw new AppError("Top-up intent cannot be cancelled", 409, "TOPUP_INTENT_STATE");
+      }
+      const [row] = await tx
+        .update(walletTopupIntents)
+        .set({
+          status: "cancelled",
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(walletTopupIntents.id, input.intentId),
+            eq(walletTopupIntents.status, current.status),
+          ),
+        )
+        .returning();
+      if (!row) throw new AppError("Top-up cancel raced", 409, "TOPUP_CANCEL_RACE");
       return toIntent(row);
     });
   }

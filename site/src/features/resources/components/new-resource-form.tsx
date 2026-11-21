@@ -37,11 +37,18 @@ import {
 } from "../resource-submission-intent";
 import { MtaMetaInspectorPanel } from "./mta-meta-inspector-panel";
 import { ResourceSubmissionSuccess } from "./resource-submission-success";
-export function NewResourceForm({ actorId }: { actorId: string }) {
+export function NewResourceForm({
+  actorId,
+  walletPaidPublishing = false,
+}: {
+  actorId: string;
+  walletPaidPublishing?: boolean;
+}) {
   const storageKey = pendingResourceDraftKey(actorId);
   const intentKey = resourceIntentKey(actorId);
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.publishing;
+  const [paidListing, setPaidListing] = useState(false);
   function safeMessage(failure: unknown, fallback: string) {
     const text = failure instanceof Error ? failure.message : "";
     return [
@@ -239,9 +246,18 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
               shortDescription: String(form.get("shortDescription") || "").trim(),
               description: String(form.get("description") || "").trim(),
               type: String(form.get("type") || "script") as "script",
-              price: 0,
-              currency: "USD" as const,
-              licenseModel: "unlimited" as const,
+              price:
+                walletPaidPublishing && String(form.get("pricingMode") || "free") === "paid"
+                  ? Number(form.get("price") || 0)
+                  : 0,
+              currency: (walletPaidPublishing &&
+              String(form.get("pricingMode") || "free") === "paid"
+                ? String(form.get("currency") || "EUR")
+                : "USD") as "USD" | "EUR" | "RUB",
+              licenseModel:
+                walletPaidPublishing && String(form.get("pricingMode") || "free") === "paid"
+                  ? ("single_server" as const)
+                  : ("unlimited" as const),
               tags: String(form.get("tags") || "")
                 .split(",")
                 .map((tag) => tag.trim())
@@ -505,6 +521,67 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
               ))}
             </select>
           </div>
+
+          {walletPaidPublishing ? (
+            <div className={typeSpace15SmCol2}>
+              <div className="space-y-1.5">
+                <label htmlFor="resource-pricing-mode" className={typeLabelBlockUpperSecondary}>
+                  {copy.pricingMode}
+                </label>
+                <select
+                  id="resource-pricing-mode"
+                  name="pricingMode"
+                  className={fieldControlClass({
+                    disabled: Boolean(createdProduct || intent),
+                    className: "min-h-11",
+                  })}
+                  disabled={Boolean(createdProduct || intent)}
+                  value={paidListing ? "paid" : "free"}
+                  onChange={(event) => setPaidListing(event.target.value === "paid")}
+                >
+                  <option value="free">{copy.freeListing}</option>
+                  <option value="paid">{copy.paidListing}</option>
+                </select>
+              </div>
+              {paidListing ? (
+                <>
+                  <p className={typeXsMuted}>{copy.paidListingNote}</p>
+                  <Input
+                    id="resource-price"
+                    name="price"
+                    type="number"
+                    label={copy.paidPrice}
+                    required
+                    min={1}
+                    max={100_000_000}
+                    step={1}
+                    readOnly={Boolean(createdProduct || intent)}
+                  />
+                  <div className="space-y-1.5">
+                    <label htmlFor="resource-currency" className={typeLabelBlockUpperSecondary}>
+                      {copy.paidCurrency}
+                    </label>
+                    <select
+                      id="resource-currency"
+                      name="currency"
+                      className={fieldControlClass({
+                        disabled: Boolean(createdProduct || intent),
+                        className: "min-h-11",
+                      })}
+                      disabled={Boolean(createdProduct || intent)}
+                      defaultValue="EUR"
+                    >
+                      {(["EUR", "USD", "RUB"] as const).map((code) => (
+                        <option key={code} value={code}>
+                          {code}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </>
+              ) : null}
+            </div>
+          ) : null}
 
           <Input
             id="resource-tags"

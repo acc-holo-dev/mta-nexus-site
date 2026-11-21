@@ -25,10 +25,6 @@ function requireWalletEngineEnabled(): void {
   }
 }
 
-export function walletAccountIdForUser(userId: string): string {
-  return `user:${userId}`;
-}
-
 export function requestHeaderRecord(request: NextRequest): Record<string, string> {
   const headers: Record<string, string> = {};
   request.headers.forEach((value, key) => {

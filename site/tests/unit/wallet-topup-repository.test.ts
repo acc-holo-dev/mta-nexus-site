@@ -151,3 +151,21 @@ it("lists recent top-ups for an account newest first", async () => {
   expect(state.queries[0].sql).toContain('from "wallet_topup_intents"');
   expect(state.queries[0].sql).toContain("order by");
 });
+
+it("cancels an awaiting top-up without ledger posting", async () => {
+  state.results = [[], [row()], [row({ status: "cancelled" })]];
+  const intent = await repo.cancelAwaiting({
+    intentId: "pay_topup_1",
+    accountId: "user:usr_buyer",
+  });
+  expect(intent.status).toBe("cancelled");
+  expect(state.queries.some((query) => query.sql.includes("for update"))).toBe(true);
+  expect(state.queries.some((query) => query.sql.startsWith("update"))).toBe(true);
+});
+
+it("rejects cancel for a succeeded top-up", async () => {
+  state.results = [[], [row({ status: "succeeded", providerEventId: "stub_evt_ok" })]];
+  await expect(
+    repo.cancelAwaiting({ intentId: "pay_topup_1", accountId: "user:usr_buyer" }),
+  ).rejects.toMatchObject({ code: "TOPUP_INTENT_STATE" });
+});

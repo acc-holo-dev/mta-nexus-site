@@ -35,7 +35,9 @@ export const POST = withPaymentProviderWebhook(async function POST(
         currency: result.intent.currency,
         providerId: result.intent.providerId,
       },
-      credited: result.entries !== null,
+      kind: result.kind,
+      credited: result.kind.startsWith("topup_") && result.entries !== null,
+      settled: result.kind.startsWith("payout_") && result.entries !== null,
     };
   });
 });

@@ -8,6 +8,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { orderOperationsService } from "../../../lib/services/commerce/commercial-plan-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
@@ -27,7 +28,10 @@ import {
   parseHistoryPage,
 } from "../commerce-history-format";
 import { getCommercialCopy } from "../commercial-i18n";
+import { commercialProviderLabel } from "../financial-i18n";
 import { OrderCancellationForm } from "../order-cancellation";
+import { getWalletCopy } from "../wallet-i18n";
+import { WalletPayOrderForm } from "../wallet-pay";
 export async function purchaseOperationsMetadata(): Promise<Metadata> {
   return {
     title: `${getCommercialCopy(await getRequestLocale()).paymentOperations} | MTA NEXUS`,
@@ -111,6 +115,7 @@ export async function PurchaseOperationsScreen({
   };
   const status = (value: string) =>
     Object.hasOwn(states, value) ? states[value as keyof typeof states] : copy.unknown;
+  const hasWalletAttempt = result.attempts.some((attempt) => attempt.provider === "wallet");
   return (
     <div className={pageShellMax4xl}>
       <Link href={`/workspace/purchases/${encodeURIComponent(id)}`} className={linkAccentSmRounded}>
@@ -121,8 +126,19 @@ export async function PurchaseOperationsScreen({
         {result.order.orderNumber} · {status(result.order.status)}
       </p>
       <p role="note" className={surfaceBgP4TextSmSecondary}>
-        {copy.operationsNote}
+        {hasWalletAttempt ? copy.walletOperationsNote : copy.operationsNote}
       </p>
+      {isWalletEngineEnabled() && result.order.status === "pending" && result.canCancel ? (
+        <WalletPayOrderForm
+          key={`wallet:${user.id}:${id}`}
+          actorId={user.id}
+          orderId={id}
+          amountLabel={`${getWalletCopy(locale === "ru" ? "ru" : "en").paySubmit}: ${formatHistoryAmount(result.order.totalAmount, result.order.currency, locale === "ru" ? "ru" : "en")}`}
+          amountMinor={result.order.totalAmount}
+          currency={result.order.currency}
+          canPay
+        />
+      ) : null}
       <OrderCancellationForm
         key={`${user.id}:${id}`}
         actorId={user.id}
@@ -147,6 +163,9 @@ export async function PurchaseOperationsScreen({
               <li key={attempt.id} className={panelSpace3P5}>
                 <p className="text-primary">
                   {copy.status}: {status(attempt.status)}
+                </p>
+                <p className="text-secondary">
+                  {copy.provider}: {commercialProviderLabel(locale, attempt.provider)}
                 </p>
                 <p className="font-numeric text-secondary">
                   {copy.amount}: {formatHistoryAmount(attempt.amount, attempt.currency, locale)}

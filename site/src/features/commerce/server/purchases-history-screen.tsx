@@ -7,6 +7,7 @@ import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellClip } from "../../shell/page-shell";
@@ -25,9 +26,10 @@ import {
   orderStatusLabel,
   parseHistoryPage,
 } from "../commerce-history-format";
-import { getCommerceHistoryCopy } from "../commerce-history-i18n";
+import { commerceHistoryBetaNotice, getCommerceHistoryCopy } from "../commerce-history-i18n";
 import { getCommercialCopy } from "../commercial-i18n";
 import { orderCaseCopy } from "../order-case-i18n";
+import { getWalletCopy } from "../wallet-i18n";
 import { HistoryPagination, HistoryShell } from "../workspace-history";
 export async function purchasesHistoryMetadata(): Promise<Metadata> {
   return {
@@ -44,6 +46,14 @@ export async function PurchasesHistoryScreen({
   const [locale, store, query] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
   const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
   const copy = getCommerceHistoryCopy(typedLocale);
+  const walletEnabled = isWalletEngineEnabled();
+  const historyNotice = commerceHistoryBetaNotice(typedLocale, walletEnabled);
+  const walletNavProps = walletEnabled
+    ? {
+        walletHref: "/workspace/wallet" as const,
+        walletLabel: getWalletCopy(typedLocale).walletNav,
+      }
+    : {};
   const dictionary = getDictionary(typedLocale);
   let user: Awaited<ReturnType<typeof authService.getSession>>;
   try {
@@ -77,7 +87,7 @@ export async function PurchasesHistoryScreen({
   if (!result) {
     return (
       <div className={pageShellClip}>
-        <HistoryShell copy={copy} area="purchases">
+        <HistoryShell copy={copy} area="purchases" notice={historyNotice} {...walletNavProps}>
           <ErrorState
             title={copy.purchasesLoadUnavailable}
             description={copy.purchasesLoadUnavailableHint}
@@ -94,7 +104,7 @@ export async function PurchasesHistoryScreen({
 
   return (
     <div className={pageShellClip}>
-      <HistoryShell copy={copy} area="purchases">
+      <HistoryShell copy={copy} area="purchases" notice={historyNotice} {...walletNavProps}>
         <Link href="/subscriptions" className={linkAccentSmRounded}>
           {getCommercialCopy(typedLocale).catalog}
         </Link>
