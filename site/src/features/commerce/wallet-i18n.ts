@@ -64,6 +64,16 @@ const copy = {
     heldReleaseAt: "Releases at (UTC)",
     heldNote:
       "Held amounts are not available to spend and are not withdrawable. Release runs after the hold window.",
+    heldReleaseTitle: "Release matured holds",
+    heldReleaseNote:
+      "{count} personal hold(s) have reached the release time. This moves escrow into your available site-wallet balance. It is not a payout.",
+    heldReleaseSubmit: "Release matured holds",
+    heldReleasing: "Releasing holds…",
+    heldReleaseSuccess: "Released {count} hold(s) into available balance.",
+    heldReleaseFailed: "Hold release was not confirmed. Retry the same request.",
+    heldOrgReleaseTitle: "Release organization holds",
+    heldOrgReleaseNote:
+      "{count} organization hold(s) have reached the release time. Owner/admin release moves escrow into the organization available balance. It is not a payout.",
     withdrawNote:
       "Withdrawals are not available. Available balance is site stored value only until payout policy and a live payout adapter are enabled.",
     heldOrg: "Organization seller holds",
@@ -177,6 +187,16 @@ const copy = {
     heldUnavailable: "Баланс холдов продавца временно недоступен.",
     heldReleaseAt: "Освобождение (UTC)",
     heldNote: "Суммы на холде нельзя тратить и нельзя вывести. Освобождение — после окна холда.",
+    heldReleaseTitle: "Освободить созревшие холды",
+    heldReleaseNote:
+      "{count} личный холд(ы) достигли срока. Escrow перейдёт в available баланс site wallet. Это не вывод средств.",
+    heldReleaseSubmit: "Освободить созревшие холды",
+    heldReleasing: "Освобождение холдов…",
+    heldReleaseSuccess: "Освобождено холдов: {count}. Средства в available балансе.",
+    heldReleaseFailed: "Освобождение холда не подтверждено. Повторите тот же запрос.",
+    heldOrgReleaseTitle: "Освободить холды организации",
+    heldOrgReleaseNote:
+      "{count} холд(ы) организации достигли срока. Owner/admin переводит escrow в available баланс организации. Это не вывод средств.",
     withdrawNote:
       "Вывод недоступен. Available balance — только stored value площадки, пока не включены payout policy и live payout adapter.",
     heldOrg: "Холды продавца организации",

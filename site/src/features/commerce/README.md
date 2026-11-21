@@ -20,6 +20,7 @@ Ledger activity: `GET /api/wallet/activity`. Seller holds: `GET /api/wallet/held
 7-day baseline). Personal and organization seller accounts (`user:` / `org:`) —
 org inspect/release requires owner/admin membership. Admin batch release:
 `POST /api/admin/commerce/wallet-holds/release-matured` (across sellers).
+Workspace wallet shows a release CTA for matured personal/org holds.
 HTTP routes under `/api/wallet/*`, pay-with-wallet, checkout/wallet, and
 `/workspace/wallet` stay dark unless `NEXUS_WALLET_ENGINE=1`. Withdrawal
 intents (migration `0094_wallet_withdrawal_intents`) hold available balance in

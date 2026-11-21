@@ -28,11 +28,22 @@ import {
 } from "../../shell/type-shell";
 import { formatHistoryDate } from "../commerce-history-format";
 import { formatFinancialMinor } from "../financial-i18n";
+import { WalletHoldReleaseForm } from "../wallet-hold-release";
 import { getWalletCopy } from "../wallet-i18n";
 import { WalletTopUpForm } from "../wallet-topup";
 
 const walletPaymentService = new WalletPaymentService();
 const CURRENCIES = ["USD", "EUR", "RUB"] as const;
+
+function maturedHoldCount(
+  holds: Array<{ currency: string; releaseAt: string }> | null | undefined,
+  currency: string,
+  nowMs: number,
+): number {
+  if (!holds) return 0;
+  return holds.filter((hold) => hold.currency === currency && Date.parse(hold.releaseAt) <= nowMs)
+    .length;
+}
 
 function statusLabel(
   copy: ReturnType<typeof getWalletCopy>,
@@ -151,6 +162,8 @@ export async function WalletWorkspaceScreen({
 
   const pending = (history ?? []).filter((intent) => intent.status === "awaiting_provider");
   const recent = (history ?? []).filter((intent) => intent.currency === currency);
+  const nowMs = Date.now();
+  const personalMatured = maturedHoldCount(heldList, currency, nowMs);
 
   return (
     <div className={pageShellMax6xl}>
@@ -248,6 +261,7 @@ export async function WalletWorkspaceScreen({
                   ))}
               </ul>
             )}
+            <WalletHoldReleaseForm actorId={user.id} maturedCount={personalMatured} />
           </>
         )}
       </section>
@@ -264,6 +278,7 @@ export async function WalletWorkspaceScreen({
               const holds =
                 org.holds?.filter((hold) => hold.currency === currency) ??
                 ([] as NonNullable<typeof org.holds>);
+              const orgMatured = maturedHoldCount(org.holds, currency, nowMs);
               return (
                 <li key={org.organizationId}>
                   <p className={typeSemiboldPrimary}>{org.accountId}</p>
@@ -291,6 +306,11 @@ export async function WalletWorkspaceScreen({
                       </ul>
                     </>
                   )}
+                  <WalletHoldReleaseForm
+                    actorId={user.id}
+                    organizationId={org.organizationId}
+                    maturedCount={orgMatured}
+                  />
                 </li>
               );
             })}
