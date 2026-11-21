@@ -63,6 +63,12 @@ vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
   isWalletWithdrawEnabled: () => state.withdraw,
   WalletPaymentService: class {
     capabilityMatrix = () => state.matrix;
+    previewAdminBatchEligible = async () => ({
+      holds: 2,
+      topups: 1,
+      unpaidOrders: 0,
+      withdrawals: state.withdraw ? 3 : null,
+    });
   },
 }));
 
@@ -103,8 +109,12 @@ it("shows engine ops CTAs when the wallet engine is on", async () => {
   expect(html).toContain(copy.providersAdminHoldSubmit);
   expect(html).toContain(copy.providersAdminTopupExpireSubmit);
   expect(html).toContain(copy.providersAdminOrderExpireSubmit);
+  expect(html).toContain(copy.providersAdminEligible.replace("{count}", "2"));
+  expect(html).toContain(copy.providersAdminEligible.replace("{count}", "1"));
+  expect(html).toContain(copy.providersAdminEligible.replace("{count}", "0"));
   expect(html).toContain(copy.providersAdminWithdrawExpireDisabled);
   expect(html).not.toContain(copy.providersAdminWithdrawExpireSubmit);
+  expect(html).not.toContain(copy.providersAdminEligible.replace("{count}", "3"));
 });
 
 it("shows withdrawal expiry when withdraw policy is on", async () => {
@@ -113,6 +123,7 @@ it("shows withdrawal expiry when withdraw policy is on", async () => {
   const copy = getWalletCopy("en");
   const html = renderToStaticMarkup(await Page());
   expect(html).toContain(copy.providersAdminWithdrawExpireSubmit);
+  expect(html).toContain(copy.providersAdminEligible.replace("{count}", "3"));
   expect(html).not.toContain(copy.providersAdminWithdrawExpireDisabled);
   expect(html).not.toContain(copy.providersAdminOpsEngineOff);
 });

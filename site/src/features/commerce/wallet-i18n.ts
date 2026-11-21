@@ -191,9 +191,10 @@ const copy = {
     providersAdminCapRefund: "refund",
     providersAdminOpsTitle: "Wallet operator batches",
     providersAdminOpsNote:
-      "Admin-only batch actions for the site wallet engine. These call the existing admin HTTP endpoints. They are not a cron and do not talk to a live PSP. Empty batches are a successful no-op.",
+      "Admin-only batch actions for the site wallet engine. These call the existing admin HTTP endpoints. Eligible counts are a read-only preview of the next batch under the default age window and limit — not a cron and not a live PSP action. Empty batches are a successful no-op.",
     providersAdminOpsEngineOff:
       "Wallet engine is off in this environment. Operator batch CTAs stay hidden until NEXUS_WALLET_ENGINE=1.",
+    providersAdminEligible: "{count} eligible for the next batch",
     providersAdminHoldTitle: "Release matured seller holds",
     providersAdminHoldNote:
       "Releases matured ECON-002 escrow holds across seller accounts into available balance. Not a payout.",
@@ -466,9 +467,10 @@ const copy = {
     providersAdminCapRefund: "возврат",
     providersAdminOpsTitle: "Операторские batch-действия кошелька",
     providersAdminOpsNote:
-      "Только admin. Вызывают существующие admin HTTP endpoints site wallet. Это не cron и не live PSP. Пустой batch — успешный no-op.",
+      "Только admin. Вызывают существующие admin HTTP endpoints site wallet. Eligible counts — read-only preview следующего batch при окне возраста и лимите по умолчанию; это не cron и не live PSP. Пустой batch — успешный no-op.",
     providersAdminOpsEngineOff:
       "Движок кошелька выключен. Operator batch CTA скрыты, пока NEXUS_WALLET_ENGINE=1.",
+    providersAdminEligible: "Подходит для следующего batch: {count}",
     providersAdminHoldTitle: "Освободить созревшие холды продавцов",
     providersAdminHoldNote:
       "Освобождает созревшие ECON-002 escrow-холды по счетам продавцов в available баланс. Это не выплата.",

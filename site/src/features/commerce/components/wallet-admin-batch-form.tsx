@@ -15,6 +15,7 @@ export function WalletAdminBatchForm({
   path,
   title,
   note,
+  eligibleLabel,
   submitLabel,
   busyLabel,
   successTemplate,
@@ -24,6 +25,7 @@ export function WalletAdminBatchForm({
   path: string;
   title: string;
   note: string;
+  eligibleLabel?: string;
   submitLabel: string;
   busyLabel: string;
   successTemplate: string;
@@ -83,6 +85,7 @@ export function WalletAdminBatchForm({
           {title}
         </h3>
         <p className="text-secondary">{note}</p>
+        {eligibleLabel ? <p className="text-secondary">{eligibleLabel}</p> : null}
       </div>
       {error ? <ErrorState title={error} description={failedLabel} /> : null}
       <Button type="submit" disabled={busy}>

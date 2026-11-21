@@ -269,6 +269,33 @@ export class WalletWithdrawalRepository {
     });
   }
 
+  /** Read-only count of withdrawals the next expireStaleAwaiting batch would process. */
+  async countEligibleStaleAwaiting(input: {
+    olderThanIso: string;
+    limit?: number;
+  }): Promise<number> {
+    const olderThan = new Date(input.olderThanIso);
+    if (!Number.isFinite(olderThan.getTime())) {
+      throw new AppError("Stale intent timestamp is invalid", 400, "WALLET_INTENT_STALE_INVALID");
+    }
+    const bounded = Math.min(
+      Math.max(Number.isSafeInteger(input.limit) ? (input.limit as number) : 20, 1),
+      50,
+    );
+    const rows = await db
+      .select({ id: walletWithdrawalIntents.id })
+      .from(walletWithdrawalIntents)
+      .where(
+        and(
+          eq(walletWithdrawalIntents.status, "awaiting_provider"),
+          lte(walletWithdrawalIntents.createdAt, olderThan),
+        ),
+      )
+      .orderBy(asc(walletWithdrawalIntents.createdAt), asc(walletWithdrawalIntents.id))
+      .limit(bounded);
+    return rows.length;
+  }
+
   /**
    * Ops-expire stale awaiting withdrawals: cancel and return escrow to available.
    * Same ledger path as user cancel; limited per invocation.

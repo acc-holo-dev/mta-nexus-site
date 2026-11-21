@@ -101,6 +101,26 @@ export class WalletSellerHoldRepository {
     });
   }
 
+  /** Read-only count of holds the next releaseMaturedBatch would process. */
+  async countEligibleMatured(input: { nowIso?: string; limit?: number } = {}): Promise<number> {
+    const nowIso = input.nowIso ?? new Date().toISOString();
+    const now = new Date(nowIso);
+    if (!Number.isFinite(now.getTime())) {
+      throw new AppError("Hold timestamp is invalid", 400, "WALLET_HOLD_INVALID");
+    }
+    const bounded = Math.min(
+      Math.max(Number.isSafeInteger(input.limit) ? (input.limit as number) : 20, 1),
+      50,
+    );
+    const rows = await db
+      .select({ id: walletSellerHolds.id })
+      .from(walletSellerHolds)
+      .where(and(eq(walletSellerHolds.status, "held"), lte(walletSellerHolds.releaseAt, now)))
+      .orderBy(asc(walletSellerHolds.releaseAt), asc(walletSellerHolds.id))
+      .limit(bounded);
+    return rows.length;
+  }
+
   private async releaseMatured(input: {
     sellerAccountId?: string;
     nowIso?: string;

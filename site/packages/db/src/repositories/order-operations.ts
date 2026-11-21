@@ -201,6 +201,39 @@ export class OrderOperationsRepository {
    * Mirrors buyer unpaid cancel guards without cancellation receipts.
    * Limited per invocation; empty batch is a successful no-op.
    */
+  /** Read-only count of unpaid pending orders the next expireStaleUnpaid batch would process. */
+  async countEligibleStaleUnpaid(input: { olderThanIso: string; limit?: number }): Promise<number> {
+    const olderThan = new Date(input.olderThanIso);
+    if (!Number.isFinite(olderThan.getTime())) {
+      throw new AppError("Stale order timestamp is invalid", 400, "WALLET_INTENT_STALE_INVALID");
+    }
+    const bounded = Math.min(
+      Math.max(Number.isSafeInteger(input.limit) ? (input.limit as number) : 20, 1),
+      50,
+    );
+    const rows = await db
+      .select({ id: orders.id })
+      .from(orders)
+      .where(
+        and(
+          eq(orders.status, "pending"),
+          lte(orders.createdAt, olderThan),
+          notExists(
+            db.select({ id: payments.id }).from(payments).where(eq(payments.orderId, orders.id)),
+          ),
+          notExists(
+            db
+              .select({ id: ledgerEntries.id })
+              .from(ledgerEntries)
+              .where(eq(ledgerEntries.referenceId, orders.id)),
+          ),
+        ),
+      )
+      .orderBy(asc(orders.createdAt), asc(orders.id))
+      .limit(bounded);
+    return rows.length;
+  }
+
   async expireStaleUnpaid(input: {
     actorId: string;
     olderThanIso: string;

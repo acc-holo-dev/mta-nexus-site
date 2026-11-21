@@ -725,6 +725,38 @@ export class WalletPaymentService {
   }
 
   /**
+   * Read-only preview of how many rows the next admin batch CTAs would process
+   * under the default age window and batch limit. Not a cron and not a PSP action.
+   */
+  async previewAdminBatchEligible(
+    input: { nowIso?: string; maxAgeMs?: number; limit?: number } = {},
+  ): Promise<{
+    holds: number;
+    topups: number;
+    unpaidOrders: number;
+    withdrawals: number | null;
+  }> {
+    if (!isWalletEngineEnabled()) {
+      throw new AppError("Wallet engine is disabled", 404, "WALLET_ENGINE_DISABLED");
+    }
+    const nowIso = input.nowIso ?? new Date().toISOString();
+    const maxAgeMs = input.maxAgeMs ?? WALLET_INTENT_STALE_AFTER_MS;
+    if (!Number.isSafeInteger(maxAgeMs) || maxAgeMs < 60_000) {
+      throw new AppError("Stale intent max age is invalid", 400, "WALLET_INTENT_STALE_INVALID");
+    }
+    const olderThanIso = new Date(Date.parse(nowIso) - maxAgeMs).toISOString();
+    const [holds, topups, unpaidOrders, withdrawals] = await Promise.all([
+      this.holds.countEligibleMatured({ nowIso, limit: input.limit }),
+      this.topups.countEligibleStaleAwaiting({ olderThanIso, limit: input.limit }),
+      this.orderOperations.countEligibleStaleUnpaid({ olderThanIso, limit: input.limit }),
+      isWalletWithdrawEnabled()
+        ? this.withdrawals.countEligibleStaleAwaiting({ olderThanIso, limit: input.limit })
+        : Promise.resolve(null),
+    ]);
+    return { holds, topups, unpaidOrders, withdrawals };
+  }
+
+  /**
    * Admin batch: mark stale awaiting/created top-ups failed (no ledger).
    * Default age is WALLET_INTENT_STALE_AFTER_MS (7d).
    */

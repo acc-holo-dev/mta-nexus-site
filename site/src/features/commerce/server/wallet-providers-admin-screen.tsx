@@ -81,6 +81,11 @@ export async function WalletProvidersAdminScreen() {
   const matrix = walletPaymentService.capabilityMatrix();
   const engineOn = isWalletEngineEnabled();
   const withdrawOn = isWalletWithdrawEnabled();
+  const eligible = engineOn
+    ? await walletPaymentService.previewAdminBatchEligible().catch(() => null)
+    : null;
+  const eligibleLabel = (count: number) =>
+    copy.providersAdminEligible.replace("{count}", String(count));
 
   return (
     <div className={pageShellMax5xl}>
@@ -137,6 +142,7 @@ export async function WalletProvidersAdminScreen() {
                 path="/api/admin/commerce/wallet-holds/release-matured"
                 title={copy.providersAdminHoldTitle}
                 note={copy.providersAdminHoldNote}
+                eligibleLabel={eligible ? eligibleLabel(eligible.holds) : undefined}
                 submitLabel={copy.providersAdminHoldSubmit}
                 busyLabel={copy.providersAdminHoldBusy}
                 successTemplate={copy.providersAdminHoldSuccess}
@@ -147,6 +153,7 @@ export async function WalletProvidersAdminScreen() {
                 path="/api/admin/commerce/wallet-topups/expire-stale"
                 title={copy.providersAdminTopupExpireTitle}
                 note={copy.providersAdminTopupExpireNote}
+                eligibleLabel={eligible ? eligibleLabel(eligible.topups) : undefined}
                 submitLabel={copy.providersAdminTopupExpireSubmit}
                 busyLabel={copy.providersAdminTopupExpireBusy}
                 successTemplate={copy.providersAdminTopupExpireSuccess}
@@ -157,6 +164,7 @@ export async function WalletProvidersAdminScreen() {
                 path="/api/admin/commerce/wallet-orders/expire-stale"
                 title={copy.providersAdminOrderExpireTitle}
                 note={copy.providersAdminOrderExpireNote}
+                eligibleLabel={eligible ? eligibleLabel(eligible.unpaidOrders) : undefined}
                 submitLabel={copy.providersAdminOrderExpireSubmit}
                 busyLabel={copy.providersAdminOrderExpireBusy}
                 successTemplate={copy.providersAdminOrderExpireSuccess}
@@ -168,6 +176,11 @@ export async function WalletProvidersAdminScreen() {
                   path="/api/admin/commerce/wallet-withdrawals/expire-stale"
                   title={copy.providersAdminWithdrawExpireTitle}
                   note={copy.providersAdminWithdrawExpireNote}
+                  eligibleLabel={
+                    eligible && eligible.withdrawals !== null
+                      ? eligibleLabel(eligible.withdrawals)
+                      : undefined
+                  }
                   submitLabel={copy.providersAdminWithdrawExpireSubmit}
                   busyLabel={copy.providersAdminWithdrawExpireBusy}
                   successTemplate={copy.providersAdminWithdrawExpireSuccess}
