@@ -1,6 +1,6 @@
 {
   "app": {
-    "route_ts": 299
+    "route_ts": 300
   },
   "components": {
     "root_files": 0,
@@ -14,7 +14,7 @@
       "files": 91
     },
     "commerce": {
-      "bytes": 715681,
+      "bytes": 717912,
       "files": 186
     },
     "community": {
@@ -83,7 +83,7 @@
     "root_files": 0,
     "root_prefix_hotspots": [],
     "services_root_files": 0,
-    "tree_bytes": 611819,
+    "tree_bytes": 612928,
     "tree_files": 132
   },
   "packages_src_files": {
@@ -96,7 +96,7 @@
     "validation": 19
   },
   "scope": "Git-tracked blobs under site/ at source_sha (git ls-tree). Ignores untracked/ignored host files so CI and dirty worktrees match.",
-  "source_sha": "52846da776b8efae2c630798826914abeb15a4eb",
+  "source_sha": "c946eaddfa6211ecb458d81577d23234a360e20b",
   "tests": {
     "site_tests_files": 1714
   }
