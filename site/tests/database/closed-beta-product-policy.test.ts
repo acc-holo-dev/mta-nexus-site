@@ -7,6 +7,7 @@ const mocks = vi.hoisted(() => ({
   findBySlug: vi.fn(),
   createWithAudit: vi.fn(),
   findLatestPublishedByProduct: vi.fn(),
+  hasManagementAccess: vi.fn(),
   can: vi.fn(),
 }));
 
@@ -16,6 +17,7 @@ vi.mock("@nexus/db", () => ({
     findById: mocks.findById,
     findBySlug: mocks.findBySlug,
     createWithAudit: mocks.createWithAudit,
+    hasManagementAccess: mocks.hasManagementAccess,
     findPublishedFreeBySlugs: vi.fn(async () => []),
     listPublishedFreeDependingOnSlug: vi.fn(async () => []),
   },
@@ -110,6 +112,30 @@ describe("open free-beta product behavior", () => {
     expect(mocks.createWithAudit).not.toHaveBeenCalled();
   });
 
+  it("creates a paid single_server product when the wallet engine is on", async () => {
+    walletState.engine = true;
+    mocks.can.mockReturnValue(true);
+    const paidInput = {
+      ...createInput(1500),
+      currency: "EUR" as const,
+      licenseModel: "single_server" as const,
+    };
+    mocks.createWithAudit.mockResolvedValue(product({ ...paidInput, price: 1500 }));
+
+    await expect(service.createProduct(paidInput, actor, "session")).resolves.toMatchObject({
+      price: 1500,
+    });
+    expect(mocks.createWithAudit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        price: 1500,
+        currency: "EUR",
+        licenseModel: "single_server",
+      }),
+      expect.any(Object),
+      "session",
+    );
+  });
+
   it("rejects build release preflight for a legacy paid product", async () => {
     mocks.findById.mockResolvedValue(product({ price: 1000 }));
 
@@ -118,6 +144,16 @@ describe("open free-beta product behavior", () => {
       code: "PAID_RESOURCES_DISABLED",
     });
     expect(mocks.can).not.toHaveBeenCalled();
+  });
+
+  it("allows build release preflight for wallet paid single_server products", async () => {
+    walletState.engine = true;
+    mocks.findById.mockResolvedValue(product({ price: 1000, licenseModel: "single_server" }));
+    mocks.hasManagementAccess.mockResolvedValue(true);
+
+    await expect(service.assertCanReleaseBuild("prd_1", actor)).resolves.toMatchObject({
+      id: "prd_1",
+    });
   });
 
   it("forces public listing queries into the free-only range", async () => {

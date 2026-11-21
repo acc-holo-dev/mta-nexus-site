@@ -299,12 +299,20 @@ export class ProductService {
     actor: User,
     currentToken: string,
   ): Promise<Product> {
-    if (input.price !== 0) {
+    const walletPaid =
+      isWalletEngineEnabled() &&
+      input.price > 0 &&
+      input.licenseModel === "single_server" &&
+      ["USD", "EUR", "RUB"].includes(input.currency);
+    if (input.price !== 0 && !walletPaid) {
       throw new AppError(
         "Paid resources are disabled during the open free beta",
         422,
         "PAID_RESOURCES_DISABLED",
       );
+    }
+    if (walletPaid && (!Number.isSafeInteger(input.price) || input.price > 100_000_000)) {
+      throw new AppError("Paid resource price is out of range", 400, "PRODUCT_METADATA_INVALID");
     }
 
     if (!can(actor, "product.create")) {
@@ -312,14 +320,17 @@ export class ProductService {
     }
 
     const id = generateId("prd");
+    const price = walletPaid ? input.price : 0;
+    const currency = walletPaid ? input.currency : "USD";
+    const licenseModel = walletPaid ? "single_server" : "unlimited";
     const product = await productRepository.createWithAudit(
       {
         ...input,
         id,
         authorId: actor.id,
-        price: 0,
-        currency: "USD",
-        licenseModel: "unlimited",
+        price,
+        currency,
+        licenseModel,
         ratingAverage: 0,
         ratingCount: 0,
         salesCount: 0,
@@ -331,7 +342,7 @@ export class ProductService {
         action: "product.created",
         targetId: id,
         targetType: "product",
-        details: { title: input.title, price: 0 },
+        details: { title: input.title, price, licenseModel },
       },
       currentToken,
     );
@@ -359,7 +370,9 @@ export class ProductService {
   async assertCanReleaseBuild(productId: string, actor: User): Promise<Product> {
     const product = await productRepository.findById(productId);
     if (!product) throw new NotFoundError("Product", productId);
-    if (product.price !== 0) {
+    const walletPaid =
+      isWalletEngineEnabled() && product.price > 0 && product.licenseModel === "single_server";
+    if (product.price !== 0 && !walletPaid) {
       throw new AppError(
         "Build releases for paid resources are disabled during the open free beta",
         422,

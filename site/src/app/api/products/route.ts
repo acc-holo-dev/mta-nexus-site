@@ -18,6 +18,7 @@ import {
 import { isUniqueConstraintViolation } from "../../../lib/platform/postgres-error";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { productService } from "../../../lib/services/commerce/product-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -54,6 +55,9 @@ function matchesCreateRequest(
     product.description === input.description &&
     (product.shortDescription ?? undefined) === input.shortDescription &&
     product.type === input.type &&
+    product.price === input.price &&
+    product.currency === input.currency &&
+    product.licenseModel === input.licenseModel &&
     (product.organizationId ?? undefined) === input.organizationId &&
     sameList(product.tags, input.tags) &&
     compatibility.mtaMinVersion === requestedCompatibility.mtaMinVersion &&
@@ -170,7 +174,12 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
-    if (parsed.data.price !== 0) {
+    const walletPaid =
+      isWalletEngineEnabled() &&
+      parsed.data.price > 0 &&
+      parsed.data.licenseModel === "single_server" &&
+      ["USD", "EUR", "RUB"].includes(parsed.data.currency);
+    if (parsed.data.price !== 0 && !walletPaid) {
       return privateJson(
         context,
         {

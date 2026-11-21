@@ -47,6 +47,13 @@ export const publishing = {
     buildForbidden: "У вас нет прав отправлять сборки этого ресурса.",
     paidPublishingUnavailable:
       "Публикация платных ресурсов недоступна в открытой бесплатной бета-версии.",
+    pricingMode: "Цена листинга",
+    freeListing: "Бесплатно",
+    paidListing: "Платно (site wallet, single-server)",
+    paidPrice: "Цена (минорные единицы)",
+    paidCurrency: "Валюта",
+    paidListingNote:
+      "Платные single-server листинги продаются через site wallet при включённом wallet engine. Карточный checkout остаётся выключенным.",
     versionAlreadyExists: "Такая версия сборки уже существует. Укажите другой номер версии.",
     multipartRequired:
       "Не удалось прочитать форму загрузки. Выберите файл ещё раз и повторите попытку.",

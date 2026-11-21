@@ -47,6 +47,13 @@ export const publishing = {
     resourceNotFound: "The resource was not found.",
     buildForbidden: "You do not have permission to submit builds for this resource.",
     paidPublishingUnavailable: "Paid resource publishing is unavailable during the open free beta.",
+    pricingMode: "Listing price",
+    freeListing: "Free",
+    paidListing: "Paid (site wallet, single-server)",
+    paidPrice: "Price (minor units)",
+    paidCurrency: "Currency",
+    paidListingNote:
+      "Paid single-server listings sell through the site wallet when the wallet engine is on. Card checkout stays disabled.",
     versionAlreadyExists: "This build version already exists. Choose a different version.",
     multipartRequired: "The build upload form could not be read. Choose the file again and retry.",
     multipartInvalid:

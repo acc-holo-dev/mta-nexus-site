@@ -19,7 +19,8 @@ Ledger activity: `GET /api/wallet/activity`. Seller holds: `GET /api/wallet/held
 `POST /api/wallet/holds/release-matured` (migration `0093_wallet_seller_holds`,
 7-day baseline). HTTP routes under `/api/wallet/*`, pay-with-wallet,
 checkout/wallet, and `/workspace/wallet` stay dark unless
-`NEXUS_WALLET_ENGINE=1`. Redirect never credits the wallet.
+`NEXUS_WALLET_ENGINE=1`. When the engine is on, authors may create/release paid
+`single_server` listings (still not card checkout). Redirect never credits the wallet.
 
 | Entry                             | Контракт                                                                                                          |
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
