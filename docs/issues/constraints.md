@@ -90,6 +90,10 @@ F08 не обозначает unauthenticated access: начальная сес�
 
 [Baseline ROADMAP](../ROADMAP.md) хранит прежний PASS для `acc1ef93`; он остаётся исторически привязанным к этому SHA и не является PASS нового кандидата. Перечень исключений UI Button также неполон: `server-review-panel` содержит raw reload button помимо упомянутого global-error. Это ограниченная неточность сводки, а не основание объявить весь завершённый roadmap этап сломанным. Актуальная очередь разработки — [ROADMAP.md](../ROADMAP.md) / `planning/tasks.json`.
 
+## Site wallet (NX-015) — operational constraint
+
+Код site wallet / admin batch ops может быть зелёным в CI и доступным за dark flags (`NEXUS_WALLET_ENGINE`, `NEXUS_WALLET_WITHDRAW`), но это **не** означает live payments, live payouts, live PSP refunds или production deploy. Card checkout остаётся `CHECKOUT_DISABLED`. Операторский контур и границы флагов — [OPERATIONS — Site wallet (dark flags)](../OPERATIONS.md#site-wallet-dark-flags); направление — [NX-015](../DECISIONS.md). Не трактуйте PASS CI на wallet PR как разрешение реального движения денег.
+
 ## Правило закрытия и отсрочки
 
 Закрытие требует task/PR, фактической проверки acceptance и SHA результата; продуктовые метрики не придумываются. Live gates требуют evidence целевого окружения, а не только файлов в repo. Отсрочка записывает причину и точку пересмотра: public beta, следующий релиз, schema change или принятое продуктовое решение. Приоритет не превращает все строки в одинаковый P1 release blocker.
