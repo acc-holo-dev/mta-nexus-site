@@ -7,6 +7,7 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { formatUnknown } from "../../../lib/i18n/unknown";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { productService } from "../../../lib/services/commerce/product-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { contentService } from "../../../lib/services/community/content-service";
 import {
   type MtaMasterServer,
@@ -41,6 +42,11 @@ function summarizeKnownPlayers(servers: readonly MtaMasterServer[]) {
 export async function HomePage() {
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
+  const walletEnabled = isWalletEngineEnabled();
+  const marketHref = walletEnabled ? "/market" : "/market?maxPrice=0";
+  const browseLabel = walletEnabled
+    ? dictionary.home.browseMarketResources
+    : dictionary.home.browseResources;
   const cookieStore = await cookies();
   let sessionFailed = false;
   const session = await authService
@@ -129,7 +135,7 @@ export async function HomePage() {
           </Rise>
           <Rise delay="medium">
             <p className="max-w-xl text-sm leading-relaxed text-secondary sm:text-base">
-              {dictionary.home.description}
+              {walletEnabled ? dictionary.home.walletDescription : dictionary.home.description}
             </p>
           </Rise>
           <Rise delay="long" className="flex flex-wrap gap-3 pt-1">
@@ -145,7 +151,7 @@ export async function HomePage() {
               {dictionary.home.exploreServers}
             </Link>
             <Link
-              href="/market?maxPrice=0"
+              href={marketHref}
               className={buttonClassName({
                 variant: "outline",
                 size: "hero",
@@ -153,7 +159,7 @@ export async function HomePage() {
                   "border-base bg-elevated font-semibold transition-[transform,colors] motion-safe:hover:-translate-y-0.5",
               })}
             >
-              {dictionary.home.browseResources}
+              {browseLabel}
             </Link>
           </Rise>
         </div>

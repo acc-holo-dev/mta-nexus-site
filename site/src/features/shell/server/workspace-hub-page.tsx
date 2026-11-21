@@ -8,6 +8,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { formatUnknown } from "../../../lib/i18n/unknown";
 import { authService } from "../../../lib/services/accounts/auth-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { userLibraryService } from "../../../lib/services/library/user-library-service";
 import {
   indexMtaObservations,
@@ -16,6 +17,7 @@ import {
 } from "../../../lib/services/servers/mta-master-directory-service";
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { getCommerceHistoryCopy } from "../../commerce/commerce-history-i18n";
+import { getWalletCopy } from "../../commerce/wallet-i18n";
 import { reactionCopy } from "../../community/content-reaction-copy";
 import { ownDiscussionCopy } from "../../community/discussion-workspace-copy";
 import { getLibraryCopy } from "../../library/library-view";
@@ -57,6 +59,11 @@ export async function WorkspaceHubPage() {
   const historyCopy = getCommerceHistoryCopy(locale);
   const libraryCopy = getLibraryCopy(locale);
   const serverCopy = getManagedServerCopy(locale);
+  const walletEnabled = isWalletEngineEnabled();
+  const marketHref = walletEnabled ? "/market" : "/market?maxPrice=0";
+  const browseLabel = walletEnabled
+    ? dictionary.workspace.browseMarketResources
+    : dictionary.workspace.browseResources;
   let user: Awaited<ReturnType<typeof authService.getSession>>;
   try {
     user = await authService.getSession((await cookies()).get("nexus_session")?.value);
@@ -186,6 +193,11 @@ export async function WorkspaceHubPage() {
             {historyCopy.tabs[area]}
           </Link>
         ))}
+        {walletEnabled ? (
+          <Link href="/workspace/wallet" className={historyNavClass}>
+            {getWalletCopy(locale).walletNav}
+          </Link>
+        ) : null}
       </nav>
 
       <section className={typeMinSpace4}>
@@ -197,8 +209,8 @@ export async function WorkspaceHubPage() {
               <Link href="/workspace/library" className={sectionLinkClass}>
                 {libraryCopy.title}
               </Link>
-              <Link href="/market?maxPrice=0" className={sectionLinkClass}>
-                {dictionary.workspace.browseResources}
+              <Link href={marketHref} className={sectionLinkClass}>
+                {browseLabel}
               </Link>
             </div>
           }
@@ -252,8 +264,8 @@ export async function WorkspaceHubPage() {
             title={dictionary.workspace.emptyLibrary}
             description={dictionary.workspace.emptyLibraryHint}
             action={
-              <Link href="/market?maxPrice=0" className={linkAccentSmRounded}>
-                {dictionary.workspace.browseResources}
+              <Link href={marketHref} className={linkAccentSmRounded}>
+                {browseLabel}
               </Link>
             }
           />

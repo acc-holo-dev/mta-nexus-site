@@ -8,7 +8,15 @@ import { MobileNav } from "./mobile-nav";
 import { Navbar } from "./navbar";
 import { Sidebar } from "./sidebar";
 
-export function NexusShell({ children, locale }: { children: ReactNode; locale: Locale }) {
+export function NexusShell({
+  children,
+  locale,
+  walletEnabled = false,
+}: {
+  children: ReactNode;
+  locale: Locale;
+  walletEnabled?: boolean;
+}) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const dictionary = getDictionary(locale);
 
@@ -40,7 +48,12 @@ export function NexusShell({ children, locale }: { children: ReactNode; locale: 
       </a>
       <div className="min-h-screen bg-page text-primary">
         <div className="flex min-h-screen">
-          <Sidebar locale={locale} isCollapsed={isSidebarCollapsed} onToggle={toggle} />
+          <Sidebar
+            locale={locale}
+            isCollapsed={isSidebarCollapsed}
+            onToggle={toggle}
+            walletEnabled={walletEnabled}
+          />
 
           <div className="flex min-w-0 flex-1 flex-col">
             <Navbar locale={locale} />
@@ -51,10 +64,10 @@ export function NexusShell({ children, locale }: { children: ReactNode; locale: 
             >
               {children}
             </main>
-            <Footer locale={locale} />
+            <Footer locale={locale} walletEnabled={walletEnabled} />
           </div>
         </div>
-        <MobileNav locale={locale} />
+        <MobileNav locale={locale} walletEnabled={walletEnabled} />
       </div>
     </LocaleProvider>
   );

@@ -40,7 +40,14 @@ export async function SalesHistoryScreen({ query }: { query: { page?: string | s
   const [locale, store] = await Promise.all([getRequestLocale(), cookies()]);
   const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
   const copy = getCommerceHistoryCopy(typedLocale);
-  const historyNotice = commerceHistoryBetaNotice(typedLocale, isWalletEngineEnabled());
+  const walletEnabled = isWalletEngineEnabled();
+  const historyNotice = commerceHistoryBetaNotice(typedLocale, walletEnabled);
+  const walletNavProps = walletEnabled
+    ? {
+        walletHref: "/workspace/wallet" as const,
+        walletLabel: getWalletCopy(typedLocale).walletNav,
+      }
+    : {};
   const dictionary = getDictionary(typedLocale);
   let user: Awaited<ReturnType<typeof authService.getSession>>;
   try {
@@ -72,7 +79,7 @@ export async function SalesHistoryScreen({ query }: { query: { page?: string | s
   if (!result) {
     return (
       <div className={pageShellClip}>
-        <HistoryShell copy={copy} area="sales" notice={historyNotice}>
+        <HistoryShell copy={copy} area="sales" notice={historyNotice} {...walletNavProps}>
           <ErrorState
             title={copy.salesLoadUnavailable}
             description={copy.salesLoadUnavailableHint}
@@ -89,20 +96,20 @@ export async function SalesHistoryScreen({ query }: { query: { page?: string | s
 
   return (
     <div className={pageShellClip}>
-      <HistoryShell copy={copy} area="sales" notice={historyNotice}>
+      <HistoryShell copy={copy} area="sales" notice={historyNotice} {...walletNavProps}>
         <Link href="/workspace/sales/report" className={linkAccentSmRounded}>
           {sellerSalesCopy(typedLocale).title}
         </Link>
         <Link href="/workspace/finance" className={linkAccentSmRounded}>
           {getFinancialCopy(typedLocale).title}
         </Link>
-        {isWalletEngineEnabled() ? (
+        {walletEnabled ? (
           <Link href="/workspace/wallet" className={linkAccentSmRounded}>
             {getWalletCopy(typedLocale).walletNav}
           </Link>
         ) : null}
         <p role="note" className={typeSmMuted}>
-          {isWalletEngineEnabled() ? copy.walletGrossNotice : copy.grossNotice}
+          {walletEnabled ? copy.walletGrossNotice : copy.grossNotice}
         </p>
         {result.sales.length === 0 ? (
           <EmptyState

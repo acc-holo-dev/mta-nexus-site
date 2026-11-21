@@ -249,6 +249,7 @@ describe("private legacy commerce pages", () => {
       const purchases = renderToStaticMarkup(await Purchases(input()));
       expect(purchases).toContain(copy.walletBetaNotice);
       expect(purchases).not.toContain(copy.betaNotice);
+      expect(purchases).toContain('href="/workspace/wallet"');
     } finally {
       if (previous === undefined) delete process.env.NEXUS_WALLET_ENGINE;
       else process.env.NEXUS_WALLET_ENGINE = previous;

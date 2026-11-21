@@ -17,12 +17,16 @@ export function HistoryShell({
   area,
   children,
   notice,
+  walletHref,
+  walletLabel,
 }: {
   copy: HistoryCopy;
   area: HistoryArea;
   children: ReactNode;
   /** Defaults to free-beta copy; pass wallet-aware notice when the engine is on. */
   notice?: string;
+  walletHref?: string;
+  walletLabel?: string;
 }) {
   const titles = {
     purchases: copy.purchasesTitle,
@@ -54,6 +58,14 @@ export function HistoryShell({
             {copy.tabs[key]}
           </Link>
         ))}
+        {walletHref && walletLabel ? (
+          <Link
+            href={walletHref}
+            className={`rounded-md border border-base px-4 py-2 text-sm text-secondary transition-colors hover:bg-hover hover:text-primary ${linkFocusRing}`}
+          >
+            {walletLabel}
+          </Link>
+        ) : null}
       </nav>
       <p role="note" className={surfaceBgP4TextSmMuted}>
         {notice ?? copy.betaNotice}

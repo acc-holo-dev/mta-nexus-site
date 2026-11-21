@@ -4,8 +4,11 @@ export const discovery = {
     title: "Live servers, community, and free resources",
     description:
       "MTA Nexus is an open free beta. Browse the official MTA server directory, community updates, and free resources without payment.",
+    walletDescription:
+      "MTA Nexus is an open free beta. Browse the official MTA server directory, community updates, and the resource market. Site-wallet purchase can settle paid listings when the wallet engine is on; card checkout stays off.",
     exploreServers: "Explore MTA servers",
     browseResources: "Browse free resources",
+    browseMarketResources: "Browse resources",
     playersOnline: "Players online",
     publicServers: "Public servers",
     resourcesShown: "Free resources shown",

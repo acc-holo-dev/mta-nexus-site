@@ -33,6 +33,7 @@ import { commerceHistoryBetaNotice, getCommerceHistoryCopy } from "../commerce-h
 import { licenseArchiveQuery, licenseArchiveUrl } from "../license-archive-query";
 import { getLicenseControlCopy } from "../license-control-i18n";
 import { getLicenseMaintenanceCopy } from "../license-maintenance-i18n";
+import { getWalletCopy } from "../wallet-i18n";
 import { HistoryShell } from "../workspace-history";
 import { LicenseArchiveFilters } from "./license-archive-filters";
 
@@ -59,10 +60,15 @@ export async function licensesHistoryMetadata(): Promise<Metadata> {
 export async function LicensesHistoryScreen({ query }: { query: Query }) {
   const [locale, store] = await Promise.all([getRequestLocale(), cookies()]);
   const copy = getCommerceHistoryCopy(locale);
-  const historyNotice = commerceHistoryBetaNotice(
-    locale === "ru" ? "ru" : "en",
-    isWalletEngineEnabled(),
-  );
+  const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
+  const walletEnabled = isWalletEngineEnabled();
+  const historyNotice = commerceHistoryBetaNotice(typedLocale, walletEnabled);
+  const walletNavProps = walletEnabled
+    ? {
+        walletHref: "/workspace/wallet" as const,
+        walletLabel: getWalletCopy(typedLocale).walletNav,
+      }
+    : {};
   const dictionary = getDictionary(locale);
   let user: Awaited<ReturnType<typeof authService.getSession>>;
   try {
@@ -110,7 +116,7 @@ export async function LicensesHistoryScreen({ query }: { query: Query }) {
   if (!result) {
     return (
       <div className={pageShellClip}>
-        <HistoryShell copy={copy} area="licenses" notice={historyNotice}>
+        <HistoryShell copy={copy} area="licenses" notice={historyNotice} {...walletNavProps}>
           <ErrorState
             title={copy.loadUnavailable}
             description={copy.loadUnavailableHint}
@@ -130,7 +136,7 @@ export async function LicensesHistoryScreen({ query }: { query: Query }) {
 
   return (
     <div className={pageShellClip}>
-      <HistoryShell copy={copy} area="licenses" notice={historyNotice}>
+      <HistoryShell copy={copy} area="licenses" notice={historyNotice} {...walletNavProps}>
         <LicenseArchiveFilters query={filters} page={result.page} locale={locale} />
         <p role="note" className={typeSmMuted}>
           {copy.licenseNotice}
