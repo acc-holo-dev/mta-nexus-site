@@ -120,7 +120,7 @@ P1/P2/P3 — относительный приоритет внутри указ
     for p in ms["phases"]:
         head += f"| {p['id']} — {p['name']} | {cell(p['outcome'])} | {counts[p['id']]} | {cell(p['exit'])} |\n"
     head += """
-F6 намеренно не содержит детального execution backlog: коммерческий блок обсуждается отдельно, действующие owner targets сохраняются. Conditional object storage относится к инфраструктуре F3 и остаётся deferred; для бесплатной beta оно не обязательно по умолчанию.
+F6 намеренно не содержит детального execution backlog: коммерческий блок обсуждается отдельно, действующие owner targets сохраняются. Принятое направление внутреннего site wallet — [NX-015](DECISIONS.md); операторские dark flags и admin batch границы — [OPERATIONS — Site wallet (dark flags)](OPERATIONS.md#site-wallet-dark-flags). Наличие кода/CI PASS за флагами не заполняет F6 execution backlog и не включает live PSP/payout/refund или production deploy. Conditional object storage относится к инфраструктуре F3 и остаётся deferred; для бесплатной beta оно не обязательно по умолчанию.
 
 ## Первая рекомендуемая волна
 
