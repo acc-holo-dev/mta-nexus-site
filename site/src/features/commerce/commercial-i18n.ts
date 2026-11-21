@@ -81,6 +81,10 @@ const copy = {
     paymentOperations: "Payment history and cancellation",
     attempts: "Recorded payment attempts",
     noAttempts: "No recorded payment attempts.",
+    noAttemptsHint:
+      "An empty attempt list is not a load failure. Cancellation remains only for unpaid pending orders with no attempts or ledger rows.",
+    noAttemptsHintWallet:
+      "An empty attempt list is not a load failure. Site-wallet settles appear here after audited ledger capture; cancellation remains only for unpaid pending orders with no attempts or ledger rows.",
     operationsNote:
       "This archive shows stored payment states; it does not independently confirm provider settlement. Cancellation is available only for a pending order with no payment attempts or financial entries. No refund or access grant is created.",
     walletOperationsNote:
@@ -224,6 +228,10 @@ const copy = {
     paymentOperations: "История платежей и отмена",
     attempts: "Записанные платёжные попытки",
     noAttempts: "Платёжных попыток не зафиксировано.",
+    noAttemptsHint:
+      "Пустой список попыток — не ошибка загрузки. Отмена по-прежнему только для неоплаченных pending-заказов без попыток и проводок.",
+    noAttemptsHintWallet:
+      "Пустой список попыток — не ошибка загрузки. Settle через site wallet появится здесь после аудируемого ledger capture; отмена по-прежнему только для неоплаченных pending-заказов без попыток и проводок.",
     operationsNote:
       "Архив показывает сохранённые состояния платежей, а не независимое подтверждение расчёта провайдером. Отмена доступна только для ожидающего заказа без платёжных попыток и финансовых записей. Возврат денег и права доступа не создаются.",
     walletOperationsNote:

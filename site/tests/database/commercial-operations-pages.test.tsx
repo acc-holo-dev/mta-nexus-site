@@ -261,6 +261,7 @@ it("keeps provider-reconciliation cancel blocker when the attempt is not site wa
   expect(html).not.toContain(copy.cannotCancelWallet);
 });
 it("provides reason and confirmation controls only for a currently cancellable unpaid order", async () => {
+  const copy = getCommercialCopy("en");
   state.detail.mockResolvedValue({
     order: { id: "ord_a", orderNumber: "N-1", status: "pending", updatedAt: now },
     attempts: [],
@@ -273,7 +274,9 @@ it("provides reason and confirmation controls only for a currently cancellable u
   expect(html).toContain("<textarea");
   expect(html).toContain('type="checkbox"');
   expect(html).toContain("Cancel unpaid order");
-  expect(html).toContain("No recorded payment attempts");
+  expect(html).toContain(copy.noAttempts);
+  expect(html).toContain(copy.noAttemptsHint);
+  expect(html).not.toContain(copy.noAttemptsHintWallet);
 });
 it("does not load private order or admin history before login", async () => {
   state.user = null;

@@ -1,5 +1,5 @@
 import { AppError } from "@nexus/domain";
-import { ErrorState } from "@nexus/ui";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -116,6 +116,7 @@ export async function PurchaseOperationsScreen({
   const status = (value: string) =>
     Object.hasOwn(states, value) ? states[value as keyof typeof states] : copy.unknown;
   const hasWalletAttempt = result.attempts.some((attempt) => attempt.provider === "wallet");
+  const walletEnabled = isWalletEngineEnabled();
   return (
     <div className={pageShellMax4xl}>
       <Link href={`/workspace/purchases/${encodeURIComponent(id)}`} className={linkAccentSmRounded}>
@@ -128,7 +129,7 @@ export async function PurchaseOperationsScreen({
       <p role="note" className={surfaceBgP4TextSmSecondary}>
         {hasWalletAttempt ? copy.walletOperationsNote : copy.operationsNote}
       </p>
-      {isWalletEngineEnabled() && result.order.status === "pending" && result.canCancel ? (
+      {walletEnabled && result.order.status === "pending" && result.canCancel ? (
         <WalletPayOrderForm
           key={`wallet:${user.id}:${id}`}
           actorId={user.id}
@@ -192,7 +193,10 @@ export async function PurchaseOperationsScreen({
             ))}
           </ol>
         ) : (
-          <p className="text-secondary">{copy.noAttempts}</p>
+          <EmptyState
+            title={copy.noAttempts}
+            description={walletEnabled ? copy.noAttemptsHintWallet : copy.noAttemptsHint}
+          />
         )}
       </section>
       {result.totalPages > 1 ? (

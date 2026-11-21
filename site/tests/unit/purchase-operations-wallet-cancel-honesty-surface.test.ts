@@ -33,4 +33,16 @@ describe("purchase operations wallet cancel honesty", () => {
     expect(ru.cannotCancelWalletHint).toContain("не через сверку с провайдером");
     expect(ru.cannotCancelWallet).not.toContain("требуют сверки с провайдером");
   });
+
+  it("uses EmptyState for empty payment attempts with wallet empty ≠ load-failure hint", () => {
+    const screen = read("site/src/features/commerce/server/purchase-operations-screen.tsx");
+    const en = getCommercialCopy("en");
+    const ru = getCommercialCopy("ru");
+    expect(screen).toContain("EmptyState");
+    expect(screen).toContain("noAttemptsHintWallet");
+    expect(screen).not.toMatch(/<p className="text-secondary">\{copy\.noAttempts\}<\/p>/);
+    expect(en.noAttemptsHint).toContain("not a load failure");
+    expect(en.noAttemptsHintWallet).toContain("Site-wallet");
+    expect(ru.noAttemptsHintWallet).toContain("site wallet");
+  });
 });
