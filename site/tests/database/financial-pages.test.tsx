@@ -284,6 +284,30 @@ it("shows an honest recovery state when recorded order evidence fails", async ()
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
   expect(html).toContain('href="/admin/commerce/reconciliation/ord_a?page=2"');
 });
+it("uses EmptyState for empty payment attempts and wallet empty hint when engine on", async () => {
+  state.user = { id: "usr_a", role: "admin" };
+  state.walletEnabled = true;
+  state.detail.mockResolvedValue({
+    order: {
+      orderNumber: "<ORDER>",
+      status: "pending",
+      amount: 123,
+      currency: "EUR",
+      missingCapture: false,
+    },
+    attempts: [],
+    ledgerTotals: [],
+    page: 1,
+    totalPages: 1,
+    total: 0,
+  });
+  const copy = getFinancialCopy("en");
+  const html = renderToStaticMarkup(await Detail(input));
+  expect(html).toContain(copy.attemptsEmpty);
+  expect(html).toContain(copy.attemptsEmptyHintWallet);
+  expect(html).not.toContain(copy.attemptsEmptyHint);
+  expect(html).not.toContain(`>${copy.empty}<`);
+});
 it("clips honest loading shells on narrow layouts", async () => {
   for (const Loading of [ReviewLoading, DetailLoading]) {
     const html = renderToStaticMarkup(await Loading());

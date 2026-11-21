@@ -57,6 +57,11 @@ const copy = {
     missingLedger: "Paid order has no ledger references",
     clear: "No structural discrepancy detected",
     details: "Recorded payment attempts",
+    attemptsEmpty: "No recorded payment attempts.",
+    attemptsEmptyHint:
+      "An empty attempt list is not a load failure. This read-only view does not create payments or refunds.",
+    attemptsEmptyHintWallet:
+      "An empty attempt list is not a load failure. Site-wallet settles appear here after audited ledger capture; this view stays read-only and does not run refunds.",
     provider: "Provider",
     providerWallet: "Site wallet",
     providerUnknown: "Recorded provider",
@@ -122,6 +127,11 @@ const copy = {
     missingLedger: "У платного заказа нет проводок",
     clear: "Структурных расхождений не обнаружено",
     details: "Записанные попытки оплаты",
+    attemptsEmpty: "Платёжных попыток не зафиксировано.",
+    attemptsEmptyHint:
+      "Пустой список попыток — не ошибка загрузки. Это read-only представление не создаёт платежи и возвраты.",
+    attemptsEmptyHintWallet:
+      "Пустой список попыток — не ошибка загрузки. Settle через site wallet появится здесь после аудируемого ledger capture; представление остаётся read-only и не выполняет возвраты.",
     provider: "Провайдер",
     providerWallet: "Site wallet",
     providerUnknown: "Записанный провайдер",

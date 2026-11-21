@@ -1,6 +1,6 @@
 import { financialReviewRepository } from "@nexus/db";
 import { AppError } from "@nexus/domain";
-import { ErrorState } from "@nexus/ui";
+import { EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -167,7 +167,10 @@ export async function FinancialReconciliationDetailScreen({
           ))}
         </ol>
       ) : (
-        <p className="text-secondary">{copy.empty}</p>
+        <EmptyState
+          title={copy.attemptsEmpty}
+          description={walletEnabled ? copy.attemptsEmptyHintWallet : copy.attemptsEmptyHint}
+        />
       )}
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className={typeFlexWrapGap4Sm}>
