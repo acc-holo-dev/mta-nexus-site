@@ -1,10 +1,4 @@
-import {
-  AppError,
-  walletAccountIdForUser as domainWalletAccountIdForUser,
-  RateLimitExceededError,
-  UnauthorizedError,
-  type User,
-} from "@nexus/domain";
+import { AppError, RateLimitExceededError, UnauthorizedError, type User } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { requireServerJsonContentType } from "../../lib/http/bounded-json";
@@ -29,10 +23,6 @@ function requireWalletEngineEnabled(): void {
   if (!isWalletEngineEnabled()) {
     throw new AppError("Wallet engine is disabled", 404, "WALLET_ENGINE_DISABLED");
   }
-}
-
-export function walletAccountIdForUser(userId: string): string {
-  return domainWalletAccountIdForUser(userId);
 }
 
 export function requestHeaderRecord(request: NextRequest): Record<string, string> {
