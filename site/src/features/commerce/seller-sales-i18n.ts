@@ -60,6 +60,9 @@ const copies = {
       "This report covers resources in the current personal or organization portfolio, using current titles and ownership. Earlier orders have no frozen seller attribution; this is not a historical seller settlement statement. Recorded line values are grouped by currency and are not balances, held funds or available payouts. Refunded line values are not refund amounts. No commission or net proceeds are inferred.",
     paymentNotice:
       "Payment labels describe database records only. They do not verify a capture with an external provider, confirm a refund or grant access. Paid checkout is not enabled by this report. Review flags are structural signals, not a complete reconciliation.",
+    walletPaymentNotice:
+      "Payment labels describe database records only. They do not verify a live PSP capture. Site-wallet settlement can credit seller escrow when the wallet engine is on; this report still does not authorize payout. Review flags are structural signals, not a complete reconciliation.",
+    wallet: "Site wallet",
     statuses: {
       completed: "Completed order record",
       refunded: "Refunded order record",
@@ -133,6 +136,9 @@ const copies = {
       "Отчёт охватывает ресурсы, которые сейчас принадлежат вам или выбранной организации, с текущими названиями и владельцами. У старых заказов нет зафиксированного продавца; это не историческая выписка расчётов с продавцом. Стоимость строк разделена по валютам и не означает баланс, удержанные средства или доступную выплату. Стоимость возвращённых строк не равна сумме возврата. Комиссия и чистый доход не вычисляются.",
     paymentNotice:
       "Подписи оплаты описывают только записи базы. Они не подтверждают списание у внешнего провайдера или возврат и не предоставляют доступ. Отчёт не включает платное оформление. Признаки проверки отражают структуру записей, а не полную финансовую сверку.",
+    walletPaymentNotice:
+      "Подписи оплаты описывают только записи базы. Они не подтверждают live PSP списание. Расчёт через site wallet может зачислить escrow продавца, когда движок кошелька включён; этот отчёт всё равно не разрешает выплату. Признаки проверки — структурные сигналы, а не полная сверка.",
+    wallet: "Кошелёк площадки",
     statuses: {
       completed: "Запись завершённого заказа",
       refunded: "Запись возвращённого заказа",

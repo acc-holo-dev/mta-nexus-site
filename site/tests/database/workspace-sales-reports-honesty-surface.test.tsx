@@ -160,12 +160,34 @@ it("locks additive sales honesty copy in commerce history i18n", () => {
   expect(history).toContain("salesLoadUnavailable");
   expect(history).toContain("salesLoadUnavailableHint");
   expect(history).toContain("emptySalesHint");
+  expect(history).toContain("walletBetaNotice");
+  expect(history).toContain("walletGrossNotice");
   const en = getCommerceHistoryCopy("en");
   const ru = getCommerceHistoryCopy("ru");
   expect(en.salesLoadUnavailable).not.toBe("");
   expect(en.salesLoadUnavailableHint).not.toBe("");
   expect(en.emptySalesHint).not.toBe("");
+  expect(en.walletBetaNotice).toContain("Site-wallet");
+  expect(en.walletGrossNotice).toContain("escrow");
   expect(ru.salesLoadUnavailable).not.toBe("");
   expect(ru.salesLoadUnavailableHint).not.toBe("");
   expect(ru.emptySalesHint).not.toBe("");
+  expect(ru.walletBetaNotice).toContain("site wallet");
+});
+
+it("locks seller sales report wallet honesty when the engine is on", () => {
+  const report = read("site/src/features/commerce/server/seller-sales-report.tsx");
+  const detail = read("site/src/features/commerce/server/seller-sales-report-detail-screen.tsx");
+  const i18n = read("site/src/features/commerce/seller-sales-i18n.ts");
+  expect(report).toContain("walletPaymentNotice");
+  expect(report).toContain('href="/workspace/wallet"');
+  expect(detail).toContain("walletPaymentNotice");
+  expect(detail).toContain('href="/workspace/wallet"');
+  expect(i18n).toContain("walletPaymentNotice");
+  const en = sellerSalesCopy("en");
+  const ru = sellerSalesCopy("ru");
+  expect(en.walletPaymentNotice).toContain("Site-wallet");
+  expect(en.wallet).toBe("Site wallet");
+  expect(ru.walletPaymentNotice).toContain("site wallet");
+  expect(ru.wallet).toBe("Кошелёк площадки");
 });

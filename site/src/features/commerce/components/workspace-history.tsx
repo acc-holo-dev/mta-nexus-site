@@ -16,10 +16,13 @@ export function HistoryShell({
   copy,
   area,
   children,
+  notice,
 }: {
   copy: HistoryCopy;
   area: HistoryArea;
   children: ReactNode;
+  /** Defaults to free-beta copy; pass wallet-aware notice when the engine is on. */
+  notice?: string;
 }) {
   const titles = {
     purchases: copy.purchasesTitle,
@@ -53,7 +56,7 @@ export function HistoryShell({
         ))}
       </nav>
       <p role="note" className={surfaceBgP4TextSmMuted}>
-        {copy.betaNotice}
+        {notice ?? copy.betaNotice}
       </p>
       {children}
     </div>

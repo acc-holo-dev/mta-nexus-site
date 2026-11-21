@@ -7,6 +7,7 @@ import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellClip } from "../../shell/page-shell";
@@ -23,9 +24,10 @@ import {
   formatHistoryDate,
   parseHistoryPage,
 } from "../commerce-history-format";
-import { getCommerceHistoryCopy } from "../commerce-history-i18n";
+import { commerceHistoryBetaNotice, getCommerceHistoryCopy } from "../commerce-history-i18n";
 import { getFinancialCopy } from "../financial-i18n";
 import { sellerSalesCopy } from "../seller-sales-i18n";
+import { getWalletCopy } from "../wallet-i18n";
 import { HistoryPagination, HistoryShell } from "../workspace-history";
 export async function salesHistoryMetadata(): Promise<Metadata> {
   return {
@@ -38,6 +40,7 @@ export async function SalesHistoryScreen({ query }: { query: { page?: string | s
   const [locale, store] = await Promise.all([getRequestLocale(), cookies()]);
   const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
   const copy = getCommerceHistoryCopy(typedLocale);
+  const historyNotice = commerceHistoryBetaNotice(typedLocale, isWalletEngineEnabled());
   const dictionary = getDictionary(typedLocale);
   let user: Awaited<ReturnType<typeof authService.getSession>>;
   try {
@@ -69,7 +72,7 @@ export async function SalesHistoryScreen({ query }: { query: { page?: string | s
   if (!result) {
     return (
       <div className={pageShellClip}>
-        <HistoryShell copy={copy} area="sales">
+        <HistoryShell copy={copy} area="sales" notice={historyNotice}>
           <ErrorState
             title={copy.salesLoadUnavailable}
             description={copy.salesLoadUnavailableHint}
@@ -86,15 +89,20 @@ export async function SalesHistoryScreen({ query }: { query: { page?: string | s
 
   return (
     <div className={pageShellClip}>
-      <HistoryShell copy={copy} area="sales">
+      <HistoryShell copy={copy} area="sales" notice={historyNotice}>
         <Link href="/workspace/sales/report" className={linkAccentSmRounded}>
           {sellerSalesCopy(typedLocale).title}
         </Link>
         <Link href="/workspace/finance" className={linkAccentSmRounded}>
           {getFinancialCopy(typedLocale).title}
         </Link>
+        {isWalletEngineEnabled() ? (
+          <Link href="/workspace/wallet" className={linkAccentSmRounded}>
+            {getWalletCopy(typedLocale).walletNav}
+          </Link>
+        ) : null}
         <p role="note" className={typeSmMuted}>
-          {copy.grossNotice}
+          {isWalletEngineEnabled() ? copy.walletGrossNotice : copy.grossNotice}
         </p>
         {result.sales.length === 0 ? (
           <EmptyState

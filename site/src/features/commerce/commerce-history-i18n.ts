@@ -8,6 +8,8 @@ export const commerceHistoryCopy = {
     back: "Back to workspace",
     betaNotice:
       "Existing records only. Paid checkout, payouts, invoices, new licenses and paid renewals are not available in this open free beta.",
+    walletBetaNotice:
+      "Existing records only. Site-wallet purchase and settlement can run when the wallet engine is on. Card checkout, live payouts, invoices, and paid renewals stay off until those surfaces are enabled.",
     page: "Page",
     of: "of",
     previous: "Previous",
@@ -74,6 +76,8 @@ export const commerceHistoryCopy = {
     loading: "Loading history…",
     grossNotice:
       "Amounts below are historical gross line prices, not your withdrawable balance, fees, earnings or payout authorization.",
+    walletGrossNotice:
+      "Amounts below are historical gross line prices. Seller proceeds from site-wallet sales sit in escrow held balance for 7 days before release into available site-wallet balance. This list is not a payout authorization.",
     grossPrice: "Gross line price",
     orderStatuses: {
       pending: "Pending",
@@ -97,6 +101,8 @@ export const commerceHistoryCopy = {
     back: "Вернуться в кабинет",
     betaNotice:
       "Только существующие данные. Оплата, вывод средств, счета, новые лицензии и платное продление пока недоступны в открытой бесплатной бете.",
+    walletBetaNotice:
+      "Только существующие данные. Покупка и расчёт через site wallet доступны, когда движок кошелька включён. Карточный checkout, live-выплаты, счета и платное продление остаются выключенными, пока эти поверхности не включены.",
     page: "Страница",
     of: "из",
     previous: "Назад",
@@ -161,6 +167,8 @@ export const commerceHistoryCopy = {
     loading: "Загрузка истории…",
     grossNotice:
       "Показана полная цена позиции заказа, а не доступный к выводу баланс, прибыль, комиссия или разрешение на выплату.",
+    walletGrossNotice:
+      "Показана полная цена позиции заказа. Поступления продавца от продаж через site wallet держатся в escrow (held) 7 дней, затем попадают в available баланс site wallet. Этот список не является разрешением на выплату.",
     grossPrice: "Цена позиции",
     orderStatuses: {
       pending: "Ожидает",
@@ -180,4 +188,9 @@ export const commerceHistoryCopy = {
 
 export function getCommerceHistoryCopy(locale: "en" | "ru") {
   return commerceHistoryCopy[locale];
+}
+
+export function commerceHistoryBetaNotice(locale: "en" | "ru", walletEnabled: boolean): string {
+  const copy = commerceHistoryCopy[locale];
+  return walletEnabled ? copy.walletBetaNotice : copy.betaNotice;
 }

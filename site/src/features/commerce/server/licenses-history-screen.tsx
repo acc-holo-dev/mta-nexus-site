@@ -10,6 +10,7 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellClip } from "../../shell/page-shell";
@@ -28,7 +29,7 @@ import {
   formatHistoryDate,
   licenseStatusLabel,
 } from "../commerce-history-format";
-import { getCommerceHistoryCopy } from "../commerce-history-i18n";
+import { commerceHistoryBetaNotice, getCommerceHistoryCopy } from "../commerce-history-i18n";
 import { licenseArchiveQuery, licenseArchiveUrl } from "../license-archive-query";
 import { getLicenseControlCopy } from "../license-control-i18n";
 import { getLicenseMaintenanceCopy } from "../license-maintenance-i18n";
@@ -58,6 +59,10 @@ export async function licensesHistoryMetadata(): Promise<Metadata> {
 export async function LicensesHistoryScreen({ query }: { query: Query }) {
   const [locale, store] = await Promise.all([getRequestLocale(), cookies()]);
   const copy = getCommerceHistoryCopy(locale);
+  const historyNotice = commerceHistoryBetaNotice(
+    locale === "ru" ? "ru" : "en",
+    isWalletEngineEnabled(),
+  );
   const dictionary = getDictionary(locale);
   let user: Awaited<ReturnType<typeof authService.getSession>>;
   try {
@@ -105,7 +110,7 @@ export async function LicensesHistoryScreen({ query }: { query: Query }) {
   if (!result) {
     return (
       <div className={pageShellClip}>
-        <HistoryShell copy={copy} area="licenses">
+        <HistoryShell copy={copy} area="licenses" notice={historyNotice}>
           <ErrorState
             title={copy.loadUnavailable}
             description={copy.loadUnavailableHint}
@@ -125,7 +130,7 @@ export async function LicensesHistoryScreen({ query }: { query: Query }) {
 
   return (
     <div className={pageShellClip}>
-      <HistoryShell copy={copy} area="licenses">
+      <HistoryShell copy={copy} area="licenses" notice={historyNotice}>
         <LicenseArchiveFilters query={filters} page={result.page} locale={locale} />
         <p role="note" className={typeSmMuted}>
           {copy.licenseNotice}

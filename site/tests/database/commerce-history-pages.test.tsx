@@ -220,6 +220,41 @@ describe("private legacy commerce pages", () => {
     expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   });
 
+  it("keeps free-beta history notice when the wallet engine is off", async () => {
+    const previous = process.env.NEXUS_WALLET_ENGINE;
+    delete process.env.NEXUS_WALLET_ENGINE;
+    try {
+      const copy = getCommerceHistoryCopy("en");
+      const html = renderToStaticMarkup(await Sales(input()));
+      expect(html).toContain(copy.betaNotice);
+      expect(html).not.toContain(copy.walletBetaNotice);
+      expect(html).toContain(copy.grossNotice);
+      expect(html).not.toContain('href="/workspace/wallet"');
+    } finally {
+      if (previous === undefined) delete process.env.NEXUS_WALLET_ENGINE;
+      else process.env.NEXUS_WALLET_ENGINE = previous;
+    }
+  });
+
+  it("switches history honesty and sales wallet nav when the wallet engine is on", async () => {
+    const previous = process.env.NEXUS_WALLET_ENGINE;
+    process.env.NEXUS_WALLET_ENGINE = "1";
+    try {
+      const copy = getCommerceHistoryCopy("en");
+      const html = renderToStaticMarkup(await Sales(input()));
+      expect(html).toContain(copy.walletBetaNotice);
+      expect(html).not.toContain(copy.betaNotice);
+      expect(html).toContain(copy.walletGrossNotice);
+      expect(html).toContain('href="/workspace/wallet"');
+      const purchases = renderToStaticMarkup(await Purchases(input()));
+      expect(purchases).toContain(copy.walletBetaNotice);
+      expect(purchases).not.toContain(copy.betaNotice);
+    } finally {
+      if (previous === undefined) delete process.env.NEXUS_WALLET_ENGINE;
+      else process.env.NEXUS_WALLET_ENGINE = previous;
+    }
+  });
+
   it("recovers with ErrorState when sales history fails to load", async () => {
     state.seller.mockRejectedValue(new Error("db unavailable"));
     const copy = getCommerceHistoryCopy("en");
