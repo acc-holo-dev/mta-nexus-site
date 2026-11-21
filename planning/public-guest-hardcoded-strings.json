@@ -85,7 +85,7 @@
     "site/src/features/support/components/support-message-browser.tsx"
   ],
   "scope": "Git-tracked public guest surfaces — discover, servers, articles, market, community, organizations, users, developers, support, explore, acquire; discovery feature; guest server directory components; guest market/resource, community feed/discussion, profile, and support UI components (excluding feature server/ and *-server ports) — hard-coded guest-facing literals + locale copy ternaries.",
-  "source_sha": "cd5353e849f0955f0e128508912417dc7457b039",
+  "source_sha": "7c2711554e1761164f60e3c093b8e6961541be66",
   "summary": {
     "allowlisted": 2,
     "findings": 2,
