@@ -1,6 +1,25 @@
 {
   "allowlist": [],
-  "findings": [],
+  "findings": [
+    {
+      "kind": "jsx-text",
+      "line": 574,
+      "path": "site/src/features/resources/components/new-resource-form.tsx",
+      "text": "EUR"
+    },
+    {
+      "kind": "jsx-text",
+      "line": 575,
+      "path": "site/src/features/resources/components/new-resource-form.tsx",
+      "text": "USD"
+    },
+    {
+      "kind": "jsx-text",
+      "line": 576,
+      "path": "site/src/features/resources/components/new-resource-form.tsx",
+      "text": "RUB"
+    }
+  ],
   "scan_roots": [
     "site/src/app/workspace",
     "site/src/app/admin",
@@ -38,12 +57,12 @@
     "site/src/features/resources/components/resource-media-editor.tsx"
   ],
   "scope": "Git-tracked member/workspace surfaces — workspace, admin, settings, auth, security app trees; library/commerce/moderation/organizations/notifications/accounts components; selective author/report/server/resource publisher forms (excluding feature server/ and *-server ports) — hard-coded member-facing literals + locale copy ternaries.",
-  "source_sha": "1ce76451ce29b32e0b60c5575e37c8c70aa10dd5",
+  "source_sha": "917f6700ec77a012024bd17f589b9783433d0dc7",
   "summary": {
     "allowlisted": 0,
-    "findings": 0,
+    "findings": 3,
     "locale_copy_ternaries": 0,
     "scanned_files": 425,
-    "unallowlisted": 0
+    "unallowlisted": 3
   }
 }
