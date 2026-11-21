@@ -29,6 +29,8 @@ export class OrderOperationsRepository {
             id: orders.id,
             orderNumber: orders.orderNumber,
             status: orders.status,
+            totalAmount: orders.totalAmount,
+            currency: orders.currency,
             updatedAt: orders.updatedAt,
           })
           .from(orders)

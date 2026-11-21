@@ -146,6 +146,8 @@ export async function PurchaseDetailScreen({
           actorId={actor.id}
           orderId={id}
           amountLabel={`${walletCopy.payTitle}: ${formatHistoryAmount(order.totalAmount, order.currency, typedLocale)}`}
+          amountMinor={order.totalAmount}
+          currency={order.currency}
           canPay={canPayWithWallet}
         />
       ) : null}

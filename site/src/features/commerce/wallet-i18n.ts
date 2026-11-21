@@ -75,6 +75,13 @@ const copy = {
     checkoutFailed: "Wallet checkout was not confirmed. Retry the same request.",
     checkoutSignIn: "Sign in to buy with wallet",
     checkoutOpenOrder: "Open order",
+    spendDue: "Amount due",
+    spendBalanceLoading: "Loading available balance…",
+    spendBalanceUnavailable:
+      "Available balance could not be loaded. Settlement still uses the server ledger if you continue.",
+    spendInsufficient:
+      "Available balance is below the amount due. Top up your site wallet, then return here.",
+    spendTopUpLink: "Open site wallet to top up",
     history: "Recent top-ups",
     activity: "Ledger activity",
     activityEmpty: "No ledger activity for this currency yet.",
@@ -334,6 +341,13 @@ const copy = {
     checkoutFailed: "Оформление с кошелька не подтверждено. Повторите тот же запрос.",
     checkoutSignIn: "Войдите, чтобы купить с кошелька",
     checkoutOpenOrder: "Открыть заказ",
+    spendDue: "К оплате",
+    spendBalanceLoading: "Загрузка доступного баланса…",
+    spendBalanceUnavailable:
+      "Не удалось загрузить доступный баланс. При продолжении расчёт всё равно идёт по серверному ledger.",
+    spendInsufficient:
+      "Доступного баланса недостаточно для суммы к оплате. Пополните site wallet и вернитесь сюда.",
+    spendTopUpLink: "Открыть site wallet для пополнения",
     history: "Недавние пополнения",
     activity: "Движения ledger",
     activityEmpty: "По этой валюте пока нет проводок ledger.",

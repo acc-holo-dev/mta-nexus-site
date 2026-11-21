@@ -509,6 +509,8 @@ export async function ProductDetailPage({
                     actorId={user?.id ?? null}
                     productId={product.id}
                     amountLabel={formattedPrice}
+                    amountMinor={product.price}
+                    currency={product.currency}
                     signedIn={Boolean(user)}
                     signInHref={authEntryHref("login", detailReturnPath)}
                   />

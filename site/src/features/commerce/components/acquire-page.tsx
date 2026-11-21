@@ -401,6 +401,8 @@ function AcquireContent({
             actorId={actorId}
             productId={product.id}
             amountLabel={formattedPrice}
+            amountMinor={product.price}
+            currency={product.currency || "USD"}
             signedIn={signedIn}
             signInHref={authEntryHref("login", acquireReturnPath ?? "/acquire")}
           />

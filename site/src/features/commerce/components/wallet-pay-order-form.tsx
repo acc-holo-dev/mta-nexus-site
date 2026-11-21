@@ -10,16 +10,25 @@ import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import { typeBlockSpace2, typeSmSuccess, typeXlSemiboldPrimary } from "../../shell/type-shell";
 import { getWalletCopy, walletError } from "../wallet-i18n";
 import { confirmedWalletPay } from "../wallet-pay-confirmation";
+import {
+  useWalletSpendBalance,
+  WalletSpendBalancePreview,
+  walletSpendSubmitBlocked,
+} from "./wallet-spend-balance-preview";
 
 export function WalletPayOrderForm({
   actorId,
   orderId,
   amountLabel,
+  amountMinor,
+  currency,
   canPay,
 }: {
   actorId: string;
   orderId: string;
   amountLabel: string;
+  amountMinor: number;
+  currency: string;
   canPay: boolean;
 }) {
   const { locale } = useNexusLocale();
@@ -33,6 +42,7 @@ export function WalletPayOrderForm({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
+  const balance = useWalletSpendBalance(actorId, currency, amountMinor);
 
   // scope is the recovery identity for actor+order; reset local confirm state on change.
   // biome-ignore lint/correctness/useExhaustiveDependencies: scope is the reset identity.
@@ -45,9 +55,11 @@ export function WalletPayOrderForm({
     setDone(false);
   }, [scope]);
 
+  const shortfall = walletSpendSubmitBlocked(balance);
+
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
-    if (!canPay || !confirmed || lock.current) return;
+    if (!canPay || !confirmed || shortfall || lock.current) return;
     lock.current = true;
     setBusy(true);
     setError("");
@@ -93,6 +105,11 @@ export function WalletPayOrderForm({
         </h2>
         <p className="text-secondary">{copy.payNote}</p>
         <p className="text-primary">{amountLabel}</p>
+        <WalletSpendBalancePreview
+          balance={balance}
+          currency={currency}
+          amountMinor={amountMinor}
+        />
       </div>
       <ActionConfirmCheckbox
         id={`${field}-confirm`}
@@ -105,7 +122,12 @@ export function WalletPayOrderForm({
       {error ? (
         <ErrorState id="wallet-pay-error" title={copy.payFailed} description={error} />
       ) : null}
-      <Button type="submit" disabled={!confirmed || busy} isLoading={busy} className="min-h-11">
+      <Button
+        type="submit"
+        disabled={!confirmed || busy || shortfall}
+        isLoading={busy}
+        className="min-h-11"
+      >
         {busy ? copy.paying : copy.paySubmit}
       </Button>
     </form>

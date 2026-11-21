@@ -131,7 +131,9 @@ export async function PurchaseOperationsScreen({
           key={`wallet:${user.id}:${id}`}
           actorId={user.id}
           orderId={id}
-          amountLabel={getWalletCopy(locale === "ru" ? "ru" : "en").paySubmit}
+          amountLabel={`${getWalletCopy(locale === "ru" ? "ru" : "en").paySubmit}: ${formatHistoryAmount(result.order.totalAmount, result.order.currency, locale === "ru" ? "ru" : "en")}`}
+          amountMinor={result.order.totalAmount}
+          currency={result.order.currency}
           canPay
         />
       ) : null}

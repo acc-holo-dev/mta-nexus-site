@@ -9,17 +9,26 @@ import { useNexusLocale } from "../../shell/locale";
 import { typeBlockSpace2, typeSmSuccess } from "../../shell/type-shell";
 import { confirmedWalletCheckout } from "../wallet-checkout-confirmation";
 import { getWalletCopy, walletError } from "../wallet-i18n";
+import {
+  useWalletSpendBalance,
+  WalletSpendBalancePreview,
+  walletSpendSubmitBlocked,
+} from "./wallet-spend-balance-preview";
 
 export function WalletCheckoutButton({
   actorId,
   productId,
   amountLabel,
+  amountMinor,
+  currency,
   signedIn,
   signInHref,
 }: {
   actorId: string | null;
   productId: string;
   amountLabel: string;
+  amountMinor: number;
+  currency: string;
   signedIn: boolean;
   signInHref: string;
 }) {
@@ -33,6 +42,7 @@ export function WalletCheckoutButton({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState<{ orderId: string; orderNumber: string } | null>(null);
+  const balance = useWalletSpendBalance(actorId ?? "", currency, amountMinor);
 
   if (!signedIn || !actorId) {
     return (
@@ -45,9 +55,11 @@ export function WalletCheckoutButton({
     );
   }
 
+  const shortfall = walletSpendSubmitBlocked(balance);
+
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
-    if (!actorId || !confirmed || lock.current) return;
+    if (!actorId || !confirmed || shortfall || lock.current) return;
     lock.current = true;
     setBusy(true);
     setError("");
@@ -104,6 +116,11 @@ export function WalletCheckoutButton({
         </h3>
         <p className="text-[11px] text-muted">{copy.checkoutNote}</p>
         <p className="text-sm text-primary">{amountLabel}</p>
+        <WalletSpendBalancePreview
+          balance={balance}
+          currency={currency}
+          amountMinor={amountMinor}
+        />
       </div>
       <ActionConfirmCheckbox
         id={`${field}-confirm`}
@@ -118,7 +135,7 @@ export function WalletCheckoutButton({
       ) : null}
       <Button
         type="submit"
-        disabled={!confirmed || busy}
+        disabled={!confirmed || busy || shortfall}
         isLoading={busy}
         className="min-h-11 w-full"
       >
