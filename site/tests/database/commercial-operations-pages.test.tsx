@@ -218,15 +218,47 @@ it("preserves immutable draft editor semantics and escapes historical reasons", 
   expect(html).not.toContain("PRIVATE-");
 });
 it("masks unknown attempt states, keeps private metadata out, and blocks cancellation after an attempt", async () => {
+  const copy = getCommercialCopy("en");
   const html = markup(await Operations(input));
   expect(html).toContain("Unknown state");
   expect(html).toContain("Site wallet");
   expect(html).toContain("audited ledger settle");
-  expect(html).toContain("provider reconciliation");
+  expect(html).toContain(copy.cannotCancelWallet);
+  expect(html).toContain(copy.cannotCancelWalletHint);
+  expect(html).toContain("not provider reconciliation");
+  expect(html).not.toContain(copy.cannotCancel);
+  expect(html).not.toContain(copy.cannotCancelHint);
   expect(html).not.toContain("PRIVATE-");
   expect(html).not.toContain("unrecognized-private-state");
   expect(html).not.toContain("<textarea");
   expect((await generateMetadata()).robots).toEqual({ index: false, follow: false });
+});
+it("keeps provider-reconciliation cancel blocker when the attempt is not site wallet", async () => {
+  const copy = getCommercialCopy("en");
+  state.detail.mockResolvedValue({
+    order: { id: "ord_a", orderNumber: "N-1", status: "pending", updatedAt: now },
+    attempts: [
+      {
+        id: "pay_b",
+        provider: "stripe",
+        status: "completed",
+        amount: 999,
+        currency: "USD",
+        createdAt: now,
+        updatedAt: now,
+        providerTransactionId: "PRIVATE-TX",
+        failureReason: null,
+      },
+    ],
+    canCancel: false,
+    total: 1,
+    totalPages: 1,
+    page: 1,
+  });
+  const html = markup(await Operations(input));
+  expect(html).toContain(copy.cannotCancel);
+  expect(html).toContain("provider reconciliation");
+  expect(html).not.toContain(copy.cannotCancelWallet);
 });
 it("provides reason and confirmation controls only for a currently cancellable unpaid order", async () => {
   state.detail.mockResolvedValue({

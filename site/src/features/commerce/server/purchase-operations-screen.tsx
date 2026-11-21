@@ -149,8 +149,14 @@ export async function PurchaseOperationsScreen({
       {!result.canCancel ? (
         <ErrorState
           id="order-operations-cannot-cancel"
-          title={result.order.status === "cancelled" ? copy.cancelledPayment : copy.cannotCancel}
-          description={copy.cannotCancelHint}
+          title={
+            result.order.status === "cancelled"
+              ? copy.cancelledPayment
+              : hasWalletAttempt
+                ? copy.cannotCancelWallet
+                : copy.cannotCancel
+          }
+          description={hasWalletAttempt ? copy.cannotCancelWalletHint : copy.cannotCancelHint}
         />
       ) : null}
       <section aria-labelledby="payment-attempts" className="space-y-4">

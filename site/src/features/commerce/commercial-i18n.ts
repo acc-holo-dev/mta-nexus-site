@@ -89,6 +89,10 @@ const copy = {
       "This order cannot be cancelled here. Orders with payment attempts require provider reconciliation.",
     cannotCancelHint:
       "Cancellation here applies only to unpaid orders with no recorded payment attempts. Recorded attempts need provider reconciliation, not a repeat cancel form.",
+    cannotCancelWallet:
+      "This order cannot be cancelled here. A recorded site-wallet payment attempt needs staff ledger review, not a buyer cancel form.",
+    cannotCancelWalletHint:
+      "Cancellation here applies only to unpaid orders with no recorded payment attempts or ledger rows. Site-wallet settles and refunds use the audited ledger path (staff refund when recommended) — not provider reconciliation and not a repeat cancel form.",
     cancel: "Cancel unpaid order",
     cancelling: "Cancelling…",
     cancelled: "Cancellation confirmed.",
@@ -228,6 +232,10 @@ const copy = {
       "Этот заказ нельзя отменить здесь. Заказы с платёжными попытками требуют сверки с провайдером.",
     cannotCancelHint:
       "Отмена здесь возможна только для неоплаченных заказов без записанных платёжных попыток. Зафиксированные попытки требуют сверки с провайдером, а не повторной формы отмены.",
+    cannotCancelWallet:
+      "Этот заказ нельзя отменить здесь. Записанная попытка оплаты через site wallet требует staff ledger review, а не формы отмены покупателя.",
+    cannotCancelWalletHint:
+      "Отмена здесь возможна только для неоплаченных заказов без записанных платёжных попыток и проводок. Settle и возвраты site wallet идут через аудируемый ledger (staff refund при рекомендации) — не через сверку с провайдером и не через повтор формы отмены.",
     cancel: "Отменить неоплаченный заказ",
     cancelling: "Отмена…",
     cancelled: "Отмена подтверждена.",
