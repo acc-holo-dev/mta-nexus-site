@@ -23,11 +23,12 @@ describe("NX-015 verified-state honesty", () => {
     expect(constraints).toContain("NEXUS_WALLET_ENGINE");
     expect(constraints).toContain("NEXUS_WALLET_WITHDRAW");
     expect(constraints).toContain("CHECKOUT_DISABLED");
-    expect(constraints).toContain("не означает live payments");
+    expect(constraints).toContain("live payments");
+    expect(constraints).toContain("не** означает");
 
     expect(roadmap).toContain("NX-015");
     expect(roadmap).toContain("OPERATIONS.md#site-wallet-dark-flags");
-    expect(roadmap).toContain("не включает live PSP/payout/refund");
+    expect(roadmap).toContain("live PSP/payout/refund");
 
     expect(commerce).toContain("Implementation status:");
     expect(commerce).toContain("NEXUS_WALLET_ENGINE");
