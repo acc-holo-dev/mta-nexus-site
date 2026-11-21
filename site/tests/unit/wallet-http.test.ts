@@ -10,6 +10,7 @@ const state = vi.hoisted(() => ({
   user: { id: "usr_wallet", role: "user" } as { id: string; role: string } | null,
   allowed: true,
   startTopUp: vi.fn(),
+  listRecentTopUps: vi.fn(),
   getAvailableBalance: vi.fn(),
   listRecentActivity: vi.fn(),
   applyVerifiedWebhook: vi.fn(),
@@ -25,6 +26,7 @@ vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
   isWalletEngineEnabled: () => state.engine,
   WalletPaymentService: class {
     startTopUp = state.startTopUp;
+    listRecentTopUps = state.listRecentTopUps;
     getAvailableBalance = state.getAvailableBalance;
     listRecentActivity = state.listRecentActivity;
     applyVerifiedWebhook = state.applyVerifiedWebhook;
@@ -40,7 +42,7 @@ vi.mock("@nexus/security", () => ({
 import { GET as activity } from "../../src/app/api/wallet/activity/route";
 import { GET as balance } from "../../src/app/api/wallet/balance/route";
 import { POST as webhook } from "../../src/app/api/wallet/providers/[providerId]/webhook/route";
-import { POST as topups } from "../../src/app/api/wallet/topups/route";
+import { GET as listTopUps, POST as topups } from "../../src/app/api/wallet/topups/route";
 
 function topUpRequest(body: unknown) {
   return new NextRequest("https://nexus.test/api/wallet/topups", {
@@ -98,6 +100,16 @@ describe("wallet HTTP", () => {
       },
       redirectUrl: null,
     });
+    state.listRecentTopUps.mockReset().mockResolvedValue([
+      {
+        id: "pay_test_1",
+        status: "awaiting_provider",
+        amount: 500,
+        currency: "EUR",
+        providerId: "stub",
+        createdAt: "2026-11-21T03:00:00.000Z",
+      },
+    ]);
     state.getAvailableBalance.mockReset().mockResolvedValue(1200);
     state.listRecentActivity.mockReset().mockResolvedValue([
       {
@@ -128,10 +140,17 @@ describe("wallet HTTP", () => {
     vi.unstubAllEnvs();
   });
 
+  function listTopUpsRequest(query: string) {
+    return new NextRequest(`https://nexus.test/api/wallet/topups?${query}`, {
+      headers: { cookie: "nexus_session=wallet-token" },
+    });
+  }
+
   it("hides wallet routes when the engine flag is off", async () => {
     state.engine = false;
     expect((await balance(balanceRequest("currency=EUR"))).status).toBe(404);
     expect((await activity(activityRequest("currency=EUR"))).status).toBe(404);
+    expect((await listTopUps(listTopUpsRequest("currency=EUR"))).status).toBe(404);
     expect((await topups(topUpRequest({}))).status).toBe(404);
     expect(
       (
@@ -195,6 +214,47 @@ describe("wallet HTTP", () => {
   it("rejects unsupported activity currency", async () => {
     expect((await activity(activityRequest("currency=BTC"))).status).toBe(400);
     expect(state.listRecentActivity).not.toHaveBeenCalled();
+  });
+
+  it("lists recent top-up intents for the signed-in account", async () => {
+    const response = await listTopUps(listTopUpsRequest("currency=EUR"));
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      accountId: "user:usr_wallet",
+      organizationId: null,
+      currency: "EUR",
+      topUps: [{ id: "pay_test_1", status: "awaiting_provider", amount: 500 }],
+    });
+    expect(state.listRecentTopUps).toHaveBeenCalledWith("user:usr_wallet", 20);
+  });
+
+  it("lists organization top-up intents for owner/admin", async () => {
+    state.listRecentTopUps.mockResolvedValueOnce([
+      {
+        id: "pay_org_1",
+        status: "awaiting_provider",
+        amount: 750,
+        currency: "EUR",
+        providerId: "stub",
+        createdAt: "2026-11-21T03:10:00.000Z",
+      },
+    ]);
+    const response = await listTopUps(listTopUpsRequest("currency=EUR&organizationId=org_sellers"));
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      accountId: "org:org_sellers",
+      organizationId: "org_sellers",
+      topUps: [{ id: "pay_org_1", amount: 750 }],
+    });
+    expect(state.resolveSellerAccountId).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "usr_wallet" }),
+      "org_sellers",
+    );
+  });
+
+  it("rejects unsupported top-up list currency", async () => {
+    expect((await listTopUps(listTopUpsRequest("currency=BTC"))).status).toBe(400);
+    expect(state.listRecentTopUps).not.toHaveBeenCalled();
   });
 
   it("starts a stub top-up for the signed-in account", async () => {

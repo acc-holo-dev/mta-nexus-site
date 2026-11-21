@@ -43,6 +43,14 @@ export const walletTopUpCancelSchema = z
   })
   .strict();
 
+export const walletTopUpQuerySchema = z
+  .object({
+    currency,
+    limit: z.coerce.number().int().min(1).max(100).optional(),
+    organizationId: organizationId.optional(),
+  })
+  .strict();
+
 export const walletBalanceQuerySchema = z
   .object({
     currency,
