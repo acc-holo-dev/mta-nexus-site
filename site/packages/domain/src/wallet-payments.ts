@@ -1011,6 +1011,51 @@ export class StubPaymentProvider implements PaymentProviderPort {
   }
 }
 
+const LIVE_PROVIDER_IDS = ["stripe", "yookassa", "crypto"] as const;
+export type LivePaymentProviderId = (typeof LIVE_PROVIDER_IDS)[number];
+
+/**
+ * Dark live PSP port: declares intended capabilities for the admin matrix but
+ * refuses every session/webhook call until credentials and adapters are wired.
+ */
+export class UnconfiguredPaymentProvider implements PaymentProviderPort {
+  readonly capabilities = ["topup", "payout", "webhook_verify", "refund"] as const;
+
+  constructor(readonly id: LivePaymentProviderId) {
+    if (!(LIVE_PROVIDER_IDS as readonly string[]).includes(id)) {
+      throw new AppError("Payment provider is unknown", 400, "PAYMENT_PROVIDER_UNKNOWN");
+    }
+  }
+
+  private notConfigured(): never {
+    throw new AppError(
+      `Payment provider ${this.id} is not configured`,
+      503,
+      "PAYMENT_PROVIDER_NOT_CONFIGURED",
+    );
+  }
+
+  async createTopUpSession(_input: CreateTopUpSessionInput): Promise<CreateTopUpSessionResult> {
+    return this.notConfigured();
+  }
+
+  async createPayoutSession(_input: CreatePayoutSessionInput): Promise<CreatePayoutSessionResult> {
+    return this.notConfigured();
+  }
+
+  async verifyWebhook(_input: VerifyWebhookInput): Promise<VerifiedProviderEvent> {
+    return this.notConfigured();
+  }
+}
+
+/** Default registered ports: stub (local/CI) plus dark live PSP placeholders. */
+export function defaultWalletPaymentProviders(): PaymentProviderPort[] {
+  return [
+    new StubPaymentProvider(),
+    ...LIVE_PROVIDER_IDS.map((id) => new UnconfiguredPaymentProvider(id)),
+  ];
+}
+
 export function selectPaymentProvider(
   ports: readonly PaymentProviderPort[],
   providerId: PaymentProviderId,

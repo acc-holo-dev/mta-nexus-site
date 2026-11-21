@@ -7,8 +7,9 @@ panel and runtime probe live here too. Services, repositories, routes and
 
 **Wallet (NX-015):** domain ports live in `@nexus/domain` (`wallet-payments`) and
 `site/src/lib/services/commerce/wallet-payment-service.ts`. Site stored-value balance
-uses the existing double-entry ledger; multi-provider capability matrix; stub top-up
-only until PSP contracts. Top-up intents persist in `wallet_topup_intents` (migration
+uses the existing double-entry ledger; multi-provider capability matrix (admin
+`/admin/commerce/wallet-providers`); stub top-up plus dark Stripe/YooKassa/crypto
+ports that refuse sessions until PSP contracts. Top-up intents persist in `wallet_topup_intents` (migration
 `0091_wallet_topup_intents`) via `walletTopupRepository`. Stub credit:
 `POST /api/wallet/topups/:id/stub-credit` applies a stub-only verified outcome.
 Ledger wallet reference
@@ -99,6 +100,7 @@ wallet.
 | `wallet-checkout.ts`              | `WalletCheckoutButton` (client); create+settle via `/api/checkout/wallet`                                         |
 | `wallet-checkout-confirmation.ts` | util port `wallet-checkout-confirmation`                                                                          |
 | `wallet-workspace-server.ts`      | `WalletWorkspaceScreen`, metadata; `/workspace/wallet`                                                            |
+| `wallet-providers-admin-server.ts`| `WalletProvidersAdminScreen`, metadata; `/admin/commerce/wallet-providers`                                        |
 
 Внутренние `components/` и `server/` не являются публичным API. Границы — dependency-cruiser
 и `scripts/tests/commerce-feature-boundaries.node-test.mjs`.

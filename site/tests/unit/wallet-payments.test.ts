@@ -10,6 +10,7 @@ import {
   buildWithdrawalHoldPosting,
   createTopUpIntent,
   createWithdrawalIntent,
+  defaultWalletPaymentProviders,
   isWalletIntentStale,
   type LedgerPosting,
   markTopUpAwaitingProvider,
@@ -20,6 +21,7 @@ import {
   StubPaymentProvider,
   selectPaymentProvider,
   type TopUpIntent,
+  UnconfiguredPaymentProvider,
   validateLedgerPosting,
   WALLET_INTENT_STALE_AFTER_MS,
   walletAccountIdForOrganization,
@@ -418,6 +420,41 @@ describe("wallet payments domain", () => {
       },
     ]);
     expect(selectPaymentProvider([stub], "stub", "topup").id).toBe("stub");
+  });
+
+  it("registers stub plus dark live ports with liveConfigured false by default", () => {
+    const ports = defaultWalletPaymentProviders();
+    expect(ports.map((port) => port.id)).toEqual(["stub", "stripe", "yookassa", "crypto"]);
+    const matrix = paymentProviderCapabilityMatrix(ports);
+    expect(matrix.every((row) => row.liveConfigured === false)).toBe(true);
+    expect(matrix.map((row) => row.id)).toEqual(["stub", "stripe", "yookassa", "crypto"]);
+  });
+
+  it("dark live ports refuse sessions and webhooks as not configured", async () => {
+    const stripe = new UnconfiguredPaymentProvider("stripe");
+    await expect(
+      stripe.createTopUpSession({
+        intentId: "wtop_dark",
+        accountId: "user:usr_a",
+        amount: 100,
+        currency: "USD",
+        idempotencyKey: "idem_dark",
+        returnPath: "/workspace/wallet",
+      }),
+    ).rejects.toMatchObject({ code: "PAYMENT_PROVIDER_NOT_CONFIGURED" });
+    await expect(
+      stripe.createPayoutSession({
+        intentId: "wwithdraw_dark",
+        accountId: "user:usr_a",
+        amount: 100,
+        currency: "USD",
+        idempotencyKey: "idem_dark_payout",
+      }),
+    ).rejects.toMatchObject({ code: "PAYMENT_PROVIDER_NOT_CONFIGURED" });
+    await expect(stripe.verifyWebhook({ rawBody: "{}", headers: {} })).rejects.toMatchObject({
+      code: "PAYMENT_PROVIDER_NOT_CONFIGURED",
+    });
+    expect(selectPaymentProvider([stripe], "stripe", "topup").id).toBe("stripe");
   });
 
   it("stub provider rejects unsigned webhooks and accepts signed top-up success", async () => {

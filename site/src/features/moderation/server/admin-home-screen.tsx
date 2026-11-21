@@ -20,6 +20,7 @@ import { adminService } from "../../../lib/services/moderation/admin-service";
 import { adSlotRendererEnabled, advertisingLifecycleEnabled } from "../../accounts/feature-flags";
 import { getCommercialCopy } from "../../commerce/commercial-i18n";
 import { getFinancialCopy } from "../../commerce/financial-i18n";
+import { getWalletCopy } from "../../commerce/wallet-i18n";
 import { moderationCopy } from "../../community/community-moderation-copy";
 import { ContentModerationControls } from "../../community/content-moderation";
 import { getResourceReleaseControlCopy } from "../../library/resource-release-control-i18n";
@@ -249,6 +250,11 @@ export async function AdminHomeScreen({
           {currentUser.role === "admin" ? (
             <Link href="/admin/commerce/reconciliation" className={chromeLinkClass}>
               {getFinancialCopy(locale).review}
+            </Link>
+          ) : null}
+          {currentUser.role === "admin" ? (
+            <Link href="/admin/commerce/wallet-providers" className={chromeLinkClass}>
+              {getWalletCopy(locale).providersAdminTitle}
             </Link>
           ) : null}
           <Link href="/admin/support" className={chromeLinkClass}>

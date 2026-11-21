@@ -22,6 +22,7 @@ import {
   canManageOrganization,
   createTopUpIntent,
   createWithdrawalIntent,
+  defaultWalletPaymentProviders,
   ForbiddenError,
   markTopUpAwaitingProvider,
   markTopUpFailed,
@@ -31,7 +32,6 @@ import {
   type PaymentProviderId,
   type PaymentProviderPort,
   paymentProviderCapabilityMatrix,
-  StubPaymentProvider,
   selectPaymentProvider,
   type TopUpIntent,
   type User,
@@ -66,13 +66,9 @@ export function isWalletWithdrawEnabled(
   return isWalletEngineEnabled(env) && env.NEXUS_WALLET_WITHDRAW === "1";
 }
 
-function defaultPaymentProviders(): PaymentProviderPort[] {
-  return [new StubPaymentProvider()];
-}
-
 export class WalletPaymentService {
   constructor(
-    private readonly providers: readonly PaymentProviderPort[] = defaultPaymentProviders(),
+    private readonly providers: readonly PaymentProviderPort[] = defaultWalletPaymentProviders(),
     private readonly topups = walletTopupRepository,
     private readonly withdrawals = walletWithdrawalRepository,
     private readonly ledger = ledgerRepository,
@@ -82,6 +78,10 @@ export class WalletPaymentService {
     private readonly holds = walletSellerHoldRepository,
   ) {}
 
+  /**
+   * Admin/ops matrix. Live PSP credentials are never marked configured here —
+   * stub is a local/CI adapter, not a live provider.
+   */
   capabilityMatrix(liveConfigured: Readonly<Partial<Record<PaymentProviderId, boolean>>> = {}) {
     return paymentProviderCapabilityMatrix(this.providers, liveConfigured);
   }
