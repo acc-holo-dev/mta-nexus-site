@@ -5,7 +5,9 @@ tabs and pagination chrome. License workspace/admin detail, archive filters, con
 panel and runtime probe live here too. Services, repositories, routes and
 `commerce-history-*` / `license-*` helpers stay in existing layers.
 
-**Wallet (NX-015):** domain ports live in `@nexus/domain` (`wallet-payments`) and
+**Wallet (NX-015):** operator flags and admin batch endpoints —
+[`docs/OPERATIONS.md`](../../../docs/OPERATIONS.md#site-wallet-dark-flags).
+Domain ports live in `@nexus/domain` (`wallet-payments`) and
 `site/src/lib/services/commerce/wallet-payment-service.ts`. Site stored-value balance
 uses the existing double-entry ledger; multi-provider capability matrix (admin
 `/admin/commerce/wallet-providers`); stub top-up plus dark Stripe/YooKassa/crypto

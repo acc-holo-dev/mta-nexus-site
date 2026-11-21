@@ -10,6 +10,7 @@ This document covers development startup, verification and production boundaries
 1. [Supported DEV startup](#1-supported-dev-startup)
 2. [Verification](#2-verification)
 3. [Production boundary](#3-production-boundary)
+   - [Site wallet (dark flags)](#site-wallet-dark-flags)
 4. [Backup and recovery](#4-backup-and-recovery)
 5. [Resource safety operations](#5-resource-safety-operations)
 6. [Branch and release operations](#6-branch-and-release-operations)
@@ -302,7 +303,34 @@ Required properties include:
 - no public database/ClamAV ports;
 - explicit recovery/email configuration before claiming email delivery is operational.
 
-Paid commerce remains disabled.
+Card checkout (`POST /api/checkout`) stays `CHECKOUT_DISABLED`. Live PSP adapters,
+live payouts, and live PSP refunds stay off. Enabling site-wallet dark flags is
+not a production deploy and does not authorize live money movement.
+
+### Site wallet (dark flags)
+
+Optional site-wallet ledger paths stay dark unless both environment flags are
+understood. Defaults are unset/off; document them in the host env (see
+`config/env/.env.example`). Feature/operator surfaces:
+
+| Flag | Effect when set to `1` |
+| --- | --- |
+| `NEXUS_WALLET_ENGINE` | Unlocks `/api/wallet/*`, pay-with-wallet, `POST /api/checkout/wallet`, `/workspace/wallet`, paid `single_server` create/settle, and admin wallet ops under `/admin/commerce/wallet-providers`. |
+| `NEXUS_WALLET_WITHDRAW` | Also requires the engine. Unlocks withdrawal intents and `POST /api/admin/commerce/wallet-withdrawals/expire-stale`. Live payout adapters stay off. |
+
+Admin batch CTAs on `/admin/commerce/wallet-providers` call existing admin HTTP
+(not a cron, not a live PSP). Empty batches are a successful no-op. The page
+shows a read-only eligible-count preview for the next batch under the default
+age window (7d) and limit (20, max 50):
+
+- `POST /api/admin/commerce/wallet-holds/release-matured` — matured ECON-002 holds → available
+- `POST /api/admin/commerce/wallet-topups/expire-stale` — stale awaiting/created top-ups → failed (no ledger)
+- `POST /api/admin/commerce/wallet-orders/expire-stale` — stale unpaid pending orders (no payments/ledger) → cancelled
+- `POST /api/admin/commerce/wallet-withdrawals/expire-stale` — stale awaiting withdrawals → cancelled with escrow return (needs withdraw flag)
+
+Staff wallet refund remains on purchase cases
+(`POST /api/admin/commerce/wallet-orders/:orderId/refund`), not on the
+reconciliation queue. Feature map: `site/src/features/commerce/README.md`.
 
 ### Infrastructure directory migration
 
