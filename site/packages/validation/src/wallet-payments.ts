@@ -38,6 +38,18 @@ export const walletActivityQuerySchema = z
   })
   .strict();
 
+export const walletHeldQuerySchema = z
+  .object({
+    currency,
+  })
+  .strict();
+
+export const walletHoldReleaseSchema = z
+  .object({
+    nowIso: z.string().datetime().optional(),
+  })
+  .strict();
+
 export const walletProviderIdSchema = providerId;
 
 export const walletPayOrderSchema = z

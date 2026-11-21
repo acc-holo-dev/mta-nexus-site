@@ -1,7 +1,42 @@
-import { BASE_COMMISSION_BPS, commercialFeeEstimate } from "./commercial-plans";
+import { BASE_COMMISSION_BPS, commercialFeeEstimate, INITIAL_HOLD_DAYS } from "./commercial-plans";
 import { AppError } from "./errors";
 import type { LedgerPosting } from "./financial-journal";
 import { validateLedgerPosting } from "./financial-journal";
+
+export { INITIAL_HOLD_DAYS };
+
+export type WalletSellerHoldStatus = "held" | "released" | "cancelled";
+
+export type WalletSellerHold = {
+  id: string;
+  orderId: string;
+  sellerAccountId: string;
+  escrowAccountId: string;
+  amount: number;
+  currency: WalletCurrency;
+  status: WalletSellerHoldStatus;
+  heldAt: string;
+  releaseAt: string;
+  holdLedgerBatchId: string;
+  releaseLedgerBatchId: string | null;
+};
+
+export function assertEscrowAccountId(accountId: string): void {
+  if (!/^escrow:[A-Za-z0-9_-]{1,160}$/u.test(accountId)) {
+    throw new AppError("Escrow account id is invalid", 400, "WALLET_ACCOUNT_INVALID");
+  }
+}
+
+export function walletHoldReleaseAt(heldAtIso: string, holdDays = INITIAL_HOLD_DAYS): string {
+  if (!Number.isSafeInteger(holdDays) || holdDays < 1 || holdDays > 365) {
+    throw new AppError("Hold days are out of range", 400, "WALLET_HOLD_INVALID");
+  }
+  const heldAt = Date.parse(heldAtIso);
+  if (!Number.isFinite(heldAt)) {
+    throw new AppError("Hold timestamp is invalid", 400, "WALLET_HOLD_INVALID");
+  }
+  return new Date(heldAt + holdDays * 86_400_000).toISOString();
+}
 
 /** Wallet engine currencies match the existing ledger allowlist. */
 export const WALLET_CURRENCIES = ["USD", "EUR", "RUB"] as const;
@@ -255,7 +290,7 @@ export function markTopUpFailed(intent: TopUpIntent, event: VerifiedProviderEven
 
 /**
  * Split a wallet spend gross into platform fee + seller proceeds (ECON-001).
- * Hold/release of seller proceeds remains a later slice; launch credits sellers available.
+ * Seller proceeds are held in escrow for INITIAL_HOLD_DAYS (ECON-002) before release.
  */
 export function allocateWalletSpendCommission(input: {
   lines: ReadonlyArray<{ grossAmount: number; sellerAccountId: string }>;
@@ -290,9 +325,8 @@ export function allocateWalletSpendCommission(input: {
 }
 
 /**
- * Spend available wallet balance against an order with platform fee + seller credits.
- * Caller supplies the current available balance from the ledger projection; this
- * function never invents funds. Seller hold/release is out of scope for this posting.
+ * Spend available wallet balance against an order: buyer debit, platform fee,
+ * seller proceeds into escrow (wallet_hold). Release is a separate posting.
  */
 export function buildWalletSpendPosting(input: {
   accountId: string;
@@ -303,7 +337,12 @@ export function buildWalletSpendPosting(input: {
   userEntryId: string;
   platformFeeEntryId: string;
   platformFee: number;
-  sellerCredits: ReadonlyArray<{ accountId: string; amount: number; entryId: string }>;
+  sellerHolds: ReadonlyArray<{
+    sellerAccountId: string;
+    escrowAccountId: string;
+    amount: number;
+    entryId: string;
+  }>;
 }): LedgerPosting[] {
   assertWalletAccountId(input.accountId);
   assertWalletAmount(input.amount);
@@ -324,33 +363,40 @@ export function buildWalletSpendPosting(input: {
   ) {
     throw new AppError("Platform fee is out of range", 400, "WALLET_SPEND_INVALID");
   }
-  if (input.sellerCredits.length === 0) {
-    throw new AppError("Wallet spend requires seller credits", 400, "WALLET_SPEND_INVALID");
+  if (input.sellerHolds.length === 0) {
+    throw new AppError("Wallet spend requires seller holds", 400, "WALLET_SPEND_INVALID");
   }
 
   let sellerTotal = 0;
   const seenSellers = new Set<string>();
+  const seenEscrows = new Set<string>();
   const seenEntryIds = new Set<string>([input.userEntryId, input.platformFeeEntryId]);
-  for (const credit of input.sellerCredits) {
-    assertWalletAccountId(credit.accountId);
-    if (credit.accountId === input.accountId) {
+  for (const hold of input.sellerHolds) {
+    assertWalletAccountId(hold.sellerAccountId);
+    assertEscrowAccountId(hold.escrowAccountId);
+    if (hold.sellerAccountId === input.accountId) {
       throw new AppError("Buyer cannot be the seller credit target", 400, "WALLET_SPEND_INVALID");
     }
-    if (seenSellers.has(credit.accountId) || seenEntryIds.has(credit.entryId)) {
-      throw new AppError("Seller credit lines must be unique", 400, "WALLET_SPEND_INVALID");
+    if (
+      seenSellers.has(hold.sellerAccountId) ||
+      seenEscrows.has(hold.escrowAccountId) ||
+      seenEntryIds.has(hold.entryId)
+    ) {
+      throw new AppError("Seller hold lines must be unique", 400, "WALLET_SPEND_INVALID");
     }
-    if (!Number.isSafeInteger(credit.amount) || credit.amount < 0) {
-      throw new AppError("Seller credit is out of range", 400, "WALLET_SPEND_INVALID");
+    if (!Number.isSafeInteger(hold.amount) || hold.amount < 0) {
+      throw new AppError("Seller hold is out of range", 400, "WALLET_SPEND_INVALID");
     }
-    seenSellers.add(credit.accountId);
-    seenEntryIds.add(credit.entryId);
-    sellerTotal += credit.amount;
+    seenSellers.add(hold.sellerAccountId);
+    seenEscrows.add(hold.escrowAccountId);
+    seenEntryIds.add(hold.entryId);
+    sellerTotal += hold.amount;
   }
   if (input.platformFee + sellerTotal !== input.amount) {
     throw new AppError("Wallet spend split does not balance", 400, "WALLET_SPEND_INVALID");
   }
 
-  // Journal entries forbid amount === 0; omit zero fee/credit legs after rounding.
+  // Journal entries forbid amount === 0; omit zero fee/hold legs after rounding.
   const entries: LedgerPosting[] = [
     {
       id: input.userEntryId,
@@ -373,18 +419,71 @@ export function buildWalletSpendPosting(input: {
       description: `Platform fee for order ${input.orderId}`,
     });
   }
-  for (const credit of input.sellerCredits) {
-    if (credit.amount === 0) continue;
+  for (const hold of input.sellerHolds) {
+    if (hold.amount === 0) continue;
     entries.push({
-      id: credit.entryId,
-      accountId: credit.accountId,
-      amount: credit.amount,
+      id: hold.entryId,
+      accountId: hold.escrowAccountId,
+      amount: hold.amount,
       currency: input.currency,
-      referenceType: "wallet_spend",
+      referenceType: "wallet_hold",
       referenceId: input.orderId,
-      description: `Seller proceeds for order ${input.orderId}`,
+      description: `Seller hold for order ${input.orderId} (${hold.sellerAccountId})`,
     });
   }
+  validateLedgerPosting(entries);
+  return entries;
+}
+
+/** Release a matured seller hold from escrow into the seller available balance. */
+export function buildWalletHoldReleasePosting(input: {
+  hold: Pick<
+    WalletSellerHold,
+    | "id"
+    | "orderId"
+    | "sellerAccountId"
+    | "escrowAccountId"
+    | "amount"
+    | "currency"
+    | "status"
+    | "releaseAt"
+  >;
+  escrowEntryId: string;
+  sellerEntryId: string;
+  nowIso: string;
+}): LedgerPosting[] {
+  if (input.hold.status !== "held") {
+    throw new AppError("Hold is not releasable", 409, "WALLET_HOLD_STATE");
+  }
+  const nowMs = Date.parse(input.nowIso);
+  const releaseMs = Date.parse(input.hold.releaseAt);
+  if (!Number.isFinite(nowMs) || !Number.isFinite(releaseMs) || nowMs < releaseMs) {
+    throw new AppError("Hold is not matured", 409, "WALLET_HOLD_NOT_MATURE");
+  }
+  assertWalletAccountId(input.hold.sellerAccountId);
+  assertEscrowAccountId(input.hold.escrowAccountId);
+  assertWalletAmount(input.hold.amount);
+  assertWalletCurrency(input.hold.currency);
+  const entries: LedgerPosting[] = [
+    {
+      id: input.escrowEntryId,
+      accountId: input.hold.escrowAccountId,
+      amount: -input.hold.amount,
+      currency: input.hold.currency,
+      referenceType: "wallet_hold",
+      referenceId: input.hold.orderId,
+      description: `Release seller hold ${input.hold.id}`,
+    },
+    {
+      id: input.sellerEntryId,
+      accountId: input.hold.sellerAccountId,
+      amount: input.hold.amount,
+      currency: input.hold.currency,
+      referenceType: "wallet_hold",
+      referenceId: input.hold.orderId,
+      description: `Seller proceeds available from hold ${input.hold.id}`,
+    },
+  ];
   validateLedgerPosting(entries);
   return entries;
 }

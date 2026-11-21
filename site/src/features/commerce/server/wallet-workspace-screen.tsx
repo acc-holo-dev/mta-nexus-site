@@ -108,6 +108,14 @@ export async function WalletWorkspaceScreen({
     available === null
       ? null
       : await walletPaymentService.listRecentActivity(accountId, currency, 20).catch(() => null);
+  const heldBalance =
+    available === null
+      ? null
+      : await walletPaymentService.getHeldBalance(accountId, currency).catch(() => null);
+  const heldList =
+    heldBalance === null
+      ? null
+      : await walletPaymentService.listHeld(accountId, 20).catch(() => null);
 
   if (available === null) {
     return (
@@ -186,6 +194,47 @@ export async function WalletWorkspaceScreen({
         </section>
       ) : null}
       <WalletTopUpForm actorId={user.id} currency={currency} />
+      <section className={panelSpace3P5} aria-labelledby="wallet-held-heading">
+        <h3 id="wallet-held-heading" className={typeSemiboldPrimary}>
+          {copy.held}
+        </h3>
+        <p role="note" className={typeXsMuted}>
+          {copy.heldNote}
+        </p>
+        {heldBalance === null || heldList === null ? (
+          <p className={typeXsMuted}>{copy.heldUnavailable}</p>
+        ) : (
+          <>
+            <dl className={typeSpace2Sm}>
+              <div>
+                <dt className="text-muted">{copy.held}</dt>
+                <dd className={typeNumericPrimary}>
+                  {formatFinancialMinor(heldBalance, currency, locale)}
+                </dd>
+              </div>
+            </dl>
+            {heldList.filter((hold) => hold.currency === currency).length === 0 ? (
+              <EmptyState title={copy.heldEmpty} description={copy.heldEmptyHint} />
+            ) : (
+              <ul className={typeSpace2Sm}>
+                {heldList
+                  .filter((hold) => hold.currency === currency)
+                  .map((hold) => (
+                    <li key={hold.id}>
+                      <p className={typeNumericPrimary}>
+                        {formatFinancialMinor(hold.amount, hold.currency, locale)}
+                      </p>
+                      <p className={typeXsMuted}>
+                        {copy.heldReleaseAt}: {formatHistoryDate(new Date(hold.releaseAt), locale)}{" "}
+                        · {hold.orderId}
+                      </p>
+                    </li>
+                  ))}
+              </ul>
+            )}
+          </>
+        )}
+      </section>
       <section className={panelSpace3P5} aria-labelledby="wallet-activity-heading">
         <h3 id="wallet-activity-heading" className={typeSemiboldPrimary}>
           {copy.activity}

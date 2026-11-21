@@ -56,6 +56,14 @@ const copy = {
     activityTopUp: "Top-up",
     activitySpend: "Wallet spend",
     activityOther: "Ledger entry",
+    held: "Seller holds",
+    heldEmpty: "No seller proceeds on hold for this currency.",
+    heldEmptyHint:
+      "After a wallet purchase of your listing, seller proceeds sit in escrow for 7 days before they become available.",
+    heldUnavailable: "Seller hold balances are temporarily unavailable.",
+    heldReleaseAt: "Releases at (UTC)",
+    heldNote:
+      "Held amounts are not available to spend and are not withdrawable. Release runs after the hold window.",
     pending: "Pending provider confirmation",
     historyEmpty: "No top-up intents recorded yet.",
     historyEmptyHint:
@@ -72,6 +80,9 @@ const copy = {
       WALLET_TOPUP_INVALID: "Check amount, currency, provider and return path.",
       WALLET_BALANCE_INVALID: "Choose a supported wallet currency.",
       WALLET_ACTIVITY_INVALID: "Choose a supported wallet currency and limit.",
+      WALLET_HOLD_INVALID: "Wallet hold request is invalid.",
+      WALLET_HOLD_STATE: "This hold cannot be released in its current state.",
+      WALLET_HOLD_NOT_MATURE: "This hold has not reached its release time.",
       PAYMENT_PROVIDER_UNKNOWN: "Payment provider is not available.",
       TOPUP_IDEMPOTENCY_CONFLICT: "This top-up request was already used with different details.",
       TOPUP_NOT_FOUND: "Top-up intent was not found.",
@@ -153,6 +164,13 @@ const copy = {
     activityTopUp: "Пополнение",
     activitySpend: "Оплата с кошелька",
     activityOther: "Проводка",
+    held: "Холды продавца",
+    heldEmpty: "По этой валюте нет поступлений продавца на холде.",
+    heldEmptyHint:
+      "После покупки вашего листинга с кошелька поступления продавца 7 дней держатся в escrow, затем становятся available.",
+    heldUnavailable: "Баланс холдов продавца временно недоступен.",
+    heldReleaseAt: "Освобождение (UTC)",
+    heldNote: "Суммы на холде нельзя тратить и нельзя вывести. Освобождение — после окна холда.",
     pending: "Ожидает подтверждения провайдера",
     historyEmpty: "Намерений пополнения пока нет.",
     historyEmptyHint:
@@ -169,6 +187,9 @@ const copy = {
       WALLET_TOPUP_INVALID: "Проверьте сумму, валюту, провайдера и путь возврата.",
       WALLET_BALANCE_INVALID: "Выберите поддерживаемую валюту кошелька.",
       WALLET_ACTIVITY_INVALID: "Выберите поддерживаемую валюту и лимит.",
+      WALLET_HOLD_INVALID: "Запрос по холду кошелька недействителен.",
+      WALLET_HOLD_STATE: "Этот холд нельзя освободить в текущем состоянии.",
+      WALLET_HOLD_NOT_MATURE: "Срок холда ещё не истёк.",
       PAYMENT_PROVIDER_UNKNOWN: "Платёжный провайдер недоступен.",
       TOPUP_IDEMPOTENCY_CONFLICT: "Этот запрос пополнения уже использован с другими данными.",
       TOPUP_NOT_FOUND: "Намерение пополнения не найдено.",

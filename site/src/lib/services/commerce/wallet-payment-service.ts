@@ -4,6 +4,7 @@ import {
   productRepository,
   type WalletOrderSettlementResult,
   walletOrderSettlementRepository,
+  walletSellerHoldRepository,
   walletTopupRepository,
 } from "@nexus/db";
 import {
@@ -24,6 +25,7 @@ import {
   type User,
   type VerifiedProviderEvent,
   type WalletCurrency,
+  type WalletSellerHold,
 } from "@nexus/domain";
 import { generateId } from "@nexus/security";
 
@@ -53,6 +55,7 @@ export class WalletPaymentService {
     private readonly settlements = walletOrderSettlementRepository,
     private readonly orders = orderRepository,
     private readonly products = productRepository,
+    private readonly holds = walletSellerHoldRepository,
   ) {}
 
   capabilityMatrix(liveConfigured: Readonly<Partial<Record<PaymentProviderId, boolean>>> = {}) {
@@ -185,7 +188,11 @@ export class WalletPaymentService {
     orderId: string;
     availableBalance: number;
     platformFee: number;
-    sellerCredits: ReadonlyArray<{ accountId: string; amount: number }>;
+    sellerHolds: ReadonlyArray<{
+      sellerAccountId: string;
+      escrowAccountId: string;
+      amount: number;
+    }>;
   }) {
     return buildWalletSpendPosting({
       accountId: input.accountId,
@@ -196,8 +203,8 @@ export class WalletPaymentService {
       userEntryId: generateId("ldg"),
       platformFeeEntryId: generateId("ldg"),
       platformFee: input.platformFee,
-      sellerCredits: input.sellerCredits.map((credit) => ({
-        ...credit,
+      sellerHolds: input.sellerHolds.map((hold) => ({
+        ...hold,
         entryId: generateId("ldg"),
       })),
     });
@@ -312,5 +319,17 @@ export class WalletPaymentService {
   /** Audited ledger lines for the account (top-up credits and wallet spends). */
   async listRecentActivity(accountId: string, currency: WalletCurrency, limit = 20) {
     return this.ledger.listRecentByAccount(accountId, currency, limit);
+  }
+
+  async getHeldBalance(sellerAccountId: string, currency: WalletCurrency): Promise<number> {
+    return this.holds.sumHeldBySeller(sellerAccountId, currency);
+  }
+
+  async listHeld(sellerAccountId: string, limit = 20): Promise<WalletSellerHold[]> {
+    return this.holds.listHeldBySeller(sellerAccountId, limit);
+  }
+
+  async releaseMaturedHolds(sellerAccountId: string, nowIso?: string): Promise<WalletSellerHold[]> {
+    return this.holds.releaseMaturedForSeller({ sellerAccountId, nowIso });
   }
 }

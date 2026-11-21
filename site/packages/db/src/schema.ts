@@ -1066,6 +1066,62 @@ export const ledgerPostingBatches = pgTable(
   ],
 );
 
+/** NX-015 / ECON-002 seller proceeds hold after wallet spend. */
+export const walletSellerHolds = pgTable(
+  "wallet_seller_holds",
+  {
+    id: text("id").primaryKey(),
+    orderId: text("order_id")
+      .notNull()
+      .references(() => orders.id, { onDelete: "restrict" }),
+    sellerAccountId: text("seller_account_id").notNull(),
+    escrowAccountId: text("escrow_account_id").notNull(),
+    amount: integer("amount").notNull(),
+    currency: text("currency").notNull(),
+    status: text("status").notNull().default("held"),
+    heldAt: timestamp("held_at", { withTimezone: true }).notNull().defaultNow(),
+    releaseAt: timestamp("release_at", { withTimezone: true }).notNull(),
+    holdLedgerBatchId: text("hold_ledger_batch_id")
+      .notNull()
+      .references(() => ledgerPostingBatches.id, { onDelete: "restrict" }),
+    releaseLedgerBatchId: text("release_ledger_batch_id").references(
+      () => ledgerPostingBatches.id,
+      {
+        onDelete: "restrict",
+      },
+    ),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    check(
+      "wallet_seller_holds_seller_account_id_check",
+      sql`${table.sellerAccountId} ~ '^(user|org):[A-Za-z0-9_-]{1,128}$'`,
+    ),
+    check(
+      "wallet_seller_holds_escrow_account_id_check",
+      sql`${table.escrowAccountId} ~ '^escrow:[A-Za-z0-9_-]{1,160}$'`,
+    ),
+    check(
+      "wallet_seller_holds_amount_check",
+      sql`${table.amount} > 0 AND ${table.amount} <= 2147483647`,
+    ),
+    check("wallet_seller_holds_currency_check", sql`${table.currency} IN ('USD', 'EUR', 'RUB')`),
+    check(
+      "wallet_seller_holds_status_check",
+      sql`${table.status} IN ('held', 'released', 'cancelled')`,
+    ),
+    uniqueIndex("wallet_seller_holds_order_seller_uidx").on(table.orderId, table.sellerAccountId),
+    uniqueIndex("wallet_seller_holds_escrow_uidx").on(table.escrowAccountId),
+    index("wallet_seller_holds_seller_status_idx").on(
+      table.sellerAccountId,
+      table.status,
+      table.releaseAt,
+    ),
+    index("wallet_seller_holds_matured_idx").on(table.status, table.releaseAt, table.id),
+  ],
+);
+
 /** NX-015 site-wallet top-up intents. Credit only after verified provider events. */
 export const walletTopupIntents = pgTable(
   "wallet_topup_intents",

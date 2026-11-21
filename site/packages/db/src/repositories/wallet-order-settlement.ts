@@ -7,6 +7,7 @@ import {
   type LedgerPosting,
   NotFoundError,
   type WalletCurrency,
+  walletHoldReleaseAt,
 } from "@nexus/domain";
 import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
 import { db } from "../client";
@@ -20,6 +21,7 @@ import {
   products,
   resourceAcquisitionEvents,
   users,
+  walletSellerHolds,
 } from "../schema";
 import { lockInitiatingSession } from "./initiating-session";
 import { accountBalanceInTransaction, postLedgerBatchInTransaction } from "./ledger-posting";
@@ -34,7 +36,12 @@ export type WalletOrderSettlementResult = {
   entries: LedgerEntry[];
   alreadySettled: boolean;
   entitlementIds: string[];
+  holdIds: string[];
 };
+
+function sellerSuffix(sellerAccountId: string): string {
+  return createHash("sha256").update(sellerAccountId).digest("hex").slice(0, 16);
+}
 
 function walletSettleIds(orderId: string) {
   return {
@@ -42,11 +49,11 @@ function walletSettleIds(orderId: string) {
     ledgerBatchId: `wspend_${orderId}`,
     userEntryId: `ldg_wspend_${orderId}_user`,
     platformFeeEntryId: `ldg_wspend_${orderId}_fee`,
-    sellerEntryId: (sellerAccountId: string) =>
-      `ldg_wspend_${orderId}_s_${createHash("sha256")
-        .update(sellerAccountId)
-        .digest("hex")
-        .slice(0, 16)}`,
+    holdEntryId: (sellerAccountId: string) =>
+      `ldg_wspend_${orderId}_h_${sellerSuffix(sellerAccountId)}`,
+    holdId: (sellerAccountId: string) => `whold_${orderId}_${sellerSuffix(sellerAccountId)}`,
+    escrowAccountId: (sellerAccountId: string) =>
+      `escrow:wspend_${orderId}_${sellerSuffix(sellerAccountId)}`,
     auditId: `aud_wspend_${orderId}`,
   };
 }
@@ -60,8 +67,8 @@ function sellerAccountForProduct(product: {
 
 /**
  * Atomic wallet spend settlement for a pending paid buyer order.
- * Posts wallet_spend, records a completed wallet payment, marks the order
- * completed, and grants product.download entitlements for each line.
+ * Posts wallet_spend (fee + escrow holds), records a completed wallet payment,
+ * marks the order completed, inserts seller holds, and grants download entitlements.
  */
 export class WalletOrderSettlementRepository {
   async settle(input: {
@@ -145,6 +152,7 @@ export class WalletOrderSettlementRepository {
           entries,
           alreadySettled: true,
           entitlementIds: [],
+          holdIds: [],
         };
       }
 
@@ -227,6 +235,18 @@ export class WalletOrderSettlementRepository {
         lines: commissionLines,
         currency,
       });
+      const sellerHolds = split.sellerCredits
+        .filter((credit) => credit.amount > 0)
+        .map((credit) => ({
+          sellerAccountId: credit.accountId,
+          escrowAccountId: ids.escrowAccountId(credit.accountId),
+          amount: credit.amount,
+          entryId: ids.holdEntryId(credit.accountId),
+          holdId: ids.holdId(credit.accountId),
+        }));
+      if (sellerHolds.length === 0 && split.platformFee !== order.totalAmount) {
+        throw new AppError("Wallet spend split does not balance", 400, "WALLET_SPEND_INVALID");
+      }
       const posting: LedgerPosting[] = buildWalletSpendPosting({
         accountId,
         amount: order.totalAmount,
@@ -236,15 +256,32 @@ export class WalletOrderSettlementRepository {
         userEntryId: ids.userEntryId,
         platformFeeEntryId: ids.platformFeeEntryId,
         platformFee: split.platformFee,
-        sellerCredits: split.sellerCredits.map((credit) => ({
-          accountId: credit.accountId,
-          amount: credit.amount,
-          entryId: ids.sellerEntryId(credit.accountId),
-        })),
+        sellerHolds,
       });
       const entries = await postLedgerBatchInTransaction(tx, ids.ledgerBatchId, posting);
 
       const now = new Date();
+      const heldAtIso = now.toISOString();
+      const releaseAt = new Date(walletHoldReleaseAt(heldAtIso));
+      const holdIds: string[] = [];
+      for (const hold of sellerHolds) {
+        await tx.insert(walletSellerHolds).values({
+          id: hold.holdId,
+          orderId: order.id,
+          sellerAccountId: hold.sellerAccountId,
+          escrowAccountId: hold.escrowAccountId,
+          amount: hold.amount,
+          currency: order.currency,
+          status: "held",
+          heldAt: now,
+          releaseAt,
+          holdLedgerBatchId: ids.ledgerBatchId,
+          createdAt: now,
+          updatedAt: now,
+        });
+        holdIds.push(hold.holdId);
+      }
+
       await tx.insert(payments).values({
         id: ids.paymentId,
         orderId: order.id,
@@ -329,7 +366,7 @@ export class WalletOrderSettlementRepository {
           totalAmount: order.totalAmount,
           currency: order.currency,
           platformFee: split.platformFee,
-          sellerCreditCount: split.sellerCredits.length,
+          sellerHoldCount: holdIds.length,
           entitlementCount: granted.length,
         },
       });
@@ -344,6 +381,7 @@ export class WalletOrderSettlementRepository {
         entries,
         alreadySettled: false,
         entitlementIds: granted,
+        holdIds,
       };
     });
   }

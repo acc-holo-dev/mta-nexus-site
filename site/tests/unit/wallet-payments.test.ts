@@ -1,6 +1,7 @@
 import {
   allocateWalletSpendCommission,
   buildVerifiedTopUpCreditPosting,
+  buildWalletHoldReleasePosting,
   buildWalletSpendPosting,
   createTopUpIntent,
   type LedgerPosting,
@@ -10,6 +11,7 @@ import {
   selectPaymentProvider,
   type TopUpIntent,
   validateLedgerPosting,
+  walletHoldReleaseAt,
 } from "@nexus/domain";
 import { describe, expect, it } from "vitest";
 import {
@@ -181,7 +183,45 @@ describe("wallet payments domain", () => {
     ).toThrow(/already credited/i);
   });
 
-  it("spends available balance with commission split and refuses overdraft", () => {
+  it("releases a matured seller hold from escrow to available", () => {
+    const heldAt = "2026-11-01T00:00:00.000Z";
+    const releaseAt = walletHoldReleaseAt(heldAt, 7);
+    const entries = buildWalletHoldReleasePosting({
+      hold: {
+        id: "whold_1",
+        orderId: "ord_hold_1",
+        sellerAccountId: "user:usr_seller",
+        escrowAccountId: "escrow:wspend_ord_hold_1_seller",
+        amount: 360,
+        currency: "EUR",
+        status: "held",
+        releaseAt,
+      },
+      escrowEntryId: "ldg_rel_esc",
+      sellerEntryId: "ldg_rel_sel",
+      nowIso: releaseAt,
+    });
+    expect(() => validateLedgerPosting(entries)).not.toThrow();
+    expect(() =>
+      buildWalletHoldReleasePosting({
+        hold: {
+          id: "whold_1",
+          orderId: "ord_hold_1",
+          sellerAccountId: "user:usr_seller",
+          escrowAccountId: "escrow:wspend_ord_hold_1_seller",
+          amount: 360,
+          currency: "EUR",
+          status: "held",
+          releaseAt,
+        },
+        escrowEntryId: "ldg_rel_esc2",
+        sellerEntryId: "ldg_rel_sel2",
+        nowIso: heldAt,
+      }),
+    ).toThrow(/not matured/i);
+  });
+
+  it("spends available balance into escrow holds with commission and refuses overdraft", () => {
     const entries = buildWalletSpendPosting({
       accountId: "user:usr_buyer",
       amount: 400,
@@ -191,14 +231,22 @@ describe("wallet payments domain", () => {
       userEntryId: "leg_spend_u",
       platformFeeEntryId: "leg_spend_fee",
       platformFee: 40,
-      sellerCredits: [{ accountId: "user:usr_seller", amount: 360, entryId: "leg_spend_s" }],
+      sellerHolds: [
+        {
+          sellerAccountId: "user:usr_seller",
+          escrowAccountId: "escrow:wspend_ord_spend_1_seller",
+          amount: 360,
+          entryId: "leg_spend_h",
+        },
+      ],
     });
     expect(() => validateLedgerPosting(entries)).not.toThrow();
     expect(entries.map((entry) => entry.accountId).sort()).toEqual([
+      "escrow:wspend_ord_spend_1_seller",
       "platform:marketplace",
       "user:usr_buyer",
-      "user:usr_seller",
     ]);
+    expect(entries.some((entry) => entry.referenceType === "wallet_hold")).toBe(true);
     expect(() =>
       buildWalletSpendPosting({
         accountId: "user:usr_buyer",
@@ -209,7 +257,14 @@ describe("wallet payments domain", () => {
         userEntryId: "leg_spend_u2",
         platformFeeEntryId: "leg_spend_fee2",
         platformFee: 160,
-        sellerCredits: [{ accountId: "user:usr_seller", amount: 1440, entryId: "leg_spend_s2" }],
+        sellerHolds: [
+          {
+            sellerAccountId: "user:usr_seller",
+            escrowAccountId: "escrow:wspend_ord_spend_2_seller",
+            amount: 1440,
+            entryId: "leg_spend_h2",
+          },
+        ],
       }),
     ).toThrow(/Insufficient wallet balance/i);
   });
@@ -316,9 +371,14 @@ describe("wallet payment service", () => {
       orderId: "ord_wallet_1",
       availableBalance: 250,
       platformFee: split.platformFee,
-      sellerCredits: split.sellerCredits,
+      sellerHolds: split.sellerCredits.map((credit) => ({
+        sellerAccountId: credit.accountId,
+        escrowAccountId: `escrow:wspend_ord_wallet_1_${credit.accountId.slice(5)}`,
+        amount: credit.amount,
+      })),
     });
     expect(() => validateLedgerPosting(spend)).not.toThrow();
+    expect(spend.some((entry) => entry.referenceType === "wallet_hold")).toBe(true);
 
     const history = await service.listRecentTopUps("user:usr_buyer");
     expect(history).toHaveLength(1);
