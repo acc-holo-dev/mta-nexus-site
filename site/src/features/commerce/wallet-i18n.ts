@@ -214,6 +214,15 @@ const copy = {
     providersAdminHoldBusy: "Releasing matured holds…",
     providersAdminHoldSuccess: "Released {count} hold(s) into available balance.",
     providersAdminHoldFailed: "Hold batch release was not confirmed. Retry the same request.",
+    providersAdminHoldsPreviewTitle: "Eligible matured holds",
+    providersAdminHoldsPreviewNote:
+      "Read-only preview of holds the next release batch would process under the default limit. Not a cron and not a live PSP action. This list does not release holds.",
+    providersAdminHoldsPreviewEmpty: "No matured holds are eligible for the next batch.",
+    providersAdminHoldsPreviewUnavailable:
+      "Eligible matured holds are temporarily unavailable. The release CTA above is unchanged.",
+    providersAdminHoldSeller: "Seller account",
+    providersAdminHoldOrder: "Order",
+    providersAdminHoldReleaseAt: "Release at (UTC)",
     providersAdminTopupExpireTitle: "Expire stale top-up intents",
     providersAdminTopupExpireNote:
       "Marks awaiting/created top-ups older than the default age window as failed. No ledger posting — those intents never credited.",
@@ -502,6 +511,15 @@ const copy = {
     providersAdminHoldBusy: "Освобождение холдов…",
     providersAdminHoldSuccess: "Освобождено холдов: {count}. Средства в available балансе.",
     providersAdminHoldFailed: "Batch освобождения холдов не подтверждён. Повторите тот же запрос.",
+    providersAdminHoldsPreviewTitle: "Eligible созревшие холды",
+    providersAdminHoldsPreviewNote:
+      "Read-only preview холдов, которые обработает следующий release batch при лимите по умолчанию. Это не cron и не live PSP. Список не освобождает холды.",
+    providersAdminHoldsPreviewEmpty: "Нет созревших холдов для следующего batch.",
+    providersAdminHoldsPreviewUnavailable:
+      "Eligible созревшие холды временно недоступны. CTA освобождения выше не изменился.",
+    providersAdminHoldSeller: "Счёт продавца",
+    providersAdminHoldOrder: "Заказ",
+    providersAdminHoldReleaseAt: "Release at (UTC)",
     providersAdminTopupExpireTitle: "Истечение устаревших top-up",
     providersAdminTopupExpireNote:
       "Помечает awaiting/created top-up старше окна по умолчанию как failed. Без ledger — эти намерения не зачислялись.",

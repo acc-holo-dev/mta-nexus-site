@@ -101,8 +101,10 @@ export class WalletSellerHoldRepository {
     });
   }
 
-  /** Read-only count of holds the next releaseMaturedBatch would process. */
-  async countEligibleMatured(input: { nowIso?: string; limit?: number } = {}): Promise<number> {
+  /** Read-only list of holds the next releaseMaturedBatch would process. */
+  async listEligibleMatured(
+    input: { nowIso?: string; limit?: number } = {},
+  ): Promise<WalletSellerHold[]> {
     const nowIso = input.nowIso ?? new Date().toISOString();
     const now = new Date(nowIso);
     if (!Number.isFinite(now.getTime())) {
@@ -113,12 +115,17 @@ export class WalletSellerHoldRepository {
       50,
     );
     const rows = await db
-      .select({ id: walletSellerHolds.id })
+      .select()
       .from(walletSellerHolds)
       .where(and(eq(walletSellerHolds.status, "held"), lte(walletSellerHolds.releaseAt, now)))
       .orderBy(asc(walletSellerHolds.releaseAt), asc(walletSellerHolds.id))
       .limit(bounded);
-    return rows.length;
+    return rows.map(mapHold);
+  }
+
+  /** Read-only count of holds the next releaseMaturedBatch would process. */
+  async countEligibleMatured(input: { nowIso?: string; limit?: number } = {}): Promise<number> {
+    return (await this.listEligibleMatured(input)).length;
   }
 
   private async releaseMatured(input: {

@@ -725,6 +725,19 @@ export class WalletPaymentService {
   }
 
   /**
+   * Admin read-only matured holds the next releaseMaturedHoldsBatch would process.
+   * Does not mutate ledger or holds. Engine-gated.
+   */
+  async listAdminEligibleMaturedHolds(
+    input: { nowIso?: string; limit?: number } = {},
+  ): Promise<WalletSellerHold[]> {
+    if (!isWalletEngineEnabled()) {
+      throw new AppError("Wallet engine is disabled", 404, "WALLET_ENGINE_DISABLED");
+    }
+    return this.holds.listEligibleMatured(input);
+  }
+
+  /**
    * Admin read-only recent top-up intents across accounts.
    * Does not mutate ledger or intents. Engine-gated.
    */

@@ -99,6 +99,9 @@ export async function WalletProvidersAdminScreen() {
     : null;
   const eligibleLabel = (count: number) =>
     copy.providersAdminEligible.replace("{count}", String(count));
+  const eligibleHolds = engineOn
+    ? await walletPaymentService.listAdminEligibleMaturedHolds().catch(() => null)
+    : null;
   const recentTopups = engineOn
     ? await walletPaymentService.listAdminRecentTopUps().catch(() => null)
     : null;
@@ -170,6 +173,39 @@ export async function WalletProvidersAdminScreen() {
                 successTemplate={copy.providersAdminHoldSuccess}
                 failedLabel={copy.providersAdminHoldFailed}
               />
+              <section
+                className={panelSpace3P5}
+                aria-labelledby="wallet-admin-holds-preview-heading"
+              >
+                <h4 id="wallet-admin-holds-preview-heading" className={typeSemiboldPrimary}>
+                  {copy.providersAdminHoldsPreviewTitle}
+                </h4>
+                <p role="note" className={typeXsMuted}>
+                  {copy.providersAdminHoldsPreviewNote}
+                </p>
+                {eligibleHolds === null ? (
+                  <p role="note" className={typeSmMuted}>
+                    {copy.providersAdminHoldsPreviewUnavailable}
+                  </p>
+                ) : eligibleHolds.length ? (
+                  <ul className={typeSpace2Sm}>
+                    {eligibleHolds.map((hold) => (
+                      <li key={hold.id}>
+                        <p className={typeNumericPrimary}>
+                          {formatFinancialMinor(hold.amount, hold.currency, locale)}
+                        </p>
+                        <p className={typeXsMuted}>
+                          {copy.providersAdminHoldSeller}: {hold.sellerAccountId} ·{" "}
+                          {copy.providersAdminHoldOrder}: {hold.orderId} ·{" "}
+                          {copy.providersAdminHoldReleaseAt}: {hold.releaseAt} · {hold.id}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className={typeSmMuted}>{copy.providersAdminHoldsPreviewEmpty}</p>
+                )}
+              </section>
               <WalletAdminBatchForm
                 actorId={user.id}
                 path="/api/admin/commerce/wallet-topups/expire-stale"

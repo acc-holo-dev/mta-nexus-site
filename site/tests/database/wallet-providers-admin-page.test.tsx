@@ -69,6 +69,21 @@ vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
       unpaidOrders: 0,
       withdrawals: state.withdraw ? 3 : null,
     });
+    listAdminEligibleMaturedHolds = async () => [
+      {
+        id: "hold_a",
+        orderId: "ord_a",
+        sellerAccountId: "user:usr_seller",
+        escrowAccountId: "escrow:hold_a",
+        amount: 900,
+        currency: "USD",
+        status: "held",
+        heldAt: "2026-11-01T00:00:00.000Z",
+        releaseAt: "2026-11-08T00:00:00.000Z",
+        holdLedgerBatchId: "batch_h",
+        releaseLedgerBatchId: null,
+      },
+    ];
     listAdminRecentTopUps = async () => [
       {
         id: "top_a",
@@ -142,6 +157,10 @@ it("shows engine ops CTAs when the wallet engine is on", async () => {
   expect(html).toContain(copy.providersAdminEligible.replace("{count}", "2"));
   expect(html).toContain(copy.providersAdminEligible.replace("{count}", "1"));
   expect(html).toContain(copy.providersAdminEligible.replace("{count}", "0"));
+  expect(html).toContain(copy.providersAdminHoldsPreviewTitle);
+  expect(html).toContain(copy.providersAdminHoldsPreviewNote);
+  expect(html).toContain("user:usr_seller");
+  expect(html).toContain("hold_a");
   expect(html).toContain(copy.providersAdminIntentsTitle);
   expect(html).toContain(copy.providersAdminIntentsNote);
   expect(html).toContain("user:usr_b");
