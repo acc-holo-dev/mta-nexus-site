@@ -5,6 +5,12 @@ tabs and pagination chrome. License workspace/admin detail, archive filters, con
 panel and runtime probe live here too. Services, repositories, routes and
 `commerce-history-*` / `license-*` helpers stay in existing layers.
 
+**Wallet (NX-015):** domain ports live in `@nexus/domain` (`wallet-payments`) and
+`site/src/lib/services/commerce/wallet-payment-service.ts`. Site stored-value balance
+uses the existing double-entry ledger; multi-provider capability matrix; stub top-up
+only until PSP contracts. HTTP/UI stay off unless `NEXUS_WALLET_ENGINE=1` and a later
+route slice lands. Redirect never credits the wallet.
+
 | Entry                             | Контракт                                                                               |
 | --------------------------------- | -------------------------------------------------------------------------------------- |
 | `workspace-history.ts`            | `HistoryShell`, `HistoryPagination`; `/workspace/{purchases,licenses,sales}` lists     |

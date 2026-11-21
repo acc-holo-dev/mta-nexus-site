@@ -39,6 +39,7 @@ MTA NEXUS — единая площадка сообщества; RU/EN, реа�
 | NX-012 | ACCEPTED_DIRECTION | Постоянные ветки только `dev` и `main`: работа и Dependabot → `dev`, выпускная линия — PR `dev` → `main` после CI       | Ruleset на `main` (CI result) сохраняется; серверные настройки `dev`/default branch — отдельный `github_settings`  |
 | NX-013 | ACCEPTED_DIRECTION | Самодостаточная документация: `current/` + `issues/` + `future/` + `docs/planning/`; один generated overview            | Спецификация — [future/documentation-system.md](future/documentation-system.md); перенос файлов ещё впереди        |
 | NX-014 | ACCEPTED_DIRECTION | CI scopes по риску: docs/`unit_ci`/`fast_ci` на `dev`; `full_acceptance` для infra/trust и code push на `main`          | Features не эскалируют в full на PR; контракт — [current/quality.md](current/quality.md); policy — `ci-policy.mjs` |
+| NX-015 | ACCEPTED_DIRECTION | Коммерция через **внутренний site wallet (stored value)**: пополнение → баланс NEXUS → spend; вывод позже; multi-provider ports; live PSP только адаптерами; stub на top-up до контрактов | Не включает live payments, production deploy, KYC/юрлицо или выбор PSP; HTTP/UI кошелька — отдельными срезами за `NEXUS_WALLET_ENGINE` |
 
 `ACCEPTED_DIRECTION` фиксирует согласие продолжить разработку подхода. Это не статус новой фичи в production и не согласие на покупку тарифа, рассылку людям или изменение сервера.
 
