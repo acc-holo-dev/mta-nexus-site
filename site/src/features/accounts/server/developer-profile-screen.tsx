@@ -10,10 +10,12 @@ import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n/serve
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { profilePrivacyService } from "../../../lib/services/accounts/profile-privacy-service";
 import { productService } from "../../../lib/services/commerce/product-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { verificationWorkspaceService } from "../../../lib/services/moderation/verification-workspace-service";
 import { FollowButton } from "../../community/follow";
 import { buildFollowInitialState } from "../../community/follow-initial-state";
 import { publicationCopy } from "../../community/publication-feed-copy";
+import { libraryMarketHref } from "../../library/library-view";
 import { ProductCard } from "../../resources/view";
 import { pageShellStack6, pageShellStack10 } from "../../shell/page-shell";
 import { panelHeroBetween } from "../../shell/panel-shell";
@@ -67,6 +69,8 @@ export async function DeveloperProfileScreen({
   const [locale, user] = await Promise.all([getRequestLocale(), getProfile(username)]);
   const dictionary = getDictionary(locale);
   const copy = dictionary.developers;
+  const walletEnabled = isWalletEngineEnabled();
+  const marketHref = libraryMarketHref(walletEnabled);
 
   if (!user || (user.role !== "developer" && user.role !== "admin")) {
     notFound();
@@ -205,8 +209,10 @@ export async function DeveloperProfileScreen({
             title={copy.noReleases}
             description={copy.noReleasesHint}
             action={
-              <Link href="/market?maxPrice=0" className={actionLinkClass}>
-                {dictionary.home.browseResources}
+              <Link href={marketHref} className={actionLinkClass}>
+                {walletEnabled
+                  ? dictionary.home.browseMarketResources
+                  : dictionary.home.browseResources}
               </Link>
             }
           />

@@ -15,11 +15,13 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { productService } from "../../../lib/services/commerce/product-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { ProfileResourcePagination, parseProfilePage } from "../../accounts/profile-pagination";
 import { ArticleCard } from "../../community/article-view";
 import { FollowButton } from "../../community/follow";
 import { buildFollowInitialState } from "../../community/follow-initial-state";
 import { publicationCopy } from "../../community/publication-feed-copy";
+import { libraryMarketHref } from "../../library/library-view";
 import { ProductCard } from "../../resources/view";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellStack4, pageShellStack6, pageShellStack10 } from "../../shell/page-shell";
@@ -73,6 +75,8 @@ export async function OrganizationProfilePage({
   const [locale, organization] = await Promise.all([getRequestLocale(), getProfile(slug)]);
   const dictionary = getDictionary(locale);
   const copy = dictionary.organizations;
+  const walletEnabled = isWalletEngineEnabled();
+  const marketHref = libraryMarketHref(walletEnabled);
 
   if (!organization) {
     notFound();
@@ -217,8 +221,10 @@ export async function OrganizationProfilePage({
           title={copy.emptyPortfolio}
           description={copy.emptyPortfolioHint}
           action={
-            <Link href="/market?maxPrice=0" className={linkAccentSm}>
-              {dictionary.home.browseResources}
+            <Link href={marketHref} className={linkAccentSm}>
+              {walletEnabled
+                ? dictionary.home.browseMarketResources
+                : dictionary.home.browseResources}
             </Link>
           }
         />

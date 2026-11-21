@@ -8,6 +8,7 @@ import { cache } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { productService } from "../../../lib/services/commerce/product-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { discoveryService } from "../../../lib/services/discovery/discovery-service";
 import {
   indexMtaObservations,
@@ -16,6 +17,7 @@ import {
 } from "../../../lib/services/servers/mta-master-directory-service";
 import { ArticleCard } from "../../community/article-view";
 import { FollowButton } from "../../community/follow";
+import { libraryMarketHref } from "../../library/library-view";
 import type { PublicResourceAttribution } from "../../resources/public-resource-attribution";
 import { ProductCard } from "../../resources/view";
 import { ServerCard } from "../../servers/client";
@@ -162,6 +164,9 @@ export async function DirectoryResults({
 }) {
   const copy = discoveryCopy(locale);
   const dictionary = getDictionary(locale).discover;
+  const home = getDictionary(locale).home;
+  const walletEnabled = isWalletEngineEnabled();
+  const marketHref = libraryMarketHref(walletEnabled);
   let loadError = copy.unavailable;
   const result = await (stream
     ? discoveryService.stream(stream)
@@ -280,8 +285,8 @@ export async function DirectoryResults({
                   {copy.reset}
                 </Link>
               ) : (
-                <Link href="/market?maxPrice=0" className={linkAccentSm}>
-                  {getDictionary(locale).home.browseResources}
+                <Link href={marketHref} className={linkAccentSm}>
+                  {walletEnabled ? home.browseMarketResources : home.browseResources}
                 </Link>
               )
             }
