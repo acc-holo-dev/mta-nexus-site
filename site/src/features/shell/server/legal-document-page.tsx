@@ -35,7 +35,14 @@ async function LegalDocumentPage({ kind }: { kind: LegalKind }) {
           }
         : legal.terms
       : kind === "privacy"
-        ? legal.privacy
+        ? walletEnabled
+          ? {
+              ...legal.privacy,
+              lead: legal.privacy.walletLead,
+              updated: legal.privacy.walletUpdated,
+              sections: legal.privacy.walletSections,
+            }
+          : legal.privacy
         : kind === "copyright"
           ? legal.copyright
           : legal.communityRules;

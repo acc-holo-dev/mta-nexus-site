@@ -29,4 +29,29 @@ describe("legal wallet honesty", () => {
     expect(ru.walletLead).toContain("site wallet");
     expect(ru.walletUpdated).toBe("21 ноября 2026");
   });
+
+  it("gates Privacy body on the wallet engine and discloses ledger data without inventing a bank or live PSP", () => {
+    const page = read("site/src/features/shell/server/legal-document-page.tsx");
+    expect(page).toContain("legal.privacy.walletLead");
+    expect(page).toContain("legal.privacy.walletSections");
+
+    const en = getDictionary("en").legal.privacy;
+    const ru = getDictionary("ru").legal.privacy;
+    expect(en.sections.some((section) => section.title === "Site wallet ledger data")).toBe(false);
+    expect(en.walletSections.some((section) => section.title === "Site wallet ledger data")).toBe(
+      true,
+    );
+    const ledger = en.walletSections.find((section) => section.title === "Site wallet ledger data");
+    expect(ledger?.body).toContain("audited ledger");
+    expect(ledger?.body).toContain("not a bank account");
+    expect(ledger?.body).toContain("Card checkout");
+    expect(ledger?.body).not.toContain("live Stripe");
+    expect(en.walletLead).toContain("site-wallet engine");
+    expect(en.walletUpdated).toBe("21 November 2026");
+    expect(ru.walletSections.some((section) => section.title === "Данные ledger site wallet")).toBe(
+      true,
+    );
+    expect(ru.walletLead).toContain("site wallet");
+    expect(ru.walletUpdated).toBe("21 ноября 2026");
+  });
 });

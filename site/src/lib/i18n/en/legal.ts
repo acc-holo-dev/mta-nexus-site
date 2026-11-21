@@ -76,6 +76,31 @@ export const legal = {
           body: "You may request access, correction, or deletion of your account data by contacting us. Some limited data may need to remain temporarily for security, fraud prevention, or legal claims.",
         },
       ],
+      walletLead:
+        "This notice describes the data used to operate and protect the MTA Nexus open free beta when the site-wallet engine is enabled in this environment. It is a product surface, not counsel certification.",
+      walletUpdated: "21 November 2026",
+      walletSections: [
+        {
+          title: "Data we use",
+          body: "We process account details such as email address, username, display name, password hash, session security data, and any profile, server, resource, or community content you choose to submit. Public server observations may include availability, player counts, MTA version, game mode, map, and the time and public source of the observation.",
+        },
+        {
+          title: "Site wallet ledger data",
+          body: "When the wallet engine is on, we also process audited ledger entries for personal and organization site-wallet accounts, including available and held balances, currency, top-up and withdrawal intents, order settlement identifiers, seller escrow holds, refund postings, and verified provider-event evidence used to credit or settle those intents. Site-wallet available balance is platform stored value, not a bank account. Card checkout and live payment-service-provider adapters stay off until those surfaces are enabled.",
+        },
+        {
+          title: "Why we use it",
+          body: "We use this data to operate accounts, prevent abuse, deliver requested resources, display public profiles and servers, maintain security logs, moderate content, and operate site-wallet top-up, purchase settlement, escrow release, and related audit trails. Passwords are never stored in readable form.",
+        },
+        {
+          title: "Visibility and retention",
+          body: "Profile, server, and published resource information can be public according to your chosen visibility settings. Site-wallet balances and ledger lines are private to the account holders and staff who need them for support or abuse response. Security, ledger, and audit records are retained only as long as reasonably needed to operate and protect the beta. We do not sell personal data.",
+        },
+        {
+          title: "Your choices",
+          body: "You may request access, correction, or deletion of your account data by contacting us. Some limited data, including ledger and payment-intent records, may need to remain temporarily for security, fraud prevention, reconciliation, or legal claims.",
+        },
+      ],
       contactLabel: "Privacy requests",
       contactEmail: "legal@nexus-mta.com",
     },
