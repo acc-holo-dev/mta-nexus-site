@@ -230,10 +230,11 @@ export class ProductService {
     const product = await productRepository.findBySlug(slug);
     if (!product) return null;
     if (product.price !== 0) {
+      // Legacy/non-wallet paid stays dark on public preview. Managed editing uses
+      // getManagedProduct. Wallet-eligible single_server lines are visible when the
+      // engine is on (published) or to managers (draft).
       if (!isWalletEngineEnabled() || product.licenseModel !== "single_server") {
-        // Managers may still open private paid drafts for editing; public market stays dark.
-        if (!actor) return null;
-        return (await this.canManageProduct(product, actor)) ? { product, isPublic: false } : null;
+        return null;
       }
     }
     if (
