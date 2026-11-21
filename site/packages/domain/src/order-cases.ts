@@ -51,6 +51,8 @@ export interface OrderCaseEvidence {
   disputedRecordCount: number;
   payments: {
     recordKey: string;
+    /** Normalized payments.provider; display-only, not part of evidenceIdentity. */
+    provider?: string | null;
     status: string;
     amount: number;
     currency: string;

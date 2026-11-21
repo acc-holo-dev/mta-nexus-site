@@ -99,7 +99,7 @@ function reviewRows(
     [["refund_request", "reviewing", currentRevision, 600, "USD"]],
     [summary],
     [[2]],
-    [["pay_a", "completed", 1200, "USD", date, date]],
+    [["pay_a", "wallet", "completed", 1200, "USD", date, date]],
   ];
 }
 beforeEach(() => {
@@ -116,7 +116,7 @@ it("locks the buyer's order and atomically claims intake, context, message and a
     [],
     [[1, 1, 1, 0, 0]],
     [[2]],
-    [["pay_a", "completed", 1200, "USD", date, date]],
+    [["pay_a", "wallet", "completed", 1200, "USD", date, date]],
     [[requestId]],
     [],
     [],
@@ -146,10 +146,12 @@ it("locks the buyer's order and atomically claims intake, context, message and a
   expect(JSON.parse(snapshot as string)).toMatchObject({
     confirmation: "recorded_only",
     recordedMatchingCaptureCount: 1,
+    payments: [{ provider: "wallet", status: "completed" }],
   });
-  expect(state.queries.every((q) => !/transaction_id|failure_reason|provider/u.test(q.sql))).toBe(
-    true,
-  );
+  expect(
+    state.queries.every((q) => !/transaction_id|failure_reason|provider_transaction/u.test(q.sql)),
+  ).toBe(true);
+  expect(state.queries.some((q) => q.sql.includes('"provider"'))).toBe(true);
 });
 it("never reads another buyer's order or writes intake when the scoped order is absent", async () => {
   state.rows = [[], []];

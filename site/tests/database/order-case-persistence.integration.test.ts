@@ -157,7 +157,10 @@ it("records a recommendation and notification without changing the order or reco
   );
   const detail = await repo.detail(f.input.caseId, f.buyerId);
   expect(JSON.stringify(detail)).not.toContain("must-not-be-projected");
-  expect(JSON.stringify(detail)).not.toContain("recorded-fixture");
+  expect(JSON.stringify(detail)).toContain("recorded-fixture");
+  expect(detail.evidence.payments.some((payment) => payment.provider === "recorded-fixture")).toBe(
+    true,
+  );
   expect(
     (await db.select().from(notifications).where(eq(notifications.recipientId, f.buyerId))).length,
   ).toBeGreaterThan(0);

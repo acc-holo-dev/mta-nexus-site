@@ -14,7 +14,8 @@ const en = {
   intro:
     "One case keeps the complete conversation and review history for this order. Continue or reopen it when you need further help.",
   financeNote:
-    "These are recorded order and payment states, not verification from a payment provider. A refund recommendation does not transfer money, change access or record a successful refund.",
+    "These are recorded order and payment states, not verification from a live payment provider. A completed site-wallet row is an audited ledger settle. A refund recommendation does not transfer money, change access or record a successful refund.",
+  provider: "Provider",
   subject: "Subject",
   message: "Describe the issue",
   kind: "Issue",
@@ -92,7 +93,8 @@ const ru: typeof en = {
   intro:
     "Одно обращение хранит всю переписку и историю разбора заказа. Продолжите или откройте его заново, если нужна дополнительная помощь.",
   financeNote:
-    "Здесь показаны учётные состояния заказа и платежей, а не подтверждение от платёжного провайдера. Рекомендация возврата не переводит деньги, не меняет доступ и не регистрирует успешный возврат.",
+    "Здесь показаны учётные состояния заказа и платежей, а не подтверждение от live платёжного провайдера. Completed строка site wallet — аудируемый ledger settle. Рекомендация возврата не переводит деньги, не меняет доступ и не регистрирует успешный возврат.",
+  provider: "Провайдер",
   subject: "Тема",
   message: "Опишите проблему",
   kind: "Проблема",

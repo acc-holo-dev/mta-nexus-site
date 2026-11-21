@@ -83,6 +83,7 @@ async function evidence(
   const rows = await tx
     .select({
       id: payments.id,
+      provider: payments.provider,
       status: payments.status,
       amount: payments.amount,
       currency: payments.currency,
@@ -107,6 +108,7 @@ async function evidence(
     disputedRecordCount: summary?.disputedRecordCount ?? 0,
     payments: rows.map((row) => ({
       recordKey: createHash("sha256").update(row.id).digest("hex"),
+      provider: row.provider,
       status: row.status,
       amount: row.amount,
       currency: row.currency,

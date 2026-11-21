@@ -33,7 +33,11 @@ import { SupportCaseThread } from "../../support/thread";
 import { formatHistoryAmount, formatHistoryDate } from "../commerce-history-format";
 import { OrderCaseCreateForm, OrderCaseReviewForm } from "../components/order-case-forms";
 import { WalletOrderRefundForm } from "../components/wallet-order-refund-form";
-import { financialOrderLabel, financialPaymentLabel } from "../financial-i18n";
+import {
+  commercialProviderLabel,
+  financialOrderLabel,
+  financialPaymentLabel,
+} from "../financial-i18n";
 import {
   orderCaseCopy,
   orderCaseKindLabel,
@@ -116,7 +120,8 @@ function Evidence({
           {data.payments.map((payment) => (
             <li key={payment.recordKey}>
               {financialPaymentLabel(locale, payment.status)} ·{" "}
-              {formatHistoryAmount(payment.amount, payment.currency, locale)} ·{" "}
+              {formatHistoryAmount(payment.amount, payment.currency, locale)} · {copy.provider}:{" "}
+              {commercialProviderLabel(locale, payment.provider)} ·{" "}
               <time dateTime={payment.createdAt}>
                 {formatHistoryDate(new Date(payment.createdAt), locale)}
               </time>
