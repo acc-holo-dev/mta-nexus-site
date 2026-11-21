@@ -252,21 +252,26 @@ it("does not read line items for another buyer's order", async () => {
 it("reads receipt amounts and current access in a bounded, read-only snapshot", async () => {
   state.results = [
     [["ord_a", "NX-001", "completed", 4500, "USD", revision.toISOString(), revision.toISOString()]],
+    [["pay_wallet_ord_a"]],
     [[21]],
-    [["itm_a", "prd_a", 4500, "USD", "Public resource", "public-resource", true]],
+    [["itm_a", "prd_a", 4500, "USD", "Public resource", "public-resource", true, "bld_a", "1.2.0"]],
   ];
   const result = await new OrderRepository().buyerDetails("ord_a", "usr_a", 2);
   expect(result).toMatchObject({
     order: { totalAmount: 4500 },
-    items: [{ hasCurrentAccess: true }],
+    items: [{ hasCurrentAccess: true, purchasedBuildId: "bld_a", purchasedVersion: "1.2.0" }],
+    walletSettled: true,
     page: 2,
     totalPages: 2,
   });
   expect(state.options[0]).toEqual({ isolationLevel: "repeatable read", accessMode: "read only" });
-  const query = state.queries[2];
+  expect(state.queries[1].sql).toContain('"payments"."provider"');
+  const query = state.queries[3];
   expect(query.sql).toContain("case when");
   expect(query.sql).toContain("coalesce");
   expect(query.sql).toContain('"entitlements"."permission" = \'product.download\'');
+  expect(query.sql).toContain("->>'buildId'");
+  expect(query.sql).toContain("->>'version'");
   expect(query.params.slice(-3)).toEqual(["ord_a", 20, 20]);
   expect(query.sql).not.toContain('"licenses"."key"');
 });

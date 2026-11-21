@@ -35,6 +35,11 @@ export const commerceHistoryCopy = {
     linePrice: "Historical line price",
     receiptNote:
       "The stored order state and amount do not activate access or confirm a new payment. Resource details reflect current visibility and access; withdrawn resources are hidden.",
+    walletReceiptNote:
+      "This order has a completed site-wallet settlement recorded in the ledger. That is an audited wallet debit, not card checkout or an external PSP capture. Purchased build evidence below is recorded metadata only — it does not pin download selection.",
+    purchasedBuildEvidence: "Recorded purchased build",
+    purchasedBuildEvidenceHint:
+      "Evidence from wallet settle metadata. Download still follows current library selection or latest published build.",
     status: "Status",
     placed: "Placed",
     total: "Order total",
@@ -128,6 +133,11 @@ export const commerceHistoryCopy = {
     linePrice: "Сохранённая цена позиции",
     receiptNote:
       "Сохранённые состояние и сумма заказа не выдают права и не подтверждают новый платёж. Данные ресурсов учитывают их текущую видимость и права доступа; снятые с публикации ресурсы скрыты.",
+    walletReceiptNote:
+      "По этому заказу записан completed расчёт через site wallet в ledger. Это аудируемое списание с кошелька, а не карточный checkout и не внешний PSP capture. Сведения о купленной сборке ниже — только metadata evidence; они не закрепляют выбор скачивания.",
+    purchasedBuildEvidence: "Зафиксированная купленная сборка",
+    purchasedBuildEvidenceHint:
+      "Evidence из metadata wallet settle. Скачивание по-прежнему следует текущему выбору в библиотеке или последней опубликованной сборке.",
     status: "Статус",
     placed: "Оформлен",
     total: "Сумма заказа",

@@ -27,6 +27,7 @@ import {
   financialFlags,
   financialOrderLabel,
   financialPaymentLabel,
+  financialProviderLabel,
   formatFinancialMinor,
   getFinancialCopy,
 } from "../financial-i18n";
@@ -143,7 +144,8 @@ export async function FinancialReconciliationDetailScreen({
             <li key={attempt.id} className={panelMinSpace2P5}>
               <p className="text-sm">
                 {financialPaymentLabel(locale, attempt.status)} ·{" "}
-                {formatFinancialMinor(attempt.amount, attempt.currency, locale)}
+                {formatFinancialMinor(attempt.amount, attempt.currency, locale)} · {copy.provider}:{" "}
+                {financialProviderLabel(locale, attempt.provider)}
               </p>
               <time dateTime={attempt.createdAt.toISOString()} className={typeXsMuted}>
                 {formatHistoryDate(attempt.createdAt, locale)}

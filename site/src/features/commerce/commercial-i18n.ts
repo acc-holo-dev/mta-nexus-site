@@ -83,6 +83,8 @@ const copy = {
     noAttempts: "No recorded payment attempts.",
     operationsNote:
       "This archive shows stored payment states; it does not independently confirm provider settlement. Cancellation is available only for a pending order with no payment attempts or financial entries. No refund or access grant is created.",
+    walletOperationsNote:
+      "Payment attempts list recorded providers. A completed site-wallet row is an audited ledger settle, not an external PSP capture. Cancellation remains only for unpaid pending orders with no attempts or ledger rows.",
     cannotCancel:
       "This order cannot be cancelled here. Orders with payment attempts require provider reconciliation.",
     cannotCancelHint:
@@ -104,6 +106,9 @@ const copy = {
     cancelledPayment: "Cancelled",
     status: "Status",
     amount: "Amount",
+    provider: "Provider",
+    providerWallet: "Site wallet",
+    providerUnknown: "Recorded provider",
     createdAt: "Created",
     updatedAt: "Updated",
     signIn: "Sign in",
@@ -217,6 +222,8 @@ const copy = {
     noAttempts: "Платёжных попыток не зафиксировано.",
     operationsNote:
       "Архив показывает сохранённые состояния платежей, а не независимое подтверждение расчёта провайдером. Отмена доступна только для ожидающего заказа без платёжных попыток и финансовых записей. Возврат денег и права доступа не создаются.",
+    walletOperationsNote:
+      "Список попыток показывает записанных провайдеров. Completed строка site wallet — аудируемый ledger settle, а не внешний PSP capture. Отмена по-прежнему только для неоплаченных pending-заказов без попыток и проводок.",
     cannotCancel:
       "Этот заказ нельзя отменить здесь. Заказы с платёжными попытками требуют сверки с провайдером.",
     cannotCancelHint:
@@ -238,6 +245,9 @@ const copy = {
     cancelledPayment: "Отменён",
     status: "Состояние",
     amount: "Сумма",
+    provider: "Провайдер",
+    providerWallet: "Site wallet",
+    providerUnknown: "Записанный провайдер",
     createdAt: "Создан",
     updatedAt: "Обновлён",
     signIn: "Войти",

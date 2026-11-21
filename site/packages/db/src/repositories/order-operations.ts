@@ -62,6 +62,7 @@ export class OrderOperationsRepository {
         const attempts = await tx
           .select({
             id: payments.id,
+            provider: payments.provider,
             status: payments.status,
             amount: payments.amount,
             currency: payments.currency,

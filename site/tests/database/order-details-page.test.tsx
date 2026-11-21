@@ -71,6 +71,7 @@ beforeEach(() => {
     total: 21,
     page: 2,
     totalPages: 2,
+    walletSettled: false,
   });
 });
 it("avoids private reads while signed out and hides unknown orders", async () => {
@@ -112,6 +113,48 @@ it("recovers with ErrorState when order details fail to load", async () => {
   expect(html).toMatch(/(?:min-h-11|link[A-Za-z]\w*|link-shell)/);
   expect(html).toContain('href="/workspace/purchases/ord_a?page=2"');
 });
+it("names completed site-wallet settle and purchased-build evidence on the receipt", async () => {
+  state.details.mockResolvedValue({
+    order: {
+      id: "ord_a",
+      orderNumber: "NX-001",
+      status: "completed",
+      totalAmount: 4500,
+      currency: "USD",
+      createdAt: new Date("2026-10-10"),
+    },
+    items: [
+      {
+        id: "itm_a",
+        productId: "prd_a",
+        productTitle: "Resource",
+        productSlug: null,
+        unitPrice: 4500,
+        currency: "USD",
+        hasCurrentAccess: true,
+        purchasedBuildId: "bld_a",
+        purchasedVersion: "1.2.0",
+      },
+    ],
+    total: 1,
+    page: 1,
+    totalPages: 1,
+    walletSettled: true,
+  });
+  const copy = getCommerceHistoryCopy("en");
+  const html = renderToStaticMarkup(
+    await Page({
+      params: Promise.resolve({ id: "ord_a" }),
+      searchParams: Promise.resolve({}),
+    }),
+  );
+  expect(html).toContain(copy.walletReceiptNote);
+  expect(html).not.toContain(copy.receiptNote);
+  expect(html).toContain(copy.purchasedBuildEvidence);
+  expect(html).toContain("v1.2.0");
+  expect(html).toContain("bld_a");
+  expect(html).toContain('data-purchased-build-evidence=""');
+});
 it("renders EmptyState when an order has no line items", async () => {
   state.details.mockResolvedValue({
     order: {
@@ -126,6 +169,7 @@ it("renders EmptyState when an order has no line items", async () => {
     total: 0,
     page: 1,
     totalPages: 1,
+    walletSettled: false,
   });
   const copy = getCommerceHistoryCopy("en");
   const html = renderToStaticMarkup(

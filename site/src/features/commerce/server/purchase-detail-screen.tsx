@@ -107,7 +107,7 @@ export async function PurchaseDetailScreen({
     );
   }
   if (!result) notFound();
-  const { order, items } = result;
+  const { order, items, walletSettled } = result;
   const walletEnabled = isWalletEngineEnabled();
   const canPayWithWallet = walletEnabled && order.status === "pending" && order.totalAmount > 0;
   const walletCopy = getWalletCopy(typedLocale);
@@ -170,7 +170,7 @@ export async function PurchaseDetailScreen({
         {orderTermsCopy(typedLocale).title}
       </Link>
       <p role="note" className={surfaceBgP4TextSmSecondary}>
-        {copy.receiptNote}
+        {walletSettled ? copy.walletReceiptNote : copy.receiptNote}
       </p>
       <section className={typeMinSpace4} aria-labelledby="order-items">
         <h2 id="order-items" className={typeXlSemiboldPrimary}>
@@ -196,6 +196,21 @@ export async function PurchaseDetailScreen({
                 <p className={typeSmMuted}>
                   {item.hasCurrentAccess ? copy.accessReady : copy.accessMissing}
                 </p>
+                {item.purchasedBuildId || item.purchasedVersion ? (
+                  <div className="space-y-1" data-purchased-build-evidence="">
+                    <p className={typeSmSecondary}>
+                      {copy.purchasedBuildEvidence}
+                      {item.purchasedVersion ? `: v${item.purchasedVersion}` : ""}
+                      {item.purchasedBuildId ? (
+                        <>
+                          {" "}
+                          <code className="break-all text-xs">{item.purchasedBuildId}</code>
+                        </>
+                      ) : null}
+                    </p>
+                    <p className={typeSmMuted}>{copy.purchasedBuildEvidenceHint}</p>
+                  </div>
+                ) : null}
                 {item.hasCurrentAccess && (
                   <Link href="/workspace/library" className={linkAccentSmRounded}>
                     {getResourceCommerceCopy(typedLocale).library}
