@@ -102,6 +102,7 @@ const REQUIRED_BROWSER = [
   "site/src/app/api/admin/community/[id]/discussion/[commentId]/reports/batch/route.ts",
   "site/src/app/api/admin/community/[id]/discussion/[commentId]/reports/batch/preview/route.ts",
   "site/src/app/api/wallet/topups/route.ts",
+  "site/src/app/api/orders/[id]/pay-with-wallet/route.ts",
 ] as const;
 
 const REQUIRED_BEARER = [

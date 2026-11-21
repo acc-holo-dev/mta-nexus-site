@@ -8,6 +8,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { orderOperationsService } from "../../../lib/services/commerce/commercial-plan-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
@@ -28,6 +29,8 @@ import {
 } from "../commerce-history-format";
 import { getCommercialCopy } from "../commercial-i18n";
 import { OrderCancellationForm } from "../order-cancellation";
+import { getWalletCopy } from "../wallet-i18n";
+import { WalletPayOrderForm } from "../wallet-pay";
 export async function purchaseOperationsMetadata(): Promise<Metadata> {
   return {
     title: `${getCommercialCopy(await getRequestLocale()).paymentOperations} | MTA NEXUS`,
@@ -123,6 +126,15 @@ export async function PurchaseOperationsScreen({
       <p role="note" className={surfaceBgP4TextSmSecondary}>
         {copy.operationsNote}
       </p>
+      {isWalletEngineEnabled() && result.order.status === "pending" && result.canCancel ? (
+        <WalletPayOrderForm
+          key={`wallet:${user.id}:${id}`}
+          actorId={user.id}
+          orderId={id}
+          amountLabel={getWalletCopy(locale === "ru" ? "ru" : "en").paySubmit}
+          canPay
+        />
+      ) : null}
       <OrderCancellationForm
         key={`${user.id}:${id}`}
         actorId={user.id}

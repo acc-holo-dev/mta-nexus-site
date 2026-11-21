@@ -32,3 +32,11 @@ export const walletBalanceQuerySchema = z
   .strict();
 
 export const walletProviderIdSchema = providerId;
+
+export const walletPayOrderSchema = z
+  .object({
+    orderId: z
+      .string()
+      .regex(/^[A-Za-z0-9_-]{1,128}$/u, "Order id must be 1–128 URL-safe characters"),
+  })
+  .strict();

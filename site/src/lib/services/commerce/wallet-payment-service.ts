@@ -1,4 +1,9 @@
-import { ledgerRepository, walletTopupRepository } from "@nexus/db";
+import {
+  ledgerRepository,
+  orderRepository,
+  walletOrderSettlementRepository,
+  walletTopupRepository,
+} from "@nexus/db";
 import {
   AppError,
   buildVerifiedTopUpCreditPosting,
@@ -6,12 +11,14 @@ import {
   createTopUpIntent,
   markTopUpAwaitingProvider,
   markTopUpFailed,
+  type Order,
   type PaymentProviderId,
   type PaymentProviderPort,
   paymentProviderCapabilityMatrix,
   StubPaymentProvider,
   selectPaymentProvider,
   type TopUpIntent,
+  type User,
   type VerifiedProviderEvent,
   type WalletCurrency,
 } from "@nexus/domain";
@@ -21,8 +28,9 @@ import { generateId } from "@nexus/security";
  * Wallet + multi-provider payment engine.
  *
  * Live PSP adapters are not wired. The stub provider is the only default port.
- * HTTP routes exist under `/api/wallet/*` but stay dark unless NEXUS_WALLET_ENGINE=1.
- * Browser redirects never credit the wallet — only verified provider events do.
+ * HTTP routes under `/api/wallet/*` and pay-with-wallet stay dark unless
+ * NEXUS_WALLET_ENGINE=1. Browser redirects never credit the wallet — only verified
+ * provider events do. Wallet spend settles pending paid orders atomically.
  */
 export function isWalletEngineEnabled(
   env: Record<string, string | undefined> = process.env,
@@ -39,6 +47,8 @@ export class WalletPaymentService {
     private readonly providers: readonly PaymentProviderPort[] = defaultPaymentProviders(),
     private readonly topups = walletTopupRepository,
     private readonly ledger = ledgerRepository,
+    private readonly settlements = walletOrderSettlementRepository,
+    private readonly orders = orderRepository,
   ) {}
 
   capabilityMatrix(liveConfigured: Readonly<Partial<Record<PaymentProviderId, boolean>>> = {}) {
@@ -134,6 +144,27 @@ export class WalletPaymentService {
       clearingEntryId: generateId("ldg"),
     });
     const batchId = `topup_${stored.id}`;
+    if (
+      "creditVerified" in this.topups &&
+      typeof (this.topups as { creditVerified?: unknown }).creditVerified === "function"
+    ) {
+      const result = await (
+        this.topups as {
+          creditVerified: (input: {
+            intentId: string;
+            providerEventId: string;
+            ledgerBatchId: string;
+            entries: typeof credited.entries;
+          }) => Promise<{ intent: TopUpIntent; entries: typeof credited.entries | null }>;
+        }
+      ).creditVerified({
+        intentId: stored.id,
+        providerEventId: event.providerEventId,
+        ledgerBatchId: batchId,
+        entries: credited.entries,
+      });
+      return { intent: result.intent, entries: result.entries ?? credited.entries };
+    }
     await this.ledger.post(batchId, credited.entries);
     const intent = await this.topups.markSucceeded({
       intentId: stored.id,
@@ -155,6 +186,27 @@ export class WalletPaymentService {
       userEntryId: generateId("ldg"),
       marketplaceEntryId: generateId("ldg"),
     });
+  }
+
+  async settleOrderFromWallet(input: { user: User; currentToken: string; orderId: string }) {
+    return this.settlements.settle({
+      buyerId: input.user.id,
+      currentToken: input.currentToken,
+      orderId: input.orderId,
+    });
+  }
+
+  async createPendingPaidOrder(input: {
+    user: User;
+    order: Omit<Order, "createdAt" | "updatedAt">;
+  }): Promise<Order> {
+    if (input.order.buyerId !== input.user.id) {
+      throw new AppError("Buyer mismatch", 403, "FORBIDDEN");
+    }
+    if (input.order.totalAmount <= 0) {
+      throw new AppError("Paid order requires a positive total", 400, "ORDER_NOT_PAYABLE");
+    }
+    return this.orders.create(input.order);
   }
 
   async getAvailableBalance(accountId: string, currency: WalletCurrency): Promise<number> {

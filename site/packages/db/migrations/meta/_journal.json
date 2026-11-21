@@ -645,6 +645,13 @@
       "when": 1794222000000,
       "tag": "0091_wallet_topup_intents",
       "breakpoints": true
+    },
+    {
+      "idx": 92,
+      "version": "7",
+      "when": 1794308400000,
+      "tag": "0092_ledger_wallet_reference_types",
+      "breakpoints": true
     }
   ]
 }

@@ -3,6 +3,8 @@ import {
   assertWalletAccountId,
   assertWalletAmount,
   assertWalletCurrency,
+  type LedgerEntry,
+  type LedgerPosting,
   type PaymentProviderId,
   type TopUpIntent,
   type TopUpIntentStatus,
@@ -11,6 +13,7 @@ import {
 import { and, desc, eq, sql } from "drizzle-orm";
 import { db } from "../client";
 import { walletTopupIntents } from "../schema";
+import { postLedgerBatchInTransaction } from "./ledger-posting";
 
 type WalletTopupRow = typeof walletTopupIntents.$inferSelect;
 
@@ -158,6 +161,59 @@ export class WalletTopupRepository {
         .returning();
       if (!row) throw new AppError("Top-up intent credit raced", 409, "TOPUP_CREDIT_RACE");
       return toIntent(row);
+    });
+  }
+
+  /**
+   * Credit a verified top-up: ledger posting and intent success flip in one transaction.
+   */
+  async creditVerified(input: {
+    intentId: string;
+    providerEventId: string;
+    ledgerBatchId: string;
+    entries: LedgerPosting[];
+  }): Promise<{ intent: TopUpIntent; entries: LedgerEntry[] | null }> {
+    return db.transaction(async (tx) => {
+      await tx.execute(
+        sql`select pg_advisory_xact_lock(hashtext(${`wallet-topup:${input.intentId}`}))`,
+      );
+      const [current] = await tx
+        .select()
+        .from(walletTopupIntents)
+        .where(eq(walletTopupIntents.id, input.intentId))
+        .limit(1)
+        .for("update");
+      if (!current) throw new AppError("Top-up intent not found", 404, "TOPUP_NOT_FOUND");
+      if (current.status === "succeeded") {
+        if (
+          current.providerEventId === input.providerEventId &&
+          current.ledgerBatchId === input.ledgerBatchId
+        ) {
+          return { intent: toIntent(current), entries: null };
+        }
+        throw new AppError("Top-up intent already credited", 409, "TOPUP_ALREADY_CREDITED");
+      }
+      if (current.status !== "awaiting_provider" && current.status !== "created") {
+        throw new AppError("Top-up intent cannot be credited", 409, "TOPUP_INTENT_STATE");
+      }
+      const posted = await postLedgerBatchInTransaction(tx, input.ledgerBatchId, input.entries);
+      const [row] = await tx
+        .update(walletTopupIntents)
+        .set({
+          status: "succeeded",
+          providerEventId: input.providerEventId,
+          ledgerBatchId: input.ledgerBatchId,
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(walletTopupIntents.id, input.intentId),
+            eq(walletTopupIntents.status, current.status),
+          ),
+        )
+        .returning();
+      if (!row) throw new AppError("Top-up intent credit raced", 409, "TOPUP_CREDIT_RACE");
+      return { intent: toIntent(row), entries: posted };
     });
   }
 

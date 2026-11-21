@@ -9,9 +9,12 @@ panel and runtime probe live here too. Services, repositories, routes and
 `site/src/lib/services/commerce/wallet-payment-service.ts`. Site stored-value balance
 uses the existing double-entry ledger; multi-provider capability matrix; stub top-up
 only until PSP contracts. Top-up intents persist in `wallet_topup_intents` (migration
-`0091_wallet_topup_intents`) via `walletTopupRepository`. HTTP routes under
-`/api/wallet/*` and `/workspace/wallet` stay dark unless `NEXUS_WALLET_ENGINE=1`.
-Redirect never credits the wallet.
+`0091_wallet_topup_intents`) via `walletTopupRepository`. Ledger wallet reference
+kinds (`topup` / `wallet_spend` / …) require migration `0092_ledger_wallet_reference_types`.
+Pending paid orders settle via `POST /api/orders/:id/pay-with-wallet` (atomic
+`wallet_spend` + completed payment + order completion + download entitlement).
+HTTP routes under `/api/wallet/*`, pay-with-wallet, and `/workspace/wallet` stay
+dark unless `NEXUS_WALLET_ENGINE=1`. Redirect never credits the wallet.
 
 | Entry                             | Контракт                                                                               |
 | --------------------------------- | -------------------------------------------------------------------------------------- |
@@ -68,6 +71,8 @@ Redirect never credits the wallet.
 | `wallet-i18n.ts`                  | util port `wallet-i18n`                                                                |
 | `wallet-topup.ts`                 | `WalletTopUpForm` (client); stub top-up against `/api/wallet/topups`                   |
 | `wallet-topup-confirmation.ts`    | util port `wallet-topup-confirmation`                                                  |
+| `wallet-pay.ts`                   | `WalletPayOrderForm` (client); pay pending order via `/api/orders/:id/pay-with-wallet` |
+| `wallet-pay-confirmation.ts`      | util port `wallet-pay-confirmation`                                                    |
 | `wallet-workspace-server.ts`      | `WalletWorkspaceScreen`, metadata; `/workspace/wallet`                                 |
 
 Внутренние `components/` и `server/` не являются публичным API. Границы — dependency-cruiser

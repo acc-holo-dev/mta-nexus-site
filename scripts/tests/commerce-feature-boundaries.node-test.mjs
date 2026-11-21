@@ -42,6 +42,7 @@ const utilPorts = [
   "checkout-api-copy",
   "wallet-i18n",
   "wallet-topup-confirmation",
+  "wallet-pay-confirmation",
 ];
 const clientPorts = [
   "acquire-page",
@@ -53,6 +54,7 @@ const clientPorts = [
   "commercial-plans",
   "plan-reviews",
   "wallet-topup",
+  "wallet-pay",
 ];
 const safeLib =
   /^(?:(?:i18n(?:\.ts$|\/)|platform\/i18n\.ts$)|(?:commerce-history-format|http\/private-api-request|support-retry)\.ts$)/u;

@@ -8,6 +8,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { commerceService } from "../../../lib/services/commerce/commerce-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { getResourceCommerceCopy } from "../../resources/resource-commerce-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
@@ -34,6 +35,8 @@ import { getCommerceHistoryCopy } from "../commerce-history-i18n";
 import { getCommercialCopy } from "../commercial-i18n";
 import { orderCaseCopy } from "../order-case-i18n";
 import { orderTermsCopy } from "../order-terms-i18n";
+import { getWalletCopy } from "../wallet-i18n";
+import { WalletPayOrderForm } from "../wallet-pay";
 export async function purchaseDetailMetadata(): Promise<Metadata> {
   return {
     title: `${getCommerceHistoryCopy(await getRequestLocale()).orderDetailsTitle} | MTA NEXUS`,
@@ -105,6 +108,9 @@ export async function PurchaseDetailScreen({
   }
   if (!result) notFound();
   const { order, items } = result;
+  const walletEnabled = isWalletEngineEnabled();
+  const canPayWithWallet = walletEnabled && order.status === "pending" && order.totalAmount > 0;
+  const walletCopy = getWalletCopy(typedLocale);
   return (
     <div className={pageShellMax4xl}>
       <header className="min-w-0 space-y-3 border-b border-base pb-5">
@@ -134,6 +140,15 @@ export async function PurchaseDetailScreen({
           </div>
         </dl>
       </header>
+      {canPayWithWallet ? (
+        <WalletPayOrderForm
+          key={`${actor.id}:${id}`}
+          actorId={actor.id}
+          orderId={id}
+          amountLabel={`${walletCopy.payTitle}: ${formatHistoryAmount(order.totalAmount, order.currency, typedLocale)}`}
+          canPay={canPayWithWallet}
+        />
+      ) : null}
       <Link
         href={`/workspace/purchases/${encodeURIComponent(id)}/operations`}
         className={linkAccentSmRounded}
