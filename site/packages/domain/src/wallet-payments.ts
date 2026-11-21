@@ -1,3 +1,4 @@
+import { BASE_COMMISSION_BPS, commercialFeeEstimate } from "./commercial-plans";
 import { AppError } from "./errors";
 import type { LedgerPosting } from "./financial-journal";
 import { validateLedgerPosting } from "./financial-journal";
@@ -253,8 +254,45 @@ export function markTopUpFailed(intent: TopUpIntent, event: VerifiedProviderEven
 }
 
 /**
- * Spend available wallet balance against an order. Caller supplies the current
- * available balance from the ledger projection; this function never invents funds.
+ * Split a wallet spend gross into platform fee + seller proceeds (ECON-001).
+ * Hold/release of seller proceeds remains a later slice; launch credits sellers available.
+ */
+export function allocateWalletSpendCommission(input: {
+  lines: ReadonlyArray<{ grossAmount: number; sellerAccountId: string }>;
+  currency: WalletCurrency;
+  commissionBps?: number;
+}): {
+  platformFee: number;
+  sellerCredits: Array<{ accountId: string; amount: number }>;
+} {
+  if (input.lines.length === 0) {
+    throw new AppError("Wallet spend requires at least one line", 400, "WALLET_SPEND_INVALID");
+  }
+  const commissionBps = input.commissionBps ?? BASE_COMMISSION_BPS;
+  let platformFee = 0;
+  const bySeller = new Map<string, number>();
+  for (const line of input.lines) {
+    assertWalletAccountId(line.sellerAccountId);
+    const quote = commercialFeeEstimate(line.grossAmount, input.currency, commissionBps);
+    platformFee += quote.platformFee;
+    bySeller.set(
+      line.sellerAccountId,
+      (bySeller.get(line.sellerAccountId) ?? 0) + quote.sellerProceeds,
+    );
+  }
+  if (!Number.isSafeInteger(platformFee) || platformFee < 0) {
+    throw new AppError("Platform fee is out of range", 400, "WALLET_SPEND_INVALID");
+  }
+  const sellerCredits = [...bySeller.entries()]
+    .map(([accountId, amount]) => ({ accountId, amount }))
+    .sort((a, b) => a.accountId.localeCompare(b.accountId));
+  return { platformFee, sellerCredits };
+}
+
+/**
+ * Spend available wallet balance against an order with platform fee + seller credits.
+ * Caller supplies the current available balance from the ledger projection; this
+ * function never invents funds. Seller hold/release is out of scope for this posting.
  */
 export function buildWalletSpendPosting(input: {
   accountId: string;
@@ -263,7 +301,9 @@ export function buildWalletSpendPosting(input: {
   orderId: string;
   availableBalance: number;
   userEntryId: string;
-  marketplaceEntryId: string;
+  platformFeeEntryId: string;
+  platformFee: number;
+  sellerCredits: ReadonlyArray<{ accountId: string; amount: number; entryId: string }>;
 }): LedgerPosting[] {
   assertWalletAccountId(input.accountId);
   assertWalletAmount(input.amount);
@@ -277,7 +317,40 @@ export function buildWalletSpendPosting(input: {
   if (input.availableBalance < input.amount) {
     throw new AppError("Insufficient wallet balance", 409, "WALLET_INSUFFICIENT_FUNDS");
   }
+  if (
+    !Number.isSafeInteger(input.platformFee) ||
+    input.platformFee < 0 ||
+    input.platformFee > input.amount
+  ) {
+    throw new AppError("Platform fee is out of range", 400, "WALLET_SPEND_INVALID");
+  }
+  if (input.sellerCredits.length === 0) {
+    throw new AppError("Wallet spend requires seller credits", 400, "WALLET_SPEND_INVALID");
+  }
 
+  let sellerTotal = 0;
+  const seenSellers = new Set<string>();
+  const seenEntryIds = new Set<string>([input.userEntryId, input.platformFeeEntryId]);
+  for (const credit of input.sellerCredits) {
+    assertWalletAccountId(credit.accountId);
+    if (credit.accountId === input.accountId) {
+      throw new AppError("Buyer cannot be the seller credit target", 400, "WALLET_SPEND_INVALID");
+    }
+    if (seenSellers.has(credit.accountId) || seenEntryIds.has(credit.entryId)) {
+      throw new AppError("Seller credit lines must be unique", 400, "WALLET_SPEND_INVALID");
+    }
+    if (!Number.isSafeInteger(credit.amount) || credit.amount < 0) {
+      throw new AppError("Seller credit is out of range", 400, "WALLET_SPEND_INVALID");
+    }
+    seenSellers.add(credit.accountId);
+    seenEntryIds.add(credit.entryId);
+    sellerTotal += credit.amount;
+  }
+  if (input.platformFee + sellerTotal !== input.amount) {
+    throw new AppError("Wallet spend split does not balance", 400, "WALLET_SPEND_INVALID");
+  }
+
+  // Journal entries forbid amount === 0; omit zero fee/credit legs after rounding.
   const entries: LedgerPosting[] = [
     {
       id: input.userEntryId,
@@ -288,16 +361,30 @@ export function buildWalletSpendPosting(input: {
       referenceId: input.orderId,
       description: `Wallet spend for order ${input.orderId}`,
     },
-    {
-      id: input.marketplaceEntryId,
+  ];
+  if (input.platformFee > 0) {
+    entries.push({
+      id: input.platformFeeEntryId,
       accountId: "platform:marketplace",
-      amount: input.amount,
+      amount: input.platformFee,
       currency: input.currency,
       referenceType: "wallet_spend",
       referenceId: input.orderId,
-      description: `Marketplace receipt for order ${input.orderId}`,
-    },
-  ];
+      description: `Platform fee for order ${input.orderId}`,
+    });
+  }
+  for (const credit of input.sellerCredits) {
+    if (credit.amount === 0) continue;
+    entries.push({
+      id: credit.entryId,
+      accountId: credit.accountId,
+      amount: credit.amount,
+      currency: input.currency,
+      referenceType: "wallet_spend",
+      referenceId: input.orderId,
+      description: `Seller proceeds for order ${input.orderId}`,
+    });
+  }
   validateLedgerPosting(entries);
   return entries;
 }

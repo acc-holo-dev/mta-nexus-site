@@ -184,11 +184,22 @@ export class WalletPaymentService {
     currency: WalletCurrency;
     orderId: string;
     availableBalance: number;
+    platformFee: number;
+    sellerCredits: ReadonlyArray<{ accountId: string; amount: number }>;
   }) {
     return buildWalletSpendPosting({
-      ...input,
+      accountId: input.accountId,
+      amount: input.amount,
+      currency: input.currency,
+      orderId: input.orderId,
+      availableBalance: input.availableBalance,
       userEntryId: generateId("ldg"),
-      marketplaceEntryId: generateId("ldg"),
+      platformFeeEntryId: generateId("ldg"),
+      platformFee: input.platformFee,
+      sellerCredits: input.sellerCredits.map((credit) => ({
+        ...credit,
+        entryId: generateId("ldg"),
+      })),
     });
   }
 

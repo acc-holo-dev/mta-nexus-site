@@ -1,13 +1,14 @@
 import { createHash } from "node:crypto";
 import {
   AppError,
+  allocateWalletSpendCommission,
   buildWalletSpendPosting,
   type LedgerEntry,
   type LedgerPosting,
   NotFoundError,
   type WalletCurrency,
 } from "@nexus/domain";
-import { and, asc, eq, or, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   auditEvents,
@@ -40,9 +41,21 @@ function walletSettleIds(orderId: string) {
     paymentId: `pay_wallet_${orderId}`,
     ledgerBatchId: `wspend_${orderId}`,
     userEntryId: `ldg_wspend_${orderId}_user`,
-    marketplaceEntryId: `ldg_wspend_${orderId}_mkt`,
+    platformFeeEntryId: `ldg_wspend_${orderId}_fee`,
+    sellerEntryId: (sellerAccountId: string) =>
+      `ldg_wspend_${orderId}_s_${createHash("sha256")
+        .update(sellerAccountId)
+        .digest("hex")
+        .slice(0, 16)}`,
     auditId: `aud_wspend_${orderId}`,
   };
+}
+
+function sellerAccountForProduct(product: {
+  authorId: string;
+  organizationId: string | null;
+}): string {
+  return product.organizationId ? `org:${product.organizationId}` : `user:${product.authorId}`;
 }
 
 /**
@@ -163,9 +176,57 @@ export class WalletOrderSettlementRepository {
         .orderBy(asc(orderItems.productId));
       if (!lines.length) throw new AppError("Order has no line items", 409, "ORDER_NOT_PAYABLE");
 
+      const catalog = await tx
+        .select({
+          id: products.id,
+          authorId: products.authorId,
+          organizationId: products.organizationId,
+          price: products.price,
+          currency: products.currency,
+        })
+        .from(products)
+        .where(
+          inArray(
+            products.id,
+            lines.map((line) => line.productId),
+          ),
+        );
+      if (catalog.length !== lines.length) {
+        throw new AppError("Catalog terms changed", 409, "ORDER_CATALOG_CHANGED");
+      }
+      const productById = new Map(catalog.map((product) => [product.id, product]));
+      const commissionLines: Array<{ grossAmount: number; sellerAccountId: string }> = [];
+      let lineTotal = 0;
+      for (const line of lines) {
+        const product = productById.get(line.productId);
+        if (!product) throw new AppError("Catalog terms changed", 409, "ORDER_CATALOG_CHANGED");
+        if (
+          line.unitPrice !== product.price ||
+          line.currency !== product.currency ||
+          line.currency !== order.currency ||
+          !Number.isSafeInteger(line.unitPrice) ||
+          line.unitPrice <= 0
+        ) {
+          throw new AppError("Catalog terms changed", 409, "ORDER_CATALOG_CHANGED");
+        }
+        const sellerAccountId = sellerAccountForProduct(product);
+        if (sellerAccountId === `user:${input.buyerId}`) {
+          throw new AppError("Buyer cannot settle own listing", 409, "WALLET_SPEND_INVALID");
+        }
+        commissionLines.push({ grossAmount: line.unitPrice, sellerAccountId });
+        lineTotal += line.unitPrice;
+      }
+      if (lineTotal !== order.totalAmount) {
+        throw new AppError("Order total does not match line items", 409, "ORDER_NOT_PAYABLE");
+      }
+
       const accountId = `user:${input.buyerId}`;
       const currency = order.currency as WalletCurrency;
       const availableBalance = await accountBalanceInTransaction(tx, accountId, currency);
+      const split = allocateWalletSpendCommission({
+        lines: commissionLines,
+        currency,
+      });
       const posting: LedgerPosting[] = buildWalletSpendPosting({
         accountId,
         amount: order.totalAmount,
@@ -173,7 +234,13 @@ export class WalletOrderSettlementRepository {
         orderId: order.id,
         availableBalance,
         userEntryId: ids.userEntryId,
-        marketplaceEntryId: ids.marketplaceEntryId,
+        platformFeeEntryId: ids.platformFeeEntryId,
+        platformFee: split.platformFee,
+        sellerCredits: split.sellerCredits.map((credit) => ({
+          accountId: credit.accountId,
+          amount: credit.amount,
+          entryId: ids.sellerEntryId(credit.accountId),
+        })),
       });
       const entries = await postLedgerBatchInTransaction(tx, ids.ledgerBatchId, posting);
 
@@ -261,6 +328,8 @@ export class WalletOrderSettlementRepository {
           ledgerBatchId: ids.ledgerBatchId,
           totalAmount: order.totalAmount,
           currency: order.currency,
+          platformFee: split.platformFee,
+          sellerCreditCount: split.sellerCredits.length,
           entitlementCount: granted.length,
         },
       });

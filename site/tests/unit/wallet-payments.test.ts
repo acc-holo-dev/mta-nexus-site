@@ -1,4 +1,5 @@
 import {
+  allocateWalletSpendCommission,
   buildVerifiedTopUpCreditPosting,
   buildWalletSpendPosting,
   createTopUpIntent,
@@ -180,7 +181,7 @@ describe("wallet payments domain", () => {
     ).toThrow(/already credited/i);
   });
 
-  it("spends available balance and refuses overdraft", () => {
+  it("spends available balance with commission split and refuses overdraft", () => {
     const entries = buildWalletSpendPosting({
       accountId: "user:usr_buyer",
       amount: 400,
@@ -188,9 +189,16 @@ describe("wallet payments domain", () => {
       orderId: "ord_spend_1",
       availableBalance: 1500,
       userEntryId: "leg_spend_u",
-      marketplaceEntryId: "leg_spend_m",
+      platformFeeEntryId: "leg_spend_fee",
+      platformFee: 40,
+      sellerCredits: [{ accountId: "user:usr_seller", amount: 360, entryId: "leg_spend_s" }],
     });
     expect(() => validateLedgerPosting(entries)).not.toThrow();
+    expect(entries.map((entry) => entry.accountId).sort()).toEqual([
+      "platform:marketplace",
+      "user:usr_buyer",
+      "user:usr_seller",
+    ]);
     expect(() =>
       buildWalletSpendPosting({
         accountId: "user:usr_buyer",
@@ -199,7 +207,9 @@ describe("wallet payments domain", () => {
         orderId: "ord_spend_2",
         availableBalance: 1500,
         userEntryId: "leg_spend_u2",
-        marketplaceEntryId: "leg_spend_m2",
+        platformFeeEntryId: "leg_spend_fee2",
+        platformFee: 160,
+        sellerCredits: [{ accountId: "user:usr_seller", amount: 1440, entryId: "leg_spend_s2" }],
       }),
     ).toThrow(/Insufficient wallet balance/i);
   });
@@ -294,12 +304,19 @@ describe("wallet payment service", () => {
     if (entries === null) throw new Error("expected ledger entries");
     expect(() => validateLedgerPosting(entries)).not.toThrow();
 
+    const split = allocateWalletSpendCommission({
+      lines: [{ grossAmount: 100, sellerAccountId: "user:usr_seller" }],
+      currency: "EUR",
+    });
+    expect(split.platformFee + split.sellerCredits.reduce((sum, c) => sum + c.amount, 0)).toBe(100);
     const spend = service.spendFromWallet({
       accountId: "user:usr_buyer",
       amount: 100,
       currency: "EUR",
       orderId: "ord_wallet_1",
       availableBalance: 250,
+      platformFee: split.platformFee,
+      sellerCredits: split.sellerCredits,
     });
     expect(() => validateLedgerPosting(spend)).not.toThrow();
 

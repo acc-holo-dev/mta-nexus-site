@@ -12,12 +12,13 @@ only until PSP contracts. Top-up intents persist in `wallet_topup_intents` (migr
 `0091_wallet_topup_intents`) via `walletTopupRepository`. Ledger wallet reference
 kinds (`topup` / `wallet_spend` / …) require migration `0092_ledger_wallet_reference_types`.
 Pending paid orders settle via `POST /api/orders/:id/pay-with-wallet` (atomic
-`wallet_spend` + completed payment + order completion + download entitlement).
-Create+settle from catalog: `POST /api/checkout/wallet` (card `/api/checkout`
-stays `CHECKOUT_DISABLED`). Ledger activity: `GET /api/wallet/activity` (credits
-and spends for the caller's account). HTTP routes under `/api/wallet/*`,
-pay-with-wallet, checkout/wallet, and `/workspace/wallet` stay dark unless
-`NEXUS_WALLET_ENGINE=1`. Redirect never credits the wallet.
+`wallet_spend` with ECON-001 platform fee + seller proceeds, completed payment,
+order completion, download entitlement). Create+settle from catalog:
+`POST /api/checkout/wallet` (card `/api/checkout` stays `CHECKOUT_DISABLED`).
+Ledger activity: `GET /api/wallet/activity`. Seller hold/release is not applied
+yet — proceeds credit the seller/org account immediately. HTTP routes under
+`/api/wallet/*`, pay-with-wallet, checkout/wallet, and `/workspace/wallet` stay
+dark unless `NEXUS_WALLET_ENGINE=1`. Redirect never credits the wallet.
 
 | Entry                             | Контракт                                                                               |
 | --------------------------------- | -------------------------------------------------------------------------------------- |
