@@ -12,7 +12,7 @@ const source = readFileSync(
 
 /** Honesty lock: order operations cannotCancel muted note → ErrorState. */
 it("locks order operations cannotCancel blocker to ErrorState", () => {
-  expect(source).toContain('import { ErrorState } from "@nexus/ui"');
+  expect(source).toMatch(/import \{[^}]*\bErrorState\b[^}]*\} from "@nexus\/ui"/u);
   expect(source).toContain('id="order-operations-cannot-cancel"');
   expect(source).toContain("copy.cannotCancel");
   expect(source).toContain("copy.cancelledPayment");
