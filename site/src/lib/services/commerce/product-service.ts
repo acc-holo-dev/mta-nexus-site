@@ -32,6 +32,7 @@ import {
   reverseDependencyLimits,
 } from "../../../features/resources/reverse-dependency-summary";
 import { isUniqueConstraintViolation } from "../../platform/postgres-error";
+import { isWalletEngineEnabled } from "./wallet-payment-service";
 
 export type { PublicResourceAttribution };
 
@@ -197,8 +198,11 @@ export class ProductService {
 
   async getProductBySlug(slug: string): Promise<Product | null> {
     const product = await productRepository.findBySlug(slug);
-    if (product?.price !== 0 || product.status !== "published") {
+    if (product?.status !== "published") {
       return null;
+    }
+    if (product.price !== 0) {
+      if (!isWalletEngineEnabled() || product.licenseModel !== "single_server") return null;
     }
     const build = await buildRepository.findLatestPublishedByProduct(product.id);
     return build ? product : null;
@@ -221,7 +225,14 @@ export class ProductService {
     actor: User | null,
   ): Promise<{ product: Product; isPublic: boolean } | null> {
     const product = await productRepository.findBySlug(slug);
-    if (product?.price !== 0) return null;
+    if (!product) return null;
+    if (product.price !== 0) {
+      if (!isWalletEngineEnabled() || product.licenseModel !== "single_server") {
+        // Managers may still open private paid drafts for editing; public market stays dark.
+        if (!actor) return null;
+        return (await this.canManageProduct(product, actor)) ? { product, isPublic: false } : null;
+      }
+    }
     if (
       product.status === "published" &&
       (await buildRepository.findLatestPublishedByProduct(product.id))

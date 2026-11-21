@@ -16,11 +16,14 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { commerceService } from "../../../lib/services/commerce/commerce-service";
 import { productService } from "../../../lib/services/commerce/product-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { resourceManagementService } from "../../../lib/services/resources/resource-management-service";
 import { resourceQaService } from "../../../lib/services/resources/resource-qa-service";
 import { resourceReleaseWatchesService } from "../../../lib/services/resources/resource-release-watches-service";
 import { resourceReviewService } from "../../../lib/services/resources/resource-review-service";
+import { formatHistoryAmount } from "../../commerce/commerce-history-format";
 import { licenseModelLabel } from "../../commerce/license-model-i18n";
+import { WalletCheckoutButton } from "../../commerce/wallet-checkout";
 import { FollowButton } from "../../community/follow";
 import { ObjectReportForm } from "../../moderation/object-report";
 import { authEntryHref } from "../../shell/auth-return";
@@ -305,7 +308,13 @@ export async function ProductDetailPage({
     buildId: versionHelpBuild?.id,
   });
 
-  const formattedPrice = product.price === 0 ? copy.free : dictionary.checkout.paidUnavailable;
+  const walletEnabled = isWalletEngineEnabled();
+  const formattedPrice =
+    product.price === 0
+      ? copy.free
+      : walletEnabled
+        ? formatHistoryAmount(product.price, product.currency, locale === "ru" ? "ru" : "en")
+        : dictionary.checkout.paidUnavailable;
 
   return (
     <div className={pageShellStack10}>
@@ -493,6 +502,16 @@ export async function ProductDetailPage({
                       returnPath={detailReturnPath}
                     />
                   </section>
+                </div>
+              ) : isPublic && walletEnabled && product.price > 0 ? (
+                <div className="space-y-3" data-acquire-intent="wallet">
+                  <WalletCheckoutButton
+                    actorId={user?.id ?? null}
+                    productId={product.id}
+                    amountLabel={formattedPrice}
+                    signedIn={Boolean(user)}
+                    signInHref={authEntryHref("login", detailReturnPath)}
+                  />
                 </div>
               ) : (
                 <ErrorState

@@ -40,3 +40,17 @@ export const walletPayOrderSchema = z
       .regex(/^[A-Za-z0-9_-]{1,128}$/u, "Order id must be 1–128 URL-safe characters"),
   })
   .strict();
+
+const productId = z
+  .string()
+  .regex(/^[A-Za-z0-9_-]{1,160}$/u, "Product id must be 1–160 URL-safe characters");
+
+export const walletCheckoutSchema = z
+  .object({
+    productIds: z
+      .array(productId)
+      .min(1)
+      .max(20)
+      .refine((ids) => new Set(ids).size === ids.length, "Product ids must be unique"),
+  })
+  .strict();

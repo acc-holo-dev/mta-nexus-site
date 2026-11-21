@@ -1,6 +1,8 @@
 import {
   ledgerRepository,
   orderRepository,
+  productRepository,
+  type WalletOrderSettlementResult,
   walletOrderSettlementRepository,
   walletTopupRepository,
 } from "@nexus/db";
@@ -11,6 +13,7 @@ import {
   createTopUpIntent,
   markTopUpAwaitingProvider,
   markTopUpFailed,
+  ORDER_TERMS_LINE_LIMIT,
   type Order,
   type PaymentProviderId,
   type PaymentProviderPort,
@@ -28,9 +31,9 @@ import { generateId } from "@nexus/security";
  * Wallet + multi-provider payment engine.
  *
  * Live PSP adapters are not wired. The stub provider is the only default port.
- * HTTP routes under `/api/wallet/*` and pay-with-wallet stay dark unless
- * NEXUS_WALLET_ENGINE=1. Browser redirects never credit the wallet — only verified
- * provider events do. Wallet spend settles pending paid orders atomically.
+ * HTTP routes under `/api/wallet/*`, pay-with-wallet, and checkout/wallet stay dark
+ * unless NEXUS_WALLET_ENGINE=1. Browser redirects never credit the wallet — only
+ * verified provider events do. Wallet spend settles pending paid orders atomically.
  */
 export function isWalletEngineEnabled(
   env: Record<string, string | undefined> = process.env,
@@ -49,6 +52,7 @@ export class WalletPaymentService {
     private readonly ledger = ledgerRepository,
     private readonly settlements = walletOrderSettlementRepository,
     private readonly orders = orderRepository,
+    private readonly products = productRepository,
   ) {}
 
   capabilityMatrix(liveConfigured: Readonly<Partial<Record<PaymentProviderId, boolean>>> = {}) {
@@ -207,6 +211,83 @@ export class WalletPaymentService {
       throw new AppError("Paid order requires a positive total", 400, "ORDER_NOT_PAYABLE");
     }
     return this.orders.create(input.order);
+  }
+
+  /**
+   * Create a pending paid order from published paid catalog lines and settle it
+   * from the buyer's site wallet. Card `/api/checkout` stays disabled.
+   */
+  async checkoutAndSettleFromWallet(input: {
+    user: User;
+    currentToken: string;
+    productIds: string[];
+  }): Promise<WalletOrderSettlementResult & { orderNumber: string }> {
+    const uniqueIds = [...new Set(input.productIds)];
+    if (
+      uniqueIds.length === 0 ||
+      uniqueIds.length > ORDER_TERMS_LINE_LIMIT ||
+      uniqueIds.length !== input.productIds.length
+    ) {
+      throw new AppError("Invalid wallet checkout", 400, "WALLET_CHECKOUT_INVALID");
+    }
+
+    const catalog = await this.products.listPublishedPaidByIds(uniqueIds);
+    if (catalog.length !== uniqueIds.length) {
+      throw new AppError("Catalog terms changed", 409, "ORDER_CATALOG_CHANGED");
+    }
+    const byId = new Map(catalog.map((product) => [product.id, product]));
+    const ordered = uniqueIds.map((id) => {
+      const product = byId.get(id);
+      if (!product) throw new AppError("Catalog terms changed", 409, "ORDER_CATALOG_CHANGED");
+      return product;
+    });
+
+    const first = ordered[0];
+    if (!first) throw new AppError("Catalog terms changed", 409, "ORDER_CATALOG_CHANGED");
+    const currency = first.currency as WalletCurrency;
+    if (!["USD", "EUR", "RUB"].includes(currency)) {
+      throw new AppError("Order currency is not supported", 400, "WALLET_CURRENCY_INVALID");
+    }
+    if (ordered.some((product) => product.currency !== currency)) {
+      throw new AppError("Mixed currencies are not supported", 400, "WALLET_CHECKOUT_INVALID");
+    }
+
+    let total = 0n;
+    for (const product of ordered) {
+      if (!Number.isSafeInteger(product.price) || product.price <= 0) {
+        throw new AppError("Catalog terms changed", 409, "ORDER_CATALOG_CHANGED");
+      }
+      total += BigInt(product.price);
+    }
+    if (total <= 0n || total > 100_000_000n) {
+      throw new AppError("Order total is out of range", 400, "ORDER_NOT_PAYABLE");
+    }
+
+    const orderId = generateId("ord");
+    const orderNumber = `NEXUS-${orderId.slice(4, 12).toUpperCase()}`;
+    const order: Omit<Order, "createdAt" | "updatedAt"> = {
+      id: orderId,
+      orderNumber,
+      buyerId: input.user.id,
+      status: "pending",
+      totalAmount: Number(total),
+      currency,
+      items: ordered.map((product) => ({
+        id: generateId("ite"),
+        orderId,
+        productId: product.id,
+        unitPrice: product.price,
+        currency,
+      })),
+    };
+
+    await this.createPendingPaidOrder({ user: input.user, order });
+    const settled = await this.settleOrderFromWallet({
+      user: input.user,
+      currentToken: input.currentToken,
+      orderId,
+    });
+    return { ...settled, orderNumber };
   }
 
   async getAvailableBalance(accountId: string, currency: WalletCurrency): Promise<number> {

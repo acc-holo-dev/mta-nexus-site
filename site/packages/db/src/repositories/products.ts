@@ -334,6 +334,32 @@ export class ProductRepository {
     return result;
   }
 
+  /**
+   * Wallet checkout catalog: published paid single_server lines with a safe
+   * published build. Free products stay on the free claim/cart path.
+   */
+  async listPublishedPaidByIds(ids: readonly string[]): Promise<Product[]> {
+    const uniqueIds = [...new Set(ids)];
+    if (uniqueIds.length === 0) return [];
+    const result: Product[] = [];
+    for (let offset = 0; offset < uniqueIds.length; offset += 500) {
+      const rows = await db
+        .select()
+        .from(products)
+        .where(
+          and(
+            inArray(products.id, uniqueIds.slice(offset, offset + 500)),
+            eq(products.status, "published"),
+            sql`${products.price} > 0`,
+            eq(products.licenseModel, "single_server"),
+            hasSafePublishedBuild(),
+          ),
+        );
+      result.push(...(rows as unknown as Product[]));
+    }
+    return result;
+  }
+
   async findById(id: string): Promise<Product | null> {
     const rows = await db.select().from(products).where(eq(products.id, id)).limit(1);
     return (rows[0] as unknown as Product) || null;
