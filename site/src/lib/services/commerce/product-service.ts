@@ -80,6 +80,7 @@ export class ProductService {
       expectedUpdatedAt: new Date(input.expectedUpdatedAt),
       reason: input.reason,
       auditId: generateId("aud"),
+      allowPaid: isWalletEngineEnabled(),
     });
   }
 
@@ -226,7 +227,9 @@ export class ProductService {
     actor: User,
     currentToken: string,
   ): Promise<Product | null> {
-    return productRepository.findCreatedDraftForReplay(slug, actor.id, currentToken);
+    return productRepository.findCreatedDraftForReplay(slug, actor.id, currentToken, {
+      allowPaid: isWalletEngineEnabled(),
+    });
   }
 
   async getProductDetailAccessBySlug(

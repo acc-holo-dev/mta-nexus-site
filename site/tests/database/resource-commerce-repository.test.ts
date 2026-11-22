@@ -187,6 +187,23 @@ it("hides a resource from a former owner after current authority is checked", as
   await expect(lifecycle.transition(command)).rejects.toMatchObject({ code: "NOT_FOUND" });
   expect(state.queries).toHaveLength(2);
 });
+it("refuses paid resources unless allowPaid unlocks single_server wallet listings", async () => {
+  state.results = [[productRow({ price: 500, licenseModel: "single_server" })]];
+  await expect(lifecycle.transition(command)).rejects.toMatchObject({ code: "NOT_FOUND" });
+  expect(state.queries).toHaveLength(1);
+
+  state.queries = [];
+  state.results = [
+    [productRow({ price: 500, licenseModel: "single_server" })],
+    [["usr_a", "developer"]],
+    [productRow({ price: 500, licenseModel: "single_server", status: "archived" })],
+    [],
+  ];
+  expect(await lifecycle.transition({ ...command, allowPaid: true })).toMatchObject({
+    id: "prd_a",
+    status: "archived",
+  });
+});
 it("does not apply a stale publication command", async () => {
   state.results = [[productRow({ updatedAt: "2026-10-10T01:00:00Z" })], [["usr_a", "developer"]]];
   await expect(lifecycle.transition(command)).rejects.toMatchObject({

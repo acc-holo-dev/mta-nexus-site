@@ -547,7 +547,15 @@ export class ProductRepository {
     slug: string,
     actorId: string,
     currentToken: string,
+    options: { allowPaid?: boolean } = {},
   ): Promise<Product | null> {
+    const allowPaid = options.allowPaid === true;
+    const priceCondition = allowPaid
+      ? or(
+          eq(products.price, 0),
+          and(sql`${products.price} > 0`, eq(products.licenseModel, "single_server")),
+        )
+      : eq(products.price, 0);
     return db.transaction(async (tx) => {
       const [product] = await tx
         .select()
@@ -557,7 +565,7 @@ export class ProductRepository {
             eq(products.slug, slug),
             eq(products.authorId, actorId),
             eq(products.status, "draft"),
-            eq(products.price, 0),
+            priceCondition,
           ),
         )
         .for("share")

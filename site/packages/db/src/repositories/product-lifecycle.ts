@@ -22,6 +22,7 @@ export class ProductLifecycleRepository {
     expectedUpdatedAt: Date;
     reason: string;
     auditId: string;
+    allowPaid?: boolean;
   }): Promise<Product> {
     return db.transaction(async (tx) => {
       const [product] = await tx
@@ -30,7 +31,10 @@ export class ProductLifecycleRepository {
         .where(eq(products.id, input.productId))
         .limit(1)
         .for("no key update");
-      if (product?.price !== 0) throw new NotFoundError("Resource", input.productId);
+      const allowPaidSingleServer =
+        input.allowPaid === true && product?.licenseModel === "single_server";
+      if (product?.price !== 0 && !allowPaidSingleServer)
+        throw new NotFoundError("Resource", input.productId);
       const actor = await assertProductMutationAuthority(tx, product, input.actorId);
       if (new Date(product.updatedAt).getTime() !== input.expectedUpdatedAt.getTime()) {
         throw new AppError(
