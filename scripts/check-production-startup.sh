@@ -129,6 +129,8 @@ if "${pc[@]}" exec -T app sh -c 'command -v pnpm >/dev/null 2>&1'; then
 fi
 "${pc[@]}" exec -T app node scripts/check-local-readiness.mjs
 "${pc[@]}" exec -T push-worker node /app/scripts/check-web-push-worker-health.mjs
+"${pc[@]}" exec -T license-worker node /app/scripts/check-license-worker-health.mjs
+"${pc[@]}" exec -T resource-release-worker node /app/scripts/check-resource-release-worker-health.mjs
 "${pc[@]}" exec -T push-worker node /app/scripts/check-web-push-worker-queue.mjs > "$work/push-queue.json"
 node --input-type=module - "$work/push-queue.json" <<'NODE'
 import assert from 'node:assert/strict'; import { readFileSync } from 'node:fs';

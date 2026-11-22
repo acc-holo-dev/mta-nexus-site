@@ -37,6 +37,9 @@ describe("deterministic development startup contract", () => {
     expect(pushWorker).toContain("/app/scripts/check-web-push-worker-health.mjs");
     expect(compose).toContain("/app/scripts/check-license-worker-health.mjs");
     expect(compose).toContain("/app/scripts/check-resource-release-worker-health.mjs");
+    expect(compose).toContain('restart: "no"');
+    const license = compose.slice(compose.indexOf("\n  license-worker:"));
+    expect(license).toContain('restart: "no"');
     expect(compose).toContain(
       "./site/packages/validation/src:/app/site/packages/validation/src:ro",
     );
