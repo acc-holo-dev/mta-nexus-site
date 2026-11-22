@@ -5,6 +5,7 @@ import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { resourceActivityService } from "../../../lib/services/resources/resource-activity-service";
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
@@ -52,6 +53,8 @@ export async function PublisherAcquisitionsScreen({
   ]);
   const copy = getResourceActivityCopy(locale);
   const dictionary = getDictionary(locale);
+  const walletEnabled = isWalletEngineEnabled();
+  const historyNote = walletEnabled ? copy.walletHistoryNote : copy.historyNote;
   const page = acquisitionPage(query.page);
   const source = acquisitionSource(query.source);
   const retryHref = acquisitionHistoryHref(source, page);
@@ -110,7 +113,7 @@ export async function PublisherAcquisitionsScreen({
           {resourceCartReceiptsCopy(locale).title}
         </Link>
         <p className={typeMax3xlSmSecondary} role="note">
-          {copy.historyNote}
+          {historyNote}
         </p>
       </header>
       <nav aria-label={copy.source} className={typeFlexMinWrapGap3}>
@@ -128,7 +131,7 @@ export async function PublisherAcquisitionsScreen({
       {result.items.length === 0 ? (
         <EmptyState
           title={copy.empty}
-          description={copy.historyNote}
+          description={historyNote}
           action={
             result.filter !== "all" ? (
               <Link href={acquisitionHistoryHref("all", 1)} className={linkAccentSmRounded}>

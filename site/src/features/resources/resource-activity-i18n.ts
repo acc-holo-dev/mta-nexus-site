@@ -15,8 +15,12 @@ const copy = {
     signInRequired: "Sign in to continue",
     historyNote:
       "New free grants recorded since the acquisition journal was introduced. Existing licenses and older library entries are not reconstructed as purchases. Current access can change independently of this record.",
+    walletHistoryNote:
+      "New grants recorded since the acquisition journal was introduced, including free claims and paid site-wallet settle when the wallet engine is on. Existing licenses and older library entries are not reconstructed as purchases. This journal is grants, not a payment ledger; card checkout stays off. Current access can change independently of this record.",
     analyticsNote:
       "These are recorded free grants and authorized download starts. A download start does not prove that a transfer completed. An active grant alone does not make a withdrawn resource downloadable. Imported licenses and earlier grants are excluded. These counts are not revenue or a withdrawable balance.",
+    walletAnalyticsNote:
+      "These are recorded grants (free claims and paid site-wallet settle when the wallet engine is on) and authorized download starts. A download start does not prove that a transfer completed. An active grant alone does not make a withdrawn resource downloadable. Imported licenses and earlier grants are excluded. These counts are not revenue, payout, or a withdrawable balance; card checkout stays off.",
     back: "Back to resource",
     library: "Open library",
     open: "Open resource",
@@ -38,6 +42,7 @@ const copy = {
     period: "Observation period",
     days: "days",
     acquisitions: "New free grants",
+    walletAcquisitions: "New grants",
     retainedGrants: "Grants still active",
     downloadStarts: "Download starts",
     timeline: "Daily activity (UTC)",
@@ -65,8 +70,12 @@ const copy = {
     signInRequired: "Войдите, чтобы продолжить",
     historyNote:
       "Новые бесплатные права, зафиксированные с введения журнала приобретений. Старые записи библиотеки и лицензии не преобразуются в покупки. Текущий доступ может измениться независимо от этой записи.",
+    walletHistoryNote:
+      "Новые права, зафиксированные с введения журнала приобретений, включая бесплатные claim и платный settle через site wallet при включённом движке. Старые записи библиотеки и лицензии не преобразуются в покупки. Этот журнал — права, а не платёжный ledger; карточный checkout остаётся выключенным. Текущий доступ может измениться независимо от этой записи.",
     analyticsNote:
       "Здесь учитываются бесплатные выдачи и разрешённые начала скачивания. Начало скачивания не подтверждает завершение передачи. Действующее право само по себе не открывает скачивание снятого с публикации ресурса. Старые выдачи и импортированные лицензии не включены. Эти показатели не являются выручкой или доступным балансом.",
+    walletAnalyticsNote:
+      "Здесь учитываются выдачи (бесплатные claim и платный settle через site wallet при включённом движке) и разрешённые начала скачивания. Начало скачивания не подтверждает завершение передачи. Действующее право само по себе не открывает скачивание снятого с публикации ресурса. Старые выдачи и импортированные лицензии не включены. Эти показатели не являются выручкой, выплатой или доступным балансом; карточный checkout остаётся выключенным.",
     back: "Назад к ресурсу",
     library: "Открыть библиотеку",
     open: "Открыть ресурс",
@@ -88,6 +97,7 @@ const copy = {
     period: "Период наблюдения",
     days: "дней",
     acquisitions: "Новые бесплатные права",
+    walletAcquisitions: "Новые права",
     retainedGrants: "Права продолжают действовать",
     downloadStarts: "Начала скачивания",
     timeline: "Активность по дням (UTC)",

@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { resourceActivityService } from "../../../lib/services/resources/resource-activity-service";
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
@@ -48,6 +49,9 @@ export async function ResourceActivityScreen({
   ]);
   const copy = getResourceActivityCopy(locale);
   const dictionary = getDictionary(locale);
+  const walletEnabled = isWalletEngineEnabled();
+  const analyticsNote = walletEnabled ? copy.walletAnalyticsNote : copy.analyticsNote;
+  const acquisitionsLabel = walletEnabled ? copy.walletAcquisitions : copy.acquisitions;
   const returnParams = new URLSearchParams();
   if (query.days !== undefined) {
     for (const part of Array.isArray(query.days) ? query.days : [query.days])
@@ -107,7 +111,7 @@ export async function ResourceActivityScreen({
         <h1 className={typeDisplayPrimary}>{copy.analytics}</h1>
         <h2 className={typeBreakXl}>{result.product.title}</h2>
         <p role="note" className={typeMax3xlSmSecondary}>
-          {copy.analyticsNote}
+          {analyticsNote}
         </p>
       </header>
       <nav aria-label={copy.period} className={typeFlexWrapGap3}>
@@ -132,7 +136,9 @@ export async function ResourceActivityScreen({
       <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map((key) => (
           <div key={key} className={panelSpace2P5}>
-            <dt className={typeSmSecondary}>{copy[key]}</dt>
+            <dt className={typeSmSecondary}>
+              {key === "acquisitions" ? acquisitionsLabel : copy[key]}
+            </dt>
             <dd className="text-2xl font-semibold">
               {result[key].toLocaleString(locale === "ru" ? "ru-RU" : "en-US")}
             </dd>
@@ -148,7 +154,7 @@ export async function ResourceActivityScreen({
                 {copy.day}
               </th>
               <th scope="col" className="px-4 py-3">
-                {copy.acquisitions}
+                {acquisitionsLabel}
               </th>
               <th scope="col" className="px-4 py-3">
                 {copy.downloadStarts}
