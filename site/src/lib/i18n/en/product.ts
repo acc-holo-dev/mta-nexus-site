@@ -178,6 +178,8 @@ export const product = {
       "A temporary reverse-lookup failure is not an empty dependents list. Try again after the catalogue recovers.",
     noDependents:
       "No published free NEXUS resources currently declare this resource as a direct dependency.",
+    noDependentsWallet:
+      "No published NEXUS resources currently declare this resource as a direct dependency. When the wallet engine is on, paid single-server listings are included in this catalogue check.",
     limitReached:
       "Showing the first 50 published direct dependents. More relationships exist than this beta surface displays.",
     limitReachedHint:

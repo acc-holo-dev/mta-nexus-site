@@ -737,7 +737,11 @@ export async function ProductDetailPage({
             <h2 className="border-b border-base pb-3 text-base font-bold text-primary">
               {copy.usedBy}
             </h2>
-            <ReverseDependencyList summary={reverseDependencySummary} locale={locale} />
+            <ReverseDependencyList
+              summary={reverseDependencySummary}
+              locale={locale}
+              walletEnabled={walletEnabled}
+            />
           </section>
 
           <section className={panelSpace4P6}>

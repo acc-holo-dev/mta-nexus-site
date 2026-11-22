@@ -116,6 +116,8 @@ export const workspace = {
     onServers: "на ваших серверах",
     libraryTitle: "Библиотека ресурсов",
     libraryDescription: "Добавленные вами бесплатные ресурсы",
+    walletLibraryDescription:
+      "Бесплатные и платные ресурсы с действующими правами. Settle через site wallet может выдать платный доступ; этот предпросмотр — права, а не платёжный ledger.",
     browseResources: "Открыть бесплатные ресурсы",
     browseMarketResources: "Открыть ресурсы",
     unavailableResource: "Недоступный ресурс",

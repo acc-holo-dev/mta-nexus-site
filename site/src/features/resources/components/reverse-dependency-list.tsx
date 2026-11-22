@@ -8,9 +8,12 @@ import type { ReverseDependencySummary } from "../reverse-dependency-summary";
 export function ReverseDependencyList({
   summary,
   locale = "en",
+  walletEnabled = false,
 }: {
   summary: ReverseDependencySummary | null;
   locale?: Locale;
+  /** When the wallet engine is on, empty copy must not claim only free resources are searched. */
+  walletEnabled?: boolean;
 }) {
   const copy = getDictionary(locale).dependencyUi;
 
@@ -21,7 +24,7 @@ export function ReverseDependencyList({
   if (summary.products.length === 0) {
     return (
       <EmptyState
-        title={copy.noDependents}
+        title={walletEnabled ? copy.noDependentsWallet : copy.noDependents}
         description={copy.reverseNotice}
         icon={<GitBranch className="h-6 w-6" aria-hidden="true" />}
       />

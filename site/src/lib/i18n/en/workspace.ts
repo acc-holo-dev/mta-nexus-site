@@ -116,6 +116,8 @@ export const workspace = {
     onServers: "on your servers",
     libraryTitle: "Resource library",
     libraryDescription: "Free resources you have added",
+    walletLibraryDescription:
+      "Free and paid resources with active grants. Site-wallet settle can grant paid access; this preview is grants, not a payment ledger.",
     browseResources: "Browse free resources",
     browseMarketResources: "Browse resources",
     unavailableResource: "Unavailable resource",

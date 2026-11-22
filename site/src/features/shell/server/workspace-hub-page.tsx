@@ -203,7 +203,11 @@ export async function WorkspaceHubPage() {
       <section className={typeMinSpace4}>
         <SectionHeader
           title={dictionary.workspace.libraryTitle}
-          description={libraryCopy.subtitle}
+          description={
+            walletEnabled
+              ? dictionary.workspace.walletLibraryDescription
+              : dictionary.workspace.libraryDescription
+          }
           action={
             <div className={typeFlexWrapCenterGap3}>
               <Link href="/workspace/library" className={sectionLinkClass}>
