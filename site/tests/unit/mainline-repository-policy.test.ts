@@ -87,7 +87,6 @@ describe("mainline repository policy", () => {
       "commerce.md",
       "documentation-system.md",
       "initiatives.md",
-      "release-2027.md",
       "release.md",
       "retention.md",
       "server-packs.md",

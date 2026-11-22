@@ -15,7 +15,6 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
-import { release2027Profile } from "../../../lib/platform/release-2027";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { adminService } from "../../../lib/services/moderation/admin-service";
 import { adSlotRendererEnabled, advertisingLifecycleEnabled } from "../../accounts/feature-flags";
@@ -47,38 +46,6 @@ import {
   AdminReportsSection,
   AdminVerificationQueueSection,
 } from "../admin-home";
-
-function PlatformStatusPanel({ copy }: { copy: ReturnType<typeof getDictionary>["admin"] }) {
-  const profile = release2027Profile();
-  const wallet =
-    profile.siteWallet === "engine_and_withdraw"
-      ? copy.platformStatusWalletWithdraw
-      : profile.siteWallet === "engine"
-        ? copy.platformStatusWalletEngine
-        : copy.platformStatusWalletOff;
-  return (
-    <section className={panelP4} aria-labelledby="platform-status">
-      <h2 id="platform-status" className={typeSemiboldPrimary}>
-        {copy.platformStatusTitle}
-      </h2>
-      <p className={typeMt05CaptionMuted}>{copy.platformStatusHint}</p>
-      <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-3">
-        <div>
-          <dt className={typeCaptionMuted}>{copy.platformStatusCurrencies}</dt>
-          <dd>{profile.displayCurrencies.join(", ")}</dd>
-        </div>
-        <div>
-          <dt className={typeCaptionMuted}>{copy.platformStatusCard}</dt>
-          <dd>{copy.platformStatusCardOff}</dd>
-        </div>
-        <div>
-          <dt className={typeCaptionMuted}>{copy.platformStatusWallet}</dt>
-          <dd>{wallet}</dd>
-        </div>
-      </dl>
-    </section>
-  );
-}
 
 export async function adminHomeMetadata(): Promise<Metadata> {
   return {
@@ -316,7 +283,6 @@ export async function AdminHomeScreen({
       </header>
 
       <AdminHealthStats copy={copy} counts={health.counts} />
-      <PlatformStatusPanel copy={copy} />
 
       {showAdLifecycle ? (
         <AdminAdPlacementSection
