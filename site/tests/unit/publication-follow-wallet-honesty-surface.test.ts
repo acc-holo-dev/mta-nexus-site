@@ -12,9 +12,10 @@ describe("publication feed and follow workspace wallet honesty", () => {
     const followService = read("site/src/lib/services/community/follow-workspace-service.ts");
 
     expect(feed).toContain("includeWalletPaidSingleServer");
-    expect(feed).toContain('eq(products.licenseModel, "single_server")');
+    expect(feed).toContain("publishedCatalogPriceCondition");
     expect(follows).toContain("publicFollowProduct");
     expect(follows).toContain("includeWalletPaidSingleServer");
+    expect(follows).toContain("publishedCatalogPriceCondition");
     expect(feedService).toContain("includeWalletPaidSingleServer: isWalletEngineEnabled()");
     expect(followService).toContain("includeWalletPaidSingleServer: isWalletEngineEnabled()");
   });

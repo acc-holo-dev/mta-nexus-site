@@ -14,14 +14,14 @@ import { can, generateId } from "@nexus/security";
 import { safeExternalWebUrl } from "@nexus/validation";
 import { encodeDiscussionCursor } from "../../../features/community/content-discussion-contract";
 import { PUBLICATION_TYPES } from "../../../features/community/publication-feed-contract";
-
-type DiscussionCursor = { createdAt: string; id: string };
-
 import {
   communityTypes,
   editorialTypes,
   type parseContentPage,
 } from "../../../features/community/user-platform-contract";
+import { isWalletEngineEnabled } from "../commerce/wallet-payment-service";
+
+type DiscussionCursor = { createdAt: string; id: string };
 
 export class ContentService {
   async manageComment(
@@ -287,7 +287,7 @@ export class ContentService {
   }> {
     const featuredProducts = await productRepository.list({
       featuredOnly: true,
-      maxPrice: 0,
+      ...(isWalletEngineEnabled() ? { includeWalletPaidSingleServer: true } : { maxPrice: 0 }),
       limit: 4,
     });
     const trendingServers = await serverRepository.listActivePublic(3);

@@ -47,6 +47,14 @@ type NodeRow = {
   missingReferences: number;
   issueCount: number;
 };
+
+/** Public graph visibility: free, or paid single_server when wallet catalog is on. */
+function publicCatalogPriceSql(includeWalletPaidSingleServer: boolean) {
+  return includeWalletPaidSingleServer
+    ? sql`(p.price = 0 OR (p.price > 0 AND p.license_model = 'single_server'))`
+    : sql`p.price = 0`;
+}
+
 async function readNodes(
   tx: ResourceTransaction,
   userId: string,
@@ -54,11 +62,13 @@ async function readNodes(
   privateRoot: string | null,
   library: boolean,
   observedAt: Date | SQL,
+  includeWalletPaidSingleServer: boolean,
   buildId?: string,
   previewRoot?: { productId: string; buildId: string },
 ) {
   const privateCondition = privateRoot ? sql`p.id = ${privateRoot}` : sql`false`;
   const previewCondition = previewRoot ? sql`p.id = ${previewRoot.productId}` : sql`false`;
+  const publicPrice = publicCatalogPriceSql(includeWalletPaidSingleServer);
   const rows = await tx.execute<NodeRow>(sql`${effectiveUserDownloadSources(userId, observedAt)}
  SELECT p.id,p.slug,left(p.title,200) AS title,p.status = 'published' AS published,p.compatibility,
  (${library} AND EXISTS (SELECT 1 FROM owned WHERE resource_id = p.id)) AS accessible,
@@ -80,7 +90,7 @@ async function readNodes(
      WHEN pref.mode = 'fixed' THEN pref.build_id ELSE latest.id END
    LIMIT 1) chosen ON true
  WHERE p.slug IN (SELECT value FROM jsonb_array_elements_text(${JSON.stringify(slugs)}::jsonb))
- AND (${privateCondition} OR (p.status = 'published' AND p.price = 0 AND latest.id IS NOT NULL))
+ AND (${privateCondition} OR (p.status = 'published' AND ${publicPrice} AND latest.id IS NOT NULL))
  ORDER BY p.slug`);
   return rows.map((row): ResourceRequirementNode => {
     const declarations = requirementDeclarations(row.compatibility),
@@ -119,6 +129,7 @@ async function expandNodes(
   rootSlugs: string[],
   library: boolean,
   observedAt: Date | SQL,
+  includeWalletPaidSingleServer: boolean,
 ) {
   const nodes = [...roots];
   const discovered = new Set(rootSlugs);
@@ -130,7 +141,15 @@ async function expandNodes(
     const batch = next.slice(0, RESOURCE_REQUIREMENTS_MAX_NODES - discovered.size);
     for (const slug of batch) discovered.add(slug);
     if (!batch.length) break;
-    const layer = await readNodes(tx, actorId, batch, null, library, observedAt);
+    const layer = await readNodes(
+      tx,
+      actorId,
+      batch,
+      null,
+      library,
+      observedAt,
+      includeWalletPaidSingleServer,
+    );
     nodes.push(...layer);
     frontier = layer.flatMap((node) => node.dependencies);
   }
@@ -138,7 +157,13 @@ async function expandNodes(
   return { nodes, truncated };
 }
 export class ResourceRequirementsRepository {
-  async collectionReport(input: { actorId: string; collectionId: string; targetMta?: string }) {
+  async collectionReport(input: {
+    actorId: string;
+    collectionId: string;
+    targetMta?: string;
+    allowPaid?: boolean;
+  }) {
+    const includeWalletPaidSingleServer = input.allowPaid === true;
     return db.transaction(
       async (tx) => {
         await tx.execute(sql`set local statement_timeout = '10s'`);
@@ -167,9 +192,10 @@ export class ResourceRequirementsRepository {
         if (!Number.isFinite(observedAt.getTime()))
           throw new Error("Collection snapshot time unavailable");
         // Mask roots before graph traversal. A retained reference is never download authority.
+        const publicPrice = publicCatalogPriceSql(includeWalletPaidSingleServer);
         const entries = await tx.execute<{ slug: string | null }>(
           sql`${effectiveUserDownloadSources(input.actorId, observedAt)}
-        SELECT CASE WHEN owned.resource_id IS NOT NULL AND p.status='published' AND p.price=0
+        SELECT CASE WHEN owned.resource_id IS NOT NULL AND p.status='published' AND ${publicPrice}
           AND EXISTS (SELECT 1 FROM ${builds} WHERE ${safePublishedBuildCondition(sql`p.id`)})
           THEN p.slug END AS slug
         FROM ${members} member LEFT JOIN owned ON owned.resource_id=member.product_id
@@ -182,9 +208,25 @@ export class ResourceRequirementsRepository {
         ].sort();
         const rootSlugs = eligible.slice(0, RESOURCE_REQUIREMENTS_MAX_NODES);
         const roots = rootSlugs.length
-          ? await readNodes(tx, input.actorId, rootSlugs, null, true, observedAt)
+          ? await readNodes(
+              tx,
+              input.actorId,
+              rootSlugs,
+              null,
+              true,
+              observedAt,
+              includeWalletPaidSingleServer,
+            )
           : [];
-        const expanded = await expandNodes(tx, input.actorId, roots, rootSlugs, true, observedAt);
+        const expanded = await expandNodes(
+          tx,
+          input.actorId,
+          roots,
+          rootSlugs,
+          true,
+          observedAt,
+          includeWalletPaidSingleServer,
+        );
         return buildCollectionRequirementsReport({
           collection,
           itemCount: entries.length,
@@ -210,6 +252,7 @@ export class ResourceRequirementsRepository {
     targetMta?: string;
     buildId?: string;
     previewBuildId?: string;
+    allowPaid?: boolean;
   }) {
     if (
       !["library", "publisher", "moderator"].includes(input.scope) ||
@@ -220,6 +263,7 @@ export class ResourceRequirementsRepository {
           !/^[A-Za-z0-9_-]{1,128}$/u.test(input.previewBuildId)))
     )
       throw new AppError("Invalid requirements preview", 400, "INVALID_REQUIREMENTS_QUERY");
+    const includeWalletPaidSingleServer = input.allowPaid === true;
     return db.transaction(
       async (tx) => {
         const [time] = await tx.execute<{ observedAt: string }>(
@@ -237,6 +281,7 @@ export class ResourceRequirementsRepository {
             authorId: products.authorId,
             organizationId: products.organizationId,
             price: products.price,
+            licenseModel: products.licenseModel,
           })
           .from(products)
           .where(eq(products.id, input.productId))
@@ -244,7 +289,10 @@ export class ResourceRequirementsRepository {
         const [product] = await (input.scope === "library"
           ? productQuery
           : productQuery.for("share"));
-        if (product?.price !== 0) throw new NotFoundError("Resource");
+        const allowPaidRoot =
+          includeWalletPaidSingleServer && product?.licenseModel === "single_server";
+        if (!product || (product.price !== 0 && !allowPaidRoot))
+          throw new NotFoundError("Resource");
         if (input.scope === "library") {
           const [actor] = await tx
             .select({ id: users.id })
@@ -264,6 +312,7 @@ export class ResourceRequirementsRepository {
           privateRoot,
           input.scope === "library",
           sql`transaction_timestamp()`,
+          includeWalletPaidSingleServer,
           input.buildId,
           input.previewBuildId
             ? { productId: product.id, buildId: input.previewBuildId }
@@ -286,6 +335,7 @@ export class ResourceRequirementsRepository {
           [product.slug],
           input.scope === "library",
           sql`transaction_timestamp()`,
+          includeWalletPaidSingleServer,
         );
         const report = buildResourceRequirementsReport({
           rootSlug: product.slug,

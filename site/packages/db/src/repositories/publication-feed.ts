@@ -11,6 +11,7 @@ import {
   users,
 } from "../schema";
 import { trustedCleanScanCondition } from "./build-safety";
+import { publishedCatalogPriceCondition } from "./products";
 import { containsPattern } from "./search-pattern";
 
 export type PublicationScope =
@@ -42,15 +43,9 @@ const publicServer = and(eq(servers.visibility, "public"), eq(servers.status, "a
 const activityVisible = sql<boolean>`coalesce(${userProfilePreferences.showActivity}, true)`;
 const serverTypes = ["article", "news", "devlog", "update", "announcement"];
 function publicProduct(includeWalletPaidSingleServer = false) {
-  const priceCondition = includeWalletPaidSingleServer
-    ? or(
-        eq(products.price, 0),
-        and(sql`${products.price} > 0`, eq(products.licenseModel, "single_server")),
-      )
-    : eq(products.price, 0);
   return and(
     eq(products.status, "published"),
-    priceCondition,
+    publishedCatalogPriceCondition(includeWalletPaidSingleServer),
     exists(
       db
         .select({ id: builds.id })

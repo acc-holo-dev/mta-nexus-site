@@ -6,7 +6,7 @@ import {
   resourceMediaUrl,
 } from "@nexus/domain";
 import type { ResourceMediaCommand } from "@nexus/validation";
-import { and, asc, eq, or, sql } from "drizzle-orm";
+import { and, asc, eq, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, products, resourceMedia, users } from "../schema";
 import { safePublishedBuildCondition } from "./build-safety";
@@ -15,6 +15,7 @@ import {
   assertBuildModerationAuthority,
   assertProductMutationAuthority,
 } from "./product-mutation-authority";
+import { publishedCatalogPriceCondition } from "./products";
 
 const selection = {
   id: resourceMedia.id,
@@ -27,12 +28,7 @@ type PaidAccessOptions = { allowPaid?: boolean };
 const publicCondition = (options: PaidAccessOptions = {}) =>
   and(
     eq(products.status, "published"),
-    options.allowPaid
-      ? or(
-          eq(products.price, 0),
-          and(sql`${products.price} > 0`, eq(products.licenseModel, "single_server")),
-        )
-      : eq(products.price, 0),
+    publishedCatalogPriceCondition(options.allowPaid === true),
     sql`exists (select 1 from builds where ${safePublishedBuildCondition(sql`${products.id}`)})`,
   );
 const conflict = () => new AppError("Gallery changed; reload", 409, "RESOURCE_MEDIA_CONFLICT");

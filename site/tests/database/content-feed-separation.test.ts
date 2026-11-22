@@ -41,7 +41,7 @@ describe("content feed separation behavior", () => {
     );
   });
 
-  it("keeps the aggregated feed bounded and free-only", async () => {
+  it("keeps the aggregated feed bounded and free-only when wallet is dark", async () => {
     await service.getFeed();
 
     expect(mocks.listProducts).toHaveBeenCalledWith({

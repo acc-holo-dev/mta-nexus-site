@@ -26,9 +26,10 @@ describe("public search hardening", () => {
       "utf8",
     );
 
-    expect(service).toContain(
-      "productRepository.list({ query: normalizedQuery, limit: boundedLimit })",
-    );
+    expect(service).toContain("productRepository.list({");
+    expect(service).toContain("query: normalizedQuery");
+    expect(service).toContain("limit: boundedLimit");
+    expect(service).toContain("includeWalletPaidSingleServer: isWalletEngineEnabled()");
     expect(service).toContain("serverRepository.searchActivePublic(normalizedQuery, boundedLimit)");
     expect(service).toContain("contentRepository.searchPublished(normalizedQuery, boundedLimit)");
     expect(service).toContain("userRepository.searchDevelopers(normalizedQuery, boundedLimit)");

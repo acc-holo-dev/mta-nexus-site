@@ -16,6 +16,7 @@ import {
 } from "../schema";
 import { trustedCleanScanCondition } from "./build-safety";
 import { lockInitiatingSession } from "./initiating-session";
+import { publishedCatalogPriceCondition } from "./products";
 import { containsPattern } from "./search-pattern";
 import { userFollowNotice } from "./user-follow-notice";
 
@@ -71,13 +72,11 @@ function availableResourceBuild() {
   );
 }
 function publicFollowProduct(includeWalletPaidSingleServer = false) {
-  const priceCondition = includeWalletPaidSingleServer
-    ? or(
-        eq(products.price, 0),
-        and(sql`${products.price} > 0`, eq(products.licenseModel, "single_server")),
-      )
-    : eq(products.price, 0);
-  return and(eq(products.status, "published"), priceCondition, availableResourceBuild());
+  return and(
+    eq(products.status, "published"),
+    publishedCatalogPriceCondition(includeWalletPaidSingleServer),
+    availableResourceBuild(),
+  );
 }
 class FollowWorkspaceRepository {
   async states(actorId: string, targetType: TargetType, targetIds: readonly string[]) {

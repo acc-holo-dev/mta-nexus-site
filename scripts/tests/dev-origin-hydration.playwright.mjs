@@ -112,19 +112,18 @@ try {
   const originalCss = readFileSync(cssFile);
   const context = await browser.newContext();
   try {
-    writeFileSync(
-      cssFile,
-      Buffer.concat([originalCss, Buffer.from('\n:root { --nexus-infra-hmr-probe: "alpha"; }\n')]),
-    );
     const page = await context.newPage();
+    // Open the page and wait for the HMR websocket before mutating CSS so
+    // watchpack delivers the probe through hot reload instead of a cold load race.
     const socketReady = page
-      .waitForEvent("websocket", { timeout: 30_000 })
-      .then((socket) => socket.waitForEvent("framereceived", { timeout: 30_000 }));
+      .waitForEvent("websocket", { timeout: 60_000 })
+      .then((socket) => socket.waitForEvent("framereceived", { timeout: 60_000 }));
     await page.goto("http://localhost:3000/auth/login", { waitUntil: "domcontentloaded" });
     await page.waitForFunction(
       () => document.querySelector("[data-theme-toggle]")?.getAttribute("data-hydrated") === "true",
     );
     await socketReady;
+
     const waitForProbe = (value) =>
       page.waitForFunction(
         (expected) =>
@@ -132,8 +131,13 @@ try {
             .getPropertyValue("--nexus-infra-hmr-probe")
             .includes(expected),
         value,
-        { timeout: 45_000 },
+        { timeout: 90_000 },
       );
+
+    writeFileSync(
+      cssFile,
+      Buffer.concat([originalCss, Buffer.from('\n:root { --nexus-infra-hmr-probe: "alpha"; }\n')]),
+    );
     await waitForProbe("alpha");
     writeFileSync(
       cssFile,
@@ -147,7 +151,7 @@ try {
           .getPropertyValue("--nexus-infra-hmr-probe")
           .trim() === "",
       null,
-      { timeout: 45_000 },
+      { timeout: 90_000 },
     );
     process.stdout.write(
       "PASS: read-only site/src bind delivers CSS hot reload alpha → beta → restored\n",

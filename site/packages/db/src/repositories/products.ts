@@ -70,6 +70,16 @@ export interface ProductQueryOptions {
   offset?: number;
 }
 
+/** Free listings, or paid single_server when the wallet catalog flag is on. */
+export function publishedCatalogPriceCondition(includeWalletPaidSingleServer?: boolean) {
+  return includeWalletPaidSingleServer
+    ? or(
+        eq(products.price, 0),
+        and(sql`${products.price} > 0`, eq(products.licenseModel, "single_server")),
+      )
+    : eq(products.price, 0);
+}
+
 export class ProductRepository {
   async hasManagementAccess(id: string, actor: Pick<User, "id" | "role">): Promise<boolean> {
     const [row] = await db
@@ -242,16 +252,10 @@ export class ProductRepository {
     const requested = Number.isFinite(requestedPage)
       ? Math.min(Math.max(Math.floor(requestedPage), 1), Number.MAX_SAFE_INTEGER)
       : 1;
-    const priceCondition = options.includeWalletPaidSingleServer
-      ? or(
-          eq(products.price, 0),
-          and(sql`${products.price} > 0`, eq(products.licenseModel, "single_server")),
-        )
-      : eq(products.price, 0);
     const condition = and(
       scope,
       eq(products.status, "published"),
-      priceCondition,
+      publishedCatalogPriceCondition(options.includeWalletPaidSingleServer),
       hasSafePublishedBuild(),
     );
     const [summary] = await db.select({ total: count() }).from(products).where(condition);
@@ -268,22 +272,28 @@ export class ProductRepository {
     return { products: rows as unknown as Product[], total, page, pageSize, totalPages };
   }
 
-  async countPublishedFree(): Promise<number> {
+  async countPublishedFree(
+    options: { includeWalletPaidSingleServer?: boolean } = {},
+  ): Promise<number> {
     const [row] = await db
       .select({ total: count() })
       .from(products)
-      .where(and(eq(products.status, "published"), eq(products.price, 0), hasSafePublishedBuild()));
+      .where(
+        and(
+          eq(products.status, "published"),
+          publishedCatalogPriceCondition(options.includeWalletPaidSingleServer),
+          hasSafePublishedBuild(),
+        ),
+      );
     return row?.total ?? 0;
   }
 
   async list(options: ProductQueryOptions = {}): Promise<Product[]> {
-    const priceCondition = options.includeWalletPaidSingleServer
-      ? or(
-          eq(products.price, 0),
-          and(sql`${products.price} > 0`, eq(products.licenseModel, "single_server")),
-        )
-      : eq(products.price, 0);
-    const conditions = [eq(products.status, "published"), priceCondition, hasSafePublishedBuild()];
+    const conditions = [
+      eq(products.status, "published"),
+      publishedCatalogPriceCondition(options.includeWalletPaidSingleServer),
+      hasSafePublishedBuild(),
+    ];
     if (options.type) conditions.push(eq(products.type, options.type));
     if (options.featuredOnly) conditions.push(eq(products.isFeatured, true));
     if (options.minPrice !== undefined) conditions.push(gte(products.price, options.minPrice));
@@ -327,7 +337,11 @@ export class ProductRepository {
     return rows as unknown as Product[];
   }
 
-  async listPublishedByOrganization(organizationId: string, limit = 100): Promise<Product[]> {
+  async listPublishedByOrganization(
+    organizationId: string,
+    limit = 100,
+    options: { includeWalletPaidSingleServer?: boolean } = {},
+  ): Promise<Product[]> {
     const boundedLimit = Number.isFinite(limit)
       ? Math.min(Math.max(Math.floor(limit), 1), 100)
       : 100;
@@ -339,7 +353,7 @@ export class ProductRepository {
         and(
           eq(products.organizationId, organizationId),
           eq(products.status, "published"),
-          eq(products.price, 0),
+          publishedCatalogPriceCondition(options.includeWalletPaidSingleServer),
           hasSafePublishedBuild(),
         ),
       )
@@ -348,7 +362,10 @@ export class ProductRepository {
     return rows as unknown as Product[];
   }
 
-  async listPublishedFreeByAuthor(authorId: string): Promise<Product[]> {
+  async listPublishedFreeByAuthor(
+    authorId: string,
+    options: { includeWalletPaidSingleServer?: boolean } = {},
+  ): Promise<Product[]> {
     const rows = await db
       .select()
       .from(products)
@@ -356,7 +373,7 @@ export class ProductRepository {
         and(
           eq(products.authorId, authorId),
           eq(products.status, "published"),
-          eq(products.price, 0),
+          publishedCatalogPriceCondition(options.includeWalletPaidSingleServer),
           hasSafePublishedBuild(),
         ),
       )
@@ -364,7 +381,10 @@ export class ProductRepository {
     return rows as unknown as Product[];
   }
 
-  async listPublishedFreeByIds(ids: readonly string[]): Promise<Product[]> {
+  async listPublishedFreeByIds(
+    ids: readonly string[],
+    options: { includeWalletPaidSingleServer?: boolean } = {},
+  ): Promise<Product[]> {
     const uniqueIds = [...new Set(ids)];
     if (uniqueIds.length === 0) return [];
     const result: Product[] = [];
@@ -376,7 +396,7 @@ export class ProductRepository {
           and(
             inArray(products.id, uniqueIds.slice(offset, offset + 500)),
             eq(products.status, "published"),
-            eq(products.price, 0),
+            publishedCatalogPriceCondition(options.includeWalletPaidSingleServer),
             hasSafePublishedBuild(),
           ),
         );
@@ -476,13 +496,6 @@ export class ProductRepository {
     ).slice(0, 25);
     if (normalized.length === 0) return [];
 
-    const priceCondition = options.includeWalletPaidSingleServer
-      ? or(
-          eq(products.price, 0),
-          and(sql`${products.price} > 0`, eq(products.licenseModel, "single_server")),
-        )
-      : eq(products.price, 0);
-
     const rows = await db
       .select()
       .from(products)
@@ -490,7 +503,7 @@ export class ProductRepository {
         and(
           inArray(products.slug, normalized),
           eq(products.status, "published"),
-          priceCondition,
+          publishedCatalogPriceCondition(options.includeWalletPaidSingleServer),
           hasSafePublishedBuild(),
         ),
       )
@@ -507,12 +520,6 @@ export class ProductRepository {
     if (!normalized) return [];
 
     const boundedLimit = Number.isFinite(limit) ? Math.min(Math.max(Math.floor(limit), 1), 51) : 51;
-    const priceCondition = options.includeWalletPaidSingleServer
-      ? or(
-          eq(products.price, 0),
-          and(sql`${products.price} > 0`, eq(products.licenseModel, "single_server")),
-        )
-      : eq(products.price, 0);
 
     const rows = await db
       .select()
@@ -520,7 +527,7 @@ export class ProductRepository {
       .where(
         and(
           eq(products.status, "published"),
-          priceCondition,
+          publishedCatalogPriceCondition(options.includeWalletPaidSingleServer),
           hasSafePublishedBuild(),
           ne(products.slug, normalized),
           sql`coalesce(${products.compatibility}->'dependencies', '[]'::jsonb) @> ${JSON.stringify([normalized])}::jsonb`,
@@ -550,12 +557,6 @@ export class ProductRepository {
     options: { allowPaid?: boolean } = {},
   ): Promise<Product | null> {
     const allowPaid = options.allowPaid === true;
-    const priceCondition = allowPaid
-      ? or(
-          eq(products.price, 0),
-          and(sql`${products.price} > 0`, eq(products.licenseModel, "single_server")),
-        )
-      : eq(products.price, 0);
     return db.transaction(async (tx) => {
       const [product] = await tx
         .select()
@@ -565,7 +566,7 @@ export class ProductRepository {
             eq(products.slug, slug),
             eq(products.authorId, actorId),
             eq(products.status, "draft"),
-            priceCondition,
+            publishedCatalogPriceCondition(allowPaid),
           ),
         )
         .for("share")

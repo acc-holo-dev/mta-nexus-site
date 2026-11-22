@@ -14,6 +14,7 @@ import {
 import type { AuditEvent, Report, User } from "@nexus/domain";
 import { ForbiddenError, NotFoundError } from "@nexus/domain";
 import { can, generateId } from "@nexus/security";
+import { isWalletEngineEnabled } from "../commerce/wallet-payment-service";
 
 type AdminReportListItem = Report & {
   targetPreview: AdminReportTargetPreview | null;
@@ -28,7 +29,9 @@ class AdminService {
     const [users, servers, products, publishedContent, reportsOpen] = await Promise.all([
       userRepository.countAll(),
       serverRepository.countActivePublic(),
-      productRepository.countPublishedFree(),
+      productRepository.countPublishedFree({
+        includeWalletPaidSingleServer: isWalletEngineEnabled(),
+      }),
       contentRepository.countPublished(),
       reportRepository.countOpen(),
     ]);

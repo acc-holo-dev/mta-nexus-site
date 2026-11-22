@@ -25,6 +25,7 @@ MTA NEXUS объединяет публичные серверы Multi Theft Aut
 
 - По умолчанию публичный каталог и claim остаются на **бесплатных** ресурсах; **live** PSP/card checkout, live payouts, live PSP refunds и production DRM **не** включены.
 - Опциональный **site wallet** (NX-015) остаётся dark, пока не выставлены `NEXUS_WALLET_ENGINE=1` / `NEXUS_WALLET_WITHDRAW=1`: audited ledger top-up/spend/holds/admin ops за stub-границами. Включение флагов **не** есть production deploy и **не** разрешает live money movement — см. [OPERATIONS — Site wallet (dark flags)](../OPERATIONS.md#site-wallet-dark-flags) и [NX-015](../DECISIONS.md).
+- При `NEXUS_WALLET_ENGINE=1` публичный каталог, search, requirements/collection graphs, admin product counts и portfolio/feed/follow surfaces включают published paid `single_server` listings через `includeWalletPaidSingleServer` / `allowPaid`. Без флага поведение остаётся free-only. Cart→wallet multi-item, live PSP и DRM pin по-прежнему вне этой границы.
 - Платные подписки через site wallet, Cart→wallet multi-item settle, seller-opt-in DRM и рекламный self-service — ещё не действующие функции (направления в `docs/future/`).
 - Рекламные механизмы за выключенными по умолчанию флагами **не** означают запущенную рекламную систему.
 - Все публичные серверы из master list видимы независимо от регистрации владельца. Claim открывает управление и доказывает контроль, но **не** условие появления в каталоге. Live-данные не подменяются редактором страницы.

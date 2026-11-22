@@ -15,6 +15,7 @@ import { DISCOVER_CONTENT_TYPES } from "../../../features/discovery/discover-que
 import type { DiscoveryStreamQuery } from "../../../features/discovery/discovery-stream-contract";
 import { getDictionary, type Locale } from "../../i18n";
 import { productService } from "../commerce/product-service";
+import { isWalletEngineEnabled } from "../commerce/wallet-payment-service";
 import {
   indexMtaObservations,
   matchesMtaEndpoint,
@@ -144,7 +145,11 @@ class DiscoveryService {
     // must not hide server matches from a player using the global search.
     const [products, servers, articles, users, organizations] = await Promise.all([
       !type || type === "product"
-        ? productRepository.list({ query: normalizedQuery, limit: boundedLimit })
+        ? productRepository.list({
+            query: normalizedQuery,
+            limit: boundedLimit,
+            includeWalletPaidSingleServer: isWalletEngineEnabled(),
+          })
         : [],
       !type || type === "server"
         ? serverRepository.searchActivePublic(normalizedQuery, boundedLimit)

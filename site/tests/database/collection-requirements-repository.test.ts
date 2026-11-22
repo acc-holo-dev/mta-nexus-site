@@ -87,9 +87,18 @@ it("masks revoked members before traversing their private graph", async () => {
   expect(result.report.nodes).toEqual([]);
   const sql = state.queries.at(-1)?.sql ?? "";
   expect(sql).toContain("CASE WHEN owned.resource_id IS NOT NULL");
-  expect(sql).toContain("p.status='published' AND p.price=0");
+  expect(sql).toContain("p.status='published' AND");
+  expect(sql).toContain("p.price = 0");
   expect(sql).toContain('"builds"."scan_status"');
   expect(sql).not.toContain("p.title");
+  expect(sql).not.toContain("license_model");
+});
+it("includes paid single_server collection roots when allowPaid unlocks the wallet catalog", async () => {
+  state.rows = [...prefix(), [{ slug: null }]];
+  await repo.collectionReport({ ...input, allowPaid: true });
+  const sql = state.queries.at(-1)?.sql ?? "";
+  expect(sql).toContain("p.license_model = 'single_server'");
+  expect(sql).toContain("p.price > 0");
 });
 it("rejects foreign collections before consulting member metadata", async () => {
   state.rows = [[], [], [["usr_a"]], []];
