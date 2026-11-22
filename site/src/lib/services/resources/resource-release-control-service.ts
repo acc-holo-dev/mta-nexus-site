@@ -10,6 +10,7 @@ import {
   type User,
 } from "@nexus/domain";
 import { generateId } from "@nexus/security";
+import { isWalletEngineEnabled } from "../commerce/wallet-payment-service";
 
 function moderator(user: User) {
   if (user.role !== "admin" && user.role !== "moderator") throw new ForbiddenError();
@@ -20,7 +21,9 @@ export const libraryReleaseService = {
   history: (user: User, query: LibraryReleaseHistoryQuery) =>
     resourceLibrarySelectionsRepository.history(user.id, query),
   page: (user: User, page = 1, filter: LibraryReleaseFilter = "all") =>
-    resourceLibrarySelectionsRepository.page(user.id, page, filter),
+    resourceLibrarySelectionsRepository.page(user.id, page, filter, {
+      allowPaid: isWalletEngineEnabled(),
+    }),
   detail: (user: User, productId: string, page = 1) =>
     resourceLibrarySelectionsRepository.detail(user.id, productId, page),
   command: (user: User, productId: string, command: LibraryReleaseCommand, currentToken: string) =>

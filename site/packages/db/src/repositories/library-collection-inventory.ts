@@ -31,6 +31,7 @@ const invalidSnapshot = () =>
 export async function readLibraryCollectionInventory(
   userId: string,
   input: LibraryCollectionInventoryQuery,
+  options: { allowPaid?: boolean } = {},
 ): Promise<LibraryCollectionInventory> {
   const parsed = libraryCollectionInventoryQuerySchema.safeParse(input);
   if (!parsed.success) throw new AppError("Invalid inventory query", 400, "COLLECTION_INVALID");
@@ -118,7 +119,7 @@ export async function readLibraryCollectionInventory(
         };
       const matchCollection = query.collectionId ? sql`c.id=${query.collectionId}` : sql`true`;
       const matchStatus = query.status === "all" ? sql`true` : sql`c.status=${query.status}`;
-      const projection = libraryReleaseProjection(userId, sql`refs.id`);
+      const projection = libraryReleaseProjection(userId, sql`refs.id`, options);
       const resources = sql`${effectiveUserDownloadSources(userId, sql`transaction_timestamp()`)}, refs AS (
       SELECT member.product_id AS id,count(*)::integer AS "membershipCount",bool_or(${matchCollection} AND ${matchStatus}) AS "inSelected"
       FROM ${members} member JOIN ${collections} c ON c.id=member.collection_id WHERE c.user_id=${userId} GROUP BY member.product_id

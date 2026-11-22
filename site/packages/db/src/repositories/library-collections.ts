@@ -298,6 +298,7 @@ export class LibraryCollectionsRepository {
     page = 1,
     filter: LibraryReleaseFilter = "all",
     q = "",
+    options: { allowPaid?: boolean } = {},
   ) {
     // biome-ignore lint/suspicious/noControlCharactersInRegex: Reject control characters in private searches.
     const controls = /[\u0000-\u001f\u007f]/u.test(q);
@@ -326,7 +327,7 @@ export class LibraryCollectionsRepository {
       const timestamp = new Date(snapshot?.observedAt ?? "");
       if (!Number.isFinite(timestamp.getTime()))
         throw new AppError("Invalid database snapshot", 500, "COLLECTION_SNAPSHOT_INVALID");
-      const result = await readLibraryReleasePage(tx, userId, page, filter, q.trim(), id);
+      const result = await readLibraryReleasePage(tx, userId, page, filter, q.trim(), id, options);
       return {
         schemaVersion: 1 as const,
         collection,

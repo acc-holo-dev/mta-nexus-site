@@ -134,11 +134,22 @@ try {
         { timeout: 90_000 },
       );
 
-    writeFileSync(
-      cssFile,
-      Buffer.concat([originalCss, Buffer.from('\n:root { --nexus-infra-hmr-probe: "alpha"; }\n')]),
-    );
-    await waitForProbe("alpha");
+    const writeAlpha = () =>
+      writeFileSync(
+        cssFile,
+        Buffer.concat([
+          originalCss,
+          Buffer.from('\n:root { --nexus-infra-hmr-probe: "alpha"; }\n'),
+        ]),
+      );
+    writeAlpha();
+    try {
+      await waitForProbe("alpha");
+    } catch {
+      // One rewrite after a Turbopack FS-event miss; still require alpha → beta → restore.
+      writeAlpha();
+      await waitForProbe("alpha");
+    }
     writeFileSync(
       cssFile,
       Buffer.concat([originalCss, Buffer.from('\n:root { --nexus-infra-hmr-probe: "beta"; }\n')]),

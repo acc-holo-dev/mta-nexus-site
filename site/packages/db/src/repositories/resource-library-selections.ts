@@ -88,10 +88,15 @@ function currentAccess(expiresAt: Date | null, productId: string) {
 export class ResourceLibrarySelectionsRepository {
   history = readLibraryReleaseHistory;
   compare = readLibraryReleaseComparison;
-  async page(userId: string, requestedPage = 1, filter: LibraryReleaseFilter = "all") {
+  async page(
+    userId: string,
+    requestedPage = 1,
+    filter: LibraryReleaseFilter = "all",
+    options: { allowPaid?: boolean } = {},
+  ) {
     return db.transaction(
       async (tx) => {
-        return readLibraryReleasePage(tx, userId, requestedPage, filter);
+        return readLibraryReleasePage(tx, userId, requestedPage, filter, "", undefined, options);
       },
       { isolationLevel: "repeatable read", accessMode: "read only" },
     );

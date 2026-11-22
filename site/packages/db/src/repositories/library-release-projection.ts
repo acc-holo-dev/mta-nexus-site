@@ -5,13 +5,21 @@ import { safePublishedBuildCondition } from "./build-safety";
 /** Shared own-preference/safe-build joins for a caller's owner-scoped resource set.
  * The caller supplies product/owned aliases in the same database-time snapshot.
  */
-export function libraryReleaseProjection(userId: string, resourceId: SQL) {
+export function libraryReleaseProjection(
+  userId: string,
+  resourceId: SQL,
+  options: { allowPaid?: boolean } = {},
+) {
   const available = sql`coalesce(owned.resource_id IS NOT NULL AND product.status='published' AND latest.id IS NOT NULL,false)`;
+  const requirementsEligible =
+    options.allowPaid === true
+      ? sql`(product.price=0 OR (product.price > 0 AND product.license_model = 'single_server'))`
+      : sql`product.price=0`;
   return {
     available,
     columns: sql`
       coalesce(pref.revision,0) AS revision,coalesce(pref.mode,'latest') AS mode,
-      coalesce(${available} AND product.price=0,false) AS "canReviewRequirements",
+      coalesce(${available} AND ${requirementsEligible},false) AS "canReviewRequirements",
       CASE WHEN ${available} THEN latest.id END AS "latestBuildId",
       CASE WHEN ${available} THEN left(latest.version,128) END AS "latestVersion",
       CASE WHEN ${available} THEN selected.id END AS "selectedBuildId",

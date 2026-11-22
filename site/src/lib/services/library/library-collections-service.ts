@@ -25,9 +25,10 @@ import {
   libraryMembershipBatchCommandSchema,
 } from "@nexus/validation";
 import { collectionId } from "../../../features/library/library-collections-query";
+import { isWalletEngineEnabled } from "../commerce/wallet-payment-service";
 export const libraryCollectionsService = {
   inventory: (actor: User, query: LibraryCollectionInventoryQuery) =>
-    readLibraryCollectionInventory(actor.id, query),
+    readLibraryCollectionInventory(actor.id, query, { allowPaid: isWalletEngineEnabled() }),
   receiptDetail: (actor: User, id: string) =>
     readLibraryCollectionReceiptDetail(actor.id, collectionId(id)),
   exportManifest: (actor: User, id: string) => exportLibraryCollection(actor.id, collectionId(id)),
@@ -83,6 +84,7 @@ export const libraryCollectionsService = {
       query.page,
       query.filter,
       query.q,
+      { allowPaid: isWalletEngineEnabled() },
     ),
   copyItemsPage: (actor: User, id: string, query: { page: number; q: string }) =>
     libraryCollectionsRepository.copyItemsPage(actor.id, collectionId(id), query.page, query.q),

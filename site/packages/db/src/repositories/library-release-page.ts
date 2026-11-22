@@ -18,11 +18,12 @@ export async function readLibraryReleasePage(
   filter: LibraryReleaseFilter,
   q = "",
   collectionId?: string,
+  options: { allowPaid?: boolean } = {},
 ) {
   const references = collectionId
     ? sql`SELECT member.product_id AS resource_id, member.added_at FROM ${members} member WHERE member.collection_id=${collectionId}`
     : sql`SELECT owned.resource_id, owned.added_at FROM owned`;
-  const projection = libraryReleaseProjection(userId, sql`refs.resource_id`),
+  const projection = libraryReleaseProjection(userId, sql`refs.resource_id`, options),
     available = projection.available;
   const sources = sql`${effectiveUserDownloadSources(userId, sql`transaction_timestamp()`)}, refs AS (${references}), release_rows AS (
         SELECT refs.resource_id AS "productId", refs.added_at AS "addedAt", owned.resource_id IS NOT NULL AS "hasAccess",
