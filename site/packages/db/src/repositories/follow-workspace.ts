@@ -70,6 +70,15 @@ function availableResourceBuild() {
       ),
   );
 }
+function publicFollowProduct(includeWalletPaidSingleServer = false) {
+  const priceCondition = includeWalletPaidSingleServer
+    ? or(
+        eq(products.price, 0),
+        and(sql`${products.price} > 0`, eq(products.licenseModel, "single_server")),
+      )
+    : eq(products.price, 0);
+  return and(eq(products.status, "published"), priceCondition, availableResourceBuild());
+}
 class FollowWorkspaceRepository {
   async states(actorId: string, targetType: TargetType, targetIds: readonly string[]) {
     const ids = [...new Set(targetIds)].slice(0, 50);
@@ -143,6 +152,7 @@ class FollowWorkspaceRepository {
   async page(
     actorId: string,
     filters: { type?: TargetType; query?: string; cursor?: Cursor } = {},
+    options: { includeWalletPaidSingleServer?: boolean } = {},
   ) {
     const pattern = filters.query?.trim()
       ? containsPattern(filters.query.trim().slice(0, 100))
@@ -200,9 +210,7 @@ class FollowWorkspaceRepository {
         and(
           eq(follows.targetType, "product"),
           eq(products.id, follows.targetId),
-          eq(products.status, "published"),
-          eq(products.price, 0),
-          availableResourceBuild(),
+          publicFollowProduct(options.includeWalletPaidSingleServer === true),
         ),
       )
       .leftJoin(
@@ -527,7 +535,7 @@ class FollowWorkspaceRepository {
     targetId: string,
     following: boolean,
     id: string,
-    options: { notifyComments?: boolean } = {},
+    options: { notifyComments?: boolean; includeWalletPaidSingleServer?: boolean } = {},
   ) {
     return this.setFollowingWithin(actorId, targetType, targetId, following, id, options);
   }
@@ -538,7 +546,7 @@ class FollowWorkspaceRepository {
     targetId: string,
     following: boolean,
     id: string,
-    options: { notifyComments?: boolean },
+    options: { notifyComments?: boolean; includeWalletPaidSingleServer?: boolean },
     token: string,
   ) {
     if (!token) throw new UnauthorizedError();
@@ -551,7 +559,7 @@ class FollowWorkspaceRepository {
     targetId: string,
     following: boolean,
     id: string,
-    options: { notifyComments?: boolean },
+    options: { notifyComments?: boolean; includeWalletPaidSingleServer?: boolean },
     token?: string,
   ) {
     if (following && targetType === "user" && targetId === actorId)
@@ -636,9 +644,7 @@ class FollowWorkspaceRepository {
             .where(
               and(
                 eq(products.id, targetId),
-                eq(products.status, "published"),
-                eq(products.price, 0),
-                availableResourceBuild(),
+                publicFollowProduct(options.includeWalletPaidSingleServer === true),
               ),
             )
             .for("share")

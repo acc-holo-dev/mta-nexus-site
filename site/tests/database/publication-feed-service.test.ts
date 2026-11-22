@@ -40,6 +40,11 @@ it("projects bounded public DTOs, sanitizes media and preserves microsecond curs
     { kind: "following", actorId: "actor" },
     { query: "", type: undefined, source: undefined, cursor: undefined },
   );
+  expect(mocks.page).toHaveBeenCalledWith(
+    { kind: "following", actorId: "actor" },
+    { query: "", type: undefined, source: undefined, cursor: undefined },
+    { includeWalletPaidSingleServer: false },
+  );
   expect(result.items[0]).toMatchObject({
     image: null,
     author: { username: "u name", avatar: null },

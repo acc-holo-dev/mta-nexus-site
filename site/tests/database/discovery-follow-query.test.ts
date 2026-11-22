@@ -162,6 +162,24 @@ it.each(["server", "organization", "user", "product"] as const)(
       expect(state.queries[1].params).toEqual(expect.arrayContaining(["published", 0]));
   },
 );
+it("includes paid single_server product follow targets when includeWalletPaidSingleServer is set", async () => {
+  state.rows = [[], [["target"]], [["new"]]];
+  expect(
+    await follows.setFollowing("actor", "product", "target", true, "new", {
+      includeWalletPaidSingleServer: true,
+    }),
+  ).toEqual({ following: true, created: true });
+  expect(state.queries[1].sql).toMatch(/"price"\s*>\s*0/i);
+  expect(state.queries[1].params).toContain("single_server");
+  expect(state.queries[1].params).toEqual(expect.arrayContaining(["published", 0]));
+});
+it("includes paid single_server product metadata in saved follows when wallet option is set", async () => {
+  state.rows = [[followRow("paid", "Paid Resource")]];
+  await follows.page("actor", {}, { includeWalletPaidSingleServer: true });
+  const query = state.queries[0];
+  expect(query.sql).toMatch(/"price"\s*>\s*0/i);
+  expect(query.params).toContain("single_server");
+});
 it("confirms a repeated command without inserting or notifying twice", async () => {
   state.rows = [[], [["target"]], [], [["existing"]]];
   expect(await follows.setFollowing("actor", "user", "target", true, "new")).toEqual({

@@ -41,10 +41,16 @@ const publishedTime = sql`coalesce(${content.publishedAt}, ${content.createdAt})
 const publicServer = and(eq(servers.visibility, "public"), eq(servers.status, "active"));
 const activityVisible = sql<boolean>`coalesce(${userProfilePreferences.showActivity}, true)`;
 const serverTypes = ["article", "news", "devlog", "update", "announcement"];
-function publicProduct() {
+function publicProduct(includeWalletPaidSingleServer = false) {
+  const priceCondition = includeWalletPaidSingleServer
+    ? or(
+        eq(products.price, 0),
+        and(sql`${products.price} > 0`, eq(products.licenseModel, "single_server")),
+      )
+    : eq(products.price, 0);
   return and(
     eq(products.status, "published"),
-    eq(products.price, 0),
+    priceCondition,
     exists(
       db
         .select({ id: builds.id })
@@ -86,7 +92,11 @@ class PublicationFeedRepository {
     return row ?? null;
   }
 
-  async page(scope: PublicationScope, filters: PublicationFilters = {}) {
+  async page(
+    scope: PublicationScope,
+    filters: PublicationFilters = {},
+    options: { includeWalletPaidSingleServer?: boolean } = {},
+  ) {
     const ids = (type: string) =>
       db
         .select({ id: follows.targetId })
@@ -150,7 +160,13 @@ class PublicationFeedRepository {
       .leftJoin(userProfilePreferences, eq(userProfilePreferences.userId, users.id))
       .leftJoin(organizations, eq(organizations.id, content.organizationId))
       .leftJoin(servers, and(eq(servers.id, content.serverId), publicServer))
-      .leftJoin(products, and(eq(products.id, content.productId), publicProduct()))
+      .leftJoin(
+        products,
+        and(
+          eq(products.id, content.productId),
+          publicProduct(options.includeWalletPaidSingleServer === true),
+        ),
+      )
       .where(
         and(
           eq(content.status, "published"),

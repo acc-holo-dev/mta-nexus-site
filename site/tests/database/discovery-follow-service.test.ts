@@ -105,6 +105,11 @@ it("projects saved identity and exact cursor without exposing repository-only fi
     query: "",
     cursor: undefined,
   });
+  expect(mocks.follows).toHaveBeenCalledWith(
+    "actor",
+    { type: undefined, query: "", cursor: undefined },
+    { includeWalletPaidSingleServer: false },
+  );
   expect(JSON.parse(result.nextCursor ?? "")).toEqual(cursor);
   expect(result.items[0].href).toBe("/organizations/team%20%26%20friends");
   expect(result.items[0].image).toBeNull();

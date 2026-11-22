@@ -8,6 +8,7 @@ import {
   type PublicationQuery,
   SERVER_PUBLICATION_TYPES,
 } from "../../../features/community/publication-feed-contract";
+import { isWalletEngineEnabled } from "../commerce/wallet-payment-service";
 
 class PublicationFeedService {
   async resolve(kind: "user" | "organization" | "server", handle: string) {
@@ -58,7 +59,9 @@ class PublicationFeedService {
         400,
         "INVALID_CURSOR",
       );
-    const page = await publicationFeedRepository.page(scope, query);
+    const page = await publicationFeedRepository.page(scope, query, {
+      includeWalletPaidSingleServer: isWalletEngineEnabled(),
+    });
     const context = (name: string | null, handle: string | null, path: string) =>
       name && handle ? { name, href: `/${path}/${encodeURIComponent(handle)}` } : null;
     return {

@@ -7,6 +7,7 @@ import type {
   ObjectMuteDuration,
   parseFollowQuery,
 } from "../../../features/community/follow-workspace-contract";
+import { isWalletEngineEnabled } from "../commerce/wallet-payment-service";
 
 const paths = {
   user: "/users",
@@ -20,7 +21,9 @@ class FollowWorkspaceService {
     actorId: string,
     filters: NonNullable<ReturnType<typeof parseFollowQuery>>,
   ): Promise<FollowPage> {
-    const result = await followWorkspaceRepository.page(actorId, filters);
+    const result = await followWorkspaceRepository.page(actorId, filters, {
+      includeWalletPaidSingleServer: isWalletEngineEnabled(),
+    });
     return {
       hasMore: result.hasMore,
       nextCursor: result.nextCursor ? encodeDiscussionCursor(result.nextCursor) : null,
@@ -57,9 +60,26 @@ class FollowWorkspaceService {
   }
 
   setFollowingAuthenticated(
-    ...args: Parameters<typeof followWorkspaceRepository.setFollowingAuthenticated>
+    actorId: Parameters<typeof followWorkspaceRepository.setFollowingAuthenticated>[0],
+    targetType: Parameters<typeof followWorkspaceRepository.setFollowingAuthenticated>[1],
+    targetId: Parameters<typeof followWorkspaceRepository.setFollowingAuthenticated>[2],
+    following: Parameters<typeof followWorkspaceRepository.setFollowingAuthenticated>[3],
+    id: Parameters<typeof followWorkspaceRepository.setFollowingAuthenticated>[4],
+    options: Parameters<typeof followWorkspaceRepository.setFollowingAuthenticated>[5],
+    token: Parameters<typeof followWorkspaceRepository.setFollowingAuthenticated>[6],
   ) {
-    return followWorkspaceRepository.setFollowingAuthenticated(...args);
+    return followWorkspaceRepository.setFollowingAuthenticated(
+      actorId,
+      targetType,
+      targetId,
+      following,
+      id,
+      {
+        ...options,
+        includeWalletPaidSingleServer: isWalletEngineEnabled(),
+      },
+      token,
+    );
   }
 
   setObjectMute(
