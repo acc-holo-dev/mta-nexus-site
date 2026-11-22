@@ -14,6 +14,8 @@ export const libraryCopy = {
     title: "Resource library",
     loading: "Loading your resource library…",
     subtitle: "Resources granted to your account, including legacy licenses.",
+    subtitleWallet:
+      "Resources granted to your account, including free claims, paid site-wallet settle when the wallet engine is on, and legacy licenses.",
     signInRequired: "Sign in to view your resource library",
     signIn: "Sign in",
     back: "Back to workspace",
@@ -55,6 +57,8 @@ export const libraryCopy = {
     title: "Библиотека ресурсов",
     loading: "Загрузка библиотеки ресурсов…",
     subtitle: "Ресурсы, доступные вашему аккаунту, включая ранее выданные лицензии.",
+    subtitleWallet:
+      "Ресурсы, доступные вашему аккаунту, включая бесплатные claim, платный settle через site wallet при включённом движке и ранее выданные лицензии.",
     signInRequired: "Войдите, чтобы посмотреть библиотеку ресурсов",
     signIn: "Войти",
     back: "Вернуться в кабинет",

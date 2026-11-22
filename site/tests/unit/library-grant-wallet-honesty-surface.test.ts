@@ -16,7 +16,10 @@ describe("library grant wallet honesty", () => {
 
     expect(libraryPage).toContain("noteWallet");
     expect(libraryPage).toContain("walletEnabled ? copy.noteWallet : copy.note");
+    expect(libraryPage).toContain("subtitleWallet");
+    expect(libraryPage).toContain("walletEnabled ? copy.subtitleWallet : copy.subtitle");
     expect(libraryView).toContain("noteWallet");
+    expect(libraryView).toContain("subtitleWallet");
     expect(reviews).toContain("walletSubtitle");
     expect(reviews).toContain("isWalletEngineEnabled");
     expect(ownReviews).toContain("walletSubtitle");
@@ -28,6 +31,12 @@ describe("library grant wallet honesty", () => {
     const libraryRu = getLibraryCopy("ru");
     const reviewEn = resourceReviewCopy("en");
     const reviewRu = resourceReviewCopy("ru");
+
+    expect(libraryEn.subtitle).not.toMatch(/site-wallet/i);
+    expect(libraryEn.subtitleWallet).toMatch(/site-wallet/i);
+    expect(libraryEn.subtitleWallet).toMatch(/free claims/i);
+    expect(libraryRu.subtitleWallet).toMatch(/site wallet/i);
+    expect(libraryRu.subtitleWallet).toMatch(/бесплатные claim/i);
 
     expect(libraryEn.note).not.toMatch(/site-wallet/i);
     expect(libraryEn.noteWallet).toMatch(/site-wallet/i);

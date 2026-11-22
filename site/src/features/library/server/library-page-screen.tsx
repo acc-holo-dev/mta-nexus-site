@@ -112,7 +112,9 @@ export async function LibraryPageScreen({
           {copy.back}
         </Link>
         <h1 className={typeDisplayPrimary}>{copy.title}</h1>
-        <p className={typeMax2xlSmSecondary}>{copy.subtitle}</p>
+        <p className={typeMax2xlSmSecondary}>
+          {walletEnabled ? copy.subtitleWallet : copy.subtitle}
+        </p>
       </header>
 
       <div className={typeFlexMinWrapGap2}>
