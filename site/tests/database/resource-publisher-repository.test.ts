@@ -71,6 +71,13 @@ it("counts and projects a bounded live managed inventory in one read-only snapsh
   expect(rows.sql).toContain('order by "products"."title" asc, "products"."id" asc');
   const projection = rows.sql.slice(0, rows.sql.indexOf(' from "products"'));
   expect(projection).not.toMatch(/storage_key|license_key|author_id|token_digest/u);
+  expect(counts.sql).toMatch(/"price"\s*=/i);
+});
+it("includes paid listings in inventory when allowPaid is set for the wallet engine", async () => {
+  state.rows = [[["published", 1]], []];
+  const query = resourcePublisherQuery(new URLSearchParams());
+  await repo.inventory("usr_a", query, query.page, { allowPaid: true });
+  expect(state.queries[0].sql).not.toMatch(/"price"\s*=/i);
 });
 it("keeps all status counts while applying the actual list status", async () => {
   state.rows = [

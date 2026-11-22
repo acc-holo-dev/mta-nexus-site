@@ -39,13 +39,19 @@ const publicationActions = [
   "product.submit",
 ];
 export class ResourcePublisherRepository {
-  async inventory(actorId: string, query: PublisherResourceQuery, requestedPage = 1) {
+  async inventory(
+    actorId: string,
+    query: PublisherResourceQuery,
+    requestedPage = 1,
+    options: { allowPaid?: boolean } = {},
+  ) {
+    const allowPaid = options.allowPaid === true;
     return db.transaction(
       async (tx) => {
         const ready = readiness();
         const scope = and(
           managedProductCondition({ id: actorId, role: "user" }),
-          eq(products.price, 0),
+          allowPaid ? undefined : eq(products.price, 0),
           query.scope === "personal"
             ? isNull(products.organizationId)
             : query.scope === "organization"
