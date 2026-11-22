@@ -110,8 +110,10 @@ export class ResourceActivityRepository {
     actorId: string,
     productId: string,
     requestedDays: ResourceActivityDays = 30,
+    options: { allowPaid?: boolean } = {},
   ): Promise<ResourceActivityReport> {
     const days = RESOURCE_ACTIVITY_DAYS.includes(requestedDays) ? requestedDays : 30;
+    const allowPaid = options.allowPaid === true;
     return db.transaction(
       async (tx) => {
         const [product] = await tx
@@ -123,7 +125,7 @@ export class ResourceActivityRepository {
             organizationId: products.organizationId,
           })
           .from(products)
-          .where(and(eq(products.id, productId), eq(products.price, 0)))
+          .where(and(eq(products.id, productId), allowPaid ? undefined : eq(products.price, 0)))
           .limit(1)
           .for("share");
         if (!product) throw new NotFoundError("Resource", productId);

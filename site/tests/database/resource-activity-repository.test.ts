@@ -118,6 +118,20 @@ it("holds live personal publisher authority and returns bounded UTC aggregates",
   expect(state.queries[3].sql).toContain("generate_series");
   expect(state.queries[3].sql).toContain("at time zone 'UTC'");
   expect(state.queries[3].params.at(-1)).toBe(7);
+  expect(state.queries[0].sql).toMatch(/"price"\s*=\s*\$?\d*|price.*=.*0/i);
+});
+
+it("loads paid product activity when allowPaid is set for the wallet engine", async () => {
+  state.results = [
+    [["prd_paid", "Paid", "published", "usr_author", null]],
+    [["usr_author", "developer"]],
+    [{ acquisitions: 1, direct: 1, cart: 0, retainedGrants: 1, downloadStarts: 0 }],
+    [{ day: "2026-10-10", acquisitions: 1, downloadStarts: 0 }],
+  ];
+  expect(
+    await activity.publisherReport("usr_author", "prd_paid", 7, { allowPaid: true }),
+  ).toMatchObject({ acquisitions: 1, direct: 1 });
+  expect(state.queries[0].sql).not.toMatch(/"price"\s*=/i);
 });
 
 it("does not return organization activity to a historical author with no current grant", async () => {

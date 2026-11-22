@@ -1,8 +1,12 @@
 import type { ResourceActivityReport } from "@nexus/db";
 
 /** Deliberately exclude titles, buyer identifiers, secrets and free-text cells. */
-export function resourceActivityCsv(report: ResourceActivityReport): string {
-  const lines = ["utc_day,free_acquisitions,download_starts"];
+export function resourceActivityCsv(
+  report: ResourceActivityReport,
+  options: { walletEnabled?: boolean } = {},
+): string {
+  const acquisitionsHeader = options.walletEnabled ? "acquisitions" : "free_acquisitions";
+  const lines = [`utc_day,${acquisitionsHeader},download_starts`];
   for (const row of report.timeline) {
     if (
       !/^\d{4}-\d{2}-\d{2}$/u.test(row.day) ||
