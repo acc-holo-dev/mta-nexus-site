@@ -75,7 +75,7 @@ with all three VAPID values set it dispatches durable Web Push jobs.
 grace window to finish the current page, emit `stopped`, and remove its health file.
 License and resource-release workers do the same cleanup. A fresh heartbeat alone is not
 liveness: probes also require recent dispatcher progress (see [Worker liveness vs progress](#worker-liveness-vs-progress)).
-App and push-worker keep `restart: "no"` so a crash stays visible; start the stack again
+App, push-worker, license-worker, and resource-release-worker keep `restart: "no"` so a crash stays visible; start the stack again
 after fixing the cause rather than relying on silent restarts.
 
 ### Optional local mail capture

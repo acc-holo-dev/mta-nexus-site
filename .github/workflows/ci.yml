@@ -414,6 +414,9 @@ jobs:
           test "$(docker compose --env-file /dev/null -f docker/compose.yaml exec -T app id -u)" != "0"
           docker compose --env-file /dev/null -f docker/compose.yaml exec -T app node --test scripts/tests/local-readiness.node-test.mjs
           docker compose --env-file /dev/null -f docker/compose.yaml exec -T app node scripts/check-local-readiness.mjs
+          docker compose --env-file /dev/null -f docker/compose.yaml exec -T push-worker node /app/scripts/check-web-push-worker-health.mjs
+          docker compose --env-file /dev/null -f docker/compose.yaml exec -T license-worker node /app/scripts/check-license-worker-health.mjs
+          docker compose --env-file /dev/null -f docker/compose.yaml exec -T resource-release-worker node /app/scripts/check-resource-release-worker-health.mjs
           curl --fail --silent --show-error --max-time 90 http://127.0.0.1:3000/ -o /tmp/nexus-local-home.html
           grep -qi '<html' /tmp/nexus-local-home.html
           for service in postgres clamav; do
@@ -448,6 +451,9 @@ jobs:
           test -n "$after"
           test "$before" != "$after"
           docker compose --env-file /dev/null -f docker/compose.yaml exec -T app node scripts/check-local-readiness.mjs
+          docker compose --env-file /dev/null -f docker/compose.yaml exec -T push-worker node /app/scripts/check-web-push-worker-health.mjs
+          docker compose --env-file /dev/null -f docker/compose.yaml exec -T license-worker node /app/scripts/check-license-worker-health.mjs
+          docker compose --env-file /dev/null -f docker/compose.yaml exec -T resource-release-worker node /app/scripts/check-resource-release-worker-health.mjs
           docker compose --env-file /dev/null -f docker/compose.yaml exec -T app node --input-type=module -e "import assert from 'node:assert/strict'; import {readFileSync} from 'node:fs'; assert.equal(readFileSync('/data/uploads/beta002-ci-probe', 'utf8'), 'preserved');"
           test "$(docker compose --env-file /dev/null -f docker/compose.yaml exec -T postgres psql -X -U nexus -d mta_nexus -Atc 'SELECT value FROM beta002_ci_probe WHERE id=1')" = "preserved"
           echo 'PASS: migrations applied, app replaced, database and uploads retained'

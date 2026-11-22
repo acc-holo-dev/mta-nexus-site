@@ -133,7 +133,7 @@ services:
       dockerfile: docker/Dockerfile
       target: development
     init: true
-    restart: unless-stopped
+    restart: "no"
     stop_grace_period: 30s
     working_dir: /app/site/packages/db
     command: ["node", "--import", "tsx", "scripts/run-license-maintenance.ts", "--loop"]
@@ -165,7 +165,7 @@ services:
       dockerfile: docker/Dockerfile
       target: development
     init: true
-    restart: unless-stopped
+    restart: "no"
     stop_grace_period: 30s
     working_dir: /app/site/packages/db
     command: ["node", "--import", "tsx", "scripts/run-resource-release-worker.ts", "--loop"]
