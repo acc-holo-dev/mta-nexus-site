@@ -117,6 +117,8 @@ export const community = {
     emptyPortfolio: "No public releases or articles yet.",
     emptyPortfolioHint:
       "Published free resources and editorial posts will appear here when available. An empty portfolio is not a load failure.",
+    emptyPortfolioHintWallet:
+      "Published free and paid resources and editorial posts will appear here when available. An empty portfolio is not a load failure. Site-wallet purchase can settle paid listings when the wallet engine is on; card checkout stays off.",
   },
   support: {
     title: "Support",

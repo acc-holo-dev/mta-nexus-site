@@ -207,6 +207,8 @@ export const publishing = {
     noReleases: "No public releases yet.",
     noReleasesHint:
       "Published free resources by this creator will appear here when available. An empty list is not a load failure.",
+    noReleasesHintWallet:
+      "Published free and paid resources by this creator will appear here when available. An empty list is not a load failure. Site-wallet purchase can settle paid listings when the wallet engine is on; card checkout stays off.",
     loadUnavailable:
       "This creator profile is temporarily unavailable. This does not mean there are no public releases.",
     loadUnavailableHint:

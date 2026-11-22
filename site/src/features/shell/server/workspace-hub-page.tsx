@@ -262,7 +262,11 @@ export async function WorkspaceHubPage() {
         ) : (
           <EmptyState
             title={dictionary.workspace.emptyLibrary}
-            description={dictionary.workspace.emptyLibraryHint}
+            description={
+              walletEnabled
+                ? dictionary.workspace.emptyLibraryHintWallet
+                : dictionary.workspace.emptyLibraryHint
+            }
             action={
               <Link href={marketHref} className={linkAccentSmRounded}>
                 {browseLabel}

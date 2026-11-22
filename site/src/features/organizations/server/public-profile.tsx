@@ -219,7 +219,7 @@ export async function OrganizationProfilePage({
       {portfolioEmpty ? (
         <EmptyState
           title={copy.emptyPortfolio}
-          description={copy.emptyPortfolioHint}
+          description={walletEnabled ? copy.emptyPortfolioHintWallet : copy.emptyPortfolioHint}
           action={
             <Link href={marketHref} className={linkAccentSm}>
               {walletEnabled

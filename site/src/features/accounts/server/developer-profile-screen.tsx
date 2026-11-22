@@ -207,7 +207,7 @@ export async function DeveloperProfileScreen({
         ) : (
           <EmptyState
             title={copy.noReleases}
-            description={copy.noReleasesHint}
+            description={walletEnabled ? copy.noReleasesHintWallet : copy.noReleasesHint}
             action={
               <Link href={marketHref} className={actionLinkClass}>
                 {walletEnabled
