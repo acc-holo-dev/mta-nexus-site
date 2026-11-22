@@ -285,7 +285,9 @@ export class ProductService {
       return buildProductDependencyResolution(product, []);
     }
 
-    const publishedDependencies = await productRepository.findPublishedFreeBySlugs(declared);
+    const publishedDependencies = await productRepository.findPublishedFreeBySlugs(declared, {
+      includeWalletPaidSingleServer: isWalletEngineEnabled(),
+    });
     return buildProductDependencyResolution(product, publishedDependencies);
   }
 
@@ -293,6 +295,7 @@ export class ProductService {
     const dependents = await productRepository.listPublishedFreeDependingOnSlug(
       productSlug,
       reverseDependencyLimits.query,
+      { includeWalletPaidSingleServer: isWalletEngineEnabled() },
     );
     return buildReverseDependencySummary(productSlug, dependents);
   }

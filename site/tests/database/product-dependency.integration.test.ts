@@ -52,10 +52,11 @@ describe("published dependency repository integration", () => {
     await productRepository.create({
       ...base,
       id: `prd_dep_paid_${suffix}`,
-      title: "Legacy paid dependency",
+      title: "Wallet paid dependency",
       slug: paidSlug,
       status: "published",
       price: 100,
+      licenseModel: "single_server",
     });
 
     // Published free dependency targets are public only with a trusted clean
@@ -75,6 +76,21 @@ describe("published dependency repository integration", () => {
       scannedAt: new Date(),
       isSigned: false,
     });
+    await buildRepository.create({
+      id: `bld_dep_paid_${suffix}`,
+      productId: `prd_dep_paid_${suffix}`,
+      version: "1.0.0",
+      status: "published",
+      storageKey: `builds/prd_dep_paid_${suffix}/v1.0.0.zip`,
+      sha256Hash: "d".repeat(64),
+      fileSizeBytes: 2048,
+      fileName: "paid-dependency-target.zip",
+      mimeType: "application/zip",
+      scanStatus: "clean",
+      scanner: "test-scanner",
+      scannedAt: new Date(),
+      isSigned: false,
+    });
   });
 
   it("returns only public published free dependency targets", async () => {
@@ -85,5 +101,14 @@ describe("published dependency repository integration", () => {
     ]);
 
     expect(rows.map((row) => row.slug)).toEqual([publishedSlug]);
+  });
+
+  it("includes paid single_server dependency targets when includeWalletPaidSingleServer is set", async () => {
+    const rows = await productRepository.findPublishedFreeBySlugs(
+      [publishedSlug, draftSlug, paidSlug],
+      { includeWalletPaidSingleServer: true },
+    );
+
+    expect(rows.map((row) => row.slug).sort()).toEqual([paidSlug, publishedSlug].sort());
   });
 });

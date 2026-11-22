@@ -63,10 +63,11 @@ describe("reverse dependency repository integration", () => {
     await productRepository.create({
       ...base,
       id: `prd_rev_paid_${suffix}`,
-      title: "Legacy paid dependent",
+      title: "Wallet paid dependent",
       slug: paidSlug,
       status: "published",
       price: 100,
+      licenseModel: "single_server",
       compatibility: { dependencies: [targetSlug] },
     });
 
@@ -87,11 +88,34 @@ describe("reverse dependency repository integration", () => {
       scannedAt: new Date(),
       isSigned: false,
     });
+    await buildRepository.create({
+      id: `bld_rev_paid_${suffix}`,
+      productId: `prd_rev_paid_${suffix}`,
+      version: "1.0.0",
+      status: "published",
+      storageKey: `builds/prd_rev_paid_${suffix}/v1.0.0.zip`,
+      sha256Hash: "c".repeat(64),
+      fileSizeBytes: 2048,
+      fileName: "paid-reverse-dependent.zip",
+      mimeType: "application/zip",
+      scanStatus: "clean",
+      scanner: "test-scanner",
+      scannedAt: new Date(),
+      isSigned: false,
+    });
   });
 
   it("returns only other published free resources declaring the target slug", async () => {
     const rows = await productRepository.listPublishedFreeDependingOnSlug(targetSlug, 51);
 
     expect(rows.map((row) => row.slug)).toEqual([publishedSlug]);
+  });
+
+  it("includes paid single_server dependents when includeWalletPaidSingleServer is set", async () => {
+    const rows = await productRepository.listPublishedFreeDependingOnSlug(targetSlug, 51, {
+      includeWalletPaidSingleServer: true,
+    });
+
+    expect(rows.map((row) => row.slug).sort()).toEqual([paidSlug, publishedSlug].sort());
   });
 });

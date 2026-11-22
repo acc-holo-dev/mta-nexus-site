@@ -162,7 +162,9 @@ it.each(["en", "ru"] as const)(
   async (locale) => {
     state.locale = locale;
     const html = renderToStaticMarkup(await Page(params()));
-    expect(state.products).toHaveBeenCalledWith("author", 1, 24, { includeWalletPaidSingleServer: false });
+    expect(state.products).toHaveBeenCalledWith("author", 1, 24, {
+      includeWalletPaidSingleServer: false,
+    });
     expect(html).toContain("published resource");
     expect(html.match(/<h1\b/g)).toHaveLength(1);
     expect(html).toContain("Creator");
@@ -211,7 +213,9 @@ it("renders the total and navigation for the requested author page", async () =>
   const html = renderToStaticMarkup(
     await Page({ ...params(), searchParams: Promise.resolve({ page: "2" }) }),
   );
-  expect(state.products).toHaveBeenCalledWith("author", 2, 24, { includeWalletPaidSingleServer: false });
+  expect(state.products).toHaveBeenCalledWith("author", 2, 24, {
+    includeWalletPaidSingleServer: false,
+  });
   expect(html).toContain('href="/developers/creator?page=1#resources"');
   expect(html).toContain('href="/developers/creator?page=3#resources"');
   expect(html).toContain("49");
@@ -220,7 +224,9 @@ it("renders the total and navigation for the requested author page", async () =>
 
 it.each(["0", "-1", "1.5", "abc", ["2", "3"]])("normalizes invalid page %j", async (page) => {
   await Page({ ...params(), searchParams: Promise.resolve({ page }) });
-  expect(state.products).toHaveBeenCalledWith("author", 1, 24, { includeWalletPaidSingleServer: false });
+  expect(state.products).toHaveBeenCalledWith("author", 1, 24, {
+    includeWalletPaidSingleServer: false,
+  });
 });
 
 it("does not offer navigation for an empty portfolio", async () => {

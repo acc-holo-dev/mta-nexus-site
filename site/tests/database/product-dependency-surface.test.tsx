@@ -8,12 +8,13 @@ import { getDictionary } from "../../src/lib/i18n";
 
 const mocks = vi.hoisted(() => ({
   findPublishedFreeBySlugs: vi.fn(),
+  listPublishedFreeDependingOnSlug: vi.fn(async () => []),
 }));
 
 vi.mock("@nexus/db", () => ({
   productRepository: {
     findPublishedFreeBySlugs: mocks.findPublishedFreeBySlugs,
-    listPublishedFreeDependingOnSlug: vi.fn(async () => []),
+    listPublishedFreeDependingOnSlug: mocks.listPublishedFreeDependingOnSlug,
   },
   buildRepository: {},
   organizationRepository: {},
@@ -51,11 +52,10 @@ describe("resource dependency resolution behavior", () => {
     });
 
     expect(mocks.findPublishedFreeBySlugs).toHaveBeenCalledOnce();
-    expect(mocks.findPublishedFreeBySlugs).toHaveBeenCalledWith([
-      " Core-UI ",
-      "core-ui",
-      "missing-pack",
-    ]);
+    expect(mocks.findPublishedFreeBySlugs).toHaveBeenCalledWith(
+      [" Core-UI ", "core-ui", "missing-pack"],
+      { includeWalletPaidSingleServer: false },
+    );
     expect(result).toMatchObject({
       declaredCount: 2,
       availableCount: 1,
@@ -89,6 +89,17 @@ describe("resource dependency resolution behavior", () => {
       dependencies: [],
     });
     expect(mocks.findPublishedFreeBySlugs).not.toHaveBeenCalled();
+  });
+
+  it("passes the wallet paid option through reverse-dependent lookup", async () => {
+    mocks.listPublishedFreeDependingOnSlug.mockResolvedValue([]);
+    const service = new ProductService();
+
+    await service.getReverseDependencySummary("core-ui");
+
+    expect(mocks.listPublishedFreeDependingOnSlug).toHaveBeenCalledWith("core-ui", 51, {
+      includeWalletPaidSingleServer: false,
+    });
   });
 
   it.each(["en", "ru"] as const)(

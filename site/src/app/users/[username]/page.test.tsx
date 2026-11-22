@@ -173,7 +173,9 @@ it.each(["en", "ru"] as const)(
   async (locale) => {
     state.locale = locale;
     const html = renderToStaticMarkup(await Page(input("2")));
-    expect(state.products).toHaveBeenCalledWith("user", 2, 24, { includeWalletPaidSingleServer: false });
+    expect(state.products).toHaveBeenCalledWith("user", 2, 24, {
+      includeWalletPaidSingleServer: false,
+    });
     expect(html).toContain("49");
     expect(html).toContain("Second-page resource");
     expect(html).toContain('href="/market/second-page-resource"');
@@ -204,7 +206,9 @@ it.each(["en", "ru"] as const)(
 
 it.each(["0", "-1", "abc", ["1", "2"], undefined])("normalizes malformed page %j", async (page) => {
   await Page(input(page));
-  expect(state.products).toHaveBeenCalledWith("user", 1, 24, { includeWalletPaidSingleServer: false });
+  expect(state.products).toHaveBeenCalledWith("user", 1, 24, {
+    includeWalletPaidSingleServer: false,
+  });
 });
 
 it("keeps public servers visible when the external directory fails", async () => {

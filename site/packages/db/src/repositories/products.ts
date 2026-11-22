@@ -467,11 +467,21 @@ export class ProductRepository {
     return rows;
   }
 
-  async findPublishedFreeBySlugs(slugs: readonly string[]): Promise<Product[]> {
+  async findPublishedFreeBySlugs(
+    slugs: readonly string[],
+    options: { includeWalletPaidSingleServer?: boolean } = {},
+  ): Promise<Product[]> {
     const normalized = Array.from(
       new Set(slugs.map((slug) => slug.trim().toLowerCase()).filter(Boolean)),
     ).slice(0, 25);
     if (normalized.length === 0) return [];
+
+    const priceCondition = options.includeWalletPaidSingleServer
+      ? or(
+          eq(products.price, 0),
+          and(sql`${products.price} > 0`, eq(products.licenseModel, "single_server")),
+        )
+      : eq(products.price, 0);
 
     const rows = await db
       .select()
@@ -480,7 +490,7 @@ export class ProductRepository {
         and(
           inArray(products.slug, normalized),
           eq(products.status, "published"),
-          eq(products.price, 0),
+          priceCondition,
           hasSafePublishedBuild(),
         ),
       )
@@ -488,11 +498,21 @@ export class ProductRepository {
     return rows as unknown as Product[];
   }
 
-  async listPublishedFreeDependingOnSlug(dependencySlug: string, limit = 51): Promise<Product[]> {
+  async listPublishedFreeDependingOnSlug(
+    dependencySlug: string,
+    limit = 51,
+    options: { includeWalletPaidSingleServer?: boolean } = {},
+  ): Promise<Product[]> {
     const normalized = dependencySlug.trim().toLowerCase();
     if (!normalized) return [];
 
     const boundedLimit = Number.isFinite(limit) ? Math.min(Math.max(Math.floor(limit), 1), 51) : 51;
+    const priceCondition = options.includeWalletPaidSingleServer
+      ? or(
+          eq(products.price, 0),
+          and(sql`${products.price} > 0`, eq(products.licenseModel, "single_server")),
+        )
+      : eq(products.price, 0);
 
     const rows = await db
       .select()
@@ -500,7 +520,7 @@ export class ProductRepository {
       .where(
         and(
           eq(products.status, "published"),
-          eq(products.price, 0),
+          priceCondition,
           hasSafePublishedBuild(),
           ne(products.slug, normalized),
           sql`coalesce(${products.compatibility}->'dependencies', '[]'::jsonb) @> ${JSON.stringify([normalized])}::jsonb`,
