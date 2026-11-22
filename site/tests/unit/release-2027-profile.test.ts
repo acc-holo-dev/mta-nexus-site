@@ -6,6 +6,7 @@ describe("2027 release profile", () => {
     expect(release2027Profile({})).toMatchObject({
       id: "2027-single-instance",
       settlementCurrency: "RUB",
+      displayCurrencies: ["RUB", "USD", "EUR"],
       cardCheckout: "disabled",
       siteWallet: "off",
       staffQueues: "paginated",

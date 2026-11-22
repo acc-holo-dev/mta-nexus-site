@@ -717,7 +717,7 @@ export class WalletOrderSettlementRepository {
       await tx.insert(auditEvents).values({
         id: ids.auditId,
         actorId: input.actorId,
-        actorType: "user",
+        actorType: "admin",
         action: "order.wallet_refunded",
         targetId: order.id,
         targetType: "order",
