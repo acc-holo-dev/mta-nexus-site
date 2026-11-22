@@ -63,6 +63,7 @@ export const discovery = {
   },
   market: {
     title: "Free Resource Library",
+    walletTitle: "Resource market",
     ready: "free resources ready for your library",
     readySingle: "free resource ready for your library",
     all: "All",
@@ -82,6 +83,7 @@ export const discovery = {
     showing: "Resources shown:",
     searchLabel: "Search resources",
     searchPlaceholder: "Search free MTA resources",
+    walletSearchPlaceholder: "Search MTA resources",
     searchButton: "Search",
     sortLabel: "Sort resources",
     categoryLabel: "Resource categories",
@@ -95,11 +97,15 @@ export const discovery = {
     empty: "No resources found in this category.",
     emptyHint:
       "Published free resources will appear here when available. An empty list is not a load failure.",
+    walletEmptyHint:
+      "Published free and paid resources will appear here when available. An empty list is not a load failure. Site-wallet purchase can settle paid listings when the wallet engine is on; card checkout stays off.",
     emptyFiltered: "Nothing matches the active Market filters.",
     emptyFilteredHint:
       "This is an empty result for the current URL, not a catalog outage. Adjust search, category, or sort and try again.",
     loadUnavailable:
       "The free resource catalog is temporarily unavailable. This does not mean there are no resources.",
+    walletLoadUnavailable:
+      "The resource market is temporarily unavailable. This does not mean there are no resources.",
     loadUnavailableHint:
       "Retry reloads this catalog page only. A temporary load failure is not an empty Market result.",
     activeFilters: "Active filters",

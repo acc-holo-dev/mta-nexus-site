@@ -7,6 +7,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { formatUnknown } from "../../../lib/i18n/unknown";
 import { productService } from "../../../lib/services/commerce/product-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellStack6 } from "../../shell/page-shell";
 import {
@@ -53,6 +54,15 @@ export async function MarketPage({
 }) {
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
+  const walletEnabled = isWalletEngineEnabled();
+  const marketTitle = walletEnabled ? dictionary.market.walletTitle : dictionary.market.title;
+  const searchPlaceholder = walletEnabled
+    ? dictionary.market.walletSearchPlaceholder
+    : dictionary.market.searchPlaceholder;
+  const emptyHint = walletEnabled ? dictionary.market.walletEmptyHint : dictionary.market.emptyHint;
+  const loadUnavailable = walletEnabled
+    ? dictionary.market.walletLoadUnavailable
+    : dictionary.market.loadUnavailable;
   const { type, sort, query, page } = parseMarketQuery(await searchParams);
   const buildHref = (
     nextType: typeof type,
@@ -99,7 +109,7 @@ export async function MarketPage({
         <div className="min-w-0">
           <h1 className={typeFlexMinCenterGap25Display}>
             <ShoppingBag className={typeIcon6Accent} />
-            <span className={typeMinBreakWords}>{dictionary.market.title}</span>
+            <span className={typeMinBreakWords}>{marketTitle}</span>
           </h1>
           <p className={typeMt05CaptionMuted}>
             {dictionary.market.showing} {formatUnknown(locale, catalog?.products.length)}
@@ -120,7 +130,7 @@ export async function MarketPage({
             type="search"
             maxLength={100}
             defaultValue={query}
-            placeholder={dictionary.market.searchPlaceholder}
+            placeholder={searchPlaceholder}
             className="min-h-11 min-w-0 flex-1 rounded-lg border border-base bg-surface px-3 text-sm text-primary placeholder:text-faint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           />
           <Button type="submit" className="min-h-11 gap-2 font-semibold">
@@ -183,7 +193,7 @@ export async function MarketPage({
 
       {!catalog ? (
         <ErrorState
-          title={dictionary.market.loadUnavailable}
+          title={loadUnavailable}
           description={dictionary.market.loadUnavailableHint}
           action={
             <Link href={catalogHref} className={linkAccentSm}>
@@ -216,7 +226,7 @@ export async function MarketPage({
               ? dictionary.market.endOfResultsHint
               : filtersActive
                 ? dictionary.market.emptyFilteredHint
-                : dictionary.market.emptyHint
+                : emptyHint
           }
           action={
             <div className="mx-auto max-w-lg space-y-4">

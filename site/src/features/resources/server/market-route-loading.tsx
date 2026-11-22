@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { pageShellStack6 } from "../../shell/page-shell";
 import { DictionaryFieldRouteLoading } from "../../shell/route-honest-loading-server";
 import { skelH11, skelH24, skelH32 } from "../../shell/skeleton-shell";
@@ -67,5 +68,6 @@ export function MarketResourceRouteLoading() {
 export function ResourcesMarketRouteLoading() {
   return MarketRouteLoading({
     headingId: "market-loading-heading",
+    titlePath: isWalletEngineEnabled() ? "market.walletTitle" : "market.title",
   });
 }
