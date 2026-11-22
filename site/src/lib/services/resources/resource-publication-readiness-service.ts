@@ -1,5 +1,6 @@
 import { resourcePublicationReadinessRepository } from "@nexus/db";
 import { AppError, NotFoundError, type User } from "@nexus/domain";
+import { isWalletEngineEnabled } from "../commerce/wallet-payment-service";
 
 export const resourcePublicationReadinessService = {
   async summary(productId: string, actor: User) {
@@ -7,7 +8,9 @@ export const resourcePublicationReadinessService = {
       throw new AppError("Invalid resource", 404, "NOT_FOUND");
     }
     try {
-      return await resourcePublicationReadinessRepository.summary(productId, actor);
+      return await resourcePublicationReadinessRepository.summary(productId, actor, {
+        allowPaid: isWalletEngineEnabled(),
+      });
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw new AppError("Resource not found", 404, "NOT_FOUND");

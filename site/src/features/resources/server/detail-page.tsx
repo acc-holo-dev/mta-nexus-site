@@ -206,6 +206,7 @@ export async function ProductDetailPage({
   }
 
   const { product, isPublic } = detail;
+  const walletEnabled = isWalletEngineEnabled();
   const managementAccess = user
     ? productService.canManageProduct(product, user)
     : Promise.resolve(false);
@@ -246,9 +247,15 @@ export async function ProductDetailPage({
     productService.getReverseDependencySummary(product.slug).catch(() => null),
     isPublic ? resourceManagementService.publicVariants(product.id) : null,
     isPublic
-      ? resourceMediaRepository.publicItems(product.id)
+      ? resourceMediaRepository.publicItems(product.id, { allowPaid: walletEnabled })
       : managementAccess.then(async (allowed) =>
-          allowed && user ? (await resourceMediaRepository.managed(product.id, user.id)).items : [],
+          allowed && user
+            ? (
+                await resourceMediaRepository.managed(product.id, user.id, false, {
+                  allowPaid: walletEnabled,
+                })
+              ).items
+            : [],
         ),
     productService.getPublicAttribution(product.id),
     user ? resourceReleaseWatchesService.detail(user, product.id).catch(() => null) : null,
@@ -308,7 +315,6 @@ export async function ProductDetailPage({
     buildId: versionHelpBuild?.id,
   });
 
-  const walletEnabled = isWalletEngineEnabled();
   const formattedPrice =
     product.price === 0
       ? copy.free

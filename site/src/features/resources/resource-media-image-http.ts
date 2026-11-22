@@ -13,6 +13,7 @@ import {
   logRequestEvent,
 } from "../../lib/platform/observability";
 import { authService } from "../../lib/services/accounts/auth-service";
+import { isWalletEngineEnabled } from "../../lib/services/commerce/wallet-payment-service";
 import { getTrustedRequestIp } from "../shell/request-client-ip";
 import { resourceMediaError } from "./resource-media-i18n";
 
@@ -43,7 +44,9 @@ export async function resourceMediaImage(request: NextRequest, mediaId: string) 
     )
       throw new AppError("Rate limited", 429, "RATE_LIMIT_EXCEEDED");
     const actor = await authService.getSession(request.cookies.get("nexus_session")?.value);
-    const image = await resourceMediaRepository.authorizeImage(mediaId, actor?.id);
+    const image = await resourceMediaRepository.authorizeImage(mediaId, actor?.id, {
+      allowPaid: isWalletEngineEnabled(),
+    });
     if (activeReads >= 4) throw new AppError("Image delivery is busy", 503, "RESOURCE_MEDIA_BUSY");
     activeReads++;
     acquired = true;

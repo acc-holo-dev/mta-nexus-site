@@ -6,7 +6,7 @@ import {
   resourceMediaUrl,
 } from "@nexus/domain";
 import type { ResourceMediaCommand } from "@nexus/validation";
-import { and, asc, eq, sql } from "drizzle-orm";
+import { and, asc, eq, or, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, products, resourceMedia, users } from "../schema";
 import { safePublishedBuildCondition } from "./build-safety";
@@ -23,10 +23,16 @@ const selection = {
   width: resourceMedia.width,
   height: resourceMedia.height,
 };
-const publicCondition = () =>
+type PaidAccessOptions = { allowPaid?: boolean };
+const publicCondition = (options: PaidAccessOptions = {}) =>
   and(
     eq(products.status, "published"),
-    eq(products.price, 0),
+    options.allowPaid
+      ? or(
+          eq(products.price, 0),
+          and(sql`${products.price} > 0`, eq(products.licenseModel, "single_server")),
+        )
+      : eq(products.price, 0),
     sql`exists (select 1 from builds where ${safePublishedBuildCondition(sql`${products.id}`)})`,
   );
 const conflict = () => new AppError("Gallery changed; reload", 409, "RESOURCE_MEDIA_CONFLICT");
@@ -35,6 +41,7 @@ async function lockProduct(
   productId: string,
   actorId: string,
   staff = false,
+  options: PaidAccessOptions = {},
 ) {
   const [product] = await tx
     .select({
@@ -50,7 +57,10 @@ async function lockProduct(
     .where(eq(products.id, productId))
     .limit(1)
     .for("no key update");
-  if (product?.price !== 0) throw new NotFoundError("Resource", productId);
+  if (!product) throw new NotFoundError("Resource", productId);
+  if (product.price !== 0 && options.allowPaid !== true) {
+    throw new NotFoundError("Resource", productId);
+  }
   const authority = staff
     ? await assertBuildModerationAuthority(tx, actorId)
     : await assertProductMutationAuthority(tx, product, actorId);
@@ -88,26 +98,31 @@ function assertEditable(product: { status: string; updatedAt: Date }, expectedUp
   if (product.updatedAt.getTime() !== new Date(expectedUpdatedAt).getTime()) throw conflict();
 }
 export class ResourceMediaRepository {
-  async managed(productId: string, actorId: string, staff = false) {
+  async managed(
+    productId: string,
+    actorId: string,
+    staff = false,
+    options: PaidAccessOptions = {},
+  ) {
     return db.transaction(
       async (tx) => {
-        await lockProduct(tx, productId, actorId, staff);
+        await lockProduct(tx, productId, actorId, staff, options);
         return view(tx, productId);
       },
       { isolationLevel: "repeatable read" },
     );
   }
-  async publicItems(productId: string) {
+  async publicItems(productId: string, options: PaidAccessOptions = {}) {
     return db
       .select(selection)
       .from(resourceMedia)
       .innerJoin(products, eq(products.id, resourceMedia.productId))
-      .where(and(eq(products.id, productId), publicCondition()))
+      .where(and(eq(products.id, productId), publicCondition(options)))
       .orderBy(asc(resourceMedia.position), asc(resourceMedia.id))
       .limit(RESOURCE_MEDIA_LIMIT)
       .then((items) => items.map((item) => ({ ...item, url: resourceMediaUrl(item.id) })));
   }
-  async authorizeImage(mediaId: string, actorId?: string) {
+  async authorizeImage(mediaId: string, actorId?: string, options: PaidAccessOptions = {}) {
     return db.transaction(async (tx) => {
       const [image] = await tx
         .select({
@@ -124,7 +139,7 @@ export class ResourceMediaRepository {
       const [visible] = await tx
         .select({ id: products.id })
         .from(products)
-        .where(and(eq(products.id, image.productId), publicCondition()))
+        .where(and(eq(products.id, image.productId), publicCondition(options)))
         .limit(1);
       if (!visible) {
         if (!actorId) throw new NotFoundError("Image", mediaId);
@@ -134,7 +149,7 @@ export class ResourceMediaRepository {
           .from(users)
           .where(eq(users.id, actorId))
           .limit(1);
-        await lockProduct(tx, image.productId, actorId, actor?.role === "moderator");
+        await lockProduct(tx, image.productId, actorId, actor?.role === "moderator", options);
       }
       const [held] = await tx
         .select({ id: resourceMedia.id })
@@ -152,9 +167,12 @@ export class ResourceMediaRepository {
     expectedUpdatedAt: string;
     auditId: string;
     image: typeof resourceMedia.$inferInsert;
+    allowPaid?: boolean;
   }) {
     return db.transaction(async (tx) => {
-      const parent = await lockProduct(tx, input.productId, input.actorId);
+      const parent = await lockProduct(tx, input.productId, input.actorId, false, {
+        allowPaid: input.allowPaid,
+      });
       assertEditable(parent, input.expectedUpdatedAt);
       const items = await tx
         .select({
@@ -198,9 +216,12 @@ export class ResourceMediaRepository {
     actorId: string;
     auditId: string;
     command: ResourceMediaCommand;
+    allowPaid?: boolean;
   }) {
     return db.transaction(async (tx) => {
-      const parent = await lockProduct(tx, input.productId, input.actorId);
+      const parent = await lockProduct(tx, input.productId, input.actorId, false, {
+        allowPaid: input.allowPaid,
+      });
       assertEditable(parent, input.command.expectedUpdatedAt);
       const rows = await tx
         .select({

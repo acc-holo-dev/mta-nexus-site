@@ -54,7 +54,9 @@ export class ResourcePublicationReadinessRepository {
   async summary(
     productId: string,
     actor: Pick<User, "id" | "role">,
+    options: { allowPaid?: boolean } = {},
   ): Promise<ResourcePublicationReadinessSummary> {
+    const allowPaid = options.allowPaid === true;
     return db.transaction(
       async (tx) => {
         const [product] = await tx
@@ -71,7 +73,11 @@ export class ResourcePublicationReadinessRepository {
           })
           .from(products)
           .where(
-            and(eq(products.id, productId), eq(products.price, 0), managedProductCondition(actor)),
+            and(
+              eq(products.id, productId),
+              allowPaid ? undefined : eq(products.price, 0),
+              managedProductCondition(actor),
+            ),
           )
           .limit(1)
           .for("share");

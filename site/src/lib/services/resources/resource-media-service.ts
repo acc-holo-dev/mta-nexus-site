@@ -3,13 +3,23 @@ import { AppError } from "@nexus/domain";
 import { generateId } from "@nexus/security";
 import { storageService } from "@nexus/storage";
 import type { ResourceMediaCommand } from "@nexus/validation";
+import { isWalletEngineEnabled } from "../commerce/wallet-payment-service";
 import { buildScannerService } from "./build-scanner-service";
 import { normalizeResourceImage } from "./resource-image-normalization";
+
 export const resourceMediaService = {
   managed: (productId: string, actorId: string, staff = false) =>
-    resourceMediaRepository.managed(productId, actorId, staff),
+    resourceMediaRepository.managed(productId, actorId, staff, {
+      allowPaid: isWalletEngineEnabled(),
+    }),
   command: (productId: string, actorId: string, command: ResourceMediaCommand) =>
-    resourceMediaRepository.command({ productId, actorId, command, auditId: generateId("aud") }),
+    resourceMediaRepository.command({
+      productId,
+      actorId,
+      command,
+      auditId: generateId("aud"),
+      allowPaid: isWalletEngineEnabled(),
+    }),
   async upload(input: {
     productId: string;
     actorId: string;
@@ -42,6 +52,7 @@ export const resourceMediaService = {
         actorId: input.actorId,
         expectedUpdatedAt: input.expectedUpdatedAt,
         auditId: generateId("aud"),
+        allowPaid: isWalletEngineEnabled(),
         image: {
           id: generateId("rmi"),
           productId: input.productId,

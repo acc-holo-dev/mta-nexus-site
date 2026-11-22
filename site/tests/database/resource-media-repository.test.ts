@@ -116,8 +116,44 @@ it("public galleries require published free parents and genuinely scanned versio
   const query = state.queries[0];
   expect(query?.params).toContain("published");
   expect(query?.params).toContain("clean");
+  expect(query?.params).toContain(0);
   expect(query?.sql).toContain('"builds"."scanned_at" is not null');
   expect(query?.sql).not.toContain('"resource_media"."storage_key"');
+  expect(query?.sql).toMatch(/"price"\s*=/i);
+});
+it("includes paid single_server parents in public galleries when allowPaid is set", async () => {
+  state.rows = [[["rmi_a", "Paid caption", 0, 30, 20]]];
+  expect(await repo.publicItems("prd_a", { allowPaid: true })).toEqual([
+    {
+      id: "rmi_a",
+      caption: "Paid caption",
+      position: 0,
+      width: 30,
+      height: 20,
+      url: "/api/resource-media/rmi_a",
+    },
+  ]);
+  const query = state.queries[0];
+  expect(query?.params).toContain("single_server");
+  expect(query?.sql).toMatch(/"price"\s*>\s*0/i);
+});
+it("refuses managed access to paid parents unless allowPaid is set for the wallet engine", async () => {
+  const paid = ["prd_a", "Paid product", "draft", 500, "usr_a", null, stamp];
+  state.rows = [[paid]];
+  await expect(repo.managed("prd_a", "usr_a")).rejects.toMatchObject({ statusCode: 404 });
+  expect(state.queries).toHaveLength(1);
+
+  state.queries = [];
+  state.rows = [
+    [paid],
+    owner,
+    [["prd_a", "Paid product", "draft", stamp]],
+    [["rmi_a", "A", 0, 30, 20]],
+  ];
+  await expect(repo.managed("prd_a", "usr_a", false, { allowPaid: true })).resolves.toMatchObject({
+    product: { id: "prd_a" },
+    items: [{ id: "rmi_a" }],
+  });
 });
 it("refuses unpublished image bytes to an anonymous viewer before storage authority is returned", async () => {
   state.rows = [
