@@ -58,15 +58,22 @@ export async function HomePage() {
   const personalPreference = parseHomePersonalPreference(
     cookieStore.get(HOME_PERSONAL_COOKIE)?.value,
   );
-  let freeResourcesFailed = false;
   let articlesFailed = false;
   let nexusListingsFailed = false;
-  const [directory, freeResources, articles, nexusListings, personalSummary] = await Promise.all([
+  const resourcesTask = productService
+    .listProducts({ maxPrice: 0, sort: "popular", limit: 4 })
+    .then((products) => ({ products, failed: false as const }))
+    .catch(() => ({ products: [], failed: true as const }))
+    .then(async (result) => {
+      if (result.failed) return { ...result, attributions: new Map() };
+      return {
+        ...result,
+        attributions: await productService.getPublicAttributions(result.products),
+      };
+    });
+  const [directory, resources, articles, nexusListings, personalSummary] = await Promise.all([
     mtaMasterDirectoryService.getDirectory().catch(() => null),
-    productService.listProducts({ maxPrice: 0, sort: "popular", limit: 4 }).catch(() => {
-      freeResourcesFailed = true;
-      return [];
-    }),
+    resourcesTask,
     contentService.listArticles(4).catch(() => {
       articlesFailed = true;
       return [];
@@ -87,9 +94,9 @@ export async function HomePage() {
         }))
       : Promise.resolve(null),
   ]);
-  const resourceAttributions = freeResourcesFailed
-    ? new Map()
-    : await productService.getPublicAttributions(freeResources);
+  const freeResources = resources.products;
+  const freeResourcesFailed = resources.failed;
+  const resourceAttributions = resources.attributions;
   const playerSummary = directory ? summarizeKnownPlayers(directory.servers) : null;
   const numberLocale = locale === "ru" ? "ru-RU" : "en-US";
   const directoryTone = directory?.isStale
