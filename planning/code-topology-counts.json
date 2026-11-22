@@ -83,7 +83,7 @@
     "root_files": 0,
     "root_prefix_hotspots": [],
     "services_root_files": 0,
-    "tree_bytes": 629121,
+    "tree_bytes": 629306,
     "tree_files": 132
   },
   "packages_src_files": {
@@ -96,8 +96,8 @@
     "validation": 19
   },
   "scope": "Git-tracked blobs under site/ at source_sha (git ls-tree). Ignores untracked/ignored host files so CI and dirty worktrees match.",
-  "source_sha": "0bc95c1d311edd7f981ff97cba7bd92ae127178f",
+  "source_sha": "0ef9c76aace28ad54ce8c1e9c3748eeb63e637c4",
   "tests": {
-    "site_tests_files": 1755
+    "site_tests_files": 1756
   }
 }
