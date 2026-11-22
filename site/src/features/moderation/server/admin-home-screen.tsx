@@ -15,7 +15,6 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
-import { release2027Profile } from "../../../lib/platform/release-2027";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { adminService } from "../../../lib/services/moderation/admin-service";
 import { adSlotRendererEnabled, advertisingLifecycleEnabled } from "../../accounts/feature-flags";
@@ -47,42 +46,6 @@ import {
   AdminReportsSection,
   AdminVerificationQueueSection,
 } from "../admin-home";
-
-function Release2027Panel({ copy }: { copy: ReturnType<typeof getDictionary>["admin"] }) {
-  const profile = release2027Profile();
-  const wallet =
-    profile.siteWallet === "engine_and_withdraw"
-      ? copy.release2027WalletWithdraw
-      : profile.siteWallet === "engine"
-        ? copy.release2027WalletEngine
-        : copy.release2027WalletOff;
-  return (
-    <section className={panelP4} aria-labelledby="release-2027-profile">
-      <h2 id="release-2027-profile" className={typeSemiboldPrimary}>
-        {copy.release2027Title}
-      </h2>
-      <p className={typeMt05CaptionMuted}>{copy.release2027Hint}</p>
-      <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
-        <div>
-          <dt className={typeCaptionMuted}>{copy.release2027Currency}</dt>
-          <dd>{profile.displayCurrencies.join(", ")}</dd>
-        </div>
-        <div>
-          <dt className={typeCaptionMuted}>{copy.release2027Card}</dt>
-          <dd>{copy.release2027CardOff}</dd>
-        </div>
-        <div>
-          <dt className={typeCaptionMuted}>{copy.release2027Wallet}</dt>
-          <dd>{wallet}</dd>
-        </div>
-        <div>
-          <dt className={typeCaptionMuted}>{copy.release2027Queues}</dt>
-          <dd>{copy.release2027QueuesPaginated}</dd>
-        </div>
-      </dl>
-    </section>
-  );
-}
 
 export async function adminHomeMetadata(): Promise<Metadata> {
   return {
@@ -320,7 +283,6 @@ export async function AdminHomeScreen({
       </header>
 
       <AdminHealthStats copy={copy} counts={health.counts} />
-      <Release2027Panel copy={copy} />
 
       {showAdLifecycle ? (
         <AdminAdPlacementSection
