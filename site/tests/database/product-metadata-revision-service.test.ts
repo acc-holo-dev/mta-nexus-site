@@ -34,6 +34,7 @@ it("passes revision and audit together into the repository", async () => {
       targetId: "resource",
     }),
     revision,
+    { allowPaid: false },
   );
   expect(mocks.findManaged).not.toHaveBeenCalled();
 });
@@ -46,7 +47,7 @@ it("reports stale metadata only when current scope still permits management", as
     statusCode: 409,
     code: "PRODUCT_METADATA_CONFLICT",
   });
-  expect(mocks.findManaged).toHaveBeenCalledWith("resource", actor);
+  expect(mocks.findManaged).toHaveBeenCalledWith("resource", actor, { allowPaid: false });
 });
 it("does not leak a conflict after access is revoked", async () => {
   mocks.updateManagedDetails.mockResolvedValue(null);

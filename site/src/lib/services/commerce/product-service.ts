@@ -90,11 +90,15 @@ export class ProductService {
   }
 
   async listManagedProducts(actor: User, status?: Product["status"], page = 1) {
-    return productRepository.pageManaged(actor, status, page);
+    return productRepository.pageManaged(actor, status, page, {
+      allowPaid: isWalletEngineEnabled(),
+    });
   }
 
   async getManagedProduct(id: string, actor: User) {
-    return productRepository.findManaged(id, actor);
+    return productRepository.findManaged(id, actor, {
+      allowPaid: isWalletEngineEnabled(),
+    });
   }
 
   async getManagedHistory(id: string, actor: User, page = 1) {
@@ -109,6 +113,7 @@ export class ProductService {
     actor: User,
     expectedUpdatedAt?: Date,
   ) {
+    const allowPaid = isWalletEngineEnabled();
     const product = await productRepository.updateManagedDetails(
       id,
       actor,
@@ -123,10 +128,11 @@ export class ProductService {
         details: { fields: ["title", "shortDescription", "description", "tags"] },
       },
       expectedUpdatedAt,
+      { allowPaid },
     );
     if (!product) {
       // Reveal a revision conflict only while the actor still has management access.
-      if (expectedUpdatedAt && (await productRepository.findManaged(id, actor))) {
+      if (expectedUpdatedAt && (await productRepository.findManaged(id, actor, { allowPaid }))) {
         throw new AppError(
           "Resource details changed; reload before saving",
           409,

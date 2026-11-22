@@ -83,10 +83,12 @@ export class ProductRepository {
     actor: Pick<User, "id" | "role">,
     status?: Product["status"],
     requestedPage = 1,
+    options: { allowPaid?: boolean } = {},
   ) {
+    const allowPaid = options.allowPaid === true;
     const condition = and(
       managedProductCondition(actor),
-      eq(products.price, 0),
+      allowPaid ? undefined : eq(products.price, 0),
       status ? eq(products.status, status) : undefined,
     );
     const [summary] = await db.select({ total: count() }).from(products).where(condition);
@@ -106,11 +108,22 @@ export class ProductRepository {
     return { products: rows as unknown as Product[], total, page, totalPages };
   }
 
-  async findManaged(id: string, actor: Pick<User, "id" | "role">): Promise<Product | null> {
+  async findManaged(
+    id: string,
+    actor: Pick<User, "id" | "role">,
+    options: { allowPaid?: boolean } = {},
+  ): Promise<Product | null> {
+    const allowPaid = options.allowPaid === true;
     const rows = await db
       .select()
       .from(products)
-      .where(and(eq(products.id, id), eq(products.price, 0), managedProductCondition(actor)))
+      .where(
+        and(
+          eq(products.id, id),
+          allowPaid ? undefined : eq(products.price, 0),
+          managedProductCondition(actor),
+        ),
+      )
       .limit(1);
     return (rows[0] as unknown as Product) ?? null;
   }
@@ -121,7 +134,9 @@ export class ProductRepository {
     details: Pick<Product, "title" | "shortDescription" | "description" | "tags">,
     audit: Omit<AuditEvent, "createdAt">,
     expectedUpdatedAt?: Date,
+    options: { allowPaid?: boolean } = {},
   ): Promise<Product | null> {
+    const allowPaid = options.allowPaid === true;
     return db.transaction(async (tx) => {
       const [parent] = await tx
         .select({
@@ -131,7 +146,13 @@ export class ProductRepository {
           status: products.status,
         })
         .from(products)
-        .where(and(eq(products.id, id), eq(products.price, 0), managedProductCondition(actor)))
+        .where(
+          and(
+            eq(products.id, id),
+            allowPaid ? undefined : eq(products.price, 0),
+            managedProductCondition(actor),
+          ),
+        )
         .limit(1)
         .for("no key update");
       if (!parent) return null;
@@ -157,7 +178,7 @@ export class ProductRepository {
         .where(
           and(
             eq(products.id, id),
-            eq(products.price, 0),
+            allowPaid ? undefined : eq(products.price, 0),
             managedProductCondition(actor),
             expectedUpdatedAt
               ? sql`date_trunc('milliseconds', ${products.updatedAt}) = ${expectedUpdatedAt.toISOString()}::timestamptz`

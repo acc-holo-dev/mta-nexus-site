@@ -68,6 +68,14 @@ it("scopes the total and rows to manageable free resources before pagination", a
   expect(queries[0].sql).toContain("manage_products");
   expect(queries[0].sql).not.toContain('"builds"');
 });
+it("includes paid managed resources when allowPaid is set for the wallet engine", async () => {
+  await repository.pageManaged({ id: "author", role: "developer" }, undefined, 1, {
+    allowPaid: true,
+  });
+  const queries = state.conditions.map((condition) => dialect.sqlToQuery(condition));
+  expect(queries[0].params).not.toContain(0);
+  expect(queries[0].sql).not.toMatch(/"price"\s*=/i);
+});
 it.each(["admin", "moderator", "developer", "user"] as const)(
   "rechecks the live administrator role for a caller claiming %s",
   async (role) => {
