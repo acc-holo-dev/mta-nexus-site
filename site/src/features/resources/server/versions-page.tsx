@@ -10,6 +10,7 @@ import { unknownMarker } from "../../../lib/i18n/unknown";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { commerceService } from "../../../lib/services/commerce/commerce-service";
 import { productService } from "../../../lib/services/commerce/product-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { authEntryHref } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
@@ -69,7 +70,8 @@ export async function PublicResourceVersionsPage({
   const requestedPage = parseReleaseHistoryPage(query.page);
 
   // Unlike private publisher history, this selector rejects unpublished,
-  // paid, and missing resources *before* querying build rows.
+  // non-wallet paid, and missing resources *before* querying build rows.
+  // Wallet-eligible published single_server paid lines remain visible when the engine is on.
   let product: Awaited<ReturnType<typeof productService.getProductBySlug>> | null = null;
   try {
     product = await productService.getProductBySlug(slug);
@@ -135,6 +137,9 @@ export async function PublicResourceVersionsPage({
   }
 
   const returnPath = releaseHistoryHref(product.slug, history.page);
+  const walletPaidAcquire =
+    isWalletEngineEnabled() && product.price > 0 && product.licenseModel === "single_server";
+  const acquireLabel = walletPaidAcquire ? copy.acquireWallet : copy.acquire;
   const canDownload = user
     ? user.role === "admin"
       ? true
@@ -287,7 +292,7 @@ export async function PublicResourceVersionsPage({
               }`}
               className={linkAccentSmRounded}
             >
-              {copy.acquire}
+              {acquireLabel}
             </Link>
           ) : (
             <GuestAuthLinks

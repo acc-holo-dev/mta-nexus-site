@@ -41,6 +41,8 @@ export const releaseHistoryCopy = {
     unsigned: "No signature recorded",
     signIn: "Sign in to download",
     acquire: "Add this free resource to your library to download a build.",
+    acquireWallet:
+      "Complete site-wallet purchase on acquire to download a build. Card checkout stays off.",
     browse: "All versions",
     previous: "Previous",
     next: "Next",
@@ -77,6 +79,8 @@ export const releaseHistoryCopy = {
     unsigned: "Подпись не зарегистрирована",
     signIn: "Войти для скачивания",
     acquire: "Добавьте бесплатный ресурс в библиотеку для скачивания сборки.",
+    acquireWallet:
+      "Завершите покупку через site wallet на странице acquire, чтобы скачать сборку. Карточный checkout остаётся выключенным.",
     browse: "Все версии",
     previous: "Назад",
     next: "Далее",
