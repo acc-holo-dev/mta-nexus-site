@@ -10,6 +10,8 @@ const en = {
   pageLoading: "Loading reviews…",
   subtitle:
     "Reviews reflect acquired access, including free resources and legacy licenses. This does not confirm payment, install, or gameplay.",
+  walletSubtitle:
+    "Reviews reflect acquired access, including free claims, paid site-wallet grants when the wallet engine is on, and legacy licenses. This does not confirm payment capture, install, or gameplay.",
   published: "Published",
   withdrawn: "Withdrawn",
   removed: "Removed by moderation",
@@ -115,6 +117,8 @@ const ru: typeof en = {
   pageLoading: "Загрузка отзывов…",
   subtitle:
     "Отзывы опираются на доступ к ресурсу, включая бесплатные ресурсы и старые лицензии. Это не подтверждение оплаты, установки или игровой сессии.",
+  walletSubtitle:
+    "Отзывы опираются на доступ к ресурсу, включая бесплатные claim, платные выдачи через site wallet при включённом движке и старые лицензии. Это не подтверждение capture оплаты, установки или игровой сессии.",
   published: "Опубликован",
   withdrawn: "Отозван",
   removed: "Удалён модерацией",

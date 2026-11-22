@@ -48,6 +48,8 @@ export const libraryCopy = {
     previous: "Previous",
     next: "Next",
     note: "Your library reflects active grants only. Expired or revoked licenses do not grant access. This is not a record of purchases or payments.",
+    noteWallet:
+      "Your library reflects active grants only, including free claims and paid site-wallet settle when the wallet engine is on. Expired or revoked licenses do not grant access. This list is grants, not a payment ledger.",
   },
   ru: {
     title: "Библиотека ресурсов",
@@ -86,6 +88,8 @@ export const libraryCopy = {
     previous: "Назад",
     next: "Вперёд",
     note: "Библиотека показывает только действующие права. Истёкшие или отозванные лицензии не дают доступа. Это не история покупок или платежей.",
+    noteWallet:
+      "Библиотека показывает только действующие права, включая бесплатные claim и платный settle через site wallet при включённом движке. Истёкшие или отозванные лицензии не дают доступа. Этот список — права, а не платёжный ledger.",
   },
 } as const;
 

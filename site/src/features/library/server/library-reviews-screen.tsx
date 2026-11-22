@@ -92,7 +92,7 @@ export async function LibraryReviewsScreen({
         {copy.back}
       </Link>
       <h1 className={typeMinBreakDisplay}>{copy.own}</h1>
-      <p className={typeSmSecondary}>{copy.subtitle}</p>
+      <p className={typeSmSecondary}>{walletEnabled ? copy.walletSubtitle : copy.subtitle}</p>
       <Link href="/workspace/review-reports" className={linkAccentSmRounded}>
         {copy.reports}
       </Link>

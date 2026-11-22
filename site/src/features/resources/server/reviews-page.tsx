@@ -8,6 +8,7 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { productService } from "../../../lib/services/commerce/product-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { resourceReviewService } from "../../../lib/services/resources/resource-review-service";
 import { authEntryHref } from "../../shell/auth-return";
 import { GuestAuthLinks } from "../../shell/guest-auth";
@@ -37,6 +38,8 @@ export async function PublicResourceReviewsPage({
   const copy = resourceReviewCopy(locale);
   const dictionary = getDictionary(locale);
   const workspace = dictionary.workspace;
+  const walletEnabled = isWalletEngineEnabled();
+  const reviewSubtitle = walletEnabled ? copy.walletSubtitle : copy.subtitle;
   const pageQuery = resourceReviewPageQuery(query);
 
   let product: Awaited<ReturnType<typeof productService.getProductBySlug>> | null = null;
@@ -90,7 +93,7 @@ export async function PublicResourceReviewsPage({
         <h1 className="font-display">
           {copy.title} · {product.title}
         </h1>
-        <p className={typeSmSecondary}>{copy.subtitle}</p>
+        <p className={typeSmSecondary}>{reviewSubtitle}</p>
         <ErrorState
           title={copy.pageUnavailable}
           description={copy.pageUnavailableDescription}
@@ -112,7 +115,7 @@ export async function PublicResourceReviewsPage({
       <h1 className="font-display">
         {copy.title} · {product.title}
       </h1>
-      <p className={typeSmSecondary}>{copy.subtitle}</p>
+      <p className={typeSmSecondary}>{reviewSubtitle}</p>
       {sessionFailed ? (
         <ErrorState
           id="resource-reviews-session-unavailable"

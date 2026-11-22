@@ -170,7 +170,7 @@ export async function LibraryPageScreen({
           </nav>
 
           <p role="note" className={surfaceBgP4TextSmMuted}>
-            {copy.note}
+            {walletEnabled ? copy.noteWallet : copy.note}
           </p>
 
           {result.items.length === 0 ? (
