@@ -154,7 +154,7 @@ it("SSR-hydrates authenticated organization follow and mute", async () => {
 it.each(["en", "ru"] as const)("renders a paginated portfolio and total in %s", async (locale) => {
   state.locale = locale;
   const html = renderToStaticMarkup(await Page(input("2", "3")));
-  expect(state.products).toHaveBeenCalledWith("org", 2, 24);
+  expect(state.products).toHaveBeenCalledWith("org", 2, 24, { includeWalletPaidSingleServer: false });
   expect(html).toContain("120");
   expect(html).toContain("Later release");
   expect(html).toContain('href="/organizations/team?page=3&amp;articlePage=3#resources"');
@@ -168,7 +168,7 @@ it.each(["en", "ru"] as const)("renders a paginated portfolio and total in %s", 
 });
 it.each(["0", "bad", ["1", "2"]])("normalizes invalid page %j", async (page) => {
   await Page(input(page));
-  expect(state.products).toHaveBeenCalledWith("org", 1, 24);
+  expect(state.products).toHaveBeenCalledWith("org", 1, 24, { includeWalletPaidSingleServer: false });
 });
 it("does not query a missing organization portfolio", async () => {
   state.exists = false;
@@ -180,7 +180,7 @@ it("does not query a missing organization portfolio", async () => {
 it.each(["0", "bad", ["1", "2"]])("normalizes invalid article page %j", async (page) => {
   await Page(input("2", page));
   expect(state.content).toHaveBeenCalledWith("org", 1, 12);
-  expect(state.products).toHaveBeenCalledWith("org", 2, 24);
+  expect(state.products).toHaveBeenCalledWith("org", 2, 24, { includeWalletPaidSingleServer: false });
 });
 it("omits empty article sections and navigation", async () => {
   state.content.mockResolvedValue({ items: [], total: 0, page: 1, totalPages: 1 });
