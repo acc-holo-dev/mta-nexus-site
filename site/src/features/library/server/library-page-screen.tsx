@@ -82,6 +82,8 @@ export async function LibraryPageScreen({
   const releaseCopy = getReleaseHistoryCopy(locale);
   const walletEnabled = isWalletEngineEnabled();
   const marketHref = libraryMarketHref(walletEnabled);
+  const receiptsCopy = resourceCartReceiptsCopy(locale);
+  const receiptsTitle = walletEnabled ? receiptsCopy.walletTitle : receiptsCopy.title;
   const filter = parseLibraryFilter(query.filter);
   const page = parseLibraryPage(query.page);
   let user: Awaited<ReturnType<typeof authService.getSession>>;
@@ -140,7 +142,7 @@ export async function LibraryPageScreen({
           {resourceReleaseWatchesCopy(locale).title}
         </Link>
         <Link href="/workspace/acquisitions/receipts" className={linkAccentSm}>
-          {resourceCartReceiptsCopy(locale).title}
+          {receiptsTitle}
         </Link>
         <Link href="/workspace/library/reviews" className={linkAccentBorder}>
           {resourceReviewCopy(locale).own}

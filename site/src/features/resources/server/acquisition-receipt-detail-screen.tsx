@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { resourceCartReceiptsService } from "../../../lib/services/commerce/resource-cart-receipts-service";
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
@@ -34,6 +35,9 @@ export async function AcquisitionReceiptDetailScreen({
   const [locale, store, { id }] = await Promise.all([getRequestLocale(), cookies(), params]),
     copy = resourceCartReceiptsCopy(locale);
   const dictionary = getDictionary(locale);
+  const walletEnabled = isWalletEngineEnabled();
+  const receiptsTitle = walletEnabled ? copy.walletTitle : copy.title;
+  const receiptsNote = walletEnabled ? copy.walletNote : copy.note;
   let user: Awaited<ReturnType<typeof authService.getSession>>;
   try {
     user = await authService.getSession(store.get("nexus_session")?.value);
@@ -66,7 +70,7 @@ export async function AcquisitionReceiptDetailScreen({
     return (
       <div className={pageShellMax4xl}>
         <Link href="/workspace/acquisitions/receipts" className={linkAccentSmRounded}>
-          {copy.title}
+          {receiptsTitle}
         </Link>
         <ErrorState
           title={copy.loadUnavailable}
@@ -83,11 +87,11 @@ export async function AcquisitionReceiptDetailScreen({
   return (
     <div className={pageShellMax4xl}>
       <Link href="/workspace/acquisitions/receipts" className={linkAccentSmRounded}>
-        {copy.title}
+        {receiptsTitle}
       </Link>
       <h1 className={typeDisplayPrimary}>{copy.receipt}</h1>
       <p role="note" className={typeSmSecondary}>
-        {copy.note}
+        {receiptsNote}
       </p>
       <p className="break-all font-mono text-xs text-muted">{receipt.requestId}</p>
       <p>

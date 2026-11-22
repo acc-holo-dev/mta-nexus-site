@@ -3,6 +3,7 @@ import type { Locale } from "../../lib/i18n";
 const copy = {
   en: {
     title: "Free acquisition receipts",
+    walletTitle: "Cart acquisition receipts",
     loading: "Loading acquisition receipts…",
     loadUnavailable:
       "Acquisition receipts are temporarily unavailable. Saved receipts were not loaded.",
@@ -21,6 +22,8 @@ const copy = {
     reviewNote:
       "Review approved versions and declared requirements before adding resources. A changed selection requires another review. Requirements are declarations, not an installation or compatibility test.",
     note: "This receipt records a free library operation and the approved versions observed at that time. It confirms no payment or file delivery. Downloads recheck current access; saved version preferences are unchanged.",
+    walletNote:
+      "These receipts record free cart claims only and the approved versions observed then. Paid site-wallet settle is recorded on purchase history and acquire — not in this list. Card checkout stays off. Downloads recheck current access; saved version preferences are unchanged.",
     legacyNote:
       "This earlier receipt has no recorded version evidence. Current catalog data is not substituted for missing historical facts.",
     pending:
@@ -74,6 +77,7 @@ const copy = {
   },
   ru: {
     title: "Квитанции бесплатного получения",
+    walletTitle: "Квитанции получения из корзины",
     loading: "Загрузка квитанций получения…",
     loadUnavailable: "Квитанции получения временно недоступны. Сохранённые квитанции не загружены.",
     loadUnavailableHint:
@@ -91,6 +95,8 @@ const copy = {
     reviewNote:
       "Перед получением проверьте одобренные версии и заявленные требования. При изменении ресурсов потребуется новый просмотр. Требования указаны автором и не подтверждают установку или совместимость.",
     note: "Квитанция фиксирует бесплатное получение в библиотеку и одобренные версии на тот момент. Она не подтверждает оплату или передачу файла. Скачивание проверяет текущие права; выбор закреплённой версии не меняется.",
+    walletNote:
+      "Эти квитанции фиксируют только бесплатные claim из корзины и одобренные версии на тот момент. Платный settle через site wallet записывается в истории покупок и на acquire — не в этом списке. Карточный checkout остаётся выключенным. Скачивание проверяет текущие права; выбор закреплённой версии не меняется.",
     legacyNote:
       "В этой ранней квитанции версии не записаны. Текущие данные каталога не заменяют отсутствующие исторические сведения.",
     pending:

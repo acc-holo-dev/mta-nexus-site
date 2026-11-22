@@ -55,6 +55,8 @@ export async function PublisherAcquisitionsScreen({
   const dictionary = getDictionary(locale);
   const walletEnabled = isWalletEngineEnabled();
   const historyNote = walletEnabled ? copy.walletHistoryNote : copy.historyNote;
+  const receiptsCopy = resourceCartReceiptsCopy(locale);
+  const receiptsTitle = walletEnabled ? receiptsCopy.walletTitle : receiptsCopy.title;
   const page = acquisitionPage(query.page);
   const source = acquisitionSource(query.source);
   const retryHref = acquisitionHistoryHref(source, page);
@@ -110,7 +112,7 @@ export async function PublisherAcquisitionsScreen({
         </Link>
         <h1 className={typeDisplayPrimary}>{copy.history}</h1>
         <Link href="/workspace/acquisitions/receipts" className={linkAccentSmRounded}>
-          {resourceCartReceiptsCopy(locale).title}
+          {receiptsTitle}
         </Link>
         <p className={typeMax3xlSmSecondary} role="note">
           {historyNote}

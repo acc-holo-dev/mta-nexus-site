@@ -6,6 +6,7 @@ import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { resourceCartReceiptsService } from "../../../lib/services/commerce/resource-cart-receipts-service";
 import { formatHistoryDate } from "../../commerce/commerce-history-format";
 import { PlatformSignIn } from "../../shell/guest-auth";
@@ -30,8 +31,10 @@ import {
 } from "../resource-cart-receipts-query";
 
 export async function acquisitionReceiptsMetadata(): Promise<Metadata> {
+  const copy = resourceCartReceiptsCopy(await getRequestLocale());
+  const title = isWalletEngineEnabled() ? copy.walletTitle : copy.title;
   return {
-    title: `${resourceCartReceiptsCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    title: `${title} | MTA NEXUS`,
     robots: { index: false, follow: false },
   };
 }
@@ -44,6 +47,9 @@ export async function AcquisitionReceiptsScreen({
   const [locale, store, raw] = await Promise.all([getRequestLocale(), cookies(), searchParams]),
     copy = resourceCartReceiptsCopy(locale);
   const dictionary = getDictionary(locale);
+  const walletEnabled = isWalletEngineEnabled();
+  const receiptsTitle = walletEnabled ? copy.walletTitle : copy.title;
+  const receiptsNote = walletEnabled ? copy.walletNote : copy.note;
   let user: Awaited<ReturnType<typeof authService.getSession>>;
   try {
     user = await authService.getSession(store.get("nexus_session")?.value);
@@ -83,7 +89,7 @@ export async function AcquisitionReceiptsScreen({
           description={copy.invalidHint}
           action={
             <Link href="/workspace/acquisitions/receipts" className={linkAccentSmRounded}>
-              {copy.title}
+              {receiptsTitle}
             </Link>
           }
         />
@@ -130,9 +136,9 @@ export async function AcquisitionReceiptsScreen({
           {copy.library}
         </Link>
       </nav>
-      <h1 className={typeDisplayPrimary}>{copy.title}</h1>
+      <h1 className={typeDisplayPrimary}>{receiptsTitle}</h1>
       <p role="note" className={typeSmSecondary}>
-        {copy.note}
+        {receiptsNote}
       </p>
       <form
         method="get"
@@ -177,7 +183,7 @@ export async function AcquisitionReceiptsScreen({
       {!result.items.length ? (
         <EmptyState
           title={result.total === 0 && !receiptsFiltered ? copy.emptyNever : copy.emptyFiltered}
-          description={copy.note}
+          description={receiptsNote}
           action={
             result.total === 0 && !receiptsFiltered ? undefined : (
               <Link href="/workspace/acquisitions/receipts" className={linkAccentSmRounded}>
