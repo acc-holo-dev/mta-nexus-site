@@ -292,17 +292,18 @@ export const product = {
     licenseModel: "Access model",
     totalDue: "Library cost",
     freeResource: "Free library access",
-    paidCheckout: "Paid resources disabled",
+    paidCheckout: "Paid settle unavailable",
     noPaymentRequired: "No payment details are required.",
     paidDisabled:
-      "Paid resources are disabled during the open free beta. No payment attempt will be created.",
+      "Paid settle stays off unless the site wallet engine is on for a single-server listing. No card or live payment-provider attempt is created.",
     paidDisabledHint:
-      "No payment attempt is created during the open free beta. Use free library acquisition instead.",
+      "Card and live PSP checkout stay disabled. When the site wallet engine is on, eligible paid single-server listings settle through the site wallet on acquire; otherwise use free library acquisition.",
     adding: "Adding resource...",
     addToLibrary: "Add to library",
     paidUnavailable: "Paid resources unavailable",
     noSimulatedPayments: "No checkout or simulated payment is created",
-    paidNotAvailable: "Paid resources are not available during the open free beta.",
+    paidNotAvailable:
+      "Paid settle is unavailable unless the site wallet engine is on for this listing. No card or live payment-provider attempt is created.",
     productNotFound: "Resource not found",
     loadFailed: "Could not load the resource. Please try again.",
     retry: "Try again",
