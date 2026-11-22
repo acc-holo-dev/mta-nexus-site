@@ -65,7 +65,7 @@ function Release2027Panel({ copy }: { copy: ReturnType<typeof getDictionary>["ad
       <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
         <div>
           <dt className={typeCaptionMuted}>{copy.release2027Currency}</dt>
-          <dd>{profile.settlementCurrency}</dd>
+          <dd>{profile.displayCurrencies.join(", ")}</dd>
         </div>
         <div>
           <dt className={typeCaptionMuted}>{copy.release2027Card}</dt>

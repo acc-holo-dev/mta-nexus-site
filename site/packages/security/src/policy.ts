@@ -82,10 +82,11 @@ export function can(
 
   // Base permission checks by action
   switch (action) {
-    case "admin.access":
     case "admin.moderation":
+      return user.role === "moderator";
+    case "admin.access":
     case "admin.audit":
-      return action === "admin.moderation" && user.role === "moderator";
+      return false;
 
     case "product.create":
       return user.role === "developer" || user.isVerified;

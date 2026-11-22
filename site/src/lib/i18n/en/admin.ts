@@ -14,7 +14,7 @@ export const admin = {
     release2027Title: "2027 release profile",
     release2027Hint:
       "What this build can run for daily community load. Card checkout stays off. Site wallet stays dark until its flags are set. This panel is not a production deploy.",
-    release2027Currency: "Settlement currency",
+    release2027Currency: "Wallet currencies",
     release2027Card: "Card checkout",
     release2027CardOff: "Disabled",
     release2027Wallet: "Site wallet",
