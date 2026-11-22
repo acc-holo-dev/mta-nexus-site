@@ -93,6 +93,7 @@ export async function OrganizationProfilePage({
       organization.id,
       parseProfilePage(query?.page),
       24,
+      { includeWalletPaidSingleServer: walletEnabled },
     ),
     contentRepository.pagePublishedEditorialByOrganization(
       organization.id,

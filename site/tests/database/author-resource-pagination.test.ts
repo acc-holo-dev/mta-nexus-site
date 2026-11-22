@@ -107,3 +107,12 @@ it("scopes organization pages before counting and limiting", async () => {
   expect(state.limit).toBe(24);
   expect(state.offset).toBe(24);
 });
+it("includes paid single_server portfolio lines when includeWalletPaidSingleServer is set", async () => {
+  await repository.pagePublishedFreeByAuthor("author", 1, 24, {
+    includeWalletPaidSingleServer: true,
+  });
+  const queries = state.conditions.map((condition) => dialect.sqlToQuery(condition));
+  expect(queries[0].sql).toMatch(/"price"\s*>\s*0/i);
+  expect(queries[0].sql).toContain("license_model");
+  expect(queries[0].params).toContain("single_server");
+});

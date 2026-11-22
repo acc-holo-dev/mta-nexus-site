@@ -202,33 +202,56 @@ export class ProductRepository {
     });
   }
 
-  async pagePublishedFreeByAuthor(authorId: string, requestedPage = 1, requestedSize = 24) {
-    return this.pagePublishedFree(eq(products.authorId, authorId), requestedPage, requestedSize);
+  async pagePublishedFreeByAuthor(
+    authorId: string,
+    requestedPage = 1,
+    requestedSize = 24,
+    options: { includeWalletPaidSingleServer?: boolean } = {},
+  ) {
+    return this.pagePublishedFree(
+      eq(products.authorId, authorId),
+      requestedPage,
+      requestedSize,
+      options,
+    );
   }
 
   async pagePublishedFreeByOrganization(
     organizationId: string,
     requestedPage = 1,
     requestedSize = 24,
+    options: { includeWalletPaidSingleServer?: boolean } = {},
   ) {
     return this.pagePublishedFree(
       eq(products.organizationId, organizationId),
       requestedPage,
       requestedSize,
+      options,
     );
   }
 
-  private async pagePublishedFree(scope: SQL, requestedPage: number, requestedSize: number) {
+  private async pagePublishedFree(
+    scope: SQL,
+    requestedPage: number,
+    requestedSize: number,
+    options: { includeWalletPaidSingleServer?: boolean } = {},
+  ) {
     const pageSize = Number.isFinite(requestedSize)
       ? Math.min(Math.max(Math.floor(requestedSize), 1), 100)
       : 24;
     const requested = Number.isFinite(requestedPage)
       ? Math.min(Math.max(Math.floor(requestedPage), 1), Number.MAX_SAFE_INTEGER)
       : 1;
+    const priceCondition = options.includeWalletPaidSingleServer
+      ? or(
+          eq(products.price, 0),
+          and(sql`${products.price} > 0`, eq(products.licenseModel, "single_server")),
+        )
+      : eq(products.price, 0);
     const condition = and(
       scope,
       eq(products.status, "published"),
-      eq(products.price, 0),
+      priceCondition,
       hasSafePublishedBuild(),
     );
     const [summary] = await db.select({ total: count() }).from(products).where(condition);

@@ -82,7 +82,9 @@ export async function DeveloperProfileScreen({
   const sessionToken = (await getRequestCookieStore()).get("nexus_session")?.value;
   let loadError = false;
   const loaded = await Promise.all([
-    productRepository.pagePublishedFreeByAuthor(user.id, requestedPage, 24),
+    productRepository.pagePublishedFreeByAuthor(user.id, requestedPage, 24, {
+      includeWalletPaidSingleServer: walletEnabled,
+    }),
     verificationWorkspaceService.publicProfile(user.id).catch(() => null),
     profilePrivacyService.visibility(user.id),
     authService.getSession(sessionToken).catch(() => undefined),

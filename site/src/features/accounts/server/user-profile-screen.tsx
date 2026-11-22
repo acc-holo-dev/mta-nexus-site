@@ -15,6 +15,7 @@ import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n/serve
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { profilePrivacyService } from "../../../lib/services/accounts/profile-privacy-service";
 import { productService } from "../../../lib/services/commerce/product-service";
+import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
 import { verificationWorkspaceService } from "../../../lib/services/moderation/verification-workspace-service";
 import {
   indexMtaObservations,
@@ -86,6 +87,7 @@ export async function UserProfileScreen({
   const dictionary = getDictionary(locale);
   const copy = dictionary.profiles;
   const privacyCopy = profilePrivacyCopy(locale);
+  const walletEnabled = isWalletEngineEnabled();
 
   if (!user) {
     notFound();
@@ -100,7 +102,9 @@ export async function UserProfileScreen({
   const profileHref = `/users/${encodeURIComponent(user.username)}`;
   let loadError = false;
   const loaded = await Promise.all([
-    productRepository.pagePublishedFreeByAuthor(user.id, resourcePageNumber, 24),
+    productRepository.pagePublishedFreeByAuthor(user.id, resourcePageNumber, 24, {
+      includeWalletPaidSingleServer: walletEnabled,
+    }),
     serverRepository.pageActivePublicByOwner(user.id, serverPageNumber, 12),
     user.role === "developer" || user.role === "admin"
       ? verificationWorkspaceService.publicProfile(user.id).catch(() => null)
