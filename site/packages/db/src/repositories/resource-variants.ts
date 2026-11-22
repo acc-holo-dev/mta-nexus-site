@@ -8,7 +8,7 @@ import {
   sameResourcePublisher,
   type User,
 } from "@nexus/domain";
-import { and, asc, eq, inArray, ne, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, ne, or, sql } from "drizzle-orm";
 import { type AnyPgColumn, alias } from "drizzle-orm/pg-core";
 import { db } from "../client";
 import {
@@ -21,11 +21,27 @@ import {
 import { assertProductMutationAuthority } from "./product-mutation-authority";
 import { managedProductCondition } from "./products";
 
+type PaidAccessOptions = { allowPaid?: boolean };
+const freeOnlyPrice = (options: PaidAccessOptions = {}) =>
+  options.allowPaid === true ? undefined : eq(products.price, 0);
 const anchor = alias(products, "variant_anchor");
-function publicResource(table: { id: AnyPgColumn; status: AnyPgColumn; price: AnyPgColumn }) {
+function publicResource(
+  table: {
+    id: AnyPgColumn;
+    status: AnyPgColumn;
+    price: AnyPgColumn;
+    licenseModel: AnyPgColumn;
+  },
+  options: PaidAccessOptions = {},
+) {
   return and(
     eq(table.status, "published"),
-    eq(table.price, 0),
+    options.allowPaid
+      ? or(
+          eq(table.price, 0),
+          and(sql`${table.price} > 0`, eq(table.licenseModel, "single_server")),
+        )
+      : eq(table.price, 0),
     sql`exists (
     select 1 from ${builds} where ${builds.productId} = ${table.id}
       and ${builds.status} = 'published' and ${builds.scanStatus} = 'clean'
@@ -50,7 +66,10 @@ const conflict = () =>
   new AppError("Variant group changed; reload", 409, "RESOURCE_VARIANTS_CONFLICT");
 
 export class ResourceVariantsRepository {
-  async publicVariants(productId: string): Promise<PublicResourceVariants | null> {
+  async publicVariants(
+    productId: string,
+    options: PaidAccessOptions = {},
+  ): Promise<PublicResourceVariants | null> {
     return db.transaction(
       async (tx) => {
         // Even the starting membership is discovered only from a live public resource.
@@ -66,8 +85,8 @@ export class ResourceVariantsRepository {
           .where(
             and(
               eq(products.id, productId),
-              publicResource(products),
-              publicResource(anchor),
+              publicResource(products, options),
+              publicResource(anchor, options),
               samePublisher,
             ),
           )
@@ -85,7 +104,7 @@ export class ResourceVariantsRepository {
           .where(
             and(
               eq(productVariantMembers.groupId, group.id),
-              publicResource(products),
+              publicResource(products, options),
               samePublisher,
             ),
           )
@@ -100,6 +119,7 @@ export class ResourceVariantsRepository {
   async managed(
     productId: string,
     actor: Pick<User, "id" | "role">,
+    options: PaidAccessOptions = {},
   ): Promise<ManagedResourceVariants> {
     return db.transaction(
       async (tx) => {
@@ -111,7 +131,7 @@ export class ResourceVariantsRepository {
           })
           .from(products)
           .where(
-            and(eq(products.id, productId), eq(products.price, 0), managedProductCondition(actor)),
+            and(eq(products.id, productId), freeOnlyPrice(options), managedProductCondition(actor)),
           )
           .limit(1);
         if (!product) throw new NotFoundError("Resource", productId);
@@ -136,7 +156,7 @@ export class ResourceVariantsRepository {
           .where(
             and(
               eq(products.id, group.anchorProductId),
-              eq(products.price, 0),
+              freeOnlyPrice(options),
               managedProductCondition(actor),
             ),
           )
@@ -156,7 +176,7 @@ export class ResourceVariantsRepository {
             and(
               eq(productVariantMembers.groupId, group.id),
               samePublisher,
-              eq(products.price, 0),
+              freeOnlyPrice(options),
               managedProductCondition(actor),
             ),
           )
@@ -176,13 +196,20 @@ export class ResourceVariantsRepository {
     );
   }
 
-  async candidates(productId: string, actor: Pick<User, "id" | "role">, requestedPage = 1) {
+  async candidates(
+    productId: string,
+    actor: Pick<User, "id" | "role">,
+    requestedPage = 1,
+    options: PaidAccessOptions = {},
+  ) {
     const page =
       Number.isSafeInteger(requestedPage) && requestedPage > 0 ? Math.min(requestedPage, 1000) : 1;
     const [owner] = await db
       .select({ authorId: products.authorId, organizationId: products.organizationId })
       .from(products)
-      .where(and(eq(products.id, productId), eq(products.price, 0), managedProductCondition(actor)))
+      .where(
+        and(eq(products.id, productId), freeOnlyPrice(options), managedProductCondition(actor)),
+      )
       .limit(1);
     if (!owner) throw new NotFoundError("Resource", productId);
     const [group] = await db
@@ -200,7 +227,7 @@ export class ResourceVariantsRepository {
       .from(products)
       .where(
         and(
-          eq(products.price, 0),
+          freeOnlyPrice(options),
           managedProductCondition(actor),
           owner.organizationId !== null
             ? eq(products.organizationId, owner.organizationId)
@@ -221,8 +248,10 @@ export class ResourceVariantsRepository {
     groupId: string;
     auditId: string;
     command: ResourceVariantCommand;
+    allowPaid?: boolean;
   }) {
     const command = input.command;
+    const allowPaid = input.allowPaid === true;
     if (
       command.action === "save" &&
       !command.variants.some((row) => row.productId === input.productId)
@@ -263,7 +292,8 @@ export class ResourceVariantsRepository {
           .orderBy(asc(products.id))
           .for("no key update");
         const parent = locked.find((row) => row.id === input.productId);
-        if (parent?.price !== 0) throw new NotFoundError("Resource", input.productId);
+        if (!parent || (parent.price !== 0 && !allowPaid))
+          throw new NotFoundError("Resource", input.productId);
         const actor = await assertProductMutationAuthority(tx, parent, input.actorId);
         const [group] = await tx
           .select()
@@ -290,7 +320,11 @@ export class ResourceVariantsRepository {
         } else {
           for (const row of command.variants) {
             const target = locked.find((product) => product.id === row.productId);
-            if (target?.price !== 0 || !sameResourcePublisher(parent, target))
+            if (
+              !target ||
+              (target.price !== 0 && !allowPaid) ||
+              !sameResourcePublisher(parent, target)
+            )
               throw new NotFoundError("Resource", row.productId);
           }
           const [occupied] = await tx

@@ -107,6 +107,33 @@ it("scopes managed reads before discovering group membership", async () => {
   await expect(variants.managed("prd_private", actor)).rejects.toMatchObject({ statusCode: 404 });
   expect(state.queries).toHaveLength(1);
   expect(state.queries[0].sql).toContain("manage_products");
+  expect(state.queries[0].sql).toMatch(/"price"\s*=/i);
+});
+it("includes paid managed variants when allowPaid is set for the wallet engine", async () => {
+  state.results = [[]];
+  await expect(variants.managed("prd_paid", actor, { allowPaid: true })).rejects.toMatchObject({
+    statusCode: 404,
+  });
+  expect(state.queries[0].sql).not.toMatch(/"price"\s*=/i);
+});
+it("includes paid single_server parents in public variants when allowPaid is set", async () => {
+  state.results = [[["vgrp_a", "Editions"]], [["prd_a", "Base", "Resource", "resource", "1.0.0"]]];
+  expect(await variants.publicVariants("prd_a", { allowPaid: true })).toEqual({
+    title: "Editions",
+    variants: [
+      {
+        productId: "prd_a",
+        label: "Base",
+        title: "Resource",
+        slug: "resource",
+        currentVersion: "1.0.0",
+      },
+    ],
+  });
+  const sql = state.queries.map((query) => query.sql).join("\n");
+  expect(sql).toMatch(/"price"\s*>\s*0/i);
+  expect(sql).toContain("license_model");
+  expect(state.queries.some((query) => query.params.includes("single_server"))).toBe(true);
 });
 it("bounds candidates and excludes resources attached to another group", async () => {
   state.results = [[[actor.id, null]], [["vgrp_a"]], []];
