@@ -280,6 +280,7 @@ it("binds the actor and generated audit identity server-side and returns only co
     groupId: expect.stringMatching(/^vgrp_/),
     auditId: expect.stringMatching(/^aud_/),
     command,
+    allowPaid: false,
   });
 });
 it("preserves private not-found and concurrency errors", async () => {
@@ -303,7 +304,7 @@ it("bounds candidate paging and rejects ambiguous repeated parameters", async ()
   expect(
     (await candidates(request("/api/products/prd_a/variants/candidates?page=2"), context)).status,
   ).toBe(200);
-  expect(state.candidates).toHaveBeenCalledWith("prd_a", state.user, 2);
+  expect(state.candidates).toHaveBeenCalledWith("prd_a", state.user, 2, { allowPaid: false });
 });
 it("returns audited requirements without expanding the private product projection", async () => {
   const result = {
@@ -326,6 +327,7 @@ it("returns audited requirements without expanding the private product projectio
     auditId: expect.stringMatching(/^aud_/),
     expectedUpdatedAt: revision,
     compatibility: { dependencies: ["resource-b"] },
+    allowPaid: false,
   });
 });
 function reviewFixture() {

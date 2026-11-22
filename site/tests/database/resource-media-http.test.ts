@@ -145,7 +145,7 @@ it("serves only fully verified PNG bytes with private no-store and browser safet
   expect(response.headers.get("X-Content-Type-Options")).toBe("nosniff");
   expect(response.headers.get("Cross-Origin-Resource-Policy")).toBe("same-origin");
   expect(response.headers.get("Vary")).toBe("Cookie");
-  expect(state.authorize).toHaveBeenCalledWith("rmi_a", undefined);
+  expect(state.authorize).toHaveBeenCalledWith("rmi_a", undefined, { allowPaid: false });
 });
 it("never opens storage after public/private authorization is refused", async () => {
   state.authorize.mockRejectedValue(new AppError("Missing", 404, "NOT_FOUND"));

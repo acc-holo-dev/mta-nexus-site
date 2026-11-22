@@ -41,6 +41,7 @@ it("authenticates and bounds inventory/history before returning private no-store
     "usr_a",
     expect.objectContaining({ scope: "personal", status: "draft", page: 2 }),
     2,
+    { allowPaid: false },
   );
   expect(
     (
