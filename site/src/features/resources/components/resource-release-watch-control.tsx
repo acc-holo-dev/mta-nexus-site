@@ -30,6 +30,8 @@ export function ResourceReleaseWatchControl({
   returnPath,
   /** Public detail shows full effective-state copy; library embeds keep outer notes. */
   surface = "embedded",
+  /** Paid wallet listing: acquire prompt names site-wallet settle instead of free claim. */
+  walletPaidAcquire = false,
 }: {
   watch: ResourceReleaseWatch;
   available?: boolean;
@@ -41,6 +43,7 @@ export function ResourceReleaseWatchControl({
   guest?: boolean;
   returnPath?: string | null;
   surface?: "detail" | "embedded";
+  walletPaidAcquire?: boolean;
 }) {
   const { locale } = useNexusLocale(),
     copy = resourceReleaseWatchesCopy(locale),
@@ -72,10 +75,13 @@ export function ResourceReleaseWatchControl({
   }, [returnPath]);
 
   const canToggle = hasAccess && (available || watch.enabled);
+  const acquireRequiredLabel = walletPaidAcquire
+    ? copy.acquireRequiredWallet
+    : copy.acquireRequired;
   const disabledReason = guest
     ? null
     : !hasAccess
-      ? copy.acquireRequired
+      ? acquireRequiredLabel
       : !available && !watch.enabled
         ? copy.noSafeBuild
         : null;
@@ -206,7 +212,7 @@ export function ResourceReleaseWatchControl({
       {disabledReason ? <ErrorState title={disabledReason} description={copy.blockedHint} /> : null}
       {!hasAccess && acquireHref ? (
         <Link href={acquireHref} className={linkAccentSm}>
-          {copy.acquireRequired}
+          {acquireRequiredLabel}
         </Link>
       ) : null}
       {!pending && (

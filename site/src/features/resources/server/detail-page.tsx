@@ -526,6 +526,27 @@ export async function ProductDetailPage({
                     signedIn={Boolean(user)}
                     signInHref={authEntryHref("login", detailReturnPath)}
                   />
+                  <section className="space-y-2 rounded-lg border border-base bg-surface p-3">
+                    <h3 className="text-xs font-semibold uppercase text-primary">
+                      {watchCopy.title}
+                    </h3>
+                    <ResourceReleaseWatchControl
+                      key={`watch-wallet-noaccess:${product.id}`}
+                      watch={watchState}
+                      available={false}
+                      commerceEnabled={commerceEnabled}
+                      hasAccess={false}
+                      walletPaidAcquire
+                      acquireHref={`/acquire?productId=${product.id}${
+                        versionHelpBuild?.status === "published"
+                          ? `&buildId=${encodeURIComponent(versionHelpBuild.id)}`
+                          : ""
+                      }`}
+                      guest={!user}
+                      surface="detail"
+                      returnPath={detailReturnPath}
+                    />
+                  </section>
                 </div>
               ) : (
                 <ErrorState
