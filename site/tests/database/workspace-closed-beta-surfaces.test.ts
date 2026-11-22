@@ -105,11 +105,15 @@ describe("open free-beta workspace behavior", () => {
       role: "user",
     };
     await SavedPage({});
-    expect(repos.saved).toHaveBeenCalledWith("usr_saved", {
-      query: "",
-      type: undefined,
-      cursor: undefined,
-    });
+    expect(repos.saved).toHaveBeenCalledWith(
+      "usr_saved",
+      {
+        query: "",
+        type: undefined,
+        cursor: undefined,
+      },
+      { includeWalletPaidSingleServer: false },
+    );
     expect(repos.follows).not.toHaveBeenCalled();
     expect(repos.products).not.toHaveBeenCalled();
     expect(repos.servers).not.toHaveBeenCalled();

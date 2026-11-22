@@ -61,7 +61,9 @@ it("accepts a cursor again only with its original source and normalized filters"
   state.page.mockClear();
   await service.page(scope, query);
   expect(state.page).toHaveBeenCalledOnce();
-  expect(state.page).toHaveBeenCalledWith(scope, query);
+  expect(state.page).toHaveBeenCalledWith(scope, query, {
+    includeWalletPaidSingleServer: false,
+  });
 });
 it.each([
   { scope: { kind: "server" as const, id: "other" }, filters: {} },
