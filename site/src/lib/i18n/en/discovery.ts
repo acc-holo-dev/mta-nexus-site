@@ -25,9 +25,15 @@ export const discovery = {
     directoryPanelUnavailableHint:
       "Retry reloads this Home network panel only. A temporary directory failure is not an empty server list.",
     resourcesTitle: "Free resources",
+    resourcesTitleWallet: "Free showcase",
     resourcesDescription: "Community resources you can add without payment",
+    resourcesDescriptionWallet:
+      "A free sample from the catalog. Paid listings settle through the site wallet on the full market when the wallet engine is on; card checkout stays off.",
     viewAllResources: "View all free resources",
+    browseFullMarket: "Browse full market",
     noResources: "The first free resources are being prepared.",
+    noResourcesWallet:
+      "No free showcase listings are ready yet. The full market can still include paid site-wallet listings when the wallet engine is on.",
     updatesTitle: "Community updates",
     updatesDescription: "News, guides, and development notes from the MTA ecosystem",
     allUpdates: "All updates",

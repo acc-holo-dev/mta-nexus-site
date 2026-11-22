@@ -22,7 +22,7 @@ import { HomePersonalChangesPanel } from "../home-personal";
 import { loadPersonalChangesSummary } from "../home-personal-changes-server";
 import { HOME_PERSONAL_COOKIE, parseHomePersonalPreference } from "../home-personal-preference";
 import { linkAccentSm, linkAccentXsSemiboldHover } from "../link-shell";
-import { typeIcon35 } from "../type-shell";
+import { typeFlexWrapCenterGap3, typeIcon35 } from "../type-shell";
 
 function summarizeKnownPlayers(servers: readonly MtaMasterServer[]) {
   let sum = 0;
@@ -250,20 +250,38 @@ export async function HomePage() {
 
       <section aria-labelledby="home-free-resources-heading">
         <SectionHeader
-          title={dictionary.home.resourcesTitle}
-          description={dictionary.home.resourcesDescription}
+          title={
+            walletEnabled ? dictionary.home.resourcesTitleWallet : dictionary.home.resourcesTitle
+          }
+          description={
+            walletEnabled
+              ? dictionary.home.resourcesDescriptionWallet
+              : dictionary.home.resourcesDescription
+          }
           titleId="home-free-resources-heading"
           action={
-            <Link href="/market?maxPrice=0" className={linkAccentXsSemiboldHover}>
-              <span>{dictionary.home.viewAllResources}</span>
-              <ArrowRight className={typeIcon35} />
-            </Link>
+            <div className={typeFlexWrapCenterGap3}>
+              <Link href="/market?maxPrice=0" className={linkAccentXsSemiboldHover}>
+                <span>{dictionary.home.viewAllResources}</span>
+                <ArrowRight className={typeIcon35} />
+              </Link>
+              {walletEnabled ? (
+                <Link href="/market" className={linkAccentXsSemiboldHover}>
+                  <span>{dictionary.home.browseFullMarket}</span>
+                  <ArrowRight className={typeIcon35} />
+                </Link>
+              ) : null}
+            </div>
           }
         />
         {freeResourcesFailed ? (
           <ErrorState
             id="home-free-resources-unavailable"
-            title={dictionary.market.loadUnavailable}
+            title={
+              walletEnabled
+                ? dictionary.market.walletLoadUnavailable
+                : dictionary.market.loadUnavailable
+            }
             description={dictionary.market.loadUnavailableHint}
           />
         ) : freeResources.length > 0 ? (
@@ -280,8 +298,14 @@ export async function HomePage() {
         ) : (
           <div id="home-free-resources-empty">
             <EmptyState
-              title={dictionary.home.noResources}
-              description={dictionary.home.resourcesDescription}
+              title={
+                walletEnabled ? dictionary.home.noResourcesWallet : dictionary.home.noResources
+              }
+              description={
+                walletEnabled
+                  ? dictionary.home.resourcesDescriptionWallet
+                  : dictionary.home.resourcesDescription
+              }
             />
           </div>
         )}
