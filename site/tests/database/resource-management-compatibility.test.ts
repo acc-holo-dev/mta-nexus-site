@@ -101,6 +101,32 @@ it("denies suspended-resource requirements changes", async () => {
     }),
   ).rejects.toMatchObject({ code: "PRODUCT_STATE_CHANGED" });
 });
+it("refuses paid parents unless allowPaid is set for the wallet engine", async () => {
+  state.results = [[row(products, { ...parent, price: 500 })]];
+  await expect(
+    compatibility.update({
+      ...input,
+      expectedUpdatedAt: revision,
+      compatibility: { dependencies: [] },
+    }),
+  ).rejects.toMatchObject({ statusCode: 404 });
+  expect(state.queries).toHaveLength(1);
+
+  state.results = [
+    [row(products, { ...parent, price: 500 })],
+    [[input.actorId, "developer"]],
+    [["prd_a", updated, { dependencies: [] }]],
+    [],
+  ];
+  await expect(
+    compatibility.update({
+      ...input,
+      expectedUpdatedAt: revision,
+      compatibility: { dependencies: [] },
+      allowPaid: true,
+    }),
+  ).resolves.toMatchObject({ id: "prd_a" });
+});
 it("confirms exactly the requested group identity/revision and saved compatibility", () => {
   expect(
     confirmedVariantCommand(

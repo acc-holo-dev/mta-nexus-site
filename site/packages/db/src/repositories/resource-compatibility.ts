@@ -11,7 +11,9 @@ export class ResourceCompatibilityRepository {
     auditId: string;
     expectedUpdatedAt: string;
     compatibility: Product["compatibility"];
+    allowPaid?: boolean;
   }) {
+    const allowPaid = input.allowPaid === true;
     return db.transaction(async (tx) => {
       const [product] = await tx
         .select()
@@ -19,7 +21,8 @@ export class ResourceCompatibilityRepository {
         .where(eq(products.id, input.productId))
         .limit(1)
         .for("no key update");
-      if (product?.price !== 0) throw new NotFoundError("Resource", input.productId);
+      if (!product || (product.price !== 0 && !allowPaid))
+        throw new NotFoundError("Resource", input.productId);
       const actor = await assertProductMutationAuthority(tx, product, input.actorId);
       if (new Date(product.updatedAt).toISOString() !== input.expectedUpdatedAt)
         throw new AppError("Resource changed; reload", 409, "PRODUCT_METADATA_CONFLICT");

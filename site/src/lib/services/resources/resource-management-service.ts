@@ -39,6 +39,7 @@ export const resourceManagementService = {
       productId,
       actorId: actor.id,
       auditId: generateId("aud"),
+      allowPaid: isWalletEngineEnabled(),
     });
   },
 };
