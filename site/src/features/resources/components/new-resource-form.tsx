@@ -48,6 +48,11 @@ export function NewResourceForm({
   const intentKey = resourceIntentKey(actorId);
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.publishing;
+  const pageTitle = walletPaidPublishing ? copy.walletResourceTitle : copy.resourceTitle;
+  const pageDescription = walletPaidPublishing
+    ? copy.walletResourceDescription
+    : copy.resourceDescription;
+  const submitLabel = walletPaidPublishing ? copy.walletSubmit : copy.submit;
   const [paidListing, setPaidListing] = useState(false);
   function safeMessage(failure: unknown, fallback: string) {
     const text = failure instanceof Error ? failure.message : "";
@@ -407,8 +412,8 @@ export function NewResourceForm({
   return (
     <div className={pageShellMax2xlStandard}>
       <div className="space-y-1.5">
-        <h1 className={typeDisplayPrimary}>{copy.resourceTitle}</h1>
-        <p className={typeMaxXlSmLeadingMuted}>{copy.resourceDescription}</p>
+        <h1 className={typeDisplayPrimary}>{pageTitle}</h1>
+        <p className={typeMaxXlSmLeadingMuted}>{pageDescription}</p>
       </div>
 
       {intent ? (
@@ -669,7 +674,7 @@ export function NewResourceForm({
                   ? copy.retryOriginal
                   : createdProduct
                     ? copy.retryBuild
-                    : copy.submit}
+                    : submitLabel}
           </Button>
         </fieldset>
       </form>

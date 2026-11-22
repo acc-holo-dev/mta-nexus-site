@@ -1,8 +1,11 @@
 export const publishing = {
   publishing: {
     resourceTitle: "Publish a free resource",
+    walletResourceTitle: "Publish a resource",
     resourceDescription:
       "Submit a private build for malware scanning and moderator review. Paid publishing remains disabled.",
+    walletResourceDescription:
+      "Submit a private build for malware scanning and moderator review. Free listings stay free; paid single-server listings can sell through the site wallet when the wallet engine is on. Card checkout stays disabled.",
     submittedTitle: "Resource submitted for review",
     submittedDescription:
       "The build is stored privately and becomes public only after a trusted clean scan and moderator approval.",
@@ -25,6 +28,7 @@ export const publishing = {
     releaseNotes: "Release notes",
     submitting: "Submitting...",
     submit: "Submit free resource for review",
+    walletSubmit: "Submit resource for review",
     createError: "Could not create resource",
     createErrorDescription:
       "A failed submit is not a created resource. Fix the form if needed, then retry.",
