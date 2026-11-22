@@ -470,7 +470,7 @@ test("J5 claim -> workspace -> download exact published build", async ({ page, b
 });
 
 test("J5 paid resource stays fail-closed and accessibly explained", async ({ page }) => {
-  const name = "paid resource free-beta accessibility without payment mutation";
+  const name = "paid resource wallet-gate accessibility without payment mutation";
   let status = "FAIL";
   const mutationRequests = [];
 
@@ -498,11 +498,11 @@ test("J5 paid resource stays fail-closed and accessibly explained", async ({ pag
     await expect(page.getByText(paidProductTitle, { exact: true })).toBeVisible();
 
     const paidStatus = page.getByRole("status").filter({
-      hasText: "Paid resources disabled",
+      hasText: "Paid settle unavailable",
     });
     await expect(paidStatus).toBeVisible();
     const paidDescription = page.getByText(
-      "Paid resources are disabled during the open free beta. No payment attempt will be created.",
+      "Paid settle stays off unless the site wallet engine is on for a single-server listing. No card or live payment-provider attempt is created.",
       { exact: true },
     );
     await expect(paidDescription).toBeVisible();
@@ -543,7 +543,7 @@ test("J5 paid resource stays fail-closed and accessibly explained", async ({ pag
       }),
     ).toBeVisible();
     const russianPaidDescription = page.getByText(
-      "Платные ресурсы отключены на время открытой бесплатной беты. Попытка оплаты не создаётся.",
+      "Платный settle выключен, пока не включён site wallet engine для single-server листинга. Карточная или live попытка оплаты провайдера не создаётся.",
       { exact: true },
     );
     await expect(russianPaidDescription).toBeVisible();
@@ -559,7 +559,7 @@ test("J5 paid resource stays fail-closed and accessibly explained", async ({ pag
     assert.deepEqual(
       mutationRequests,
       [],
-      "Paid free-beta screen must not create checkout or free-claim mutations",
+      "Paid wallet-gate screen must not create checkout or free-claim mutations",
     );
 
     results.push({
