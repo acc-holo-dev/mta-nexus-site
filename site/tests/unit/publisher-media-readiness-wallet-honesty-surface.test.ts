@@ -21,7 +21,7 @@ describe("publisher media and publication readiness wallet honesty", () => {
     expect(mediaService).toContain("allowPaid: isWalletEngineEnabled()");
     expect(mediaRepo).toContain("PaidAccessOptions");
     expect(mediaRepo).toContain("options.allowPaid");
-    expect(mediaRepo).toContain("eq(products.price, 0)");
+    expect(mediaRepo).toContain("publishedCatalogPriceCondition");
 
     expect(readinessService).toContain("allowPaid: isWalletEngineEnabled()");
     expect(readinessRepo).toContain("allowPaid ? undefined : eq(products.price, 0)");

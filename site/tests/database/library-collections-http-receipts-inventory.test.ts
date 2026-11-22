@@ -80,14 +80,18 @@ it("reads and exports private resource inventory under fixed session identity an
   expect(response.status).toBe(200);
   expect(response.headers.get("cache-control")).toBe("private, no-store");
   expect(response.headers.get("vary")).toBe("Cookie");
-  expect(state.inventory).toHaveBeenCalledWith("usr_a", {
-    page: 2,
-    status: "active",
-    filter: "shared",
-    q: "%",
-    collectionId: "lcol_a",
-    release: "pinned",
-  });
+  expect(state.inventory).toHaveBeenCalledWith(
+    "usr_a",
+    {
+      page: 2,
+      status: "active",
+      filter: "shared",
+      q: "%",
+      collectionId: "lcol_a",
+      release: "pinned",
+    },
+    { allowPaid: false },
+  );
   expect(state.rate).toHaveBeenCalledWith("resourceInspection", "usr_a");
   const exported = await inventoryExport(request(`${path}/export`));
   expect(exported.headers.get("content-disposition")).toContain("collection-resources.json");

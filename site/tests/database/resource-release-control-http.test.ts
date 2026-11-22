@@ -113,7 +113,7 @@ it.each([
 });
 it("binds library reads and selections exclusively to the session buyer", async () => {
   await libraryPage(get("/api/library/releases?filter=updates&page=2"));
-  expect(state.libraryPage).toHaveBeenCalledWith("usr_a", 2, "updates");
+  expect(state.libraryPage).toHaveBeenCalledWith("usr_a", 2, "updates", { allowPaid: false });
   const response = await select(post("/api/library/releases/prd_a", fixed), context);
   expect(response.status).toBe(200);
   privateResponse(response);

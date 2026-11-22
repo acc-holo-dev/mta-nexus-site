@@ -41,7 +41,9 @@ it("serves scoped private release inspection and bounded attachment exports", as
   const response = await releases(request(`${path}?page=2&filter=updates&q=core`), context);
   expect(response.status).toBe(200);
   expect(response.headers.get("cache-control")).toContain("no-store");
-  expect(state.releases).toHaveBeenCalledWith("usr_a", "lcol_a", 2, "updates", "core");
+  expect(state.releases).toHaveBeenCalledWith("usr_a", "lcol_a", 2, "updates", "core", {
+    allowPaid: false,
+  });
   const download = await releasesExport(request(`${path}/export`), context);
   expect(download.headers.get("content-disposition")).toContain("attachment");
   expect(download.headers.get("x-content-type-options")).toBe("nosniff");

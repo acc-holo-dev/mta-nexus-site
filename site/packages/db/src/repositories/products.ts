@@ -71,13 +71,14 @@ export interface ProductQueryOptions {
 }
 
 /** Free listings, or paid single_server when the wallet catalog flag is on. */
-export function publishedCatalogPriceCondition(includeWalletPaidSingleServer?: boolean) {
-  return includeWalletPaidSingleServer
-    ? or(
-        eq(products.price, 0),
-        and(sql`${products.price} > 0`, eq(products.licenseModel, "single_server")),
-      )
-    : eq(products.price, 0);
+export function publishedCatalogPriceCondition(includeWalletPaidSingleServer?: boolean): SQL {
+  if (!includeWalletPaidSingleServer) return eq(products.price, 0);
+  return (
+    or(
+      eq(products.price, 0),
+      and(sql`${products.price} > 0`, eq(products.licenseModel, "single_server")),
+    ) ?? eq(products.price, 0)
+  );
 }
 
 export class ProductRepository {

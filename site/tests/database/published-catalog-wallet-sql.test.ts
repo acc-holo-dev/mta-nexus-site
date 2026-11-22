@@ -22,6 +22,7 @@ vi.mock("../../packages/db/src/client", () => ({
             offset() {
               return Promise.resolve([]);
             },
+            // biome-ignore lint/suspicious/noThenProperty: drizzle builders are awaitable thenables in these unit mocks
             then(resolve: (rows: unknown[]) => unknown, reject?: (error: unknown) => unknown) {
               return Promise.resolve([]).then(resolve, reject);
             },

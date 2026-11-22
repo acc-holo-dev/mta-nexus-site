@@ -239,7 +239,11 @@ describe("discovery search results and pagination", () => {
       "developer",
       "organization",
     ]);
-    expect(sources.products).toHaveBeenCalledWith({ query: "Match", limit: 5 });
+    expect(sources.products).toHaveBeenCalledWith({
+      query: "Match",
+      limit: 5,
+      includeWalletPaidSingleServer: false,
+    });
     expect(sources.servers).toHaveBeenCalledWith("Match", 5);
     expect(sources.articles).toHaveBeenCalledWith("Match", 5);
     expect(results[1].players).toBeUndefined();
