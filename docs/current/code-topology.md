@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 22 ноября 2026 (Europe/Moscow).  
-**source_sha:** `aba10eb18` (`cursor/wallet-spend-settle-d07d`, NX-015 residual catalog honesty).  
+**source_sha:** `672c4b41a` (`cursor/wallet-spend-settle-d07d`, NX-015 residual catalog honesty).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -31,7 +31,7 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    |            Факт на `aba10eb18` |
+| Область                    |            Факт на `672c4b41a` |
 | -------------------------- | -----------------------------: |
 | `features/*` domains       |                             13 |
 | `components/` tree files   |                              0 |
