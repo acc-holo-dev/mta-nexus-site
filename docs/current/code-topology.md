@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
-**measured_at:** 18 ноября 2026 (Europe/Moscow).  
-**source_sha:** `765b6bff` (`dev`, Waves 189–197 tip + inventory fix).  
+**measured_at:** 22 ноября 2026 (Europe/Moscow).  
+**source_sha:** `aba10eb18` (`cursor/wallet-spend-settle-d07d`, NX-015 residual catalog honesty).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -15,7 +15,7 @@
 ```text
 site/
 ├── src/
-│   ├── app/                 # App Router + HTTP adapters (282× route.ts)
+│   ├── app/                 # App Router + HTTP adapters (301× route.ts)
 │   ├── features/            # feature-группировка (13 доменов, incl. shell/)
 │   ├── components/          # корневой UI вне features (пуст после slice 36)
 │   └── lib/                 # только каталоги: http/ + i18n/ + platform/ + services/
@@ -31,39 +31,39 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    |             Факт на `e9e88ceb` |
+| Область                    |            Факт на `aba10eb18` |
 | -------------------------- | -----------------------------: |
 | `features/*` domains       |                             13 |
 | `components/` tree files   |                              0 |
 | `components/` root files   |                              0 |
-| `lib/` tree files          |                            126 |
+| `lib/` tree files          |                            132 |
 | `lib/` root files          |                              0 |
 | `lib/` root dirs           | http, i18n, platform, services |
 | `lib/services/` root files |                              0 |
 | `lib/**/*-i18n.ts`         |                              0 |
-| `app/**/route.ts`          |                            282 |
-| `site/tests` files         |                           1663 |
+| `app/**/route.ts`          |                            301 |
+| `site/tests` files         |                           1764 |
 | `@nexus/ui` src files      |                             20 |
-| `@nexus/domain` src files  |                             54 |
-| `@nexus/db` src files      |                            201 |
+| `@nexus/domain` src files  |                             57 |
+| `@nexus/db` src files      |                            206 |
 
 ### Features
 
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
-| accounts      |    52 | 158691 |
-| commerce      |    71 | 330627 |
-| community     |   128 | 594001 |
-| discovery     |     8 |  33815 |
-| library       |    86 | 409749 |
-| moderation    |    35 | 158575 |
-| notifications |    25 | 136481 |
-| organizations |    49 | 187199 |
-| resources     |   171 | 747623 |
-| servers       |    87 | 318668 |
-| shell         |    67 | 111009 |
-| support       |    22 | 110720 |
-| trust         |    16 |  62612 |
+| accounts      |    91 | 235745 |
+| commerce      |   188 | 765800 |
+| community     |   154 | 635565 |
+| discovery     |    22 |  50388 |
+| library       |   124 | 524752 |
+| moderation    |    56 | 220400 |
+| notifications |    27 | 142000 |
+| organizations |    59 | 202271 |
+| resources     |   232 | 935216 |
+| servers       |   111 | 382891 |
+| shell         |   101 | 210725 |
+| support       |    28 | 117845 |
+| trust         |    28 |  83844 |
 
 Эталон границ: [`features/servers/README.md`](../../site/src/features/servers/README.md) (`client` / `server` / `model` + server-only ports, без прямого импорта внутренностей снаружи).
 
