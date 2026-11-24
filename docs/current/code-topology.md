@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 24 ноября 2026 (Europe/Moscow).  
-**source_sha:** `811b8baac` (`cursor/market-card-fx-2e5e`, market cards show recorded rate estimates).  
+**source_sha:** `1edd6412a` (`cursor/catalog-card-fx-2e5e`, public cards share the recorded rate estimate).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -31,7 +31,7 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    |            Факт на `811b8baac` |
+| Область                    |            Факт на `1edd6412a` |
 | -------------------------- | -----------------------------: |
 | `features/*` domains       |                             13 |
 | `components/` tree files   |                              0 |
@@ -51,15 +51,15 @@ site/
 
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
-| accounts      |    92 | 242109 |
+| accounts      |    92 | 242701 |
 | commerce      |   204 | 817733 |
 | community     |   154 | 635565 |
-| discovery     |    22 |  50388 |
+| discovery     |    22 |  50639 |
 | library       |   124 | 524752 |
 | moderation    |    56 | 221046 |
 | notifications |    27 | 142000 |
-| organizations |    59 | 202271 |
-| resources     |   232 | 940093 |
+| organizations |    59 | 202552 |
+| resources     |   232 | 939531 |
 | servers       |   111 | 382891 |
 | shell         |   101 | 211264 |
 | support       |    28 | 117845 |
