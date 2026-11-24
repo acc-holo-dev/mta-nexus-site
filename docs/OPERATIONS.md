@@ -313,10 +313,10 @@ Optional site-wallet ledger paths stay dark unless both environment flags are
 understood. Defaults are unset/off; document them in the host env (see
 `config/env/.env.example`). Feature/operator surfaces:
 
-| Flag                    | Effect when set to `1`                                                                                                                                                                         |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Flag                    | Effect when set to `1`                                                                                                                                                                                                                                  |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `NEXUS_WALLET_ENGINE`   | Unlocks `/api/wallet/*`, pay-with-wallet, `POST /api/checkout/wallet`, `/workspace/wallet`, paid `single_server` create/settle, admin wallet ops under `/admin/commerce/wallet-providers`, and staff balance grants at `/admin/commerce/wallet-grants`. |
-| `NEXUS_WALLET_WITHDRAW` | Also requires the engine. Unlocks withdrawal intents and `POST /api/admin/commerce/wallet-withdrawals/expire-stale`. Live payout adapters stay off.                                            |
+| `NEXUS_WALLET_WITHDRAW` | Also requires the engine. Unlocks withdrawal intents and `POST /api/admin/commerce/wallet-withdrawals/expire-stale`. Live payout adapters stay off.                                                                                                     |
 
 Admin batch CTAs on `/admin/commerce/wallet-providers` call existing admin HTTP
 (not a cron, not a live PSP). Empty batches are a successful no-op. The page
