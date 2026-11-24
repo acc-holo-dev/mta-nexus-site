@@ -54,6 +54,12 @@ export default defineConfig({
           // reads return empty. Isolate each file so its client mock applies.
           isolate: true,
           maxWorkers: 1,
+          // Integration tests run hundreds of ms each in isolation, but full-suite
+          // load on small dev hosts and CI runners (serial files, one shared
+          // disposable database) pushed slow tests past the 5s Vitest default and
+          // failed the verification gate spuriously. Keep a generous headroom;
+          // genuine hangs still fail the run well before the suite would finish.
+          testTimeout: 20_000,
         },
       },
     ],
