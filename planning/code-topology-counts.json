@@ -14,7 +14,7 @@
       "files": 92
     },
     "commerce": {
-      "bytes": 817733,
+      "bytes": 820578,
       "files": 204
     },
     "community": {
@@ -42,7 +42,7 @@
       "files": 59
     },
     "resources": {
-      "bytes": 939531,
+      "bytes": 939602,
       "files": 232
     },
     "servers": {
@@ -96,7 +96,7 @@
     "validation": 19
   },
   "scope": "Git-tracked blobs under site/ at source_sha (git ls-tree). Ignores untracked/ignored host files so CI and dirty worktrees match.",
-  "source_sha": "1edd6412a4a6f8b21f5978206fc73c77253c4545",
+  "source_sha": "24bdeed05ee64f12220aef58de021cd50ce43e6b",
   "tests": {
     "site_tests_files": 1775
   }
