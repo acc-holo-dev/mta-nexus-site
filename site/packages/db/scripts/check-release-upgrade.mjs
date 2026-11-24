@@ -181,7 +181,9 @@ try {
                     ? "to_jsonb(t) - 'review_status' - 'review_revision' - 'review_updated_at' - 'review_access_source' - 'review_moderation_reason'"
                     : table === "order_items"
                       ? "to_jsonb(t) - 'commercial_snapshot'"
-                      : "to_jsonb(t)";
+                      : table === "orders"
+                        ? "to_jsonb(t) - 'list_amount' - 'discount_amount' - 'promo_code'"
+                        : "to_jsonb(t)";
       result[table] = await client.unsafe(`SELECT ${rowJson} AS row FROM "${table}" t ORDER BY id`);
     }
     return JSON.stringify(result);
