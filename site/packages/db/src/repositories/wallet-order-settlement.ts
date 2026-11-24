@@ -7,6 +7,7 @@ import {
   type LedgerEntry,
   type LedgerPosting,
   NotFoundError,
+  quotePromoDiscount,
   type WalletCurrency,
   walletAccountIdForUser,
   walletHoldReleaseAt,
@@ -27,6 +28,7 @@ import {
 } from "../schema";
 import { lockInitiatingSession } from "./initiating-session";
 import { accountBalanceInTransaction, postLedgerBatchInTransaction } from "./ledger-posting";
+import { lockPromoCode, redeemLockedPromo } from "./promo-codes";
 
 export type WalletPurchasedBuild = {
   productId: string;
@@ -72,6 +74,7 @@ function walletSettleIds(orderId: string) {
     ledgerBatchId: `wspend_${orderId}`,
     userEntryId: `ldg_wspend_${orderId}_user`,
     platformFeeEntryId: `ldg_wspend_${orderId}_fee`,
+    promoEntryId: `ldg_wspend_${orderId}_promo`,
     holdEntryId: (sellerAccountId: string) =>
       `ldg_wspend_${orderId}_h_${sellerSuffix(sellerAccountId)}`,
     holdId: (sellerAccountId: string) => `whold_${orderId}_${sellerSuffix(sellerAccountId)}`,
@@ -87,9 +90,60 @@ function walletRefundIds(orderId: string) {
     ledgerBatchId: `wrefund_${orderId}`,
     buyerEntryId: `ldg_wrefund_${orderId}_buyer`,
     platformFeeEntryId: `ldg_wrefund_${orderId}_fee`,
+    promoEntryId: `ldg_wrefund_${orderId}_promo`,
     holdEntryId: (holdId: string) => `ldg_wrefund_${orderId}_${holdId}`,
     auditId: `aud_wrefund_${orderId}`,
   };
+}
+
+async function lockedPromoForOrder(
+  tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
+  order: {
+    id: string;
+    buyerId: string;
+    totalAmount: number;
+    currency: string;
+    listAmount: number | null;
+    discountAmount: number | null;
+    promoCode: string | null;
+  },
+  lineTotal: number,
+): Promise<{ code: string; discountAmount: number } | null> {
+  if (!order.promoCode && order.listAmount === null && order.discountAmount === null) return null;
+  if (
+    !order.promoCode ||
+    order.listAmount === null ||
+    order.discountAmount === null ||
+    order.listAmount !== lineTotal ||
+    order.listAmount - order.discountAmount !== order.totalAmount
+  ) {
+    throw new AppError("Promo terms changed", 409, "PROMO_TERMS_CHANGED");
+  }
+  const record = await lockPromoCode(tx, order.promoCode);
+  if (!record) throw new AppError("Promo code was not found", 404, "PROMO_NOT_FOUND");
+  const quote = quotePromoDiscount({
+    listAmount: lineTotal,
+    currency: order.currency as WalletCurrency,
+    promo: record,
+    now: new Date(),
+  });
+  if (
+    quote.discountAmount !== order.discountAmount ||
+    quote.chargedAmount !== order.totalAmount ||
+    quote.currency !== order.currency
+  ) {
+    throw new AppError("Promo terms changed", 409, "PROMO_TERMS_CHANGED");
+  }
+  await redeemLockedPromo(tx, {
+    code: quote.code,
+    buyerId: order.buyerId,
+    orderId: order.id,
+    listAmount: quote.listAmount,
+    discountAmount: quote.discountAmount,
+    chargedAmount: quote.chargedAmount,
+    currency: quote.currency,
+  });
+  return { code: quote.code, discountAmount: quote.discountAmount };
 }
 
 function sellerAccountForProduct(product: {
@@ -130,6 +184,9 @@ export class WalletOrderSettlementRepository {
           status: orders.status,
           totalAmount: orders.totalAmount,
           currency: orders.currency,
+          listAmount: orders.listAmount,
+          discountAmount: orders.discountAmount,
+          promoCode: orders.promoCode,
         })
         .from(orders)
         .where(eq(orders.id, input.orderId))
@@ -260,7 +317,9 @@ export class WalletOrderSettlementRepository {
         commissionLines.push({ grossAmount: line.unitPrice, sellerAccountId });
         lineTotal += line.unitPrice;
       }
-      if (lineTotal !== order.totalAmount) {
+      const promo = await lockedPromoForOrder(tx, order, lineTotal);
+      const fundedTotal = order.totalAmount + (promo?.discountAmount ?? 0);
+      if (lineTotal !== fundedTotal) {
         throw new AppError("Order total does not match line items", 409, "ORDER_NOT_PAYABLE");
       }
 
@@ -280,7 +339,7 @@ export class WalletOrderSettlementRepository {
           entryId: ids.holdEntryId(credit.accountId),
           holdId: ids.holdId(credit.accountId),
         }));
-      if (sellerHolds.length === 0 && split.platformFee !== order.totalAmount) {
+      if (sellerHolds.length === 0 && split.platformFee !== fundedTotal) {
         throw new AppError("Wallet spend split does not balance", 400, "WALLET_SPEND_INVALID");
       }
       const posting: LedgerPosting[] = buildWalletSpendPosting({
@@ -293,6 +352,15 @@ export class WalletOrderSettlementRepository {
         platformFeeEntryId: ids.platformFeeEntryId,
         platformFee: split.platformFee,
         sellerHolds,
+        ...(promo
+          ? {
+              promoFunding: {
+                amount: promo.discountAmount,
+                entryId: ids.promoEntryId,
+                code: promo.code,
+              },
+            }
+          : {}),
       });
       const entries = await postLedgerBatchInTransaction(tx, ids.ledgerBatchId, posting);
 
@@ -458,6 +526,9 @@ export class WalletOrderSettlementRepository {
           status: orders.status,
           totalAmount: orders.totalAmount,
           currency: orders.currency,
+          listAmount: orders.listAmount,
+          discountAmount: orders.discountAmount,
+          promoCode: orders.promoCode,
         })
         .from(orders)
         .where(eq(orders.id, input.orderId))
@@ -524,7 +595,15 @@ export class WalletOrderSettlementRepository {
 
       const currency = order.currency as WalletCurrency;
       const holdTotal = holdRows.reduce((sum, row) => sum + row.amount, 0);
-      const platformFee = order.totalAmount - holdTotal;
+      const discount = order.discountAmount ?? 0;
+      const listAmount = order.listAmount ?? order.totalAmount;
+      if (
+        (order.promoCode === null) !== (discount === 0) ||
+        listAmount - discount !== order.totalAmount
+      ) {
+        throw new AppError("Wallet refund split does not balance", 400, "WALLET_REFUND_INVALID");
+      }
+      const platformFee = listAmount - holdTotal;
       if (!Number.isSafeInteger(platformFee) || platformFee < 0) {
         throw new AppError("Wallet refund split does not balance", 400, "WALLET_REFUND_INVALID");
       }
@@ -559,6 +638,15 @@ export class WalletOrderSettlementRepository {
           status: row.status as "held" | "released",
           entryId: ids.holdEntryId(row.id),
         })),
+        ...(discount > 0 && order.promoCode
+          ? {
+              promoRestore: {
+                amount: discount,
+                entryId: ids.promoEntryId,
+                code: order.promoCode,
+              },
+            }
+          : {}),
       });
       const entries = await postLedgerBatchInTransaction(tx, ids.ledgerBatchId, posting);
 

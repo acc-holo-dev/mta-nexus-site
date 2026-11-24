@@ -1,5 +1,6 @@
 import type { Order, OrderItem } from "./entities";
 import { AppError } from "./errors";
+import { readOrderPromoTruth } from "./promo-codes";
 export const ORDER_TERMS_LINE_LIMIT = 20;
 export type OrderLineTerms = {
   version: 1;
@@ -121,7 +122,10 @@ export function validatePendingOrder(order: Omit<Order, "createdAt" | "updatedAt
     productIds.add(item.productId);
     total += BigInt(item.unitPrice);
   }
-  if (total !== BigInt(order.totalAmount)) throw fail();
+  const promo = readOrderPromoTruth(order);
+  if (promo) {
+    if (total !== BigInt(promo.listAmount)) throw fail();
+  } else if (total !== BigInt(order.totalAmount)) throw fail();
   return [...order.items].sort((a: OrderItem, b: OrderItem) =>
     a.productId.localeCompare(b.productId, "en"),
   );

@@ -1,13 +1,14 @@
 "use client";
 
-import { Button, ErrorState } from "@nexus/ui";
+import { Button, ErrorState, Input } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 import { useNexusLocale } from "../../shell/locale";
 import { typeBlockSpace2, typeSmSuccess } from "../../shell/type-shell";
-import { confirmedWalletCheckout } from "../wallet-checkout-confirmation";
+import { formatHistoryAmount } from "../commerce-history-format";
+import { confirmedPromoQuote, confirmedWalletCheckout } from "../wallet-checkout-confirmation";
 import { getWalletCopy, walletError } from "../wallet-i18n";
 import {
   useWalletSpendBalance,
@@ -43,9 +44,22 @@ export function WalletCheckoutButton({
   const controller = useRef<AbortController | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [quoting, setQuoting] = useState(false);
   const [error, setError] = useState("");
-  const [done, setDone] = useState<{ orderId: string; orderNumber: string } | null>(null);
-  const balance = useWalletSpendBalance(actorId ?? "", currency, amountMinor);
+  const [promoInput, setPromoInput] = useState("");
+  const [promoQuote, setPromoQuote] = useState<ReturnType<typeof confirmedPromoQuote>>(null);
+  const [done, setDone] = useState<{
+    orderId: string;
+    orderNumber: string;
+    promo: { code: string; discountAmount: number; listAmount: number } | null;
+  } | null>(null);
+  const normalizedCode = promoInput.trim().toUpperCase();
+  const applied =
+    promoQuote && promoQuote.code === normalizedCode && promoQuote.currency === currency
+      ? promoQuote
+      : null;
+  const dueMinor = applied?.chargedAmount ?? amountMinor;
+  const balance = useWalletSpendBalance(actorId ?? "", currency, dueMinor);
 
   if (!signedIn || !actorId) {
     return (
@@ -59,10 +73,43 @@ export function WalletCheckoutButton({
   }
 
   const shortfall = walletSpendSubmitBlocked(balance);
+  const codePending = normalizedCode.length > 0 && !applied;
+
+  async function onApply() {
+    if (!actorId || quoting || busy || !/^[A-Z0-9]{4,16}$/u.test(normalizedCode)) return;
+    setQuoting(true);
+    setError("");
+    setPromoQuote(null);
+    try {
+      const response = await fetch("/api/checkout/wallet/promo-quote", {
+        ...privateApiRequest({
+          method: "POST",
+          json: {
+            productIds: [productId],
+            promoCode: normalizedCode,
+            ...(buildId ? { buildId } : {}),
+          },
+        }),
+        headers: { "Content-Type": "application/json", "x-nexus-actor-id": actorId },
+      });
+      const body = await response.json().catch(() => null);
+      const quote = response.ok ? confirmedPromoQuote(body, normalizedCode) : null;
+      if (!quote || quote.currency !== currency) {
+        const code = body && typeof body === "object" ? (body as { code?: unknown }).code : null;
+        setError(walletError(locale, code));
+        return;
+      }
+      setPromoQuote(quote);
+    } catch {
+      setError(copy.checkoutFailed);
+    } finally {
+      setQuoting(false);
+    }
+  }
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
-    if (!actorId || !confirmed || shortfall || lock.current) return;
+    if (!actorId || !confirmed || shortfall || codePending || lock.current) return;
     lock.current = true;
     setBusy(true);
     setError("");
@@ -75,6 +122,7 @@ export function WalletCheckoutButton({
           json: {
             productIds: [productId],
             ...(buildId ? { buildId } : {}),
+            ...(applied ? { promoCode: applied.code } : {}),
           },
           signal: abort.signal,
         }),
@@ -88,7 +136,11 @@ export function WalletCheckoutButton({
         setError(walletError(locale, code));
         return;
       }
-      setDone({ orderId: confirmedBody.orderId, orderNumber: confirmedBody.orderNumber });
+      setDone({
+        orderId: confirmedBody.orderId,
+        orderNumber: confirmedBody.orderNumber,
+        promo: confirmedBody.promo,
+      });
       router.refresh();
     } catch {
       if (!abort.signal.aborted) setError(copy.checkoutFailed);
@@ -122,11 +174,60 @@ export function WalletCheckoutButton({
         </h3>
         <p className="text-[11px] text-muted">{copy.checkoutNote}</p>
         <p className="text-sm text-primary">{amountLabel}</p>
-        <WalletSpendBalancePreview
-          balance={balance}
-          currency={currency}
-          amountMinor={amountMinor}
-        />
+        <div className="space-y-2">
+          <label className="block text-sm text-secondary" htmlFor={`${field}-promo`}>
+            {copy.promoCode}
+          </label>
+          <Input
+            id={`${field}-promo`}
+            value={promoInput}
+            autoComplete="off"
+            spellCheck={false}
+            onChange={(event) => {
+              setPromoInput(event.target.value);
+              setPromoQuote(null);
+            }}
+          />
+          <p className="text-[11px] text-muted">{copy.promoHint}</p>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              disabled={quoting || busy || !/^[A-Z0-9]{4,16}$/u.test(normalizedCode)}
+              isLoading={quoting}
+              onClick={onApply}
+            >
+              {quoting ? copy.promoApplying : copy.promoApply}
+            </Button>
+            {applied ? (
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => {
+                  setPromoInput("");
+                  setPromoQuote(null);
+                }}
+              >
+                {copy.promoClear}
+              </Button>
+            ) : null}
+          </div>
+          {applied ? (
+            <p role="status" className="text-sm text-primary">
+              {copy.promoApplied
+                .replace("{code}", applied.code)
+                .replace(
+                  "{discount}",
+                  formatHistoryAmount(applied.discountAmount, applied.currency, locale),
+                )
+                .replace(
+                  "{charged}",
+                  formatHistoryAmount(applied.chargedAmount, applied.currency, locale),
+                )}
+            </p>
+          ) : null}
+        </div>
+        <WalletSpendBalancePreview balance={balance} currency={currency} amountMinor={dueMinor} />
       </div>
       <ActionConfirmCheckbox
         id={`${field}-confirm`}
@@ -141,7 +242,7 @@ export function WalletCheckoutButton({
       ) : null}
       <Button
         type="submit"
-        disabled={!confirmed || busy || shortfall}
+        disabled={!confirmed || busy || shortfall || codePending}
         isLoading={busy}
         className="min-h-11 w-full"
       >

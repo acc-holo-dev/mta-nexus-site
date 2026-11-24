@@ -138,6 +138,31 @@ export async function PurchaseDetailScreen({
               {formatHistoryAmount(order.totalAmount, order.currency, typedLocale)}
             </dd>
           </div>
+          {order.promoCode && order.listAmount != null && order.discountAmount != null ? (
+            <>
+              <div className="min-w-0">
+                <dt className="text-muted">{walletCopy.promoList}</dt>
+                <dd className="text-primary">
+                  {formatHistoryAmount(order.listAmount, order.currency, typedLocale)}
+                </dd>
+              </div>
+              <div className="min-w-0">
+                <dt className="text-muted">{walletCopy.promoDiscount}</dt>
+                <dd className="text-primary">
+                  {walletCopy.promoApplied
+                    .replace("{code}", order.promoCode)
+                    .replace(
+                      "{discount}",
+                      formatHistoryAmount(order.discountAmount, order.currency, typedLocale),
+                    )
+                    .replace(
+                      "{charged}",
+                      formatHistoryAmount(order.totalAmount, order.currency, typedLocale),
+                    )}
+                </dd>
+              </div>
+            </>
+          ) : null}
         </dl>
       </header>
       {canPayWithWallet ? (

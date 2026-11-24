@@ -14,6 +14,7 @@ vi.mock("@nexus/db", () => ({
   organizationRepository: {},
   productRepository: {},
   userRepository: {},
+  promoCodeRepository: {},
   walletOrderSettlementRepository: {},
   walletSellerHoldRepository: {},
   walletTopupRepository: {},

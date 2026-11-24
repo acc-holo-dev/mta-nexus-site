@@ -640,18 +640,124 @@ export const entitlements = pgTable(
 );
 
 // 13. Orders
-export const orders = pgTable("orders", {
-  id: text("id").primaryKey(),
-  orderNumber: text("order_number").notNull().unique(),
-  buyerId: text("buyer_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "restrict" }),
-  status: text("status").notNull().default("pending"), // pending, processing, completed, cancelled, refunded
-  totalAmount: integer("total_amount").notNull(),
-  currency: text("currency").notNull().default("USD"),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
-});
+export const orders = pgTable(
+  "orders",
+  {
+    id: text("id").primaryKey(),
+    orderNumber: text("order_number").notNull().unique(),
+    buyerId: text("buyer_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    status: text("status").notNull().default("pending"), // pending, processing, completed, cancelled, refunded
+    totalAmount: integer("total_amount").notNull(),
+    currency: text("currency").notNull().default("USD"),
+    listAmount: integer("list_amount"),
+    discountAmount: integer("discount_amount"),
+    promoCode: text("promo_code"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    check(
+      "orders_promo_truth_check",
+      sql`(
+      ${table.listAmount} IS NULL AND ${table.discountAmount} IS NULL AND ${table.promoCode} IS NULL
+    ) OR (
+      ${table.listAmount} BETWEEN 2 AND 100000000
+      AND ${table.discountAmount} BETWEEN 1 AND 100000000
+      AND ${table.discountAmount} < ${table.listAmount}
+      AND ${table.totalAmount} = ${table.listAmount} - ${table.discountAmount}
+      AND ${table.totalAmount} >= 1
+      AND ${table.promoCode} ~ '^[A-Z0-9]{4,16}$'
+    )`,
+    ),
+  ],
+);
+
+/** Platform-funded checkout codes. Redemptions are one per buyer per code. */
+export const promoCodes = pgTable(
+  "promo_codes",
+  {
+    id: text("id").primaryKey(),
+    code: text("code").notNull(),
+    kind: text("kind").$type<"percent" | "fixed">().notNull(),
+    percent: integer("percent"),
+    amount: integer("amount"),
+    currency: text("currency"),
+    active: boolean("active").notNull().default(true),
+    maxRedemptions: integer("max_redemptions"),
+    redemptionCount: integer("redemption_count").notNull().default(0),
+    startsAt: timestamp("starts_at", { withTimezone: true }),
+    endsAt: timestamp("ends_at", { withTimezone: true }),
+    createdBy: text("created_by")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("promo_codes_code_idx").on(table.code),
+    check("promo_codes_id_check", sql`${table.id} ~ '^prm_[a-f0-9]{24}$'`),
+    check("promo_codes_code_check", sql`${table.code} ~ '^[A-Z0-9]{4,16}$'`),
+    check(
+      "promo_codes_kind_check",
+      sql`(
+        ${table.kind} = 'percent'
+        AND ${table.percent} BETWEEN 1 AND 90
+        AND ${table.amount} IS NULL
+        AND ${table.currency} IS NULL
+      ) OR (
+        ${table.kind} = 'fixed'
+        AND ${table.amount} BETWEEN 1 AND 100000000
+        AND ${table.currency} IN ('USD', 'EUR', 'RUB')
+        AND ${table.percent} IS NULL
+      )`,
+    ),
+    check(
+      "promo_codes_count_check",
+      sql`${table.redemptionCount} >= 0 AND (
+        ${table.maxRedemptions} IS NULL
+        OR (
+          ${table.maxRedemptions} BETWEEN 1 AND 100000
+          AND ${table.redemptionCount} <= ${table.maxRedemptions}
+        )
+      )`,
+    ),
+    check(
+      "promo_codes_window_check",
+      sql`${table.startsAt} IS NULL OR ${table.endsAt} IS NULL OR ${table.startsAt} < ${table.endsAt}`,
+    ),
+  ],
+);
+
+export const promoRedemptions = pgTable(
+  "promo_redemptions",
+  {
+    orderId: text("order_id")
+      .primaryKey()
+      .references(() => orders.id, { onDelete: "restrict" }),
+    code: text("code").notNull(),
+    buyerId: text("buyer_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    listAmount: integer("list_amount").notNull(),
+    discountAmount: integer("discount_amount").notNull(),
+    chargedAmount: integer("charged_amount").notNull(),
+    currency: text("currency").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("promo_redemptions_buyer_code_idx").on(table.buyerId, table.code),
+    check("promo_redemptions_code_check", sql`${table.code} ~ '^[A-Z0-9]{4,16}$'`),
+    check(
+      "promo_redemptions_amounts_check",
+      sql`${table.listAmount} BETWEEN 2 AND 100000000
+        AND ${table.discountAmount} BETWEEN 1 AND 100000000
+        AND ${table.discountAmount} < ${table.listAmount}
+        AND ${table.chargedAmount} = ${table.listAmount} - ${table.discountAmount}
+        AND ${table.currency} IN ('USD', 'EUR', 'RUB')`,
+    ),
+  ],
+);
 
 // Account-scoped acquisition basket. This contains no payments or balances.
 export const resourceCartItems = pgTable(

@@ -253,7 +253,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract keeps staff queue indexes and covers notification delivery", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0095_ledger_staff_grant");
+  assert.equal(plan.targetTag, "0096_promo_codes");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),

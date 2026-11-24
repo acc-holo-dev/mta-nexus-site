@@ -12,6 +12,7 @@ vi.mock("@nexus/db", () => ({
   organizationRepository: {},
   productRepository: {},
   userRepository: {},
+  promoCodeRepository: {},
   walletOrderSettlementRepository: {},
   walletSellerHoldRepository: {
     listEligibleMatured: (...args: unknown[]) => state.listHolds(...args),

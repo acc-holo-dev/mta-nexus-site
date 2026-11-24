@@ -313,10 +313,10 @@ Optional site-wallet ledger paths stay dark unless both environment flags are
 understood. Defaults are unset/off; document them in the host env (see
 `config/env/.env.example`). Feature/operator surfaces:
 
-| Flag                    | Effect when set to `1`                                                                                                                                                                                                                                  |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `NEXUS_WALLET_ENGINE`   | Unlocks `/api/wallet/*`, pay-with-wallet, `POST /api/checkout/wallet`, `/workspace/wallet`, paid `single_server` create/settle, admin wallet ops under `/admin/commerce/wallet-providers`, and staff balance grants at `/admin/commerce/wallet-grants`. |
-| `NEXUS_WALLET_WITHDRAW` | Also requires the engine. Unlocks withdrawal intents and `POST /api/admin/commerce/wallet-withdrawals/expire-stale`. Live payout adapters stay off.                                                                                                     |
+| Flag                    | Effect when set to `1`                                                                                                                                                                                                                                                                                |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXUS_WALLET_ENGINE`   | Unlocks `/api/wallet/*`, pay-with-wallet, `POST /api/checkout/wallet`, `/workspace/wallet`, paid `single_server` create/settle, admin wallet ops under `/admin/commerce/wallet-providers`, staff balance grants at `/admin/commerce/wallet-grants`, and promo codes at `/admin/commerce/promo-codes`. |
+| `NEXUS_WALLET_WITHDRAW` | Also requires the engine. Unlocks withdrawal intents and `POST /api/admin/commerce/wallet-withdrawals/expire-stale`. Live payout adapters stay off.                                                                                                                                                   |
 
 Admin batch CTAs on `/admin/commerce/wallet-providers` call existing admin HTTP
 (not a cron, not a live PSP). Empty batches are a successful no-op. The page
@@ -334,6 +334,8 @@ and read-only previews of the exact rows the next hold-release, top-up expire,
 unpaid-order expire, and withdrawal expire batches would process.
 
 Staff balance grant is `POST /api/admin/commerce/wallet-grants` (admin session, engine on). It credits a member's available balance with a balanced `staff_grant` journal and one audit row. It is not a payment-provider top-up. The same idempotency key does not credit twice.
+
+Promo codes are `POST /api/admin/commerce/promo-codes` (admin session, engine on). `POST /api/checkout/wallet/promo-quote` previews the discount and does not reserve the code. Checkout stores the catalog total, the discount, and the code, then charges the reduced total from the site wallet. Seller commission stays on the catalog price. `platform:promo` funds the gap with a `fee` journal leg. Each buyer can redeem a code once. This is not a card coupon.
 
 Staff wallet refund remains on purchase cases
 (`POST /api/admin/commerce/wallet-orders/:orderId/refund`), not on the
