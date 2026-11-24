@@ -122,6 +122,12 @@ export const discovery = {
     free: "Free",
     priceEstimateAbout: "About {amount} at the recorded rate",
     priceEstimateUnavailable: "Recorded rates could not be loaded. The listing price is unchanged.",
+    recordedRatesTitle: "Recorded exchange rates",
+    recordedRatesNote:
+      "An administrator records these pairs. They are not a market price, and a listing still charges in its own currency.",
+    recordedRatePair: "{base} = {quote}",
+    recordedRatesEmpty:
+      "No exchange pairs are recorded yet. Listing prices stay in their own currency.",
     noPreview: "No preview",
     updated: "upd",
     noReviewsYet: "No reviews yet",

@@ -11,6 +11,7 @@ import {
   isWalletEngineEnabled,
   WalletPaymentService,
 } from "../../../lib/services/commerce/wallet-payment-service";
+import { formatFinancialMinor } from "../../commerce/financial-i18n";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellStack6 } from "../../shell/page-shell";
 import {
@@ -196,6 +197,36 @@ export async function MarketPage({
           );
         })}
       </nav>
+
+      {walletEnabled ? (
+        <section aria-labelledby="market-recorded-rates" className={typeSmMuted}>
+          <h2 id="market-recorded-rates" className={typeSemiboldPrimary}>
+            {dictionary.market.recordedRatesTitle}
+          </h2>
+          <p role="note">{dictionary.market.recordedRatesNote}</p>
+          {catalogRates === null ? (
+            <p>{dictionary.market.priceEstimateUnavailable}</p>
+          ) : catalogRates && catalogRates.length > 0 ? (
+            <ul>
+              {catalogRates.map((rate) => (
+                <li key={`${rate.baseCurrency}-${rate.quoteCurrency}`}>
+                  {dictionary.market.recordedRatePair
+                    .replace(
+                      "{base}",
+                      formatFinancialMinor(rate.baseAmount, rate.baseCurrency, locale),
+                    )
+                    .replace(
+                      "{quote}",
+                      formatFinancialMinor(rate.quoteAmount, rate.quoteCurrency, locale),
+                    )}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>{dictionary.market.recordedRatesEmpty}</p>
+          )}
+        </section>
+      ) : null}
 
       {!catalog ? (
         <ErrorState
