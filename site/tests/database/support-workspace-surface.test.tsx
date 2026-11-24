@@ -197,7 +197,8 @@ it("passes the filtered queue href into the case thread surface", async () => {
   });
   expect(isValidElement(node)).toBe(true);
   if (isValidElement(node)) {
-    const back = new URL(node.props.queueHref as string, "https://nexus.test");
+    const props = node.props as { queueHref?: string };
+    const back = new URL(props.queueHref ?? "", "https://nexus.test");
     expect(back.pathname).toBe("/support");
     expect(back.searchParams.get("q")).toBe("billing");
     expect(back.searchParams.get("status")).toBe("open");
