@@ -1,5 +1,6 @@
 vi.mock("server-only", () => ({}));
 
+import { isValidElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
@@ -187,6 +188,23 @@ it.each(["en", "ru"] as const)(
     expect(invalid).not.toContain("../private");
   },
 );
+it("passes the filtered queue href into the case thread surface", async () => {
+  const id = `sup_${"a".repeat(24)}`;
+  mocks.session.mockResolvedValue({ id: "actor", role: "user" });
+  const node = await SupportPageSurface({
+    id,
+    searchParams: Promise.resolve({ q: "billing", status: "open", page: "2" }),
+  });
+  expect(isValidElement(node)).toBe(true);
+  if (isValidElement(node)) {
+    const back = new URL(node.props.queueHref as string, "https://nexus.test");
+    expect(back.pathname).toBe("/support");
+    expect(back.searchParams.get("q")).toBe("billing");
+    expect(back.searchParams.get("status")).toBe("open");
+    expect(back.searchParams.get("page")).toBe("2");
+  }
+});
+
 it("remounts support list and thread when the authenticated actor changes", async () => {
   const id = `sup_${"a".repeat(24)}`;
   mocks.session.mockResolvedValue({ id: "actor_a", role: "user" });

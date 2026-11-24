@@ -55,10 +55,12 @@ export function SupportCaseThread({
   caseId,
   actorId,
   staffMode = false,
+  queueHref,
 }: {
   caseId: string;
   actorId: string;
   staffMode?: boolean;
+  queueHref?: string;
 }) {
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.support,
@@ -317,7 +319,8 @@ export function SupportCaseThread({
     }
   }
 
-  const backHref = staffMode ? "/admin/support" : "/support";
+  const caseBase = `${staffMode ? "/admin/support" : "/support"}/${caseId}`;
+  const backHref = queueHref ?? (staffMode ? "/admin/support" : "/support");
 
   if (loading) {
     return (
@@ -415,7 +418,7 @@ export function SupportCaseThread({
           locale={locale}
           onChangeStatus={(status) => void updateStatus(status)}
         />
-        <Link href={`${backHref}/${caseId}/messages`} className={linkAccentSm}>
+        <Link href={`${caseBase}/messages`} className={linkAccentSm}>
           {supportMessageCopy(locale).title}
         </Link>
       </header>
@@ -471,7 +474,7 @@ export function SupportCaseThread({
             </div>
             <p className={typePrewrapSmLeadingSecondary}>{message.body}</p>
             <Link
-              href={`${backHref}/${caseId}/messages?focus=${message.id}#message-${message.id}`}
+              href={`${caseBase}/messages?focus=${message.id}#message-${message.id}`}
               className={`mt-2 ${linkAccentXs}`}
             >
               {supportMessageCopy(locale).link}
