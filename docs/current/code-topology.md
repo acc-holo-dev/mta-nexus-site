@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
-**measured_at:** 22 ноября 2026 (Europe/Moscow).  
-**source_sha:** `073c28572` (`cursor/wallet-spend-settle-d07d`, NX-015 residual catalog honesty).  
+**measured_at:** 24 ноября 2026 (Europe/Moscow).  
+**source_sha:** `7d03a985e` (`cursor/shell-wallet-profile-2e5e`, sticky desktop rail and owner wallet on profile).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -31,7 +31,7 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    |            Факт на `073c28572` |
+| Область                    |            Факт на `7d03a985e` |
 | -------------------------- | -----------------------------: |
 | `features/*` domains       |                             13 |
 | `components/` tree files   |                              0 |
@@ -42,7 +42,7 @@ site/
 | `lib/services/` root files |                              0 |
 | `lib/**/*-i18n.ts`         |                              0 |
 | `app/**/route.ts`          |                            301 |
-| `site/tests` files         |                           1765 |
+| `site/tests` files         |                           1767 |
 | `@nexus/ui` src files      |                             20 |
 | `@nexus/domain` src files  |                             57 |
 | `@nexus/db` src files      |                            206 |
@@ -51,7 +51,7 @@ site/
 
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
-| accounts      |    91 | 235745 |
+| accounts      |    92 | 238991 |
 | commerce      |   188 | 765800 |
 | community     |   154 | 635565 |
 | discovery     |    22 |  50388 |
@@ -61,7 +61,7 @@ site/
 | organizations |    59 | 202271 |
 | resources     |   232 | 935216 |
 | servers       |   111 | 382891 |
-| shell         |   101 | 210725 |
+| shell         |   101 | 211264 |
 | support       |    28 | 117845 |
 | trust         |    28 |  83844 |
 
