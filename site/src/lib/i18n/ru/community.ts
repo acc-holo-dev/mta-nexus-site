@@ -103,6 +103,12 @@ export const community = {
     ownWalletOff:
       "Кошелёк площадки на этом развёртывании выключен, поэтому доступный баланс не показывается. Финансовые выписки остаются в разделе «Финансы».",
     ownWalletUnavailable: "Доступный баланс не загрузился. Это не нулевой баланс.",
+    ownWalletEstimate:
+      "{base} — примерно {quote} по записанному курсу. Баланс при этом не двигается.",
+    ownWalletEstimateNone: "Записанного курса из {base} в {quote} нет.",
+    ownWalletEstimateDust: "Записанный курс из {base} в {quote} слишком мал, чтобы его показать.",
+    ownWalletEstimateInvalid: "Записанный курс из {base} в {quote} нельзя показать.",
+    ownWalletEstimateUnavailable: "Записанные курсы не загрузились. Балансы выше не изменились.",
     openWallet: "Открыть кошелёк",
     openFinance: "Открыть финансы",
   },

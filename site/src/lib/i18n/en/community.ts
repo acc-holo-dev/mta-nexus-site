@@ -104,6 +104,13 @@ export const community = {
     ownWalletOff:
       "Site wallet is off on this deployment, so there is no available balance to show. Finance still lists statements.",
     ownWalletUnavailable: "Available balance could not be loaded. This is not a zero balance.",
+    ownWalletEstimate:
+      "{base} is about {quote} at the recorded rate. This does not move the balance.",
+    ownWalletEstimateNone: "No recorded rate from {base} to {quote}.",
+    ownWalletEstimateDust: "The recorded rate from {base} to {quote} is too small to show.",
+    ownWalletEstimateInvalid: "The recorded rate from {base} to {quote} cannot be shown.",
+    ownWalletEstimateUnavailable:
+      "Recorded rates could not be loaded. The balances above are unchanged.",
     openWallet: "Open wallet",
     openFinance: "Open finance",
   },

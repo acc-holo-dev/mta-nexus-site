@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   loadOwnProfileBalances,
+  profileFxLines,
   showOwnProfileWallet,
 } from "../../src/features/accounts/profile-wallet-visibility";
 
@@ -35,6 +36,23 @@ describe("own profile wallet visibility", () => {
       { currency: "USD", available: null },
       { currency: "EUR", available: 1250 },
       { currency: "RUB", available: 0 },
+    ]);
+  });
+
+  it("quotes a known balance and keeps a missing rate distinct from zero", () => {
+    const lines = profileFxLines(
+      [
+        { currency: "USD", available: 100 },
+        { currency: "EUR", available: null },
+        { currency: "RUB", available: 0 },
+      ],
+      [{ baseCurrency: "USD", quoteCurrency: "RUB", baseAmount: 100, quoteAmount: 9000 }],
+    );
+    expect(lines).toEqual([
+      { kind: "none", base: "USD", quote: "EUR" },
+      { kind: "quote", base: "USD", quote: "RUB", amount: 9000 },
+      { kind: "none", base: "RUB", quote: "USD" },
+      { kind: "none", base: "RUB", quote: "EUR" },
     ]);
   });
 });
