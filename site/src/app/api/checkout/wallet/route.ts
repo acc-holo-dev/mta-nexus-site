@@ -28,6 +28,7 @@ export const POST = withBrowserMutation(function POST(request: NextRequest) {
       currentToken: token,
       productIds: parsed.data.productIds,
       ...(parsed.data.buildId ? { buildId: parsed.data.buildId } : {}),
+      ...(parsed.data.promoCode ? { promoCode: parsed.data.promoCode } : {}),
     });
     return {
       orderId: settled.orderId,
@@ -37,6 +38,9 @@ export const POST = withBrowserMutation(function POST(request: NextRequest) {
       status: settled.status,
       totalAmount: settled.totalAmount,
       currency: settled.currency,
+      listAmount: settled.listAmount,
+      discountAmount: settled.discountAmount,
+      promoCode: settled.promoCode,
       alreadySettled: settled.alreadySettled,
       purchasedBuilds: settled.purchasedBuilds,
       actorId: actor.id,

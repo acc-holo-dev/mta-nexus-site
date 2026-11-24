@@ -147,6 +147,7 @@ vi.mock("../../src/lib/services/resources/resource-release-watches-service", () 
 }));
 
 vi.mock("@nexus/db", () => ({
+  promoCodeRepository: {},
   resourceMediaRepository: { publicItems: async () => [], managed: async () => ({ items: [] }) },
   notificationRepository: {
     getPreferences: vi.fn(async () => ({

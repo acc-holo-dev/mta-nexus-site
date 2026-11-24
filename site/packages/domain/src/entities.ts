@@ -328,6 +328,10 @@ export interface Order {
   status: OrderStatus;
   totalAmount: number;
   currency: string;
+  /** Catalog sum when a promo code lowered totalAmount. Null means no code. */
+  listAmount?: number | null;
+  discountAmount?: number | null;
+  promoCode?: string | null;
   items: OrderItem[];
   createdAt: Date;
   updatedAt: Date;

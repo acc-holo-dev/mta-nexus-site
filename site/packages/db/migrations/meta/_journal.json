@@ -673,6 +673,13 @@
       "when": 1794567600000,
       "tag": "0095_ledger_staff_grant",
       "breakpoints": true
+    },
+    {
+      "idx": 96,
+      "version": "7",
+      "when": 1794654000000,
+      "tag": "0096_promo_codes",
+      "breakpoints": true
     }
   ]
 }

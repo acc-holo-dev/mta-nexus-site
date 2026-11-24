@@ -7,6 +7,7 @@ import {
   orderRepository,
   organizationRepository,
   productRepository,
+  promoCodeRepository,
   type StaleUnpaidOrderExpiry,
   userRepository,
   type WalletOrderRefundResult,
@@ -35,11 +36,15 @@ import {
   markTopUpAwaitingProvider,
   markTopUpFailed,
   markWithdrawalAwaitingProvider,
+  normalizePromoCode,
   ORDER_TERMS_LINE_LIMIT,
   type Order,
   type PaymentProviderId,
   type PaymentProviderPort,
+  type PromoCodeRecord,
+  type PromoQuote,
   paymentProviderCapabilityMatrix,
+  quotePromoDiscount,
   selectPaymentProvider,
   type TopUpIntent,
   type User,
@@ -86,6 +91,7 @@ export class WalletPaymentService {
     private readonly holds = walletSellerHoldRepository,
     private readonly orderOperations = orderOperationsRepository,
     private readonly builds = buildRepository,
+    private readonly promos = promoCodeRepository,
   ) {}
 
   /**
@@ -572,7 +578,15 @@ export class WalletPaymentService {
     currentToken: string;
     productIds: string[];
     buildId?: string;
-  }): Promise<WalletOrderSettlementResult & { orderNumber: string }> {
+    promoCode?: string;
+  }): Promise<
+    WalletOrderSettlementResult & {
+      orderNumber: string;
+      listAmount: number;
+      discountAmount: number;
+      promoCode: string | null;
+    }
+  > {
     const uniqueIds = [...new Set(input.productIds)];
     if (
       uniqueIds.length === 0 ||
@@ -616,6 +630,21 @@ export class WalletPaymentService {
     if (total <= 0n || total > 100_000_000n) {
       throw new AppError("Order total is out of range", 400, "ORDER_NOT_PAYABLE");
     }
+    const listAmount = Number(total);
+    let chargedAmount = listAmount;
+    let discountAmount = 0;
+    let appliedCode: string | null = null;
+    if (input.promoCode) {
+      const quote = await this.quotePromoForList({
+        buyerId: input.user.id,
+        code: input.promoCode,
+        listAmount,
+        currency,
+      });
+      chargedAmount = quote.chargedAmount;
+      discountAmount = quote.discountAmount;
+      appliedCode = quote.code;
+    }
 
     const purchasedBuilds: WalletPurchasedBuild[] = [];
     if (input.buildId) {
@@ -637,8 +666,11 @@ export class WalletPaymentService {
       orderNumber,
       buyerId: input.user.id,
       status: "pending",
-      totalAmount: Number(total),
+      totalAmount: chargedAmount,
       currency,
+      listAmount: appliedCode ? listAmount : null,
+      discountAmount: appliedCode ? discountAmount : null,
+      promoCode: appliedCode,
       items: ordered.map((product) => ({
         id: generateId("ite"),
         orderId,
@@ -655,7 +687,150 @@ export class WalletPaymentService {
       orderId,
       purchasedBuilds,
     });
-    return { ...settled, orderNumber };
+    return {
+      ...settled,
+      orderNumber,
+      listAmount,
+      discountAmount,
+      promoCode: appliedCode,
+    };
+  }
+
+  /**
+   * Preview a platform promo against the current published paid catalog.
+   * Does not reserve the code. Settlement rechecks and redeems it.
+   */
+  async quoteWalletPromo(input: {
+    user: User;
+    productIds: string[];
+    buildId?: string;
+    promoCode: string;
+  }): Promise<PromoQuote> {
+    if (!isWalletEngineEnabled()) {
+      throw new AppError("Wallet engine is disabled", 404, "WALLET_ENGINE_DISABLED");
+    }
+    const priced = await this.checkoutAndSettleCatalog(input);
+    return this.quotePromoForList({
+      buyerId: input.user.id,
+      code: input.promoCode,
+      listAmount: priced.listAmount,
+      currency: priced.currency,
+    });
+  }
+
+  async createPromoCode(input: {
+    actor: User;
+    code: string;
+    kind: "percent" | "fixed";
+    percent?: number;
+    amount?: number;
+    currency?: WalletCurrency;
+    maxRedemptions?: number;
+  }): Promise<PromoCodeRecord> {
+    if (!isWalletEngineEnabled()) {
+      throw new AppError("Wallet engine is disabled", 404, "WALLET_ENGINE_DISABLED");
+    }
+    if (input.actor.role !== "admin") throw new ForbiddenError();
+    const code = normalizePromoCode(input.code);
+    if (input.kind === "percent") {
+      if (
+        !Number.isSafeInteger(input.percent) ||
+        (input.percent ?? 0) < 1 ||
+        (input.percent ?? 0) > 90 ||
+        input.amount !== undefined ||
+        input.currency
+      ) {
+        throw new AppError("Promo code is invalid", 400, "PROMO_INVALID");
+      }
+    } else if (
+      !Number.isSafeInteger(input.amount) ||
+      (input.amount ?? 0) < 1 ||
+      !input.currency ||
+      input.percent !== undefined
+    ) {
+      throw new AppError("Promo code is invalid", 400, "PROMO_INVALID");
+    }
+    return this.promos.create({
+      actorId: input.actor.id,
+      code,
+      kind: input.kind,
+      percent: input.kind === "percent" ? (input.percent ?? null) : null,
+      amount: input.kind === "fixed" ? (input.amount ?? null) : null,
+      currency: input.kind === "fixed" ? (input.currency ?? null) : null,
+      maxRedemptions: input.maxRedemptions ?? null,
+    });
+  }
+
+  private async quotePromoForList(input: {
+    buyerId: string;
+    code: string;
+    listAmount: number;
+    currency: WalletCurrency;
+  }): Promise<PromoQuote> {
+    const code = normalizePromoCode(input.code);
+    const promo = await this.promos.findByCode(code);
+    if (!promo) throw new AppError("Promo code was not found", 404, "PROMO_NOT_FOUND");
+    if (await this.promos.buyerHasRedeemed(input.buyerId, code)) {
+      throw new AppError("Promo code was already used", 409, "PROMO_ALREADY_USED");
+    }
+    return quotePromoDiscount({
+      listAmount: input.listAmount,
+      currency: input.currency,
+      promo,
+      now: new Date(),
+    });
+  }
+
+  private async checkoutAndSettleCatalog(input: {
+    productIds: string[];
+    buildId?: string;
+  }): Promise<{ listAmount: number; currency: WalletCurrency }> {
+    const uniqueIds = [...new Set(input.productIds)];
+    if (
+      uniqueIds.length === 0 ||
+      uniqueIds.length > ORDER_TERMS_LINE_LIMIT ||
+      uniqueIds.length !== input.productIds.length
+    ) {
+      throw new AppError("Invalid wallet checkout", 400, "WALLET_CHECKOUT_INVALID");
+    }
+    if (input.buildId && uniqueIds.length !== 1) {
+      throw new AppError("Invalid wallet checkout", 400, "WALLET_CHECKOUT_INVALID");
+    }
+    const catalog = await this.products.listPublishedPaidByIds(uniqueIds);
+    if (catalog.length !== uniqueIds.length) {
+      throw new AppError("Catalog terms changed", 409, "ORDER_CATALOG_CHANGED");
+    }
+    const byId = new Map(catalog.map((product) => [product.id, product]));
+    const ordered = uniqueIds.map((id) => {
+      const product = byId.get(id);
+      if (!product) throw new AppError("Catalog terms changed", 409, "ORDER_CATALOG_CHANGED");
+      return product;
+    });
+    const first = ordered[0];
+    if (!first) throw new AppError("Catalog terms changed", 409, "ORDER_CATALOG_CHANGED");
+    const currency = first.currency as WalletCurrency;
+    if (!["USD", "EUR", "RUB"].includes(currency)) {
+      throw new AppError("Order currency is not supported", 400, "WALLET_CURRENCY_INVALID");
+    }
+    if (ordered.some((product) => product.currency !== currency)) {
+      throw new AppError("Mixed currencies are not supported", 400, "WALLET_CHECKOUT_INVALID");
+    }
+    let total = 0n;
+    for (const product of ordered) {
+      if (!Number.isSafeInteger(product.price) || product.price <= 0) {
+        throw new AppError("Catalog terms changed", 409, "ORDER_CATALOG_CHANGED");
+      }
+      total += BigInt(product.price);
+    }
+    if (total <= 1n || total > 100_000_000n) {
+      throw new AppError("Order total is out of range", 400, "ORDER_NOT_PAYABLE");
+    }
+    if (input.buildId) {
+      const build = await this.builds.findPublishedByProductAndId(first.id, input.buildId);
+      if (!build)
+        throw new AppError("Published build is unavailable", 409, "ORDER_CATALOG_CHANGED");
+    }
+    return { listAmount: Number(total), currency };
   }
 
   async getAvailableBalance(accountId: string, currency: WalletCurrency): Promise<number> {

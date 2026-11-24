@@ -145,6 +145,10 @@ const buildId = z
   .string()
   .regex(/^[A-Za-z0-9_-]{1,128}$/u, "Build id must be 1–128 URL-safe characters");
 
+const promoCode = z
+  .string()
+  .regex(/^[A-Za-z0-9]{4,16}$/u, "Promo code must be 4–16 letters or digits");
+
 export const walletCheckoutSchema = z
   .object({
     productIds: z
@@ -154,6 +158,8 @@ export const walletCheckoutSchema = z
       .refine((ids) => new Set(ids).size === ids.length, "Product ids must be unique"),
     /** Optional published build bind for single-product checkout evidence. */
     buildId: buildId.optional(),
+    /** Optional platform promo. Settlement rechecks the discount. */
+    promoCode: promoCode.optional(),
   })
   .strict()
   .superRefine((value, ctx) => {
@@ -162,6 +168,63 @@ export const walletCheckoutSchema = z
         code: z.ZodIssueCode.custom,
         message: "buildId requires exactly one productId",
         path: ["buildId"],
+      });
+    }
+  });
+
+export const walletPromoQuoteSchema = z
+  .object({
+    productIds: z
+      .array(productId)
+      .min(1)
+      .max(20)
+      .refine((ids) => new Set(ids).size === ids.length, "Product ids must be unique"),
+    buildId: buildId.optional(),
+    promoCode,
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    if (value.buildId && value.productIds.length !== 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "buildId requires exactly one productId",
+        path: ["buildId"],
+      });
+    }
+  });
+
+export const walletPromoCreateSchema = z
+  .object({
+    code: promoCode,
+    kind: z.enum(["percent", "fixed"]),
+    percent: z.number().int().min(1).max(90).optional(),
+    amount: z.number().int().min(1).max(100_000_000).optional(),
+    currency: currency.optional(),
+    maxRedemptions: z.number().int().min(1).max(100_000).optional(),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    if (value.kind === "percent") {
+      if (
+        value.percent === undefined ||
+        value.amount !== undefined ||
+        value.currency !== undefined
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Percent codes take a percent and no amount",
+          path: ["percent"],
+        });
+      }
+    } else if (
+      value.amount === undefined ||
+      value.currency === undefined ||
+      value.percent !== undefined
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Fixed codes take an amount and a currency",
+        path: ["amount"],
       });
     }
   });

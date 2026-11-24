@@ -682,6 +682,8 @@ export function buildWalletSpendPosting(input: {
     amount: number;
     entryId: string;
   }>;
+  /** Platform-funded gap so seller gross stays the catalog price. */
+  promoFunding?: { amount: number; entryId: string; code: string };
 }): LedgerPosting[] {
   assertWalletAccountId(input.accountId);
   assertWalletAmount(input.amount);
@@ -695,10 +697,21 @@ export function buildWalletSpendPosting(input: {
   if (input.availableBalance < input.amount) {
     throw new AppError("Insufficient wallet balance", 409, "WALLET_INSUFFICIENT_FUNDS");
   }
+  const promoFunding = input.promoFunding ?? null;
+  if (
+    promoFunding &&
+    (!Number.isSafeInteger(promoFunding.amount) ||
+      promoFunding.amount <= 0 ||
+      !/^[A-Z0-9]{4,16}$/u.test(promoFunding.code) ||
+      !/^[A-Za-z0-9_-]{1,128}$/u.test(promoFunding.entryId))
+  ) {
+    throw new AppError("Promo funding is invalid", 400, "PROMO_INVALID");
+  }
+  const fundedAmount = input.amount + (promoFunding?.amount ?? 0);
   if (
     !Number.isSafeInteger(input.platformFee) ||
     input.platformFee < 0 ||
-    input.platformFee > input.amount
+    input.platformFee > fundedAmount
   ) {
     throw new AppError("Platform fee is out of range", 400, "WALLET_SPEND_INVALID");
   }
@@ -710,6 +723,7 @@ export function buildWalletSpendPosting(input: {
   const seenSellers = new Set<string>();
   const seenEscrows = new Set<string>();
   const seenEntryIds = new Set<string>([input.userEntryId, input.platformFeeEntryId]);
+  if (promoFunding) seenEntryIds.add(promoFunding.entryId);
   for (const hold of input.sellerHolds) {
     assertWalletAccountId(hold.sellerAccountId);
     assertEscrowAccountId(hold.escrowAccountId);
@@ -731,7 +745,7 @@ export function buildWalletSpendPosting(input: {
     seenEntryIds.add(hold.entryId);
     sellerTotal += hold.amount;
   }
-  if (input.platformFee + sellerTotal !== input.amount) {
+  if (input.platformFee + sellerTotal !== fundedAmount) {
     throw new AppError("Wallet spend split does not balance", 400, "WALLET_SPEND_INVALID");
   }
 
@@ -747,6 +761,17 @@ export function buildWalletSpendPosting(input: {
       description: `Wallet spend for order ${input.orderId}`,
     },
   ];
+  if (promoFunding) {
+    entries.push({
+      id: promoFunding.entryId,
+      accountId: "platform:promo",
+      amount: -promoFunding.amount,
+      currency: input.currency,
+      referenceType: "fee",
+      referenceId: input.orderId,
+      description: `Platform promo ${promoFunding.code} for order ${input.orderId}`,
+    });
+  }
   if (input.platformFee > 0) {
     entries.push({
       id: input.platformFeeEntryId,
@@ -795,6 +820,8 @@ export function buildWalletOrderRefundPosting(input: {
     status: WalletSellerHoldStatus;
     entryId: string;
   }>;
+  /** Restores the platform promo debit from the original spend. */
+  promoRestore?: { amount: number; entryId: string; code: string };
 }): LedgerPosting[] {
   assertWalletAccountId(input.buyerAccountId);
   assertWalletAmount(input.amount);
@@ -802,14 +829,25 @@ export function buildWalletOrderRefundPosting(input: {
   if (!/^[A-Za-z0-9_-]{1,128}$/u.test(input.orderId)) {
     throw new AppError("Order id is invalid", 400, "WALLET_ORDER_INVALID");
   }
+  const promoRestore = input.promoRestore ?? null;
+  if (
+    promoRestore &&
+    (!Number.isSafeInteger(promoRestore.amount) ||
+      promoRestore.amount <= 0 ||
+      !/^[A-Z0-9]{4,16}$/u.test(promoRestore.code) ||
+      !/^[A-Za-z0-9_-]{1,128}$/u.test(promoRestore.entryId))
+  ) {
+    throw new AppError("Promo funding is invalid", 400, "PROMO_INVALID");
+  }
+  const fundedAmount = input.amount + (promoRestore?.amount ?? 0);
   if (
     !Number.isSafeInteger(input.platformFee) ||
     input.platformFee < 0 ||
-    input.platformFee > input.amount
+    input.platformFee > fundedAmount
   ) {
     throw new AppError("Platform fee is out of range", 400, "WALLET_REFUND_INVALID");
   }
-  if (input.holds.length === 0 && input.platformFee !== input.amount) {
+  if (input.holds.length === 0 && input.platformFee !== fundedAmount) {
     throw new AppError(
       "Wallet refund requires seller holds or full fee",
       400,
@@ -820,6 +858,7 @@ export function buildWalletOrderRefundPosting(input: {
   let holdTotal = 0;
   const seenHolds = new Set<string>();
   const seenEntryIds = new Set<string>([input.buyerEntryId, input.platformFeeEntryId]);
+  if (promoRestore) seenEntryIds.add(promoRestore.entryId);
   for (const hold of input.holds) {
     if (hold.status === "cancelled") {
       throw new AppError("Hold is already cancelled", 409, "WALLET_HOLD_STATE");
@@ -841,7 +880,7 @@ export function buildWalletOrderRefundPosting(input: {
     seenEntryIds.add(hold.entryId);
     holdTotal += hold.amount;
   }
-  if (input.platformFee + holdTotal !== input.amount) {
+  if (input.platformFee + holdTotal !== fundedAmount) {
     throw new AppError("Wallet refund split does not balance", 400, "WALLET_REFUND_INVALID");
   }
 
@@ -856,6 +895,17 @@ export function buildWalletOrderRefundPosting(input: {
       description: `Wallet refund for order ${input.orderId}`,
     },
   ];
+  if (promoRestore) {
+    entries.push({
+      id: promoRestore.entryId,
+      accountId: "platform:promo",
+      amount: promoRestore.amount,
+      currency: input.currency,
+      referenceType: "refund",
+      referenceId: input.orderId,
+      description: `Restore platform promo ${promoRestore.code} for order ${input.orderId}`,
+    });
+  }
   if (input.platformFee > 0) {
     entries.push({
       id: input.platformFeeEntryId,

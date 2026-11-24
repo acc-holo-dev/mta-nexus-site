@@ -34,6 +34,9 @@ export class OrderRepository {
             status: orders.status,
             totalAmount: orders.totalAmount,
             currency: orders.currency,
+            listAmount: orders.listAmount,
+            discountAmount: orders.discountAmount,
+            promoCode: orders.promoCode,
             createdAt: orders.createdAt,
             updatedAt: orders.updatedAt,
           })
@@ -221,6 +224,9 @@ export class OrderRepository {
       status: order.status,
       totalAmount: order.totalAmount,
       currency: order.currency,
+      listAmount: order.listAmount ?? null,
+      discountAmount: order.discountAmount ?? null,
+      promoCode: order.promoCode ?? null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -236,6 +242,9 @@ export class OrderRepository {
           status: orders.status,
           totalAmount: orders.totalAmount,
           currency: orders.currency,
+          listAmount: orders.listAmount,
+          discountAmount: orders.discountAmount,
+          promoCode: orders.promoCode,
           createdAt: orders.createdAt,
           updatedAt: orders.updatedAt,
         })
@@ -248,7 +257,10 @@ export class OrderRepository {
           existing.buyerId !== order.buyerId ||
           existing.orderNumber !== order.orderNumber ||
           existing.currency !== order.currency ||
-          existing.totalAmount !== order.totalAmount
+          existing.totalAmount !== order.totalAmount ||
+          existing.listAmount !== (order.listAmount ?? null) ||
+          existing.discountAmount !== (order.discountAmount ?? null) ||
+          existing.promoCode !== (order.promoCode ?? null)
         )
           throw new AppError("Order request changed", 409, "ORDER_REQUEST_CONFLICT");
         if (existing.status !== "pending")
@@ -370,6 +382,9 @@ export class OrderRepository {
           itemCount: items.length,
           totalAmount: order.totalAmount,
           currency: order.currency,
+          listAmount: order.listAmount ?? null,
+          discountAmount: order.discountAmount ?? null,
+          promoCode: order.promoCode ?? null,
         },
       });
       const [record] = await tx

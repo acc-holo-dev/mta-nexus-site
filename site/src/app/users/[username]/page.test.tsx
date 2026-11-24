@@ -34,6 +34,7 @@ const state = vi.hoisted(() => ({
   muteState: vi.fn(async () => ({ muted: false, mutedUntil: null as string | null })),
 }));
 vi.mock("@nexus/db", () => ({
+  promoCodeRepository: {},
   userRepository: {
     findByUsername: async () =>
       state.exists
