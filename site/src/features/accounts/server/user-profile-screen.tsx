@@ -55,7 +55,6 @@ import { profilePrivacyCopy } from "../profile-privacy-copy";
 import { loadOwnProfileBalances, showOwnProfileWallet } from "../profile-wallet-visibility";
 
 const getProfile = cache((username: string) => userRepository.findByUsername(username));
-const profileWallet = new WalletPaymentService();
 
 export async function userProfileMetadata({
   params,
@@ -179,7 +178,7 @@ export async function UserProfileScreen({
   });
   const walletBalances =
     ownWallet && walletEnabled
-      ? await loadOwnProfileBalances(profileWallet, `user:${user.id}`)
+      ? await loadOwnProfileBalances(new WalletPaymentService(), `user:${user.id}`)
       : null;
 
   return (
