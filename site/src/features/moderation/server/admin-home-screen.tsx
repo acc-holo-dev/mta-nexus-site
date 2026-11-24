@@ -267,6 +267,11 @@ export async function AdminHomeScreen({
               {getWalletCopy(locale).promoTitle}
             </Link>
           ) : null}
+          {currentUser.role === "admin" ? (
+            <Link href="/admin/commerce/fx-rates" className={chromeLinkClass}>
+              {getWalletCopy(locale).fxAdminTitle}
+            </Link>
+          ) : null}
           <Link href="/admin/support" className={chromeLinkClass}>
             {copy.supportQueue}
           </Link>

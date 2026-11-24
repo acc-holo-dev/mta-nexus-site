@@ -229,6 +229,19 @@ export const walletPromoCreateSchema = z
     }
   });
 
+export const walletFxRateSchema = z
+  .object({
+    baseCurrency: currency,
+    quoteCurrency: currency,
+    baseAmount: z.number().int().min(1).max(100_000_000),
+    quoteAmount: z.number().int().min(1).max(100_000_000),
+  })
+  .strict()
+  .refine((value) => value.baseCurrency !== value.quoteCurrency, {
+    message: "Exchange rate must use two currencies",
+    path: ["quoteCurrency"],
+  });
+
 export const walletWithdrawalCreateSchema = z
   .object({
     amount: z.number().int().positive().max(2_147_483_647),

@@ -759,6 +759,35 @@ export const promoRedemptions = pgTable(
   ],
 );
 
+/** Admin-recorded minor-unit pair. Not a market price and not a balance movement. */
+export const walletFxRates = pgTable(
+  "wallet_fx_rates",
+  {
+    id: text("id").primaryKey(),
+    baseCurrency: text("base_currency").notNull(),
+    quoteCurrency: text("quote_currency").notNull(),
+    baseAmount: integer("base_amount").notNull(),
+    quoteAmount: integer("quote_amount").notNull(),
+    updatedBy: text("updated_by")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("wallet_fx_rates_pair_idx").on(table.baseCurrency, table.quoteCurrency),
+    check("wallet_fx_rates_id_check", sql`${table.id} ~ '^fxr_[a-f0-9]{24}$'`),
+    check(
+      "wallet_fx_rates_pair_check",
+      sql`${table.baseCurrency} IN ('USD', 'EUR', 'RUB')
+        AND ${table.quoteCurrency} IN ('USD', 'EUR', 'RUB')
+        AND ${table.baseCurrency} <> ${table.quoteCurrency}
+        AND ${table.baseAmount} BETWEEN 1 AND 100000000
+        AND ${table.quoteAmount} BETWEEN 1 AND 100000000`,
+    ),
+  ],
+);
+
 // Account-scoped acquisition basket. This contains no payments or balances.
 export const resourceCartItems = pgTable(
   "resource_cart_items",

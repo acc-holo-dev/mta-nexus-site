@@ -38,6 +38,7 @@ export * from "./plan-reviews";
 export * from "./private-change-history";
 export * from "./product-types";
 export * from "./promo-codes";
+export * from "./wallet-fx";
 export * from "./release-pagination";
 export * from "./resource-build-workspace";
 export * from "./resource-cart-receipts";

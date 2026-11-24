@@ -1,4 +1,11 @@
-import { AppError, type LedgerEntry, type TopUpIntent, type WithdrawalIntent } from "@nexus/domain";
+import {
+  AppError,
+  type ExplicitFxRate,
+  type LedgerEntry,
+  quoteExplicitFx,
+  type TopUpIntent,
+  type WithdrawalIntent,
+} from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
@@ -39,6 +46,44 @@ import {
 
 const walletPaymentService = new WalletPaymentService();
 const CURRENCIES = ["USD", "EUR", "RUB"] as const;
+
+function FxEstimate({
+  copy,
+  locale,
+  rate,
+  sourceAmount,
+  sourceCurrency,
+}: {
+  copy: ReturnType<typeof getWalletCopy>;
+  locale: Parameters<typeof formatFinancialMinor>[2];
+  rate: ExplicitFxRate;
+  sourceAmount: number;
+  sourceCurrency: string;
+}) {
+  let destination: number;
+  try {
+    destination = quoteExplicitFx({
+      sourceAmount,
+      baseAmount: rate.baseAmount,
+      quoteAmount: rate.quoteAmount,
+    });
+  } catch (error) {
+    const code = error instanceof AppError ? error.code : "";
+    return <p className={typeXsMuted}>{code === "FX_EXCEEDS" ? copy.fxExceeds : copy.fxDust}</p>;
+  }
+  return (
+    <p className={typeNumericPrimary}>
+      {copy.fxRate
+        .replace("{base}", formatFinancialMinor(rate.baseAmount, sourceCurrency, locale))
+        .replace("{quote}", formatFinancialMinor(rate.quoteAmount, rate.quoteCurrency, locale))}
+      {" · "}
+      {copy.fxEstimate.replace(
+        "{destination}",
+        formatFinancialMinor(destination, rate.quoteCurrency, locale),
+      )}
+    </p>
+  );
+}
 
 function maturedHoldCount(
   holds: Array<{ currency: string; releaseAt: string }> | null | undefined,
@@ -162,6 +207,8 @@ export async function WalletWorkspaceScreen({
     available === null
       ? null
       : await walletPaymentService.listRecentTopUps(accountId, 20).catch(() => null);
+  const fxRates =
+    available === null ? null : await walletPaymentService.listFxRates().catch(() => null);
   const activity =
     available === null
       ? null
@@ -267,6 +314,42 @@ export async function WalletWorkspaceScreen({
           </Link>
         ))}
       </nav>
+      <section className={panelSpace3P5} aria-labelledby="wallet-fx-heading">
+        <h3 id="wallet-fx-heading" className={typeSemiboldPrimary}>
+          {copy.fxTitle}
+        </h3>
+        <p role="note" className={typeXsMuted}>
+          {copy.fxNote}
+        </p>
+        {fxRates === null ? (
+          <p className={typeXsMuted}>{copy.fxUnavailable}</p>
+        ) : (
+          <ul className={typeSpace2Sm}>
+            {CURRENCIES.filter((value) => value !== currency).map((quoteCurrency) => {
+              const rate = fxRates.find(
+                (item) => item.baseCurrency === currency && item.quoteCurrency === quoteCurrency,
+              );
+              return (
+                <li key={quoteCurrency}>
+                  {rate ? (
+                    <FxEstimate
+                      copy={copy}
+                      locale={locale}
+                      rate={rate}
+                      sourceAmount={available ?? 0}
+                      sourceCurrency={currency}
+                    />
+                  ) : (
+                    <p className={typeXsMuted}>
+                      {quoteCurrency}: {copy.fxNone}
+                    </p>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
       <section className={panelSpace3P5} aria-labelledby="wallet-available-heading">
         <h3 id="wallet-available-heading" className={typeSemiboldPrimary}>
           {currency}

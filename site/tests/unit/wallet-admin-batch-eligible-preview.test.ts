@@ -18,6 +18,7 @@ vi.mock("@nexus/db", () => ({
   productRepository: {},
   userRepository: {},
   promoCodeRepository: {},
+  walletFxRateRepository: {},
   walletOrderSettlementRepository: {},
   walletSellerHoldRepository: {
     countEligibleMatured: (...args: unknown[]) => state.countHolds(...args),

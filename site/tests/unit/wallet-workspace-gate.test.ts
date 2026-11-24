@@ -7,6 +7,12 @@ const state = vi.hoisted(() => ({
   held: {} as Record<string, number>,
   fail: new Set<string>(),
   activity: [] as Array<Record<string, unknown>>,
+  fxRates: [] as Array<{
+    baseCurrency: string;
+    quoteCurrency: string;
+    baseAmount: number;
+    quoteAmount: number;
+  }>,
 }));
 
 vi.mock("next/headers", () => ({
@@ -38,6 +44,7 @@ vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
     listRecentTopUps = async () => [];
     listRecentActivity = async () => state.activity;
     getHeldBalance = async (_accountId: string, currency: string) => state.held[currency] ?? 0;
+    listFxRates = async () => state.fxRates;
     listHeld = async () => [];
     listManageableOrganizationSellerAccounts = async () => [
       { organizationId: "org_a", accountId: "org:org_a" },
@@ -82,6 +89,7 @@ describe("wallet workspace gate", () => {
     state.held = {};
     state.fail = new Set();
     state.activity = [];
+    state.fxRates = [];
   });
 
   it("hides the workspace wallet when the engine flag is off", async () => {
@@ -140,5 +148,22 @@ describe("wallet workspace gate", () => {
     expect(html).toContain("15.00 USD");
     expect(html).toContain(copy.balanceUnavailable);
     expect(html).not.toContain(copy.loadUnavailable);
+    expect(html).toContain(copy.fxNone);
+  });
+
+  it("shows a recorded rate and leaves the other direction unrecorded", async () => {
+    state.engine = true;
+    state.available = { USD: 10_000 };
+    state.fxRates = [
+      { baseCurrency: "USD", quoteCurrency: "RUB", baseAmount: 100, quoteAmount: 9_000 },
+    ];
+    const copy = getWalletCopy("en");
+    const html = renderToStaticMarkup(
+      await WalletWorkspaceScreen({ searchParams: Promise.resolve({ currency: "USD" }) }),
+    );
+    expect(html).toContain("1.00 USD");
+    expect(html).toContain("90.00 RUB");
+    expect(html).toContain("9,000.00 RUB");
+    expect(html).toContain(`EUR: ${copy.fxNone}`);
   });
 });
