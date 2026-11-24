@@ -97,7 +97,7 @@ function ActivityEstimate({
   copy: ReturnType<typeof getWalletCopy>;
   currency: string;
   locale: Parameters<typeof formatFinancialMinor>[2];
-  rates: readonly ExplicitFxRate[] | null;
+  rates: readonly ExplicitFxRate[] | null | undefined;
 }) {
   const lines = publicPriceEstimates({ price: amount, currency }, rates);
   if (lines === undefined) return null;
@@ -589,6 +589,13 @@ export async function WalletWorkspaceScreen({
                             {entry.amount < 0 ? "−" : "+"}
                             {formatFinancialMinor(Math.abs(entry.amount), entry.currency, locale)}
                           </p>
+                          <ActivityEstimate
+                            amount={Math.abs(entry.amount)}
+                            copy={copy}
+                            currency={entry.currency}
+                            locale={locale}
+                            rates={available === null ? undefined : fxRates}
+                          />
                           <p className={typeXsMuted}>
                             {entry.amount < 0 ? copy.activityDebit : copy.activityCredit} ·{" "}
                             {activityKindLabel(copy, entry.referenceType)} · {copy.recordedAt}:{" "}
