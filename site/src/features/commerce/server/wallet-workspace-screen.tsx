@@ -411,6 +411,13 @@ export async function WalletWorkspaceScreen({
                 <p className={typeNumericPrimary}>
                   {formatFinancialMinor(intent.amount, intent.currency, locale)}
                 </p>
+                <ActivityEstimate
+                  amount={intent.amount}
+                  copy={copy}
+                  currency={intent.currency}
+                  locale={locale}
+                  rates={available === null ? undefined : fxRates}
+                />
                 <p className={typeXsMuted}>
                   {statusLabel(copy, intent.status)} · {intent.id}
                 </p>
@@ -520,6 +527,13 @@ export async function WalletWorkspaceScreen({
                           <p className={typeNumericPrimary}>
                             {formatFinancialMinor(intent.amount, intent.currency, locale)}
                           </p>
+                          <ActivityEstimate
+                            amount={intent.amount}
+                            copy={copy}
+                            currency={intent.currency}
+                            locale={locale}
+                            rates={available === null ? undefined : fxRates}
+                          />
                           <p className={typeXsMuted}>
                             {statusLabel(copy, intent.status)} · {copy.recordedAt}:{" "}
                             {formatHistoryDate(new Date(intent.createdAt), locale)} · {intent.id}
@@ -747,6 +761,13 @@ export async function WalletWorkspaceScreen({
                 <p className={typeNumericPrimary}>
                   {formatFinancialMinor(intent.amount, intent.currency, locale)}
                 </p>
+                <ActivityEstimate
+                  amount={intent.amount}
+                  copy={copy}
+                  currency={intent.currency}
+                  locale={locale}
+                  rates={available === null ? undefined : fxRates}
+                />
                 <p className={typeXsMuted}>
                   {statusLabel(copy, intent.status)} · {copy.recordedAt}:{" "}
                   {formatHistoryDate(new Date(intent.createdAt), locale)} · {intent.id}
