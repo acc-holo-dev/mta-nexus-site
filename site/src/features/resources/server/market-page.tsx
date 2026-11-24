@@ -1,4 +1,4 @@
-import { PRODUCT_TYPES, type ProductType } from "@nexus/domain";
+import { explicitFxLines, PRODUCT_TYPES, type ProductType, WALLET_CURRENCIES } from "@nexus/domain";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { ChevronLeft, ChevronRight, Search, ShoppingBag } from "lucide-react";
 import type { Metadata } from "next";
@@ -7,7 +7,10 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { formatUnknown } from "../../../lib/i18n/unknown";
 import { productService } from "../../../lib/services/commerce/product-service";
-import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { linkAccentSm } from "../../shell/link-shell";
 import { pageShellStack6 } from "../../shell/page-shell";
 import {
@@ -90,6 +93,9 @@ export async function MarketPage({
   } catch {
     catalog = null;
   }
+  const catalogRates = walletEnabled
+    ? await new WalletPaymentService().listFxRates().catch(() => null)
+    : undefined;
 
   const filtersActive = type !== "all" || sort !== "popular" || Boolean(query) || page > 1;
   const activeCategoryLabel =
@@ -209,6 +215,21 @@ export async function MarketPage({
               product={product}
               locale={locale}
               attribution={catalog.attributions.get(product.id) ?? null}
+              priceEstimates={
+                !walletEnabled || product.price <= 0
+                  ? undefined
+                  : catalogRates
+                    ? (WALLET_CURRENCIES as readonly string[]).includes(product.currency)
+                      ? explicitFxLines(
+                          {
+                            currency: product.currency as (typeof WALLET_CURRENCIES)[number],
+                            amount: product.price,
+                          },
+                          catalogRates,
+                        )
+                      : undefined
+                    : null
+              }
             />
           ))}
         </div>

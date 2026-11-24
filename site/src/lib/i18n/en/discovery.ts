@@ -120,6 +120,8 @@ export const discovery = {
     clearCategory: "Show all categories",
     firstPageSameFilters: "Back to page 1 with the same filters",
     free: "Free",
+    priceEstimateAbout: "About {amount} at the recorded rate",
+    priceEstimateUnavailable: "Recorded rates could not be loaded. The listing price is unchanged.",
     noPreview: "No preview",
     updated: "upd",
     noReviewsYet: "No reviews yet",
