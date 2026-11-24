@@ -15,11 +15,10 @@ import {
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax6xl } from "../../shell/page-shell";
-import { panelSpace3P5 } from "../../shell/panel-shell";
+import { panelSpace2P4, panelSpace3P5 } from "../../shell/panel-shell";
 import { PlatformSessionError } from "../../shell/session-error";
 import {
   typeDisplayPrimary,
-  typeFlexWrapGap4Sm,
   typeNumericPrimary,
   typeRoundedBorderP4SmSecondary,
   typeSemiboldPrimary,
@@ -71,6 +70,7 @@ function activityKindLabel(
   if (referenceType === "wallet_hold") return copy.activityHold;
   if (referenceType === "withdrawal") return copy.activityWithdrawal;
   if (referenceType === "refund") return copy.activityRefund;
+  if (referenceType === "staff_grant") return copy.activityStaffGrant;
   return copy.activityOther;
 }
 
@@ -102,9 +102,8 @@ export async function WalletWorkspaceScreen({
   const [locale, store, query] = await Promise.all([getRequestLocale(), cookies(), searchParams]);
   const copy = getWalletCopy(locale);
   const dictionary = getDictionary(locale);
-  const currency =
-    CURRENCIES.find((value) => value === query.currency) ?? ("EUR" as (typeof CURRENCIES)[number]);
-  const returnPath = `/workspace/wallet?currency=${currency}`;
+  const requested = CURRENCIES.find((value) => value === query.currency);
+  const signInPath = `/workspace/wallet?currency=${requested ?? "EUR"}`;
 
   let user: Awaited<ReturnType<typeof authService.getSession>>;
   try {
@@ -115,22 +114,50 @@ export async function WalletWorkspaceScreen({
         locale={locale}
         title={copy.title}
         message={copy.loadUnavailable}
-        retryHref={returnPath}
+        retryHref={signInPath}
       />
     );
   }
   if (!user) {
-    return <PlatformSignIn locale={locale} returnPath={returnPath} />;
+    return <PlatformSignIn locale={locale} returnPath={signInPath} />;
   }
 
   const accountId = `user:${user.id}`;
-  let available: number | null = null;
+  let balances: Array<{
+    currency: (typeof CURRENCIES)[number];
+    available: number | null;
+    held: number | null;
+  }>;
   try {
-    available = await walletPaymentService.getAvailableBalance(accountId, currency);
+    balances = await Promise.all(
+      CURRENCIES.map(async (value) => {
+        const read = async (load: Promise<number>) => {
+          try {
+            return await load;
+          } catch (error) {
+            if (error instanceof AppError && [403, 404].includes(error.statusCode)) throw error;
+            return null;
+          }
+        };
+        return {
+          currency: value,
+          available: await read(walletPaymentService.getAvailableBalance(accountId, value)),
+          held: await read(walletPaymentService.getHeldBalance(accountId, value)),
+        };
+      }),
+    );
   } catch (error) {
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
-    available = null;
+    throw error;
   }
+  const currency =
+    requested ??
+    balances.find((row) => (row.available ?? 0) > 0)?.currency ??
+    balances.find((row) => row.available !== null)?.currency ??
+    "EUR";
+  const selected = balances.find((row) => row.currency === currency);
+  const available = selected?.available ?? null;
+  const returnPath = `/workspace/wallet?currency=${currency}`;
   const history =
     available === null
       ? null
@@ -139,10 +166,7 @@ export async function WalletWorkspaceScreen({
     available === null
       ? null
       : await walletPaymentService.listRecentActivity(accountId, currency, 20).catch(() => null);
-  const heldBalance =
-    available === null
-      ? null
-      : await walletPaymentService.getHeldBalance(accountId, currency).catch(() => null);
+  const heldBalance = available === null ? null : (selected?.held ?? null);
   const heldList =
     heldBalance === null
       ? null
@@ -220,15 +244,26 @@ export async function WalletWorkspaceScreen({
       <p role="note" className={typeXsMuted}>
         {withdrawEnabled ? copy.withdrawEnabledNote : copy.withdrawNote}
       </p>
-      <nav aria-label={copy.currency} className={typeFlexWrapGap4Sm}>
-        {CURRENCIES.map((value) => (
+      <nav aria-label={copy.balances} className="grid gap-4 md:grid-cols-3">
+        {balances.map((row) => (
           <Link
-            key={value}
-            href={`/workspace/wallet?currency=${value}`}
-            aria-current={value === currency ? "page" : undefined}
-            className={linkAccentSmRounded}
+            key={row.currency}
+            href={`/workspace/wallet?currency=${row.currency}`}
+            aria-current={row.currency === currency ? "page" : undefined}
+            className={`${panelSpace2P4} block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]`}
           >
-            {value}
+            <span className={typeSemiboldPrimary}>{row.currency}</span>
+            <span className={typeNumericPrimary}>
+              {row.available === null
+                ? copy.balanceUnavailable
+                : formatFinancialMinor(row.available, row.currency, locale)}
+            </span>
+            <span className={typeXsMuted}>
+              {copy.held}:{" "}
+              {row.held === null
+                ? copy.balanceUnavailable
+                : formatFinancialMinor(row.held, row.currency, locale)}
+            </span>
           </Link>
         ))}
       </nav>
