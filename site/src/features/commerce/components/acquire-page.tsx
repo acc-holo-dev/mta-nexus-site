@@ -1,5 +1,6 @@
 "use client";
 
+import type { ExplicitFxRate } from "@nexus/domain";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { CheckCircle2, Library, PackageOpen, ShieldCheck } from "lucide-react";
 import Link from "next/link";
@@ -53,6 +54,7 @@ export type AcquirePageProps = {
   walletEnabled?: boolean;
   actorId?: string | null;
   signedIn?: boolean;
+  fxRates?: readonly ExplicitFxRate[] | null;
 };
 
 const shellClass = pageShellMax2xlStandard;
@@ -66,6 +68,7 @@ function AcquireContent({
   walletEnabled = false,
   actorId = null,
   signedIn = false,
+  fxRates,
 }: AcquirePageProps) {
   const searchParams = useSearchParams();
   const productId = searchParams.get("productId");
@@ -408,6 +411,7 @@ function AcquireContent({
             amountLabel={formattedPrice}
             amountMinor={product.price}
             currency={product.currency || "USD"}
+            fxRates={fxRates}
             signedIn={signedIn}
             signInHref={authEntryHref("login", acquireReturnPath ?? "/acquire")}
           />

@@ -577,6 +577,7 @@ export async function ProductDetailPage({
                     amountLabel={formattedPrice}
                     amountMinor={product.price}
                     currency={product.currency}
+                    fxRates={listingCurrency ? priceRates : undefined}
                     signedIn={Boolean(user)}
                     signInHref={authEntryHref("login", detailReturnPath)}
                   />

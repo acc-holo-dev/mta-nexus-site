@@ -95,6 +95,11 @@ const copy = {
     checkoutTitle: "Buy with site wallet",
     checkoutNote:
       "Creates a pending order and settles it from your available site-wallet balance. This is not card checkout and does not withdraw funds.",
+    checkoutDueEstimate: "About {quote}. The wallet still pays in {base}.",
+    checkoutDueNone: "No recorded rate from {base} to {quote}.",
+    checkoutDueDust: "The recorded rate from {base} to {quote} is too small to show.",
+    checkoutDueInvalid: "The recorded rate from {base} to {quote} cannot be shown.",
+    checkoutDueUnavailable: "Recorded rates could not be loaded. The charge is unchanged.",
     checkoutConfirm: "I confirm buying this resource from my site wallet balance.",
     checkoutSubmit: "Buy with wallet",
     checkoutSubmitting: "Settling purchase…",
@@ -510,6 +515,11 @@ const copy = {
     checkoutTitle: "Купить с кошелька площадки",
     checkoutNote:
       "Создаёт ожидающий заказ и сразу рассчитывает его с доступного баланса site wallet. Это не карточный checkout и не вывод средств.",
+    checkoutDueEstimate: "Примерно {quote}. Кошелёк всё равно платит в {base}.",
+    checkoutDueNone: "Записанного курса из {base} в {quote} нет.",
+    checkoutDueDust: "Записанный курс из {base} в {quote} слишком мал, чтобы его показать.",
+    checkoutDueInvalid: "Записанный курс из {base} в {quote} нельзя показать.",
+    checkoutDueUnavailable: "Записанные курсы не загрузились. Сумма списания не изменилась.",
     checkoutConfirm: "Подтверждаю покупку этого ресурса с баланса site wallet.",
     checkoutSubmit: "Купить с кошелька",
     checkoutSubmitting: "Оформление покупки…",
