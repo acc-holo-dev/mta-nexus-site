@@ -4,7 +4,7 @@ import {
   notificationRepository,
   resourceMediaRepository,
 } from "@nexus/db";
-import { buildResourceVersionHelp } from "@nexus/domain";
+import { buildResourceVersionHelp, explicitFxLines, WALLET_CURRENCIES } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { CheckCircle2, Key, Layers, MessageSquare, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
@@ -16,7 +16,10 @@ import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { commerceService } from "../../../lib/services/commerce/commerce-service";
 import { productService } from "../../../lib/services/commerce/product-service";
-import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { resourceManagementService } from "../../../lib/services/resources/resource-management-service";
 import { resourceQaService } from "../../../lib/services/resources/resource-qa-service";
 import { resourceReleaseWatchesService } from "../../../lib/services/resources/resource-release-watches-service";
@@ -321,6 +324,17 @@ export async function ProductDetailPage({
       : walletEnabled
         ? formatHistoryAmount(product.price, product.currency, locale === "ru" ? "ru" : "en")
         : dictionary.checkout.paidUnavailable;
+  const listingCurrency = (WALLET_CURRENCIES as readonly string[]).includes(product.currency)
+    ? (product.currency as (typeof WALLET_CURRENCIES)[number])
+    : null;
+  const priceRates =
+    walletEnabled && product.price > 0 && listingCurrency
+      ? await new WalletPaymentService().listFxRates().catch(() => null)
+      : null;
+  const priceEstimates =
+    priceRates && listingCurrency
+      ? explicitFxLines({ currency: listingCurrency, amount: product.price }, priceRates)
+      : null;
 
   return (
     <div className={pageShellStack10}>
@@ -382,6 +396,40 @@ export async function ProductDetailPage({
           <div className="nexus-panel sticky top-24 space-y-6 p-6 shadow-nexus-sm">
             <div>
               <div className={type3xlBlackPrimary}>{formattedPrice}</div>
+              {walletEnabled && product.price > 0 && listingCurrency ? (
+                priceEstimates ? (
+                  <ul className="mt-2 space-y-1 text-xs text-muted">
+                    {priceEstimates.map((line) => (
+                      <li key={line.quote}>
+                        {line.kind === "quote"
+                          ? copy.priceEstimate
+                              .replace("{base}", line.base)
+                              .replace(
+                                "{quote}",
+                                formatHistoryAmount(
+                                  line.amount,
+                                  line.quote,
+                                  locale === "ru" ? "ru" : "en",
+                                ),
+                              )
+                          : line.kind === "dust"
+                            ? copy.priceEstimateDust
+                                .replace("{base}", line.base)
+                                .replace("{quote}", line.quote)
+                            : line.kind === "invalid"
+                              ? copy.priceEstimateInvalid
+                                  .replace("{base}", line.base)
+                                  .replace("{quote}", line.quote)
+                              : copy.priceEstimateNone
+                                  .replace("{base}", line.base)
+                                  .replace("{quote}", line.quote)}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className={typeMt1XsMuted}>{copy.priceEstimateUnavailable}</p>
+                )
+              ) : null}
               <div className={typeMt1XsMuted}>
                 {copy.licenseModel}: <span>{licenseModelLabel(locale, product.licenseModel)}</span>
               </div>

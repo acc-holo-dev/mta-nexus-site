@@ -50,6 +50,11 @@ export const product = {
     noReviewsHint:
       "Здесь появятся опубликованные отзывы читателей с доступом. Пустой список — не сбой загрузки.",
     free: "Бесплатно",
+    priceEstimate: "Примерно {quote} по записанному курсу. Цена объявления остаётся в {base}.",
+    priceEstimateNone: "Записанного курса из {base} в {quote} нет.",
+    priceEstimateDust: "Записанный курс из {base} в {quote} слишком мал, чтобы его показать.",
+    priceEstimateInvalid: "Записанный курс из {base} в {quote} нельзя показать.",
+    priceEstimateUnavailable: "Записанные курсы не загрузились. Цена объявления не изменилась.",
     licenseModel: "Модель доступа",
     managementAccess: "Доступ к управлению",
     inLibrary: "В вашей библиотеке",

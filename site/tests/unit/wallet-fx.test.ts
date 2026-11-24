@@ -1,4 +1,4 @@
-import { AppError, quoteExplicitFx } from "@nexus/domain";
+import { AppError, explicitFxLines, quoteExplicitFx } from "@nexus/domain";
 import { describe, expect, it } from "vitest";
 
 describe("explicit exchange quote", () => {
@@ -25,5 +25,16 @@ describe("explicit exchange quote", () => {
     expect(() =>
       quoteExplicitFx({ sourceAmount: 100_000_000, baseAmount: 1, quoteAmount: 2 }),
     ).toThrow(AppError);
+  });
+
+  it("keeps a missing listing-price direction distinct from a quote", () => {
+    expect(
+      explicitFxLines({ currency: "EUR", amount: 250 }, [
+        { baseCurrency: "EUR", quoteCurrency: "USD", baseAmount: 100, quoteAmount: 110 },
+      ]),
+    ).toEqual([
+      { kind: "quote", base: "EUR", quote: "USD", amount: 275 },
+      { kind: "none", base: "EUR", quote: "RUB" },
+    ]);
   });
 });
