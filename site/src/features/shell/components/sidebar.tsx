@@ -103,7 +103,7 @@ export function Sidebar({
 
   return (
     <aside
-      className={`z-30 hidden shrink-0 select-none flex-col border-r border-base bg-surface transition-all duration-200 lg:flex ${
+      className={`sticky top-0 z-30 hidden h-screen shrink-0 select-none flex-col border-r border-base bg-surface transition-all duration-200 lg:flex ${
         isCollapsed ? "w-14" : "w-56"
       }`}
     >

@@ -1,0 +1,1421 @@
+# Audit 2027 backlog
+
+Generated from App Router pages × seven checks. Each row is one task.
+
+- [ ] A0001 `/acquire` — URL state survives Back
+- [ ] A0002 `/acquire` — loading distinct from empty and error
+- [ ] A0003 `/acquire` — RU and EN copy
+- [ ] A0004 `/acquire` — keyboard focus visible
+- [ ] A0005 `/acquire` — mobile width 390
+- [ ] A0006 `/acquire` — icon meaning matches action
+- [ ] A0007 `/acquire` — color uses tokens not raw gray
+- [ ] A0008 `/admin` — URL state survives Back
+- [ ] A0009 `/admin` — loading distinct from empty and error
+- [ ] A0010 `/admin` — RU and EN copy
+- [ ] A0011 `/admin` — keyboard focus visible
+- [ ] A0012 `/admin` — mobile width 390
+- [ ] A0013 `/admin` — icon meaning matches action
+- [ ] A0014 `/admin` — color uses tokens not raw gray
+- [ ] A0015 `/admin/commerce/order-cases` — URL state survives Back
+- [ ] A0016 `/admin/commerce/order-cases` — loading distinct from empty and error
+- [ ] A0017 `/admin/commerce/order-cases` — RU and EN copy
+- [ ] A0018 `/admin/commerce/order-cases` — keyboard focus visible
+- [ ] A0019 `/admin/commerce/order-cases` — mobile width 390
+- [ ] A0020 `/admin/commerce/order-cases` — icon meaning matches action
+- [ ] A0021 `/admin/commerce/order-cases` — color uses tokens not raw gray
+- [ ] A0022 `/admin/commerce/order-cases/[id]` — URL state survives Back
+- [ ] A0023 `/admin/commerce/order-cases/[id]` — loading distinct from empty and error
+- [ ] A0024 `/admin/commerce/order-cases/[id]` — RU and EN copy
+- [ ] A0025 `/admin/commerce/order-cases/[id]` — keyboard focus visible
+- [ ] A0026 `/admin/commerce/order-cases/[id]` — mobile width 390
+- [ ] A0027 `/admin/commerce/order-cases/[id]` — icon meaning matches action
+- [ ] A0028 `/admin/commerce/order-cases/[id]` — color uses tokens not raw gray
+- [ ] A0029 `/admin/commerce/plans` — URL state survives Back
+- [ ] A0030 `/admin/commerce/plans` — loading distinct from empty and error
+- [ ] A0031 `/admin/commerce/plans` — RU and EN copy
+- [ ] A0032 `/admin/commerce/plans` — keyboard focus visible
+- [ ] A0033 `/admin/commerce/plans` — mobile width 390
+- [ ] A0034 `/admin/commerce/plans` — icon meaning matches action
+- [ ] A0035 `/admin/commerce/plans` — color uses tokens not raw gray
+- [ ] A0036 `/admin/commerce/plans/[id]` — URL state survives Back
+- [ ] A0037 `/admin/commerce/plans/[id]` — loading distinct from empty and error
+- [ ] A0038 `/admin/commerce/plans/[id]` — RU and EN copy
+- [ ] A0039 `/admin/commerce/plans/[id]` — keyboard focus visible
+- [ ] A0040 `/admin/commerce/plans/[id]` — mobile width 390
+- [ ] A0041 `/admin/commerce/plans/[id]` — icon meaning matches action
+- [ ] A0042 `/admin/commerce/plans/[id]` — color uses tokens not raw gray
+- [ ] A0043 `/admin/commerce/plans/new` — URL state survives Back
+- [ ] A0044 `/admin/commerce/plans/new` — loading distinct from empty and error
+- [ ] A0045 `/admin/commerce/plans/new` — RU and EN copy
+- [ ] A0046 `/admin/commerce/plans/new` — keyboard focus visible
+- [ ] A0047 `/admin/commerce/plans/new` — mobile width 390
+- [ ] A0048 `/admin/commerce/plans/new` — icon meaning matches action
+- [ ] A0049 `/admin/commerce/plans/new` — color uses tokens not raw gray
+- [ ] A0050 `/admin/commerce/reconciliation` — URL state survives Back
+- [ ] A0051 `/admin/commerce/reconciliation` — loading distinct from empty and error
+- [ ] A0052 `/admin/commerce/reconciliation` — RU and EN copy
+- [ ] A0053 `/admin/commerce/reconciliation` — keyboard focus visible
+- [ ] A0054 `/admin/commerce/reconciliation` — mobile width 390
+- [ ] A0055 `/admin/commerce/reconciliation` — icon meaning matches action
+- [ ] A0056 `/admin/commerce/reconciliation` — color uses tokens not raw gray
+- [ ] A0057 `/admin/commerce/reconciliation/[id]` — URL state survives Back
+- [ ] A0058 `/admin/commerce/reconciliation/[id]` — loading distinct from empty and error
+- [ ] A0059 `/admin/commerce/reconciliation/[id]` — RU and EN copy
+- [ ] A0060 `/admin/commerce/reconciliation/[id]` — keyboard focus visible
+- [ ] A0061 `/admin/commerce/reconciliation/[id]` — mobile width 390
+- [ ] A0062 `/admin/commerce/reconciliation/[id]` — icon meaning matches action
+- [ ] A0063 `/admin/commerce/reconciliation/[id]` — color uses tokens not raw gray
+- [ ] A0064 `/admin/commerce/reconciliation/[id]/terms` — URL state survives Back
+- [ ] A0065 `/admin/commerce/reconciliation/[id]/terms` — loading distinct from empty and error
+- [ ] A0066 `/admin/commerce/reconciliation/[id]/terms` — RU and EN copy
+- [ ] A0067 `/admin/commerce/reconciliation/[id]/terms` — keyboard focus visible
+- [ ] A0068 `/admin/commerce/reconciliation/[id]/terms` — mobile width 390
+- [ ] A0069 `/admin/commerce/reconciliation/[id]/terms` — icon meaning matches action
+- [ ] A0070 `/admin/commerce/reconciliation/[id]/terms` — color uses tokens not raw gray
+- [ ] A0071 `/admin/commerce/reviews` — URL state survives Back
+- [ ] A0072 `/admin/commerce/reviews` — loading distinct from empty and error
+- [ ] A0073 `/admin/commerce/reviews` — RU and EN copy
+- [ ] A0074 `/admin/commerce/reviews` — keyboard focus visible
+- [ ] A0075 `/admin/commerce/reviews` — mobile width 390
+- [ ] A0076 `/admin/commerce/reviews` — icon meaning matches action
+- [ ] A0077 `/admin/commerce/reviews` — color uses tokens not raw gray
+- [ ] A0078 `/admin/commerce/reviews/[id]` — URL state survives Back
+- [ ] A0079 `/admin/commerce/reviews/[id]` — loading distinct from empty and error
+- [ ] A0080 `/admin/commerce/reviews/[id]` — RU and EN copy
+- [ ] A0081 `/admin/commerce/reviews/[id]` — keyboard focus visible
+- [ ] A0082 `/admin/commerce/reviews/[id]` — mobile width 390
+- [ ] A0083 `/admin/commerce/reviews/[id]` — icon meaning matches action
+- [ ] A0084 `/admin/commerce/reviews/[id]` — color uses tokens not raw gray
+- [ ] A0085 `/admin/commerce/wallet-providers` — URL state survives Back
+- [ ] A0086 `/admin/commerce/wallet-providers` — loading distinct from empty and error
+- [ ] A0087 `/admin/commerce/wallet-providers` — RU and EN copy
+- [ ] A0088 `/admin/commerce/wallet-providers` — keyboard focus visible
+- [ ] A0089 `/admin/commerce/wallet-providers` — mobile width 390
+- [ ] A0090 `/admin/commerce/wallet-providers` — icon meaning matches action
+- [ ] A0091 `/admin/commerce/wallet-providers` — color uses tokens not raw gray
+- [ ] A0092 `/admin/community` — URL state survives Back
+- [ ] A0093 `/admin/community` — loading distinct from empty and error
+- [ ] A0094 `/admin/community` — RU and EN copy
+- [ ] A0095 `/admin/community` — keyboard focus visible
+- [ ] A0096 `/admin/community` — mobile width 390
+- [ ] A0097 `/admin/community` — icon meaning matches action
+- [ ] A0098 `/admin/community` — color uses tokens not raw gray
+- [ ] A0099 `/admin/community/[id]` — URL state survives Back
+- [ ] A0100 `/admin/community/[id]` — loading distinct from empty and error
+- [ ] A0101 `/admin/community/[id]` — RU and EN copy
+- [ ] A0102 `/admin/community/[id]` — keyboard focus visible
+- [ ] A0103 `/admin/community/[id]` — mobile width 390
+- [ ] A0104 `/admin/community/[id]` — icon meaning matches action
+- [ ] A0105 `/admin/community/[id]` — color uses tokens not raw gray
+- [ ] A0106 `/admin/community/[id]/discussion` — URL state survives Back
+- [ ] A0107 `/admin/community/[id]/discussion` — loading distinct from empty and error
+- [ ] A0108 `/admin/community/[id]/discussion` — RU and EN copy
+- [ ] A0109 `/admin/community/[id]/discussion` — keyboard focus visible
+- [ ] A0110 `/admin/community/[id]/discussion` — mobile width 390
+- [ ] A0111 `/admin/community/[id]/discussion` — icon meaning matches action
+- [ ] A0112 `/admin/community/[id]/discussion` — color uses tokens not raw gray
+- [ ] A0113 `/admin/community/[id]/discussion/[commentId]` — URL state survives Back
+- [ ] A0114 `/admin/community/[id]/discussion/[commentId]` — loading distinct from empty and error
+- [ ] A0115 `/admin/community/[id]/discussion/[commentId]` — RU and EN copy
+- [ ] A0116 `/admin/community/[id]/discussion/[commentId]` — keyboard focus visible
+- [ ] A0117 `/admin/community/[id]/discussion/[commentId]` — mobile width 390
+- [ ] A0118 `/admin/community/[id]/discussion/[commentId]` — icon meaning matches action
+- [ ] A0119 `/admin/community/[id]/discussion/[commentId]` — color uses tokens not raw gray
+- [ ] A0120 `/admin/community/[id]/discussion/[commentId]/reports` — URL state survives Back
+- [ ] A0121 `/admin/community/[id]/discussion/[commentId]/reports` — loading distinct from empty and error
+- [ ] A0122 `/admin/community/[id]/discussion/[commentId]/reports` — RU and EN copy
+- [ ] A0123 `/admin/community/[id]/discussion/[commentId]/reports` — keyboard focus visible
+- [ ] A0124 `/admin/community/[id]/discussion/[commentId]/reports` — mobile width 390
+- [ ] A0125 `/admin/community/[id]/discussion/[commentId]/reports` — icon meaning matches action
+- [ ] A0126 `/admin/community/[id]/discussion/[commentId]/reports` — color uses tokens not raw gray
+- [ ] A0127 `/admin/community/[id]/reports` — URL state survives Back
+- [ ] A0128 `/admin/community/[id]/reports` — loading distinct from empty and error
+- [ ] A0129 `/admin/community/[id]/reports` — RU and EN copy
+- [ ] A0130 `/admin/community/[id]/reports` — keyboard focus visible
+- [ ] A0131 `/admin/community/[id]/reports` — mobile width 390
+- [ ] A0132 `/admin/community/[id]/reports` — icon meaning matches action
+- [ ] A0133 `/admin/community/[id]/reports` — color uses tokens not raw gray
+- [ ] A0134 `/admin/licenses` — URL state survives Back
+- [ ] A0135 `/admin/licenses` — loading distinct from empty and error
+- [ ] A0136 `/admin/licenses` — RU and EN copy
+- [ ] A0137 `/admin/licenses` — keyboard focus visible
+- [ ] A0138 `/admin/licenses` — mobile width 390
+- [ ] A0139 `/admin/licenses` — icon meaning matches action
+- [ ] A0140 `/admin/licenses` — color uses tokens not raw gray
+- [ ] A0141 `/admin/licenses/[id]` — URL state survives Back
+- [ ] A0142 `/admin/licenses/[id]` — loading distinct from empty and error
+- [ ] A0143 `/admin/licenses/[id]` — RU and EN copy
+- [ ] A0144 `/admin/licenses/[id]` — keyboard focus visible
+- [ ] A0145 `/admin/licenses/[id]` — mobile width 390
+- [ ] A0146 `/admin/licenses/[id]` — icon meaning matches action
+- [ ] A0147 `/admin/licenses/[id]` — color uses tokens not raw gray
+- [ ] A0148 `/admin/licenses/[id]/history` — URL state survives Back
+- [ ] A0149 `/admin/licenses/[id]/history` — loading distinct from empty and error
+- [ ] A0150 `/admin/licenses/[id]/history` — RU and EN copy
+- [ ] A0151 `/admin/licenses/[id]/history` — keyboard focus visible
+- [ ] A0152 `/admin/licenses/[id]/history` — mobile width 390
+- [ ] A0153 `/admin/licenses/[id]/history` — icon meaning matches action
+- [ ] A0154 `/admin/licenses/[id]/history` — color uses tokens not raw gray
+- [ ] A0155 `/admin/licenses/maintenance` — URL state survives Back
+- [ ] A0156 `/admin/licenses/maintenance` — loading distinct from empty and error
+- [ ] A0157 `/admin/licenses/maintenance` — RU and EN copy
+- [ ] A0158 `/admin/licenses/maintenance` — keyboard focus visible
+- [ ] A0159 `/admin/licenses/maintenance` — mobile width 390
+- [ ] A0160 `/admin/licenses/maintenance` — icon meaning matches action
+- [ ] A0161 `/admin/licenses/maintenance` — color uses tokens not raw gray
+- [ ] A0162 `/admin/reports` — URL state survives Back
+- [ ] A0163 `/admin/reports` — loading distinct from empty and error
+- [ ] A0164 `/admin/reports` — RU and EN copy
+- [ ] A0165 `/admin/reports` — keyboard focus visible
+- [ ] A0166 `/admin/reports` — mobile width 390
+- [ ] A0167 `/admin/reports` — icon meaning matches action
+- [ ] A0168 `/admin/reports` — color uses tokens not raw gray
+- [ ] A0169 `/admin/reports/[id]` — URL state survives Back
+- [ ] A0170 `/admin/reports/[id]` — loading distinct from empty and error
+- [ ] A0171 `/admin/reports/[id]` — RU and EN copy
+- [ ] A0172 `/admin/reports/[id]` — keyboard focus visible
+- [ ] A0173 `/admin/reports/[id]` — mobile width 390
+- [ ] A0174 `/admin/reports/[id]` — icon meaning matches action
+- [ ] A0175 `/admin/reports/[id]` — color uses tokens not raw gray
+- [ ] A0176 `/admin/reports/[id]/history` — URL state survives Back
+- [ ] A0177 `/admin/reports/[id]/history` — loading distinct from empty and error
+- [ ] A0178 `/admin/reports/[id]/history` — RU and EN copy
+- [ ] A0179 `/admin/reports/[id]/history` — keyboard focus visible
+- [ ] A0180 `/admin/reports/[id]/history` — mobile width 390
+- [ ] A0181 `/admin/reports/[id]/history` — icon meaning matches action
+- [ ] A0182 `/admin/reports/[id]/history` — color uses tokens not raw gray
+- [ ] A0183 `/admin/reports/targets` — URL state survives Back
+- [ ] A0184 `/admin/reports/targets` — loading distinct from empty and error
+- [ ] A0185 `/admin/reports/targets` — RU and EN copy
+- [ ] A0186 `/admin/reports/targets` — keyboard focus visible
+- [ ] A0187 `/admin/reports/targets` — mobile width 390
+- [ ] A0188 `/admin/reports/targets` — icon meaning matches action
+- [ ] A0189 `/admin/reports/targets` — color uses tokens not raw gray
+- [ ] A0190 `/admin/resources` — URL state survives Back
+- [ ] A0191 `/admin/resources` — loading distinct from empty and error
+- [ ] A0192 `/admin/resources` — RU and EN copy
+- [ ] A0193 `/admin/resources` — keyboard focus visible
+- [ ] A0194 `/admin/resources` — mobile width 390
+- [ ] A0195 `/admin/resources` — icon meaning matches action
+- [ ] A0196 `/admin/resources` — color uses tokens not raw gray
+- [ ] A0197 `/admin/resources/[id]` — URL state survives Back
+- [ ] A0198 `/admin/resources/[id]` — loading distinct from empty and error
+- [ ] A0199 `/admin/resources/[id]` — RU and EN copy
+- [ ] A0200 `/admin/resources/[id]` — keyboard focus visible
+- [ ] A0201 `/admin/resources/[id]` — mobile width 390
+- [ ] A0202 `/admin/resources/[id]` — icon meaning matches action
+- [ ] A0203 `/admin/resources/[id]` — color uses tokens not raw gray
+- [ ] A0204 `/admin/resources/[id]/builds/[buildId]` — URL state survives Back
+- [ ] A0205 `/admin/resources/[id]/builds/[buildId]` — loading distinct from empty and error
+- [ ] A0206 `/admin/resources/[id]/builds/[buildId]` — RU and EN copy
+- [ ] A0207 `/admin/resources/[id]/builds/[buildId]` — keyboard focus visible
+- [ ] A0208 `/admin/resources/[id]/builds/[buildId]` — mobile width 390
+- [ ] A0209 `/admin/resources/[id]/builds/[buildId]` — icon meaning matches action
+- [ ] A0210 `/admin/resources/[id]/builds/[buildId]` — color uses tokens not raw gray
+- [ ] A0211 `/admin/resources/[id]/builds/[buildId]/package` — URL state survives Back
+- [ ] A0212 `/admin/resources/[id]/builds/[buildId]/package` — loading distinct from empty and error
+- [ ] A0213 `/admin/resources/[id]/builds/[buildId]/package` — RU and EN copy
+- [ ] A0214 `/admin/resources/[id]/builds/[buildId]/package` — keyboard focus visible
+- [ ] A0215 `/admin/resources/[id]/builds/[buildId]/package` — mobile width 390
+- [ ] A0216 `/admin/resources/[id]/builds/[buildId]/package` — icon meaning matches action
+- [ ] A0217 `/admin/resources/[id]/builds/[buildId]/package` — color uses tokens not raw gray
+- [ ] A0218 `/admin/resources/[id]/media` — URL state survives Back
+- [ ] A0219 `/admin/resources/[id]/media` — loading distinct from empty and error
+- [ ] A0220 `/admin/resources/[id]/media` — RU and EN copy
+- [ ] A0221 `/admin/resources/[id]/media` — keyboard focus visible
+- [ ] A0222 `/admin/resources/[id]/media` — mobile width 390
+- [ ] A0223 `/admin/resources/[id]/media` — icon meaning matches action
+- [ ] A0224 `/admin/resources/[id]/media` — color uses tokens not raw gray
+- [ ] A0225 `/admin/resources/[id]/requirements` — URL state survives Back
+- [ ] A0226 `/admin/resources/[id]/requirements` — loading distinct from empty and error
+- [ ] A0227 `/admin/resources/[id]/requirements` — RU and EN copy
+- [ ] A0228 `/admin/resources/[id]/requirements` — keyboard focus visible
+- [ ] A0229 `/admin/resources/[id]/requirements` — mobile width 390
+- [ ] A0230 `/admin/resources/[id]/requirements` — icon meaning matches action
+- [ ] A0231 `/admin/resources/[id]/requirements` — color uses tokens not raw gray
+- [ ] A0232 `/admin/storage` — URL state survives Back
+- [ ] A0233 `/admin/storage` — loading distinct from empty and error
+- [ ] A0234 `/admin/storage` — RU and EN copy
+- [ ] A0235 `/admin/storage` — keyboard focus visible
+- [ ] A0236 `/admin/storage` — mobile width 390
+- [ ] A0237 `/admin/storage` — icon meaning matches action
+- [ ] A0238 `/admin/storage` — color uses tokens not raw gray
+- [ ] A0239 `/admin/storage/objects/[id]` — URL state survives Back
+- [ ] A0240 `/admin/storage/objects/[id]` — loading distinct from empty and error
+- [ ] A0241 `/admin/storage/objects/[id]` — RU and EN copy
+- [ ] A0242 `/admin/storage/objects/[id]` — keyboard focus visible
+- [ ] A0243 `/admin/storage/objects/[id]` — mobile width 390
+- [ ] A0244 `/admin/storage/objects/[id]` — icon meaning matches action
+- [ ] A0245 `/admin/storage/objects/[id]` — color uses tokens not raw gray
+- [ ] A0246 `/admin/support` — URL state survives Back
+- [ ] A0247 `/admin/support` — loading distinct from empty and error
+- [ ] A0248 `/admin/support` — RU and EN copy
+- [ ] A0249 `/admin/support` — keyboard focus visible
+- [ ] A0250 `/admin/support` — mobile width 390
+- [ ] A0251 `/admin/support` — icon meaning matches action
+- [ ] A0252 `/admin/support` — color uses tokens not raw gray
+- [ ] A0253 `/admin/support/[id]` — URL state survives Back
+- [ ] A0254 `/admin/support/[id]` — loading distinct from empty and error
+- [ ] A0255 `/admin/support/[id]` — RU and EN copy
+- [ ] A0256 `/admin/support/[id]` — keyboard focus visible
+- [ ] A0257 `/admin/support/[id]` — mobile width 390
+- [ ] A0258 `/admin/support/[id]` — icon meaning matches action
+- [ ] A0259 `/admin/support/[id]` — color uses tokens not raw gray
+- [ ] A0260 `/admin/support/[id]/messages` — URL state survives Back
+- [ ] A0261 `/admin/support/[id]/messages` — loading distinct from empty and error
+- [ ] A0262 `/admin/support/[id]/messages` — RU and EN copy
+- [ ] A0263 `/admin/support/[id]/messages` — keyboard focus visible
+- [ ] A0264 `/admin/support/[id]/messages` — mobile width 390
+- [ ] A0265 `/admin/support/[id]/messages` — icon meaning matches action
+- [ ] A0266 `/admin/support/[id]/messages` — color uses tokens not raw gray
+- [ ] A0267 `/articles` — URL state survives Back
+- [ ] A0268 `/articles` — loading distinct from empty and error
+- [ ] A0269 `/articles` — RU and EN copy
+- [ ] A0270 `/articles` — keyboard focus visible
+- [ ] A0271 `/articles` — mobile width 390
+- [ ] A0272 `/articles` — icon meaning matches action
+- [ ] A0273 `/articles` — color uses tokens not raw gray
+- [ ] A0274 `/articles/[slug]` — URL state survives Back
+- [ ] A0275 `/articles/[slug]` — loading distinct from empty and error
+- [ ] A0276 `/articles/[slug]` — RU and EN copy
+- [ ] A0277 `/articles/[slug]` — keyboard focus visible
+- [ ] A0278 `/articles/[slug]` — mobile width 390
+- [ ] A0279 `/articles/[slug]` — icon meaning matches action
+- [ ] A0280 `/articles/[slug]` — color uses tokens not raw gray
+- [ ] A0281 `/auth/forgot-password` — URL state survives Back
+- [ ] A0282 `/auth/forgot-password` — loading distinct from empty and error
+- [ ] A0283 `/auth/forgot-password` — RU and EN copy
+- [ ] A0284 `/auth/forgot-password` — keyboard focus visible
+- [ ] A0285 `/auth/forgot-password` — mobile width 390
+- [ ] A0286 `/auth/forgot-password` — icon meaning matches action
+- [ ] A0287 `/auth/forgot-password` — color uses tokens not raw gray
+- [ ] A0288 `/auth/login` — URL state survives Back
+- [ ] A0289 `/auth/login` — loading distinct from empty and error
+- [ ] A0290 `/auth/login` — RU and EN copy
+- [ ] A0291 `/auth/login` — keyboard focus visible
+- [ ] A0292 `/auth/login` — mobile width 390
+- [ ] A0293 `/auth/login` — icon meaning matches action
+- [ ] A0294 `/auth/login` — color uses tokens not raw gray
+- [ ] A0295 `/auth/register` — URL state survives Back
+- [ ] A0296 `/auth/register` — loading distinct from empty and error
+- [ ] A0297 `/auth/register` — RU and EN copy
+- [ ] A0298 `/auth/register` — keyboard focus visible
+- [ ] A0299 `/auth/register` — mobile width 390
+- [ ] A0300 `/auth/register` — icon meaning matches action
+- [ ] A0301 `/auth/register` — color uses tokens not raw gray
+- [ ] A0302 `/auth/reset-password` — URL state survives Back
+- [ ] A0303 `/auth/reset-password` — loading distinct from empty and error
+- [ ] A0304 `/auth/reset-password` — RU and EN copy
+- [ ] A0305 `/auth/reset-password` — keyboard focus visible
+- [ ] A0306 `/auth/reset-password` — mobile width 390
+- [ ] A0307 `/auth/reset-password` — icon meaning matches action
+- [ ] A0308 `/auth/reset-password` — color uses tokens not raw gray
+- [ ] A0309 `/auth/verify-email` — URL state survives Back
+- [ ] A0310 `/auth/verify-email` — loading distinct from empty and error
+- [ ] A0311 `/auth/verify-email` — RU and EN copy
+- [ ] A0312 `/auth/verify-email` — keyboard focus visible
+- [ ] A0313 `/auth/verify-email` — mobile width 390
+- [ ] A0314 `/auth/verify-email` — icon meaning matches action
+- [ ] A0315 `/auth/verify-email` — color uses tokens not raw gray
+- [ ] A0316 `/checkout` — URL state survives Back
+- [ ] A0317 `/checkout` — loading distinct from empty and error
+- [ ] A0318 `/checkout` — RU and EN copy
+- [ ] A0319 `/checkout` — keyboard focus visible
+- [ ] A0320 `/checkout` — mobile width 390
+- [ ] A0321 `/checkout` — icon meaning matches action
+- [ ] A0322 `/checkout` — color uses tokens not raw gray
+- [ ] A0323 `/community` — URL state survives Back
+- [ ] A0324 `/community` — loading distinct from empty and error
+- [ ] A0325 `/community` — RU and EN copy
+- [ ] A0326 `/community` — keyboard focus visible
+- [ ] A0327 `/community` — mobile width 390
+- [ ] A0328 `/community` — icon meaning matches action
+- [ ] A0329 `/community` — color uses tokens not raw gray
+- [ ] A0330 `/community-rules` — URL state survives Back
+- [ ] A0331 `/community-rules` — loading distinct from empty and error
+- [ ] A0332 `/community-rules` — RU and EN copy
+- [ ] A0333 `/community-rules` — keyboard focus visible
+- [ ] A0334 `/community-rules` — mobile width 390
+- [ ] A0335 `/community-rules` — icon meaning matches action
+- [ ] A0336 `/community-rules` — color uses tokens not raw gray
+- [ ] A0337 `/community/new` — URL state survives Back
+- [ ] A0338 `/community/new` — loading distinct from empty and error
+- [ ] A0339 `/community/new` — RU and EN copy
+- [ ] A0340 `/community/new` — keyboard focus visible
+- [ ] A0341 `/community/new` — mobile width 390
+- [ ] A0342 `/community/new` — icon meaning matches action
+- [ ] A0343 `/community/new` — color uses tokens not raw gray
+- [ ] A0344 `/copyright` — URL state survives Back
+- [ ] A0345 `/copyright` — loading distinct from empty and error
+- [ ] A0346 `/copyright` — RU and EN copy
+- [ ] A0347 `/copyright` — keyboard focus visible
+- [ ] A0348 `/copyright` — mobile width 390
+- [ ] A0349 `/copyright` — icon meaning matches action
+- [ ] A0350 `/copyright` — color uses tokens not raw gray
+- [ ] A0351 `/dev` — URL state survives Back
+- [ ] A0352 `/dev` — loading distinct from empty and error
+- [ ] A0353 `/dev` — RU and EN copy
+- [ ] A0354 `/dev` — keyboard focus visible
+- [ ] A0355 `/dev` — mobile width 390
+- [ ] A0356 `/dev` — icon meaning matches action
+- [ ] A0357 `/dev` — color uses tokens not raw gray
+- [ ] A0358 `/developers` — URL state survives Back
+- [ ] A0359 `/developers` — loading distinct from empty and error
+- [ ] A0360 `/developers` — RU and EN copy
+- [ ] A0361 `/developers` — keyboard focus visible
+- [ ] A0362 `/developers` — mobile width 390
+- [ ] A0363 `/developers` — icon meaning matches action
+- [ ] A0364 `/developers` — color uses tokens not raw gray
+- [ ] A0365 `/developers/[username]` — URL state survives Back
+- [ ] A0366 `/developers/[username]` — loading distinct from empty and error
+- [ ] A0367 `/developers/[username]` — RU and EN copy
+- [ ] A0368 `/developers/[username]` — keyboard focus visible
+- [ ] A0369 `/developers/[username]` — mobile width 390
+- [ ] A0370 `/developers/[username]` — icon meaning matches action
+- [ ] A0371 `/developers/[username]` — color uses tokens not raw gray
+- [ ] A0372 `/discover` — URL state survives Back
+- [ ] A0373 `/discover` — loading distinct from empty and error
+- [ ] A0374 `/discover` — RU and EN copy
+- [ ] A0375 `/discover` — keyboard focus visible
+- [ ] A0376 `/discover` — mobile width 390
+- [ ] A0377 `/discover` — icon meaning matches action
+- [ ] A0378 `/discover` — color uses tokens not raw gray
+- [ ] A0379 `/discover/stream` — URL state survives Back
+- [ ] A0380 `/discover/stream` — loading distinct from empty and error
+- [ ] A0381 `/discover/stream` — RU and EN copy
+- [ ] A0382 `/discover/stream` — keyboard focus visible
+- [ ] A0383 `/discover/stream` — mobile width 390
+- [ ] A0384 `/discover/stream` — icon meaning matches action
+- [ ] A0385 `/discover/stream` — color uses tokens not raw gray
+- [ ] A0386 `/explore` — URL state survives Back
+- [ ] A0387 `/explore` — loading distinct from empty and error
+- [ ] A0388 `/explore` — RU and EN copy
+- [ ] A0389 `/explore` — keyboard focus visible
+- [ ] A0390 `/explore` — mobile width 390
+- [ ] A0391 `/explore` — icon meaning matches action
+- [ ] A0392 `/explore` — color uses tokens not raw gray
+- [ ] A0393 `/market` — URL state survives Back
+- [ ] A0394 `/market` — loading distinct from empty and error
+- [ ] A0395 `/market` — RU and EN copy
+- [ ] A0396 `/market` — keyboard focus visible
+- [ ] A0397 `/market` — mobile width 390
+- [ ] A0398 `/market` — icon meaning matches action
+- [ ] A0399 `/market` — color uses tokens not raw gray
+- [ ] A0400 `/market/[slug]` — URL state survives Back
+- [ ] A0401 `/market/[slug]` — loading distinct from empty and error
+- [ ] A0402 `/market/[slug]` — RU and EN copy
+- [ ] A0403 `/market/[slug]` — keyboard focus visible
+- [ ] A0404 `/market/[slug]` — mobile width 390
+- [ ] A0405 `/market/[slug]` — icon meaning matches action
+- [ ] A0406 `/market/[slug]` — color uses tokens not raw gray
+- [ ] A0407 `/market/[slug]/reviews` — URL state survives Back
+- [ ] A0408 `/market/[slug]/reviews` — loading distinct from empty and error
+- [ ] A0409 `/market/[slug]/reviews` — RU and EN copy
+- [ ] A0410 `/market/[slug]/reviews` — keyboard focus visible
+- [ ] A0411 `/market/[slug]/reviews` — mobile width 390
+- [ ] A0412 `/market/[slug]/reviews` — icon meaning matches action
+- [ ] A0413 `/market/[slug]/reviews` — color uses tokens not raw gray
+- [ ] A0414 `/market/[slug]/versions` — URL state survives Back
+- [ ] A0415 `/market/[slug]/versions` — loading distinct from empty and error
+- [ ] A0416 `/market/[slug]/versions` — RU and EN copy
+- [ ] A0417 `/market/[slug]/versions` — keyboard focus visible
+- [ ] A0418 `/market/[slug]/versions` — mobile width 390
+- [ ] A0419 `/market/[slug]/versions` — icon meaning matches action
+- [ ] A0420 `/market/[slug]/versions` — color uses tokens not raw gray
+- [ ] A0421 `/notifications` — URL state survives Back
+- [ ] A0422 `/notifications` — loading distinct from empty and error
+- [ ] A0423 `/notifications` — RU and EN copy
+- [ ] A0424 `/notifications` — keyboard focus visible
+- [ ] A0425 `/notifications` — mobile width 390
+- [ ] A0426 `/notifications` — icon meaning matches action
+- [ ] A0427 `/notifications` — color uses tokens not raw gray
+- [ ] A0428 `/organizations` — URL state survives Back
+- [ ] A0429 `/organizations` — loading distinct from empty and error
+- [ ] A0430 `/organizations` — RU and EN copy
+- [ ] A0431 `/organizations` — keyboard focus visible
+- [ ] A0432 `/organizations` — mobile width 390
+- [ ] A0433 `/organizations` — icon meaning matches action
+- [ ] A0434 `/organizations` — color uses tokens not raw gray
+- [ ] A0435 `/organizations/[slug]` — URL state survives Back
+- [ ] A0436 `/organizations/[slug]` — loading distinct from empty and error
+- [ ] A0437 `/organizations/[slug]` — RU and EN copy
+- [ ] A0438 `/organizations/[slug]` — keyboard focus visible
+- [ ] A0439 `/organizations/[slug]` — mobile width 390
+- [ ] A0440 `/organizations/[slug]` — icon meaning matches action
+- [ ] A0441 `/organizations/[slug]` — color uses tokens not raw gray
+- [ ] A0442 `/organizations/[slug]/activity` — URL state survives Back
+- [ ] A0443 `/organizations/[slug]/activity` — loading distinct from empty and error
+- [ ] A0444 `/organizations/[slug]/activity` — RU and EN copy
+- [ ] A0445 `/organizations/[slug]/activity` — keyboard focus visible
+- [ ] A0446 `/organizations/[slug]/activity` — mobile width 390
+- [ ] A0447 `/organizations/[slug]/activity` — icon meaning matches action
+- [ ] A0448 `/organizations/[slug]/activity` — color uses tokens not raw gray
+- [ ] A0449 `/organizations/[slug]/trust` — URL state survives Back
+- [ ] A0450 `/organizations/[slug]/trust` — loading distinct from empty and error
+- [ ] A0451 `/organizations/[slug]/trust` — RU and EN copy
+- [ ] A0452 `/organizations/[slug]/trust` — keyboard focus visible
+- [ ] A0453 `/organizations/[slug]/trust` — mobile width 390
+- [ ] A0454 `/organizations/[slug]/trust` — icon meaning matches action
+- [ ] A0455 `/organizations/[slug]/trust` — color uses tokens not raw gray
+- [ ] A0456 `/page.tsx` — URL state survives Back
+- [ ] A0457 `/page.tsx` — loading distinct from empty and error
+- [ ] A0458 `/page.tsx` — RU and EN copy
+- [ ] A0459 `/page.tsx` — keyboard focus visible
+- [ ] A0460 `/page.tsx` — mobile width 390
+- [ ] A0461 `/page.tsx` — icon meaning matches action
+- [ ] A0462 `/page.tsx` — color uses tokens not raw gray
+- [ ] A0463 `/privacy` — URL state survives Back
+- [ ] A0464 `/privacy` — loading distinct from empty and error
+- [ ] A0465 `/privacy` — RU and EN copy
+- [ ] A0466 `/privacy` — keyboard focus visible
+- [ ] A0467 `/privacy` — mobile width 390
+- [ ] A0468 `/privacy` — icon meaning matches action
+- [ ] A0469 `/privacy` — color uses tokens not raw gray
+- [ ] A0470 `/security` — URL state survives Back
+- [ ] A0471 `/security` — loading distinct from empty and error
+- [ ] A0472 `/security` — RU and EN copy
+- [ ] A0473 `/security` — keyboard focus visible
+- [ ] A0474 `/security` — mobile width 390
+- [ ] A0475 `/security` — icon meaning matches action
+- [ ] A0476 `/security` — color uses tokens not raw gray
+- [ ] A0477 `/servers` — URL state survives Back
+- [ ] A0478 `/servers` — loading distinct from empty and error
+- [ ] A0479 `/servers` — RU and EN copy
+- [ ] A0480 `/servers` — keyboard focus visible
+- [ ] A0481 `/servers` — mobile width 390
+- [ ] A0482 `/servers` — icon meaning matches action
+- [ ] A0483 `/servers` — color uses tokens not raw gray
+- [ ] A0484 `/servers/[slug]` — URL state survives Back
+- [ ] A0485 `/servers/[slug]` — loading distinct from empty and error
+- [ ] A0486 `/servers/[slug]` — RU and EN copy
+- [ ] A0487 `/servers/[slug]` — keyboard focus visible
+- [ ] A0488 `/servers/[slug]` — mobile width 390
+- [ ] A0489 `/servers/[slug]` — icon meaning matches action
+- [ ] A0490 `/servers/[slug]` — color uses tokens not raw gray
+- [ ] A0491 `/servers/[slug]/observations` — URL state survives Back
+- [ ] A0492 `/servers/[slug]/observations` — loading distinct from empty and error
+- [ ] A0493 `/servers/[slug]/observations` — RU and EN copy
+- [ ] A0494 `/servers/[slug]/observations` — keyboard focus visible
+- [ ] A0495 `/servers/[slug]/observations` — mobile width 390
+- [ ] A0496 `/servers/[slug]/observations` — icon meaning matches action
+- [ ] A0497 `/servers/[slug]/observations` — color uses tokens not raw gray
+- [ ] A0498 `/servers/[slug]/statistics` — URL state survives Back
+- [ ] A0499 `/servers/[slug]/statistics` — loading distinct from empty and error
+- [ ] A0500 `/servers/[slug]/statistics` — RU and EN copy
+- [ ] A0501 `/servers/[slug]/statistics` — keyboard focus visible
+- [ ] A0502 `/servers/[slug]/statistics` — mobile width 390
+- [ ] A0503 `/servers/[slug]/statistics` — icon meaning matches action
+- [ ] A0504 `/servers/[slug]/statistics` — color uses tokens not raw gray
+- [ ] A0505 `/servers/[slug]/trust` — URL state survives Back
+- [ ] A0506 `/servers/[slug]/trust` — loading distinct from empty and error
+- [ ] A0507 `/servers/[slug]/trust` — RU and EN copy
+- [ ] A0508 `/servers/[slug]/trust` — keyboard focus visible
+- [ ] A0509 `/servers/[slug]/trust` — mobile width 390
+- [ ] A0510 `/servers/[slug]/trust` — icon meaning matches action
+- [ ] A0511 `/servers/[slug]/trust` — color uses tokens not raw gray
+- [ ] A0512 `/servers/[slug]/updates` — URL state survives Back
+- [ ] A0513 `/servers/[slug]/updates` — loading distinct from empty and error
+- [ ] A0514 `/servers/[slug]/updates` — RU and EN copy
+- [ ] A0515 `/servers/[slug]/updates` — keyboard focus visible
+- [ ] A0516 `/servers/[slug]/updates` — mobile width 390
+- [ ] A0517 `/servers/[slug]/updates` — icon meaning matches action
+- [ ] A0518 `/servers/[slug]/updates` — color uses tokens not raw gray
+- [ ] A0519 `/settings` — URL state survives Back
+- [ ] A0520 `/settings` — loading distinct from empty and error
+- [ ] A0521 `/settings` — RU and EN copy
+- [ ] A0522 `/settings` — keyboard focus visible
+- [ ] A0523 `/settings` — mobile width 390
+- [ ] A0524 `/settings` — icon meaning matches action
+- [ ] A0525 `/settings` — color uses tokens not raw gray
+- [ ] A0526 `/settings/developer` — URL state survives Back
+- [ ] A0527 `/settings/developer` — loading distinct from empty and error
+- [ ] A0528 `/settings/developer` — RU and EN copy
+- [ ] A0529 `/settings/developer` — keyboard focus visible
+- [ ] A0530 `/settings/developer` — mobile width 390
+- [ ] A0531 `/settings/developer` — icon meaning matches action
+- [ ] A0532 `/settings/developer` — color uses tokens not raw gray
+- [ ] A0533 `/settings/history` — URL state survives Back
+- [ ] A0534 `/settings/history` — loading distinct from empty and error
+- [ ] A0535 `/settings/history` — RU and EN copy
+- [ ] A0536 `/settings/history` — keyboard focus visible
+- [ ] A0537 `/settings/history` — mobile width 390
+- [ ] A0538 `/settings/history` — icon meaning matches action
+- [ ] A0539 `/settings/history` — color uses tokens not raw gray
+- [ ] A0540 `/settings/privacy` — URL state survives Back
+- [ ] A0541 `/settings/privacy` — loading distinct from empty and error
+- [ ] A0542 `/settings/privacy` — RU and EN copy
+- [ ] A0543 `/settings/privacy` — keyboard focus visible
+- [ ] A0544 `/settings/privacy` — mobile width 390
+- [ ] A0545 `/settings/privacy` — icon meaning matches action
+- [ ] A0546 `/settings/privacy` — color uses tokens not raw gray
+- [ ] A0547 `/subscriptions` — URL state survives Back
+- [ ] A0548 `/subscriptions` — loading distinct from empty and error
+- [ ] A0549 `/subscriptions` — RU and EN copy
+- [ ] A0550 `/subscriptions` — keyboard focus visible
+- [ ] A0551 `/subscriptions` — mobile width 390
+- [ ] A0552 `/subscriptions` — icon meaning matches action
+- [ ] A0553 `/subscriptions` — color uses tokens not raw gray
+- [ ] A0554 `/support` — URL state survives Back
+- [ ] A0555 `/support` — loading distinct from empty and error
+- [ ] A0556 `/support` — RU and EN copy
+- [ ] A0557 `/support` — keyboard focus visible
+- [ ] A0558 `/support` — mobile width 390
+- [ ] A0559 `/support` — icon meaning matches action
+- [ ] A0560 `/support` — color uses tokens not raw gray
+- [ ] A0561 `/support/[id]` — URL state survives Back
+- [ ] A0562 `/support/[id]` — loading distinct from empty and error
+- [ ] A0563 `/support/[id]` — RU and EN copy
+- [ ] A0564 `/support/[id]` — keyboard focus visible
+- [ ] A0565 `/support/[id]` — mobile width 390
+- [ ] A0566 `/support/[id]` — icon meaning matches action
+- [ ] A0567 `/support/[id]` — color uses tokens not raw gray
+- [ ] A0568 `/support/[id]/messages` — URL state survives Back
+- [ ] A0569 `/support/[id]/messages` — loading distinct from empty and error
+- [ ] A0570 `/support/[id]/messages` — RU and EN copy
+- [ ] A0571 `/support/[id]/messages` — keyboard focus visible
+- [ ] A0572 `/support/[id]/messages` — mobile width 390
+- [ ] A0573 `/support/[id]/messages` — icon meaning matches action
+- [ ] A0574 `/support/[id]/messages` — color uses tokens not raw gray
+- [ ] A0575 `/terms` — URL state survives Back
+- [ ] A0576 `/terms` — loading distinct from empty and error
+- [ ] A0577 `/terms` — RU and EN copy
+- [ ] A0578 `/terms` — keyboard focus visible
+- [ ] A0579 `/terms` — mobile width 390
+- [ ] A0580 `/terms` — icon meaning matches action
+- [ ] A0581 `/terms` — color uses tokens not raw gray
+- [ ] A0582 `/users/[username]` — URL state survives Back
+- [ ] A0583 `/users/[username]` — loading distinct from empty and error
+- [ ] A0584 `/users/[username]` — RU and EN copy
+- [ ] A0585 `/users/[username]` — keyboard focus visible
+- [ ] A0586 `/users/[username]` — mobile width 390
+- [ ] A0587 `/users/[username]` — icon meaning matches action
+- [ ] A0588 `/users/[username]` — color uses tokens not raw gray
+- [ ] A0589 `/users/[username]/activity` — URL state survives Back
+- [ ] A0590 `/users/[username]/activity` — loading distinct from empty and error
+- [ ] A0591 `/users/[username]/activity` — RU and EN copy
+- [ ] A0592 `/users/[username]/activity` — keyboard focus visible
+- [ ] A0593 `/users/[username]/activity` — mobile width 390
+- [ ] A0594 `/users/[username]/activity` — icon meaning matches action
+- [ ] A0595 `/users/[username]/activity` — color uses tokens not raw gray
+- [ ] A0596 `/users/[username]/trust` — URL state survives Back
+- [ ] A0597 `/users/[username]/trust` — loading distinct from empty and error
+- [ ] A0598 `/users/[username]/trust` — RU and EN copy
+- [ ] A0599 `/users/[username]/trust` — keyboard focus visible
+- [ ] A0600 `/users/[username]/trust` — mobile width 390
+- [ ] A0601 `/users/[username]/trust` — icon meaning matches action
+- [ ] A0602 `/users/[username]/trust` — color uses tokens not raw gray
+- [ ] A0603 `/users/[username]/trust/history` — URL state survives Back
+- [ ] A0604 `/users/[username]/trust/history` — loading distinct from empty and error
+- [ ] A0605 `/users/[username]/trust/history` — RU and EN copy
+- [ ] A0606 `/users/[username]/trust/history` — keyboard focus visible
+- [ ] A0607 `/users/[username]/trust/history` — mobile width 390
+- [ ] A0608 `/users/[username]/trust/history` — icon meaning matches action
+- [ ] A0609 `/users/[username]/trust/history` — color uses tokens not raw gray
+- [ ] A0610 `/workspace` — URL state survives Back
+- [ ] A0611 `/workspace` — loading distinct from empty and error
+- [ ] A0612 `/workspace` — RU and EN copy
+- [ ] A0613 `/workspace` — keyboard focus visible
+- [ ] A0614 `/workspace` — mobile width 390
+- [ ] A0615 `/workspace` — icon meaning matches action
+- [ ] A0616 `/workspace` — color uses tokens not raw gray
+- [ ] A0617 `/workspace/acquisitions` — URL state survives Back
+- [ ] A0618 `/workspace/acquisitions` — loading distinct from empty and error
+- [ ] A0619 `/workspace/acquisitions` — RU and EN copy
+- [ ] A0620 `/workspace/acquisitions` — keyboard focus visible
+- [ ] A0621 `/workspace/acquisitions` — mobile width 390
+- [ ] A0622 `/workspace/acquisitions` — icon meaning matches action
+- [ ] A0623 `/workspace/acquisitions` — color uses tokens not raw gray
+- [ ] A0624 `/workspace/acquisitions/receipts` — URL state survives Back
+- [ ] A0625 `/workspace/acquisitions/receipts` — loading distinct from empty and error
+- [ ] A0626 `/workspace/acquisitions/receipts` — RU and EN copy
+- [ ] A0627 `/workspace/acquisitions/receipts` — keyboard focus visible
+- [ ] A0628 `/workspace/acquisitions/receipts` — mobile width 390
+- [ ] A0629 `/workspace/acquisitions/receipts` — icon meaning matches action
+- [ ] A0630 `/workspace/acquisitions/receipts` — color uses tokens not raw gray
+- [ ] A0631 `/workspace/acquisitions/receipts/[id]` — URL state survives Back
+- [ ] A0632 `/workspace/acquisitions/receipts/[id]` — loading distinct from empty and error
+- [ ] A0633 `/workspace/acquisitions/receipts/[id]` — RU and EN copy
+- [ ] A0634 `/workspace/acquisitions/receipts/[id]` — keyboard focus visible
+- [ ] A0635 `/workspace/acquisitions/receipts/[id]` — mobile width 390
+- [ ] A0636 `/workspace/acquisitions/receipts/[id]` — icon meaning matches action
+- [ ] A0637 `/workspace/acquisitions/receipts/[id]` — color uses tokens not raw gray
+- [ ] A0638 `/workspace/cart` — URL state survives Back
+- [ ] A0639 `/workspace/cart` — loading distinct from empty and error
+- [ ] A0640 `/workspace/cart` — RU and EN copy
+- [ ] A0641 `/workspace/cart` — keyboard focus visible
+- [ ] A0642 `/workspace/cart` — mobile width 390
+- [ ] A0643 `/workspace/cart` — icon meaning matches action
+- [ ] A0644 `/workspace/cart` — color uses tokens not raw gray
+- [ ] A0645 `/workspace/content` — URL state survives Back
+- [ ] A0646 `/workspace/content` — loading distinct from empty and error
+- [ ] A0647 `/workspace/content` — RU and EN copy
+- [ ] A0648 `/workspace/content` — keyboard focus visible
+- [ ] A0649 `/workspace/content` — mobile width 390
+- [ ] A0650 `/workspace/content` — icon meaning matches action
+- [ ] A0651 `/workspace/content` — color uses tokens not raw gray
+- [ ] A0652 `/workspace/content/[id]` — URL state survives Back
+- [ ] A0653 `/workspace/content/[id]` — loading distinct from empty and error
+- [ ] A0654 `/workspace/content/[id]` — RU and EN copy
+- [ ] A0655 `/workspace/content/[id]` — keyboard focus visible
+- [ ] A0656 `/workspace/content/[id]` — mobile width 390
+- [ ] A0657 `/workspace/content/[id]` — icon meaning matches action
+- [ ] A0658 `/workspace/content/[id]` — color uses tokens not raw gray
+- [ ] A0659 `/workspace/content/[id]/history` — URL state survives Back
+- [ ] A0660 `/workspace/content/[id]/history` — loading distinct from empty and error
+- [ ] A0661 `/workspace/content/[id]/history` — RU and EN copy
+- [ ] A0662 `/workspace/content/[id]/history` — keyboard focus visible
+- [ ] A0663 `/workspace/content/[id]/history` — mobile width 390
+- [ ] A0664 `/workspace/content/[id]/history` — icon meaning matches action
+- [ ] A0665 `/workspace/content/[id]/history` — color uses tokens not raw gray
+- [ ] A0666 `/workspace/content/new` — URL state survives Back
+- [ ] A0667 `/workspace/content/new` — loading distinct from empty and error
+- [ ] A0668 `/workspace/content/new` — RU and EN copy
+- [ ] A0669 `/workspace/content/new` — keyboard focus visible
+- [ ] A0670 `/workspace/content/new` — mobile width 390
+- [ ] A0671 `/workspace/content/new` — icon meaning matches action
+- [ ] A0672 `/workspace/content/new` — color uses tokens not raw gray
+- [ ] A0673 `/workspace/discussions` — URL state survives Back
+- [ ] A0674 `/workspace/discussions` — loading distinct from empty and error
+- [ ] A0675 `/workspace/discussions` — RU and EN copy
+- [ ] A0676 `/workspace/discussions` — keyboard focus visible
+- [ ] A0677 `/workspace/discussions` — mobile width 390
+- [ ] A0678 `/workspace/discussions` — icon meaning matches action
+- [ ] A0679 `/workspace/discussions` — color uses tokens not raw gray
+- [ ] A0680 `/workspace/discussions/[id]` — URL state survives Back
+- [ ] A0681 `/workspace/discussions/[id]` — loading distinct from empty and error
+- [ ] A0682 `/workspace/discussions/[id]` — RU and EN copy
+- [ ] A0683 `/workspace/discussions/[id]` — keyboard focus visible
+- [ ] A0684 `/workspace/discussions/[id]` — mobile width 390
+- [ ] A0685 `/workspace/discussions/[id]` — icon meaning matches action
+- [ ] A0686 `/workspace/discussions/[id]` — color uses tokens not raw gray
+- [ ] A0687 `/workspace/feed` — URL state survives Back
+- [ ] A0688 `/workspace/feed` — loading distinct from empty and error
+- [ ] A0689 `/workspace/feed` — RU and EN copy
+- [ ] A0690 `/workspace/feed` — keyboard focus visible
+- [ ] A0691 `/workspace/feed` — mobile width 390
+- [ ] A0692 `/workspace/feed` — icon meaning matches action
+- [ ] A0693 `/workspace/feed` — color uses tokens not raw gray
+- [ ] A0694 `/workspace/finance` — URL state survives Back
+- [ ] A0695 `/workspace/finance` — loading distinct from empty and error
+- [ ] A0696 `/workspace/finance` — RU and EN copy
+- [ ] A0697 `/workspace/finance` — keyboard focus visible
+- [ ] A0698 `/workspace/finance` — mobile width 390
+- [ ] A0699 `/workspace/finance` — icon meaning matches action
+- [ ] A0700 `/workspace/finance` — color uses tokens not raw gray
+- [ ] A0701 `/workspace/library` — URL state survives Back
+- [ ] A0702 `/workspace/library` — loading distinct from empty and error
+- [ ] A0703 `/workspace/library` — RU and EN copy
+- [ ] A0704 `/workspace/library` — keyboard focus visible
+- [ ] A0705 `/workspace/library` — mobile width 390
+- [ ] A0706 `/workspace/library` — icon meaning matches action
+- [ ] A0707 `/workspace/library` — color uses tokens not raw gray
+- [ ] A0708 `/workspace/library/[id]/collections` — URL state survives Back
+- [ ] A0709 `/workspace/library/[id]/collections` — loading distinct from empty and error
+- [ ] A0710 `/workspace/library/[id]/collections` — RU and EN copy
+- [ ] A0711 `/workspace/library/[id]/collections` — keyboard focus visible
+- [ ] A0712 `/workspace/library/[id]/collections` — mobile width 390
+- [ ] A0713 `/workspace/library/[id]/collections` — icon meaning matches action
+- [ ] A0714 `/workspace/library/[id]/collections` — color uses tokens not raw gray
+- [ ] A0715 `/workspace/library/[id]/requirements` — URL state survives Back
+- [ ] A0716 `/workspace/library/[id]/requirements` — loading distinct from empty and error
+- [ ] A0717 `/workspace/library/[id]/requirements` — RU and EN copy
+- [ ] A0718 `/workspace/library/[id]/requirements` — keyboard focus visible
+- [ ] A0719 `/workspace/library/[id]/requirements` — mobile width 390
+- [ ] A0720 `/workspace/library/[id]/requirements` — icon meaning matches action
+- [ ] A0721 `/workspace/library/[id]/requirements` — color uses tokens not raw gray
+- [ ] A0722 `/workspace/library/[id]/versions` — URL state survives Back
+- [ ] A0723 `/workspace/library/[id]/versions` — loading distinct from empty and error
+- [ ] A0724 `/workspace/library/[id]/versions` — RU and EN copy
+- [ ] A0725 `/workspace/library/[id]/versions` — keyboard focus visible
+- [ ] A0726 `/workspace/library/[id]/versions` — mobile width 390
+- [ ] A0727 `/workspace/library/[id]/versions` — icon meaning matches action
+- [ ] A0728 `/workspace/library/[id]/versions` — color uses tokens not raw gray
+- [ ] A0729 `/workspace/library/[id]/versions/compare` — URL state survives Back
+- [ ] A0730 `/workspace/library/[id]/versions/compare` — loading distinct from empty and error
+- [ ] A0731 `/workspace/library/[id]/versions/compare` — RU and EN copy
+- [ ] A0732 `/workspace/library/[id]/versions/compare` — keyboard focus visible
+- [ ] A0733 `/workspace/library/[id]/versions/compare` — mobile width 390
+- [ ] A0734 `/workspace/library/[id]/versions/compare` — icon meaning matches action
+- [ ] A0735 `/workspace/library/[id]/versions/compare` — color uses tokens not raw gray
+- [ ] A0736 `/workspace/library/collections` — URL state survives Back
+- [ ] A0737 `/workspace/library/collections` — loading distinct from empty and error
+- [ ] A0738 `/workspace/library/collections` — RU and EN copy
+- [ ] A0739 `/workspace/library/collections` — keyboard focus visible
+- [ ] A0740 `/workspace/library/collections` — mobile width 390
+- [ ] A0741 `/workspace/library/collections` — icon meaning matches action
+- [ ] A0742 `/workspace/library/collections` — color uses tokens not raw gray
+- [ ] A0743 `/workspace/library/collections/[id]` — URL state survives Back
+- [ ] A0744 `/workspace/library/collections/[id]` — loading distinct from empty and error
+- [ ] A0745 `/workspace/library/collections/[id]` — RU and EN copy
+- [ ] A0746 `/workspace/library/collections/[id]` — keyboard focus visible
+- [ ] A0747 `/workspace/library/collections/[id]` — mobile width 390
+- [ ] A0748 `/workspace/library/collections/[id]` — icon meaning matches action
+- [ ] A0749 `/workspace/library/collections/[id]` — color uses tokens not raw gray
+- [ ] A0750 `/workspace/library/collections/[id]/add` — URL state survives Back
+- [ ] A0751 `/workspace/library/collections/[id]/add` — loading distinct from empty and error
+- [ ] A0752 `/workspace/library/collections/[id]/add` — RU and EN copy
+- [ ] A0753 `/workspace/library/collections/[id]/add` — keyboard focus visible
+- [ ] A0754 `/workspace/library/collections/[id]/add` — mobile width 390
+- [ ] A0755 `/workspace/library/collections/[id]/add` — icon meaning matches action
+- [ ] A0756 `/workspace/library/collections/[id]/add` — color uses tokens not raw gray
+- [ ] A0757 `/workspace/library/collections/[id]/compare` — URL state survives Back
+- [ ] A0758 `/workspace/library/collections/[id]/compare` — loading distinct from empty and error
+- [ ] A0759 `/workspace/library/collections/[id]/compare` — RU and EN copy
+- [ ] A0760 `/workspace/library/collections/[id]/compare` — keyboard focus visible
+- [ ] A0761 `/workspace/library/collections/[id]/compare` — mobile width 390
+- [ ] A0762 `/workspace/library/collections/[id]/compare` — icon meaning matches action
+- [ ] A0763 `/workspace/library/collections/[id]/compare` — color uses tokens not raw gray
+- [ ] A0764 `/workspace/library/collections/[id]/copy` — URL state survives Back
+- [ ] A0765 `/workspace/library/collections/[id]/copy` — loading distinct from empty and error
+- [ ] A0766 `/workspace/library/collections/[id]/copy` — RU and EN copy
+- [ ] A0767 `/workspace/library/collections/[id]/copy` — keyboard focus visible
+- [ ] A0768 `/workspace/library/collections/[id]/copy` — mobile width 390
+- [ ] A0769 `/workspace/library/collections/[id]/copy` — icon meaning matches action
+- [ ] A0770 `/workspace/library/collections/[id]/copy` — color uses tokens not raw gray
+- [ ] A0771 `/workspace/library/collections/[id]/copy-items` — URL state survives Back
+- [ ] A0772 `/workspace/library/collections/[id]/copy-items` — loading distinct from empty and error
+- [ ] A0773 `/workspace/library/collections/[id]/copy-items` — RU and EN copy
+- [ ] A0774 `/workspace/library/collections/[id]/copy-items` — keyboard focus visible
+- [ ] A0775 `/workspace/library/collections/[id]/copy-items` — mobile width 390
+- [ ] A0776 `/workspace/library/collections/[id]/copy-items` — icon meaning matches action
+- [ ] A0777 `/workspace/library/collections/[id]/copy-items` — color uses tokens not raw gray
+- [ ] A0778 `/workspace/library/collections/[id]/history` — URL state survives Back
+- [ ] A0779 `/workspace/library/collections/[id]/history` — loading distinct from empty and error
+- [ ] A0780 `/workspace/library/collections/[id]/history` — RU and EN copy
+- [ ] A0781 `/workspace/library/collections/[id]/history` — keyboard focus visible
+- [ ] A0782 `/workspace/library/collections/[id]/history` — mobile width 390
+- [ ] A0783 `/workspace/library/collections/[id]/history` — icon meaning matches action
+- [ ] A0784 `/workspace/library/collections/[id]/history` — color uses tokens not raw gray
+- [ ] A0785 `/workspace/library/collections/[id]/import` — URL state survives Back
+- [ ] A0786 `/workspace/library/collections/[id]/import` — loading distinct from empty and error
+- [ ] A0787 `/workspace/library/collections/[id]/import` — RU and EN copy
+- [ ] A0788 `/workspace/library/collections/[id]/import` — keyboard focus visible
+- [ ] A0789 `/workspace/library/collections/[id]/import` — mobile width 390
+- [ ] A0790 `/workspace/library/collections/[id]/import` — icon meaning matches action
+- [ ] A0791 `/workspace/library/collections/[id]/import` — color uses tokens not raw gray
+- [ ] A0792 `/workspace/library/collections/[id]/move-items` — URL state survives Back
+- [ ] A0793 `/workspace/library/collections/[id]/move-items` — loading distinct from empty and error
+- [ ] A0794 `/workspace/library/collections/[id]/move-items` — RU and EN copy
+- [ ] A0795 `/workspace/library/collections/[id]/move-items` — keyboard focus visible
+- [ ] A0796 `/workspace/library/collections/[id]/move-items` — mobile width 390
+- [ ] A0797 `/workspace/library/collections/[id]/move-items` — icon meaning matches action
+- [ ] A0798 `/workspace/library/collections/[id]/move-items` — color uses tokens not raw gray
+- [ ] A0799 `/workspace/library/collections/[id]/reconcile` — URL state survives Back
+- [ ] A0800 `/workspace/library/collections/[id]/reconcile` — loading distinct from empty and error
+- [ ] A0801 `/workspace/library/collections/[id]/reconcile` — RU and EN copy
+- [ ] A0802 `/workspace/library/collections/[id]/reconcile` — keyboard focus visible
+- [ ] A0803 `/workspace/library/collections/[id]/reconcile` — mobile width 390
+- [ ] A0804 `/workspace/library/collections/[id]/reconcile` — icon meaning matches action
+- [ ] A0805 `/workspace/library/collections/[id]/reconcile` — color uses tokens not raw gray
+- [ ] A0806 `/workspace/library/collections/[id]/releases` — URL state survives Back
+- [ ] A0807 `/workspace/library/collections/[id]/releases` — loading distinct from empty and error
+- [ ] A0808 `/workspace/library/collections/[id]/releases` — RU and EN copy
+- [ ] A0809 `/workspace/library/collections/[id]/releases` — keyboard focus visible
+- [ ] A0810 `/workspace/library/collections/[id]/releases` — mobile width 390
+- [ ] A0811 `/workspace/library/collections/[id]/releases` — icon meaning matches action
+- [ ] A0812 `/workspace/library/collections/[id]/releases` — color uses tokens not raw gray
+- [ ] A0813 `/workspace/library/collections/[id]/requirements` — URL state survives Back
+- [ ] A0814 `/workspace/library/collections/[id]/requirements` — loading distinct from empty and error
+- [ ] A0815 `/workspace/library/collections/[id]/requirements` — RU and EN copy
+- [ ] A0816 `/workspace/library/collections/[id]/requirements` — keyboard focus visible
+- [ ] A0817 `/workspace/library/collections/[id]/requirements` — mobile width 390
+- [ ] A0818 `/workspace/library/collections/[id]/requirements` — icon meaning matches action
+- [ ] A0819 `/workspace/library/collections/[id]/requirements` — color uses tokens not raw gray
+- [ ] A0820 `/workspace/library/collections/[id]/versions` — URL state survives Back
+- [ ] A0821 `/workspace/library/collections/[id]/versions` — loading distinct from empty and error
+- [ ] A0822 `/workspace/library/collections/[id]/versions` — RU and EN copy
+- [ ] A0823 `/workspace/library/collections/[id]/versions` — keyboard focus visible
+- [ ] A0824 `/workspace/library/collections/[id]/versions` — mobile width 390
+- [ ] A0825 `/workspace/library/collections/[id]/versions` — icon meaning matches action
+- [ ] A0826 `/workspace/library/collections/[id]/versions` — color uses tokens not raw gray
+- [ ] A0827 `/workspace/library/collections/[id]/versions/history` — URL state survives Back
+- [ ] A0828 `/workspace/library/collections/[id]/versions/history` — loading distinct from empty and error
+- [ ] A0829 `/workspace/library/collections/[id]/versions/history` — RU and EN copy
+- [ ] A0830 `/workspace/library/collections/[id]/versions/history` — keyboard focus visible
+- [ ] A0831 `/workspace/library/collections/[id]/versions/history` — mobile width 390
+- [ ] A0832 `/workspace/library/collections/[id]/versions/history` — icon meaning matches action
+- [ ] A0833 `/workspace/library/collections/[id]/versions/history` — color uses tokens not raw gray
+- [ ] A0834 `/workspace/library/collections/[id]/watches` — URL state survives Back
+- [ ] A0835 `/workspace/library/collections/[id]/watches` — loading distinct from empty and error
+- [ ] A0836 `/workspace/library/collections/[id]/watches` — RU and EN copy
+- [ ] A0837 `/workspace/library/collections/[id]/watches` — keyboard focus visible
+- [ ] A0838 `/workspace/library/collections/[id]/watches` — mobile width 390
+- [ ] A0839 `/workspace/library/collections/[id]/watches` — icon meaning matches action
+- [ ] A0840 `/workspace/library/collections/[id]/watches` — color uses tokens not raw gray
+- [ ] A0841 `/workspace/library/collections/history` — URL state survives Back
+- [ ] A0842 `/workspace/library/collections/history` — loading distinct from empty and error
+- [ ] A0843 `/workspace/library/collections/history` — RU and EN copy
+- [ ] A0844 `/workspace/library/collections/history` — keyboard focus visible
+- [ ] A0845 `/workspace/library/collections/history` — mobile width 390
+- [ ] A0846 `/workspace/library/collections/history` — icon meaning matches action
+- [ ] A0847 `/workspace/library/collections/history` — color uses tokens not raw gray
+- [ ] A0848 `/workspace/library/collections/membership-history` — URL state survives Back
+- [ ] A0849 `/workspace/library/collections/membership-history` — loading distinct from empty and error
+- [ ] A0850 `/workspace/library/collections/membership-history` — RU and EN copy
+- [ ] A0851 `/workspace/library/collections/membership-history` — keyboard focus visible
+- [ ] A0852 `/workspace/library/collections/membership-history` — mobile width 390
+- [ ] A0853 `/workspace/library/collections/membership-history` — icon meaning matches action
+- [ ] A0854 `/workspace/library/collections/membership-history` — color uses tokens not raw gray
+- [ ] A0855 `/workspace/library/collections/membership-history/[id]` — URL state survives Back
+- [ ] A0856 `/workspace/library/collections/membership-history/[id]` — loading distinct from empty and error
+- [ ] A0857 `/workspace/library/collections/membership-history/[id]` — RU and EN copy
+- [ ] A0858 `/workspace/library/collections/membership-history/[id]` — keyboard focus visible
+- [ ] A0859 `/workspace/library/collections/membership-history/[id]` — mobile width 390
+- [ ] A0860 `/workspace/library/collections/membership-history/[id]` — icon meaning matches action
+- [ ] A0861 `/workspace/library/collections/membership-history/[id]` — color uses tokens not raw gray
+- [ ] A0862 `/workspace/library/collections/receipts/[id]` — URL state survives Back
+- [ ] A0863 `/workspace/library/collections/receipts/[id]` — loading distinct from empty and error
+- [ ] A0864 `/workspace/library/collections/receipts/[id]` — RU and EN copy
+- [ ] A0865 `/workspace/library/collections/receipts/[id]` — keyboard focus visible
+- [ ] A0866 `/workspace/library/collections/receipts/[id]` — mobile width 390
+- [ ] A0867 `/workspace/library/collections/receipts/[id]` — icon meaning matches action
+- [ ] A0868 `/workspace/library/collections/receipts/[id]` — color uses tokens not raw gray
+- [ ] A0869 `/workspace/library/collections/resources` — URL state survives Back
+- [ ] A0870 `/workspace/library/collections/resources` — loading distinct from empty and error
+- [ ] A0871 `/workspace/library/collections/resources` — RU and EN copy
+- [ ] A0872 `/workspace/library/collections/resources` — keyboard focus visible
+- [ ] A0873 `/workspace/library/collections/resources` — mobile width 390
+- [ ] A0874 `/workspace/library/collections/resources` — icon meaning matches action
+- [ ] A0875 `/workspace/library/collections/resources` — color uses tokens not raw gray
+- [ ] A0876 `/workspace/library/downloads` — URL state survives Back
+- [ ] A0877 `/workspace/library/downloads` — loading distinct from empty and error
+- [ ] A0878 `/workspace/library/downloads` — RU and EN copy
+- [ ] A0879 `/workspace/library/downloads` — keyboard focus visible
+- [ ] A0880 `/workspace/library/downloads` — mobile width 390
+- [ ] A0881 `/workspace/library/downloads` — icon meaning matches action
+- [ ] A0882 `/workspace/library/downloads` — color uses tokens not raw gray
+- [ ] A0883 `/workspace/library/downloads/[id]` — URL state survives Back
+- [ ] A0884 `/workspace/library/downloads/[id]` — loading distinct from empty and error
+- [ ] A0885 `/workspace/library/downloads/[id]` — RU and EN copy
+- [ ] A0886 `/workspace/library/downloads/[id]` — keyboard focus visible
+- [ ] A0887 `/workspace/library/downloads/[id]` — mobile width 390
+- [ ] A0888 `/workspace/library/downloads/[id]` — icon meaning matches action
+- [ ] A0889 `/workspace/library/downloads/[id]` — color uses tokens not raw gray
+- [ ] A0890 `/workspace/library/review/[id]` — URL state survives Back
+- [ ] A0891 `/workspace/library/review/[id]` — loading distinct from empty and error
+- [ ] A0892 `/workspace/library/review/[id]` — RU and EN copy
+- [ ] A0893 `/workspace/library/review/[id]` — keyboard focus visible
+- [ ] A0894 `/workspace/library/review/[id]` — mobile width 390
+- [ ] A0895 `/workspace/library/review/[id]` — icon meaning matches action
+- [ ] A0896 `/workspace/library/review/[id]` — color uses tokens not raw gray
+- [ ] A0897 `/workspace/library/reviews` — URL state survives Back
+- [ ] A0898 `/workspace/library/reviews` — loading distinct from empty and error
+- [ ] A0899 `/workspace/library/reviews` — RU and EN copy
+- [ ] A0900 `/workspace/library/reviews` — keyboard focus visible
+- [ ] A0901 `/workspace/library/reviews` — mobile width 390
+- [ ] A0902 `/workspace/library/reviews` — icon meaning matches action
+- [ ] A0903 `/workspace/library/reviews` — color uses tokens not raw gray
+- [ ] A0904 `/workspace/library/updates` — URL state survives Back
+- [ ] A0905 `/workspace/library/updates` — loading distinct from empty and error
+- [ ] A0906 `/workspace/library/updates` — RU and EN copy
+- [ ] A0907 `/workspace/library/updates` — keyboard focus visible
+- [ ] A0908 `/workspace/library/updates` — mobile width 390
+- [ ] A0909 `/workspace/library/updates` — icon meaning matches action
+- [ ] A0910 `/workspace/library/updates` — color uses tokens not raw gray
+- [ ] A0911 `/workspace/library/version-history` — URL state survives Back
+- [ ] A0912 `/workspace/library/version-history` — loading distinct from empty and error
+- [ ] A0913 `/workspace/library/version-history` — RU and EN copy
+- [ ] A0914 `/workspace/library/version-history` — keyboard focus visible
+- [ ] A0915 `/workspace/library/version-history` — mobile width 390
+- [ ] A0916 `/workspace/library/version-history` — icon meaning matches action
+- [ ] A0917 `/workspace/library/version-history` — color uses tokens not raw gray
+- [ ] A0918 `/workspace/library/watches` — URL state survives Back
+- [ ] A0919 `/workspace/library/watches` — loading distinct from empty and error
+- [ ] A0920 `/workspace/library/watches` — RU and EN copy
+- [ ] A0921 `/workspace/library/watches` — keyboard focus visible
+- [ ] A0922 `/workspace/library/watches` — mobile width 390
+- [ ] A0923 `/workspace/library/watches` — icon meaning matches action
+- [ ] A0924 `/workspace/library/watches` — color uses tokens not raw gray
+- [ ] A0925 `/workspace/library/watches/history` — URL state survives Back
+- [ ] A0926 `/workspace/library/watches/history` — loading distinct from empty and error
+- [ ] A0927 `/workspace/library/watches/history` — RU and EN copy
+- [ ] A0928 `/workspace/library/watches/history` — keyboard focus visible
+- [ ] A0929 `/workspace/library/watches/history` — mobile width 390
+- [ ] A0930 `/workspace/library/watches/history` — icon meaning matches action
+- [ ] A0931 `/workspace/library/watches/history` — color uses tokens not raw gray
+- [ ] A0932 `/workspace/licenses` — URL state survives Back
+- [ ] A0933 `/workspace/licenses` — loading distinct from empty and error
+- [ ] A0934 `/workspace/licenses` — RU and EN copy
+- [ ] A0935 `/workspace/licenses` — keyboard focus visible
+- [ ] A0936 `/workspace/licenses` — mobile width 390
+- [ ] A0937 `/workspace/licenses` — icon meaning matches action
+- [ ] A0938 `/workspace/licenses` — color uses tokens not raw gray
+- [ ] A0939 `/workspace/licenses/[id]` — URL state survives Back
+- [ ] A0940 `/workspace/licenses/[id]` — loading distinct from empty and error
+- [ ] A0941 `/workspace/licenses/[id]` — RU and EN copy
+- [ ] A0942 `/workspace/licenses/[id]` — keyboard focus visible
+- [ ] A0943 `/workspace/licenses/[id]` — mobile width 390
+- [ ] A0944 `/workspace/licenses/[id]` — icon meaning matches action
+- [ ] A0945 `/workspace/licenses/[id]` — color uses tokens not raw gray
+- [ ] A0946 `/workspace/licenses/[id]/history` — URL state survives Back
+- [ ] A0947 `/workspace/licenses/[id]/history` — loading distinct from empty and error
+- [ ] A0948 `/workspace/licenses/[id]/history` — RU and EN copy
+- [ ] A0949 `/workspace/licenses/[id]/history` — keyboard focus visible
+- [ ] A0950 `/workspace/licenses/[id]/history` — mobile width 390
+- [ ] A0951 `/workspace/licenses/[id]/history` — icon meaning matches action
+- [ ] A0952 `/workspace/licenses/[id]/history` — color uses tokens not raw gray
+- [ ] A0953 `/workspace/order-cases` — URL state survives Back
+- [ ] A0954 `/workspace/order-cases` — loading distinct from empty and error
+- [ ] A0955 `/workspace/order-cases` — RU and EN copy
+- [ ] A0956 `/workspace/order-cases` — keyboard focus visible
+- [ ] A0957 `/workspace/order-cases` — mobile width 390
+- [ ] A0958 `/workspace/order-cases` — icon meaning matches action
+- [ ] A0959 `/workspace/order-cases` — color uses tokens not raw gray
+- [ ] A0960 `/workspace/order-cases/[id]` — URL state survives Back
+- [ ] A0961 `/workspace/order-cases/[id]` — loading distinct from empty and error
+- [ ] A0962 `/workspace/order-cases/[id]` — RU and EN copy
+- [ ] A0963 `/workspace/order-cases/[id]` — keyboard focus visible
+- [ ] A0964 `/workspace/order-cases/[id]` — mobile width 390
+- [ ] A0965 `/workspace/order-cases/[id]` — icon meaning matches action
+- [ ] A0966 `/workspace/order-cases/[id]` — color uses tokens not raw gray
+- [ ] A0967 `/workspace/organizations` — URL state survives Back
+- [ ] A0968 `/workspace/organizations` — loading distinct from empty and error
+- [ ] A0969 `/workspace/organizations` — RU and EN copy
+- [ ] A0970 `/workspace/organizations` — keyboard focus visible
+- [ ] A0971 `/workspace/organizations` — mobile width 390
+- [ ] A0972 `/workspace/organizations` — icon meaning matches action
+- [ ] A0973 `/workspace/organizations` — color uses tokens not raw gray
+- [ ] A0974 `/workspace/organizations/[id]` — URL state survives Back
+- [ ] A0975 `/workspace/organizations/[id]` — loading distinct from empty and error
+- [ ] A0976 `/workspace/organizations/[id]` — RU and EN copy
+- [ ] A0977 `/workspace/organizations/[id]` — keyboard focus visible
+- [ ] A0978 `/workspace/organizations/[id]` — mobile width 390
+- [ ] A0979 `/workspace/organizations/[id]` — icon meaning matches action
+- [ ] A0980 `/workspace/organizations/[id]` — color uses tokens not raw gray
+- [ ] A0981 `/workspace/organizations/[id]/activity` — URL state survives Back
+- [ ] A0982 `/workspace/organizations/[id]/activity` — loading distinct from empty and error
+- [ ] A0983 `/workspace/organizations/[id]/activity` — RU and EN copy
+- [ ] A0984 `/workspace/organizations/[id]/activity` — keyboard focus visible
+- [ ] A0985 `/workspace/organizations/[id]/activity` — mobile width 390
+- [ ] A0986 `/workspace/organizations/[id]/activity` — icon meaning matches action
+- [ ] A0987 `/workspace/organizations/[id]/activity` — color uses tokens not raw gray
+- [ ] A0988 `/workspace/organizations/[id]/content` — URL state survives Back
+- [ ] A0989 `/workspace/organizations/[id]/content` — loading distinct from empty and error
+- [ ] A0990 `/workspace/organizations/[id]/content` — RU and EN copy
+- [ ] A0991 `/workspace/organizations/[id]/content` — keyboard focus visible
+- [ ] A0992 `/workspace/organizations/[id]/content` — mobile width 390
+- [ ] A0993 `/workspace/organizations/[id]/content` — icon meaning matches action
+- [ ] A0994 `/workspace/organizations/[id]/content` — color uses tokens not raw gray
+- [ ] A0995 `/workspace/organizations/[id]/content/[contentId]` — URL state survives Back
+- [ ] A0996 `/workspace/organizations/[id]/content/[contentId]` — loading distinct from empty and error
+- [ ] A0997 `/workspace/organizations/[id]/content/[contentId]` — RU and EN copy
+- [ ] A0998 `/workspace/organizations/[id]/content/[contentId]` — keyboard focus visible
+- [ ] A0999 `/workspace/organizations/[id]/content/[contentId]` — mobile width 390
+- [ ] A1000 `/workspace/organizations/[id]/content/[contentId]` — icon meaning matches action
+- [ ] A1001 `/workspace/organizations/[id]/content/[contentId]` — color uses tokens not raw gray
+- [ ] A1002 `/workspace/organizations/[id]/content/[contentId]/history` — URL state survives Back
+- [ ] A1003 `/workspace/organizations/[id]/content/[contentId]/history` — loading distinct from empty and error
+- [ ] A1004 `/workspace/organizations/[id]/content/[contentId]/history` — RU and EN copy
+- [ ] A1005 `/workspace/organizations/[id]/content/[contentId]/history` — keyboard focus visible
+- [ ] A1006 `/workspace/organizations/[id]/content/[contentId]/history` — mobile width 390
+- [ ] A1007 `/workspace/organizations/[id]/content/[contentId]/history` — icon meaning matches action
+- [ ] A1008 `/workspace/organizations/[id]/content/[contentId]/history` — color uses tokens not raw gray
+- [ ] A1009 `/workspace/organizations/[id]/content/new` — URL state survives Back
+- [ ] A1010 `/workspace/organizations/[id]/content/new` — loading distinct from empty and error
+- [ ] A1011 `/workspace/organizations/[id]/content/new` — RU and EN copy
+- [ ] A1012 `/workspace/organizations/[id]/content/new` — keyboard focus visible
+- [ ] A1013 `/workspace/organizations/[id]/content/new` — mobile width 390
+- [ ] A1014 `/workspace/organizations/[id]/content/new` — icon meaning matches action
+- [ ] A1015 `/workspace/organizations/[id]/content/new` — color uses tokens not raw gray
+- [ ] A1016 `/workspace/organizations/[id]/team` — URL state survives Back
+- [ ] A1017 `/workspace/organizations/[id]/team` — loading distinct from empty and error
+- [ ] A1018 `/workspace/organizations/[id]/team` — RU and EN copy
+- [ ] A1019 `/workspace/organizations/[id]/team` — keyboard focus visible
+- [ ] A1020 `/workspace/organizations/[id]/team` — mobile width 390
+- [ ] A1021 `/workspace/organizations/[id]/team` — icon meaning matches action
+- [ ] A1022 `/workspace/organizations/[id]/team` — color uses tokens not raw gray
+- [ ] A1023 `/workspace/organizations/new` — URL state survives Back
+- [ ] A1024 `/workspace/organizations/new` — loading distinct from empty and error
+- [ ] A1025 `/workspace/organizations/new` — RU and EN copy
+- [ ] A1026 `/workspace/organizations/new` — keyboard focus visible
+- [ ] A1027 `/workspace/organizations/new` — mobile width 390
+- [ ] A1028 `/workspace/organizations/new` — icon meaning matches action
+- [ ] A1029 `/workspace/organizations/new` — color uses tokens not raw gray
+- [ ] A1030 `/workspace/platform-reports` — URL state survives Back
+- [ ] A1031 `/workspace/platform-reports` — loading distinct from empty and error
+- [ ] A1032 `/workspace/platform-reports` — RU and EN copy
+- [ ] A1033 `/workspace/platform-reports` — keyboard focus visible
+- [ ] A1034 `/workspace/platform-reports` — mobile width 390
+- [ ] A1035 `/workspace/platform-reports` — icon meaning matches action
+- [ ] A1036 `/workspace/platform-reports` — color uses tokens not raw gray
+- [ ] A1037 `/workspace/platform-reports/[id]` — URL state survives Back
+- [ ] A1038 `/workspace/platform-reports/[id]` — loading distinct from empty and error
+- [ ] A1039 `/workspace/platform-reports/[id]` — RU and EN copy
+- [ ] A1040 `/workspace/platform-reports/[id]` — keyboard focus visible
+- [ ] A1041 `/workspace/platform-reports/[id]` — mobile width 390
+- [ ] A1042 `/workspace/platform-reports/[id]` — icon meaning matches action
+- [ ] A1043 `/workspace/platform-reports/[id]` — color uses tokens not raw gray
+- [ ] A1044 `/workspace/purchases` — URL state survives Back
+- [ ] A1045 `/workspace/purchases` — loading distinct from empty and error
+- [ ] A1046 `/workspace/purchases` — RU and EN copy
+- [ ] A1047 `/workspace/purchases` — keyboard focus visible
+- [ ] A1048 `/workspace/purchases` — mobile width 390
+- [ ] A1049 `/workspace/purchases` — icon meaning matches action
+- [ ] A1050 `/workspace/purchases` — color uses tokens not raw gray
+- [ ] A1051 `/workspace/purchases/[id]` — URL state survives Back
+- [ ] A1052 `/workspace/purchases/[id]` — loading distinct from empty and error
+- [ ] A1053 `/workspace/purchases/[id]` — RU and EN copy
+- [ ] A1054 `/workspace/purchases/[id]` — keyboard focus visible
+- [ ] A1055 `/workspace/purchases/[id]` — mobile width 390
+- [ ] A1056 `/workspace/purchases/[id]` — icon meaning matches action
+- [ ] A1057 `/workspace/purchases/[id]` — color uses tokens not raw gray
+- [ ] A1058 `/workspace/purchases/[id]/operations` — URL state survives Back
+- [ ] A1059 `/workspace/purchases/[id]/operations` — loading distinct from empty and error
+- [ ] A1060 `/workspace/purchases/[id]/operations` — RU and EN copy
+- [ ] A1061 `/workspace/purchases/[id]/operations` — keyboard focus visible
+- [ ] A1062 `/workspace/purchases/[id]/operations` — mobile width 390
+- [ ] A1063 `/workspace/purchases/[id]/operations` — icon meaning matches action
+- [ ] A1064 `/workspace/purchases/[id]/operations` — color uses tokens not raw gray
+- [ ] A1065 `/workspace/purchases/[id]/support` — URL state survives Back
+- [ ] A1066 `/workspace/purchases/[id]/support` — loading distinct from empty and error
+- [ ] A1067 `/workspace/purchases/[id]/support` — RU and EN copy
+- [ ] A1068 `/workspace/purchases/[id]/support` — keyboard focus visible
+- [ ] A1069 `/workspace/purchases/[id]/support` — mobile width 390
+- [ ] A1070 `/workspace/purchases/[id]/support` — icon meaning matches action
+- [ ] A1071 `/workspace/purchases/[id]/support` — color uses tokens not raw gray
+- [ ] A1072 `/workspace/purchases/[id]/terms` — URL state survives Back
+- [ ] A1073 `/workspace/purchases/[id]/terms` — loading distinct from empty and error
+- [ ] A1074 `/workspace/purchases/[id]/terms` — RU and EN copy
+- [ ] A1075 `/workspace/purchases/[id]/terms` — keyboard focus visible
+- [ ] A1076 `/workspace/purchases/[id]/terms` — mobile width 390
+- [ ] A1077 `/workspace/purchases/[id]/terms` — icon meaning matches action
+- [ ] A1078 `/workspace/purchases/[id]/terms` — color uses tokens not raw gray
+- [ ] A1079 `/workspace/reactions` — URL state survives Back
+- [ ] A1080 `/workspace/reactions` — loading distinct from empty and error
+- [ ] A1081 `/workspace/reactions` — RU and EN copy
+- [ ] A1082 `/workspace/reactions` — keyboard focus visible
+- [ ] A1083 `/workspace/reactions` — mobile width 390
+- [ ] A1084 `/workspace/reactions` — icon meaning matches action
+- [ ] A1085 `/workspace/reactions` — color uses tokens not raw gray
+- [ ] A1086 `/workspace/reports` — URL state survives Back
+- [ ] A1087 `/workspace/reports` — loading distinct from empty and error
+- [ ] A1088 `/workspace/reports` — RU and EN copy
+- [ ] A1089 `/workspace/reports` — keyboard focus visible
+- [ ] A1090 `/workspace/reports` — mobile width 390
+- [ ] A1091 `/workspace/reports` — icon meaning matches action
+- [ ] A1092 `/workspace/reports` — color uses tokens not raw gray
+- [ ] A1093 `/workspace/reports/[id]` — URL state survives Back
+- [ ] A1094 `/workspace/reports/[id]` — loading distinct from empty and error
+- [ ] A1095 `/workspace/reports/[id]` — RU and EN copy
+- [ ] A1096 `/workspace/reports/[id]` — keyboard focus visible
+- [ ] A1097 `/workspace/reports/[id]` — mobile width 390
+- [ ] A1098 `/workspace/reports/[id]` — icon meaning matches action
+- [ ] A1099 `/workspace/reports/[id]` — color uses tokens not raw gray
+- [ ] A1100 `/workspace/reports/[id]/history` — URL state survives Back
+- [ ] A1101 `/workspace/reports/[id]/history` — loading distinct from empty and error
+- [ ] A1102 `/workspace/reports/[id]/history` — RU and EN copy
+- [ ] A1103 `/workspace/reports/[id]/history` — keyboard focus visible
+- [ ] A1104 `/workspace/reports/[id]/history` — mobile width 390
+- [ ] A1105 `/workspace/reports/[id]/history` — icon meaning matches action
+- [ ] A1106 `/workspace/reports/[id]/history` — color uses tokens not raw gray
+- [ ] A1107 `/workspace/resources` — URL state survives Back
+- [ ] A1108 `/workspace/resources` — loading distinct from empty and error
+- [ ] A1109 `/workspace/resources` — RU and EN copy
+- [ ] A1110 `/workspace/resources` — keyboard focus visible
+- [ ] A1111 `/workspace/resources` — mobile width 390
+- [ ] A1112 `/workspace/resources` — icon meaning matches action
+- [ ] A1113 `/workspace/resources` — color uses tokens not raw gray
+- [ ] A1114 `/workspace/resources/[id]` — URL state survives Back
+- [ ] A1115 `/workspace/resources/[id]` — loading distinct from empty and error
+- [ ] A1116 `/workspace/resources/[id]` — RU and EN copy
+- [ ] A1117 `/workspace/resources/[id]` — keyboard focus visible
+- [ ] A1118 `/workspace/resources/[id]` — mobile width 390
+- [ ] A1119 `/workspace/resources/[id]` — icon meaning matches action
+- [ ] A1120 `/workspace/resources/[id]` — color uses tokens not raw gray
+- [ ] A1121 `/workspace/resources/[id]/activity` — URL state survives Back
+- [ ] A1122 `/workspace/resources/[id]/activity` — loading distinct from empty and error
+- [ ] A1123 `/workspace/resources/[id]/activity` — RU and EN copy
+- [ ] A1124 `/workspace/resources/[id]/activity` — keyboard focus visible
+- [ ] A1125 `/workspace/resources/[id]/activity` — mobile width 390
+- [ ] A1126 `/workspace/resources/[id]/activity` — icon meaning matches action
+- [ ] A1127 `/workspace/resources/[id]/activity` — color uses tokens not raw gray
+- [ ] A1128 `/workspace/resources/[id]/builds/[buildId]` — URL state survives Back
+- [ ] A1129 `/workspace/resources/[id]/builds/[buildId]` — loading distinct from empty and error
+- [ ] A1130 `/workspace/resources/[id]/builds/[buildId]` — RU and EN copy
+- [ ] A1131 `/workspace/resources/[id]/builds/[buildId]` — keyboard focus visible
+- [ ] A1132 `/workspace/resources/[id]/builds/[buildId]` — mobile width 390
+- [ ] A1133 `/workspace/resources/[id]/builds/[buildId]` — icon meaning matches action
+- [ ] A1134 `/workspace/resources/[id]/builds/[buildId]` — color uses tokens not raw gray
+- [ ] A1135 `/workspace/resources/[id]/builds/[buildId]/package` — URL state survives Back
+- [ ] A1136 `/workspace/resources/[id]/builds/[buildId]/package` — loading distinct from empty and error
+- [ ] A1137 `/workspace/resources/[id]/builds/[buildId]/package` — RU and EN copy
+- [ ] A1138 `/workspace/resources/[id]/builds/[buildId]/package` — keyboard focus visible
+- [ ] A1139 `/workspace/resources/[id]/builds/[buildId]/package` — mobile width 390
+- [ ] A1140 `/workspace/resources/[id]/builds/[buildId]/package` — icon meaning matches action
+- [ ] A1141 `/workspace/resources/[id]/builds/[buildId]/package` — color uses tokens not raw gray
+- [ ] A1142 `/workspace/resources/[id]/compatibility` — URL state survives Back
+- [ ] A1143 `/workspace/resources/[id]/compatibility` — loading distinct from empty and error
+- [ ] A1144 `/workspace/resources/[id]/compatibility` — RU and EN copy
+- [ ] A1145 `/workspace/resources/[id]/compatibility` — keyboard focus visible
+- [ ] A1146 `/workspace/resources/[id]/compatibility` — mobile width 390
+- [ ] A1147 `/workspace/resources/[id]/compatibility` — icon meaning matches action
+- [ ] A1148 `/workspace/resources/[id]/compatibility` — color uses tokens not raw gray
+- [ ] A1149 `/workspace/resources/[id]/copies` — URL state survives Back
+- [ ] A1150 `/workspace/resources/[id]/copies` — loading distinct from empty and error
+- [ ] A1151 `/workspace/resources/[id]/copies` — RU and EN copy
+- [ ] A1152 `/workspace/resources/[id]/copies` — keyboard focus visible
+- [ ] A1153 `/workspace/resources/[id]/copies` — mobile width 390
+- [ ] A1154 `/workspace/resources/[id]/copies` — icon meaning matches action
+- [ ] A1155 `/workspace/resources/[id]/copies` — color uses tokens not raw gray
+- [ ] A1156 `/workspace/resources/[id]/copies/[receiptId]` — URL state survives Back
+- [ ] A1157 `/workspace/resources/[id]/copies/[receiptId]` — loading distinct from empty and error
+- [ ] A1158 `/workspace/resources/[id]/copies/[receiptId]` — RU and EN copy
+- [ ] A1159 `/workspace/resources/[id]/copies/[receiptId]` — keyboard focus visible
+- [ ] A1160 `/workspace/resources/[id]/copies/[receiptId]` — mobile width 390
+- [ ] A1161 `/workspace/resources/[id]/copies/[receiptId]` — icon meaning matches action
+- [ ] A1162 `/workspace/resources/[id]/copies/[receiptId]` — color uses tokens not raw gray
+- [ ] A1163 `/workspace/resources/[id]/copy` — URL state survives Back
+- [ ] A1164 `/workspace/resources/[id]/copy` — loading distinct from empty and error
+- [ ] A1165 `/workspace/resources/[id]/copy` — RU and EN copy
+- [ ] A1166 `/workspace/resources/[id]/copy` — keyboard focus visible
+- [ ] A1167 `/workspace/resources/[id]/copy` — mobile width 390
+- [ ] A1168 `/workspace/resources/[id]/copy` — icon meaning matches action
+- [ ] A1169 `/workspace/resources/[id]/copy` — color uses tokens not raw gray
+- [ ] A1170 `/workspace/resources/[id]/deliveries` — URL state survives Back
+- [ ] A1171 `/workspace/resources/[id]/deliveries` — loading distinct from empty and error
+- [ ] A1172 `/workspace/resources/[id]/deliveries` — RU and EN copy
+- [ ] A1173 `/workspace/resources/[id]/deliveries` — keyboard focus visible
+- [ ] A1174 `/workspace/resources/[id]/deliveries` — mobile width 390
+- [ ] A1175 `/workspace/resources/[id]/deliveries` — icon meaning matches action
+- [ ] A1176 `/workspace/resources/[id]/deliveries` — color uses tokens not raw gray
+- [ ] A1177 `/workspace/resources/[id]/history` — URL state survives Back
+- [ ] A1178 `/workspace/resources/[id]/history` — loading distinct from empty and error
+- [ ] A1179 `/workspace/resources/[id]/history` — RU and EN copy
+- [ ] A1180 `/workspace/resources/[id]/history` — keyboard focus visible
+- [ ] A1181 `/workspace/resources/[id]/history` — mobile width 390
+- [ ] A1182 `/workspace/resources/[id]/history` — icon meaning matches action
+- [ ] A1183 `/workspace/resources/[id]/history` — color uses tokens not raw gray
+- [ ] A1184 `/workspace/resources/[id]/media` — URL state survives Back
+- [ ] A1185 `/workspace/resources/[id]/media` — loading distinct from empty and error
+- [ ] A1186 `/workspace/resources/[id]/media` — RU and EN copy
+- [ ] A1187 `/workspace/resources/[id]/media` — keyboard focus visible
+- [ ] A1188 `/workspace/resources/[id]/media` — mobile width 390
+- [ ] A1189 `/workspace/resources/[id]/media` — icon meaning matches action
+- [ ] A1190 `/workspace/resources/[id]/media` — color uses tokens not raw gray
+- [ ] A1191 `/workspace/resources/[id]/moderation` — URL state survives Back
+- [ ] A1192 `/workspace/resources/[id]/moderation` — loading distinct from empty and error
+- [ ] A1193 `/workspace/resources/[id]/moderation` — RU and EN copy
+- [ ] A1194 `/workspace/resources/[id]/moderation` — keyboard focus visible
+- [ ] A1195 `/workspace/resources/[id]/moderation` — mobile width 390
+- [ ] A1196 `/workspace/resources/[id]/moderation` — icon meaning matches action
+- [ ] A1197 `/workspace/resources/[id]/moderation` — color uses tokens not raw gray
+- [ ] A1198 `/workspace/resources/[id]/requirements` — URL state survives Back
+- [ ] A1199 `/workspace/resources/[id]/requirements` — loading distinct from empty and error
+- [ ] A1200 `/workspace/resources/[id]/requirements` — RU and EN copy
+- [ ] A1201 `/workspace/resources/[id]/requirements` — keyboard focus visible
+- [ ] A1202 `/workspace/resources/[id]/requirements` — mobile width 390
+- [ ] A1203 `/workspace/resources/[id]/requirements` — icon meaning matches action
+- [ ] A1204 `/workspace/resources/[id]/requirements` — color uses tokens not raw gray
+- [ ] A1205 `/workspace/resources/[id]/variants` — URL state survives Back
+- [ ] A1206 `/workspace/resources/[id]/variants` — loading distinct from empty and error
+- [ ] A1207 `/workspace/resources/[id]/variants` — RU and EN copy
+- [ ] A1208 `/workspace/resources/[id]/variants` — keyboard focus visible
+- [ ] A1209 `/workspace/resources/[id]/variants` — mobile width 390
+- [ ] A1210 `/workspace/resources/[id]/variants` — icon meaning matches action
+- [ ] A1211 `/workspace/resources/[id]/variants` — color uses tokens not raw gray
+- [ ] A1212 `/workspace/resources/new` — URL state survives Back
+- [ ] A1213 `/workspace/resources/new` — loading distinct from empty and error
+- [ ] A1214 `/workspace/resources/new` — RU and EN copy
+- [ ] A1215 `/workspace/resources/new` — keyboard focus visible
+- [ ] A1216 `/workspace/resources/new` — mobile width 390
+- [ ] A1217 `/workspace/resources/new` — icon meaning matches action
+- [ ] A1218 `/workspace/resources/new` — color uses tokens not raw gray
+- [ ] A1219 `/workspace/review-reports` — URL state survives Back
+- [ ] A1220 `/workspace/review-reports` — loading distinct from empty and error
+- [ ] A1221 `/workspace/review-reports` — RU and EN copy
+- [ ] A1222 `/workspace/review-reports` — keyboard focus visible
+- [ ] A1223 `/workspace/review-reports` — mobile width 390
+- [ ] A1224 `/workspace/review-reports` — icon meaning matches action
+- [ ] A1225 `/workspace/review-reports` — color uses tokens not raw gray
+- [ ] A1226 `/workspace/review-reports/[id]` — URL state survives Back
+- [ ] A1227 `/workspace/review-reports/[id]` — loading distinct from empty and error
+- [ ] A1228 `/workspace/review-reports/[id]` — RU and EN copy
+- [ ] A1229 `/workspace/review-reports/[id]` — keyboard focus visible
+- [ ] A1230 `/workspace/review-reports/[id]` — mobile width 390
+- [ ] A1231 `/workspace/review-reports/[id]` — icon meaning matches action
+- [ ] A1232 `/workspace/review-reports/[id]` — color uses tokens not raw gray
+- [ ] A1233 `/workspace/sales` — URL state survives Back
+- [ ] A1234 `/workspace/sales` — loading distinct from empty and error
+- [ ] A1235 `/workspace/sales` — RU and EN copy
+- [ ] A1236 `/workspace/sales` — keyboard focus visible
+- [ ] A1237 `/workspace/sales` — mobile width 390
+- [ ] A1238 `/workspace/sales` — icon meaning matches action
+- [ ] A1239 `/workspace/sales` — color uses tokens not raw gray
+- [ ] A1240 `/workspace/sales/report` — URL state survives Back
+- [ ] A1241 `/workspace/sales/report` — loading distinct from empty and error
+- [ ] A1242 `/workspace/sales/report` — RU and EN copy
+- [ ] A1243 `/workspace/sales/report` — keyboard focus visible
+- [ ] A1244 `/workspace/sales/report` — mobile width 390
+- [ ] A1245 `/workspace/sales/report` — icon meaning matches action
+- [ ] A1246 `/workspace/sales/report` — color uses tokens not raw gray
+- [ ] A1247 `/workspace/sales/report/[id]` — URL state survives Back
+- [ ] A1248 `/workspace/sales/report/[id]` — loading distinct from empty and error
+- [ ] A1249 `/workspace/sales/report/[id]` — RU and EN copy
+- [ ] A1250 `/workspace/sales/report/[id]` — keyboard focus visible
+- [ ] A1251 `/workspace/sales/report/[id]` — mobile width 390
+- [ ] A1252 `/workspace/sales/report/[id]` — icon meaning matches action
+- [ ] A1253 `/workspace/sales/report/[id]` — color uses tokens not raw gray
+- [ ] A1254 `/workspace/saved` — URL state survives Back
+- [ ] A1255 `/workspace/saved` — loading distinct from empty and error
+- [ ] A1256 `/workspace/saved` — RU and EN copy
+- [ ] A1257 `/workspace/saved` — keyboard focus visible
+- [ ] A1258 `/workspace/saved` — mobile width 390
+- [ ] A1259 `/workspace/saved` — icon meaning matches action
+- [ ] A1260 `/workspace/saved` — color uses tokens not raw gray
+- [ ] A1261 `/workspace/servers` — URL state survives Back
+- [ ] A1262 `/workspace/servers` — loading distinct from empty and error
+- [ ] A1263 `/workspace/servers` — RU and EN copy
+- [ ] A1264 `/workspace/servers` — keyboard focus visible
+- [ ] A1265 `/workspace/servers` — mobile width 390
+- [ ] A1266 `/workspace/servers` — icon meaning matches action
+- [ ] A1267 `/workspace/servers` — color uses tokens not raw gray
+- [ ] A1268 `/workspace/servers/[id]` — URL state survives Back
+- [ ] A1269 `/workspace/servers/[id]` — loading distinct from empty and error
+- [ ] A1270 `/workspace/servers/[id]` — RU and EN copy
+- [ ] A1271 `/workspace/servers/[id]` — keyboard focus visible
+- [ ] A1272 `/workspace/servers/[id]` — mobile width 390
+- [ ] A1273 `/workspace/servers/[id]` — icon meaning matches action
+- [ ] A1274 `/workspace/servers/[id]` — color uses tokens not raw gray
+- [ ] A1275 `/workspace/servers/[id]/activity` — URL state survives Back
+- [ ] A1276 `/workspace/servers/[id]/activity` — loading distinct from empty and error
+- [ ] A1277 `/workspace/servers/[id]/activity` — RU and EN copy
+- [ ] A1278 `/workspace/servers/[id]/activity` — keyboard focus visible
+- [ ] A1279 `/workspace/servers/[id]/activity` — mobile width 390
+- [ ] A1280 `/workspace/servers/[id]/activity` — icon meaning matches action
+- [ ] A1281 `/workspace/servers/[id]/activity` — color uses tokens not raw gray
+- [ ] A1282 `/workspace/servers/[id]/content` — URL state survives Back
+- [ ] A1283 `/workspace/servers/[id]/content` — loading distinct from empty and error
+- [ ] A1284 `/workspace/servers/[id]/content` — RU and EN copy
+- [ ] A1285 `/workspace/servers/[id]/content` — keyboard focus visible
+- [ ] A1286 `/workspace/servers/[id]/content` — mobile width 390
+- [ ] A1287 `/workspace/servers/[id]/content` — icon meaning matches action
+- [ ] A1288 `/workspace/servers/[id]/content` — color uses tokens not raw gray
+- [ ] A1289 `/workspace/servers/[id]/content/[contentId]` — URL state survives Back
+- [ ] A1290 `/workspace/servers/[id]/content/[contentId]` — loading distinct from empty and error
+- [ ] A1291 `/workspace/servers/[id]/content/[contentId]` — RU and EN copy
+- [ ] A1292 `/workspace/servers/[id]/content/[contentId]` — keyboard focus visible
+- [ ] A1293 `/workspace/servers/[id]/content/[contentId]` — mobile width 390
+- [ ] A1294 `/workspace/servers/[id]/content/[contentId]` — icon meaning matches action
+- [ ] A1295 `/workspace/servers/[id]/content/[contentId]` — color uses tokens not raw gray
+- [ ] A1296 `/workspace/servers/[id]/content/[contentId]/history` — URL state survives Back
+- [ ] A1297 `/workspace/servers/[id]/content/[contentId]/history` — loading distinct from empty and error
+- [ ] A1298 `/workspace/servers/[id]/content/[contentId]/history` — RU and EN copy
+- [ ] A1299 `/workspace/servers/[id]/content/[contentId]/history` — keyboard focus visible
+- [ ] A1300 `/workspace/servers/[id]/content/[contentId]/history` — mobile width 390
+- [ ] A1301 `/workspace/servers/[id]/content/[contentId]/history` — icon meaning matches action
+- [ ] A1302 `/workspace/servers/[id]/content/[contentId]/history` — color uses tokens not raw gray
+- [ ] A1303 `/workspace/servers/[id]/content/new` — URL state survives Back
+- [ ] A1304 `/workspace/servers/[id]/content/new` — loading distinct from empty and error
+- [ ] A1305 `/workspace/servers/[id]/content/new` — RU and EN copy
+- [ ] A1306 `/workspace/servers/[id]/content/new` — keyboard focus visible
+- [ ] A1307 `/workspace/servers/[id]/content/new` — mobile width 390
+- [ ] A1308 `/workspace/servers/[id]/content/new` — icon meaning matches action
+- [ ] A1309 `/workspace/servers/[id]/content/new` — color uses tokens not raw gray
+- [ ] A1310 `/workspace/servers/[id]/observations` — URL state survives Back
+- [ ] A1311 `/workspace/servers/[id]/observations` — loading distinct from empty and error
+- [ ] A1312 `/workspace/servers/[id]/observations` — RU and EN copy
+- [ ] A1313 `/workspace/servers/[id]/observations` — keyboard focus visible
+- [ ] A1314 `/workspace/servers/[id]/observations` — mobile width 390
+- [ ] A1315 `/workspace/servers/[id]/observations` — icon meaning matches action
+- [ ] A1316 `/workspace/servers/[id]/observations` — color uses tokens not raw gray
+- [ ] A1317 `/workspace/servers/[id]/statistics` — URL state survives Back
+- [ ] A1318 `/workspace/servers/[id]/statistics` — loading distinct from empty and error
+- [ ] A1319 `/workspace/servers/[id]/statistics` — RU and EN copy
+- [ ] A1320 `/workspace/servers/[id]/statistics` — keyboard focus visible
+- [ ] A1321 `/workspace/servers/[id]/statistics` — mobile width 390
+- [ ] A1322 `/workspace/servers/[id]/statistics` — icon meaning matches action
+- [ ] A1323 `/workspace/servers/[id]/statistics` — color uses tokens not raw gray
+- [ ] A1324 `/workspace/servers/new` — URL state survives Back
+- [ ] A1325 `/workspace/servers/new` — loading distinct from empty and error
+- [ ] A1326 `/workspace/servers/new` — RU and EN copy
+- [ ] A1327 `/workspace/servers/new` — keyboard focus visible
+- [ ] A1328 `/workspace/servers/new` — mobile width 390
+- [ ] A1329 `/workspace/servers/new` — icon meaning matches action
+- [ ] A1330 `/workspace/servers/new` — color uses tokens not raw gray
+- [ ] A1331 `/workspace/subscriptions` — URL state survives Back
+- [ ] A1332 `/workspace/subscriptions` — loading distinct from empty and error
+- [ ] A1333 `/workspace/subscriptions` — RU and EN copy
+- [ ] A1334 `/workspace/subscriptions` — keyboard focus visible
+- [ ] A1335 `/workspace/subscriptions` — mobile width 390
+- [ ] A1336 `/workspace/subscriptions` — icon meaning matches action
+- [ ] A1337 `/workspace/subscriptions` — color uses tokens not raw gray
+- [ ] A1338 `/workspace/subscriptions/activate` — URL state survives Back
+- [ ] A1339 `/workspace/subscriptions/activate` — loading distinct from empty and error
+- [ ] A1340 `/workspace/subscriptions/activate` — RU and EN copy
+- [ ] A1341 `/workspace/subscriptions/activate` — keyboard focus visible
+- [ ] A1342 `/workspace/subscriptions/activate` — mobile width 390
+- [ ] A1343 `/workspace/subscriptions/activate` — icon meaning matches action
+- [ ] A1344 `/workspace/subscriptions/activate` — color uses tokens not raw gray
+- [ ] A1345 `/workspace/subscriptions/history` — URL state survives Back
+- [ ] A1346 `/workspace/subscriptions/history` — loading distinct from empty and error
+- [ ] A1347 `/workspace/subscriptions/history` — RU and EN copy
+- [ ] A1348 `/workspace/subscriptions/history` — keyboard focus visible
+- [ ] A1349 `/workspace/subscriptions/history` — mobile width 390
+- [ ] A1350 `/workspace/subscriptions/history` — icon meaning matches action
+- [ ] A1351 `/workspace/subscriptions/history` — color uses tokens not raw gray
+- [ ] A1352 `/workspace/subscriptions/receipts/[id]` — URL state survives Back
+- [ ] A1353 `/workspace/subscriptions/receipts/[id]` — loading distinct from empty and error
+- [ ] A1354 `/workspace/subscriptions/receipts/[id]` — RU and EN copy
+- [ ] A1355 `/workspace/subscriptions/receipts/[id]` — keyboard focus visible
+- [ ] A1356 `/workspace/subscriptions/receipts/[id]` — mobile width 390
+- [ ] A1357 `/workspace/subscriptions/receipts/[id]` — icon meaning matches action
+- [ ] A1358 `/workspace/subscriptions/receipts/[id]` — color uses tokens not raw gray
+- [ ] A1359 `/workspace/subscriptions/reviews` — URL state survives Back
+- [ ] A1360 `/workspace/subscriptions/reviews` — loading distinct from empty and error
+- [ ] A1361 `/workspace/subscriptions/reviews` — RU and EN copy
+- [ ] A1362 `/workspace/subscriptions/reviews` — keyboard focus visible
+- [ ] A1363 `/workspace/subscriptions/reviews` — mobile width 390
+- [ ] A1364 `/workspace/subscriptions/reviews` — icon meaning matches action
+- [ ] A1365 `/workspace/subscriptions/reviews` — color uses tokens not raw gray
+- [ ] A1366 `/workspace/subscriptions/reviews/[id]` — URL state survives Back
+- [ ] A1367 `/workspace/subscriptions/reviews/[id]` — loading distinct from empty and error
+- [ ] A1368 `/workspace/subscriptions/reviews/[id]` — RU and EN copy
+- [ ] A1369 `/workspace/subscriptions/reviews/[id]` — keyboard focus visible
+- [ ] A1370 `/workspace/subscriptions/reviews/[id]` — mobile width 390
+- [ ] A1371 `/workspace/subscriptions/reviews/[id]` — icon meaning matches action
+- [ ] A1372 `/workspace/subscriptions/reviews/[id]` — color uses tokens not raw gray
+- [ ] A1373 `/workspace/subscriptions/reviews/new` — URL state survives Back
+- [ ] A1374 `/workspace/subscriptions/reviews/new` — loading distinct from empty and error
+- [ ] A1375 `/workspace/subscriptions/reviews/new` — RU and EN copy
+- [ ] A1376 `/workspace/subscriptions/reviews/new` — keyboard focus visible
+- [ ] A1377 `/workspace/subscriptions/reviews/new` — mobile width 390
+- [ ] A1378 `/workspace/subscriptions/reviews/new` — icon meaning matches action
+- [ ] A1379 `/workspace/subscriptions/reviews/new` — color uses tokens not raw gray
+- [ ] A1380 `/workspace/verification` — URL state survives Back
+- [ ] A1381 `/workspace/verification` — loading distinct from empty and error
+- [ ] A1382 `/workspace/verification` — RU and EN copy
+- [ ] A1383 `/workspace/verification` — keyboard focus visible
+- [ ] A1384 `/workspace/verification` — mobile width 390
+- [ ] A1385 `/workspace/verification` — icon meaning matches action
+- [ ] A1386 `/workspace/verification` — color uses tokens not raw gray
+- [ ] A1387 `/workspace/verification/[id]` — URL state survives Back
+- [ ] A1388 `/workspace/verification/[id]` — loading distinct from empty and error
+- [ ] A1389 `/workspace/verification/[id]` — RU and EN copy
+- [ ] A1390 `/workspace/verification/[id]` — keyboard focus visible
+- [ ] A1391 `/workspace/verification/[id]` — mobile width 390
+- [ ] A1392 `/workspace/verification/[id]` — icon meaning matches action
+- [ ] A1393 `/workspace/verification/[id]` — color uses tokens not raw gray
+- [ ] A1394 `/workspace/verification/history` — URL state survives Back
+- [ ] A1395 `/workspace/verification/history` — loading distinct from empty and error
+- [ ] A1396 `/workspace/verification/history` — RU and EN copy
+- [ ] A1397 `/workspace/verification/history` — keyboard focus visible
+- [ ] A1398 `/workspace/verification/history` — mobile width 390
+- [ ] A1399 `/workspace/verification/history` — icon meaning matches action
+- [ ] A1400 `/workspace/verification/history` — color uses tokens not raw gray
+- [ ] A1401 `/workspace/wallet` — URL state survives Back
+- [ ] A1402 `/workspace/wallet` — loading distinct from empty and error
+- [ ] A1403 `/workspace/wallet` — RU and EN copy
+- [ ] A1404 `/workspace/wallet` — keyboard focus visible
+- [ ] A1405 `/workspace/wallet` — mobile width 390
+- [ ] A1406 `/workspace/wallet` — icon meaning matches action
+- [ ] A1407 `/workspace/wallet` — color uses tokens not raw gray
+- [ ] A1408 global — Left rail stays viewport-pinned while the document scrolls
+- [ ] A1409 global — Public profile does not show private wallet balances
+- [ ] A1410 global — Signed-in header shows wallet balances when the engine flag is on
+- [ ] A1411 global — No promo-code redemption exists
+- [ ] A1412 global — No FX conversion between USD EUR RUB
+- [ ] A1413 global — Admin tree is absent from guest screenshot passes
+- [ ] A1414 global — Motion respects prefers-reduced-motion
+- [ ] A1415 global — Type scale is one system not per-feature captions
+
+Total: 1415
