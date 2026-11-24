@@ -158,6 +158,22 @@ it("renders intake and reload controls with shared Button chrome", async () => {
   expect(html).toContain("text-accent");
   expect(html).toContain("underline");
 });
+it("preserves list filters in case detail back links", async () => {
+  const html = renderToStaticMarkup(
+    await OrderCaseDetailPage({
+      caseId: "sup_a",
+      query: { reviewStatus: "refund_recommended", threadStatus: "open", page: "2" },
+    }),
+  );
+  const back = html.match(/href="([^"]+)"[^>]*>[^<]*Back to cases|Назад/su);
+  expect(back?.[1]).toBeDefined();
+  const url = new URL(back![1], "https://nexus.test");
+  expect(url.pathname).toBe("/workspace/order-cases");
+  expect(url.searchParams.get("reviewStatus")).toBe("refund_recommended");
+  expect(url.searchParams.get("threadStatus")).toBe("open");
+  expect(url.searchParams.get("page")).toBe("2");
+});
+
 it("preserves filters in archive pagination", async () => {
   const html = renderToStaticMarkup(
     await OrderCaseListPage({
