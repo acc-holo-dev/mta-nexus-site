@@ -83,6 +83,20 @@ export function explicitFxLines(
   });
 }
 
+/** Card estimate. Undefined leaves the card alone. Null means the rate read failed. */
+export function publicPriceEstimates(
+  product: { price: number; currency: string },
+  rates: readonly ExplicitFxRate[] | null | undefined,
+): readonly ExplicitFxLine[] | null | undefined {
+  if (rates === undefined || product.price <= 0) return undefined;
+  if (rates === null) return null;
+  if (!(WALLET_CURRENCIES as readonly string[]).includes(product.currency)) return undefined;
+  return explicitFxLines(
+    { currency: product.currency as WalletCurrency, amount: product.price },
+    rates,
+  );
+}
+
 export function assertFxCurrencies(base: string, quote: string): void {
   if (
     !(WALLET_CURRENCIES as readonly string[]).includes(base) ||

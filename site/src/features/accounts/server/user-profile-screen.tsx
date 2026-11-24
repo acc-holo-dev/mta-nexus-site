@@ -4,6 +4,7 @@ import {
   serverRepository,
   userRepository,
 } from "@nexus/db";
+import { publicPriceEstimates } from "@nexus/domain";
 import { Avatar, ErrorState, StatCard } from "@nexus/ui";
 import { Calendar, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
@@ -187,6 +188,11 @@ export async function UserProfileScreen({
   const walletRates = walletService ? await walletService.listFxRates().catch(() => null) : null;
   const walletEstimates =
     walletBalances && walletRates ? profileFxLines(walletBalances, walletRates) : null;
+  const publicRates = walletEnabled
+    ? walletService && walletRates
+      ? walletRates
+      : await new WalletPaymentService().listFxRates().catch(() => null)
+    : undefined;
 
   return (
     <div className={pageShellStack10}>
@@ -346,6 +352,7 @@ export async function UserProfileScreen({
                 product={product}
                 locale={locale}
                 attribution={attributions.get(product.id) ?? null}
+                priceEstimates={publicPriceEstimates(product, publicRates)}
               />
             ))}
           </div>

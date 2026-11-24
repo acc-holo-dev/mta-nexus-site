@@ -1,4 +1,4 @@
-import { explicitFxLines, PRODUCT_TYPES, type ProductType, WALLET_CURRENCIES } from "@nexus/domain";
+import { PRODUCT_TYPES, type ProductType, publicPriceEstimates } from "@nexus/domain";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { ChevronLeft, ChevronRight, Search, ShoppingBag } from "lucide-react";
 import type { Metadata } from "next";
@@ -215,21 +215,7 @@ export async function MarketPage({
               product={product}
               locale={locale}
               attribution={catalog.attributions.get(product.id) ?? null}
-              priceEstimates={
-                !walletEnabled || product.price <= 0
-                  ? undefined
-                  : catalogRates
-                    ? (WALLET_CURRENCIES as readonly string[]).includes(product.currency)
-                      ? explicitFxLines(
-                          {
-                            currency: product.currency as (typeof WALLET_CURRENCIES)[number],
-                            amount: product.price,
-                          },
-                          catalogRates,
-                        )
-                      : undefined
-                    : null
-              }
+              priceEstimates={publicPriceEstimates(product, catalogRates)}
             />
           ))}
         </div>
