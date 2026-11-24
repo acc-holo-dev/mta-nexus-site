@@ -3,7 +3,8 @@
 import { Button, EmptyState, ErrorState, SearchField } from "@nexus/ui";
 import { ChevronLeft, ChevronRight, Copy, Users } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { panelSpace3P4 } from "../../shell/panel-shell";
 import {
@@ -17,6 +18,11 @@ import {
   typeXsSecondaryAnywhere,
 } from "../../shell/type-shell";
 import { mtaEndpointKey } from "../model/mta-listing-profile-map";
+import {
+  type MtaDirectoryMinPlayers,
+  mtaDirectoryHref,
+  parseMtaDirectoryPageQuery,
+} from "../mta-directory-page-query";
 import type { MtaMasterServer } from "../model/mta-master-directory-shared";
 
 const PAGE_SIZE = 50;
@@ -160,13 +166,66 @@ export function MtaMasterServerDirectory({
 }) {
   const dictionary = getDictionary(locale);
   const copy = dictionary.servers;
-  const [query, setQuery] = useState("");
-  const [minimumPlayers, setMinimumPlayers] = useState(0);
-  const [page, setPage] = useState(0);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const urlState = useMemo(
+    () => parseMtaDirectoryPageQuery(Object.fromEntries(searchParams.entries())),
+    [searchParams],
+  );
+  const [query, setQuery] = useState(urlState.query);
+  const [minimumPlayers, setMinimumPlayers] = useState<MtaDirectoryMinPlayers>(urlState.minPlayers);
+  const [page, setPage] = useState(Math.max(0, urlState.page - 1));
   const [attempt, setAttempt] = useState(0);
   const [directory, setDirectory] = useState<DirectoryResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setQuery(urlState.query);
+    setMinimumPlayers(urlState.minPlayers);
+    setPage(Math.max(0, urlState.page - 1));
+  }, [urlState.minPlayers, urlState.page, urlState.query]);
+
+  const replaceDirectoryUrl = useCallback(
+    (next: { query: string; minPlayers: MtaDirectoryMinPlayers; page: number }) => {
+      const href = mtaDirectoryHref(
+        {
+          query: next.query,
+          minPlayers: next.minPlayers,
+          page: next.page + 1,
+        },
+        pathname,
+      );
+      const current = searchParams.size > 0 ? `${pathname}?${searchParams.toString()}` : pathname;
+      if (href === current) return;
+      router.replace(href, { scroll: false });
+    },
+    [pathname, router, searchParams],
+  );
+
+  useEffect(() => {
+    if (
+      query === urlState.query &&
+      minimumPlayers === urlState.minPlayers &&
+      page === urlState.page - 1
+    ) {
+      return;
+    }
+    const delay = query === urlState.query ? 0 : SEARCH_DELAY_MS;
+    const handle = window.setTimeout(() => {
+      replaceDirectoryUrl({ query, minPlayers: minimumPlayers, page });
+    }, delay);
+    return () => window.clearTimeout(handle);
+  }, [
+    minimumPlayers,
+    page,
+    query,
+    replaceDirectoryUrl,
+    urlState.minPlayers,
+    urlState.page,
+    urlState.query,
+  ]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies(attempt): Explicit refresh trigger; changing it must restart this request.
   useEffect(() => {
@@ -202,7 +261,9 @@ export function MtaMasterServerDirectory({
           if (!active) return;
           const lastPage = Math.max(0, Math.ceil(result.total / PAGE_SIZE) - 1);
           if (page > lastPage) {
-            setPage(lastPage);
+            const clamped = Math.max(0, lastPage);
+            setPage(clamped);
+            replaceDirectoryUrl({ query, minPlayers: minimumPlayers, page: clamped });
             return;
           }
           setDirectory(result);
@@ -223,7 +284,15 @@ export function MtaMasterServerDirectory({
       window.clearTimeout(timeout);
       controller.abort();
     };
-  }, [minimumPlayers, page, query, attempt, copy.directoryFetchError, copy.directoryTimeout]);
+  }, [
+    attempt,
+    copy.directoryFetchError,
+    copy.directoryTimeout,
+    minimumPlayers,
+    page,
+    query,
+    replaceDirectoryUrl,
+  ]);
 
   const totalPages = Math.max(1, Math.ceil((directory?.total ?? 0) / PAGE_SIZE));
   const hasFilters = Boolean(query.trim()) || minimumPlayers > 0;
@@ -236,7 +305,7 @@ export function MtaMasterServerDirectory({
     setPage(0);
   }
 
-  function updateMinimumPlayers(value: number) {
+  function updateMinimumPlayers(value: MtaDirectoryMinPlayers) {
     setMinimumPlayers(value);
     setPage(0);
   }
@@ -245,6 +314,7 @@ export function MtaMasterServerDirectory({
     setQuery("");
     setMinimumPlayers(0);
     setPage(0);
+    router.replace(pathname, { scroll: false });
   }
 
   return (
@@ -297,7 +367,9 @@ export function MtaMasterServerDirectory({
               {copy.minimumPlayers}
               <select
                 value={minimumPlayers}
-                onChange={(event) => updateMinimumPlayers(Number(event.target.value))}
+                onChange={(event) =>
+                  updateMinimumPlayers(Number(event.target.value) as MtaDirectoryMinPlayers)
+                }
                 className={`${controlClass} mt-1 block w-full`}
               >
                 <option value={0}>{copy.anyPlayers}</option>

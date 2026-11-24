@@ -9,7 +9,7 @@ const nextConfig = {
   experimental: { cpus: 2, webpackMemoryOptimizations: true },
   // Stable Compose service DNS is used by dev-network/browser verification. Keep
   // the historical default container name for existing local stacks as well.
-  allowedDevOrigins: ["app", "nexus-local-app-1"],
+  allowedDevOrigins: ["app", "nexus-local-app-1", "localhost", "127.0.0.1"],
   output: "standalone",
   outputFileTracingRoot: repositoryRoot,
   // OPS-05 / ARC10: deliberately omit next.config `env` so production secrets

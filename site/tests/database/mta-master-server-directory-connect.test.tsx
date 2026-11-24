@@ -1,6 +1,12 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ replace: () => undefined }),
+  usePathname: () => "/servers",
+  useSearchParams: () => new URLSearchParams(),
+}));
 import { MtaMasterServerDirectory } from "../../src/features/servers/client";
 import { getDictionary } from "../../src/lib/i18n";
 

@@ -2,6 +2,7 @@ import { PageHeader } from "@nexus/ui";
 import { Plus, Server as ServerIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { serverService } from "../../../lib/services/servers/server-service";
@@ -9,6 +10,7 @@ import { pageShellStack8 } from "../../shell/page-shell";
 import { typeIcon7Accent } from "../../shell/type-shell";
 import { MtaMasterServerDirectory } from "../components/mta-master-server-directory";
 import { mtaListingProfileRecord } from "../model/mta-listing-profile-map";
+import { ServersDirectoryRouteLoading } from "./servers-directory-route-loading";
 
 export async function serversMetadata(): Promise<Metadata> {
   return {
@@ -38,7 +40,9 @@ export async function ServersPage() {
           </Link>
         }
       />
-      <MtaMasterServerDirectory locale={locale} profileByEndpoint={profileByEndpoint} />
+      <Suspense fallback={<ServersDirectoryRouteLoading rows={5} />}>
+        <MtaMasterServerDirectory locale={locale} profileByEndpoint={profileByEndpoint} />
+      </Suspense>
     </div>
   );
 }

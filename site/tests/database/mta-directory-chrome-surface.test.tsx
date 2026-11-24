@@ -11,7 +11,9 @@ while (!existsSync(join(root, "pnpm-workspace.yaml"))) root = dirname(root);
 const read = (relative: string) => readFileSync(join(root, relative), "utf8");
 
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ refresh: () => undefined }),
+  useRouter: () => ({ replace: () => undefined }),
+  usePathname: () => "/servers",
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 import { MtaMasterServerDirectory } from "../../src/features/servers/client";
@@ -42,6 +44,8 @@ describe("MTA directory/visibility chrome", () => {
 
   it("locks directory resetFilters CTA to size=touch", () => {
     const source = read("site/src/features/servers/components/mta-master-server-directory.tsx");
+    expect(source).toContain("mtaDirectoryHref");
+    expect(source).toContain("useSearchParams");
     expect(source).toContain("onClick={resetFilters}");
     expect(source).toMatch(
       /size="touch"[\s\S]{0,80}?onClick=\{resetFilters\}|onClick=\{resetFilters\}[\s\S]{0,80}?size="touch"/u,
