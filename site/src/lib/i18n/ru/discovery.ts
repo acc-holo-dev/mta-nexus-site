@@ -122,6 +122,11 @@ export const discovery = {
     free: "Бесплатно",
     priceEstimateAbout: "Примерно {amount} по записанному курсу",
     priceEstimateUnavailable: "Записанные курсы не загрузились. Цена объявления не изменилась.",
+    recordedRatesTitle: "Записанные курсы обмена",
+    recordedRatesNote:
+      "Эти пары записывает администратор. Это не рыночная цена, и объявление по-прежнему списывается в своей валюте.",
+    recordedRatePair: "{base} = {quote}",
+    recordedRatesEmpty: "Пар обмена пока нет. Цены объявлений остаются в своей валюте.",
     noPreview: "Нет превью",
     updated: "обн.",
     noReviewsYet: "Пока нет отзывов",
