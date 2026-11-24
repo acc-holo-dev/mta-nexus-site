@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import {
   buildRepository,
   type EligibleStaleUnpaidOrder,
@@ -7,6 +8,7 @@ import {
   organizationRepository,
   productRepository,
   type StaleUnpaidOrderExpiry,
+  userRepository,
   type WalletOrderRefundResult,
   type WalletOrderSettlementResult,
   type WalletPurchasedBuild,
@@ -18,6 +20,7 @@ import {
 import {
   AppError,
   assertSellerAccountId,
+  buildStaffBalanceGrantPosting,
   buildVerifiedTopUpCreditPosting,
   buildVerifiedWithdrawalPayoutPosting,
   buildVerifiedWithdrawalRefundPosting,
@@ -657,6 +660,79 @@ export class WalletPaymentService {
 
   async getAvailableBalance(accountId: string, currency: WalletCurrency): Promise<number> {
     return this.ledger.getAccountBalance(accountId, currency);
+  }
+
+  /**
+   * Admin credit of available site-wallet balance. Balanced staff_grant posting
+   * plus an audit row. Dark unless the wallet engine is on. Not a PSP top-up.
+   */
+  async grantStaffBalance(input: {
+    actor: User;
+    username: string;
+    amount: number;
+    currency: WalletCurrency;
+    reason: string;
+    idempotencyKey: string;
+  }): Promise<{
+    grantId: string;
+    username: string;
+    accountId: string;
+    amount: number;
+    currency: WalletCurrency;
+    available: number;
+    actorId: string;
+  }> {
+    if (!isWalletEngineEnabled()) {
+      throw new AppError("Wallet engine is disabled", 404, "WALLET_ENGINE_DISABLED");
+    }
+    if (input.actor.role !== "admin") throw new ForbiddenError();
+    const target = await userRepository.findByUsername(input.username);
+    if (!target) {
+      throw new AppError("Wallet grant user was not found", 404, "WALLET_GRANT_USER_NOT_FOUND");
+    }
+    const accountId = walletAccountIdForUser(target.id);
+    const digest = createHash("sha256")
+      .update(`staff-grant:${input.idempotencyKey}`)
+      .digest("hex")
+      .slice(0, 24);
+    const grantId = `wgr_${digest}`;
+    const entries = buildStaffBalanceGrantPosting({
+      grantId,
+      accountId,
+      amount: input.amount,
+      currency: input.currency,
+      reason: input.reason,
+      actorId: input.actor.id,
+      userEntryId: `wgrc_${digest}`,
+      clearingEntryId: `wgrd_${digest}`,
+    });
+    await this.ledger.postAudited(`wgrb_${digest}`, entries, {
+      id: `wgra_${digest}`,
+      actorId: input.actor.id,
+      actorType: "admin",
+      action: "wallet.staff_grant",
+      targetId: target.id,
+      targetType: "user",
+      details: {
+        grantId,
+        username: target.username,
+        accountId,
+        amount: input.amount,
+        currency: input.currency,
+        reason: input.reason,
+        idempotencyKey: input.idempotencyKey,
+      },
+    });
+    const available = await this.getAvailableBalance(accountId, input.currency);
+    return {
+      grantId,
+      username: target.username,
+      accountId,
+      amount: input.amount,
+      currency: input.currency,
+      available,
+      actorId: input.actor.id,
+    };
   }
 
   async listRecentTopUps(accountId: string, limit = 20): Promise<TopUpIntent[]> {

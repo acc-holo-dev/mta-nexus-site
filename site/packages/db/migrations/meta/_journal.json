@@ -666,6 +666,13 @@
       "when": 1794481200000,
       "tag": "0094_wallet_withdrawal_intents",
       "breakpoints": true
+    },
+    {
+      "idx": 95,
+      "version": "7",
+      "when": 1794567600000,
+      "tag": "0095_ledger_staff_grant",
+      "breakpoints": true
     }
   ]
 }

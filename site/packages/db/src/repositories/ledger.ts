@@ -1,13 +1,14 @@
 import { createHash } from "node:crypto";
 import {
   AppError,
+  type AuditEvent,
   type LedgerEntry,
   type LedgerPosting,
   validateLedgerPosting,
 } from "@nexus/domain";
 import { and, desc, eq, sql } from "drizzle-orm";
 import { db } from "../client";
-import { ledgerEntries } from "../schema";
+import { auditEvents, ledgerEntries } from "../schema";
 import { postLedgerBatchInTransaction } from "./ledger-posting";
 
 const fingerprint = (value: unknown) =>
@@ -18,6 +19,37 @@ export class LedgerRepository {
   async post(idempotencyKey: string, entries: LedgerPosting[]): Promise<LedgerEntry[]> {
     validateLedgerPosting(entries);
     return db.transaction(async (tx) => postLedgerBatchInTransaction(tx, idempotencyKey, entries));
+  }
+
+  /**
+   * Balanced journal plus one audit row in the same transaction.
+   * Replaying the same posting key does not insert a second audit row.
+   */
+  async postAudited(
+    idempotencyKey: string,
+    entries: LedgerPosting[],
+    audit: Omit<AuditEvent, "createdAt">,
+  ): Promise<LedgerEntry[]> {
+    validateLedgerPosting(entries);
+    return db.transaction(async (tx) => {
+      const posted = await postLedgerBatchInTransaction(tx, idempotencyKey, entries);
+      await tx
+        .insert(auditEvents)
+        .values({
+          id: audit.id,
+          actorId: audit.actorId,
+          actorType: audit.actorType,
+          action: audit.action,
+          targetId: audit.targetId,
+          targetType: audit.targetType,
+          ipAddress: audit.ipAddress ?? null,
+          userAgent: audit.userAgent ?? null,
+          details: audit.details ?? {},
+          createdAt: new Date(),
+        })
+        .onConflictDoNothing({ target: auditEvents.id });
+      return posted;
+    });
   }
 
   async append(entries: Omit<LedgerEntry, "createdAt">[]) {

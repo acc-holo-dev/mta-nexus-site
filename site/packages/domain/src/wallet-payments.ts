@@ -1070,3 +1070,60 @@ export function selectPaymentProvider(
   }
   return port;
 }
+
+/** Counter-account for audited staff credits. Not a payment-provider clearing account. */
+export const STAFF_GRANT_CLEARING_ACCOUNT = "platform:staff_grants";
+
+const STAFF_GRANT_REASON = /^[\p{L}\p{N}\p{P}\p{Zs}]{8,280}$/u;
+
+/**
+ * Balanced journal for an admin credit. The user account is credited and
+ * platform:staff_grants is debited by the same minor-unit amount. This is not
+ * a verified top-up and must not be labeled as one.
+ */
+export function buildStaffBalanceGrantPosting(input: {
+  grantId: string;
+  accountId: string;
+  amount: number;
+  currency: WalletCurrency;
+  reason: string;
+  actorId: string;
+  userEntryId: string;
+  clearingEntryId: string;
+}): LedgerPosting[] {
+  assertWalletAccountId(input.accountId);
+  assertWalletAmount(input.amount);
+  assertWalletCurrency(input.currency);
+  if (!/^wgr_[a-f0-9]{24}$/u.test(input.grantId)) {
+    throw new AppError("Staff grant id is invalid", 400, "WALLET_GRANT_INVALID");
+  }
+  if (!/^[A-Za-z0-9_-]{1,160}$/u.test(input.actorId)) {
+    throw new AppError("Staff grant actor is invalid", 400, "WALLET_GRANT_INVALID");
+  }
+  if (!STAFF_GRANT_REASON.test(input.reason)) {
+    throw new AppError("Staff grant reason is invalid", 400, "WALLET_GRANT_REASON_INVALID");
+  }
+  const description = `Staff grant ${input.grantId} by ${input.actorId}: ${input.reason}`;
+  const entries: LedgerPosting[] = [
+    {
+      id: input.userEntryId,
+      accountId: input.accountId,
+      amount: input.amount,
+      currency: input.currency,
+      referenceType: "staff_grant",
+      referenceId: input.grantId,
+      description,
+    },
+    {
+      id: input.clearingEntryId,
+      accountId: STAFF_GRANT_CLEARING_ACCOUNT,
+      amount: -input.amount,
+      currency: input.currency,
+      referenceType: "staff_grant",
+      referenceId: input.grantId,
+      description: `Staff grant clearing ${input.grantId}`,
+    },
+  ];
+  validateLedgerPosting(entries);
+  return entries;
+}

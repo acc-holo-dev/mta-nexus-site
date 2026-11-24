@@ -359,7 +359,8 @@ export interface LedgerEntry {
     | "topup"
     | "wallet_spend"
     | "withdrawal"
-    | "wallet_hold";
+    | "wallet_hold"
+    | "staff_grant";
   referenceId: string;
   balanceAfter: number;
   description: string;

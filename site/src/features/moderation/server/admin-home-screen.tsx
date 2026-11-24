@@ -257,6 +257,11 @@ export async function AdminHomeScreen({
               {getWalletCopy(locale).providersAdminTitle}
             </Link>
           ) : null}
+          {currentUser.role === "admin" ? (
+            <Link href="/admin/commerce/wallet-grants" className={chromeLinkClass}>
+              {getWalletCopy(locale).grantTitle}
+            </Link>
+          ) : null}
           <Link href="/admin/support" className={chromeLinkClass}>
             {copy.supportQueue}
           </Link>

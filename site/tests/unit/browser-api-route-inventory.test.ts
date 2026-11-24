@@ -101,6 +101,7 @@ const REQUIRED_BROWSER = [
   "site/src/app/api/admin/community/[id]/discussion/[commentId]/route.ts",
   "site/src/app/api/admin/community/[id]/discussion/[commentId]/reports/batch/route.ts",
   "site/src/app/api/admin/community/[id]/discussion/[commentId]/reports/batch/preview/route.ts",
+  "site/src/app/api/admin/commerce/wallet-grants/route.ts",
   "site/src/app/api/admin/commerce/wallet-holds/release-matured/route.ts",
   "site/src/app/api/admin/commerce/wallet-topups/expire-stale/route.ts",
   "site/src/app/api/admin/commerce/wallet-withdrawals/expire-stale/route.ts",

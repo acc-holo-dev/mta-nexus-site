@@ -127,6 +127,9 @@ export async function WalletProvidersAdminScreen() {
       <Link href="/admin" className={linkAccentSmRounded}>
         {copy.providersAdminBack}
       </Link>
+      <Link href="/admin/commerce/wallet-grants" className={linkAccentSmRounded}>
+        {copy.grantTitle}
+      </Link>
       <h1 className={typeDisplayPrimary}>{copy.providersAdminTitle}</h1>
       <p role="note" className={typeRoundedBorderP4SmSecondary}>
         {copy.providersAdminNote}
