@@ -18,12 +18,12 @@ import {
   typeXsSecondaryAnywhere,
 } from "../../shell/type-shell";
 import { mtaEndpointKey } from "../model/mta-listing-profile-map";
+import type { MtaMasterServer } from "../model/mta-master-directory-shared";
 import {
   type MtaDirectoryMinPlayers,
   mtaDirectoryHref,
   parseMtaDirectoryPageQuery,
 } from "../mta-directory-page-query";
-import type { MtaMasterServer } from "../model/mta-master-directory-shared";
 
 const PAGE_SIZE = 50;
 const REQUEST_TIMEOUT_MS = 12_000;
@@ -180,12 +180,16 @@ export function MtaMasterServerDirectory({
   const [directory, setDirectory] = useState<DirectoryResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const writtenHref = useRef<string | null>(null);
 
   useEffect(() => {
+    const href = mtaDirectoryHref(urlState, pathname);
+    if (writtenHref.current === href) return;
+    writtenHref.current = href;
     setQuery(urlState.query);
     setMinimumPlayers(urlState.minPlayers);
     setPage(Math.max(0, urlState.page - 1));
-  }, [urlState.minPlayers, urlState.page, urlState.query]);
+  }, [pathname, urlState]);
 
   const replaceDirectoryUrl = useCallback(
     (next: { query: string; minPlayers: MtaDirectoryMinPlayers; page: number }) => {
@@ -197,6 +201,7 @@ export function MtaMasterServerDirectory({
         },
         pathname,
       );
+      writtenHref.current = href;
       const current = searchParams.size > 0 ? `${pathname}?${searchParams.toString()}` : pathname;
       if (href === current) return;
       router.replace(href, { scroll: false });
