@@ -1,6 +1,6 @@
 {
   "app": {
-    "route_ts": 302
+    "route_ts": 304
   },
   "components": {
     "root_files": 0,
@@ -14,8 +14,8 @@
       "files": 92
     },
     "commerce": {
-      "bytes": 780312,
-      "files": 194
+      "bytes": 802209,
+      "files": 199
     },
     "community": {
       "bytes": 635565,
@@ -30,7 +30,7 @@
       "files": 124
     },
     "moderation": {
-      "bytes": 220617,
+      "bytes": 220832,
       "files": 56
     },
     "notifications": {
@@ -83,21 +83,21 @@
     "root_files": 0,
     "root_prefix_hotspots": [],
     "services_root_files": 0,
-    "tree_bytes": 634874,
+    "tree_bytes": 640887,
     "tree_files": 132
   },
   "packages_src_files": {
     "config": 1,
-    "db": 206,
-    "domain": 57,
+    "db": 207,
+    "domain": 58,
     "security": 10,
     "storage": 6,
     "ui": 20,
     "validation": 19
   },
   "scope": "Git-tracked blobs under site/ at source_sha (git ls-tree). Ignores untracked/ignored host files so CI and dirty worktrees match.",
-  "source_sha": "b91d4ccc6dc5daa244419158ff9863a25f3ca5cc",
+  "source_sha": "d333320f35141753f783fca443cc4a2c360be3d9",
   "tests": {
-    "site_tests_files": 1770
+    "site_tests_files": 1773
   }
 }
