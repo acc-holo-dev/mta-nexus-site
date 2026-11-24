@@ -44,11 +44,7 @@ import {
   orderCaseStatusLabel,
   orderCaseThreadLabel,
 } from "../order-case-i18n";
-import {
-  orderCaseDetailHref,
-  orderCaseListHref,
-  orderCasePageQuery,
-} from "../order-case-query";
+import { orderCaseDetailHref, orderCaseListHref, orderCasePageQuery } from "../order-case-query";
 export async function orderCaseMetadata(staff = false): Promise<Metadata> {
   const copy = orderCaseCopy(await getRequestLocale());
   return {

@@ -165,9 +165,10 @@ it("preserves list filters in case detail back links", async () => {
       query: { reviewStatus: "refund_recommended", threadStatus: "open", page: "2" },
     }),
   );
-  const back = html.match(/href="([^"]+)"[^>]*>[^<]*Back to cases|Назад/su);
-  expect(back?.[1]).toBeDefined();
-  const url = new URL(back![1], "https://nexus.test");
+  const hrefs = [...html.matchAll(/href="([^"]+)"/gu)].map((match) => match[1]);
+  const listHref = hrefs.find((href) => href.includes("reviewStatus=refund_recommended"));
+  expect(listHref).toBeTruthy();
+  const url = new URL(listHref ?? "", "https://nexus.test");
   expect(url.pathname).toBe("/workspace/order-cases");
   expect(url.searchParams.get("reviewStatus")).toBe("refund_recommended");
   expect(url.searchParams.get("threadStatus")).toBe("open");
