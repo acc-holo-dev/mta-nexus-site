@@ -1,5 +1,5 @@
 import { financialStatementsRepository } from "@nexus/db";
-import { AppError } from "@nexus/domain";
+import { AppError, publicPriceEstimates } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
@@ -158,6 +158,9 @@ export async function WorkspaceFinanceScreen({
       }),
     );
   }
+  const fxRates = walletEnabled
+    ? await walletPaymentService.listFxRates().catch(() => null)
+    : undefined;
   return (
     <div className={pageShellMax6xl}>
       <Link href="/workspace/sales" className={linkAccentSmRounded}>
@@ -206,6 +209,13 @@ export async function WorkspaceFinanceScreen({
                 : walletEnabled
                   ? copy.walletBalanceUnavailable
                   : copy.unknown;
+            const availableEstimates =
+              walletCopy && walletBalance && walletBalance.available !== null
+                ? publicPriceEstimates(
+                    { price: walletBalance.available, currency: total.currency },
+                    fxRates,
+                  )
+                : undefined;
             return (
               <li key={total.currency} className={panelSpace3P5}>
                 <h3 className={typeSemiboldPrimary}>{total.currency}</h3>
@@ -235,6 +245,26 @@ export async function WorkspaceFinanceScreen({
                     </dd>
                   </div>
                 </dl>
+                {availableEstimates === null ? (
+                  <p className={typeXsMuted}>{walletCopy?.fxUnavailable}</p>
+                ) : availableEstimates ? (
+                  <ul className={typeXsMuted}>
+                    {availableEstimates.map((line) => (
+                      <li key={line.quote}>
+                        {line.kind === "quote"
+                          ? walletCopy?.fxEstimate.replace(
+                              "{destination}",
+                              formatFinancialMinor(line.amount, line.quote, locale),
+                            )
+                          : line.kind === "dust"
+                            ? walletCopy?.fxDust
+                            : line.kind === "invalid"
+                              ? walletCopy?.fxExceeds
+                              : `${line.quote}: ${walletCopy?.fxNone}`}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
                 <p className={typeXsMuted}>
                   {copy.legacy}: {total.legacyEntries}
                 </p>
