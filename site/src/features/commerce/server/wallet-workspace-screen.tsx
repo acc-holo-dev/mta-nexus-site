@@ -465,6 +465,13 @@ export async function WalletWorkspaceScreen({
                       <p className={typeNumericPrimary}>
                         {formatFinancialMinor(hold.amount, hold.currency, locale)}
                       </p>
+                      <ActivityEstimate
+                        amount={hold.amount}
+                        copy={copy}
+                        currency={hold.currency}
+                        locale={locale}
+                        rates={available === null ? undefined : fxRates}
+                      />
                       <p className={typeXsMuted}>
                         {copy.heldReleaseAt}: {formatHistoryDate(new Date(hold.releaseAt), locale)}{" "}
                         · {hold.orderId}
@@ -573,6 +580,13 @@ export async function WalletWorkspaceScreen({
                             <p className={typeNumericPrimary}>
                               {formatFinancialMinor(hold.amount, hold.currency, locale)}
                             </p>
+                            <ActivityEstimate
+                              amount={hold.amount}
+                              copy={copy}
+                              currency={hold.currency}
+                              locale={locale}
+                              rates={available === null ? undefined : fxRates}
+                            />
                             <p className={typeXsMuted}>
                               {copy.heldReleaseAt}:{" "}
                               {formatHistoryDate(new Date(hold.releaseAt), locale)} · {hold.orderId}
