@@ -16,6 +16,7 @@ const state = vi.hoisted(() => ({
   detail: vi.fn(),
   getAvailableBalance: vi.fn(),
   getHeldBalance: vi.fn(),
+  listFxRates: vi.fn(),
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
@@ -42,6 +43,7 @@ vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
   WalletPaymentService: class {
     getAvailableBalance = state.getAvailableBalance;
     getHeldBalance = state.getHeldBalance;
+    listFxRates = state.listFxRates;
   },
 }));
 vi.mock("@nexus/db", () => ({
@@ -73,6 +75,7 @@ beforeEach(() => {
   state.held = 120;
   state.getAvailableBalance.mockReset().mockImplementation(async () => state.available);
   state.getHeldBalance.mockReset().mockImplementation(async () => state.held);
+  state.listFxRates.mockReset().mockResolvedValue([]);
   state.statement.mockReset().mockResolvedValue({
     scope: { id: "user:usr_a", name: null },
     totals: [
