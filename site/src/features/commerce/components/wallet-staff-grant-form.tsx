@@ -132,9 +132,11 @@ export function WalletStaffGrantForm({ actorId }: { actorId: string }) {
           value={currency}
           onChange={(event) => setCurrency(event.target.value as "USD" | "EUR" | "RUB")}
         >
-          <option value="RUB">RUB</option>
-          <option value="USD">USD</option>
-          <option value="EUR">EUR</option>
+          {(["RUB", "USD", "EUR"] as const).map((code) => (
+            <option key={code} value={code}>
+              {code}
+            </option>
+          ))}
         </select>
       </label>
       <Input
