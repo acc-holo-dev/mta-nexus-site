@@ -103,7 +103,7 @@ export function Sidebar({
 
   return (
     <aside
-      className={`z-30 hidden shrink-0 select-none flex-col border-r border-base bg-surface transition-all duration-200 lg:flex ${
+      className={`sticky top-0 z-30 hidden h-dvh max-h-dvh shrink-0 select-none flex-col self-start border-r border-base bg-surface transition-all duration-200 lg:flex ${
         isCollapsed ? "w-14" : "w-56"
       }`}
     >
@@ -134,7 +134,7 @@ export function Sidebar({
       </div>
 
       <nav
-        className="flex-1 space-y-5 overflow-y-auto px-2 py-3"
+        className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain px-2 py-3"
         aria-label={dictionary.nav.ecosystem}
       >
         <div className="space-y-0.5">

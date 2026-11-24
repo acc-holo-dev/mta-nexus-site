@@ -23,6 +23,8 @@ export const shell = {
     saved: "Сохранённое",
     notifications: "Уведомления",
     settings: "Настройки",
+    siteWallet: "Кошелёк площадки",
+    finance: "Финансы",
     support: "Поддержка",
     securityCenter: "Безопасность",
     admin: "Админ",
