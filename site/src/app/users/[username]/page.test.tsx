@@ -35,6 +35,7 @@ const state = vi.hoisted(() => ({
 }));
 vi.mock("@nexus/db", () => ({
   promoCodeRepository: {},
+  walletFxRateRepository: {},
   userRepository: {
     findByUsername: async () =>
       state.exists

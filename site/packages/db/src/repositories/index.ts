@@ -67,6 +67,7 @@ export * from "./products";
 export * from "./profile-change-history";
 export { profilePrivacyRepository } from "./profile-privacy";
 export * from "./promo-codes";
+export * from "./wallet-fx-rates";
 export { type PublicContextKind, publicContextTrustRepository } from "./public-context-trust";
 export { publicDirectoryRepository } from "./public-directory";
 export { publicUserTrustRepository } from "./public-user-trust";

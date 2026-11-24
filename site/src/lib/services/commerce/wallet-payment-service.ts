@@ -13,6 +13,7 @@ import {
   type WalletOrderRefundResult,
   type WalletOrderSettlementResult,
   type WalletPurchasedBuild,
+  walletFxRateRepository,
   walletOrderSettlementRepository,
   walletSellerHoldRepository,
   walletTopupRepository,
@@ -20,6 +21,7 @@ import {
 } from "@nexus/db";
 import {
   AppError,
+  assertFxCurrencies,
   assertSellerAccountId,
   buildStaffBalanceGrantPosting,
   buildVerifiedTopUpCreditPosting,
@@ -32,6 +34,7 @@ import {
   createTopUpIntent,
   createWithdrawalIntent,
   defaultWalletPaymentProviders,
+  type ExplicitFxRate,
   ForbiddenError,
   markTopUpAwaitingProvider,
   markTopUpFailed,
@@ -44,6 +47,7 @@ import {
   type PromoCodeRecord,
   type PromoQuote,
   paymentProviderCapabilityMatrix,
+  quoteExplicitFx,
   quotePromoDiscount,
   selectPaymentProvider,
   type TopUpIntent,
@@ -92,6 +96,7 @@ export class WalletPaymentService {
     private readonly orderOperations = orderOperationsRepository,
     private readonly builds = buildRepository,
     private readonly promos = promoCodeRepository,
+    private readonly fxRates = walletFxRateRepository,
   ) {}
 
   /**
@@ -715,6 +720,39 @@ export class WalletPaymentService {
       code: input.promoCode,
       listAmount: priced.listAmount,
       currency: priced.currency,
+    });
+  }
+
+  async listFxRates(): Promise<ExplicitFxRate[]> {
+    if (!isWalletEngineEnabled()) {
+      throw new AppError("Wallet engine is disabled", 404, "WALLET_ENGINE_DISABLED");
+    }
+    return this.fxRates.list();
+  }
+
+  async setFxRate(input: {
+    actor: User;
+    baseCurrency: string;
+    quoteCurrency: string;
+    baseAmount: number;
+    quoteAmount: number;
+  }): Promise<ExplicitFxRate> {
+    if (!isWalletEngineEnabled()) {
+      throw new AppError("Wallet engine is disabled", 404, "WALLET_ENGINE_DISABLED");
+    }
+    if (input.actor.role !== "admin") throw new ForbiddenError();
+    assertFxCurrencies(input.baseCurrency, input.quoteCurrency);
+    quoteExplicitFx({
+      sourceAmount: input.baseAmount,
+      baseAmount: input.baseAmount,
+      quoteAmount: input.quoteAmount,
+    });
+    return this.fxRates.save({
+      actorId: input.actor.id,
+      baseCurrency: input.baseCurrency as WalletCurrency,
+      quoteCurrency: input.quoteCurrency as WalletCurrency,
+      baseAmount: input.baseAmount,
+      quoteAmount: input.quoteAmount,
     });
   }
 

@@ -337,6 +337,8 @@ Staff balance grant is `POST /api/admin/commerce/wallet-grants` (admin session, 
 
 Promo codes are `POST /api/admin/commerce/promo-codes` (admin session, engine on). `POST /api/checkout/wallet/promo-quote` previews the discount and does not reserve the code. Checkout stores the catalog total, the discount, and the code, then charges the reduced total from the site wallet. Seller commission stays on the catalog price. `platform:promo` funds the gap with a `fee` journal leg. Each buyer can redeem a code once. This is not a card coupon.
 
+Exchange rates are `POST /api/admin/commerce/fx-rates` (admin session, engine on). The pair is minor units of one currency against minor units of another. The wallet shows that recorded estimate. A missing rate stays unrecorded. The rate does not move a balance and is not a card conversion.
+
 Staff wallet refund remains on purchase cases
 (`POST /api/admin/commerce/wallet-orders/:orderId/refund`), not on the
 reconciliation queue. The staff purchase-case queue filtered to
