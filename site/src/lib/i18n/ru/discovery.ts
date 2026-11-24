@@ -120,6 +120,8 @@ export const discovery = {
     clearCategory: "Показать все категории",
     firstPageSameFilters: "К странице 1 с теми же фильтрами",
     free: "Бесплатно",
+    priceEstimateAbout: "Примерно {amount} по записанному курсу",
+    priceEstimateUnavailable: "Записанные курсы не загрузились. Цена объявления не изменилась.",
     noPreview: "Нет превью",
     updated: "обн.",
     noReviewsYet: "Пока нет отзывов",

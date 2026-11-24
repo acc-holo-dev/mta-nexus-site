@@ -1,4 +1,4 @@
-import type { Product } from "@nexus/domain";
+import type { ExplicitFxLine, Product } from "@nexus/domain";
 import { Library, Star, Tag } from "lucide-react";
 import Link from "next/link";
 import { getDictionary, type Locale } from "../../../lib/i18n";
@@ -57,10 +57,13 @@ export function ProductCard({
   product,
   locale = "en",
   attribution = null,
+  priceEstimates,
 }: {
   product: Product;
   locale?: Locale;
   attribution?: PublicResourceAttribution | null;
+  /** Recorded-rate lines for a paid card. Null means the rate read failed. */
+  priceEstimates?: readonly ExplicitFxLine[] | null;
 }) {
   const dictionary = getDictionary(locale);
   const market = dictionary.market;
@@ -97,6 +100,25 @@ export function ProductCard({
           {priceLabel}
         </div>
       </Link>
+      {product.price > 0 && priceEstimates === null ? (
+        <p className="px-3 pt-2 text-[11px] text-muted">{market.priceEstimateUnavailable}</p>
+      ) : null}
+      {product.price > 0 &&
+      priceEstimates &&
+      priceEstimates.some((line) => line.kind === "quote") ? (
+        <ul className="space-y-0.5 px-3 pt-2 text-[11px] text-muted">
+          {priceEstimates.map((line) =>
+            line.kind === "quote" ? (
+              <li key={line.quote}>
+                {market.priceEstimateAbout.replace(
+                  "{amount}",
+                  formatHistoryAmount(line.amount, line.quote, locale),
+                )}
+              </li>
+            ) : null,
+          )}
+        </ul>
+      ) : null}
 
       <div className={typeFlex1ColGap2P35}>
         <div className={typeFlexBetweenCaption}>

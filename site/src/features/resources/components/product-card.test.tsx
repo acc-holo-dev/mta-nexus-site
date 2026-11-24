@@ -139,4 +139,29 @@ describe("ProductCard attribution and honest metrics", () => {
     expect(paidRu).toContain("₽");
     expect(paidRu).not.toContain(getDictionary("ru").market.free);
   });
+
+  it("shows a recorded-rate estimate without replacing the listing price", () => {
+    const html = renderToStaticMarkup(
+      <ProductCard
+        product={product({ price: 499, currency: "EUR", licenseModel: "single_server" })}
+        locale="en"
+        priceEstimates={[{ kind: "quote", base: "EUR", quote: "USD", amount: 550 }]}
+      />,
+    );
+    expect(html).toContain("€4.99");
+    expect(html).toContain("About $5.50 at the recorded rate");
+  });
+
+  it("says the rate read failed without calling the paid price free", () => {
+    const html = renderToStaticMarkup(
+      <ProductCard
+        product={product({ price: 499, currency: "EUR", licenseModel: "single_server" })}
+        locale="en"
+        priceEstimates={null}
+      />,
+    );
+    expect(html).toContain("€4.99");
+    expect(html).toContain(getDictionary("en").market.priceEstimateUnavailable);
+    expect(html).not.toContain(getDictionary("en").market.free);
+  });
 });
