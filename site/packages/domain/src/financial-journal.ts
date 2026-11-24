@@ -12,6 +12,7 @@ export const LEDGER_REFERENCE_TYPES = [
   "wallet_spend",
   "withdrawal",
   "wallet_hold",
+  "staff_grant",
 ] as const;
 export type LedgerReferenceType = (typeof LEDGER_REFERENCE_TYPES)[number];
 

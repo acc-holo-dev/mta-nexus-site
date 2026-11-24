@@ -315,7 +315,7 @@ understood. Defaults are unset/off; document them in the host env (see
 
 | Flag                    | Effect when set to `1`                                                                                                                                                                         |
 | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `NEXUS_WALLET_ENGINE`   | Unlocks `/api/wallet/*`, pay-with-wallet, `POST /api/checkout/wallet`, `/workspace/wallet`, paid `single_server` create/settle, and admin wallet ops under `/admin/commerce/wallet-providers`. |
+| `NEXUS_WALLET_ENGINE`   | Unlocks `/api/wallet/*`, pay-with-wallet, `POST /api/checkout/wallet`, `/workspace/wallet`, paid `single_server` create/settle, admin wallet ops under `/admin/commerce/wallet-providers`, and staff balance grants at `/admin/commerce/wallet-grants`. |
 | `NEXUS_WALLET_WITHDRAW` | Also requires the engine. Unlocks withdrawal intents and `POST /api/admin/commerce/wallet-withdrawals/expire-stale`. Live payout adapters stay off.                                            |
 
 Admin batch CTAs on `/admin/commerce/wallet-providers` call existing admin HTTP
@@ -332,6 +332,8 @@ The same admin page also shows a read-only recent top-up/withdrawal intent list
 across accounts (inspect before expire; no credit/cancel/settle from that list)
 and read-only previews of the exact rows the next hold-release, top-up expire,
 unpaid-order expire, and withdrawal expire batches would process.
+
+Staff balance grant is `POST /api/admin/commerce/wallet-grants` (admin session, engine on). It credits a member's available balance with a balanced `staff_grant` journal and one audit row. It is not a payment-provider top-up. The same idempotency key does not credit twice.
 
 Staff wallet refund remains on purchase cases
 (`POST /api/admin/commerce/wallet-orders/:orderId/refund`), not on the

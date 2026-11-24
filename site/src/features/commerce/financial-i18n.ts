@@ -215,6 +215,7 @@ export function financialReferenceLabel(locale: Locale, reference: string) {
           wallet_spend: "Оплата с кошелька",
           wallet_hold: "Холд продавца",
           withdrawal: "Вывод",
+          staff_grant: "Выдача сотрудником",
         }
       : {
           order: "Order",
@@ -225,6 +226,7 @@ export function financialReferenceLabel(locale: Locale, reference: string) {
           wallet_spend: "Wallet spend",
           wallet_hold: "Seller hold",
           withdrawal: "Withdrawal",
+          staff_grant: "Staff grant",
         };
   return Object.hasOwn(labels, reference)
     ? labels[reference as keyof typeof labels]

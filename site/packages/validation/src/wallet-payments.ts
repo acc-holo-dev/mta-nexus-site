@@ -95,6 +95,25 @@ export const walletHoldReleaseBatchSchema = z
   })
   .strict();
 
+export const walletStaffGrantSchema = z
+  .object({
+    username: z
+      .string()
+      .min(3)
+      .max(32)
+      .regex(
+        /^[a-zA-Z0-9_-]+$/u,
+        "Username can only contain alphanumeric characters, underscores, and hyphens",
+      ),
+    amount: z.number().int().positive().max(100_000_000),
+    currency,
+    reason: z
+      .string()
+      .regex(/^[\p{L}\p{N}\p{P}\p{Zs}]{8,280}$/u, "Reason must be 8–280 characters"),
+    idempotencyKey,
+  })
+  .strict();
+
 export const walletIntentExpireBatchSchema = z
   .object({
     nowIso: z.string().datetime().optional(),

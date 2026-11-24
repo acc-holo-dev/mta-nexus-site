@@ -89,9 +89,11 @@ it("labels wallet ledger reference types in EN and RU", () => {
   expect(financialReferenceLabel("en", "wallet_hold")).toBe("Seller hold");
   expect(financialReferenceLabel("en", "topup")).toBe("Top-up");
   expect(financialReferenceLabel("en", "withdrawal")).toBe("Withdrawal");
+  expect(financialReferenceLabel("en", "staff_grant")).toBe("Staff grant");
   expect(financialReferenceLabel("ru", "wallet_spend")).toBe("Оплата с кошелька");
   expect(financialReferenceLabel("ru", "wallet_hold")).toBe("Холд продавца");
   expect(financialReferenceLabel("ru", "topup")).toBe("Пополнение");
   expect(financialReferenceLabel("ru", "withdrawal")).toBe("Вывод");
+  expect(financialReferenceLabel("ru", "staff_grant")).toBe("Выдача сотрудником");
   expect(financialReferenceLabel("en", "mystery")).toBe("Unknown state");
 });
