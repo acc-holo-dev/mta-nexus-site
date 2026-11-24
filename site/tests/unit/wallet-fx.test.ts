@@ -1,4 +1,4 @@
-import { AppError, explicitFxLines, quoteExplicitFx } from "@nexus/domain";
+import { AppError, explicitFxLines, publicPriceEstimates, quoteExplicitFx } from "@nexus/domain";
 import { describe, expect, it } from "vitest";
 
 describe("explicit exchange quote", () => {
@@ -33,6 +33,24 @@ describe("explicit exchange quote", () => {
         { baseCurrency: "EUR", quoteCurrency: "USD", baseAmount: 100, quoteAmount: 110 },
       ]),
     ).toEqual([
+      { kind: "quote", base: "EUR", quote: "USD", amount: 275 },
+      { kind: "none", base: "EUR", quote: "RUB" },
+    ]);
+  });
+
+  it("leaves a free card alone and marks a failed rate read", () => {
+    const rates = [
+      {
+        baseCurrency: "EUR" as const,
+        quoteCurrency: "USD" as const,
+        baseAmount: 100,
+        quoteAmount: 110,
+      },
+    ];
+    expect(publicPriceEstimates({ price: 0, currency: "EUR" }, rates)).toBeUndefined();
+    expect(publicPriceEstimates({ price: 250, currency: "EUR" }, undefined)).toBeUndefined();
+    expect(publicPriceEstimates({ price: 250, currency: "EUR" }, null)).toBeNull();
+    expect(publicPriceEstimates({ price: 250, currency: "EUR" }, rates)).toEqual([
       { kind: "quote", base: "EUR", quote: "USD", amount: 275 },
       { kind: "none", base: "EUR", quote: "RUB" },
     ]);

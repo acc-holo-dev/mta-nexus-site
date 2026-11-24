@@ -1,5 +1,5 @@
 import { followWorkspaceRepository } from "@nexus/db";
-import { AppError } from "@nexus/domain";
+import { AppError, publicPriceEstimates } from "@nexus/domain";
 import { Avatar, Button, EmptyState, ErrorState, FilterBar, SearchField } from "@nexus/ui";
 import { ShieldCheck } from "lucide-react";
 import { cookies } from "next/headers";
@@ -8,7 +8,10 @@ import { cache } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { productService } from "../../../lib/services/commerce/product-service";
-import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { discoveryService } from "../../../lib/services/discovery/discovery-service";
 import {
   indexMtaObservations,
@@ -166,6 +169,9 @@ export async function DirectoryResults({
   const dictionary = getDictionary(locale).discover;
   const home = getDictionary(locale).home;
   const walletEnabled = isWalletEngineEnabled();
+  const publicRates = walletEnabled
+    ? await new WalletPaymentService().listFxRates().catch(() => null)
+    : undefined;
   const marketHref = libraryMarketHref(walletEnabled);
   let loadError = copy.unavailable;
   const result = await (stream
@@ -356,6 +362,7 @@ export async function DirectoryResults({
                   product={product}
                   locale={locale}
                   attribution={resourceAttributions.get(product.id) ?? null}
+                  priceEstimates={publicPriceEstimates(product, publicRates)}
                 />
                 {followControl(product.id, product.title)}
               </div>

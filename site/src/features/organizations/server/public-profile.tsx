@@ -4,6 +4,7 @@ import {
   organizationRepository,
   productRepository,
 } from "@nexus/db";
+import { publicPriceEstimates } from "@nexus/domain";
 import { EmptyState, ErrorState, StatCard } from "@nexus/ui";
 import { safeExternalWebUrl } from "@nexus/validation";
 import { Building2, ExternalLink, Globe, ShieldCheck } from "lucide-react";
@@ -15,7 +16,10 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { productService } from "../../../lib/services/commerce/product-service";
-import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { ProfileResourcePagination, parseProfilePage } from "../../accounts/profile-pagination";
 import { ArticleCard } from "../../community/article-view";
 import { FollowButton } from "../../community/follow";
@@ -76,6 +80,9 @@ export async function OrganizationProfilePage({
   const dictionary = getDictionary(locale);
   const copy = dictionary.organizations;
   const walletEnabled = isWalletEngineEnabled();
+  const publicRates = walletEnabled
+    ? await new WalletPaymentService().listFxRates().catch(() => null)
+    : undefined;
   const marketHref = libraryMarketHref(walletEnabled);
 
   if (!organization) {
@@ -243,6 +250,7 @@ export async function OrganizationProfilePage({
                 product={product}
                 locale={locale}
                 attribution={attributions.get(product.id) ?? null}
+                priceEstimates={publicPriceEstimates(product, publicRates)}
               />
             ))}
           </div>

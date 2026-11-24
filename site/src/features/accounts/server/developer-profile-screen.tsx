@@ -1,4 +1,5 @@
 import { followWorkspaceRepository, productRepository } from "@nexus/db";
+import { publicPriceEstimates } from "@nexus/domain";
 import { Avatar, EmptyState, ErrorState, StatCard } from "@nexus/ui";
 import { ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
@@ -10,7 +11,10 @@ import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n/serve
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { profilePrivacyService } from "../../../lib/services/accounts/profile-privacy-service";
 import { productService } from "../../../lib/services/commerce/product-service";
-import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { verificationWorkspaceService } from "../../../lib/services/moderation/verification-workspace-service";
 import { FollowButton } from "../../community/follow";
 import { buildFollowInitialState } from "../../community/follow-initial-state";
@@ -70,6 +74,9 @@ export async function DeveloperProfileScreen({
   const dictionary = getDictionary(locale);
   const copy = dictionary.developers;
   const walletEnabled = isWalletEngineEnabled();
+  const publicRates = walletEnabled
+    ? await new WalletPaymentService().listFxRates().catch(() => null)
+    : undefined;
   const marketHref = libraryMarketHref(walletEnabled);
 
   if (!user || (user.role !== "developer" && user.role !== "admin")) {
@@ -203,6 +210,7 @@ export async function DeveloperProfileScreen({
                 product={product}
                 locale={locale}
                 attribution={attributions.get(product.id) ?? null}
+                priceEstimates={publicPriceEstimates(product, publicRates)}
               />
             ))}
           </div>
