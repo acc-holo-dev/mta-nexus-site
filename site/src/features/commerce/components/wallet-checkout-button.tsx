@@ -1,5 +1,6 @@
 "use client";
 
+import { type ExplicitFxRate, publicPriceEstimates } from "@nexus/domain";
 import { Button, ErrorState, Input } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
@@ -25,6 +26,7 @@ export function WalletCheckoutButton({
   currency,
   signedIn,
   signInHref,
+  fxRates,
 }: {
   actorId: string | null;
   productId: string;
@@ -35,6 +37,8 @@ export function WalletCheckoutButton({
   currency: string;
   signedIn: boolean;
   signInHref: string;
+  /** Recorded pairs for the amount due. Null means the rate read failed. */
+  fxRates?: readonly ExplicitFxRate[] | null;
 }) {
   const { locale } = useNexusLocale();
   const copy = getWalletCopy(locale);
@@ -59,6 +63,10 @@ export function WalletCheckoutButton({
       ? promoQuote
       : null;
   const dueMinor = applied?.chargedAmount ?? amountMinor;
+  const dueEstimates =
+    fxRates === undefined
+      ? undefined
+      : publicPriceEstimates({ price: dueMinor, currency }, fxRates);
   const balance = useWalletSpendBalance(actorId ?? "", currency, dueMinor);
 
   if (!signedIn || !actorId) {
@@ -174,6 +182,31 @@ export function WalletCheckoutButton({
         </h3>
         <p className="text-[11px] text-muted">{copy.checkoutNote}</p>
         <p className="text-sm text-primary">{amountLabel}</p>
+        {dueEstimates === null ? (
+          <p className="text-[11px] text-muted">{copy.checkoutDueUnavailable}</p>
+        ) : dueEstimates ? (
+          <ul className="space-y-0.5 text-[11px] text-muted">
+            {dueEstimates.map((line) => (
+              <li key={line.quote}>
+                {line.kind === "quote"
+                  ? copy.checkoutDueEstimate
+                      .replace("{base}", line.base)
+                      .replace("{quote}", formatHistoryAmount(line.amount, line.quote, locale))
+                  : line.kind === "dust"
+                    ? copy.checkoutDueDust
+                        .replace("{base}", line.base)
+                        .replace("{quote}", line.quote)
+                    : line.kind === "invalid"
+                      ? copy.checkoutDueInvalid
+                          .replace("{base}", line.base)
+                          .replace("{quote}", line.quote)
+                      : copy.checkoutDueNone
+                          .replace("{base}", line.base)
+                          .replace("{quote}", line.quote)}
+              </li>
+            ))}
+          </ul>
+        ) : null}
         <div className="space-y-2">
           <label className="block text-sm text-secondary" htmlFor={`${field}-promo`}>
             {copy.promoCode}

@@ -1,6 +1,9 @@
 import { cookies } from "next/headers";
 import { authService } from "../../../lib/services/accounts/auth-service";
-import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { AcquirePage } from "../acquire-page";
 
 /** RSC shell: session + wallet flag for the client acquire surface. */
@@ -12,11 +15,16 @@ export async function AcquirePageScreen() {
   } catch {
     user = null;
   }
+  const walletEnabled = isWalletEngineEnabled();
+  const fxRates = walletEnabled
+    ? await new WalletPaymentService().listFxRates().catch(() => null)
+    : undefined;
   return (
     <AcquirePage
-      walletEnabled={isWalletEngineEnabled()}
+      walletEnabled={walletEnabled}
       actorId={user?.id ?? null}
       signedIn={Boolean(user)}
+      fxRates={fxRates}
     />
   );
 }
