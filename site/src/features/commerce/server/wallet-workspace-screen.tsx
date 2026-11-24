@@ -642,6 +642,13 @@ export async function WalletWorkspaceScreen({
                               <p className={typeNumericPrimary}>
                                 {formatFinancialMinor(intent.amount, intent.currency, locale)}
                               </p>
+                              <ActivityEstimate
+                                amount={intent.amount}
+                                copy={copy}
+                                currency={intent.currency}
+                                locale={locale}
+                                rates={available === null ? undefined : fxRates}
+                              />
                               <p className={typeXsMuted}>
                                 {withdrawalStatusLabel(copy, intent.status)} · {copy.recordedAt}:{" "}
                                 {formatHistoryDate(new Date(intent.createdAt), locale)} ·{" "}
@@ -695,6 +702,13 @@ export async function WalletWorkspaceScreen({
                   <p className={typeNumericPrimary}>
                     {formatFinancialMinor(intent.amount, intent.currency, locale)}
                   </p>
+                  <ActivityEstimate
+                    amount={intent.amount}
+                    copy={copy}
+                    currency={intent.currency}
+                    locale={locale}
+                    rates={available === null ? undefined : fxRates}
+                  />
                   <p className={typeXsMuted}>
                     {withdrawalStatusLabel(copy, intent.status)} · {copy.recordedAt}:{" "}
                     {formatHistoryDate(new Date(intent.createdAt), locale)} · {intent.id}
