@@ -45,6 +45,44 @@ export function quoteExplicitFx(input: {
   return Number(destination);
 }
 
+export type ExplicitFxLine =
+  | { kind: "quote"; base: WalletCurrency; quote: WalletCurrency; amount: number }
+  | { kind: "none" | "dust" | "invalid"; base: WalletCurrency; quote: WalletCurrency };
+
+/** One source amount against the other wallet currencies. Missing rates stay missing. */
+export function explicitFxLines(
+  source: { currency: WalletCurrency; amount: number },
+  rates: readonly ExplicitFxRate[],
+): ExplicitFxLine[] {
+  return WALLET_CURRENCIES.filter((quote) => quote !== source.currency).map((quote) => {
+    const rate = rates.find(
+      (item) => item.baseCurrency === source.currency && item.quoteCurrency === quote,
+    );
+    if (!rate) return { kind: "none" as const, base: source.currency, quote };
+    try {
+      return {
+        kind: "quote" as const,
+        base: source.currency,
+        quote,
+        amount: quoteExplicitFx({
+          sourceAmount: source.amount,
+          baseAmount: rate.baseAmount,
+          quoteAmount: rate.quoteAmount,
+        }),
+      };
+    } catch (error) {
+      return {
+        kind:
+          error instanceof AppError && error.code === "FX_DUST"
+            ? ("dust" as const)
+            : ("invalid" as const),
+        base: source.currency,
+        quote,
+      };
+    }
+  });
+}
+
 export function assertFxCurrencies(base: string, quote: string): void {
   if (
     !(WALLET_CURRENCIES as readonly string[]).includes(base) ||

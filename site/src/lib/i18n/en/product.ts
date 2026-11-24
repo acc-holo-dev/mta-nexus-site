@@ -50,6 +50,11 @@ export const product = {
     noReviewsHint:
       "Published reviews from readers with acquired access will appear here. An empty list is not a load failure.",
     free: "Free",
+    priceEstimate: "About {quote} at the recorded rate. The listing price stays {base}.",
+    priceEstimateNone: "No recorded rate from {base} to {quote}.",
+    priceEstimateDust: "The recorded rate from {base} to {quote} is too small to show.",
+    priceEstimateInvalid: "The recorded rate from {base} to {quote} cannot be shown.",
+    priceEstimateUnavailable: "Recorded rates could not be loaded. The listing price is unchanged.",
     licenseModel: "Access model",
     managementAccess: "Management access",
     inLibrary: "In your library",
