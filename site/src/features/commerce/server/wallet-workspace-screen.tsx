@@ -2,6 +2,7 @@ import {
   AppError,
   type ExplicitFxRate,
   type LedgerEntry,
+  publicPriceEstimates,
   quoteExplicitFx,
   type TopUpIntent,
   type WithdrawalIntent,
@@ -82,6 +83,42 @@ function FxEstimate({
         formatFinancialMinor(destination, rate.quoteCurrency, locale),
       )}
     </p>
+  );
+}
+
+function ActivityEstimate({
+  amount,
+  copy,
+  currency,
+  locale,
+  rates,
+}: {
+  amount: number;
+  copy: ReturnType<typeof getWalletCopy>;
+  currency: string;
+  locale: Parameters<typeof formatFinancialMinor>[2];
+  rates: readonly ExplicitFxRate[] | null;
+}) {
+  const lines = publicPriceEstimates({ price: amount, currency }, rates);
+  if (lines === undefined) return null;
+  if (lines === null) return <p className={typeXsMuted}>{copy.fxUnavailable}</p>;
+  return (
+    <ul className={typeXsMuted}>
+      {lines.map((line) => (
+        <li key={line.quote}>
+          {line.kind === "quote"
+            ? copy.fxEstimate.replace(
+                "{destination}",
+                formatFinancialMinor(line.amount, line.quote, locale),
+              )
+            : line.kind === "dust"
+              ? copy.fxDust
+              : line.kind === "invalid"
+                ? copy.fxExceeds
+                : `${line.quote}: ${copy.fxNone}`}
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -671,6 +708,13 @@ export async function WalletWorkspaceScreen({
                   {entry.amount < 0 ? "−" : "+"}
                   {formatFinancialMinor(Math.abs(entry.amount), entry.currency, locale)}
                 </p>
+                <ActivityEstimate
+                  amount={Math.abs(entry.amount)}
+                  copy={copy}
+                  currency={entry.currency}
+                  locale={locale}
+                  rates={fxRates}
+                />
                 <p className={typeXsMuted}>
                   {entry.amount < 0 ? copy.activityDebit : copy.activityCredit} ·{" "}
                   {activityKindLabel(copy, entry.referenceType)} · {copy.recordedAt}:{" "}
