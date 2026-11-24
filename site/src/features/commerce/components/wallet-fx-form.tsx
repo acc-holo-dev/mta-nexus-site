@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Input } from "@nexus/ui";
+import { Button, ErrorState, Input } from "@nexus/ui";
 import { walletFxRateSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useState } from "react";
@@ -117,11 +117,7 @@ export function WalletFxForm({ actorId }: { actorId: string }) {
           onChange={(event) => setQuoteAmount(event.target.value)}
         />
       </label>
-      {error ? (
-        <p role="alert" className={typeSmSecondary}>
-          {error}
-        </p>
-      ) : null}
+      {error ? <ErrorState title={copy.fxAdminTitle} description={error} /> : null}
       {saved ? (
         <p role="status" className={typeSmSuccess}>
           {copy.fxSuccess}
