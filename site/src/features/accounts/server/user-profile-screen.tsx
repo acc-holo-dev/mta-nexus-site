@@ -15,12 +15,16 @@ import { getRequestCookieStore, getRequestLocale } from "../../../lib/i18n/serve
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { profilePrivacyService } from "../../../lib/services/accounts/profile-privacy-service";
 import { productService } from "../../../lib/services/commerce/product-service";
-import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { verificationWorkspaceService } from "../../../lib/services/moderation/verification-workspace-service";
 import {
   indexMtaObservations,
   mtaMasterDirectoryService,
 } from "../../../lib/services/servers/mta-master-directory-service";
+import { formatFinancialMinor } from "../../commerce/financial-i18n";
 import { FollowButton } from "../../community/follow";
 import { buildFollowInitialState } from "../../community/follow-initial-state";
 import { publicationCopy } from "../../community/publication-feed-copy";
@@ -48,8 +52,10 @@ import { trustCopy } from "../../trust/public-user-trust-copy";
 import { DeveloperExperience } from "../developer-experience";
 import { ProfileResourcePagination, parseProfilePage } from "../profile-pagination";
 import { profilePrivacyCopy } from "../profile-privacy-copy";
+import { loadOwnProfileBalances, showOwnProfileWallet } from "../profile-wallet-visibility";
 
 const getProfile = cache((username: string) => userRepository.findByUsername(username));
+const profileWallet = new WalletPaymentService();
 
 export async function userProfileMetadata({
   params,
@@ -166,6 +172,15 @@ export async function UserProfileScreen({
       year: "numeric",
     },
   );
+  const ownWallet = showOwnProfileWallet({
+    actorId: actor?.id,
+    profileUserId: user.id,
+    guestPreview,
+  });
+  const walletBalances =
+    ownWallet && walletEnabled
+      ? await loadOwnProfileBalances(profileWallet, `user:${user.id}`)
+      : null;
 
   return (
     <div className={pageShellStack10}>
@@ -240,6 +255,47 @@ export async function UserProfileScreen({
           <StatCard label={copy.servers} value={serverPage.total} tone="success" />
         </div>
       </section>
+
+      {ownWallet ? (
+        <section aria-labelledby="profile-wallet-heading" className="nexus-panel space-y-3 p-4">
+          <h2 id="profile-wallet-heading" className="text-sm font-semibold text-primary">
+            {copy.ownWallet}
+          </h2>
+          {walletEnabled ? (
+            walletBalances?.some((entry) => entry.available !== null) ? (
+              <ul className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                {walletBalances.map((entry) => (
+                  <li
+                    key={entry.currency}
+                    className="rounded-md border border-base bg-inset px-3 py-2"
+                  >
+                    <div className="text-xs text-muted">{entry.currency}</div>
+                    <div className="font-numeric text-sm text-primary">
+                      {entry.available === null
+                        ? copy.ownWalletUnavailable
+                        : formatFinancialMinor(entry.available, entry.currency, locale)}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-secondary">{copy.ownWalletUnavailable}</p>
+            )
+          ) : (
+            <p className="text-sm text-secondary">{copy.ownWalletOff}</p>
+          )}
+          <div className="flex flex-wrap gap-3">
+            {walletEnabled ? (
+              <Link href="/workspace/wallet" className={linkAccentSm}>
+                {copy.openWallet}
+              </Link>
+            ) : null}
+            <Link href="/workspace/finance" className={linkAccentSm}>
+              {copy.openFinance}
+            </Link>
+          </div>
+        </section>
+      ) : null}
 
       <DeveloperExperience profile={professional} locale={locale} />
       <Link href={`/users/${encodeURIComponent(user.username)}/trust`} className={linkAccentSm}>

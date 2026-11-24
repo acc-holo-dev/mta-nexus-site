@@ -100,6 +100,12 @@ export const community = {
     servers: "Servers",
     authoredResources: "Authored resources",
     operatedServers: "Operated servers",
+    ownWallet: "Your site wallet",
+    ownWalletOff:
+      "Site wallet is off on this deployment, so there is no available balance to show. Finance still lists statements.",
+    ownWalletUnavailable: "Available balance could not be loaded. This is not a zero balance.",
+    openWallet: "Open wallet",
+    openFinance: "Open finance",
   },
   organizations: {
     title: "Organization",
