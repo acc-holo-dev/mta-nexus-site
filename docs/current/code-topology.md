@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 24 ноября 2026 (Europe/Moscow).  
-**source_sha:** `a94f6b26d` (`cursor/wallet-fx-rate-2e5e`, explicit site-wallet exchange rate).  
+**source_sha:** `03fcc22be` (`cursor/wallet-fx-rate-2e5e`, explicit site-wallet exchange rate).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -31,7 +31,7 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    |            Факт на `a94f6b26d` |
+| Область                    |            Факт на `03fcc22be` |
 | -------------------------- | -----------------------------: |
 | `features/*` domains       |                             13 |
 | `components/` tree files   |                              0 |
@@ -52,7 +52,7 @@ site/
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
 | accounts      |    92 | 238954 |
-| commerce      |   204 | 817754 |
+| commerce      |   204 | 817733 |
 | community     |   154 | 635565 |
 | discovery     |    22 |  50388 |
 | library       |   124 | 524752 |
