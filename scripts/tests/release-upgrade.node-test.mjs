@@ -267,6 +267,10 @@ test("upgrade contract keeps staff queue indexes and covers notification deliver
   assert.match(rehearsal, /'support_cases_category_status_updated_id_idx'/u);
   assert.match(rehearsal, /supportStaffFilterIndexPresent = true/u);
   assert.match(rehearsal, /reportNotificationDeliverySchemaPresent = true/u);
+  assert.match(
+    rehearsal,
+    /table === "orders"[\s\S]*- 'list_amount' - 'discount_amount' - 'promo_code'/u,
+  );
   assert.match(rehearsal, /webPushAdmissionRecoverySchemaPresent = true/u);
   assert.match(rehearsal, /supportNotificationDeliverySchemaPresent = true/u);
   assert.match(rehearsal, /buildIncidentNotificationDeliverySchemaPresent = true/u);

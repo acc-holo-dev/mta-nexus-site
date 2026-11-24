@@ -211,7 +211,7 @@ it("exact pending-order replays use frozen terms without rereading changed catal
   state.rows = [
     [],
     [],
-    [["ord_a", "NUMBER", "usr_buyer", "pending", 100, "USD", date, date]],
+    [["ord_a", "NUMBER", "usr_buyer", "pending", 100, "USD", null, null, null, date, date]],
     [["usr_buyer"]],
     [["itm_a", "prd_a", 100, "USD", terms]],
   ];
@@ -222,7 +222,11 @@ it("exact pending-order replays use frozen terms without rereading changed catal
   ).toBe(false);
 });
 it("order-key reuse with different economics fails without rewriting the earlier request", async () => {
-  state.rows = [[], [], [["ord_a", "NUMBER", "usr_buyer", "pending", 101, "USD", date, date]]];
+  state.rows = [
+    [],
+    [],
+    [["ord_a", "NUMBER", "usr_buyer", "pending", 101, "USD", null, null, null, date, date]],
+  ];
   await expect(orders.create(input)).rejects.toMatchObject({ code: "ORDER_REQUEST_CONFLICT" });
   expect(state.queries).toHaveLength(3);
 });
@@ -230,7 +234,7 @@ it("legacy pending orders cannot silently enter the recorded-terms pipeline on r
   state.rows = [
     [],
     [],
-    [["ord_a", "NUMBER", "usr_buyer", "pending", 100, "USD", date, date]],
+    [["ord_a", "NUMBER", "usr_buyer", "pending", 100, "USD", null, null, null, date, date]],
     [["usr_buyer"]],
     [["itm_a", "prd_a", 100, "USD", null]],
   ];
