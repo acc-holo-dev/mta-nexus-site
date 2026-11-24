@@ -6,15 +6,19 @@ import {
   Code2,
   Compass,
   Home,
+  Landmark,
   LayoutDashboard,
   Library,
   LifeBuoy,
   MessageSquare,
+  PenLine,
   Plus,
   Server,
+  ServerPlus,
   Settings,
   ShieldCheck,
   Users,
+  Wallet,
 } from "lucide-react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
 import { getUserPlatformCopy } from "../../community/user-platform-copy";
@@ -49,7 +53,7 @@ export function shellNavigation(locale: Locale, options: { walletEnabled?: boole
     studio: {
       href: "/workspace/content",
       label: getUserPlatformCopy(locale).studio,
-      icon: BookOpen,
+      icon: PenLine,
     },
     publish: {
       href: "/workspace/resources/new",
@@ -64,7 +68,17 @@ export function shellNavigation(locale: Locale, options: { walletEnabled?: boole
     registerServer: {
       href: "/workspace/servers/new",
       label: dictionary.nav.registerServer,
-      icon: Server,
+      icon: ServerPlus,
+    },
+    wallet: {
+      href: "/workspace/wallet",
+      label: dictionary.nav.siteWallet,
+      icon: Wallet,
+    },
+    finance: {
+      href: "/workspace/finance",
+      label: dictionary.nav.finance,
+      icon: Landmark,
     },
     organizations: {
       href: "/workspace/organizations",
@@ -91,7 +105,13 @@ export function shellNavigation(locale: Locale, options: { walletEnabled?: boole
     library,
     servers,
     publications,
-    account: [common.notifications, common.security, common.settings],
+    account: [
+      ...(walletEnabled ? [common.wallet] : []),
+      common.finance,
+      common.notifications,
+      common.security,
+      common.settings,
+    ],
     mobilePrimary: [
       common.home,
       common.servers,
@@ -103,8 +123,10 @@ export function shellNavigation(locale: Locale, options: { walletEnabled?: boole
       { ...common.overview, label: dictionary.nav.mobileWorkspace },
       ...library.slice(1),
       common.managedServers,
-      { ...common.registerServer, icon: Plus },
+      common.registerServer,
       common.organizations,
+      ...(walletEnabled ? [common.wallet] : []),
+      common.finance,
       ...publications,
       common.notifications,
       common.settings,
