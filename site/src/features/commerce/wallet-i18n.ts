@@ -7,6 +7,8 @@ const copy = {
     note: "Available balance is the audited ledger total for your personal site wallet. It is not withdrawable. A browser return from a payment provider never credits the wallet — only a verified provider event does.",
     available: "Available balance",
     currency: "Currency",
+    balances: "Balances by currency",
+    balanceUnavailable: "Unavailable",
     topUp: "Top up with stub provider",
     topUpNote:
       "Stub creates a top-up intent only. It does not open a hosted checkout. Balance updates after a verified provider webhook, not after this form.",
@@ -106,6 +108,7 @@ const copy = {
     activityHold: "Seller hold",
     activityWithdrawal: "Withdrawal",
     activityRefund: "Refund",
+    activityStaffGrant: "Staff grant",
     activityOther: "Ledger entry",
     orgActivity: "Organization ledger activity",
     orgActivityEmpty: "No organization ledger activity for this currency yet.",
@@ -393,6 +396,8 @@ const copy = {
     note: "Доступный баланс — аудируемый итог ledger по личному site wallet. Это не сумма к выводу. Возврат браузера от платёжного провайдера никогда не зачисляет кошелёк — только подтверждённое событие провайдера.",
     available: "Доступный баланс",
     currency: "Валюта",
+    balances: "Балансы по валютам",
+    balanceUnavailable: "Недоступно",
     topUp: "Пополнить через stub-провайдер",
     topUpNote:
       "Stub только создаёт намерение пополнения. Hosted checkout не открывается. Баланс обновится после verified webhook провайдера, а не после этой формы.",
@@ -492,6 +497,7 @@ const copy = {
     activityHold: "Холд продавца",
     activityWithdrawal: "Вывод",
     activityRefund: "Возврат",
+    activityStaffGrant: "Выдача сотрудником",
     activityOther: "Проводка",
     orgActivity: "Движения ledger организации",
     orgActivityEmpty: "По этой валюте пока нет проводок ledger организации.",
