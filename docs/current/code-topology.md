@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 24 ноября 2026 (Europe/Moscow).  
-**source_sha:** `c8c90e3f9` (`cursor/catalog-filter-keep-2e5e`, catalog search and filters stay in the URL).  
+**source_sha:** `425aa62f4` (`cursor/catalog-filter-keep-2e5e`, catalog search and filters stay in the URL).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -31,21 +31,21 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    |            Факт на `c8c90e3f9` |
+| Область                    |            Факт на `425aa62f4` |
 | -------------------------- | -----------------------------: |
-| `features/*` domains       |                             13 |
-| `components/` tree files   |                              0 |
-| `components/` root files   |                              0 |
-| `lib/` tree files          |                            132 |
-| `lib/` root files          |                              0 |
-| `lib/` root dirs           | http, i18n, platform, services |
-| `lib/services/` root files |                              0 |
-| `lib/**/*-i18n.ts`         |                              0 |
-| `app/**/route.ts`          |                            305 |
-| `site/tests` files         |                           1775 |
-| `@nexus/ui` src files      |                             20 |
-| `@nexus/domain` src files  |                             59 |
-| `@nexus/db` src files      |                            208 |
+| `features/*` domains | 13 |
+| `components/` tree files | 0 |
+| `components/` root files | 0 |
+| `lib/` tree files | 132 |
+| `lib/` root files | 0 |
+| `lib/` root dirs | http, i18n, platform, services |
+| `lib/services/` root files | 0 |
+| `lib/**/*-i18n.ts` | 0 |
+| `app/**/route.ts` | 305 |
+| `site/tests` files | 1775 |
+| `@nexus/ui` src files | 20 |
+| `@nexus/domain` src files | 59 |
+| `@nexus/db` src files | 208 |
 
 ### Features
 
