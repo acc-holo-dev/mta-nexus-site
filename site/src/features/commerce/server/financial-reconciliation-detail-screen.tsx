@@ -8,7 +8,10 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
-import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
@@ -34,6 +37,7 @@ import {
   getFinancialCopy,
 } from "../financial-i18n";
 import { orderTermsCopy } from "../order-terms-i18n";
+import { ReviewAmountEstimate } from "./financial-reconciliation-screen";
 
 export async function financialReconciliationDetailMetadata(): Promise<Metadata> {
   return {
@@ -114,6 +118,10 @@ export async function FinancialReconciliationDetailScreen({
     );
   }
 
+  const fxRates = walletEnabled
+    ? await new WalletPaymentService().listFxRates().catch(() => null)
+    : undefined;
+
   return (
     <div className={pageShellMax4xl}>
       <Link href="/admin/commerce/reconciliation" className={linkAccentSm}>
@@ -143,6 +151,14 @@ export async function FinancialReconciliationDetailScreen({
         {financialOrderLabel(locale, result.order.status)} ·{" "}
         {formatFinancialMinor(result.order.amount, result.order.currency, locale)}
       </p>
+      {fxRates !== undefined ? (
+        <ReviewAmountEstimate
+          amount={result.order.amount}
+          currency={result.order.currency}
+          locale={locale}
+          rates={fxRates}
+        />
+      ) : null}
       <ul className={typeSpace2SmSecondary}>
         {financialFlags
           .filter((flag) => result.order[flag])
@@ -160,6 +176,14 @@ export async function FinancialReconciliationDetailScreen({
                 {formatFinancialMinor(attempt.amount, attempt.currency, locale)} · {copy.provider}:{" "}
                 {financialProviderLabel(locale, attempt.provider)}
               </p>
+              {fxRates !== undefined ? (
+                <ReviewAmountEstimate
+                  amount={attempt.amount}
+                  currency={attempt.currency}
+                  locale={locale}
+                  rates={fxRates}
+                />
+              ) : null}
               <time dateTime={attempt.createdAt.toISOString()} className={typeXsMuted}>
                 {formatHistoryDate(attempt.createdAt, locale)}
               </time>
@@ -194,6 +218,14 @@ export async function FinancialReconciliationDetailScreen({
         {result.ledgerTotals.map((total) => (
           <li key={total.currency}>
             {formatFinancialMinor(total.net, total.currency, locale)} · {total.entries}
+            {fxRates !== undefined ? (
+              <ReviewAmountEstimate
+                amount={total.net}
+                currency={total.currency}
+                locale={locale}
+                rates={fxRates}
+              />
+            ) : null}
           </li>
         ))}
       </ul>

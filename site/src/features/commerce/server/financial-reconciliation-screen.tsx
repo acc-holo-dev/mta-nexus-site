@@ -1,5 +1,5 @@
 import { financialReviewRepository } from "@nexus/db";
-import { AppError } from "@nexus/domain";
+import { AppError, type ExplicitFxRate, publicPriceEstimates } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { Receipt } from "lucide-react";
 import type { Metadata } from "next";
@@ -9,7 +9,10 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
-import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm, linkAccentTightBreakSemibold, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
@@ -30,6 +33,46 @@ import {
   formatFinancialMinor,
   getFinancialCopy,
 } from "../financial-i18n";
+import { getWalletCopy } from "../wallet-i18n";
+
+export function ReviewAmountEstimate({
+  amount,
+  currency,
+  locale,
+  rates,
+}: {
+  amount: number | string;
+  currency: string;
+  locale: "en" | "ru";
+  rates: readonly ExplicitFxRate[] | null | undefined;
+}) {
+  const text = String(amount);
+  if (!/^-?\d+$/u.test(text)) return null;
+  const minor = Number(text);
+  if (!Number.isSafeInteger(minor)) return null;
+  const copy = getWalletCopy(locale);
+  const lines = publicPriceEstimates({ price: minor, currency }, rates);
+  if (lines === undefined) return null;
+  if (lines === null) return <p className={typeSmMuted}>{copy.fxUnavailable}</p>;
+  return (
+    <ul className={typeSmMuted}>
+      {lines.map((line) => (
+        <li key={line.quote}>
+          {line.kind === "quote"
+            ? copy.fxEstimate.replace(
+                "{destination}",
+                formatFinancialMinor(line.amount, line.quote, locale),
+              )
+            : line.kind === "dust"
+              ? copy.fxDust
+              : line.kind === "invalid"
+                ? copy.fxExceeds
+                : `${line.quote}: ${copy.fxNone}`}
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export async function financialReconciliationMetadata(): Promise<Metadata> {
   return {
@@ -106,6 +149,10 @@ export async function FinancialReconciliationScreen({
     );
   }
 
+  const fxRates = walletEnabled
+    ? await new WalletPaymentService().listFxRates().catch(() => null)
+    : undefined;
+
   return (
     <div className={pageShellMax5xl}>
       <Link href="/admin" className={linkAccentSm}>
@@ -152,6 +199,14 @@ export async function FinancialReconciliationScreen({
                 {financialOrderLabel(locale, order.status)} ·{" "}
                 {formatFinancialMinor(order.amount, order.currency, locale)}
               </p>
+              {fxRates !== undefined ? (
+                <ReviewAmountEstimate
+                  amount={order.amount}
+                  currency={order.currency}
+                  locale={locale}
+                  rates={fxRates}
+                />
+              ) : null}
               <ul className={typeSpace1SmSecondary}>
                 {financialFlags
                   .filter((flag) => order[flag])
