@@ -86,6 +86,8 @@ describe("ProductCard attribution and honest metrics", () => {
     expect(html).not.toMatch(/@|email|\.com/i);
     expect(html.match(/<a\b/g)?.length).toBeGreaterThanOrEqual(2);
     expect(html).toContain("<article");
+    expect(html).toContain('class="group flex flex-col overflow-hidden nexus-panel transition-all hover:border-strong hover:shadow-nexus h-full"');
+    expect(html).toContain("mt-auto flex items-center justify-between border-t");
   });
 
   it("prefers organization attribution without nesting it inside the media anchor", () => {
