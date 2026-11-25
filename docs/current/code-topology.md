@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 24 ноября 2026 (Europe/Moscow).  
-**source_sha:** `09f8f7db5` (`cursor/catalog-filter-keep-2e5e`, catalog search and filters stay in the URL).  
+**source_sha:** `7661e7591` (`cursor/catalog-filter-keep-2e5e`, catalog search and filters stay in the URL).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -31,7 +31,7 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    |            Факт на `d4f1a6e8a` |
+| Область                    |            Факт на `7661e7591` |
 | -------------------------- | -----------------------------: |
 | `features/*` domains       |                             13 |
 | `components/` tree files   |                              0 |
@@ -42,7 +42,7 @@ site/
 | `lib/services/` root files |                              0 |
 | `lib/**/*-i18n.ts`         |                              0 |
 | `app/**/route.ts`          |                            305 |
-| `site/tests` files         |                           1780 |
+| `site/tests` files         |                           1781 |
 | `@nexus/ui` src files      |                             20 |
 | `@nexus/domain` src files  |                             59 |
 | `@nexus/db` src files      |                            208 |
@@ -60,7 +60,7 @@ site/
 | notifications |    28 | 143879 |
 | organizations |    59 | 205059 |
 | resources     |   232 | 941698 |
-| servers       |   113 | 389619 |
+| servers       |   113 | 390070 |
 | shell         |   101 | 211348 |
 | support       |    28 | 119993 |
 | trust         |    28 |  83844 |
