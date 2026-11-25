@@ -20,7 +20,10 @@ describe("subscription wallet honesty surface", () => {
 
   it("states a failed recorded-rate read once on the subscription fee estimate", () => {
     const source = readFileSync(
-      resolve(process.cwd(), "site/src/features/commerce/components/subscription-fee-estimator.tsx"),
+      resolve(
+        process.cwd(),
+        "site/src/features/commerce/components/subscription-fee-estimator.tsx",
+      ),
       "utf8",
     );
     expect(source).toContain("rates === null");

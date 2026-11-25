@@ -105,6 +105,43 @@ it("hides empty copy while a refresh is in flight and restores it only after suc
     expect(render().some((node) => node.props.title === emptyFiltered)).toBe(true),
   );
 });
+it("does not present a failed reload of an empty page as an empty inbox", async () => {
+  const emptyPage = {
+    items: [],
+    unreadCount: 0,
+    olderCursor: null,
+    newerCursor: null,
+  };
+  harness.slots = [];
+  harness.cursor = 0;
+  harness.slots[0] = emptyPage;
+  harness.fetch.mockReset().mockResolvedValueOnce(response({ error: "PRIVATE_SQL" }, 500));
+  click(render(), "Reload saved inbox");
+  await vi.waitFor(() =>
+    expect(
+      render().some(
+        (node) => node.props.title === "The inbox is temporarily unavailable. Try again.",
+      ),
+    ).toBe(true),
+  );
+  const nodes = render();
+  expect(
+    nodes.some(
+      (node) =>
+        node.props.title === "No notifications yet." ||
+        node.props.title ===
+          "No matching notifications on this page. Try another filter or return to the latest page.",
+    ),
+  ).toBe(false);
+  expect(
+    nodes.some(
+      (node) =>
+        node.props.description ===
+        "Retry reloads this inbox page only. A temporary load failure is not an empty notification list.",
+    ),
+  ).toBe(true);
+  expect(JSON.stringify(nodes)).not.toContain("PRIVATE_SQL");
+});
 it("does not replace the loaded inbox when refresh returns another account", async () => {
   harness.fetch.mockResolvedValueOnce(response({ ...refreshed, actorId: "usr_other" }));
   click(render(), "Reload saved inbox");
