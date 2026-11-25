@@ -1,6 +1,6 @@
 "use client";
 
-import { type ExplicitFxRate, publicPriceEstimates } from "@nexus/domain";
+import type { ExplicitFxRate } from "@nexus/domain";
 import { Button, ErrorState } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
@@ -10,13 +10,12 @@ import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import {
   typeBlockSpace2,
-  typeSmMuted,
   typeSmSuccess,
   typeXlSemiboldPrimary,
 } from "../../shell/type-shell";
-import { formatHistoryAmount } from "../commerce-history-format";
 import { getWalletCopy, walletError } from "../wallet-i18n";
 import { confirmedWalletPay } from "../wallet-pay-confirmation";
+import { RecordedRateEstimate } from "./recorded-rate-estimate";
 import {
   useWalletSpendBalance,
   WalletSpendBalancePreview,
@@ -165,25 +164,6 @@ function PayEstimate({
   locale: "en" | "ru";
   rates: readonly ExplicitFxRate[] | null;
 }) {
-  const lines = publicPriceEstimates({ price: amount, currency }, rates);
-  if (lines === undefined) return null;
-  if (lines === null) return <p className={typeSmMuted}>{copy.fxUnavailable}</p>;
-  return (
-    <ul className={typeSmMuted}>
-      {lines.map((line) => (
-        <li key={line.quote}>
-          {line.kind === "quote"
-            ? copy.fxEstimate.replace(
-                "{destination}",
-                formatHistoryAmount(line.amount, line.quote, locale),
-              )
-            : line.kind === "dust"
-              ? copy.fxDust
-              : line.kind === "invalid"
-                ? copy.fxExceeds
-                : `${line.quote}: ${copy.fxNone}`}
-        </li>
-      ))}
-    </ul>
-  );
+  void copy;
+  return <RecordedRateEstimate amount={amount} currency={currency} locale={locale} rates={rates} />;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { type ExplicitFxRate, publicPriceEstimates } from "@nexus/domain";
+import type { ExplicitFxRate } from "@nexus/domain";
 import { Button, ErrorState, Input } from "@nexus/ui";
 import { walletStaffGrantSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
@@ -21,6 +21,7 @@ import {
   type ConfirmedStaffWalletGrant,
   confirmedStaffWalletGrant,
 } from "../wallet-staff-grant-confirmation";
+import { RecordedRateEstimate } from "./recorded-rate-estimate";
 
 function grantKey() {
   return `grant_${crypto.randomUUID().replaceAll("-", "")}`;
@@ -208,25 +209,6 @@ function GrantEstimate({
   locale: "en" | "ru";
   rates: readonly ExplicitFxRate[] | null;
 }) {
-  const lines = publicPriceEstimates({ price: amount, currency }, rates);
-  if (lines === undefined) return null;
-  if (lines === null) return <p className={typeSmSecondary}>{copy.fxUnavailable}</p>;
-  return (
-    <ul className={typeSmSecondary}>
-      {lines.map((line) => (
-        <li key={line.quote}>
-          {line.kind === "quote"
-            ? copy.fxEstimate.replace(
-                "{destination}",
-                formatFinancialMinor(line.amount, line.quote, locale),
-              )
-            : line.kind === "dust"
-              ? copy.fxDust
-              : line.kind === "invalid"
-                ? copy.fxExceeds
-                : `${line.quote}: ${copy.fxNone}`}
-        </li>
-      ))}
-    </ul>
-  );
+  void copy;
+  return <RecordedRateEstimate amount={amount} currency={currency} locale={locale} rates={rates} />;
 }

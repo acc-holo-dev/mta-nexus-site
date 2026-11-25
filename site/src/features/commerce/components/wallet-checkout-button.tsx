@@ -1,6 +1,6 @@
 "use client";
 
-import { type ExplicitFxRate, publicPriceEstimates } from "@nexus/domain";
+import type { ExplicitFxRate } from "@nexus/domain";
 import { Button, ErrorState, Input } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
@@ -11,6 +11,7 @@ import { typeBlockSpace2, typeSmSuccess } from "../../shell/type-shell";
 import { formatHistoryAmount } from "../commerce-history-format";
 import { confirmedPromoQuote, confirmedWalletCheckout } from "../wallet-checkout-confirmation";
 import { getWalletCopy, walletError } from "../wallet-i18n";
+import { RecordedRateEstimate } from "./recorded-rate-estimate";
 import {
   useWalletSpendBalance,
   WalletSpendBalancePreview,
@@ -63,14 +64,7 @@ export function WalletCheckoutButton({
       ? promoQuote
       : null;
   const dueMinor = applied?.chargedAmount ?? amountMinor;
-  const dueEstimates =
-    fxRates === undefined
-      ? undefined
-      : publicPriceEstimates({ price: dueMinor, currency }, fxRates);
-  const discountEstimates =
-    !applied || fxRates === undefined
-      ? undefined
-      : publicPriceEstimates({ price: applied.discountAmount, currency }, fxRates);
+  const quoteLocale = locale === "ru" ? "ru" : "en";
   const balance = useWalletSpendBalance(actorId ?? "", currency, dueMinor);
 
   if (!signedIn || !actorId) {
@@ -186,31 +180,12 @@ export function WalletCheckoutButton({
         </h3>
         <p className="text-[11px] text-muted">{copy.checkoutNote}</p>
         <p className="text-sm text-primary">{amountLabel}</p>
-        {dueEstimates === null ? (
-          <p className="text-[11px] text-muted">{copy.checkoutDueUnavailable}</p>
-        ) : dueEstimates ? (
-          <ul className="space-y-0.5 text-[11px] text-muted">
-            {dueEstimates.map((line) => (
-              <li key={line.quote}>
-                {line.kind === "quote"
-                  ? copy.checkoutDueEstimate
-                      .replace("{base}", line.base)
-                      .replace("{quote}", formatHistoryAmount(line.amount, line.quote, locale))
-                  : line.kind === "dust"
-                    ? copy.checkoutDueDust
-                        .replace("{base}", line.base)
-                        .replace("{quote}", line.quote)
-                    : line.kind === "invalid"
-                      ? copy.checkoutDueInvalid
-                          .replace("{base}", line.base)
-                          .replace("{quote}", line.quote)
-                      : copy.checkoutDueNone
-                          .replace("{base}", line.base)
-                          .replace("{quote}", line.quote)}
-              </li>
-            ))}
-          </ul>
-        ) : null}
+        <RecordedRateEstimate
+          amount={dueMinor}
+          currency={currency}
+          locale={quoteLocale}
+          rates={fxRates}
+        />
         <div className="space-y-2">
           <label className="block text-sm text-secondary" htmlFor={`${field}-promo`}>
             {copy.promoCode}
@@ -263,30 +238,14 @@ export function WalletCheckoutButton({
                 )}
             </p>
           ) : null}
-          {discountEstimates === null ? (
-            <p className="text-[11px] text-muted">{copy.checkoutDueUnavailable}</p>
-          ) : discountEstimates ? (
-            <ul className="space-y-0.5 text-[11px] text-muted">
-              {discountEstimates.map((line) => (
-                <li key={line.quote}>
-                  {line.kind === "quote"
-                    ? copy.checkoutDueEstimate
-                        .replace("{base}", line.base)
-                        .replace("{quote}", formatHistoryAmount(line.amount, line.quote, locale))
-                    : line.kind === "dust"
-                      ? copy.checkoutDueDust
-                          .replace("{base}", line.base)
-                          .replace("{quote}", line.quote)
-                      : line.kind === "invalid"
-                        ? copy.checkoutDueInvalid
-                            .replace("{base}", line.base)
-                            .replace("{quote}", line.quote)
-                        : copy.checkoutDueNone
-                            .replace("{base}", line.base)
-                            .replace("{quote}", line.quote)}
-                </li>
-              ))}
-            </ul>
+          {applied ? (
+            <RecordedRateEstimate
+              amount={applied.discountAmount}
+              currency={currency}
+              locale={quoteLocale}
+              purpose="discount"
+              rates={fxRates}
+            />
           ) : null}
         </div>
         <WalletSpendBalancePreview balance={balance} currency={currency} amountMinor={dueMinor} />

@@ -1,4 +1,4 @@
-import { AppError, type ExplicitFxRate, publicPriceEstimates } from "@nexus/domain";
+import { AppError, type ExplicitFxRate } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
@@ -23,7 +23,6 @@ import {
   typeDisplayPrimary,
   typeFlexGap4Sm,
   typeGridGap3Sm2,
-  typeSmMuted,
   typeXlSemiboldPrimary,
 } from "../../shell/type-shell";
 import {
@@ -32,6 +31,7 @@ import {
   parseHistoryPage,
 } from "../commerce-history-format";
 import { getCommercialCopy } from "../commercial-i18n";
+import { RecordedRateEstimate } from "../components/recorded-rate-estimate";
 import { commercialProviderLabel } from "../financial-i18n";
 import { OrderCancellationForm } from "../order-cancellation";
 import { getWalletCopy } from "../wallet-i18n";
@@ -50,27 +50,8 @@ function AttemptEstimate({
   locale: "en" | "ru";
   rates: readonly ExplicitFxRate[] | null;
 }) {
-  const lines = publicPriceEstimates({ price: amount, currency }, rates);
-  if (lines === undefined) return null;
-  if (lines === null) return <p className={typeSmMuted}>{copy.fxUnavailable}</p>;
-  return (
-    <ul className={typeSmMuted}>
-      {lines.map((line) => (
-        <li key={line.quote}>
-          {line.kind === "quote"
-            ? copy.fxEstimate.replace(
-                "{destination}",
-                formatHistoryAmount(line.amount, line.quote, locale),
-              )
-            : line.kind === "dust"
-              ? copy.fxDust
-              : line.kind === "invalid"
-                ? copy.fxExceeds
-                : `${line.quote}: ${copy.fxNone}`}
-        </li>
-      ))}
-    </ul>
-  );
+  void copy;
+  return <RecordedRateEstimate amount={amount} currency={currency} locale={locale} rates={rates} />;
 }
 export async function purchaseOperationsMetadata(): Promise<Metadata> {
   return {

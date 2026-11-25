@@ -1,5 +1,5 @@
 import { financialReviewRepository } from "@nexus/db";
-import { AppError, type ExplicitFxRate, publicPriceEstimates } from "@nexus/domain";
+import { AppError, type ExplicitFxRate } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { Receipt } from "lucide-react";
 import type { Metadata } from "next";
@@ -26,6 +26,7 @@ import {
   typeSpace1SmSecondary,
 } from "../../shell/type-shell";
 import { parseHistoryPage } from "../commerce-history-format";
+import { RecordedRateEstimate } from "../components/recorded-rate-estimate";
 import {
   financialFlags,
   financialOrderLabel,
@@ -33,7 +34,6 @@ import {
   formatFinancialMinor,
   getFinancialCopy,
 } from "../financial-i18n";
-import { getWalletCopy } from "../wallet-i18n";
 
 export function ReviewAmountEstimate({
   amount,
@@ -46,32 +46,7 @@ export function ReviewAmountEstimate({
   locale: "en" | "ru";
   rates: readonly ExplicitFxRate[] | null | undefined;
 }) {
-  const text = String(amount);
-  if (!/^-?\d+$/u.test(text)) return null;
-  const minor = Number(text);
-  if (!Number.isSafeInteger(minor)) return null;
-  const copy = getWalletCopy(locale);
-  const lines = publicPriceEstimates({ price: minor, currency }, rates);
-  if (lines === undefined) return null;
-  if (lines === null) return <p className={typeSmMuted}>{copy.fxUnavailable}</p>;
-  return (
-    <ul className={typeSmMuted}>
-      {lines.map((line) => (
-        <li key={line.quote}>
-          {line.kind === "quote"
-            ? copy.fxEstimate.replace(
-                "{destination}",
-                formatFinancialMinor(line.amount, line.quote, locale),
-              )
-            : line.kind === "dust"
-              ? copy.fxDust
-              : line.kind === "invalid"
-                ? copy.fxExceeds
-                : `${line.quote}: ${copy.fxNone}`}
-        </li>
-      ))}
-    </ul>
-  );
+  return <RecordedRateEstimate amount={amount} currency={currency} locale={locale} rates={rates} />;
 }
 
 export async function financialReconciliationMetadata(): Promise<Metadata> {

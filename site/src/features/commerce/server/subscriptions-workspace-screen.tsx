@@ -8,6 +8,10 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { subscriptionsService } from "../../../lib/services/commerce/subscriptions-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -80,6 +84,9 @@ export async function SubscriptionsWorkspaceScreen({
         subscriptionsService.scopes(actor, query.scopePage),
       ]),
       s = result.subscription;
+    const fxRates = isWalletEngineEnabled()
+      ? await new WalletPaymentService().listFxRates().catch(() => null)
+      : undefined;
     const historyHref = subscriptionAccountHref(query.organizationId).replace(
       "/workspace/subscriptions",
       "/workspace/subscriptions/history",
@@ -197,6 +204,7 @@ export async function SubscriptionsWorkspaceScreen({
           actorId={actor.id}
           key={query.organizationId ?? actor.id}
           organizationId={query.organizationId}
+          rates={fxRates}
         />
       </section>
     );

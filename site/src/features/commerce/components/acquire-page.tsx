@@ -39,6 +39,7 @@ import { formatHistoryAmount } from "../commerce-history-format";
 import { licenseModelLabel } from "../license-model-i18n";
 import { WalletCheckoutButton } from "../wallet-checkout";
 import { getWalletCopy } from "../wallet-i18n";
+import { RecordedRateEstimate } from "./recorded-rate-estimate";
 
 interface ProductInfo {
   id: string;
@@ -383,7 +384,17 @@ function AcquireContent({
           </div>
           <div className={typeFlexCenterBetweenGap4Py2}>
             <dt className="text-muted">{copy.price}</dt>
-            <dd className="font-numeric font-bold text-primary">{formattedPrice}</dd>
+            <dd className="text-right font-numeric font-bold text-primary">
+              {formattedPrice}
+              {product.price > 0 ? (
+                <RecordedRateEstimate
+                  amount={product.price}
+                  currency={product.currency || "USD"}
+                  locale={locale === "ru" ? "ru" : "en"}
+                  rates={fxRates}
+                />
+              ) : null}
+            </dd>
           </div>
           <div className={typeFlexCenterBetweenGap4Py2}>
             <dt className="text-muted">{copy.licenseModel}</dt>

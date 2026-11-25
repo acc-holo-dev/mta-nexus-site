@@ -1,5 +1,4 @@
 import type { ExplicitFxRate, OrderTermsReport } from "@nexus/domain";
-import { publicPriceEstimates } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { ScrollText } from "lucide-react";
 import Link from "next/link";
@@ -18,8 +17,8 @@ import {
   typeMinSpace3,
   typeSmMuted,
   typeSmSecondary,
-  typeXsMuted,
 } from "../../shell/type-shell";
+import { RecordedRateEstimate } from "../components/recorded-rate-estimate";
 import { formatFinancialMinor } from "../financial-i18n";
 import { orderTermsCopy, orderTermsLicenseLabel, orderTermsNotice } from "../order-terms-i18n";
 import { sellerSalesTime } from "../seller-sales-i18n";
@@ -46,31 +45,8 @@ function TermsEstimate({
   locale: "en" | "ru";
   rates: readonly ExplicitFxRate[] | null;
 }) {
-  const text = String(amount);
-  if (!/^-?\d+$/u.test(text)) return null;
-  const minor = Number(text);
-  if (!Number.isSafeInteger(minor)) return null;
-  const lines = publicPriceEstimates({ price: minor, currency }, rates);
-  if (lines === undefined) return null;
-  if (lines === null) return <p className={typeXsMuted}>{copy.fxUnavailable}</p>;
-  return (
-    <ul className={typeXsMuted}>
-      {lines.map((line) => (
-        <li key={line.quote}>
-          {line.kind === "quote"
-            ? copy.fxEstimate.replace(
-                "{destination}",
-                formatFinancialMinor(line.amount, line.quote, locale),
-              )
-            : line.kind === "dust"
-              ? copy.fxDust
-              : line.kind === "invalid"
-                ? copy.fxExceeds
-                : `${line.quote}: ${copy.fxNone}`}
-        </li>
-      ))}
-    </ul>
-  );
+  void copy;
+  return <RecordedRateEstimate amount={amount} currency={currency} locale={locale} rates={rates} />;
 }
 
 export function OrderTermsReportView({

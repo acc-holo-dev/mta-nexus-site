@@ -1,5 +1,5 @@
 "use client";
-import { COMMERCIAL_CURRENCIES, type CommercialCurrency } from "@nexus/domain";
+import { COMMERCIAL_CURRENCIES, type CommercialCurrency, type ExplicitFxRate } from "@nexus/domain";
 import { Button, ErrorState, fieldClassBlock } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
@@ -17,9 +17,16 @@ import {
 import { formatHistoryAmount } from "../commerce-history-format";
 import { confirmedCommercialEstimate, parseCommercialAmount } from "../commercial-confirmation";
 import { commercialError, getCommercialCopy } from "../commercial-i18n";
+import { RecordedRateEstimate } from "./recorded-rate-estimate";
 
 type Plan = { id: string; title: string; revision: number; commissionBps: number };
-export function CommercialFeeCalculator({ plans }: { plans: Plan[] }) {
+export function CommercialFeeCalculator({
+  plans,
+  rates,
+}: {
+  plans: Plan[];
+  rates?: readonly ExplicitFxRate[] | null;
+}) {
   const { locale } = useNexusLocale(),
     copy = getCommercialCopy(locale),
     field = useId(),
@@ -144,12 +151,24 @@ export function CommercialFeeCalculator({ plans }: { plans: Plan[] }) {
               <dt className="text-muted">{copy.fee}</dt>
               <dd className={typeNumericPrimary}>
                 {formatHistoryAmount(result.platformFee, result.currency, locale)}
+                <RecordedRateEstimate
+                  amount={result.platformFee}
+                  currency={result.currency}
+                  locale={locale === "ru" ? "ru" : "en"}
+                  rates={rates}
+                />
               </dd>
             </div>
             <div>
               <dt className="text-muted">{copy.proceeds}</dt>
               <dd className={typeNumericPrimary}>
                 {formatHistoryAmount(result.sellerProceeds, result.currency, locale)}
+                <RecordedRateEstimate
+                  amount={result.sellerProceeds}
+                  currency={result.currency}
+                  locale={locale === "ru" ? "ru" : "en"}
+                  rates={rates}
+                />
               </dd>
             </div>
           </dl>

@@ -1,9 +1,8 @@
-import {
-  type ExplicitFxRate,
-  type PaymentProviderCapability,
-  publicPriceEstimates,
-  type TopUpIntent,
-  type WithdrawalIntent,
+import type {
+  ExplicitFxRate,
+  PaymentProviderCapability,
+  TopUpIntent,
+  WithdrawalIntent,
 } from "@nexus/domain";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
@@ -32,6 +31,7 @@ import {
   typeXlPrimary,
   typeXsMuted,
 } from "../../shell/type-shell";
+import { RecordedRateEstimate } from "../components/recorded-rate-estimate";
 import { formatFinancialMinor } from "../financial-i18n";
 import { WalletAdminBatchForm } from "../wallet-admin-ops";
 import { getWalletCopy } from "../wallet-i18n";
@@ -51,26 +51,14 @@ function ProviderAmountEstimate({
   locale: Parameters<typeof formatFinancialMinor>[2];
   rates: readonly ExplicitFxRate[] | null | undefined;
 }) {
-  const lines = publicPriceEstimates({ price: amount, currency }, rates);
-  if (lines === undefined) return null;
-  if (lines === null) return <p className={typeXsMuted}>{copy.fxUnavailable}</p>;
+  void copy;
   return (
-    <ul className={typeXsMuted}>
-      {lines.map((line) => (
-        <li key={line.quote}>
-          {line.kind === "quote"
-            ? copy.fxEstimate.replace(
-                "{destination}",
-                formatFinancialMinor(line.amount, line.quote, locale),
-              )
-            : line.kind === "dust"
-              ? copy.fxDust
-              : line.kind === "invalid"
-                ? copy.fxExceeds
-                : `${line.quote}: ${copy.fxNone}`}
-        </li>
-      ))}
-    </ul>
+    <RecordedRateEstimate
+      amount={amount}
+      currency={currency}
+      locale={locale === "ru" ? "ru" : "en"}
+      rates={rates}
+    />
   );
 }
 

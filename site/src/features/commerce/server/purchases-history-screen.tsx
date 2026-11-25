@@ -7,7 +7,10 @@ import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
-import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellClip } from "../../shell/page-shell";
@@ -28,6 +31,7 @@ import {
 } from "../commerce-history-format";
 import { commerceHistoryBetaNotice, getCommerceHistoryCopy } from "../commerce-history-i18n";
 import { getCommercialCopy } from "../commercial-i18n";
+import { RecordedRateEstimate } from "../components/recorded-rate-estimate";
 import { orderCaseCopy } from "../order-case-i18n";
 import { getWalletCopy } from "../wallet-i18n";
 import { HistoryPagination, HistoryShell } from "../workspace-history";
@@ -47,6 +51,9 @@ export async function PurchasesHistoryScreen({
   const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
   const copy = getCommerceHistoryCopy(typedLocale);
   const walletEnabled = isWalletEngineEnabled();
+  const fxRates = walletEnabled
+    ? await new WalletPaymentService().listFxRates().catch(() => null)
+    : undefined;
   const historyNotice = commerceHistoryBetaNotice(typedLocale, walletEnabled);
   const walletNavProps = walletEnabled
     ? {
@@ -142,6 +149,12 @@ export async function PurchasesHistoryScreen({
                     <dt className="text-muted">{copy.total}</dt>
                     <dd className={typeNumericSemiboldPrimary}>
                       {formatHistoryAmount(order.totalAmount, order.currency, typedLocale)}
+                      <RecordedRateEstimate
+                        amount={order.totalAmount}
+                        currency={order.currency}
+                        locale={typedLocale}
+                        rates={fxRates}
+                      />
                     </dd>
                   </div>
                 </dl>

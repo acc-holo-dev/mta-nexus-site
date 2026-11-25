@@ -5,6 +5,10 @@ import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { commercialPlanService } from "../../../lib/services/commerce/commercial-plan-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { panelClipSpace3P5 } from "../../shell/panel-shell";
@@ -74,6 +78,9 @@ export async function PublicSubscriptionsScreen({
     );
   }
 
+  const fxRates = isWalletEngineEnabled()
+    ? await new WalletPaymentService().listFxRates().catch(() => null)
+    : undefined;
   const estimates = result.plans.map((plan) => ({
     id: plan.id,
     title: locale === "ru" ? plan.titleRu : plan.titleEn,
@@ -188,6 +195,7 @@ export async function PublicSubscriptionsScreen({
       <CommercialFeeCalculator
         key={`${locale}:${scope}:${estimates.map((plan) => `${plan.id}:${plan.revision}`).join(",")}`}
         plans={estimates}
+        rates={fxRates}
       />
     </div>
   );

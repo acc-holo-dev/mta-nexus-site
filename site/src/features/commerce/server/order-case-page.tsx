@@ -1,4 +1,9 @@
-import { AppError, ORDER_CASE_REVIEW_STATUSES, type OrderCaseEvidence } from "@nexus/domain";
+import {
+  AppError,
+  type ExplicitFxRate,
+  ORDER_CASE_REVIEW_STATUSES,
+  type OrderCaseEvidence,
+} from "@nexus/domain";
 import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { LifeBuoy } from "lucide-react";
 import type { Metadata } from "next";
@@ -10,7 +15,10 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { orderCaseService } from "../../../lib/services/commerce/order-case-service";
-import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
@@ -32,6 +40,7 @@ import {
 import { SupportCaseThread } from "../../support/thread";
 import { formatHistoryAmount, formatHistoryDate } from "../commerce-history-format";
 import { OrderCaseCreateForm, OrderCaseReviewForm } from "../components/order-case-forms";
+import { RecordedRateEstimate } from "../components/recorded-rate-estimate";
 import { WalletOrderRefundForm } from "../components/wallet-order-refund-form";
 import {
   commercialProviderLabel,
@@ -87,13 +96,20 @@ function OrderCaseLoadError({
     </div>
   );
 }
+async function caseRates() {
+  if (!isWalletEngineEnabled()) return undefined;
+  return new WalletPaymentService().listFxRates().catch(() => null);
+}
+
 function Evidence({
   data,
   locale,
+  rates,
   title,
 }: {
   data: OrderCaseEvidence;
   locale: "ru" | "en";
+  rates?: readonly ExplicitFxRate[] | null;
   title: string;
 }) {
   const copy = orderCaseCopy(locale);
@@ -103,6 +119,12 @@ function Evidence({
       <p>
         {financialOrderLabel(locale, data.orderStatus)} ·{" "}
         {formatHistoryAmount(data.totalAmount, data.currency, locale)}
+        <RecordedRateEstimate
+          amount={data.totalAmount}
+          currency={data.currency}
+          locale={locale}
+          rates={rates}
+        />
       </p>
       <p className={typeSmSecondary}>
         {copy.items}: {data.itemCount} · {copy.payments}: {data.paymentCount} · {copy.captures}:{" "}
@@ -120,8 +142,14 @@ function Evidence({
           {data.payments.map((payment) => (
             <li key={payment.recordKey}>
               {financialPaymentLabel(locale, payment.status)} ·{" "}
-              {formatHistoryAmount(payment.amount, payment.currency, locale)} · {copy.provider}:{" "}
-              {commercialProviderLabel(locale, payment.provider)} ·{" "}
+              {formatHistoryAmount(payment.amount, payment.currency, locale)}
+              <RecordedRateEstimate
+                amount={payment.amount}
+                currency={payment.currency}
+                locale={locale}
+                rates={rates}
+              />
+              · {copy.provider}: {commercialProviderLabel(locale, payment.provider)} ·{" "}
               <time dateTime={payment.createdAt}>
                 {formatHistoryDate(new Date(payment.createdAt), locale)}
               </time>
@@ -217,6 +245,7 @@ export async function OrderCaseCreatePage({ orderId }: { orderId: string }) {
       />
     );
   }
+  const rates = await caseRates();
   return (
     <div className={pageShellMax4xl}>
       <Link href={orderPath} className={linkAccentSmRounded}>
@@ -227,7 +256,7 @@ export async function OrderCaseCreatePage({ orderId }: { orderId: string }) {
       <p role="note" className={typeSmSecondary}>
         {copy.financeNote}
       </p>
-      <Evidence data={result.evidence} locale={locale} title={copy.current} />
+      <Evidence data={result.evidence} locale={locale} rates={rates} title={copy.current} />
       {result.existingCase ? (
         <Link
           href={`/workspace/order-cases/${encodeURIComponent(result.existingCase.id)}`}
@@ -356,67 +385,78 @@ export async function OrderCaseListPage({
         </form>
       </search>
       {result.items.length ? (
-        <ol className="space-y-3">
-          {result.items.map((item) => {
-            const engineOn = isWalletEngineEnabled();
-            const reconciliationEligible =
-              item.orderStatus === "completed" &&
-              item.currency === item.orderCurrency &&
-              item.requestedAmount !== null &&
-              item.requestedAmount <= item.orderTotalAmount &&
-              item.recordedCaptureCount === 1 &&
-              item.recordedMatchingCaptureCount === 1 &&
-              item.refundedRecordCount === 0 &&
-              item.disputedRecordCount === 0;
-            const walletExecutable =
-              reconciliationEligible && item.paymentProvider === "wallet" && engineOn;
-            return (
-              <li key={item.id} className={panelSpace2P5}>
-                <Link
-                  href={`${base}/${encodeURIComponent(item.id)}`}
-                  className={`break-words font-semibold ${linkAccentSmRounded}`}
-                >
-                  {item.subject}
-                </Link>
-                <p className="text-sm">
-                  {copy.order}: {item.orderNumber} · {orderCaseKindLabel(locale, item.kind)}
-                </p>
-                <p className={typeSmSecondary}>
-                  {orderCaseStatusLabel(locale, item.reviewStatus)} · {copy.thread}:{" "}
-                  {orderCaseThreadLabel(locale, item.threadStatus)}
-                </p>
-                {staff ? (
-                  <p className={typeSmSecondary}>
-                    {copy.orderStatus}: {financialOrderLabel(locale, item.orderStatus)}
-                    {item.paymentProvider
-                      ? ` · ${copy.provider}: ${commercialProviderLabel(locale, item.paymentProvider)}`
-                      : ""}
-                  </p>
-                ) : null}
-                {staff && item.reviewStatus === "refund_recommended" ? (
-                  <p role="note" className={typeXsMuted}>
-                    {!engineOn
-                      ? copy.walletRefundEngineOff
-                      : walletExecutable
-                        ? copy.walletRefundExecutable
-                        : item.paymentProvider && item.paymentProvider !== "wallet"
-                          ? copy.walletRefundNotWallet
-                          : copy.walletRefundNotExecutable}
-                  </p>
-                ) : null}
-                {item.requestedAmount !== null && (
-                  <p className="text-sm">
-                    {copy.requested}:{" "}
-                    {formatHistoryAmount(item.requestedAmount, item.currency, locale)}
-                  </p>
-                )}
-                <time dateTime={item.createdAt.toISOString()} className={typeXsMuted}>
-                  {formatHistoryDate(item.createdAt, locale)}
-                </time>
-              </li>
-            );
-          })}
-        </ol>
+        await (async () => {
+          const rates = await caseRates();
+          return (
+            <ol className="space-y-3">
+              {result.items.map((item) => {
+                const engineOn = isWalletEngineEnabled();
+                const reconciliationEligible =
+                  item.orderStatus === "completed" &&
+                  item.currency === item.orderCurrency &&
+                  item.requestedAmount !== null &&
+                  item.requestedAmount <= item.orderTotalAmount &&
+                  item.recordedCaptureCount === 1 &&
+                  item.recordedMatchingCaptureCount === 1 &&
+                  item.refundedRecordCount === 0 &&
+                  item.disputedRecordCount === 0;
+                const walletExecutable =
+                  reconciliationEligible && item.paymentProvider === "wallet" && engineOn;
+                return (
+                  <li key={item.id} className={panelSpace2P5}>
+                    <Link
+                      href={`${base}/${encodeURIComponent(item.id)}`}
+                      className={`break-words font-semibold ${linkAccentSmRounded}`}
+                    >
+                      {item.subject}
+                    </Link>
+                    <p className="text-sm">
+                      {copy.order}: {item.orderNumber} · {orderCaseKindLabel(locale, item.kind)}
+                    </p>
+                    <p className={typeSmSecondary}>
+                      {orderCaseStatusLabel(locale, item.reviewStatus)} · {copy.thread}:{" "}
+                      {orderCaseThreadLabel(locale, item.threadStatus)}
+                    </p>
+                    {staff ? (
+                      <p className={typeSmSecondary}>
+                        {copy.orderStatus}: {financialOrderLabel(locale, item.orderStatus)}
+                        {item.paymentProvider
+                          ? ` · ${copy.provider}: ${commercialProviderLabel(locale, item.paymentProvider)}`
+                          : ""}
+                      </p>
+                    ) : null}
+                    {staff && item.reviewStatus === "refund_recommended" ? (
+                      <p role="note" className={typeXsMuted}>
+                        {!engineOn
+                          ? copy.walletRefundEngineOff
+                          : walletExecutable
+                            ? copy.walletRefundExecutable
+                            : item.paymentProvider && item.paymentProvider !== "wallet"
+                              ? copy.walletRefundNotWallet
+                              : copy.walletRefundNotExecutable}
+                      </p>
+                    ) : null}
+                    {item.requestedAmount !== null && (
+                      <p className="text-sm">
+                        {copy.requested}:{" "}
+                        {formatHistoryAmount(item.requestedAmount, item.currency, locale)}
+                        <RecordedRateEstimate
+                          amount={item.requestedAmount}
+                          currency={item.currency}
+                          locale={locale}
+                          rates={rates}
+                        />
+                      </p>
+                    )}
+                    <time dateTime={item.createdAt.toISOString()} className={typeXsMuted}>
+                      {formatHistoryDate(item.createdAt, locale)}
+                    </time>
+                  </li>
+                );
+              })}
+            </ol>
+          );
+        })()
       ) : (
         <EmptyState
           title={copy.empty}
@@ -501,6 +541,7 @@ export async function OrderCaseDetailPage({
     current.recordedMatchingCaptureCount === 1 &&
     current.refundedRecordCount === 0 &&
     current.disputedRecordCount === 0;
+  const rates = await caseRates();
   return (
     <div className={pageShellMax4xl}>
       <Link href={listBase} className={linkAccentSmRounded}>
@@ -518,6 +559,12 @@ export async function OrderCaseDetailPage({
         <p>
           {copy.requested}:{" "}
           {formatHistoryAmount(result.case.requestedAmount, result.case.currency, locale)}
+          <RecordedRateEstimate
+            amount={result.case.requestedAmount}
+            currency={result.case.currency}
+            locale={locale}
+            rates={rates}
+          />
         </p>
       )}
       <p role="note" className={surfaceP4TextSmSecondary}>
@@ -530,8 +577,8 @@ export async function OrderCaseDetailPage({
           description={copy.changedHint}
         />
       ) : null}
-      <Evidence data={result.snapshot} locale={locale} title={copy.snapshot} />
-      <Evidence data={current} locale={locale} title={copy.current} />
+      <Evidence data={result.snapshot} locale={locale} rates={rates} title={copy.snapshot} />
+      <Evidence data={current} locale={locale} rates={rates} title={copy.current} />
       {staff && actor.role === "admin" && (
         <Link
           href={`/admin/commerce/reconciliation/${encodeURIComponent(result.order.id)}`}

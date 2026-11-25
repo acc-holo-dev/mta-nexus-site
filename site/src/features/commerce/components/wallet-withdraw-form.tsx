@@ -1,6 +1,6 @@
 "use client";
 
-import { type ExplicitFxRate, publicPriceEstimates } from "@nexus/domain";
+import type { ExplicitFxRate } from "@nexus/domain";
 import { Button, ErrorState } from "@nexus/ui";
 import { walletWithdrawalCreateSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
@@ -23,6 +23,7 @@ import {
   type ConfirmedWalletWithdrawal,
   confirmedWalletWithdrawal,
 } from "../wallet-withdraw-confirmation";
+import { RecordedRateEstimate } from "./recorded-rate-estimate";
 import { useWalletProviderSelection } from "./use-wallet-provider-selection";
 
 export function WalletWithdrawForm({
@@ -208,25 +209,6 @@ function IntentEstimate({
   locale: "en" | "ru";
   rates: readonly ExplicitFxRate[] | null;
 }) {
-  const lines = publicPriceEstimates({ price: amount, currency }, rates);
-  if (lines === undefined) return null;
-  if (lines === null) return <p className={typeSmSecondary}>{copy.fxUnavailable}</p>;
-  return (
-    <ul className={typeSmSecondary}>
-      {lines.map((line) => (
-        <li key={line.quote}>
-          {line.kind === "quote"
-            ? copy.fxEstimate.replace(
-                "{destination}",
-                formatFinancialMinor(line.amount, line.quote, locale),
-              )
-            : line.kind === "dust"
-              ? copy.fxDust
-              : line.kind === "invalid"
-                ? copy.fxExceeds
-                : `${line.quote}: ${copy.fxNone}`}
-        </li>
-      ))}
-    </ul>
-  );
+  void copy;
+  return <RecordedRateEstimate amount={amount} currency={currency} locale={locale} rates={rates} />;
 }

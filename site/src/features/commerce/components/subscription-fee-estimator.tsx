@@ -1,5 +1,5 @@
 "use client";
-import type { commercialFeeEstimate } from "@nexus/domain";
+import type { commercialFeeEstimate, ExplicitFxRate } from "@nexus/domain";
 import { Button, ErrorState } from "@nexus/ui";
 import { type FormEvent, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
@@ -15,12 +15,15 @@ import { formatHistoryAmount } from "../commerce-history-format";
 import { parseCommercialAmount } from "../commercial-confirmation";
 import { confirmedSubscriptionEstimate } from "../subscription-confirmation";
 import { subscriptionsCopy } from "../subscriptions-i18n";
+import { RecordedRateEstimate } from "./recorded-rate-estimate";
 export function SubscriptionFeeEstimator({
   actorId,
   organizationId,
+  rates,
 }: {
   actorId: string;
   organizationId?: string;
+  rates?: readonly ExplicitFxRate[] | null;
 }) {
   const { locale } = useNexusLocale(),
     c = subscriptionsCopy(locale),
@@ -127,9 +130,21 @@ export function SubscriptionFeeEstimator({
           <p>
             {c.estimate}: {formatHistoryAmount(result.platformFee, result.currency, locale)}
           </p>
+          <RecordedRateEstimate
+            amount={result.platformFee}
+            currency={result.currency}
+            locale={locale === "ru" ? "ru" : "en"}
+            rates={rates}
+          />
           <p>
             {c.proceeds}: {formatHistoryAmount(result.sellerProceeds, result.currency, locale)}
           </p>
+          <RecordedRateEstimate
+            amount={result.sellerProceeds}
+            currency={result.currency}
+            locale={locale === "ru" ? "ru" : "en"}
+            rates={rates}
+          />
         </output>
       )}
     </form>

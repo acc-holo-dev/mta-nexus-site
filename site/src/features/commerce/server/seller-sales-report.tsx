@@ -1,5 +1,9 @@
-import type { ExplicitFxRate, SellerSalesQuery, SellerSalesReport } from "@nexus/domain";
-import { publicPriceEstimates, SELLER_SALES_EVIDENCE } from "@nexus/domain";
+import {
+  type ExplicitFxRate,
+  SELLER_SALES_EVIDENCE,
+  type SellerSalesQuery,
+  type SellerSalesReport,
+} from "@nexus/domain";
 import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
@@ -31,8 +35,8 @@ import {
   typeSpace3BorderTPt5,
   typeWFullLeftSm,
   typeXlPrimary,
-  typeXsMuted,
 } from "../../shell/type-shell";
+import { RecordedRateEstimate } from "../components/recorded-rate-estimate";
 import { formatFinancialMinor } from "../financial-i18n";
 import { sellerSalesCopy, sellerSalesTime } from "../seller-sales-i18n";
 import { sellerSalesUrl, sellerSaleUrl } from "../seller-sales-query";
@@ -53,30 +57,14 @@ export function GrossEstimate({
   locale: Locale;
   rates: readonly ExplicitFxRate[] | null | undefined;
 }) {
-  const text = String(amount);
-  if (!/^-?\d+$/u.test(text)) return null;
-  const minor = Number(text);
-  if (!Number.isSafeInteger(minor)) return null;
-  const lines = publicPriceEstimates({ price: minor, currency }, rates);
-  if (lines === undefined) return null;
-  if (lines === null) return <p className={typeXsMuted}>{copy.fxUnavailable}</p>;
+  void copy;
   return (
-    <ul className={typeXsMuted}>
-      {lines.map((line) => (
-        <li key={line.quote}>
-          {line.kind === "quote"
-            ? copy.fxEstimate.replace(
-                "{destination}",
-                formatFinancialMinor(line.amount, line.quote, locale),
-              )
-            : line.kind === "dust"
-              ? copy.fxDust
-              : line.kind === "invalid"
-                ? copy.fxExceeds
-                : `${line.quote}: ${copy.fxNone}`}
-        </li>
-      ))}
-    </ul>
+    <RecordedRateEstimate
+      amount={amount}
+      currency={currency}
+      locale={locale === "ru" ? "ru" : "en"}
+      rates={rates}
+    />
   );
 }
 

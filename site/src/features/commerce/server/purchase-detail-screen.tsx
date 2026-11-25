@@ -1,4 +1,4 @@
-import { publicPriceEstimates } from "@nexus/domain";
+import type { ExplicitFxRate } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { Package } from "lucide-react";
 import type { Metadata } from "next";
@@ -37,6 +37,7 @@ import {
 } from "../commerce-history-format";
 import { getCommerceHistoryCopy } from "../commerce-history-i18n";
 import { getCommercialCopy } from "../commercial-i18n";
+import { RecordedRateEstimate } from "../components/recorded-rate-estimate";
 import { orderCaseCopy } from "../order-case-i18n";
 import { orderTermsCopy } from "../order-terms-i18n";
 import { getWalletCopy } from "../wallet-i18n";
@@ -51,30 +52,9 @@ function OrderAmountEstimate({
   amount: number;
   currency: string;
   locale: "en" | "ru";
-  rates: Parameters<typeof publicPriceEstimates>[1];
+  rates: readonly ExplicitFxRate[] | null | undefined;
 }) {
-  const copy = getWalletCopy(locale);
-  const lines = publicPriceEstimates({ price: amount, currency }, rates);
-  if (lines === undefined) return null;
-  if (lines === null) return <p className={typeSmMuted}>{copy.fxUnavailable}</p>;
-  return (
-    <ul className={typeSmMuted}>
-      {lines.map((line) => (
-        <li key={line.quote}>
-          {line.kind === "quote"
-            ? copy.fxEstimate.replace(
-                "{destination}",
-                formatHistoryAmount(line.amount, line.quote, locale),
-              )
-            : line.kind === "dust"
-              ? copy.fxDust
-              : line.kind === "invalid"
-                ? copy.fxExceeds
-                : `${line.quote}: ${copy.fxNone}`}
-        </li>
-      ))}
-    </ul>
-  );
+  return <RecordedRateEstimate amount={amount} currency={currency} locale={locale} rates={rates} />;
 }
 export async function purchaseDetailMetadata(): Promise<Metadata> {
   return {
@@ -285,6 +265,14 @@ export async function PurchaseDetailScreen({
                   {copy.linePrice}:{" "}
                   {formatHistoryAmount(item.unitPrice, item.currency, typedLocale)}
                 </p>
+                {fxRates !== undefined ? (
+                  <OrderAmountEstimate
+                    amount={item.unitPrice}
+                    currency={item.currency}
+                    locale={typedLocale}
+                    rates={fxRates}
+                  />
+                ) : null}
                 <p className={typeSmMuted}>
                   {item.hasCurrentAccess ? copy.accessReady : copy.accessMissing}
                 </p>

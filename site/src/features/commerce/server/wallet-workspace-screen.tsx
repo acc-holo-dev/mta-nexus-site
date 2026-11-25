@@ -2,7 +2,6 @@ import {
   AppError,
   type ExplicitFxRate,
   type LedgerEntry,
-  publicPriceEstimates,
   quoteExplicitFx,
   type TopUpIntent,
   type WithdrawalIntent,
@@ -35,6 +34,7 @@ import {
   typeXsMuted,
 } from "../../shell/type-shell";
 import { formatHistoryDate } from "../commerce-history-format";
+import { RecordedRateEstimate } from "../components/recorded-rate-estimate";
 import { formatFinancialMinor } from "../financial-i18n";
 import { WalletHoldReleaseForm } from "../wallet-hold-release";
 import { getWalletCopy } from "../wallet-i18n";
@@ -88,38 +88,16 @@ function FxEstimate({
 
 function ActivityEstimate({
   amount,
-  copy,
   currency,
   locale,
   rates,
 }: {
   amount: number;
-  copy: ReturnType<typeof getWalletCopy>;
   currency: string;
-  locale: Parameters<typeof formatFinancialMinor>[2];
+  locale: "en" | "ru";
   rates: readonly ExplicitFxRate[] | null | undefined;
 }) {
-  const lines = publicPriceEstimates({ price: amount, currency }, rates);
-  if (lines === undefined) return null;
-  if (lines === null) return <p className={typeXsMuted}>{copy.fxUnavailable}</p>;
-  return (
-    <ul className={typeXsMuted}>
-      {lines.map((line) => (
-        <li key={line.quote}>
-          {line.kind === "quote"
-            ? copy.fxEstimate.replace(
-                "{destination}",
-                formatFinancialMinor(line.amount, line.quote, locale),
-              )
-            : line.kind === "dust"
-              ? copy.fxDust
-              : line.kind === "invalid"
-                ? copy.fxExceeds
-                : `${line.quote}: ${copy.fxNone}`}
-        </li>
-      ))}
-    </ul>
-  );
+  return <RecordedRateEstimate amount={amount} currency={currency} locale={locale} rates={rates} />;
 }
 
 function maturedHoldCount(
@@ -330,43 +308,42 @@ export async function WalletWorkspaceScreen({
       </p>
       <nav aria-label={copy.balances} className="grid gap-4 md:grid-cols-3">
         {balances.map((row) => (
-          <Link
-            key={row.currency}
-            href={`/workspace/wallet?currency=${row.currency}`}
-            aria-current={row.currency === currency ? "page" : undefined}
-            className={`${panelSpace2P4} block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]`}
-          >
-            <span className={typeSemiboldPrimary}>{row.currency}</span>
-            <span className={typeNumericPrimary}>
-              {row.available === null
-                ? copy.balanceUnavailable
-                : formatFinancialMinor(row.available, row.currency, locale)}
-            </span>
+          <article key={row.currency} className={panelSpace2P4}>
+            <Link
+              href={`/workspace/wallet?currency=${row.currency}`}
+              aria-current={row.currency === currency ? "page" : undefined}
+              className="block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
+              <span className={typeSemiboldPrimary}>{row.currency}</span>
+              <span className={typeNumericPrimary}>
+                {row.available === null
+                  ? copy.balanceUnavailable
+                  : formatFinancialMinor(row.available, row.currency, locale)}
+              </span>
+              <span className={typeXsMuted}>
+                {copy.held}:{" "}
+                {row.held === null
+                  ? copy.balanceUnavailable
+                  : formatFinancialMinor(row.held, row.currency, locale)}
+              </span>
+            </Link>
             {row.available === null ? null : (
               <ActivityEstimate
                 amount={row.available}
-                copy={copy}
                 currency={row.currency}
                 locale={locale}
                 rates={fxRates}
               />
             )}
-            <span className={typeXsMuted}>
-              {copy.held}:{" "}
-              {row.held === null
-                ? copy.balanceUnavailable
-                : formatFinancialMinor(row.held, row.currency, locale)}
-            </span>
             {row.held === null ? null : (
               <ActivityEstimate
                 amount={row.held}
-                copy={copy}
                 currency={row.currency}
                 locale={locale}
                 rates={fxRates}
               />
             )}
-          </Link>
+          </article>
         ))}
       </nav>
       <section className={panelSpace3P5} aria-labelledby="wallet-fx-heading">
@@ -417,7 +394,6 @@ export async function WalletWorkspaceScreen({
             </dd>
             <ActivityEstimate
               amount={available}
-              copy={copy}
               currency={currency}
               locale={locale}
               rates={fxRates}
@@ -438,7 +414,6 @@ export async function WalletWorkspaceScreen({
                 </p>
                 <ActivityEstimate
                   amount={intent.amount}
-                  copy={copy}
                   currency={intent.currency}
                   locale={locale}
                   rates={available === null ? undefined : fxRates}
@@ -492,7 +467,6 @@ export async function WalletWorkspaceScreen({
                       </p>
                       <ActivityEstimate
                         amount={hold.amount}
-                        copy={copy}
                         currency={hold.currency}
                         locale={locale}
                         rates={available === null ? undefined : fxRates}
@@ -541,7 +515,6 @@ export async function WalletWorkspaceScreen({
                         </dd>
                         <ActivityEstimate
                           amount={org.available}
-                          copy={copy}
                           currency={currency}
                           locale={locale}
                           rates={fxRates}
@@ -569,7 +542,6 @@ export async function WalletWorkspaceScreen({
                           </p>
                           <ActivityEstimate
                             amount={intent.amount}
-                            copy={copy}
                             currency={intent.currency}
                             locale={locale}
                             rates={available === null ? undefined : fxRates}
@@ -609,7 +581,6 @@ export async function WalletWorkspaceScreen({
                       </p>
                       <ActivityEstimate
                         amount={org.held}
-                        copy={copy}
                         currency={currency}
                         locale={locale}
                         rates={fxRates}
@@ -622,7 +593,6 @@ export async function WalletWorkspaceScreen({
                             </p>
                             <ActivityEstimate
                               amount={hold.amount}
-                              copy={copy}
                               currency={hold.currency}
                               locale={locale}
                               rates={available === null ? undefined : fxRates}
@@ -659,7 +629,6 @@ export async function WalletWorkspaceScreen({
                           </p>
                           <ActivityEstimate
                             amount={Math.abs(entry.amount)}
-                            copy={copy}
                             currency={entry.currency}
                             locale={locale}
                             rates={available === null ? undefined : fxRates}
@@ -699,7 +668,6 @@ export async function WalletWorkspaceScreen({
                               </p>
                               <ActivityEstimate
                                 amount={intent.amount}
-                                copy={copy}
                                 currency={intent.currency}
                                 locale={locale}
                                 rates={available === null ? undefined : fxRates}
@@ -759,7 +727,6 @@ export async function WalletWorkspaceScreen({
                   </p>
                   <ActivityEstimate
                     amount={intent.amount}
-                    copy={copy}
                     currency={intent.currency}
                     locale={locale}
                     rates={available === null ? undefined : fxRates}
@@ -800,7 +767,6 @@ export async function WalletWorkspaceScreen({
                 </p>
                 <ActivityEstimate
                   amount={Math.abs(entry.amount)}
-                  copy={copy}
                   currency={entry.currency}
                   locale={locale}
                   rates={fxRates}
@@ -832,7 +798,6 @@ export async function WalletWorkspaceScreen({
                 </p>
                 <ActivityEstimate
                   amount={intent.amount}
-                  copy={copy}
                   currency={intent.currency}
                   locale={locale}
                   rates={available === null ? undefined : fxRates}
