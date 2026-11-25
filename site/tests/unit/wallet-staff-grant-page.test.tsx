@@ -32,6 +32,9 @@ vi.mock("../../src/lib/services/accounts/auth-service", () => ({
 }));
 vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
   isWalletEngineEnabled: () => state.engine,
+  WalletPaymentService: class {
+    listFxRates = async () => [];
+  },
 }));
 vi.mock("../../src/features/commerce/components/wallet-staff-grant-form", () => ({
   WalletStaffGrantForm: ({ actorId }: { actorId: string }) => <form data-staff-grant={actorId} />,

@@ -1,5 +1,6 @@
 "use client";
 
+import { type ExplicitFxRate, publicPriceEstimates } from "@nexus/domain";
 import { Button, ErrorState, Input } from "@nexus/ui";
 import { walletStaffGrantSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
@@ -25,7 +26,13 @@ function grantKey() {
   return `grant_${crypto.randomUUID().replaceAll("-", "")}`;
 }
 
-export function WalletStaffGrantForm({ actorId }: { actorId: string }) {
+export function WalletStaffGrantForm({
+  actorId,
+  rates,
+}: {
+  actorId: string;
+  rates?: readonly ExplicitFxRate[] | null;
+}) {
   const { locale } = useNexusLocale();
   const copy = getWalletCopy(locale);
   const field = useId();
@@ -151,19 +158,75 @@ export function WalletStaffGrantForm({ actorId }: { actorId: string }) {
       />
       {error ? <ErrorState title={error} description={copy.grantFailed} /> : null}
       {result ? (
-        <p role="status" className={typeSmSuccess}>
-          {copy.grantSuccess
-            .replace("{username}", result.username)
-            .replace("{amount}", formatFinancialMinor(result.amount, result.currency, locale))
-            .replace(
-              "{available}",
-              formatFinancialMinor(result.available, result.currency, locale),
-            )}
-        </p>
+        <div role="status" className={typeBlockSpace2}>
+          <p className={typeSmSuccess}>
+            {copy.grantSuccess
+              .replace("{username}", result.username)
+              .replace("{amount}", formatFinancialMinor(result.amount, result.currency, locale))
+              .replace(
+                "{available}",
+                formatFinancialMinor(result.available, result.currency, locale),
+              )}
+          </p>
+          {rates !== undefined ? (
+            <>
+              <GrantEstimate
+                amount={result.amount}
+                copy={copy}
+                currency={result.currency}
+                locale={locale}
+                rates={rates}
+              />
+              <GrantEstimate
+                amount={result.available}
+                copy={copy}
+                currency={result.currency}
+                locale={locale}
+                rates={rates}
+              />
+            </>
+          ) : null}
+        </div>
       ) : null}
       <Button type="submit" disabled={busy}>
         {busy ? copy.grantSubmitting : copy.grantSubmit}
       </Button>
     </form>
+  );
+}
+
+function GrantEstimate({
+  amount,
+  copy,
+  currency,
+  locale,
+  rates,
+}: {
+  amount: number;
+  copy: ReturnType<typeof getWalletCopy>;
+  currency: string;
+  locale: "en" | "ru";
+  rates: readonly ExplicitFxRate[] | null;
+}) {
+  const lines = publicPriceEstimates({ price: amount, currency }, rates);
+  if (lines === undefined) return null;
+  if (lines === null) return <p className={typeSmSecondary}>{copy.fxUnavailable}</p>;
+  return (
+    <ul className={typeSmSecondary}>
+      {lines.map((line) => (
+        <li key={line.quote}>
+          {line.kind === "quote"
+            ? copy.fxEstimate.replace(
+                "{destination}",
+                formatFinancialMinor(line.amount, line.quote, locale),
+              )
+            : line.kind === "dust"
+              ? copy.fxDust
+              : line.kind === "invalid"
+                ? copy.fxExceeds
+                : `${line.quote}: ${copy.fxNone}`}
+        </li>
+      ))}
+    </ul>
   );
 }

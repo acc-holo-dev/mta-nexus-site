@@ -4,7 +4,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
-import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
@@ -45,6 +48,10 @@ export async function WalletStaffGrantScreen() {
     return <PlatformSignIn locale={locale} returnPath="/admin/commerce/wallet-grants" />;
   }
   if (user.role !== "admin") notFound();
+  const engineOn = isWalletEngineEnabled();
+  const fxRates = engineOn
+    ? await new WalletPaymentService().listFxRates().catch(() => null)
+    : undefined;
 
   return (
     <div className={pageShellMax5xl}>
@@ -55,8 +62,8 @@ export async function WalletStaffGrantScreen() {
       <p role="note" className={typeRoundedBorderP4SmSecondary}>
         {copy.grantPageNote}
       </p>
-      {isWalletEngineEnabled() ? (
-        <WalletStaffGrantForm actorId={user.id} />
+      {engineOn ? (
+        <WalletStaffGrantForm actorId={user.id} rates={fxRates} />
       ) : (
         <p className={`${panelSpace3P5} ${typeSmMuted}`}>{copy.grantEngineOff}</p>
       )}
