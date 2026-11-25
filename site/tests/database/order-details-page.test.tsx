@@ -8,7 +8,11 @@ const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
   details: vi.fn(),
   walletEnabled: false,
-  fxRates: vi.fn(async () => [] as const),
+  fxRates: vi.fn(
+    async (): Promise<
+      { baseCurrency: string; quoteCurrency: string; baseAmount: number; quoteAmount: number }[]
+    > => [],
+  ),
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({

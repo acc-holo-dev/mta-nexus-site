@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 24 ноября 2026 (Europe/Moscow).  
-**source_sha:** `e84f277a2` (`cursor/order-terms-fx-2e5e`, purchase, subscription, and profile rate notes).  
+**source_sha:** `4fbf4df86` (`cursor/catalog-filter-keep-2e5e`, catalog search and filters stay in the URL).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -31,7 +31,7 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    |            Факт на `3c2dcf3b2` |
+| Область                    |            Факт на `4fbf4df86` |
 | -------------------------- | -----------------------------: |
 | `features/*` domains       |                             13 |
 | `components/` tree files   |                              0 |
@@ -42,7 +42,7 @@ site/
 | `lib/services/` root files |                              0 |
 | `lib/**/*-i18n.ts`         |                              0 |
 | `app/**/route.ts`          |                            305 |
-| `site/tests` files         |                           1775 |
+| `site/tests` files         |                           1778 |
 | `@nexus/ui` src files      |                             20 |
 | `@nexus/domain` src files  |                             59 |
 | `@nexus/db` src files      |                            208 |
@@ -52,16 +52,16 @@ site/
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
 | accounts      |    92 | 241849 |
-| commerce      |   206 | 856381 |
+| commerce      |   207 | 862398 |
 | community     |   154 | 635565 |
 | discovery     |    22 |  50639 |
-| library       |   124 | 524752 |
+| library       |   124 | 526455 |
 | moderation    |    56 | 221046 |
 | notifications |    27 | 142000 |
-| organizations |    59 | 202552 |
-| resources     |   232 | 939426 |
-| servers       |   111 | 382891 |
-| shell         |   101 | 211264 |
+| organizations |    59 | 205059 |
+| resources     |   232 | 939707 |
+| servers       |   113 | 389619 |
+| shell         |   101 | 211348 |
 | support       |    28 | 117845 |
 | trust         |    28 |  83844 |
 

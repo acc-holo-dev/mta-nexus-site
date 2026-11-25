@@ -1,4 +1,5 @@
 import { orderRepository } from "@nexus/db";
+import type { ExplicitFxRate } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { Package } from "lucide-react";
 import type { Metadata } from "next";
@@ -31,10 +32,10 @@ import {
 } from "../commerce-history-format";
 import { commerceHistoryBetaNotice, getCommerceHistoryCopy } from "../commerce-history-i18n";
 import { getCommercialCopy } from "../commercial-i18n";
-import { RecordedRateEstimate } from "../components/recorded-rate-estimate";
 import { orderCaseCopy } from "../order-case-i18n";
 import { getWalletCopy } from "../wallet-i18n";
 import { HistoryPagination, HistoryShell } from "../workspace-history";
+import { PurchaseTotalEstimate } from "./purchase-total-estimate";
 export async function purchasesHistoryMetadata(): Promise<Metadata> {
   return {
     title: `${getCommerceHistoryCopy(await getRequestLocale()).purchasesTitle} | MTA NEXUS`,
@@ -51,9 +52,6 @@ export async function PurchasesHistoryScreen({
   const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
   const copy = getCommerceHistoryCopy(typedLocale);
   const walletEnabled = isWalletEngineEnabled();
-  const fxRates = walletEnabled
-    ? await new WalletPaymentService().listFxRates().catch(() => null)
-    : undefined;
   const historyNotice = commerceHistoryBetaNotice(typedLocale, walletEnabled);
   const walletNavProps = walletEnabled
     ? {
@@ -109,6 +107,10 @@ export async function PurchasesHistoryScreen({
     );
   }
 
+  const fxRates: readonly ExplicitFxRate[] | null | undefined = walletEnabled
+    ? await new WalletPaymentService().listFxRates().catch(() => null)
+    : undefined;
+
   return (
     <div className={pageShellClip}>
       <HistoryShell copy={copy} area="purchases" notice={historyNotice} {...walletNavProps}>
@@ -149,7 +151,7 @@ export async function PurchasesHistoryScreen({
                     <dt className="text-muted">{copy.total}</dt>
                     <dd className={typeNumericSemiboldPrimary}>
                       {formatHistoryAmount(order.totalAmount, order.currency, typedLocale)}
-                      <RecordedRateEstimate
+                      <PurchaseTotalEstimate
                         amount={order.totalAmount}
                         currency={order.currency}
                         locale={typedLocale}
