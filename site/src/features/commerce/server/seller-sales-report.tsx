@@ -388,6 +388,15 @@ export function SellerSalesReportView({
                       {period.gross === null
                         ? c.unknown
                         : formatFinancialMinor(period.gross, period.currency, locale)}
+                      {walletCopy && period.gross !== null ? (
+                        <GrossEstimate
+                          amount={period.gross}
+                          copy={walletCopy}
+                          currency={period.currency}
+                          locale={locale}
+                          rates={fxRates}
+                        />
+                      ) : null}
                     </td>
                   </tr>
                 ))}
