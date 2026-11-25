@@ -84,6 +84,14 @@ export const commerceHistoryCopy = {
     walletGrossNotice:
       "Amounts below are historical gross line prices. Seller proceeds from site-wallet sales sit in escrow held balance for 7 days before release into available site-wallet balance. This list is not a payout authorization.",
     grossPrice: "Gross line price",
+    saleLineEstimate:
+      "About {amount} at the recorded rate. The stored gross line stays {base}. This does not move money.",
+    saleLineEstimateNone: "No recorded rate from {base} to {quote}.",
+    saleLineEstimateDust:
+      "The recorded rate from {base} to {quote} is too small to show a whole unit.",
+    saleLineEstimateInvalid: "The recorded rate from {base} to {quote} cannot be shown.",
+    saleLineEstimateUnavailable:
+      "Recorded rates could not be loaded. The stored gross line is unchanged.",
     orderStatuses: {
       pending: "Pending",
       processing: "Processing",
@@ -180,6 +188,14 @@ export const commerceHistoryCopy = {
     walletGrossNotice:
       "Показана полная цена позиции заказа. Поступления продавца от продаж через site wallet держатся в escrow (held) 7 дней, затем попадают в available баланс site wallet. Этот список не является разрешением на выплату.",
     grossPrice: "Цена позиции",
+    saleLineEstimate:
+      "Примерно {amount} по записанному курсу. Сохранённая цена позиции остаётся в {base}. Деньги не перемещаются.",
+    saleLineEstimateNone: "Записанного курса из {base} в {quote} нет.",
+    saleLineEstimateDust:
+      "Записанный курс из {base} в {quote} слишком мал, чтобы показать целую единицу.",
+    saleLineEstimateInvalid: "Записанный курс из {base} в {quote} нельзя показать.",
+    saleLineEstimateUnavailable:
+      "Записанные курсы не загрузились. Сохранённая цена позиции не изменилась.",
     orderStatuses: {
       pending: "Ожидает",
       processing: "Обрабатывается",
