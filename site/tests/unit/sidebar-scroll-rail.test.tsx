@@ -33,6 +33,7 @@ vi.mock("../../src/features/shell/auth-session", () => ({
   useAuthSession: () => auth.session,
 }));
 
+import { NexusShell } from "../../src/features/shell/shell";
 import { Sidebar } from "../../src/features/shell/sidebar";
 
 describe("desktop sidebar scroll rail", () => {
@@ -52,6 +53,23 @@ describe("desktop sidebar scroll rail", () => {
 
     expect(html).toMatch(/<aside[^>]*class="[^"]*sticky top-0[^"]*h-dvh[^"]*self-start/);
     expect(html).toMatch(/<nav[^>]*class="[^"]*min-h-0[^"]*overflow-y-auto[^"]*overscroll-contain/);
+    expect(html).toMatch(/href="\/servers"[^>]*class="[^"]*px-1/);
+  });
+
+  it("keeps the desktop rail outside the scrolling main column", () => {
+    const html = renderToStaticMarkup(
+      <NexusShell locale="en">
+        <p>Page</p>
+      </NexusShell>,
+    );
+
+    expect(html).toMatch(
+      /<div class="flex h-dvh min-h-0 overflow-hidden bg-page text-primary"><aside[^>]*class="[^"]*sticky top-0[^"]*lg:flex/,
+    );
+    expect(html).toMatch(
+      /<div class="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overscroll-contain[^"]*">/,
+    );
+    expect(html).toMatch(/<nav class="fixed inset-x-0 bottom-0[^"]*lg:hidden"/);
   });
 
   it("puts finance in the signed-in shell and the wallet only when the engine flag is on", () => {

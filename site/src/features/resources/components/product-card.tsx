@@ -80,7 +80,7 @@ export function ProductCard({
       : formatHistoryAmount(product.price, product.currency, locale);
 
   return (
-    <article className={panelGroupHoverCol}>
+    <article className={`${panelGroupHoverCol} h-full`}>
       <Link
         href={productHref}
         aria-label={product.title}
@@ -154,7 +154,7 @@ export function ProductCard({
 
         <p className={typeClamp2CaptionMuted}>{product.shortDescription || product.description}</p>
 
-        <div className="flex items-center justify-between border-t border-base pt-2.5 font-caption text-faint">
+        <div className="mt-auto flex items-center justify-between border-t border-base pt-2.5 font-caption text-faint">
           <div className="flex min-w-0 items-center gap-1.5">
             <Tag className="h-3 w-3 shrink-0" aria-hidden="true" />
             <span className="truncate">{product.tags.slice(0, 2).join(", ")}</span>
