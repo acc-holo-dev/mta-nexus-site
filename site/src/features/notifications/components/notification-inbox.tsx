@@ -414,7 +414,7 @@ export function NotificationInbox({
           {copy.retry}
         </Button>
       </div>
-      {!busy && !page.items.length ? (
+      {!busy && !error && !page.items.length ? (
         <EmptyState
           title={emptyFiltered ? copy.emptyFiltered : copy.empty}
           description={emptyFiltered ? copy.emptyFilteredDescription : copy.emptyDescription}
