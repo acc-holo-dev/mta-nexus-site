@@ -46,29 +46,27 @@ export function NexusShell({
       >
         {dictionary.nav.skipToContent}
       </a>
-      <div className="min-h-screen bg-page text-primary">
-        <div className="flex min-h-screen">
-          <Sidebar
-            locale={locale}
-            isCollapsed={isSidebarCollapsed}
-            onToggle={toggle}
-            walletEnabled={walletEnabled}
-          />
+      <div className="flex h-dvh min-h-0 overflow-hidden bg-page text-primary">
+        <Sidebar
+          locale={locale}
+          isCollapsed={isSidebarCollapsed}
+          onToggle={toggle}
+          walletEnabled={walletEnabled}
+        />
 
-          <div className="flex min-w-0 flex-1 flex-col">
-            <Navbar locale={locale} />
-            <main
-              id="main-content"
-              tabIndex={-1}
-              className="mx-auto min-w-0 w-full max-w-7xl flex-1 overflow-x-clip px-4 py-6 pb-24 outline-none sm:px-6 lg:pb-6"
-            >
-              {children}
-            </main>
-            <Footer locale={locale} walletEnabled={walletEnabled} />
-          </div>
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overscroll-contain pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-0">
+          <Navbar locale={locale} />
+          <main
+            id="main-content"
+            tabIndex={-1}
+            className="mx-auto min-w-0 w-full max-w-7xl flex-1 overflow-x-clip px-4 py-6 outline-none sm:px-6"
+          >
+            {children}
+          </main>
+          <Footer locale={locale} walletEnabled={walletEnabled} />
         </div>
-        <MobileNav locale={locale} walletEnabled={walletEnabled} />
       </div>
+      <MobileNav locale={locale} walletEnabled={walletEnabled} />
     </LocaleProvider>
   );
 }

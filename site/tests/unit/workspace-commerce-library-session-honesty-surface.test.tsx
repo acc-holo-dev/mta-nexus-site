@@ -42,7 +42,7 @@ it("locks cart/library/finance/acquisitions session probe failure to PlatformSes
 
   expect(library).toContain("title={copy.title}");
   expect(library).toContain("message={copy.loadUnavailable}");
-  expect(library).toContain("retryHref={libraryHref(filter, page)}");
+  expect(library).toContain("retryHref={libraryHref(filter, page, q)}");
 
   expect(finance).toContain("title={copy.title}");
   expect(finance).toContain("message={copy.statementsLoadUnavailable}");

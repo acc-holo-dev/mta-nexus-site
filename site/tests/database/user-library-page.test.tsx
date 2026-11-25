@@ -69,7 +69,9 @@ import LibraryPage, { generateMetadata } from "../../src/app/workspace/library/p
 import { getLibraryCopy } from "../../src/features/library/library-view";
 
 const now = new Date("2026-10-09T00:00:00.000Z");
-const pageProps = (query: { page?: string | string[]; filter?: string | string[] } = {}) => ({
+const pageProps = (
+  query: { page?: string | string[]; filter?: string | string[]; q?: string | string[] } = {},
+) => ({
   searchParams: Promise.resolve(query),
 });
 
@@ -230,6 +232,25 @@ describe("private resource library", () => {
     expect(filtered).toContain('href="/workspace/library"');
     expect(filtered).not.toContain(copy.emptyHint);
     expect(copy.emptyFilterHint).not.toBe(copy.subtitle);
+
+    state.page.mockResolvedValueOnce({
+      items: [],
+      counts: { all: 3, ready: 3, unavailable: 0 },
+      total: 0,
+      page: 1,
+      pageSize: 12,
+      totalPages: 1,
+    });
+    const searched = renderToStaticMarkup(
+      await LibraryPage(pageProps({ filter: "ready", q: "radar", page: "2" })),
+    );
+    expect(state.page).toHaveBeenLastCalledWith("usr_player", 2, "ready", undefined, "radar");
+    expect(searched).toContain('name="q"');
+    expect(searched).toContain('value="radar"');
+    expect(searched).toContain("filter=ready&amp;q=radar");
+    expect(searched).toContain(copy.emptyFilter);
+    expect(searched).not.toContain(copy.emptyHint);
+    expect(searched).toContain('href="/workspace/library"');
   });
 
   it.each(["en", "ru"] as const)(
