@@ -8,7 +8,11 @@ export const userLibraryService = {
     page?: number,
     filter?: UserLibraryFilter,
     pageSize?: number,
+    query?: string,
   ): Promise<UserLibraryPage> {
+    if (query !== undefined) {
+      return userLibraryRepository.pageByUser(userId, page, filter, pageSize, query);
+    }
     return pageSize === undefined
       ? userLibraryRepository.pageByUser(userId, page, filter)
       : userLibraryRepository.pageByUser(userId, page, filter, pageSize);

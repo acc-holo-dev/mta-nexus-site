@@ -30,6 +30,57 @@ import { getOrganizationCopy } from "../organization-workspace-copy";
 
 const textareaClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]";
+
+const organizationProfileDraftKeys = [
+  "name",
+  "slug",
+  "description",
+  "logoUrl",
+  "websiteUrl",
+] as const;
+
+type OrganizationProfileDraftKey = (typeof organizationProfileDraftKeys)[number];
+
+export type OrganizationProfileDraft = Partial<Record<OrganizationProfileDraftKey, string>>;
+
+/** Plain profile text only. Tokens, passwords, and member roles stay out of the query. */
+export function applyOrganizationProfileDraftQuery(
+  params: URLSearchParams,
+  fields: OrganizationProfileDraft,
+) {
+  for (const key of organizationProfileDraftKeys) {
+    if (!(key in fields)) continue;
+    const value = fields[key] ?? "";
+    if (value.length > 0) params.set(key, value);
+    else params.delete(key);
+  }
+  return params;
+}
+
+export function readOrganizationProfileDraftQuery(
+  params: URLSearchParams,
+): OrganizationProfileDraft | null {
+  const draft: OrganizationProfileDraft = {};
+  for (const key of organizationProfileDraftKeys) {
+    const value = params.get(key);
+    if (value) draft[key] = value;
+  }
+  return Object.keys(draft).length > 0 ? draft : null;
+}
+
+function readOrganizationProfileDraftLocation(): OrganizationProfileDraft | null {
+  if (typeof window === "undefined") return null;
+  return readOrganizationProfileDraftQuery(new URLSearchParams(window.location.search));
+}
+
+function publishOrganizationProfileDraft(fields: OrganizationProfileDraft) {
+  if (typeof window === "undefined") return;
+  const url = new URL(window.location.href);
+  applyOrganizationProfileDraftQuery(url.searchParams, fields);
+  const next = `${url.pathname}${url.search}${url.hash}`;
+  const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  if (next !== current) window.history.replaceState(null, "", next);
+}
 export function OrganizationProfileForm({
   locale,
   actorId,
@@ -86,13 +137,26 @@ export function OrganizationProfileForm({
   const localeRef = useRef(locale);
   localeRef.current = locale;
   useEffect(() => {
-    if (initial) return;
+    const draft = readOrganizationProfileDraftLocation();
+    if (initial) {
+      if (draft) {
+        setFields((current) => ({ ...current, ...draft }));
+        setDirty(true);
+      }
+      return;
+    }
     let alive = true;
     setCreationReady(false);
     setCreationNonce(null);
     setVerifiedCreationKey("");
-    setFields({ name: "", description: "", logoUrl: "", websiteUrl: "", slug: "" });
-    setDirty(false);
+    setFields({
+      name: draft?.name ?? "",
+      description: draft?.description ?? "",
+      logoUrl: draft?.logoUrl ?? "",
+      websiteUrl: draft?.websiteUrl ?? "",
+      slug: draft?.slug ?? "",
+    });
+    setDirty(Boolean(draft));
     setError("");
     setCreationNotice("");
     async function restore() {
@@ -113,8 +177,10 @@ export function OrganizationProfileForm({
           if (item.actorId !== actorId || !/^[a-f0-9]{32}$/u.test(item.nonce) || !parsed.success)
             throw new Error("storage");
           if (alive) {
-            setFields(parsed.data);
+            const locationDraft = readOrganizationProfileDraftLocation();
+            setFields({ ...parsed.data, ...locationDraft });
             setCreationNonce(item.nonce);
+            if (locationDraft) setDirty(true);
           }
         }
         if (alive) {
@@ -183,7 +249,11 @@ export function OrganizationProfileForm({
     if (canEdit) setRestrictedVerified(false);
   }, [canEdit]);
   function change(key: keyof typeof fields, value: string) {
-    setFields((current) => ({ ...current, [key]: value }));
+    setFields((current) => {
+      const next = { ...current, [key]: value };
+      publishOrganizationProfileDraft(next);
+      return next;
+    });
     setDirty(true);
     setSaved(false);
   }
@@ -315,13 +385,15 @@ export function OrganizationProfileForm({
       );
       if (!identity) throw new Error(copy.unavailable);
       if (identity.id !== actorId) {
-        setFields({
+        const restored = {
           name: base.name,
           description: base.description,
           logoUrl: base.logoUrl,
           websiteUrl: base.websiteUrl,
           slug: base.slug,
-        });
+        };
+        setFields(restored);
+        publishOrganizationProfileDraft(restored);
         setDirty(false);
         setError(copy.profileActorChanged);
         return;
@@ -483,13 +555,15 @@ export function OrganizationProfileForm({
               disabled={busy}
               onClick={() => {
                 if (!dirty) {
-                  setFields({
+                  const restored = {
                     name: newest.name,
                     description: newest.description,
                     logoUrl: newest.logoUrl,
                     websiteUrl: newest.websiteUrl,
                     slug: newest.slug,
-                  });
+                  };
+                  setFields(restored);
+                  publishOrganizationProfileDraft(restored);
                 }
                 setBase(newest);
                 setChecked(null);
