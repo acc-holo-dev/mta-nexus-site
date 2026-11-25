@@ -1,5 +1,5 @@
 "use client";
-import { Button, ErrorState } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
@@ -42,6 +42,7 @@ import {
   reserveSupportReplyRetry,
   resolveSupportRetryActorScope,
 } from "../support-retry";
+import { supportThreadMessageFrame } from "../support-thread-message-frame";
 import {
   SupportClientFailure,
   supportWorkspaceCopy,
@@ -444,40 +445,62 @@ export function SupportCaseThread({
       ) : null}
 
       <section className="space-y-3" aria-label={copy.messages}>
-        {messages.map((message) => (
-          <article
-            key={message.id}
-            id={`message-${message.id}`}
-            className={`rounded-xl border p-4 ${
-              message.authorRole === "staff"
-                ? "border-[color:var(--nexus-accent)]/25 bg-accent-soft"
-                : "border-base bg-surface"
-            }`}
-          >
-            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-              <span className="text-xs font-bold text-primary">
-                {message.authorRole === "staff"
-                  ? copy.staff
-                  : capabilities.requester
-                    ? copy.you
-                    : copy.requester}
-              </span>
-              <time
-                dateTime={new Date(message.createdAt).toISOString()}
-                className={typeNumericElevenFaint}
+        {supportThreadMessageFrame(messages.length, messageTotal) === "load-error" ? (
+          <ErrorState
+            title={copy.caseLoadError}
+            description={copy.caseLoadErrorHint}
+            action={
+              <Button
+                type="button"
+                onClick={() => void load()}
+                className={linkGhostAccent}
+                variant="ghost"
               >
-                {new Date(message.createdAt).toLocaleString(dateLocale)}
-              </time>
-            </div>
-            <p className={typePrewrapSmLeadingSecondary}>{message.body}</p>
-            <Link
-              href={`${backHref}/${caseId}/messages?focus=${message.id}#message-${message.id}`}
-              className={`mt-2 ${linkAccentXs}`}
+                {workspaceCopy.reload}
+              </Button>
+            }
+          />
+        ) : supportThreadMessageFrame(messages.length, messageTotal) === "empty" ? (
+          <EmptyState
+            title={supportMessageCopy(locale).empty}
+            description={supportMessageCopy(locale).emptyDescription}
+          />
+        ) : (
+          messages.map((message) => (
+            <article
+              key={message.id}
+              id={`message-${message.id}`}
+              className={`rounded-xl border p-4 ${
+                message.authorRole === "staff"
+                  ? "border-[color:var(--nexus-accent)]/25 bg-accent-soft"
+                  : "border-base bg-surface"
+              }`}
             >
-              {supportMessageCopy(locale).link}
-            </Link>
-          </article>
-        ))}
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                <span className="text-xs font-bold text-primary">
+                  {message.authorRole === "staff"
+                    ? copy.staff
+                    : capabilities.requester
+                      ? copy.you
+                      : copy.requester}
+                </span>
+                <time
+                  dateTime={new Date(message.createdAt).toISOString()}
+                  className={typeNumericElevenFaint}
+                >
+                  {new Date(message.createdAt).toLocaleString(dateLocale)}
+                </time>
+              </div>
+              <p className={typePrewrapSmLeadingSecondary}>{message.body}</p>
+              <Link
+                href={`${backHref}/${caseId}/messages?focus=${message.id}#message-${message.id}`}
+                className={`mt-2 ${linkAccentXs}`}
+              >
+                {supportMessageCopy(locale).link}
+              </Link>
+            </article>
+          ))
+        )}
       </section>
 
       {messageTotalPages > 1 && (
