@@ -8,6 +8,10 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { subscriptionsService } from "../../../lib/services/commerce/subscriptions-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -76,6 +80,9 @@ export async function SubscriptionReceiptScreen({
       detail = await subscriptionsService.detail(actor, path.id, query.organizationId),
       r = detail.receipt,
       s = r.subscription;
+    const fxRates = isWalletEngineEnabled()
+      ? await new WalletPaymentService().listFxRates().catch(() => null)
+      : undefined;
     return (
       <section className={pageShellMax5xl}>
         <Link
@@ -104,7 +111,7 @@ export async function SubscriptionReceiptScreen({
           {c.current}: {c.statuses[detail.current.status]}
         </p>
         <h2>{c.snapshot}</h2>
-        <PlanReviewTerms terms={s.terms} locale={locale} />
+        <PlanReviewTerms terms={s.terms} locale={locale} rates={fxRates} />
         <p role="note" className={typeSmSecondary}>
           {c.notice}
         </p>
