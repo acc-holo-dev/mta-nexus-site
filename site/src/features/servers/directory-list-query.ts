@@ -16,6 +16,15 @@ export function parseDirectoryListQuery(search: string): DirectoryListQuery {
   return { query, minimumPlayers, page };
 }
 
+/** Replace the current `/servers` query without adding a history entry. */
+export function replaceDirectoryListUrl(filters: DirectoryListQuery) {
+  if (typeof window === "undefined" || window.location.pathname !== "/servers") return;
+  const nextSearch = applyDirectoryListQuery(window.location.search, filters);
+  const next = `${window.location.pathname}${nextSearch}${window.location.hash}`;
+  const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  if (next !== current) window.history.replaceState(null, "", next);
+}
+
 /** Keep unrelated params. `page` in the URL is 1-based; page 0 is omitted. */
 export function applyDirectoryListQuery(
   currentSearch: string,

@@ -3,10 +3,9 @@
 import { Button, EmptyState, ErrorState, SearchField } from "@nexus/ui";
 import { ChevronLeft, ChevronRight, Copy, Users } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
-import { applyDirectoryListQuery, parseDirectoryListQuery } from "../directory-list-query";
+import { parseDirectoryListQuery, replaceDirectoryListUrl } from "../directory-list-query";
 import { panelSpace3P4 } from "../../shell/panel-shell";
 import {
   typeFlexWrapCenterBetweenGap3,
@@ -210,7 +209,6 @@ export function MtaMasterServerDirectory({
 }) {
   const dictionary = getDictionary(locale);
   const copy = dictionary.servers;
-  const router = useRouter();
   const [query, setQuery] = useState("");
   const [minimumPlayers, setMinimumPlayers] = useState(0);
   const [page, setPage] = useState(0);
@@ -235,16 +233,6 @@ export function MtaMasterServerDirectory({
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
-
-  function writeListUrl(nextFilters: { query: string; minimumPlayers: number; page: number }) {
-    if (window.location.pathname !== "/servers") return;
-    const nextSearch = applyDirectoryListQuery(window.location.search, nextFilters);
-    const next = `${window.location.pathname}${nextSearch}${window.location.hash}`;
-    const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
-    if (next === current) return;
-    if (typeof router.replace === "function") router.replace(next, { scroll: false });
-    else window.history.replaceState(null, "", next);
-  }
 
   // biome-ignore lint/correctness/useExhaustiveDependencies(attempt): Explicit refresh trigger; changing it must restart this request.
   useEffect(() => {
@@ -282,7 +270,7 @@ export function MtaMasterServerDirectory({
           const lastPage = Math.max(0, Math.ceil(result.total / PAGE_SIZE) - 1);
           if (page > lastPage) {
             setPage(lastPage);
-            writeListUrl({ query, minimumPlayers, page: lastPage });
+            replaceDirectoryListUrl({ query, minimumPlayers, page: lastPage });
             return;
           }
           setDirectory(result);
@@ -322,25 +310,25 @@ export function MtaMasterServerDirectory({
   function updateQuery(value: string) {
     setQuery(value);
     setPage(0);
-    writeListUrl({ query: value, minimumPlayers, page: 0 });
+    replaceDirectoryListUrl({ query: value, minimumPlayers, page: 0 });
   }
 
   function updateMinimumPlayers(value: number) {
     setMinimumPlayers(value);
     setPage(0);
-    writeListUrl({ query, minimumPlayers: value, page: 0 });
+    replaceDirectoryListUrl({ query, minimumPlayers: value, page: 0 });
   }
 
   function resetFilters() {
     setQuery("");
     setMinimumPlayers(0);
     setPage(0);
-    writeListUrl({ query: "", minimumPlayers: 0, page: 0 });
+    replaceDirectoryListUrl({ query: "", minimumPlayers: 0, page: 0 });
   }
 
   function showPage(nextPage: number) {
     setPage(nextPage);
-    writeListUrl({ query, minimumPlayers, page: nextPage });
+    replaceDirectoryListUrl({ query, minimumPlayers, page: nextPage });
   }
 
   return (
