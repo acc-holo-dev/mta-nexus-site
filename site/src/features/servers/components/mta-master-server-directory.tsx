@@ -3,8 +3,10 @@
 import { Button, EmptyState, ErrorState, SearchField } from "@nexus/ui";
 import { ChevronLeft, ChevronRight, Copy, Users } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { getDictionary, type Locale } from "../../../lib/i18n";
+import { applyDirectoryListQuery, parseDirectoryListQuery } from "../directory-list-query";
 import { panelSpace3P4 } from "../../shell/panel-shell";
 import {
   typeFlexWrapCenterBetweenGap3,
@@ -151,6 +153,54 @@ function ServerCard({
   );
 }
 
+export function PublicDirectoryOutcome({
+  locale,
+  outcome,
+  onRetry,
+  resetFilters,
+  errorTitle,
+}: {
+  locale: Locale;
+  outcome: "unavailable" | "empty" | "filtered";
+  onRetry: () => void;
+  resetFilters: () => void;
+  errorTitle?: string;
+}) {
+  const copy = getDictionary(locale).servers;
+  if (outcome === "unavailable") {
+    return (
+      <ErrorState
+        id="mta-master-directory-fetch-error"
+        title={errorTitle ?? copy.directoryFetchError}
+        description={copy.unavailableHint}
+        action={
+          <Button type="button" variant="secondary" size="touch" onClick={onRetry}>
+            {copy.tryAgain}
+          </Button>
+        }
+      />
+    );
+  }
+  const hasFilters = outcome === "filtered";
+  return (
+    <EmptyState
+      title={hasFilters ? copy.noMatch : copy.none}
+      description={hasFilters ? copy.noMatchDescription : copy.noneDescription}
+      action={
+        hasFilters ? (
+          <Button type="button" variant="secondary" size="touch" onClick={resetFilters}>
+            {copy.resetFilters}
+          </Button>
+        ) : (
+          <Button type="button" variant="secondary" size="touch" onClick={onRetry}>
+            {copy.tryAgain}
+          </Button>
+        )
+      }
+    />
+  );
+}
+
 export function MtaMasterServerDirectory({
   locale = "en",
   profileByEndpoint = {},
@@ -160,16 +210,45 @@ export function MtaMasterServerDirectory({
 }) {
   const dictionary = getDictionary(locale);
   const copy = dictionary.servers;
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [minimumPlayers, setMinimumPlayers] = useState(0);
   const [page, setPage] = useState(0);
+  const [listReady, setListReady] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const [directory, setDirectory] = useState<DirectoryResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const parsed = parseDirectoryListQuery(window.location.search);
+    setQuery(parsed.query);
+    setMinimumPlayers(parsed.minimumPlayers);
+    setPage(parsed.page);
+    setListReady(true);
+    const onPopState = () => {
+      const next = parseDirectoryListQuery(window.location.search);
+      setQuery(next.query);
+      setMinimumPlayers(next.minimumPlayers);
+      setPage(next.page);
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+
+  function writeListUrl(nextFilters: { query: string; minimumPlayers: number; page: number }) {
+    if (window.location.pathname !== "/servers") return;
+    const nextSearch = applyDirectoryListQuery(window.location.search, nextFilters);
+    const next = `${window.location.pathname}${nextSearch}${window.location.hash}`;
+    const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    if (next === current) return;
+    if (typeof router.replace === "function") router.replace(next, { scroll: false });
+    else window.history.replaceState(null, "", next);
+  }
+
   // biome-ignore lint/correctness/useExhaustiveDependencies(attempt): Explicit refresh trigger; changing it must restart this request.
   useEffect(() => {
+    if (!listReady) return;
     const controller = new AbortController();
     let active = true;
     let timedOut = false;
@@ -203,6 +282,7 @@ export function MtaMasterServerDirectory({
           const lastPage = Math.max(0, Math.ceil(result.total / PAGE_SIZE) - 1);
           if (page > lastPage) {
             setPage(lastPage);
+            writeListUrl({ query, minimumPlayers, page: lastPage });
             return;
           }
           setDirectory(result);
@@ -223,7 +303,15 @@ export function MtaMasterServerDirectory({
       window.clearTimeout(timeout);
       controller.abort();
     };
-  }, [minimumPlayers, page, query, attempt, copy.directoryFetchError, copy.directoryTimeout]);
+  }, [
+    listReady,
+    minimumPlayers,
+    page,
+    query,
+    attempt,
+    copy.directoryFetchError,
+    copy.directoryTimeout,
+  ]);
 
   const totalPages = Math.max(1, Math.ceil((directory?.total ?? 0) / PAGE_SIZE));
   const hasFilters = Boolean(query.trim()) || minimumPlayers > 0;
@@ -234,17 +322,25 @@ export function MtaMasterServerDirectory({
   function updateQuery(value: string) {
     setQuery(value);
     setPage(0);
+    writeListUrl({ query: value, minimumPlayers, page: 0 });
   }
 
   function updateMinimumPlayers(value: number) {
     setMinimumPlayers(value);
     setPage(0);
+    writeListUrl({ query, minimumPlayers: value, page: 0 });
   }
 
   function resetFilters() {
     setQuery("");
     setMinimumPlayers(0);
     setPage(0);
+    writeListUrl({ query: "", minimumPlayers: 0, page: 0 });
+  }
+
+  function showPage(nextPage: number) {
+    setPage(nextPage);
+    writeListUrl({ query, minimumPlayers, page: nextPage });
   }
 
   return (
@@ -321,19 +417,12 @@ export function MtaMasterServerDirectory({
       ) : null}
 
       {error && (
-        <ErrorState
-          title={error}
-          description={copy.unavailableHint}
-          action={
-            <Button
-              type="button"
-              variant="secondary"
-              size="touch"
-              onClick={() => setAttempt((current) => current + 1)}
-            >
-              {copy.tryAgain}
-            </Button>
-          }
+        <PublicDirectoryOutcome
+          locale={locale}
+          outcome="unavailable"
+          errorTitle={error}
+          onRetry={() => setAttempt((current) => current + 1)}
+          resetFilters={resetFilters}
         />
       )}
 
@@ -348,25 +437,11 @@ export function MtaMasterServerDirectory({
             />
           ))}
           {directory.servers.length === 0 && (
-            <EmptyState
-              title={hasFilters ? copy.noMatch : copy.none}
-              description={hasFilters ? copy.noMatchDescription : copy.noneDescription}
-              action={
-                hasFilters ? (
-                  <Button type="button" variant="secondary" size="touch" onClick={resetFilters}>
-                    {copy.resetFilters}
-                  </Button>
-                ) : (
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    size="touch"
-                    onClick={() => setAttempt((current) => current + 1)}
-                  >
-                    {copy.tryAgain}
-                  </Button>
-                )
-              }
+            <PublicDirectoryOutcome
+              locale={locale}
+              outcome={hasFilters ? "filtered" : "empty"}
+              onRetry={() => setAttempt((current) => current + 1)}
+              resetFilters={resetFilters}
             />
           )}
         </div>
@@ -378,7 +453,7 @@ export function MtaMasterServerDirectory({
             type="button"
             variant="secondary"
             size="touch"
-            onClick={() => setPage((current) => Math.max(0, current - 1))}
+            onClick={() => showPage(Math.max(0, page - 1))}
             disabled={page === 0}
             className="gap-1"
           >
@@ -392,7 +467,7 @@ export function MtaMasterServerDirectory({
             type="button"
             variant="secondary"
             size="touch"
-            onClick={() => setPage((current) => Math.min(totalPages - 1, current + 1))}
+            onClick={() => showPage(Math.min(totalPages - 1, page + 1))}
             disabled={page >= totalPages - 1}
             className="gap-1"
           >
