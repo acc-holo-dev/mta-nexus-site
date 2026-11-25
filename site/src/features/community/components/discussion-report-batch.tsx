@@ -1,5 +1,5 @@
 "use client";
-import { Button, ErrorState } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -48,12 +48,15 @@ export function DiscussionReportBatch({
   items,
   locale,
   allowActions,
+  filtersActive = false,
 }: {
   contentId: string;
   commentId: string | null;
   items: z.infer<typeof discussionReportsPageSchema>["items"];
   locale: Locale;
   allowActions: boolean;
+  /** True when search, category, history, or a later page narrowed this list. */
+  filtersActive?: boolean;
 }) {
   const copy = reportBatchCopy(locale),
     labels = communityReportCopy(locale),
@@ -445,25 +448,42 @@ export function DiscussionReportBatch({
           ))}
         </ul>
       ) : (
-        <div className={panelSpace3P5}>
-          <p className="text-muted">
-            {commentId === null
-              ? reportGroupsCopy(locale).publicationEmpty
-              : discussionReportsCopy(locale).emptyFiltered}
-          </p>
-          <Link
-            href={
-              commentId === null
-                ? `/admin/community/${encodeURIComponent(contentId)}/reports`
-                : `/admin/community/${encodeURIComponent(contentId)}/discussion/${encodeURIComponent(commentId)}/reports`
-            }
-            className={linkAccentSm}
-          >
-            {commentId === null
-              ? reportGroupsCopy(locale).reset
-              : discussionReportsCopy(locale).clear}
-          </Link>
-        </div>
+        <EmptyState
+          title={
+            commentId === null
+              ? filtersActive
+                ? reportGroupsCopy(locale).publicationEmpty
+                : communityReportCopy(locale).empty
+              : filtersActive
+                ? discussionReportsCopy(locale).emptyFiltered
+                : discussionReportsCopy(locale).empty
+          }
+          description={
+            commentId === null
+              ? filtersActive
+                ? communityReportCopy(locale).reset
+                : reportGroupsCopy(locale).publicationDescription
+              : filtersActive
+                ? discussionReportsCopy(locale).emptyFilteredDescription
+                : discussionReportsCopy(locale).emptyDescription
+          }
+          action={
+            filtersActive ? (
+              <Link
+                href={
+                  commentId === null
+                    ? `/admin/community/${encodeURIComponent(contentId)}/reports`
+                    : `/admin/community/${encodeURIComponent(contentId)}/discussion/${encodeURIComponent(commentId)}/reports`
+                }
+                className={linkAccentSm}
+              >
+                {commentId === null
+                  ? reportGroupsCopy(locale).reset
+                  : discussionReportsCopy(locale).clear}
+              </Link>
+            ) : undefined
+          }
+        />
       )}
     </section>
   );
