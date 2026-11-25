@@ -84,6 +84,7 @@ export class UserLibraryRepository {
     requestedPage = 1,
     filter: UserLibraryFilter = "all",
     requestedPageSize = USER_LIBRARY_PAGE_SIZE,
+    query = "",
   ): Promise<UserLibraryPage> {
     const now = new Date();
     const sources = effectiveUserDownloadSources(userId, now);
@@ -135,17 +136,39 @@ export class UserLibraryRepository {
     };
     const normalizedFilter: UserLibraryFilter =
       filter === "ready" || filter === "unavailable" ? filter : "all";
-    const total = counts[normalizedFilter];
+    let needle = "";
+    for (const char of query.trim()) {
+      const code = char.codePointAt(0) ?? 0;
+      if (code < 32 || code === 127) continue;
+      needle += char;
+      if (needle.length >= 80) break;
+    }
+    const pattern = needle ? `%${needle.replace(/[\\%_]/g, (char) => `\\${char}`)}%` : "";
+    const titleMatch = needle ? sql`${products.title} ILIKE ${pattern} ESCAPE '\\'` : sql`TRUE`;
+    const filterClause =
+      normalizedFilter === "ready"
+        ? sql`WHERE ${ready} AND ${titleMatch}`
+        : normalizedFilter === "unavailable"
+          ? sql`WHERE NOT (${ready}) AND ${titleMatch}`
+          : needle
+            ? sql`WHERE ${titleMatch}`
+            : sql``;
+    const total = needle
+      ? Number(
+          (
+            await db.execute<{ total: number }>(sql`
+              ${sources}
+              SELECT count(*)::integer AS "total"
+              ${joined}
+              ${filterClause}
+            `)
+          )[0]?.total ?? 0,
+        )
+      : counts[normalizedFilter];
     const bounds = libraryPageBounds(total, requestedPage, requestedPageSize);
     if (!total) {
       return { items: [], ...bounds, total, counts, filter: normalizedFilter };
     }
-    const filterClause =
-      normalizedFilter === "ready"
-        ? sql`WHERE ${ready}`
-        : normalizedFilter === "unavailable"
-          ? sql`WHERE NOT (${ready})`
-          : sql``;
     const rows = await db.execute<ItemRow>(sql`
       ${sources}
       SELECT owned.resource_id AS "resourceId",

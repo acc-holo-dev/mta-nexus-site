@@ -9,6 +9,19 @@ export function parseLibraryPage(value: string | string[] | undefined): number {
   return typeof value === "string" && /^[1-9][0-9]{0,5}$/u.test(value) ? Number(value) : 1;
 }
 
+/** Bound a single search box value. Arrays and control characters never become SQL. */
+export function parseLibraryQuery(value: string | string[] | undefined): string {
+  if (typeof value !== "string") return "";
+  let query = "";
+  for (const char of value.trim()) {
+    const code = char.codePointAt(0) ?? 0;
+    if (code < 32 || code === 127) continue;
+    query += char;
+    if (query.length >= 80) break;
+  }
+  return query;
+}
+
 export const libraryCopy = {
   en: {
     title: "Resource library",
@@ -31,9 +44,10 @@ export const libraryCopy = {
       "Free resources and active grants show up here after they are added to your account.",
     emptyHintWallet:
       "Free and paid resources with active grants show up here after they are added to your account. Site-wallet settle can grant paid library access; this list is grants, not a payment ledger.",
+    search: "Search library",
+    searchSubmit: "Search",
     emptyFilter: "There are no resources matching this filter.",
-    emptyFilterHint:
-      "Switch to All or another availability filter to see the rest of your library.",
+    emptyFilterHint: "Clear the search or switch to All to see the rest of your library.",
     clearFilters: "Show all library resources",
     loadUnavailable: "Your resource library is temporarily unavailable. Please try again.",
     loadUnavailableHint:
@@ -73,9 +87,11 @@ export const libraryCopy = {
     emptyHint: "Бесплатные ресурсы и действующие права появятся здесь после добавления в аккаунт.",
     emptyHintWallet:
       "Бесплатные и платные ресурсы с действующими правами появятся здесь после добавления в аккаунт. Settle через site wallet может выдать платный доступ в библиотеку; этот список — права, а не платёжный ledger.",
+    search: "Поиск по библиотеке",
+    searchSubmit: "Найти",
     emptyFilter: "Нет ресурсов с выбранным статусом.",
     emptyFilterHint:
-      "Выберите «Все» или другой фильтр доступности, чтобы увидеть остальные ресурсы.",
+      "Очистите поиск или выберите «Все», чтобы увидеть остальные ресурсы библиотеки.",
     clearFilters: "Показать всю библиотеку",
     loadUnavailable: "Библиотека ресурсов временно недоступна. Попробуйте ещё раз.",
     loadUnavailableHint:
@@ -106,9 +122,11 @@ export function libraryMarketHref(walletEnabled: boolean) {
   return walletEnabled ? "/market" : "/market?maxPrice=0";
 }
 
-export function libraryHref(filter: UserLibraryFilter, page: number) {
+export function libraryHref(filter: UserLibraryFilter, page: number, search = "") {
   const params = new URLSearchParams();
   if (filter !== "all") params.set("filter", filter);
+  const q = parseLibraryQuery(search);
+  if (q) params.set("q", q);
   if (page > 1) params.set("page", String(page));
   const query = params.toString();
   return `/workspace/library${query ? `?${query}` : ""}`;
