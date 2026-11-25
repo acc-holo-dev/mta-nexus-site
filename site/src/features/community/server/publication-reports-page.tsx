@@ -1,5 +1,5 @@
 import { AppError } from "@nexus/domain";
-import { Button, ErrorState } from "@nexus/ui";
+import { Button, EmptyState, ErrorState } from "@nexus/ui";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { getRequestLocale } from "../../../lib/i18n/server";
@@ -22,7 +22,13 @@ import {
 } from "../../shell/type-shell";
 import { reportRateLimit } from "../community-report-api";
 import { REPORT_TYPES } from "../community-report-contract";
-import { communityReportCopy, communityReportError } from "../community-report-copy";
+import {
+  communityReportCopy,
+  communityReportError,
+  publicationReportLoadFailureDescription,
+  publicationReportQueueEmpty,
+  publicationReportsAreFiltered,
+} from "../community-report-copy";
 import {
   publicationReportPageQuery,
   publicationReportsPageSchema,
@@ -77,6 +83,8 @@ export async function PublicationReportsPage({
     );
     if (data.publication.id !== id || data.page !== filters.page || data.view !== filters.view)
       throw new AppError("Publication scope changed", 503, "INTERNAL_ERROR");
+    const filteredReports = publicationReportsAreFiltered(filters);
+    const emptyQueue = publicationReportQueueEmpty(locale, filteredReports);
     const href = (page: number) => {
       const params = new URLSearchParams({ view: filters.view, page: String(page) });
       if (filters.query) params.set("q", filters.query);
@@ -148,14 +156,28 @@ export async function PublicationReportsPage({
             </div>
           </form>
         </search>
-        <DiscussionReportBatch
-          key={`${actor.id}:${id}:${JSON.stringify(filters)}:${data.items.map((item) => `${item.id}:${item.status}`).join("|")}`}
-          contentId={id}
-          commentId={null}
-          items={data.items}
-          locale={locale}
-          allowActions={filters.view === "pending"}
-        />
+        {data.items.length === 0 ? (
+          <EmptyState
+            title={emptyQueue.title}
+            description={emptyQueue.description}
+            action={
+              filteredReports ? (
+                <Link href={path} className={linkAccentSmRounded}>
+                  {copy.reset}
+                </Link>
+              ) : undefined
+            }
+          />
+        ) : (
+          <DiscussionReportBatch
+            key={`${actor.id}:${id}:${JSON.stringify(filters)}:${data.items.map((item) => `${item.id}:${item.status}`).join("|")}`}
+            contentId={id}
+            commentId={null}
+            items={data.items}
+            locale={locale}
+            allowActions={filters.view === "pending"}
+          />
+        )}
         <nav aria-label={labels.page} className={typeFlexWrapCenterGap4Sm}>
           {filters.page > 1 && (
             <Link href={href(filters.page - 1)} className={linkAccent}>
@@ -182,7 +204,10 @@ export async function PublicationReportsPage({
             locale,
             error instanceof AppError ? error.code : "INTERNAL_ERROR",
           )}
-          description={labels.formErrorHint}
+          description={publicationReportLoadFailureDescription(
+            locale,
+            error instanceof AppError ? error.code : "INTERNAL_ERROR",
+          )}
           action={
             <Link href={path} className={linkAccentSmRounded}>
               {labels.reload}
