@@ -4,7 +4,7 @@ import {
   notificationRepository,
   resourceMediaRepository,
 } from "@nexus/db";
-import { buildResourceVersionHelp, explicitFxLines, WALLET_CURRENCIES } from "@nexus/domain";
+import { buildResourceVersionHelp, WALLET_CURRENCIES } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { CheckCircle2, Key, Layers, MessageSquare, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
@@ -25,6 +25,7 @@ import { resourceQaService } from "../../../lib/services/resources/resource-qa-s
 import { resourceReleaseWatchesService } from "../../../lib/services/resources/resource-release-watches-service";
 import { resourceReviewService } from "../../../lib/services/resources/resource-review-service";
 import { formatHistoryAmount } from "../../commerce/commerce-history-format";
+import { RecordedRateEstimate } from "../../commerce/components/recorded-rate-estimate";
 import { licenseModelLabel } from "../../commerce/license-model-i18n";
 import { WalletCheckoutButton } from "../../commerce/wallet-checkout";
 import { FollowButton } from "../../community/follow";
@@ -331,10 +332,6 @@ export async function ProductDetailPage({
     walletEnabled && product.price > 0 && listingCurrency
       ? await new WalletPaymentService().listFxRates().catch(() => null)
       : null;
-  const priceEstimates =
-    priceRates && listingCurrency
-      ? explicitFxLines({ currency: listingCurrency, amount: product.price }, priceRates)
-      : null;
 
   return (
     <div className={pageShellStack10}>
@@ -397,38 +394,12 @@ export async function ProductDetailPage({
             <div>
               <div className={type3xlBlackPrimary}>{formattedPrice}</div>
               {walletEnabled && product.price > 0 && listingCurrency ? (
-                priceEstimates ? (
-                  <ul className="mt-2 space-y-1 text-xs text-muted">
-                    {priceEstimates.map((line) => (
-                      <li key={line.quote}>
-                        {line.kind === "quote"
-                          ? copy.priceEstimate
-                              .replace("{base}", line.base)
-                              .replace(
-                                "{quote}",
-                                formatHistoryAmount(
-                                  line.amount,
-                                  line.quote,
-                                  locale === "ru" ? "ru" : "en",
-                                ),
-                              )
-                          : line.kind === "dust"
-                            ? copy.priceEstimateDust
-                                .replace("{base}", line.base)
-                                .replace("{quote}", line.quote)
-                            : line.kind === "invalid"
-                              ? copy.priceEstimateInvalid
-                                  .replace("{base}", line.base)
-                                  .replace("{quote}", line.quote)
-                              : copy.priceEstimateNone
-                                  .replace("{base}", line.base)
-                                  .replace("{quote}", line.quote)}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className={typeMt1XsMuted}>{copy.priceEstimateUnavailable}</p>
-                )
+                <RecordedRateEstimate
+                  amount={product.price}
+                  currency={listingCurrency}
+                  locale={locale === "ru" ? "ru" : "en"}
+                  rates={priceRates}
+                />
               ) : null}
               <div className={typeMt1XsMuted}>
                 {copy.licenseModel}: <span>{licenseModelLabel(locale, product.licenseModel)}</span>
