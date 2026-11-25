@@ -61,7 +61,7 @@ site/
 | organizations |    59 | 202552 |
 | resources     |   232 | 940862 |
 | servers       |   111 | 382891 |
-| shell         |   101 | 211264 |
+| shell         |   101 | 211348 |
 | support       |    28 | 117845 |
 | trust         |    28 |  83844 |
 

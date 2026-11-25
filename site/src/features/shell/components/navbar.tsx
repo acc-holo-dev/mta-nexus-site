@@ -15,7 +15,7 @@ export function Navbar({ locale }: { locale: Locale }) {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-base bg-surface/95 backdrop-blur">
-      <div className="flex min-h-14 flex-wrap items-center justify-between gap-2 px-3 py-2 sm:gap-3 sm:px-6">
+      <div className="flex min-h-14 flex-wrap items-center justify-between gap-2 px-4 sm:gap-3 sm:px-6 lg:h-14 lg:flex-nowrap">
         <BrandMark href="/" className="lg:hidden" wordmarkClassName="hidden sm:inline" />
 
         <div className="order-3 min-w-0 basis-full sm:order-none sm:flex-1 lg:max-w-xl">
