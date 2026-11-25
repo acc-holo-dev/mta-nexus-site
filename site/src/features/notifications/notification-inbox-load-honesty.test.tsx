@@ -46,5 +46,5 @@ it("shows a failed inbox reload as an error, not an empty notification list", as
   const tree = render();
   expect(tree.some((node) => node.props.title === copy.empty)).toBe(false);
   expect(tree.some((node) => node.props.title === copy.emptyFiltered)).toBe(false);
-  expect(tree.some((node) => node.props.description === copy.formErrorHint)).toBe(true);
+  expect(tree.some((node) => node.props.description === copy.unavailableHint)).toBe(true);
 });
