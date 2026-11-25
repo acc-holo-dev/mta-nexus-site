@@ -75,8 +75,7 @@ export async function FinancialReconciliationTermsScreen({
       if (value !== undefined) values.set(key, value);
     }
     const report = await orderTermsService.report(actor, id, "admin", orderTermsPageQuery(values));
-    const walletEnabled = isWalletEngineEnabled();
-    const fxRates = walletEnabled
+    const fxRates = isWalletEngineEnabled()
       ? await new WalletPaymentService().listFxRates().catch(() => null)
       : undefined;
     return (
@@ -84,7 +83,7 @@ export async function FinancialReconciliationTermsScreen({
         report={report}
         scope="admin"
         locale={locale}
-        walletEnabled={walletEnabled}
+        walletEnabled={isWalletEngineEnabled()}
         fxRates={fxRates}
       />
     );

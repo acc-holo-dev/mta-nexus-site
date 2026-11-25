@@ -36,6 +36,9 @@ vi.mock("../../src/lib/services/commerce/order-terms-service", () => ({
 }));
 vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
   isWalletEngineEnabled: () => state.walletEnabled,
+  WalletPaymentService: class {
+    listFxRates = async () => [];
+  },
 }));
 
 import TermsLoading from "../../src/app/admin/commerce/reconciliation/[id]/terms/loading";

@@ -74,8 +74,7 @@ export async function PurchaseTermsScreen({
       if (value !== undefined) values.set(key, value);
     }
     const report = await orderTermsService.report(actor, id, "buyer", orderTermsPageQuery(values));
-    const walletEnabled = isWalletEngineEnabled();
-    const fxRates = walletEnabled
+    const fxRates = isWalletEngineEnabled()
       ? await new WalletPaymentService().listFxRates().catch(() => null)
       : undefined;
     return (
@@ -83,7 +82,7 @@ export async function PurchaseTermsScreen({
         report={report}
         scope="buyer"
         locale={locale}
-        walletEnabled={walletEnabled}
+        walletEnabled={isWalletEngineEnabled()}
         fxRates={fxRates}
       />
     );
