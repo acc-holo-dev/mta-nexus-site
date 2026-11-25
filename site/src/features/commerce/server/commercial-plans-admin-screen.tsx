@@ -9,6 +9,10 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { commercialPlanService } from "../../../lib/services/commerce/commercial-plan-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
@@ -24,6 +28,7 @@ import {
 } from "../../shell/type-shell";
 import { formatHistoryAmount, parseHistoryPage } from "../commerce-history-format";
 import { getCommercialCopy } from "../commercial-i18n";
+import { RecordedRateEstimate } from "../components/recorded-rate-estimate";
 
 export async function commercialPlansAdminMetadata(): Promise<Metadata> {
   return {
@@ -99,6 +104,9 @@ export async function CommercialPlansAdminScreen({
     );
   }
 
+  const fxRates = isWalletEngineEnabled()
+    ? await new WalletPaymentService().listFxRates().catch(() => null)
+    : undefined;
   return (
     <div className={pageShellMax5xl}>
       <Link href="/admin" className={linkAccentSm}>
@@ -156,6 +164,12 @@ export async function CommercialPlansAdminScreen({
               <p className={typeSmPrimary}>
                 {formatHistoryAmount(plan.price, plan.currency, locale)} · {plan.durationDays}{" "}
                 {copy.days} · {(plan.commissionBps / 100).toLocaleString(locale)}%
+                <RecordedRateEstimate
+                  amount={plan.price}
+                  currency={plan.currency}
+                  locale={locale}
+                  rates={fxRates}
+                />
               </p>
             </li>
           ))}
