@@ -17,6 +17,14 @@ vi.mock("../../lib/services/commerce/product-service", () => ({
     getPublicAttributions: async () => new Map(),
   },
 }));
+vi.mock("../../lib/services/commerce/wallet-payment-service", () => ({
+  isWalletEngineEnabled: () => false,
+  WalletPaymentService: class WalletPaymentService {
+    async listFxRates() {
+      return [];
+    }
+  },
+}));
 vi.mock("../../features/resources/view", () => ({
   ProductCard: ({ product }: { product: { title: string } }) => <article>{product.title}</article>,
 }));
@@ -58,6 +66,14 @@ describe("free resource catalog as rendered for visitors", () => {
     expect(html).toContain("page=2");
     expect(html).toContain("q=MTA+%26+RPG");
     expect(html).toContain("Далее");
+    expect(html).toContain('method="get"');
+    expect(html).toContain('action="/market"');
+    expect(html).toContain('name="type" value="script"');
+    expect(html).toContain('name="sort" value="rating"');
+    expect(html).toContain('name="q"');
+    expect(html).toContain('value="MTA &amp; RPG"');
+    expect(html).toContain('href="/market?type=script&amp;sort=popular&amp;q=MTA+%26+RPG"');
+    expect(html).not.toContain("localStorage");
   });
 
   it("explains an exhausted page and offers a way back to the same filtered first page", async () => {
