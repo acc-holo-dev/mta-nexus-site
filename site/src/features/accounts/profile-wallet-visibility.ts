@@ -16,7 +16,7 @@ export function showOwnProfileWallet(input: {
   );
 }
 
-export type ProfileFxLine =
+type ProfileFxLine =
   | { kind: "quote"; base: WalletCurrency; quote: WalletCurrency; amount: number }
   | { kind: "dust" | "invalid"; base: WalletCurrency; quote: WalletCurrency };
 
