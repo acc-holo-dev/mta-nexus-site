@@ -1,14 +1,15 @@
 "use client";
 
-import type { ExplicitFxRate } from "@nexus/domain";
+import { type ExplicitFxLine, type ExplicitFxRate, publicPriceEstimates } from "@nexus/domain";
 import { Button, ErrorState, Input } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 import { useNexusLocale } from "../../shell/locale";
-import { typeBlockSpace2, typeSmSuccess } from "../../shell/type-shell";
+import { typeBlockSpace2, typeSmMuted, typeSmSuccess } from "../../shell/type-shell";
 import { formatHistoryAmount } from "../commerce-history-format";
+import { formatFinancialMinor } from "../financial-i18n";
 import { confirmedPromoQuote, confirmedWalletCheckout } from "../wallet-checkout-confirmation";
 import { getWalletCopy, walletError } from "../wallet-i18n";
 import { RecordedRateEstimate } from "./recorded-rate-estimate";
@@ -17,6 +18,50 @@ import {
   WalletSpendBalancePreview,
   walletSpendSubmitBlocked,
 } from "./wallet-spend-balance-preview";
+
+/** Due-line copy only. The discount line keeps recorded-rate wording. */
+function checkoutDueLine(line: ExplicitFxLine, currency: string, locale: "en" | "ru"): string {
+  const copy = getWalletCopy(locale);
+  if (line.kind === "quote") {
+    return copy.checkoutDueEstimate
+      .replace("{quote}", formatFinancialMinor(line.amount, line.quote, locale))
+      .replace("{base}", currency);
+  }
+  const template =
+    line.kind === "none"
+      ? copy.checkoutDueNone
+      : line.kind === "dust"
+        ? copy.checkoutDueDust
+        : copy.checkoutDueInvalid;
+  return template.replaceAll("{base}", currency).replaceAll("{quote}", line.quote);
+}
+
+function CheckoutDueEstimate({
+  amount,
+  currency,
+  locale,
+  rates,
+}: {
+  amount: number;
+  currency: string;
+  locale: "en" | "ru";
+  rates: readonly ExplicitFxRate[] | null | undefined;
+}) {
+  if (!Number.isSafeInteger(amount)) return null;
+  const lines = publicPriceEstimates({ price: Math.abs(amount), currency }, rates);
+  if (lines === undefined) return null;
+  if (lines === null) {
+    return <p className={typeSmMuted}>{getWalletCopy(locale).checkoutDueUnavailable}</p>;
+  }
+  if (lines.length === 0) return null;
+  return (
+    <ul className={typeSmMuted}>
+      {lines.map((line) => (
+        <li key={`${line.kind}-${line.quote}`}>{checkoutDueLine(line, currency, locale)}</li>
+      ))}
+    </ul>
+  );
+}
 
 export function WalletCheckoutButton({
   actorId,
@@ -180,7 +225,7 @@ export function WalletCheckoutButton({
         </h3>
         <p className="text-[11px] text-muted">{copy.checkoutNote}</p>
         <p className="text-sm text-primary">{amountLabel}</p>
-        <RecordedRateEstimate
+        <CheckoutDueEstimate
           amount={dueMinor}
           currency={currency}
           locale={quoteLocale}
