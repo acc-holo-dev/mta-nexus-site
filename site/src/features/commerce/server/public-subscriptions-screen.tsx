@@ -28,6 +28,7 @@ import {
 import { formatHistoryAmount, parseHistoryPage } from "../commerce-history-format";
 import { getCommercialCopy } from "../commercial-i18n";
 import { CommercialFeeCalculator } from "../commercial-plans";
+import { RecordedRateEstimate } from "../components/recorded-rate-estimate";
 import { planReviewsCopy } from "../plan-reviews-i18n";
 import { subscriptionsCopy } from "../subscriptions-i18n";
 
@@ -127,6 +128,12 @@ export async function PublicSubscriptionsScreen({
               <p className={typeNumericPrimary}>
                 {formatHistoryAmount(plan.price, plan.currency, locale)} · {plan.durationDays}{" "}
                 {copy.days}
+                <RecordedRateEstimate
+                  amount={plan.price}
+                  currency={plan.currency}
+                  locale={locale}
+                  rates={fxRates}
+                />
               </p>
               <p className={typeSmSecondary}>
                 {copy.commission}: {(plan.commissionBps / 100).toLocaleString(locale)}%
