@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 24 ноября 2026 (Europe/Moscow).  
-**source_sha:** `5c39384b3` (`cursor/catalog-filter-keep-2e5e`, catalog search and filters stay in the URL).  
+**source_sha:** `d4f1a6e8a` (`cursor/catalog-filter-keep-2e5e`, catalog search and filters stay in the URL).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -31,7 +31,7 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    |            Факт на `5c39384b3` |
+| Область                    |            Факт на `d4f1a6e8a` |
 | -------------------------- | -----------------------------: |
 | `features/*` domains       |                             13 |
 | `components/` tree files   |                              0 |
@@ -51,7 +51,7 @@ site/
 
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
-| accounts      |    92 | 241849 |
+| accounts      |    92 | 243432 |
 | commerce      |   207 | 862399 |
 | community     |   154 | 635565 |
 | discovery     |    22 |  50639 |
