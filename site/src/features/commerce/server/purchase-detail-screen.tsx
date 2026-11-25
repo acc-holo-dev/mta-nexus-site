@@ -48,13 +48,23 @@ function OrderAmountEstimate({
   currency,
   locale,
   rates,
+  purpose = "amount",
 }: {
   amount: number;
   currency: string;
   locale: "en" | "ru";
   rates: readonly ExplicitFxRate[] | null | undefined;
+  purpose?: "amount" | "discount";
 }) {
-  return <RecordedRateEstimate amount={amount} currency={currency} locale={locale} rates={rates} />;
+  return (
+    <RecordedRateEstimate
+      amount={amount}
+      currency={currency}
+      locale={locale}
+      purpose={purpose}
+      rates={rates}
+    />
+  );
 }
 export async function purchaseDetailMetadata(): Promise<Metadata> {
   return {
@@ -203,6 +213,7 @@ export async function PurchaseDetailScreen({
                     amount={order.discountAmount}
                     currency={order.currency}
                     locale={typedLocale}
+                    purpose="discount"
                     rates={fxRates}
                   />
                 ) : null}
