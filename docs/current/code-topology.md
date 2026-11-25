@@ -55,7 +55,7 @@ site/
 | commerce      |   204 | 830895 |
 | community     |   154 | 635565 |
 | discovery     |    22 |  50639 |
-| library       |   124 | 524752 |
+| library       |   124 | 526455 |
 | moderation    |    56 | 221046 |
 | notifications |    27 | 142000 |
 | organizations |    59 | 202552 |
