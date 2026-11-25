@@ -8,11 +8,7 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
-import {
-  typeBlockSpace2,
-  typeSmSuccess,
-  typeXlSemiboldPrimary,
-} from "../../shell/type-shell";
+import { typeBlockSpace2, typeSmSuccess, typeXlSemiboldPrimary } from "../../shell/type-shell";
 import { getWalletCopy, walletError } from "../wallet-i18n";
 import { confirmedWalletPay } from "../wallet-pay-confirmation";
 import { RecordedRateEstimate } from "./recorded-rate-estimate";
