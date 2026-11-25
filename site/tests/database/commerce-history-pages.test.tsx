@@ -31,6 +31,16 @@ vi.mock("../../src/lib/services/accounts/auth-service", () => ({
 vi.mock("../../src/lib/i18n/server", () => ({
   getRequestLocale: async () => state.locale,
 }));
+vi.mock("../../src/lib/services/commerce/wallet-payment-service", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("../../src/lib/services/commerce/wallet-payment-service")>();
+  return {
+    ...actual,
+    WalletPaymentService: class {
+      listFxRates = async () => [];
+    },
+  };
+});
 vi.mock("next/link", async () => {
   const React = await import("react");
   return {
