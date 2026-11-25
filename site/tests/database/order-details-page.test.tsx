@@ -7,6 +7,12 @@ const state = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,
   locale: "en" as "en" | "ru",
   details: vi.fn(),
+  walletEnabled: false,
+  fxRates: vi.fn(
+    async (): Promise<
+      { baseCurrency: string; quoteCurrency: string; baseAmount: number; quoteAmount: number }[]
+    > => [],
+  ),
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
@@ -24,10 +30,20 @@ vi.mock("../../src/lib/services/accounts/auth-service", () => ({
 vi.mock("../../src/lib/services/commerce/commerce-service", () => ({
   commerceService: { getBuyerOrderDetails: state.details },
 }));
+vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
+  isWalletEngineEnabled: () => state.walletEnabled,
+  WalletPaymentService: class {
+    listFxRates() {
+      return state.fxRates();
+    }
+  },
+}));
 
 import PurchaseDetailLoading from "../../src/app/workspace/purchases/[id]/loading";
 import Page from "../../src/app/workspace/purchases/[id]/page";
 import { getCommerceHistoryCopy } from "../../src/features/commerce/commerce-history-i18n";
+import { formatHistoryAmount } from "../../src/features/commerce/commerce-history-format";
+import { getWalletCopy } from "../../src/features/commerce/wallet-i18n";
 import { getDictionary } from "../../src/lib/i18n";
 
 const input = {
@@ -37,6 +53,8 @@ const input = {
 beforeEach(() => {
   state.user = { id: "usr_a" };
   state.locale = "en";
+  state.walletEnabled = false;
+  state.fxRates.mockReset().mockResolvedValue([]);
   state.details.mockReset().mockResolvedValue({
     order: {
       id: "ord_a",
@@ -180,6 +198,67 @@ it("renders EmptyState when an order has no line items", async () => {
   );
   expect(html).toContain(copy.emptyItems);
   expect(html).toContain(copy.emptyItemsHint);
+});
+it("states a failed recorded rate once per section and quotes each amount when rates exist", async () => {
+  const walletCopy = getWalletCopy("en");
+  const recordedTotal = formatHistoryAmount(4500, "USD", "en");
+  const recordedLine = formatHistoryAmount(10, "USD", "en");
+  const off = renderToStaticMarkup(await Page(input));
+  expect(off).not.toContain(walletCopy.recordedRateUnavailable);
+  expect(off).not.toContain("About ");
+  expect(off).toContain(recordedTotal);
+  expect(off).toContain(recordedLine);
+
+  state.walletEnabled = true;
+  state.fxRates.mockRejectedValue(new Error("fx unavailable"));
+  const failed = renderToStaticMarkup(await Page(input));
+  expect(failed.split(walletCopy.recordedRateUnavailable).length - 1).toBe(2);
+  expect(failed).toContain(recordedTotal);
+  expect(failed).toContain(recordedLine);
+
+  state.details.mockResolvedValue({
+    order: {
+      id: "ord_a",
+      orderNumber: "NX-001",
+      status: "completed",
+      totalAmount: 4000,
+      listAmount: 4500,
+      discountAmount: 500,
+      promoCode: "SAVE",
+      currency: "USD",
+      createdAt: new Date("2026-10-10"),
+    },
+    items: [
+      {
+        id: "itm_a",
+        productId: "prd_a",
+        productTitle: "Resource",
+        productSlug: "resource",
+        unitPrice: 4500,
+        currency: "USD",
+        hasCurrentAccess: false,
+      },
+    ],
+    total: 1,
+    page: 1,
+    totalPages: 1,
+    walletSettled: false,
+  });
+  state.fxRates.mockResolvedValue([
+    { baseCurrency: "USD", quoteCurrency: "EUR", baseAmount: 100, quoteAmount: 90 },
+  ]);
+  const quoted = renderToStaticMarkup(
+    await Page({
+      params: Promise.resolve({ id: "ord_a" }),
+      searchParams: Promise.resolve({}),
+    }),
+  );
+  expect(quoted).not.toContain(walletCopy.recordedRateUnavailable);
+  expect(quoted.split("About ").length - 1).toBe(3);
+  expect(quoted.split("The discount is about ").length - 1).toBe(1);
+  expect(quoted).toContain(formatHistoryAmount(4000, "USD", "en"));
+  expect(quoted).toContain(formatHistoryAmount(500, "USD", "en"));
+  expect(quoted).toContain(formatHistoryAmount(4500, "USD", "en"));
 });
 it("clips the honest purchase detail loading shell on narrow layouts", async () => {
   const html = renderToStaticMarkup(await PurchaseDetailLoading());

@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { getCommercialCopy } from "../../src/features/commerce/commercial-i18n";
 import { subscriptionsCopy } from "../../src/features/commerce/subscriptions-i18n";
@@ -14,5 +16,19 @@ describe("subscription wallet honesty surface", () => {
       expect(subscriptions.paymentRequired).not.toMatch(/requires a payment provider/i);
       expect(commercial.planNote).not.toMatch(/until a payment provider is integrated/i);
     }
+  });
+
+  it("states a failed recorded-rate read once on the subscription fee estimate", () => {
+    const source = readFileSync(
+      resolve(
+        process.cwd(),
+        "site/src/features/commerce/components/subscription-fee-estimator.tsx",
+      ),
+      "utf8",
+    );
+    expect(source).toContain("rates === null");
+    expect(source).toContain("recordedRateUnavailable");
+    expect(source).toContain("rates === null ? undefined : rates");
+    expect(source.match(/recordedRateUnavailable/g)).toHaveLength(1);
   });
 });
