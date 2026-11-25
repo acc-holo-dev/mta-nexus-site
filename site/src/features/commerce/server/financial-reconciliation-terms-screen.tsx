@@ -8,7 +8,10 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { orderTermsService } from "../../../lib/services/commerce/order-terms-service";
-import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
@@ -72,12 +75,17 @@ export async function FinancialReconciliationTermsScreen({
       if (value !== undefined) values.set(key, value);
     }
     const report = await orderTermsService.report(actor, id, "admin", orderTermsPageQuery(values));
+    const walletEnabled = isWalletEngineEnabled();
+    const fxRates = walletEnabled
+      ? await new WalletPaymentService().listFxRates().catch(() => null)
+      : undefined;
     return (
       <OrderTermsReportView
         report={report}
         scope="admin"
         locale={locale}
-        walletEnabled={isWalletEngineEnabled()}
+        walletEnabled={walletEnabled}
+        fxRates={fxRates}
       />
     );
   } catch (error) {

@@ -1,4 +1,5 @@
-import type { OrderTermsReport } from "@nexus/domain";
+import type { ExplicitFxRate, OrderTermsReport } from "@nexus/domain";
+import { publicPriceEstimates } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { ScrollText } from "lucide-react";
 import Link from "next/link";
@@ -17,10 +18,12 @@ import {
   typeMinSpace3,
   typeSmMuted,
   typeSmSecondary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { formatFinancialMinor } from "../financial-i18n";
 import { orderTermsCopy, orderTermsLicenseLabel, orderTermsNotice } from "../order-terms-i18n";
 import { sellerSalesTime } from "../seller-sales-i18n";
+import { getWalletCopy } from "../wallet-i18n";
 
 // Honesty residual: consistency flags via ErrorState.
 const ORDER_TERMS_FLAG_IDS = {
@@ -30,16 +33,54 @@ const ORDER_TERMS_FLAG_IDS = {
   unsupportedCurrency: "order-terms-unsupported-currency",
 } as const;
 
+function TermsEstimate({
+  amount,
+  copy,
+  currency,
+  locale,
+  rates,
+}: {
+  amount: number;
+  copy: ReturnType<typeof getWalletCopy>;
+  currency: string;
+  locale: "en" | "ru";
+  rates: readonly ExplicitFxRate[] | null;
+}) {
+  const lines = publicPriceEstimates({ price: amount, currency }, rates);
+  if (lines === undefined) return null;
+  if (lines === null) return <p className={typeXsMuted}>{copy.fxUnavailable}</p>;
+  return (
+    <ul className={typeXsMuted}>
+      {lines.map((line) => (
+        <li key={line.quote}>
+          {line.kind === "quote"
+            ? copy.fxEstimate.replace(
+                "{destination}",
+                formatFinancialMinor(line.amount, line.quote, locale),
+              )
+            : line.kind === "dust"
+              ? copy.fxDust
+              : line.kind === "invalid"
+                ? copy.fxExceeds
+                : `${line.quote}: ${copy.fxNone}`}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function OrderTermsReportView({
   report,
   scope,
   locale,
   walletEnabled = false,
+  fxRates,
 }: {
   report: OrderTermsReport;
   scope: "buyer" | "admin";
   locale: "en" | "ru";
   walletEnabled?: boolean;
+  fxRates?: readonly ExplicitFxRate[] | null;
 }) {
   const c = orderTermsCopy(locale),
     notice = orderTermsNotice(locale, walletEnabled),
@@ -80,6 +121,15 @@ export function OrderTermsReportView({
             <dt>{c.total}</dt>
             <dd className="font-numeric">
               {formatFinancialMinor(report.order.totalAmount, report.order.currency, locale)}
+              {fxRates !== undefined ? (
+                <TermsEstimate
+                  amount={report.order.totalAmount}
+                  copy={getWalletCopy(locale)}
+                  currency={report.order.currency}
+                  locale={locale}
+                  rates={fxRates}
+                />
+              ) : null}
             </dd>
           </div>
           <div>
