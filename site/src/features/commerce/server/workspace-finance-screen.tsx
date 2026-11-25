@@ -46,14 +46,18 @@ function StatementEstimate({
   rates,
   copy,
 }: {
-  amount: number;
+  amount: number | string;
   currency: string;
   locale: Parameters<typeof formatFinancialMinor>[2];
   rates: Parameters<typeof publicPriceEstimates>[1];
   copy: ReturnType<typeof getWalletCopy> | null;
 }) {
   if (!copy) return null;
-  const lines = publicPriceEstimates({ price: Math.abs(amount), currency }, rates);
+  const text = String(amount);
+  if (!/^-?\d+$/u.test(text)) return null;
+  const minor = Number(text);
+  if (!Number.isSafeInteger(minor)) return null;
+  const lines = publicPriceEstimates({ price: Math.abs(minor), currency }, rates);
   if (lines === undefined) return null;
   if (lines === null) return <p className={typeXsMuted}>{copy.fxUnavailable}</p>;
   return (
@@ -267,11 +271,27 @@ export async function WorkspaceFinanceScreen({
                       <dd className={typeNumericPrimary}>
                         {formatFinancialMinor(amount, total.currency, locale)}
                       </dd>
+                      <StatementEstimate
+                        amount={amount}
+                        copy={walletCopy}
+                        currency={total.currency}
+                        locale={locale}
+                        rates={fxRates}
+                      />
                     </div>
                   ))}
                   <div>
                     <dt className="text-muted">{copy.held}</dt>
                     <dd className={walletEnabled ? typeNumericPrimary : undefined}>{heldLabel}</dd>
+                    {walletCopy && walletBalance && walletBalance.held !== null ? (
+                      <StatementEstimate
+                        amount={walletBalance.held}
+                        copy={walletCopy}
+                        currency={total.currency}
+                        locale={locale}
+                        rates={fxRates}
+                      />
+                    ) : null}
                   </div>
                   <div>
                     <dt className="text-muted">
