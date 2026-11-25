@@ -26,6 +26,7 @@ import {
   mtaMasterDirectoryService,
 } from "../../../lib/services/servers/mta-master-directory-service";
 import { formatFinancialMinor } from "../../commerce/financial-i18n";
+import { RecordedRateEstimate } from "../../commerce/recorded-rate-estimate";
 import { FollowButton } from "../../community/follow";
 import { buildFollowInitialState } from "../../community/follow-initial-state";
 import { publicationCopy } from "../../community/publication-feed-copy";
@@ -53,11 +54,7 @@ import { trustCopy } from "../../trust/public-user-trust-copy";
 import { DeveloperExperience } from "../developer-experience";
 import { ProfileResourcePagination, parseProfilePage } from "../profile-pagination";
 import { profilePrivacyCopy } from "../profile-privacy-copy";
-import {
-  loadOwnProfileBalances,
-  profileFxLines,
-  showOwnProfileWallet,
-} from "../profile-wallet-visibility";
+import { loadOwnProfileBalances, showOwnProfileWallet } from "../profile-wallet-visibility";
 
 const getProfile = cache((username: string) => userRepository.findByUsername(username));
 
@@ -186,8 +183,6 @@ export async function UserProfileScreen({
     ? await loadOwnProfileBalances(walletService, `user:${user.id}`)
     : null;
   const walletRates = walletService ? await walletService.listFxRates().catch(() => null) : null;
-  const walletEstimates =
-    walletBalances && walletRates ? profileFxLines(walletBalances, walletRates) : null;
   const publicRates = walletEnabled
     ? walletService && walletRates
       ? walletRates
@@ -297,31 +292,19 @@ export async function UserProfileScreen({
             <p className="text-sm text-secondary">{copy.ownWalletOff}</p>
           )}
           {walletEnabled && walletBalances?.some((entry) => entry.available !== null) ? (
-            walletEstimates ? (
-              <ul className="space-y-1 text-xs text-muted">
-                {walletEstimates.map((line) => (
-                  <li key={`${line.base}-${line.quote}`}>
-                    {line.kind === "quote"
-                      ? copy.ownWalletEstimate
-                          .replace("{base}", line.base)
-                          .replace("{quote}", formatFinancialMinor(line.amount, line.quote, locale))
-                      : line.kind === "dust"
-                        ? copy.ownWalletEstimateDust
-                            .replace("{base}", line.base)
-                            .replace("{quote}", line.quote)
-                        : line.kind === "invalid"
-                          ? copy.ownWalletEstimateInvalid
-                              .replace("{base}", line.base)
-                              .replace("{quote}", line.quote)
-                          : copy.ownWalletEstimateNone
-                              .replace("{base}", line.base)
-                              .replace("{quote}", line.quote)}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-xs text-muted">{copy.ownWalletEstimateUnavailable}</p>
-            )
+            <div className="space-y-1">
+              {walletBalances.map((entry) =>
+                entry.available === null ? null : (
+                  <RecordedRateEstimate
+                    key={entry.currency}
+                    amount={entry.available}
+                    currency={entry.currency}
+                    locale={locale}
+                    rates={walletRates}
+                  />
+                ),
+              )}
+            </div>
           ) : null}
           <div className="flex flex-wrap gap-3">
             {walletEnabled ? (
