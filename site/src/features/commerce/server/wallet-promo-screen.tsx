@@ -4,7 +4,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
-import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
@@ -56,7 +59,10 @@ export async function WalletPromoScreen() {
         {copy.promoPageNote}
       </p>
       {isWalletEngineEnabled() ? (
-        <WalletPromoForm actorId={user.id} />
+        <WalletPromoForm
+          actorId={user.id}
+          rates={await new WalletPaymentService().listFxRates().catch(() => null)}
+        />
       ) : (
         <p className={`${panelSpace3P5} ${typeSmMuted}`}>{copy.promoEngineOff}</p>
       )}

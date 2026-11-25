@@ -1,5 +1,6 @@
 "use client";
 
+import type { ExplicitFxRate } from "@nexus/domain";
 import { Button, ErrorState, Input } from "@nexus/ui";
 import { walletPromoCreateSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
@@ -10,8 +11,15 @@ import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import { typeBlockSpace2, typeSmSecondary, typeSmSuccess } from "../../shell/type-shell";
 import { parseCommercialAmount } from "../commercial-confirmation";
 import { getWalletCopy, walletError } from "../wallet-i18n";
+import { RecordedRateEstimate } from "./recorded-rate-estimate";
 
-export function WalletPromoForm({ actorId }: { actorId: string }) {
+export function WalletPromoForm({
+  actorId,
+  rates,
+}: {
+  actorId: string;
+  rates?: readonly ExplicitFxRate[] | null;
+}) {
   const { locale } = useNexusLocale();
   const copy = getWalletCopy(locale);
   const field = useId();
@@ -156,6 +164,12 @@ export function WalletPromoForm({ actorId }: { actorId: string }) {
               </option>
             ))}
           </select>
+          <RecordedRateEstimate
+            amount={parseCommercialAmount(amount) ?? ""}
+            currency={currency}
+            locale={locale}
+            rates={rates}
+          />
         </div>
       )}
       <div className={typeBlockSpace2}>

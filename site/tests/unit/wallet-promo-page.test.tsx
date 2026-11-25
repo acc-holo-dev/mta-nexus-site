@@ -25,6 +25,9 @@ vi.mock("../../src/lib/services/accounts/auth-service", () => ({
 }));
 vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
   isWalletEngineEnabled: () => state.engine,
+  WalletPaymentService: class {
+    listFxRates = async () => [];
+  },
 }));
 vi.mock("../../src/features/commerce/components/wallet-promo-form", () => ({
   WalletPromoForm: ({ actorId }: { actorId: string }) => <form data-promo-form={actorId} />,
