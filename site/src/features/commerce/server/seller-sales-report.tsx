@@ -1,5 +1,5 @@
-import type { SellerSalesQuery, SellerSalesReport } from "@nexus/domain";
-import { SELLER_SALES_EVIDENCE } from "@nexus/domain";
+import type { ExplicitFxRate, SellerSalesQuery, SellerSalesReport } from "@nexus/domain";
+import { publicPriceEstimates, SELLER_SALES_EVIDENCE } from "@nexus/domain";
 import { Button, EmptyState } from "@nexus/ui";
 import Link from "next/link";
 import type { Locale } from "../../../lib/i18n";
@@ -31,24 +31,69 @@ import {
   typeSpace3BorderTPt5,
   typeWFullLeftSm,
   typeXlPrimary,
+  typeXsMuted,
 } from "../../shell/type-shell";
 import { formatFinancialMinor } from "../financial-i18n";
 import { sellerSalesCopy, sellerSalesTime } from "../seller-sales-i18n";
 import { sellerSalesUrl, sellerSaleUrl } from "../seller-sales-query";
+import { getWalletCopy } from "../wallet-i18n";
 
 type Scopes = { scopes: { id: string; name: string }[]; page: number; totalPages: number };
+
+function GrossEstimate({
+  amount,
+  copy,
+  currency,
+  locale,
+  rates,
+}: {
+  amount: string;
+  copy: ReturnType<typeof getWalletCopy>;
+  currency: string;
+  locale: Locale;
+  rates: readonly ExplicitFxRate[] | null | undefined;
+}) {
+  if (!/^-?\d+$/u.test(amount)) return null;
+  const minor = Number(amount);
+  if (!Number.isSafeInteger(minor)) return null;
+  const lines = publicPriceEstimates({ price: minor, currency }, rates);
+  if (lines === undefined) return null;
+  if (lines === null) return <p className={typeXsMuted}>{copy.fxUnavailable}</p>;
+  return (
+    <ul className={typeXsMuted}>
+      {lines.map((line) => (
+        <li key={line.quote}>
+          {line.kind === "quote"
+            ? copy.fxEstimate.replace(
+                "{destination}",
+                formatFinancialMinor(line.amount, line.quote, locale),
+              )
+            : line.kind === "dust"
+              ? copy.fxDust
+              : line.kind === "invalid"
+                ? copy.fxExceeds
+                : `${line.quote}: ${copy.fxNone}`}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function SellerSalesReportView({
   report,
   query,
   scopes,
   locale,
+  fxRates,
 }: {
   report: SellerSalesReport;
   query: SellerSalesQuery;
   scopes: Scopes;
   locale: Locale;
+  fxRates?: readonly ExplicitFxRate[] | null;
 }) {
   const c = sellerSalesCopy(locale);
+  const walletCopy = fxRates === undefined ? null : getWalletCopy(locale);
   const walletEnabled = isWalletEngineEnabled();
   const resetHref = sellerSalesUrl({
     page: 1,
@@ -212,6 +257,15 @@ export function SellerSalesReportView({
                       ? c.unknown
                       : formatFinancialMinor(total.gross, total.currency, locale)}
                   </dd>
+                  {walletCopy && total.gross !== null ? (
+                    <GrossEstimate
+                      amount={total.gross}
+                      copy={walletCopy}
+                      currency={total.currency}
+                      locale={locale}
+                      rates={fxRates}
+                    />
+                  ) : null}
                 </div>
                 <div>
                   <dt>{c.lines}</dt>
