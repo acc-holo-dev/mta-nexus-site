@@ -52,9 +52,6 @@ export async function PurchasesHistoryScreen({
   const typedLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
   const copy = getCommerceHistoryCopy(typedLocale);
   const walletEnabled = isWalletEngineEnabled();
-  const fxRates = walletEnabled
-    ? await new WalletPaymentService().listFxRates().catch(() => null)
-    : undefined;
   const historyNotice = commerceHistoryBetaNotice(typedLocale, walletEnabled);
   const walletNavProps = walletEnabled
     ? {
