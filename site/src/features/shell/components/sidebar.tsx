@@ -71,7 +71,7 @@ export function Sidebar({
 
   const isActive = (href: string) => shellDestinationActive(href, pathname);
 
-  const renderItems = (items: NavItem[]) =>
+  const renderItems = (items: NavItem[], itemPadding = "px-2.5") =>
     items.map((item) => {
       const Icon = item.icon;
       const active = isActive(item.href);
@@ -82,11 +82,13 @@ export function Sidebar({
           title={isCollapsed ? item.label : undefined}
           aria-label={isCollapsed ? item.label : undefined}
           aria-current={active ? "page" : undefined}
-          className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--nexus-accent)] ${
+          className={`flex items-center gap-2.5 rounded-md py-1.5 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--nexus-accent)] ${
+            isCollapsed ? "justify-center px-0" : itemPadding
+          } ${
             active
               ? "bg-accent-soft font-semibold text-accent"
               : "text-secondary hover:bg-hover hover:text-primary"
-          } ${isCollapsed ? "justify-center px-0" : ""}`}
+          }`}
         >
           <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
           {!isCollapsed && <span>{item.label}</span>}
@@ -139,11 +141,11 @@ export function Sidebar({
       >
         <div className="space-y-0.5">
           {!isCollapsed && (
-            <div className="px-2.5 pb-1.5 font-label uppercase text-faint">
+            <div className="px-1 pb-1.5 font-label uppercase text-faint">
               {dictionary.nav.ecosystem}
             </div>
           )}
-          {renderItems(primaryNav)}
+          {renderItems(primaryNav, "px-1")}
         </div>
 
         {workspaceTools ? (

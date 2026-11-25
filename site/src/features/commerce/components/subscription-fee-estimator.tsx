@@ -8,6 +8,7 @@ import { panelClipSpace4P5 } from "../../shell/panel-shell";
 import {
   typeBlockSpace2,
   typeGrid2Gap4,
+  typeSmMuted,
   typeSmSecondary,
   typeWFullSurfaceBorderP2,
 } from "../../shell/type-shell";
@@ -15,6 +16,7 @@ import { formatHistoryAmount } from "../commerce-history-format";
 import { parseCommercialAmount } from "../commercial-confirmation";
 import { confirmedSubscriptionEstimate } from "../subscription-confirmation";
 import { subscriptionsCopy } from "../subscriptions-i18n";
+import { getWalletCopy } from "../wallet-i18n";
 import { RecordedRateEstimate } from "./recorded-rate-estimate";
 export function SubscriptionFeeEstimator({
   actorId,
@@ -124,6 +126,11 @@ export function SubscriptionFeeEstimator({
       {error ? <ErrorState title={error} description={c.formErrorHint} /> : null}
       {result && (
         <output className={typeBlockSpace2}>
+          {rates === null ? (
+            <p role="note" className={typeSmMuted}>
+              {getWalletCopy(locale === "ru" ? "ru" : "en").recordedRateUnavailable}
+            </p>
+          ) : null}
           <p>
             {c.rate}: {result.commissionBps / 100}%
           </p>
@@ -134,7 +141,7 @@ export function SubscriptionFeeEstimator({
             amount={result.platformFee}
             currency={result.currency}
             locale={locale === "ru" ? "ru" : "en"}
-            rates={rates}
+            rates={rates === null ? undefined : rates}
           />
           <p>
             {c.proceeds}: {formatHistoryAmount(result.sellerProceeds, result.currency, locale)}
@@ -143,7 +150,7 @@ export function SubscriptionFeeEstimator({
             amount={result.sellerProceeds}
             currency={result.currency}
             locale={locale === "ru" ? "ru" : "en"}
-            rates={rates}
+            rates={rates === null ? undefined : rates}
           />
         </output>
       )}
