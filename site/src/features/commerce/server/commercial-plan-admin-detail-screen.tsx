@@ -8,6 +8,10 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { commercialPlanService } from "../../../lib/services/commerce/commercial-plan-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSm, linkMinH } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
@@ -32,6 +36,7 @@ import {
 import { commercialTerms } from "../commercial-confirmation";
 import { getCommercialCopy } from "../commercial-i18n";
 import { CommercialPlanForm } from "../commercial-plans";
+import { RecordedRateEstimate } from "../components/recorded-rate-estimate";
 
 export async function commercialPlanAdminDetailMetadata(): Promise<Metadata> {
   return {
@@ -110,6 +115,9 @@ export async function CommercialPlanAdminDetailScreen({
     );
   }
   const { plan } = result;
+  const fxRates = isWalletEngineEnabled()
+    ? await new WalletPaymentService().listFxRates().catch(() => null)
+    : undefined;
   const editor = {
     ...commercialTerms(plan),
     id: plan.id,
@@ -155,6 +163,12 @@ export async function CommercialPlanAdminDetailScreen({
                 {formatHistoryAmount(version.terms.price, version.terms.currency, locale)} ·{" "}
                 {version.terms.durationDays} {copy.days} · {copy.commission}:{" "}
                 {(version.terms.commissionBps / 100).toLocaleString(locale)}%
+                <RecordedRateEstimate
+                  amount={version.terms.price}
+                  currency={version.terms.currency}
+                  locale={locale}
+                  rates={fxRates}
+                />
               </p>
               <p className="whitespace-pre-wrap break-words text-sm text-muted">
                 {copy.reason}: {version.reason}
