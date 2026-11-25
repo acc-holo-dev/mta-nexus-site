@@ -1,3 +1,4 @@
+import { publicPriceEstimates } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { Package } from "lucide-react";
 import type { Metadata } from "next";
@@ -8,7 +9,10 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { commerceService } from "../../../lib/services/commerce/commerce-service";
-import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { getResourceCommerceCopy } from "../../resources/resource-commerce-i18n";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
@@ -37,6 +41,41 @@ import { orderCaseCopy } from "../order-case-i18n";
 import { orderTermsCopy } from "../order-terms-i18n";
 import { getWalletCopy } from "../wallet-i18n";
 import { WalletPayOrderForm } from "../wallet-pay";
+
+function OrderAmountEstimate({
+  amount,
+  currency,
+  locale,
+  rates,
+}: {
+  amount: number;
+  currency: string;
+  locale: "en" | "ru";
+  rates: Parameters<typeof publicPriceEstimates>[1];
+}) {
+  const copy = getWalletCopy(locale);
+  const lines = publicPriceEstimates({ price: amount, currency }, rates);
+  if (lines === undefined) return null;
+  if (lines === null) return <p className={typeSmMuted}>{copy.fxUnavailable}</p>;
+  return (
+    <ul className={typeSmMuted}>
+      {lines.map((line) => (
+        <li key={line.quote}>
+          {line.kind === "quote"
+            ? copy.fxEstimate.replace(
+                "{destination}",
+                formatHistoryAmount(line.amount, line.quote, locale),
+              )
+            : line.kind === "dust"
+              ? copy.fxDust
+              : line.kind === "invalid"
+                ? copy.fxExceeds
+                : `${line.quote}: ${copy.fxNone}`}
+        </li>
+      ))}
+    </ul>
+  );
+}
 export async function purchaseDetailMetadata(): Promise<Metadata> {
   return {
     title: `${getCommerceHistoryCopy(await getRequestLocale()).orderDetailsTitle} | MTA NEXUS`,
@@ -109,6 +148,9 @@ export async function PurchaseDetailScreen({
   if (!result) notFound();
   const { order, items, walletSettled } = result;
   const walletEnabled = isWalletEngineEnabled();
+  const fxRates = walletEnabled
+    ? await new WalletPaymentService().listFxRates().catch(() => null)
+    : undefined;
   const canPayWithWallet = walletEnabled && order.status === "pending" && order.totalAmount > 0;
   const walletCopy = getWalletCopy(typedLocale);
   return (
@@ -137,6 +179,14 @@ export async function PurchaseDetailScreen({
             <dd className={typeNumericPrimary}>
               {formatHistoryAmount(order.totalAmount, order.currency, typedLocale)}
             </dd>
+            {fxRates !== undefined ? (
+              <OrderAmountEstimate
+                amount={order.totalAmount}
+                currency={order.currency}
+                locale={typedLocale}
+                rates={fxRates}
+              />
+            ) : null}
           </div>
           {order.promoCode && order.listAmount != null && order.discountAmount != null ? (
             <>
@@ -145,6 +195,14 @@ export async function PurchaseDetailScreen({
                 <dd className="text-primary">
                   {formatHistoryAmount(order.listAmount, order.currency, typedLocale)}
                 </dd>
+                {fxRates !== undefined ? (
+                  <OrderAmountEstimate
+                    amount={order.listAmount}
+                    currency={order.currency}
+                    locale={typedLocale}
+                    rates={fxRates}
+                  />
+                ) : null}
               </div>
               <div className="min-w-0">
                 <dt className="text-muted">{walletCopy.promoDiscount}</dt>
@@ -160,6 +218,14 @@ export async function PurchaseDetailScreen({
                       formatHistoryAmount(order.totalAmount, order.currency, typedLocale),
                     )}
                 </dd>
+                {fxRates !== undefined ? (
+                  <OrderAmountEstimate
+                    amount={order.discountAmount}
+                    currency={order.currency}
+                    locale={typedLocale}
+                    rates={fxRates}
+                  />
+                ) : null}
               </div>
             </>
           ) : null}

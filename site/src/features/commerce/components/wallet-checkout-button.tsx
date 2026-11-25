@@ -67,6 +67,10 @@ export function WalletCheckoutButton({
     fxRates === undefined
       ? undefined
       : publicPriceEstimates({ price: dueMinor, currency }, fxRates);
+  const discountEstimates =
+    !applied || fxRates === undefined
+      ? undefined
+      : publicPriceEstimates({ price: applied.discountAmount, currency }, fxRates);
   const balance = useWalletSpendBalance(actorId ?? "", currency, dueMinor);
 
   if (!signedIn || !actorId) {
@@ -258,6 +262,31 @@ export function WalletCheckoutButton({
                   formatHistoryAmount(applied.chargedAmount, applied.currency, locale),
                 )}
             </p>
+          ) : null}
+          {discountEstimates === null ? (
+            <p className="text-[11px] text-muted">{copy.checkoutDueUnavailable}</p>
+          ) : discountEstimates ? (
+            <ul className="space-y-0.5 text-[11px] text-muted">
+              {discountEstimates.map((line) => (
+                <li key={line.quote}>
+                  {line.kind === "quote"
+                    ? copy.checkoutDueEstimate
+                        .replace("{base}", line.base)
+                        .replace("{quote}", formatHistoryAmount(line.amount, line.quote, locale))
+                    : line.kind === "dust"
+                      ? copy.checkoutDueDust
+                          .replace("{base}", line.base)
+                          .replace("{quote}", line.quote)
+                      : line.kind === "invalid"
+                        ? copy.checkoutDueInvalid
+                            .replace("{base}", line.base)
+                            .replace("{quote}", line.quote)
+                        : copy.checkoutDueNone
+                            .replace("{base}", line.base)
+                            .replace("{quote}", line.quote)}
+                </li>
+              ))}
+            </ul>
           ) : null}
         </div>
         <WalletSpendBalancePreview balance={balance} currency={currency} amountMinor={dueMinor} />
