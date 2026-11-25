@@ -40,13 +40,17 @@ function TermsEstimate({
   locale,
   rates,
 }: {
-  amount: number;
+  amount: number | string;
   copy: ReturnType<typeof getWalletCopy>;
   currency: string;
   locale: "en" | "ru";
   rates: readonly ExplicitFxRate[] | null;
 }) {
-  const lines = publicPriceEstimates({ price: amount, currency }, rates);
+  const text = String(amount);
+  if (!/^-?\d+$/u.test(text)) return null;
+  const minor = Number(text);
+  if (!Number.isSafeInteger(minor)) return null;
+  const lines = publicPriceEstimates({ price: minor, currency }, rates);
   if (lines === undefined) return null;
   if (lines === null) return <p className={typeXsMuted}>{copy.fxUnavailable}</p>;
   return (
@@ -164,6 +168,15 @@ export function OrderTermsReportView({
           {report.summary.totals.map((total) => (
             <li key={total.currency}>
               {formatFinancialMinor(total.value, total.currency, locale)}
+              {fxRates !== undefined ? (
+                <TermsEstimate
+                  amount={total.value}
+                  copy={getWalletCopy(locale)}
+                  currency={total.currency}
+                  locale={locale}
+                  rates={fxRates}
+                />
+              ) : null}
             </li>
           ))}
         </ul>
@@ -182,6 +195,15 @@ export function OrderTermsReportView({
               <p className="font-numeric">
                 {c.linePrice}: {formatFinancialMinor(line.unitPrice, line.currency, locale)}
               </p>
+              {fxRates !== undefined ? (
+                <TermsEstimate
+                  amount={line.unitPrice}
+                  copy={getWalletCopy(locale)}
+                  currency={line.currency}
+                  locale={locale}
+                  rates={fxRates}
+                />
+              ) : null}
               {line.terms ? (
                 <>
                   <dl className={typeGridGap3Sm2}>
