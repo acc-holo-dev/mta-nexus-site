@@ -334,7 +334,7 @@ export function NotificationInbox({
       {error ? (
         <ErrorState
           title={error}
-          description={copy.formErrorHint}
+          description={blocked ? copy.unavailableHint : copy.formErrorHint}
           action={
             <Button
               type="button"
@@ -414,7 +414,7 @@ export function NotificationInbox({
           {copy.retry}
         </Button>
       </div>
-      {!busy && !page.items.length ? (
+      {!busy && !blocked && !page.items.length ? (
         <EmptyState
           title={emptyFiltered ? copy.emptyFiltered : copy.empty}
           description={emptyFiltered ? copy.emptyFilteredDescription : copy.emptyDescription}
