@@ -59,7 +59,7 @@ site/
 | moderation    |    56 | 221046 |
 | notifications |    27 | 142000 |
 | organizations |    59 | 202552 |
-| resources     |   232 | 941112 |
+| resources     |   232 | 941125 |
 | servers       |   111 | 382891 |
 | shell         |   101 | 211264 |
 | support       |    28 | 117845 |
