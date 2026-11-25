@@ -8,7 +8,10 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { sellerSalesService } from "../../../lib/services/commerce/seller-sales-service";
-import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax3xl } from "../../shell/page-shell";
@@ -24,6 +27,8 @@ import {
 import { formatFinancialMinor } from "../financial-i18n";
 import { sellerSalesCopy, sellerSalesTime } from "../seller-sales-i18n";
 import { sellerSalesDetailQuery, sellerSalesUrl } from "../seller-sales-query";
+import { getWalletCopy } from "../wallet-i18n";
+import { GrossEstimate } from "./seller-sales-report";
 
 type Query = Record<string, string | string[] | undefined>;
 
@@ -108,6 +113,11 @@ async function SellerSalesReportDetailScreen({ saleId, query }: { saleId: string
     );
   }
   const { sale, scope } = result;
+  const walletOn = isWalletEngineEnabled();
+  const fxRates = walletOn
+    ? await new WalletPaymentService().listFxRates().catch(() => null)
+    : undefined;
+  const walletCopy = walletOn ? getWalletCopy(locale) : null;
   return (
     <div className={pageShellMax3xl}>
       <Link
@@ -130,9 +140,9 @@ async function SellerSalesReportDetailScreen({ saleId, query }: { saleId: string
         {attribution === "recorded" ? c.recordedNotice : c.notice}
       </p>
       <p role="note" className={typeSmSecondary}>
-        {isWalletEngineEnabled() ? c.walletPaymentNotice : c.paymentNotice}
+        {walletOn ? c.walletPaymentNotice : c.paymentNotice}
       </p>
-      {isWalletEngineEnabled() ? (
+      {walletOn ? (
         <Link href="/workspace/wallet" className={linkAccentSmRounded}>
           {c.wallet}
         </Link>
@@ -143,7 +153,6 @@ async function SellerSalesReportDetailScreen({ saleId, query }: { saleId: string
           [c.product, sale.productId],
           [c.status, c.statuses[sale.status]],
           [c.evidenceTitle, c.evidence[sale.evidence]],
-          [c.gross, formatFinancialMinor(sale.unitPrice, sale.currency, locale)],
           [c.date, `${sellerSalesTime(sale.createdAt, locale)} UTC`],
           [c.observed, `${sellerSalesTime(result.observedAt, locale)} UTC`],
         ].map(([label, value]) => (
@@ -152,6 +161,21 @@ async function SellerSalesReportDetailScreen({ saleId, query }: { saleId: string
             <dd className={typeBreakPrimary}>{value}</dd>
           </div>
         ))}
+        <div>
+          <dt className={typeSmMuted}>{c.gross}</dt>
+          <dd className={typeBreakPrimary}>
+            {formatFinancialMinor(sale.unitPrice, sale.currency, locale)}
+            {walletCopy ? (
+              <GrossEstimate
+                amount={sale.unitPrice}
+                copy={walletCopy}
+                currency={sale.currency}
+                locale={locale}
+                rates={fxRates}
+              />
+            ) : null}
+          </dd>
+        </div>
       </dl>
       {sale.inCurrentPortfolio !== false ? (
         <Link
