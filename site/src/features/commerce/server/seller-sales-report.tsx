@@ -40,7 +40,7 @@ import { getWalletCopy } from "../wallet-i18n";
 
 type Scopes = { scopes: { id: string; name: string }[]; page: number; totalPages: number };
 
-function GrossEstimate({
+export function GrossEstimate({
   amount,
   copy,
   currency,
