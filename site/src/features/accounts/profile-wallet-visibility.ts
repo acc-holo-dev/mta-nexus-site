@@ -54,7 +54,11 @@ export function profileWalletRates(
         missing ??= { base: line.base, quote: line.quote };
         continue;
       }
-      lines.push(line);
+      if (line.kind === "quote") {
+        lines.push({ kind: "quote", base: line.base, quote: line.quote, amount: line.amount });
+      } else {
+        lines.push({ kind: line.kind, base: line.base, quote: line.quote });
+      }
     }
   }
   if (lines.length > 0) return { kind: "lines", lines };
