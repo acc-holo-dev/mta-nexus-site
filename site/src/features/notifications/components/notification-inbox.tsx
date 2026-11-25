@@ -168,7 +168,6 @@ export function NotificationInbox({
     } catch (failure) {
       if (mounted.current) {
         setError(safeMessage(failure, copy.unavailable));
-        setBlocked(true);
       }
     } finally {
       pending.current = false;
