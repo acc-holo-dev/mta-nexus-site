@@ -165,5 +165,13 @@ describe("wallet workspace gate", () => {
     expect(html).toContain("90.00 RUB");
     expect(html).toContain("9,000.00 RUB");
     expect(html).toContain(`EUR: ${copy.fxNone}`);
+    const card = html.match(/<article[\s\S]*?currency=USD[\s\S]*?<\/article>/);
+    expect(card?.[0]).toBeTruthy();
+    const anchor = card?.[0].match(/<a [^>]*currency=USD[\s\S]*?<\/a>/);
+    expect(anchor?.[0]).toBeTruthy();
+    expect(anchor?.[0]).not.toContain(copy.recordedRateEstimate.slice(0, 5));
+    expect(card?.[0].indexOf("</a>") ?? -1).toBeLessThan(
+      card?.[0].indexOf(copy.recordedRateEstimate.replace("{destination}", "9,000.00 RUB")) ?? -1,
+    );
   });
 });

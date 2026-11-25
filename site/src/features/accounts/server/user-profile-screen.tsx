@@ -4,7 +4,7 @@ import {
   serverRepository,
   userRepository,
 } from "@nexus/db";
-import { publicPriceEstimates } from "@nexus/domain";
+import { type ExplicitFxRate, publicPriceEstimates, type WalletCurrency } from "@nexus/domain";
 import { Avatar, ErrorState, StatCard } from "@nexus/ui";
 import { Calendar, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
@@ -26,7 +26,6 @@ import {
   mtaMasterDirectoryService,
 } from "../../../lib/services/servers/mta-master-directory-service";
 import { formatFinancialMinor } from "../../commerce/financial-i18n";
-import { RecordedRateEstimate } from "../../commerce/recorded-rate-estimate";
 import { FollowButton } from "../../community/follow";
 import { buildFollowInitialState } from "../../community/follow-initial-state";
 import { publicationCopy } from "../../community/publication-feed-copy";
@@ -47,6 +46,7 @@ import {
   typeIcon35,
   typeMaxXlSmLeadingMuted,
   typeMinSpace15,
+  typeSmMuted,
   typeTruncate2xlBlackPrimary,
   typeTruncateXsFaint,
 } from "../../shell/type-shell";
@@ -54,7 +54,11 @@ import { trustCopy } from "../../trust/public-user-trust-copy";
 import { DeveloperExperience } from "../developer-experience";
 import { ProfileResourcePagination, parseProfilePage } from "../profile-pagination";
 import { profilePrivacyCopy } from "../profile-privacy-copy";
-import { loadOwnProfileBalances, showOwnProfileWallet } from "../profile-wallet-visibility";
+import {
+  loadOwnProfileBalances,
+  profileWalletRates,
+  showOwnProfileWallet,
+} from "../profile-wallet-visibility";
 
 const getProfile = cache((username: string) => userRepository.findByUsername(username));
 
@@ -292,19 +296,12 @@ export async function UserProfileScreen({
             <p className="text-sm text-secondary">{copy.ownWalletOff}</p>
           )}
           {walletEnabled && walletBalances?.some((entry) => entry.available !== null) ? (
-            <div className="space-y-1">
-              {walletBalances.map((entry) =>
-                entry.available === null ? null : (
-                  <RecordedRateEstimate
-                    key={entry.currency}
-                    amount={entry.available}
-                    currency={entry.currency}
-                    locale={locale}
-                    rates={walletRates}
-                  />
-                ),
-              )}
-            </div>
+            <ProfileWalletRateNotes
+              balances={walletBalances}
+              rates={walletRates}
+              locale={locale}
+              copy={copy}
+            />
           ) : null}
           <div className="flex flex-wrap gap-3">
             {walletEnabled ? (
@@ -376,5 +373,52 @@ export async function UserProfileScreen({
         </section>
       )}
     </div>
+  );
+}
+
+function ProfileWalletRateNotes({
+  balances,
+  rates,
+  locale,
+  copy,
+}: {
+  balances: Array<{ currency: WalletCurrency; available: number | null }>;
+  rates: readonly ExplicitFxRate[] | null;
+  locale: "en" | "ru";
+  copy: {
+    ownWalletEstimate: string;
+    ownWalletEstimateNone: string;
+    ownWalletEstimateDust: string;
+    ownWalletEstimateInvalid: string;
+    ownWalletEstimateUnavailable: string;
+  };
+}) {
+  const view = profileWalletRates(balances, rates);
+  if (!view) return null;
+  if (view.kind === "unavailable") {
+    return <p className={typeSmMuted}>{copy.ownWalletEstimateUnavailable}</p>;
+  }
+  if (view.kind === "none") {
+    return (
+      <p className={typeSmMuted}>
+        {copy.ownWalletEstimateNone.replace("{base}", view.base).replace("{quote}", view.quote)}
+      </p>
+    );
+  }
+  return (
+    <ul className={typeSmMuted}>
+      {view.lines.map((line) => {
+        const available = balances.find((entry) => entry.currency === line.base)?.available ?? 0;
+        const text =
+          line.kind === "quote"
+            ? copy.ownWalletEstimate
+                .replace("{base}", formatFinancialMinor(available, line.base, locale))
+                .replace("{quote}", formatFinancialMinor(line.amount, line.quote, locale))
+            : (line.kind === "dust" ? copy.ownWalletEstimateDust : copy.ownWalletEstimateInvalid)
+                .replace("{base}", line.base)
+                .replace("{quote}", line.quote);
+        return <li key={`${line.kind}-${line.base}-${line.quote}`}>{text}</li>;
+      })}
+    </ul>
   );
 }

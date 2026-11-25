@@ -295,11 +295,9 @@ export async function CollectionComparePage({
                 description={h.destinationReadOnlyHint}
               />
             ) : !transferable.length ? (
-              <ErrorState
-                id="library-collection-compare-no-source-items"
-                title={h.noSourceItems}
-                description={h.noSourceItemsHint}
-              />
+              <section id="library-collection-compare-no-source-items">
+                <EmptyState title={h.noSourceItems} description={h.noSourceItemsHint} />
+              </section>
             ) : (
               <LibraryCollectionItemCopyForm
                 key={`${id}:${report.source.revision}:${comparison.destination.id}:${comparison.destination.revision}:${comparison.page}:${comparison.filter}:${comparison.q}:${comparison.transfer}`}
