@@ -5,6 +5,7 @@ import {
   libraryHref,
   parseLibraryFilter,
   parseLibraryPage,
+  parseLibraryQuery,
 } from "../../src/features/library/library-view";
 
 describe("bounded library routing", () => {
@@ -61,6 +62,12 @@ describe("bounded library routing", () => {
     expect(libraryHref("all", 1)).toBe("/workspace/library");
     expect(libraryHref("ready", 1)).toBe("/workspace/library?filter=ready");
     expect(libraryHref("unavailable", 2)).toBe("/workspace/library?filter=unavailable&page=2");
+    expect(libraryHref("ready", 2, "  radar  ")).toBe(
+      "/workspace/library?filter=ready&q=radar&page=2",
+    );
+    expect(libraryHref("all", 1, "   ")).toBe("/workspace/library");
+    expect(parseLibraryQuery(["radar"])).toBe("");
+    expect(parseLibraryQuery(`ra\u0000dar`)).toBe("radar");
   });
 
   it.each(["en", "ru"] as const)("has usable locale copy for all rights states in %s", (locale) => {
