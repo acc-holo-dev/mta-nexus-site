@@ -24,6 +24,19 @@ vi.mock("@nexus/db", () => ({
     pageSellerHistory: state.seller,
   },
   licenseRepository: { pageUserHistory: state.licenses },
+  // Purchase history reads recorded rates only when the wallet engine is on.
+  // The service constructor binds these repositories; list() stays empty so the
+  // page still renders and no ledger row is touched.
+  walletTopupRepository: {},
+  walletWithdrawalRepository: {},
+  ledgerRepository: {},
+  walletOrderSettlementRepository: {},
+  productRepository: {},
+  walletSellerHoldRepository: {},
+  orderOperationsRepository: {},
+  buildRepository: {},
+  promoCodeRepository: {},
+  walletFxRateRepository: { list: async () => [] },
 }));
 vi.mock("../../src/lib/services/accounts/auth-service", () => ({
   authService: { getSession: async () => state.user },
