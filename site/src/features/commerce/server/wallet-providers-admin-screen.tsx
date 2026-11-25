@@ -1,4 +1,10 @@
-import type { PaymentProviderCapability, TopUpIntent, WithdrawalIntent } from "@nexus/domain";
+import {
+  type ExplicitFxRate,
+  type PaymentProviderCapability,
+  publicPriceEstimates,
+  type TopUpIntent,
+  type WithdrawalIntent,
+} from "@nexus/domain";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -31,6 +37,42 @@ import { WalletAdminBatchForm } from "../wallet-admin-ops";
 import { getWalletCopy } from "../wallet-i18n";
 
 const walletPaymentService = new WalletPaymentService();
+
+function ProviderAmountEstimate({
+  amount,
+  copy,
+  currency,
+  locale,
+  rates,
+}: {
+  amount: number;
+  copy: ReturnType<typeof getWalletCopy>;
+  currency: string;
+  locale: Parameters<typeof formatFinancialMinor>[2];
+  rates: readonly ExplicitFxRate[] | null | undefined;
+}) {
+  const lines = publicPriceEstimates({ price: amount, currency }, rates);
+  if (lines === undefined) return null;
+  if (lines === null) return <p className={typeXsMuted}>{copy.fxUnavailable}</p>;
+  return (
+    <ul className={typeXsMuted}>
+      {lines.map((line) => (
+        <li key={line.quote}>
+          {line.kind === "quote"
+            ? copy.fxEstimate.replace(
+                "{destination}",
+                formatFinancialMinor(line.amount, line.quote, locale),
+              )
+            : line.kind === "dust"
+              ? copy.fxDust
+              : line.kind === "invalid"
+                ? copy.fxExceeds
+                : `${line.quote}: ${copy.fxNone}`}
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 function capabilityLabel(
   copy: ReturnType<typeof getWalletCopy>,
@@ -121,6 +163,7 @@ export async function WalletProvidersAdminScreen() {
       : null;
   const intentsUnavailable =
     engineOn && (recentTopups === null || (withdrawOn && recentWithdrawals === null));
+  const fxRates = engineOn ? await walletPaymentService.listFxRates().catch(() => null) : undefined;
 
   return (
     <div className={pageShellMax5xl}>
@@ -216,6 +259,13 @@ export async function WalletProvidersAdminScreen() {
                         <p className={typeNumericPrimary}>
                           {formatFinancialMinor(hold.amount, hold.currency, locale)}
                         </p>
+                        <ProviderAmountEstimate
+                          amount={hold.amount}
+                          copy={copy}
+                          currency={hold.currency}
+                          locale={locale}
+                          rates={fxRates}
+                        />
                         <p className={typeXsMuted}>
                           {copy.providersAdminHoldSeller}: {hold.sellerAccountId} ·{" "}
                           {copy.providersAdminHoldOrder}: {hold.orderId} ·{" "}
@@ -261,6 +311,13 @@ export async function WalletProvidersAdminScreen() {
                           {formatFinancialMinor(intent.amount, intent.currency, locale)} ·{" "}
                           {intentStatusLabel(copy, intent.status)}
                         </p>
+                        <ProviderAmountEstimate
+                          amount={intent.amount}
+                          copy={copy}
+                          currency={intent.currency}
+                          locale={locale}
+                          rates={fxRates}
+                        />
                         <p className={typeXsMuted}>
                           {intent.accountId} · {intent.providerId} · {intent.createdAt} ·{" "}
                           {intent.id}
@@ -305,6 +362,13 @@ export async function WalletProvidersAdminScreen() {
                           {order.orderNumber} ·{" "}
                           {formatFinancialMinor(order.totalAmount, order.currency, locale)}
                         </p>
+                        <ProviderAmountEstimate
+                          amount={order.totalAmount}
+                          copy={copy}
+                          currency={order.currency}
+                          locale={locale}
+                          rates={fxRates}
+                        />
                         <p className={typeXsMuted}>
                           {copy.providersAdminUnpaidBuyer}: {order.buyerId} ·{" "}
                           {copy.providersAdminUnpaidCreatedAt}: {order.createdAt} · {order.id}
@@ -355,6 +419,13 @@ export async function WalletProvidersAdminScreen() {
                               {formatFinancialMinor(intent.amount, intent.currency, locale)} ·{" "}
                               {intentStatusLabel(copy, intent.status)}
                             </p>
+                            <ProviderAmountEstimate
+                              amount={intent.amount}
+                              copy={copy}
+                              currency={intent.currency}
+                              locale={locale}
+                              rates={fxRates}
+                            />
                             <p className={typeXsMuted}>
                               {intent.accountId} · {intent.providerId} · {intent.createdAt} ·{" "}
                               {intent.id}
@@ -400,6 +471,13 @@ export async function WalletProvidersAdminScreen() {
                             <p className={typeNumericPrimary}>
                               {formatFinancialMinor(intent.amount, intent.currency, locale)}
                             </p>
+                            <ProviderAmountEstimate
+                              amount={intent.amount}
+                              copy={copy}
+                              currency={intent.currency}
+                              locale={locale}
+                              rates={fxRates}
+                            />
                             <p className={typeXsMuted}>
                               {copy.providersAdminIntentAccount}: {intent.accountId} ·{" "}
                               {copy.providersAdminIntentStatus}:{" "}
@@ -429,6 +507,13 @@ export async function WalletProvidersAdminScreen() {
                               <p className={typeNumericPrimary}>
                                 {formatFinancialMinor(intent.amount, intent.currency, locale)}
                               </p>
+                              <ProviderAmountEstimate
+                                amount={intent.amount}
+                                copy={copy}
+                                currency={intent.currency}
+                                locale={locale}
+                                rates={fxRates}
+                              />
                               <p className={typeXsMuted}>
                                 {copy.providersAdminIntentAccount}: {intent.accountId} ·{" "}
                                 {copy.providersAdminIntentStatus}:{" "}

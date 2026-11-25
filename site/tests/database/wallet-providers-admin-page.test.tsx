@@ -63,6 +63,7 @@ vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
   isWalletWithdrawEnabled: () => state.withdraw,
   WalletPaymentService: class {
     capabilityMatrix = () => state.matrix;
+    listFxRates = async () => [];
     previewAdminBatchEligible = async () => ({
       holds: 2,
       topups: 1,
