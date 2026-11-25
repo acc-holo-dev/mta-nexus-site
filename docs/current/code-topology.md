@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
 **measured_at:** 24 ноября 2026 (Europe/Moscow).  
-**source_sha:** `6bcce9d54` (`cursor/sale-line-estimate-2e5e`, seller sales history shows a recorded rate estimate).  
+**source_sha:** `3591da114` (`cursor/catalog-filter-keep-2e5e`, catalog search and filters stay in the URL).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -31,7 +31,7 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    |            Факт на `6bcce9d54` |
+| Область                    |            Факт на `3591da114` |
 | -------------------------- | -----------------------------: |
 | `features/*` domains       |                             13 |
 | `components/` tree files   |                              0 |
@@ -42,7 +42,7 @@ site/
 | `lib/services/` root files |                              0 |
 | `lib/**/*-i18n.ts`         |                              0 |
 | `app/**/route.ts`          |                            305 |
-| `site/tests` files         |                           1776 |
+| `site/tests` files         |                           1777 |
 | `@nexus/ui` src files      |                             20 |
 | `@nexus/domain` src files  |                             59 |
 | `@nexus/db` src files      |                            208 |
@@ -52,16 +52,16 @@ site/
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
 | accounts      |    92 | 242701 |
-| commerce      |   204 | 834287 |
+| commerce      |   205 | 834474 |
 | community     |   154 | 635565 |
 | discovery     |    22 |  50639 |
 | library       |   124 | 524752 |
 | moderation    |    56 | 221046 |
 | notifications |    27 | 142000 |
-| organizations |    59 | 202552 |
-| resources     |   232 | 940862 |
-| servers       |   111 | 382891 |
-| shell         |   101 | 211264 |
+| organizations |    59 | 205059 |
+| resources     |   232 | 940880 |
+| servers       |   113 | 389619 |
+| shell         |   101 | 211348 |
 | support       |    28 | 117845 |
 | trust         |    28 |  83844 |
 

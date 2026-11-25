@@ -43,6 +43,13 @@ export const commerceHistoryCopy = {
     status: "Status",
     placed: "Placed",
     total: "Order total",
+    purchaseEstimateQuote:
+      "About {amount}. This recorded-rate estimate does not change the stored order total.",
+    purchaseEstimateUnavailable:
+      "Recorded exchange rates could not be loaded. The stored order total is unchanged.",
+    purchaseEstimateNone: "No recorded rate from {base} to {quote}.",
+    purchaseEstimateDust: "The recorded rate from {base} to {quote} is too small to show.",
+    purchaseEstimateInvalid: "The recorded rate from {base} to {quote} cannot be shown.",
     purchasesLoadUnavailable:
       "Purchase history is temporarily unavailable. This does not mean you have no purchases.",
     purchasesLoadUnavailableHint:
@@ -149,6 +156,13 @@ export const commerceHistoryCopy = {
     status: "Статус",
     placed: "Оформлен",
     total: "Сумма заказа",
+    purchaseEstimateQuote:
+      "Примерно {amount}. Эта оценка по записанному курсу не меняет сохранённую сумму заказа.",
+    purchaseEstimateUnavailable:
+      "Записанные курсы обмена не загрузились. Сохранённая сумма заказа не изменилась.",
+    purchaseEstimateNone: "Записанного курса из {base} в {quote} нет.",
+    purchaseEstimateDust: "Записанный курс из {base} в {quote} слишком мал, чтобы его показать.",
+    purchaseEstimateInvalid: "Записанный курс из {base} в {quote} нельзя показать.",
     purchasesLoadUnavailable:
       "История покупок временно недоступна. Это не означает, что покупок нет.",
     purchasesLoadUnavailableHint:
