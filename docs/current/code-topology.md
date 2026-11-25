@@ -51,19 +51,19 @@ site/
 
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
-| accounts      |    92 | 242701 |
-| commerce      |   204 | 830895 |
-| community     |   154 | 635565 |
-| discovery     |    22 |  50639 |
-| library       |   124 | 524752 |
-| moderation    |    56 | 221046 |
-| notifications |    27 | 142000 |
-| organizations |    59 | 202552 |
-| resources     |   232 | 940880 |
-| servers       |   111 | 382891 |
-| shell         |   101 | 211348 |
-| support       |    28 | 117845 |
-| trust         |    28 |  83844 |
+| accounts      |    92 |  242701 |
+| commerce      |   204 |  830895 |
+| community     |   154 |  635565 |
+| discovery     |    22 |   50639 |
+| library       |   124 |  524752 |
+| moderation    |    56 |  221046 |
+| notifications |    27 |  142000 |
+| organizations |    59 |  202552 |
+| resources     |   232 |  940880 |
+| servers       |   113 |  389619 |
+| shell         |   101 |  211348 |
+| support       |    28 |  117845 |
+| trust         |    28 |   83844 |
 
 Эталон границ: [`features/servers/README.md`](../../site/src/features/servers/README.md) (`client` / `server` / `model` + server-only ports, без прямого импорта внутренностей снаружи).
 
