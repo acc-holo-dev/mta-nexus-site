@@ -29,6 +29,7 @@ import {
   typeP3Numeric,
   typeRoundedBorderP4SmSecondary,
   typeSemiboldPrimary,
+  typeSmMuted,
   typeSpace2Sm,
   typeSpace3BorderTPt5,
   typeWFullLeftSm,
@@ -53,7 +54,7 @@ function StatementEstimate({
   rates: readonly ExplicitFxRate[] | null | undefined;
   copy: ReturnType<typeof getWalletCopy> | null;
 }) {
-  if (!copy) return null;
+  if (!copy || rates === null) return null;
   return (
     <RecordedRateEstimate
       amount={amount}
@@ -219,82 +220,94 @@ export async function WorkspaceFinanceScreen({
         ))}
       </nav>
       {result.totals.length ? (
-        <ul className="grid gap-4 md:grid-cols-3">
-          {result.totals.map((total) => {
-            const walletBalance = walletBalanceByCurrency.get(total.currency);
-            const heldLabel =
-              walletEnabled && walletBalance && walletBalance.held !== null
-                ? formatFinancialMinor(walletBalance.held, total.currency, locale)
-                : walletEnabled
-                  ? copy.walletBalanceUnavailable
-                  : copy.unknown;
-            const availableLabel =
-              walletEnabled && walletBalance && walletBalance.available !== null
-                ? formatFinancialMinor(walletBalance.available, total.currency, locale)
-                : walletEnabled
-                  ? copy.walletBalanceUnavailable
-                  : copy.unknown;
-            return (
-              <li key={total.currency} className={panelSpace3P5}>
-                <h3 className={typeSemiboldPrimary}>{total.currency}</h3>
-                <dl className={typeSpace2Sm}>
-                  {[
-                    [copy.balance, total.balance],
-                    [copy.credits, total.credits],
-                    [copy.debits, total.debits],
-                  ].map(([label, amount]) => (
-                    <div key={label}>
-                      <dt className="text-muted">{label}</dt>
-                      <dd className={typeNumericPrimary}>
-                        {formatFinancialMinor(amount, total.currency, locale)}
+        <section aria-labelledby="finance-totals-heading" className="space-y-4">
+          <h2 id="finance-totals-heading" className="sr-only">
+            {copy.balance}
+          </h2>
+          {fxRates === null && walletCopy ? (
+            <p role="note" className={typeSmMuted}>
+              {walletCopy.recordedRateUnavailable}
+            </p>
+          ) : null}
+          <ul className="grid gap-4 md:grid-cols-3">
+            {result.totals.map((total) => {
+              const walletBalance = walletBalanceByCurrency.get(total.currency);
+              const heldLabel =
+                walletEnabled && walletBalance && walletBalance.held !== null
+                  ? formatFinancialMinor(walletBalance.held, total.currency, locale)
+                  : walletEnabled
+                    ? copy.walletBalanceUnavailable
+                    : copy.unknown;
+              const availableLabel =
+                walletEnabled && walletBalance && walletBalance.available !== null
+                  ? formatFinancialMinor(walletBalance.available, total.currency, locale)
+                  : walletEnabled
+                    ? copy.walletBalanceUnavailable
+                    : copy.unknown;
+              return (
+                <li key={total.currency} className={panelSpace3P5}>
+                  <h3 className={typeSemiboldPrimary}>{total.currency}</h3>
+                  <dl className={typeSpace2Sm}>
+                    {[
+                      [copy.balance, total.balance],
+                      [copy.credits, total.credits],
+                      [copy.debits, total.debits],
+                    ].map(([label, amount]) => (
+                      <div key={label}>
+                        <dt className="text-muted">{label}</dt>
+                        <dd className={typeNumericPrimary}>
+                          {formatFinancialMinor(amount, total.currency, locale)}
+                        </dd>
+                        <StatementEstimate
+                          amount={amount}
+                          copy={walletCopy}
+                          currency={total.currency}
+                          locale={locale}
+                          rates={fxRates}
+                        />
+                      </div>
+                    ))}
+                    <div>
+                      <dt className="text-muted">{copy.held}</dt>
+                      <dd className={walletEnabled ? typeNumericPrimary : undefined}>
+                        {heldLabel}
                       </dd>
-                      <StatementEstimate
-                        amount={amount}
-                        copy={walletCopy}
-                        currency={total.currency}
-                        locale={locale}
-                        rates={fxRates}
-                      />
+                      {walletCopy && walletBalance && walletBalance.held !== null ? (
+                        <StatementEstimate
+                          amount={walletBalance.held}
+                          copy={walletCopy}
+                          currency={total.currency}
+                          locale={locale}
+                          rates={fxRates}
+                        />
+                      ) : null}
                     </div>
-                  ))}
-                  <div>
-                    <dt className="text-muted">{copy.held}</dt>
-                    <dd className={walletEnabled ? typeNumericPrimary : undefined}>{heldLabel}</dd>
-                    {walletCopy && walletBalance && walletBalance.held !== null ? (
-                      <StatementEstimate
-                        amount={walletBalance.held}
-                        copy={walletCopy}
-                        currency={total.currency}
-                        locale={locale}
-                        rates={fxRates}
-                      />
-                    ) : null}
-                  </div>
-                  <div>
-                    <dt className="text-muted">
-                      {walletEnabled ? copy.available : copy.availableLegacy}
-                    </dt>
-                    <dd className={walletEnabled ? typeNumericPrimary : undefined}>
-                      {availableLabel}
-                    </dd>
-                    {walletCopy && walletBalance && walletBalance.available !== null ? (
-                      <StatementEstimate
-                        amount={walletBalance.available}
-                        copy={walletCopy}
-                        currency={total.currency}
-                        locale={locale}
-                        rates={fxRates}
-                      />
-                    ) : null}
-                  </div>
-                </dl>
-                <p className={typeXsMuted}>
-                  {copy.legacy}: {total.legacyEntries}
-                </p>
-              </li>
-            );
-          })}
-        </ul>
+                    <div>
+                      <dt className="text-muted">
+                        {walletEnabled ? copy.available : copy.availableLegacy}
+                      </dt>
+                      <dd className={walletEnabled ? typeNumericPrimary : undefined}>
+                        {availableLabel}
+                      </dd>
+                      {walletCopy && walletBalance && walletBalance.available !== null ? (
+                        <StatementEstimate
+                          amount={walletBalance.available}
+                          copy={walletCopy}
+                          currency={total.currency}
+                          locale={locale}
+                          rates={fxRates}
+                        />
+                      ) : null}
+                    </div>
+                  </dl>
+                  <p className={typeXsMuted}>
+                    {copy.legacy}: {total.legacyEntries}
+                  </p>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
       ) : (
         <EmptyState
           title={copy.empty}
@@ -303,6 +316,11 @@ export async function WorkspaceFinanceScreen({
       )}
       {result.entries.length ? (
         <div className="overflow-x-auto">
+          {fxRates === null && walletCopy ? (
+            <p role="note" className={typeSmMuted}>
+              {walletCopy.recordedRateUnavailable}
+            </p>
+          ) : null}
           <table className={typeWFullLeftSm}>
             <caption className="sr-only">{copy.title}</caption>
             <thead>

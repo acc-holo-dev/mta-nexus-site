@@ -20,4 +20,12 @@ describe("finance workspace wallet empty/unavailable honesty", () => {
     expect(screen).toContain("walletEnabled");
     expect(screen).toContain("copy.unknown");
   });
+
+  it("states missing recorded rates once per finance section", () => {
+    const screen = read("site/src/features/commerce/server/workspace-finance-screen.tsx");
+    expect(screen).toContain("if (!copy || rates === null) return null");
+    const notes = screen.match(/walletCopy\.recordedRateUnavailable/g) ?? [];
+    expect(notes).toHaveLength(2);
+    expect(screen).toContain('id="finance-totals-heading"');
+  });
 });
