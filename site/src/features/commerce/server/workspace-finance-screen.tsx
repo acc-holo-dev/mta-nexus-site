@@ -39,6 +39,43 @@ import { formatHistoryDate, parseHistoryPage } from "../commerce-history-format"
 import { financialReferenceLabel, formatFinancialMinor, getFinancialCopy } from "../financial-i18n";
 import { getWalletCopy } from "../wallet-i18n";
 
+function StatementEstimate({
+  amount,
+  currency,
+  locale,
+  rates,
+  copy,
+}: {
+  amount: number;
+  currency: string;
+  locale: Parameters<typeof formatFinancialMinor>[2];
+  rates: Parameters<typeof publicPriceEstimates>[1];
+  copy: ReturnType<typeof getWalletCopy> | null;
+}) {
+  if (!copy) return null;
+  const lines = publicPriceEstimates({ price: Math.abs(amount), currency }, rates);
+  if (lines === undefined) return null;
+  if (lines === null) return <p className={typeXsMuted}>{copy.fxUnavailable}</p>;
+  return (
+    <ul className={typeXsMuted}>
+      {lines.map((line) => (
+        <li key={line.quote}>
+          {line.kind === "quote"
+            ? copy.fxEstimate.replace(
+                "{destination}",
+                formatFinancialMinor(line.amount, line.quote, locale),
+              )
+            : line.kind === "dust"
+              ? copy.fxDust
+              : line.kind === "invalid"
+                ? copy.fxExceeds
+                : `${line.quote}: ${copy.fxNone}`}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 const walletPaymentService = new WalletPaymentService();
 const WALLET_CURRENCIES = ["USD", "EUR", "RUB"] as const;
 
@@ -305,9 +342,23 @@ export async function WorkspaceFinanceScreen({
                   </td>
                   <td className={typeP3Numeric}>
                     {formatFinancialMinor(entry.amount, entry.currency, locale)}
+                    <StatementEstimate
+                      amount={entry.amount}
+                      copy={walletCopy}
+                      currency={entry.currency}
+                      locale={locale}
+                      rates={fxRates}
+                    />
                   </td>
                   <td className={typeP3Numeric}>
                     {formatFinancialMinor(entry.balanceAfter, entry.currency, locale)}
+                    <StatementEstimate
+                      amount={entry.balanceAfter}
+                      copy={walletCopy}
+                      currency={entry.currency}
+                      locale={locale}
+                      rates={fxRates}
+                    />
                   </td>
                 </tr>
               ))}
