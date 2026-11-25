@@ -58,10 +58,9 @@ describe("desktop sidebar scroll rail", () => {
 
   it("keeps the desktop rail outside the scrolling main column", () => {
     const html = renderToStaticMarkup(
-      React.createElement(NexusShell, {
-        locale: "en",
-        children: React.createElement("p", null, "Page"),
-      }),
+      <NexusShell locale="en">
+        <p>Page</p>
+      </NexusShell>,
     );
 
     expect(html).toMatch(
