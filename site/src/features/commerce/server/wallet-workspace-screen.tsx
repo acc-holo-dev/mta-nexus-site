@@ -415,6 +415,13 @@ export async function WalletWorkspaceScreen({
             <dd className={typeNumericPrimary}>
               {formatFinancialMinor(available, currency, locale)}
             </dd>
+            <ActivityEstimate
+              amount={available}
+              copy={copy}
+              currency={currency}
+              locale={locale}
+              rates={fxRates}
+            />
           </div>
         </dl>
       </section>
@@ -532,6 +539,13 @@ export async function WalletWorkspaceScreen({
                         <dd className={typeNumericPrimary}>
                           {formatFinancialMinor(org.available, currency, locale)}
                         </dd>
+                        <ActivityEstimate
+                          amount={org.available}
+                          copy={copy}
+                          currency={currency}
+                          locale={locale}
+                          rates={fxRates}
+                        />
                       </div>
                     </dl>
                   )}
@@ -593,6 +607,13 @@ export async function WalletWorkspaceScreen({
                       <p className={typeNumericPrimary}>
                         {formatFinancialMinor(org.held, currency, locale)}
                       </p>
+                      <ActivityEstimate
+                        amount={org.held}
+                        copy={copy}
+                        currency={currency}
+                        locale={locale}
+                        rates={fxRates}
+                      />
                       <ul className={typeSpace2Sm}>
                         {holds.map((hold) => (
                           <li key={hold.id}>
