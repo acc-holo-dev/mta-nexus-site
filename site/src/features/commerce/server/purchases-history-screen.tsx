@@ -1,4 +1,5 @@
 import { orderRepository } from "@nexus/db";
+import type { ExplicitFxRate } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import { Package } from "lucide-react";
 import type { Metadata } from "next";
@@ -7,7 +8,10 @@ import Link from "next/link";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
-import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellClip } from "../../shell/page-shell";
@@ -31,6 +35,7 @@ import { getCommercialCopy } from "../commercial-i18n";
 import { orderCaseCopy } from "../order-case-i18n";
 import { getWalletCopy } from "../wallet-i18n";
 import { HistoryPagination, HistoryShell } from "../workspace-history";
+import { PurchaseTotalEstimate } from "./purchase-total-estimate";
 export async function purchasesHistoryMetadata(): Promise<Metadata> {
   return {
     title: `${getCommerceHistoryCopy(await getRequestLocale()).purchasesTitle} | MTA NEXUS`,
@@ -102,6 +107,10 @@ export async function PurchasesHistoryScreen({
     );
   }
 
+  const fxRates: readonly ExplicitFxRate[] | null | undefined = walletEnabled
+    ? await new WalletPaymentService().listFxRates().catch(() => null)
+    : undefined;
+
   return (
     <div className={pageShellClip}>
       <HistoryShell copy={copy} area="purchases" notice={historyNotice} {...walletNavProps}>
@@ -142,6 +151,12 @@ export async function PurchasesHistoryScreen({
                     <dt className="text-muted">{copy.total}</dt>
                     <dd className={typeNumericSemiboldPrimary}>
                       {formatHistoryAmount(order.totalAmount, order.currency, typedLocale)}
+                      <PurchaseTotalEstimate
+                        amount={order.totalAmount}
+                        currency={order.currency}
+                        locale={typedLocale}
+                        rates={fxRates}
+                      />
                     </dd>
                   </div>
                 </dl>
