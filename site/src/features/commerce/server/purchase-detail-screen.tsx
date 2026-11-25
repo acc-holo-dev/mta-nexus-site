@@ -240,6 +240,7 @@ export async function PurchaseDetailScreen({
           amountMinor={order.totalAmount}
           currency={order.currency}
           canPay={canPayWithWallet}
+          rates={fxRates}
         />
       ) : null}
       <Link

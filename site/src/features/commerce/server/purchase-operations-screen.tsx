@@ -1,4 +1,4 @@
-import { AppError } from "@nexus/domain";
+import { AppError, type ExplicitFxRate, publicPriceEstimates } from "@nexus/domain";
 import { EmptyState, ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
@@ -8,7 +8,10 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { orderOperationsService } from "../../../lib/services/commerce/commercial-plan-service";
-import { isWalletEngineEnabled } from "../../../lib/services/commerce/wallet-payment-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
@@ -20,6 +23,7 @@ import {
   typeDisplayPrimary,
   typeFlexGap4Sm,
   typeGridGap3Sm2,
+  typeSmMuted,
   typeXlSemiboldPrimary,
 } from "../../shell/type-shell";
 import {
@@ -32,6 +36,42 @@ import { commercialProviderLabel } from "../financial-i18n";
 import { OrderCancellationForm } from "../order-cancellation";
 import { getWalletCopy } from "../wallet-i18n";
 import { WalletPayOrderForm } from "../wallet-pay";
+
+function AttemptEstimate({
+  amount,
+  copy,
+  currency,
+  locale,
+  rates,
+}: {
+  amount: number;
+  copy: ReturnType<typeof getWalletCopy>;
+  currency: string;
+  locale: "en" | "ru";
+  rates: readonly ExplicitFxRate[] | null;
+}) {
+  const lines = publicPriceEstimates({ price: amount, currency }, rates);
+  if (lines === undefined) return null;
+  if (lines === null) return <p className={typeSmMuted}>{copy.fxUnavailable}</p>;
+  return (
+    <ul className={typeSmMuted}>
+      {lines.map((line) => (
+        <li key={line.quote}>
+          {line.kind === "quote"
+            ? copy.fxEstimate.replace(
+                "{destination}",
+                formatHistoryAmount(line.amount, line.quote, locale),
+              )
+            : line.kind === "dust"
+              ? copy.fxDust
+              : line.kind === "invalid"
+                ? copy.fxExceeds
+                : `${line.quote}: ${copy.fxNone}`}
+        </li>
+      ))}
+    </ul>
+  );
+}
 export async function purchaseOperationsMetadata(): Promise<Metadata> {
   return {
     title: `${getCommercialCopy(await getRequestLocale()).paymentOperations} | MTA NEXUS`,
@@ -117,6 +157,11 @@ export async function PurchaseOperationsScreen({
     Object.hasOwn(states, value) ? states[value as keyof typeof states] : copy.unknown;
   const hasWalletAttempt = result.attempts.some((attempt) => attempt.provider === "wallet");
   const walletEnabled = isWalletEngineEnabled();
+  const typedLocale = locale === "ru" ? "ru" : "en";
+  const fxRates = walletEnabled
+    ? await new WalletPaymentService().listFxRates().catch(() => null)
+    : undefined;
+  const walletCopy = getWalletCopy(typedLocale);
   return (
     <div className={pageShellMax4xl}>
       <Link href={`/workspace/purchases/${encodeURIComponent(id)}`} className={linkAccentSmRounded}>
@@ -134,10 +179,11 @@ export async function PurchaseOperationsScreen({
           key={`wallet:${user.id}:${id}`}
           actorId={user.id}
           orderId={id}
-          amountLabel={`${getWalletCopy(locale === "ru" ? "ru" : "en").paySubmit}: ${formatHistoryAmount(result.order.totalAmount, result.order.currency, locale === "ru" ? "ru" : "en")}`}
+          amountLabel={`${walletCopy.paySubmit}: ${formatHistoryAmount(result.order.totalAmount, result.order.currency, typedLocale)}`}
           amountMinor={result.order.totalAmount}
           currency={result.order.currency}
           canPay
+          rates={fxRates}
         />
       ) : null}
       <OrderCancellationForm
@@ -178,6 +224,15 @@ export async function PurchaseOperationsScreen({
                 <p className="font-numeric text-secondary">
                   {copy.amount}: {formatHistoryAmount(attempt.amount, attempt.currency, locale)}
                 </p>
+                {fxRates !== undefined ? (
+                  <AttemptEstimate
+                    amount={attempt.amount}
+                    copy={walletCopy}
+                    currency={attempt.currency}
+                    locale={typedLocale}
+                    rates={fxRates}
+                  />
+                ) : null}
                 <dl className={typeGridGap3Sm2}>
                   {(["createdAt", "updatedAt"] as const).map((key) => (
                     <div key={key}>

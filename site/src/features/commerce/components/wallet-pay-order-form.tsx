@@ -1,5 +1,6 @@
 "use client";
 
+import { type ExplicitFxRate, publicPriceEstimates } from "@nexus/domain";
 import { Button, ErrorState } from "@nexus/ui";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
@@ -7,7 +8,13 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 import { useNexusLocale } from "../../shell/locale";
 import { panelClipSpace4P5 } from "../../shell/panel-shell";
-import { typeBlockSpace2, typeSmSuccess, typeXlSemiboldPrimary } from "../../shell/type-shell";
+import {
+  typeBlockSpace2,
+  typeSmMuted,
+  typeSmSuccess,
+  typeXlSemiboldPrimary,
+} from "../../shell/type-shell";
+import { formatHistoryAmount } from "../commerce-history-format";
 import { getWalletCopy, walletError } from "../wallet-i18n";
 import { confirmedWalletPay } from "../wallet-pay-confirmation";
 import {
@@ -23,6 +30,7 @@ export function WalletPayOrderForm({
   amountMinor,
   currency,
   canPay,
+  rates,
 }: {
   actorId: string;
   orderId: string;
@@ -30,6 +38,7 @@ export function WalletPayOrderForm({
   amountMinor: number;
   currency: string;
   canPay: boolean;
+  rates?: readonly ExplicitFxRate[] | null;
 }) {
   const { locale } = useNexusLocale();
   const copy = getWalletCopy(locale);
@@ -105,6 +114,15 @@ export function WalletPayOrderForm({
         </h2>
         <p className="text-secondary">{copy.payNote}</p>
         <p className="text-primary">{amountLabel}</p>
+        {rates === undefined ? null : (
+          <PayEstimate
+            amount={amountMinor}
+            copy={copy}
+            currency={currency}
+            locale={locale}
+            rates={rates}
+          />
+        )}
         <WalletSpendBalancePreview
           balance={balance}
           currency={currency}
@@ -131,5 +149,41 @@ export function WalletPayOrderForm({
         {busy ? copy.paying : copy.paySubmit}
       </Button>
     </form>
+  );
+}
+
+function PayEstimate({
+  amount,
+  copy,
+  currency,
+  locale,
+  rates,
+}: {
+  amount: number;
+  copy: ReturnType<typeof getWalletCopy>;
+  currency: string;
+  locale: "en" | "ru";
+  rates: readonly ExplicitFxRate[] | null;
+}) {
+  const lines = publicPriceEstimates({ price: amount, currency }, rates);
+  if (lines === undefined) return null;
+  if (lines === null) return <p className={typeSmMuted}>{copy.fxUnavailable}</p>;
+  return (
+    <ul className={typeSmMuted}>
+      {lines.map((line) => (
+        <li key={line.quote}>
+          {line.kind === "quote"
+            ? copy.fxEstimate.replace(
+                "{destination}",
+                formatHistoryAmount(line.amount, line.quote, locale),
+              )
+            : line.kind === "dust"
+              ? copy.fxDust
+              : line.kind === "invalid"
+                ? copy.fxExceeds
+                : `${line.quote}: ${copy.fxNone}`}
+        </li>
+      ))}
+    </ul>
   );
 }
