@@ -56,7 +56,7 @@ function OrderAmountEstimate({
   rates: readonly ExplicitFxRate[] | null | undefined;
   purpose?: "amount" | "discount";
 }) {
-  if (rates == null) return null;
+  if (rates === null) return null;
   return (
     <RecordedRateEstimate
       amount={amount}

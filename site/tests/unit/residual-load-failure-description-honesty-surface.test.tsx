@@ -18,12 +18,16 @@ it("locks residual load-failure ErrorStates to recovery description hints", () =
   );
 
   const support = read("site/src/features/support/server/support-message-page.tsx");
-  expect(support).toContain(
-    "title === supportWorkspaceCopy(locale).unavailable ? copy.unavailableHint : undefined",
-  );
-  expect(read("site/src/features/support/support-message-discovery-copy.ts")).toContain(
-    "unavailableHint:",
-  );
+  expect(support).toContain("description={supportMessageErrorDescription(locale, title)}");
+  expect(support).not.toContain("unavailableHint : undefined");
+  const messageCopy = read("site/src/features/support/support-message-discovery-copy.ts");
+  expect(messageCopy).toContain("unavailableHint:");
+  expect(messageCopy).toContain("invalidHint:");
+  expect(messageCopy).toContain("expiredHint:");
+  expect(messageCopy).toContain("missingHint:");
+  expect(messageCopy).toContain("rateHint:");
+  expect(messageCopy).toContain("authHint:");
+  expect(messageCopy).toContain("export function supportMessageErrorDescription");
 
   const inventory = read("site/src/features/library/server/collection-inventory-page.tsx");
   expect(inventory).toContain("title === c.retry");

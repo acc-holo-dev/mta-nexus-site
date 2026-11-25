@@ -232,6 +232,29 @@ export function communityReportError(locale: Locale, code: unknown) {
   if (code === "INTERNAL_ERROR" || code === "UNCONFIRMED") return copy.unavailable;
   return userPlatformError(locale, code);
 }
+/** Load failure for a publication report queue. A bad filter is not an empty queue or a failed submit. */
+export function publicationReportLoadFailureDescription(locale: Locale, code: unknown) {
+  const copy = communityReportCopy(locale);
+  return String(code) === "VALIDATION_ERROR" ? copy.queryInvalidHint : copy.unavailableHint;
+}
+
+export function publicationReportsAreFiltered(filters: {
+  query?: string;
+  type?: string;
+  view: string;
+  page: number;
+}) {
+  return Boolean(filters.query || filters.type || filters.view === "history" || filters.page > 1);
+}
+
+/** Zero loaded reports. Filter misses stay distinct from a queue that simply has no reports. */
+export function publicationReportQueueEmpty(locale: Locale, filtered: boolean) {
+  const copy = communityReportCopy(locale);
+  return filtered
+    ? { title: copy.emptyFiltered, description: copy.reset }
+    : { title: copy.empty, description: copy.description };
+}
+
 export const communityReportMutationError = (locale: Locale, code: unknown) =>
   code === "INTERNAL_ERROR" || code === "UNCONFIRMED"
     ? communityReportCopy(locale).mutationUnavailable

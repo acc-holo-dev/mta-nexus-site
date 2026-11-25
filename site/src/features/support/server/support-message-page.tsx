@@ -13,8 +13,11 @@ import { PlatformSessionError } from "../../shell/session-error";
 import { typeDisplayPrimary } from "../../shell/type-shell";
 import { SupportMessageBrowser } from "../components/support-message-browser";
 import { parseSupportMessageQuery } from "../support-message-discovery-contract";
-import { supportMessageCopy, supportMessageError } from "../support-message-discovery-copy";
-import { supportWorkspaceCopy } from "../support-workspace-copy";
+import {
+  supportMessageCopy,
+  supportMessageError,
+  supportMessageErrorDescription,
+} from "../support-message-discovery-copy";
 
 export async function supportMessageMetadata() {
   return {
@@ -85,9 +88,7 @@ export async function SupportMessagePage({
         <h1 className={typeDisplayPrimary}>{copy.title}</h1>
         <ErrorState
           title={title}
-          description={
-            title === supportWorkspaceCopy(locale).unavailable ? copy.unavailableHint : undefined
-          }
+          description={supportMessageErrorDescription(locale, title)}
           action={
             <Link href={path} className={linkAccentSmRounded}>
               {copy.reset}

@@ -125,7 +125,7 @@ export async function MarketPage({
       </div>
 
       <search aria-label={dictionary.market.searchLabel}>
-        <form action="/market" method="get" className={typeFlexWrapGap2}>
+        <form key={catalogHref} action="/market" method="get" className={typeFlexWrapGap2}>
           <input type="hidden" name="type" value={type} />
           <input type="hidden" name="sort" value={sort} />
           <label htmlFor="market-query" className="sr-only">

@@ -400,7 +400,20 @@ export async function ServerDetailScreen({
               aria-hidden={occupancyPercent == null}
             />
           </div>
-          {!observedServer && <div className={typeElevenFaint}>{copy.noObservation}</div>}
+          {!directory ? (
+            <ErrorState
+              id="server-directory-unavailable"
+              title={dictionary.servers.unavailable}
+              description={dictionary.servers.unavailableHint}
+              action={
+                <Link href={serverReturnPath} className={linkAccentTightHover}>
+                  {dictionary.errors.retry}
+                </Link>
+              }
+            />
+          ) : !observedServer ? (
+            <div className={typeElevenFaint}>{copy.noObservation}</div>
+          ) : null}
           {directoryIsStale ? (
             <ErrorState
               id="server-directory-stale-snapshot"
