@@ -56,6 +56,7 @@ function OrderAmountEstimate({
   rates: readonly ExplicitFxRate[] | null | undefined;
   purpose?: "amount" | "discount";
 }) {
+  if (rates === null) return null;
   return (
     <RecordedRateEstimate
       amount={amount}
@@ -155,6 +156,11 @@ export async function PurchaseDetailScreen({
         <p className="text-secondary">
           {copy.status}: {orderStatusLabel(order.status, copy.orderStatuses)}
         </p>
+        {fxRates === null ? (
+          <p role="note" className={typeSmMuted}>
+            {walletCopy.recordedRateUnavailable}
+          </p>
+        ) : null}
         <dl className="grid min-w-0 gap-4 text-sm sm:grid-cols-2">
           <div className="min-w-0">
             <dt className="text-muted">{copy.placed}</dt>
@@ -259,6 +265,11 @@ export async function PurchaseDetailScreen({
         <h2 id="order-items" className={typeXlSemiboldPrimary}>
           {copy.lineItems} ({result.total})
         </h2>
+        {fxRates === null ? (
+          <p role="note" className={typeSmMuted}>
+            {walletCopy.recordedRateUnavailable}
+          </p>
+        ) : null}
         {items.length === 0 ? (
           <EmptyState
             title={copy.emptyItems}
