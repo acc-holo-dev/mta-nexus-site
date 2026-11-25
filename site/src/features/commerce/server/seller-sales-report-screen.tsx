@@ -1,4 +1,4 @@
-import { AppError } from "@nexus/domain";
+import { AppError, type ExplicitFxRate } from "@nexus/domain";
 import { ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
@@ -8,6 +8,10 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { sellerSalesService } from "../../../lib/services/commerce/seller-sales-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax6xl, pageShellMax6xlDense } from "../../shell/page-shell";
@@ -81,8 +85,17 @@ async function SellerSalesReportScreen({ query }: { query: Query }) {
         </div>
       );
     }
+    const fxRates: readonly ExplicitFxRate[] | null | undefined = isWalletEngineEnabled()
+      ? await new WalletPaymentService().listFxRates().catch(() => null)
+      : undefined;
     return (
-      <SellerSalesReportView report={report} query={reportQuery} scopes={scopes} locale={locale} />
+      <SellerSalesReportView
+        fxRates={fxRates}
+        report={report}
+        query={reportQuery}
+        scopes={scopes}
+        locale={locale}
+      />
     );
   } catch (error) {
     if (error instanceof Error && error.message === "NEXT_NOT_FOUND") throw error;
