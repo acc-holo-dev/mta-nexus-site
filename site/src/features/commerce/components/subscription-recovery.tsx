@@ -1,4 +1,5 @@
 "use client";
+import type { ExplicitFxRate } from "@nexus/domain";
 import { commercialPlanTermsSchema, subscriptionCommandSchema } from "@nexus/validation";
 import { useEffect, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
@@ -7,7 +8,13 @@ import { PlanReviewTerms } from "../plan-reviews-workspace";
 import { subscriptionsCopy } from "../subscriptions-i18n";
 import { SubscriptionControls } from "./subscription-controls";
 
-export function SubscriptionRecovery({ actorId }: { actorId: string }) {
+export function SubscriptionRecovery({
+  actorId,
+  rates,
+}: {
+  actorId: string;
+  rates?: readonly ExplicitFxRate[] | null;
+}) {
   const { locale } = useNexusLocale();
   const copy = subscriptionsCopy(locale);
   const [item, setItem] = useState<{
@@ -70,7 +77,7 @@ export function SubscriptionRecovery({ actorId }: { actorId: string }) {
     <section className="space-y-4">
       <h2>{copy.recoverTitle}</h2>
       <p>{copy.recoverDescription}</p>
-      <PlanReviewTerms terms={snapshot.terms} locale={locale} />
+      <PlanReviewTerms terms={snapshot.terms} locale={locale} rates={rates} />
       {command.action === "activate" ? (
         <SubscriptionControls
           actorId={actorId}

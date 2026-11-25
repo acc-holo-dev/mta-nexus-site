@@ -94,7 +94,7 @@ export async function SubscriptionsWorkspaceScreen({
     return (
       <section className={pageShellMax5xl}>
         <h1 className="font-display">{c.title}</h1>
-        <SubscriptionRecovery key={actor.id} actorId={actor.id} />
+        <SubscriptionRecovery key={actor.id} actorId={actor.id} rates={fxRates} />
         <nav className={typeFlexWrapGap4}>
           <Link href="/subscriptions" className={subscriptionNavLinkClass}>
             {c.catalog}
@@ -166,7 +166,7 @@ export async function SubscriptionsWorkspaceScreen({
                 {c.ended}: {formatSubscriptionTime(s.cancelledAt, locale)}
               </p>
             )}
-            <PlanReviewTerms terms={s.terms} locale={locale} />
+            <PlanReviewTerms terms={s.terms} locale={locale} rates={fxRates} />
             {s.status === "expired" ? (
               <ErrorState
                 id="subscription-expired"
