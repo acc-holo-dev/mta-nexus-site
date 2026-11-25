@@ -29,6 +29,7 @@ import {
   typeNumericPrimary,
   typeRoundedBorderP4SmSecondary,
   typeSemiboldPrimary,
+  typeSmMuted,
   typeSpace2Sm,
   typeXlPrimary,
   typeXsMuted,
@@ -73,7 +74,7 @@ function FxEstimate({
     return <p className={typeXsMuted}>{code === "FX_EXCEEDS" ? copy.fxExceeds : copy.fxDust}</p>;
   }
   return (
-    <p className={typeNumericPrimary}>
+    <p className={typeSmMuted}>
       {copy.fxRate
         .replace("{base}", formatFinancialMinor(rate.baseAmount, sourceCurrency, locale))
         .replace("{quote}", formatFinancialMinor(rate.quoteAmount, rate.quoteCurrency, locale))}
