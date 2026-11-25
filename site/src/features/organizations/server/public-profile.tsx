@@ -43,6 +43,7 @@ import {
   typeTruncateXsFaint,
 } from "../../shell/type-shell";
 import { contextTrustCopy } from "../../trust/public-context-trust-copy";
+import { OrganizationListingRateNote } from "../organization-listing-rate-note";
 
 const getProfile = cache((slug: string) => organizationRepository.findBySlug(slug));
 
@@ -245,13 +246,20 @@ export async function OrganizationProfilePage({
           </h2>
           <div className={typeGridMinCols1Gap6Clip}>
             {products.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                locale={locale}
-                attribution={attributions.get(product.id) ?? null}
-                priceEstimates={publicPriceEstimates(product, publicRates)}
-              />
+              <div key={product.id} className="min-w-0">
+                <ProductCard
+                  product={product}
+                  locale={locale}
+                  attribution={attributions.get(product.id) ?? null}
+                  priceEstimates={publicPriceEstimates(product, publicRates)}
+                />
+                <OrganizationListingRateNote
+                  price={product.price}
+                  currency={product.currency}
+                  rates={publicRates}
+                  locale={locale}
+                />
+              </div>
             ))}
           </div>
           <ProfileResourcePagination
