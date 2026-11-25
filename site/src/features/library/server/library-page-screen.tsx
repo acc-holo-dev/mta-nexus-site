@@ -1,4 +1,4 @@
-import { EmptyState, ErrorState, StatusBadge } from "@nexus/ui";
+import { Button, EmptyState, ErrorState, StatusBadge } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -37,6 +37,7 @@ import {
   typeDisplayPrimary,
   typeFlexMinWrapGap2,
   typeFlexWrapCenterGap4,
+  typeFlexWrapEndGap3,
   typeFlexWrapGap2,
   typeFlexWrapGap4,
   typeGridGap4Md2,
@@ -54,6 +55,7 @@ import {
   libraryMarketHref,
   parseLibraryFilter,
   parseLibraryPage,
+  parseLibraryQuery,
 } from "../library-view";
 import { getResourceReleaseControlCopy } from "../resource-release-control-i18n";
 
@@ -70,6 +72,7 @@ export async function LibraryPageScreen({
   searchParams: Promise<{
     filter?: string | string[];
     page?: string | string[];
+    q?: string | string[];
   }>;
 }) {
   const [locale, cookieStore, query] = await Promise.all([
@@ -86,6 +89,8 @@ export async function LibraryPageScreen({
   const receiptsTitle = walletEnabled ? receiptsCopy.walletTitle : receiptsCopy.title;
   const filter = parseLibraryFilter(query.filter);
   const page = parseLibraryPage(query.page);
+  const q = parseLibraryQuery(query.q);
+  const listHref = (nextPage: number, nextFilter = filter) => libraryHref(nextFilter, nextPage, q);
   let user: Awaited<ReturnType<typeof authService.getSession>>;
   try {
     user = await authService.getSession(cookieStore.get("nexus_session")?.value);
@@ -95,13 +100,16 @@ export async function LibraryPageScreen({
         locale={locale}
         title={copy.title}
         message={copy.loadUnavailable}
-        retryHref={libraryHref(filter, page)}
+        retryHref={libraryHref(filter, page, q)}
       />
     );
   }
-  if (!user) return <PlatformSignIn locale={locale} returnPath={libraryHref(filter, page)} />;
+  if (!user) return <PlatformSignIn locale={locale} returnPath={libraryHref(filter, page, q)} />;
 
-  const result = await userLibraryService.pageByUser(user.id, page, filter).catch(() => null);
+  const result = await (q
+    ? userLibraryService.pageByUser(user.id, page, filter, undefined, q)
+    : userLibraryService.pageByUser(user.id, page, filter)
+  ).catch(() => null);
   const filters: readonly UserLibraryFilter[] = ["all", "ready", "unavailable"];
 
   return (
@@ -153,18 +161,36 @@ export async function LibraryPageScreen({
           title={copy.loadUnavailable}
           description={copy.loadUnavailableHint}
           action={
-            <Link href={libraryHref(filter, page)} className={linkAccentSmRounded}>
+            <Link href={libraryHref(filter, page, q)} className={linkAccentSmRounded}>
               {dictionary.errors.retry}
             </Link>
           }
         />
       ) : (
         <>
+          <search aria-label={copy.search}>
+            <form method="get" action="/workspace/library" className={typeFlexWrapEndGap3}>
+              {filter !== "all" ? <input type="hidden" name="filter" value={filter} /> : null}
+              <label className="space-y-1">
+                <span className={typeXsSecondary}>{copy.search}</span>
+                <input
+                  name="q"
+                  defaultValue={q}
+                  maxLength={80}
+                  className="min-h-11 rounded-md border border-base bg-surface px-3 text-sm text-primary"
+                />
+              </label>
+              <Button type="submit" variant="outline">
+                {copy.searchSubmit}
+              </Button>
+            </form>
+          </search>
+
           <nav aria-label={copy.title} className={typeFlexWrapGap2}>
             {filters.map((value) => (
               <Link
                 key={value}
-                href={libraryHref(value, 1)}
+                href={libraryHref(value, 1, q)}
                 aria-current={filter === value ? "page" : undefined}
                 className="inline-flex min-h-11 items-center rounded-lg border border-base bg-surface px-4 text-sm text-secondary transition-colors hover:border-strong hover:bg-hover hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)] aria-[current=page]:border-transparent aria-[current=page]:bg-accent aria-[current=page]:text-white"
               >
@@ -275,7 +301,7 @@ export async function LibraryPageScreen({
             {result.totalPages > 1 && (
               <nav aria-label={copy.page} className={typeFlexWrapCenterGap4}>
                 {result.page > 1 ? (
-                  <Link href={libraryHref(filter, result.page - 1)} className={linkAccentTight}>
+                  <Link href={listHref(result.page - 1)} className={linkAccentTight}>
                     {copy.previous}
                   </Link>
                 ) : null}
@@ -283,7 +309,7 @@ export async function LibraryPageScreen({
                   {copy.page} {result.page} {copy.of} {result.totalPages}
                 </span>
                 {result.page < result.totalPages ? (
-                  <Link href={libraryHref(filter, result.page + 1)} className={linkAccentTight}>
+                  <Link href={listHref(result.page + 1)} className={linkAccentTight}>
                     {copy.next}
                   </Link>
                 ) : null}
