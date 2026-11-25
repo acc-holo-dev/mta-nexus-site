@@ -148,8 +148,27 @@ describe("ProductCard attribution and honest metrics", () => {
         priceEstimates={[{ kind: "quote", base: "EUR", quote: "USD", amount: 550 }]}
       />,
     );
+    const copy = getDictionary("en").product;
     expect(html).toContain("€4.99");
-    expect(html).toContain("About $5.50 at the recorded rate");
+    expect(html).toContain(copy.priceEstimate.replace("{quote}", "$5.50").replace("{base}", "EUR"));
+    expect(html).not.toContain(getDictionary("en").market.free);
+  });
+
+  it("says a missing recorded rate does not replace the listing price", () => {
+    const html = renderToStaticMarkup(
+      <ProductCard
+        product={product({ price: 499, currency: "EUR", licenseModel: "single_server" })}
+        locale="en"
+        priceEstimates={[{ kind: "none", base: "EUR", quote: "USD" }]}
+      />,
+    );
+    const copy = getDictionary("en").product;
+    expect(html).toContain("€4.99");
+    expect(html).toContain(
+      copy.priceEstimateNone.replace("{base}", "EUR").replace("{quote}", "USD"),
+    );
+    expect(html).not.toContain(getDictionary("en").market.free);
+    expect(html).not.toContain(getDictionary("en").market.priceEstimateUnavailable);
   });
 
   it("says the rate read failed without calling the paid price free", () => {
@@ -163,5 +182,27 @@ describe("ProductCard attribution and honest metrics", () => {
     expect(html).toContain("€4.99");
     expect(html).toContain(getDictionary("en").market.priceEstimateUnavailable);
     expect(html).not.toContain(getDictionary("en").market.free);
+  });
+
+  it("keeps dust and invalid recorded rates as estimates beside the listing price", () => {
+    const html = renderToStaticMarkup(
+      <ProductCard
+        product={product({ price: 499, currency: "EUR", licenseModel: "single_server" })}
+        locale="ru"
+        priceEstimates={[
+          { kind: "dust", base: "EUR", quote: "RUB" },
+          { kind: "invalid", base: "EUR", quote: "USD" },
+        ]}
+      />,
+    );
+    const copy = getDictionary("ru").product;
+    expect(html).toContain("4,99");
+    expect(html).toContain("€");
+    expect(html).toContain(
+      copy.priceEstimateDust.replace("{base}", "EUR").replace("{quote}", "RUB"),
+    );
+    expect(html).toContain(
+      copy.priceEstimateInvalid.replace("{base}", "EUR").replace("{quote}", "USD"),
+    );
   });
 });

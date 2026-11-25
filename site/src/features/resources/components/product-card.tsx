@@ -67,6 +67,7 @@ export function ProductCard({
 }) {
   const dictionary = getDictionary(locale);
   const market = dictionary.market;
+  const productCopy = dictionary.product;
   const productHref = `/market/${product.slug}`;
   const updatedDate = new Date(product.updatedAt).toLocaleDateString(
     locale === "ru" ? "ru-RU" : "en-US",
@@ -103,20 +104,24 @@ export function ProductCard({
       {product.price > 0 && priceEstimates === null ? (
         <p className="px-3 pt-2 text-[11px] text-muted">{market.priceEstimateUnavailable}</p>
       ) : null}
-      {product.price > 0 &&
-      priceEstimates &&
-      priceEstimates.some((line) => line.kind === "quote") ? (
+      {product.price > 0 && priceEstimates && priceEstimates.length > 0 ? (
         <ul className="space-y-0.5 px-3 pt-2 text-[11px] text-muted">
-          {priceEstimates.map((line) =>
-            line.kind === "quote" ? (
-              <li key={line.quote}>
-                {market.priceEstimateAbout.replace(
-                  "{amount}",
-                  formatHistoryAmount(line.amount, line.quote, locale),
-                )}
-              </li>
-            ) : null,
-          )}
+          {priceEstimates.map((line) => (
+            <li key={line.quote}>
+              {line.kind === "quote"
+                ? productCopy.priceEstimate
+                    .replace("{quote}", formatHistoryAmount(line.amount, line.quote, locale))
+                    .replace("{base}", line.base)
+                : (line.kind === "none"
+                    ? productCopy.priceEstimateNone
+                    : line.kind === "dust"
+                      ? productCopy.priceEstimateDust
+                      : productCopy.priceEstimateInvalid
+                  )
+                    .replace("{base}", line.base)
+                    .replace("{quote}", line.quote)}
+            </li>
+          ))}
         </ul>
       ) : null}
 
