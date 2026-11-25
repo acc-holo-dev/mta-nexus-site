@@ -25,7 +25,7 @@ import { resourceQaService } from "../../../lib/services/resources/resource-qa-s
 import { resourceReleaseWatchesService } from "../../../lib/services/resources/resource-release-watches-service";
 import { resourceReviewService } from "../../../lib/services/resources/resource-review-service";
 import { formatHistoryAmount } from "../../commerce/commerce-history-format";
-import { RecordedRateEstimate } from "../../commerce/components/recorded-rate-estimate";
+import { RecordedRateEstimate } from "../../commerce/recorded-rate-estimate";
 import { licenseModelLabel } from "../../commerce/license-model-i18n";
 import { WalletCheckoutButton } from "../../commerce/wallet-checkout";
 import { FollowButton } from "../../community/follow";

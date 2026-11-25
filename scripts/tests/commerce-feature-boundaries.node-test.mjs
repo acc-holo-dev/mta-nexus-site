@@ -57,6 +57,7 @@ const clientPorts = [
   "wallet-topup",
   "wallet-pay",
   "wallet-checkout",
+  "recorded-rate-estimate",
 ];
 const safeLib =
   /^(?:(?:i18n(?:\.ts$|\/)|platform\/i18n\.ts$)|(?:commerce-history-format|http\/private-api-request|support-retry)\.ts$)/u;
