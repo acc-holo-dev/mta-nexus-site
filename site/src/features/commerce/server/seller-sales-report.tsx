@@ -47,14 +47,15 @@ function GrossEstimate({
   locale,
   rates,
 }: {
-  amount: string;
+  amount: number | string;
   copy: ReturnType<typeof getWalletCopy>;
   currency: string;
   locale: Locale;
   rates: readonly ExplicitFxRate[] | null | undefined;
 }) {
-  if (!/^-?\d+$/u.test(amount)) return null;
-  const minor = Number(amount);
+  const text = String(amount);
+  if (!/^-?\d+$/u.test(text)) return null;
+  const minor = Number(text);
   if (!Number.isSafeInteger(minor)) return null;
   const lines = publicPriceEstimates({ price: minor, currency }, rates);
   if (lines === undefined) return null;
@@ -304,6 +305,15 @@ export function SellerSalesReportView({
               <p className={typeNumericPrimary}>
                 {formatFinancialMinor(sale.unitPrice, sale.currency, locale)}
               </p>
+              {walletCopy ? (
+                <GrossEstimate
+                  amount={sale.unitPrice}
+                  copy={walletCopy}
+                  currency={sale.currency}
+                  locale={locale}
+                  rates={fxRates}
+                />
+              ) : null}
               <p className={typeSmSecondary}>
                 {c.statuses[sale.status]} · {c.evidence[sale.evidence]}
               </p>
