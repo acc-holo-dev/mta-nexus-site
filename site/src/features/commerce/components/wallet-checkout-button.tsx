@@ -248,7 +248,12 @@ export function WalletCheckoutButton({
             />
           ) : null}
         </div>
-        <WalletSpendBalancePreview balance={balance} currency={currency} amountMinor={dueMinor} />
+        <WalletSpendBalancePreview
+          balance={balance}
+          currency={currency}
+          amountMinor={dueMinor}
+          rates={fxRates}
+        />
       </div>
       <ActionConfirmCheckbox
         id={`${field}-confirm`}

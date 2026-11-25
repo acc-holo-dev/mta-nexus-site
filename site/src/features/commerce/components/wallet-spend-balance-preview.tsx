@@ -1,11 +1,13 @@
 "use client";
 
+import type { ExplicitFxRate } from "@nexus/domain";
 import { useEffect, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { useNexusLocale } from "../../shell/locale";
 import { formatHistoryAmount } from "../commerce-history-format";
 import { confirmedWalletBalance } from "../wallet-balance-confirmation";
 import { getWalletCopy } from "../wallet-i18n";
+import { RecordedRateEstimate } from "./recorded-rate-estimate";
 
 export type WalletSpendBalanceState =
   | { status: "loading" }
@@ -62,10 +64,13 @@ export function WalletSpendBalancePreview({
   balance,
   currency,
   amountMinor,
+  rates,
 }: {
   balance: WalletSpendBalanceState;
   currency: string;
   amountMinor: number;
+  /** Recorded pairs already loaded by the parent. Undefined skips the quote. */
+  rates?: readonly ExplicitFxRate[] | null;
 }) {
   const { locale } = useNexusLocale();
   const copy = getWalletCopy(locale);
@@ -89,6 +94,7 @@ export function WalletSpendBalancePreview({
 
   const availableLabel = formatHistoryAmount(balance.available, currency, locale);
   const dueLabel = formatHistoryAmount(amountMinor, currency, locale);
+  const quoteLocale = locale === "ru" ? "ru" : "en";
 
   return (
     <div
@@ -98,9 +104,25 @@ export function WalletSpendBalancePreview({
       <p className="text-secondary">
         {copy.available}: <span className="font-numeric text-primary">{availableLabel}</span>
       </p>
+      {rates === undefined ? null : (
+        <RecordedRateEstimate
+          amount={balance.available}
+          currency={currency}
+          locale={quoteLocale}
+          rates={rates}
+        />
+      )}
       <p className="text-secondary">
         {copy.spendDue}: <span className="font-numeric text-primary">{dueLabel}</span>
       </p>
+      {rates === undefined ? null : (
+        <RecordedRateEstimate
+          amount={amountMinor}
+          currency={currency}
+          locale={quoteLocale}
+          rates={rates}
+        />
+      )}
       {!balance.enough ? (
         <div className="space-y-1" role="status">
           <p className="text-warning">{copy.spendInsufficient}</p>

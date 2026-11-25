@@ -122,6 +122,7 @@ export function WalletPayOrderForm({
           balance={balance}
           currency={currency}
           amountMinor={amountMinor}
+          rates={rates}
         />
       </div>
       <ActionConfirmCheckbox

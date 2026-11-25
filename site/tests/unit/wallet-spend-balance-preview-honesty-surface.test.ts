@@ -19,8 +19,12 @@ describe("wallet spend balance preview honesty", () => {
     expect(checkout).toContain("WalletSpendBalancePreview");
     expect(checkout).toContain("walletSpendSubmitBlocked");
     expect(checkout).toContain("amountMinor");
+    expect(checkout).toContain("rates={fxRates}");
     expect(pay).toContain("WalletSpendBalancePreview");
     expect(pay).toContain("amountMinor");
+    expect(pay).toContain("rates={rates}");
+    expect(preview).toContain("RecordedRateEstimate");
+    expect(preview).not.toContain("listFxRates");
     expect(i18n).toContain("spendInsufficient");
     expect(i18n).toContain("spendBalanceUnavailable");
   });
