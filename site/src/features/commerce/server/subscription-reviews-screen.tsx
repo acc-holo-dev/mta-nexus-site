@@ -8,6 +8,10 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { planReviewsService } from "../../../lib/services/commerce/plan-reviews-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
@@ -20,6 +24,7 @@ import {
   typeSurfaceBorderP2,
 } from "../../shell/type-shell";
 import { formatHistoryAmount, formatHistoryDate } from "../commerce-history-format";
+import { RecordedRateEstimate } from "../components/recorded-rate-estimate";
 import { planReviewsCopy } from "../plan-reviews-i18n";
 import { planReviewHref, planReviewsPageParams, planReviewsQuery } from "../plan-reviews-query";
 import { planReviewNavLinkClass } from "../plan-reviews-workspace";
@@ -73,6 +78,9 @@ export async function SubscriptionReviewsScreen({
       planReviewsService.page(actor, query),
       planReviewsService.scopes(actor, query.scopePage),
     ]);
+    const fxRates = isWalletEngineEnabled()
+      ? await new WalletPaymentService().listFxRates().catch(() => null)
+      : undefined;
     const href = (page: number, scopePage = scopes.page) =>
       `/workspace/subscriptions/reviews?${new URLSearchParams({ page: String(page), scopePage: String(scopePage), days: String(query.days), ...(query.organizationId ? { organizationId: query.organizationId } : {}) })}`;
     return (
@@ -161,6 +169,12 @@ export async function SubscriptionReviewsScreen({
                 <p className="text-sm">
                   {formatHistoryAmount(r.terms.price, r.terms.currency, locale)} ·{" "}
                   {r.terms.durationDays} {c.days} · {c.commission}: {r.terms.commissionBps / 100}%
+                  <RecordedRateEstimate
+                    amount={r.terms.price}
+                    currency={r.terms.currency}
+                    locale={locale}
+                    rates={fxRates}
+                  />
                 </p>
               </li>
             ))}
