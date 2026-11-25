@@ -41,13 +41,7 @@ vi.mock("../../src/lib/services/commerce/wallet-payment-service", () => ({
   },
 }));
 vi.mock("../../src/features/commerce/components/wallet-promo-form", () => ({
-  WalletPromoForm: ({
-    actorId,
-    rates,
-  }: {
-    actorId: string;
-    rates?: readonly unknown[] | null;
-  }) => (
+  WalletPromoForm: ({ actorId, rates }: { actorId: string; rates?: readonly unknown[] | null }) => (
     <form
       data-promo-form={actorId}
       data-rate-count={rates === null ? "null" : String(rates?.length ?? "missing")}

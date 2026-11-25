@@ -53,7 +53,7 @@ describe("promo fixed-amount estimate", () => {
     );
     expect(form).toContain("RecordedRateEstimate");
     expect(form).toContain("parseCommercialAmount(amount)");
-    expect(form).toContain('onChange={(event) => setAmount(event.target.value)}');
+    expect(form).toContain("onChange={(event) => setAmount(event.target.value)}");
     expect(form.indexOf('kind === "percent"')).toBeLessThan(form.indexOf("<RecordedRateEstimate"));
     expect(form).not.toContain("listFxRates");
     expect(screen).toContain("isWalletEngineEnabled()");
