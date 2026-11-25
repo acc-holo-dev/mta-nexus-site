@@ -1,7 +1,6 @@
 import {
-  AppError,
   type ExplicitFxRate,
-  quoteExplicitFx,
+  publicPriceEstimates,
   WALLET_CURRENCIES,
   type WalletCurrency,
 } from "@nexus/domain";
@@ -19,46 +18,48 @@ export function showOwnProfileWallet(input: {
 
 export type ProfileFxLine =
   | { kind: "quote"; base: WalletCurrency; quote: WalletCurrency; amount: number }
-  | { kind: "none" | "dust" | "invalid"; base: WalletCurrency; quote: WalletCurrency };
+  | { kind: "dust" | "invalid"; base: WalletCurrency; quote: WalletCurrency };
 
-/** Estimates for the owner's known balances. A missing rate stays a missing rate. */
-export function profileFxLines(
+export type ProfileWalletRates =
+  | { kind: "unavailable" }
+  | { kind: "none"; base: WalletCurrency; quote: WalletCurrency }
+  | { kind: "lines"; lines: ProfileFxLine[] };
+
+/**
+ * Recorded-rate quotes for known positive balances.
+ * Missing pairs are omitted. A failed read or a total absence of pairs is one note.
+ * Zero stays on the balance line and is not quoted. Ledger math stays in the domain.
+ */
+export function profileWalletRates(
   balances: Array<{ currency: WalletCurrency; available: number | null }>,
-  rates: readonly ExplicitFxRate[],
-): ProfileFxLine[] {
+  rates: readonly ExplicitFxRate[] | null | undefined,
+): ProfileWalletRates | null {
+  const positive = balances.filter(
+    (balance): balance is { currency: WalletCurrency; available: number } =>
+      balance.available !== null && balance.available > 0,
+  );
+  if (positive.length === 0 || rates === undefined) return null;
+  if (rates === null) return { kind: "unavailable" };
+
   const lines: ProfileFxLine[] = [];
-  for (const balance of balances) {
-    if (balance.available === null) continue;
-    for (const quote of WALLET_CURRENCIES) {
-      if (quote === balance.currency) continue;
-      const rate = rates.find(
-        (item) => item.baseCurrency === balance.currency && item.quoteCurrency === quote,
-      );
-      if (!rate) {
-        lines.push({ kind: "none", base: balance.currency, quote });
+  let missing: { base: WalletCurrency; quote: WalletCurrency } | null = null;
+  for (const balance of positive) {
+    const estimates = publicPriceEstimates(
+      { price: balance.available, currency: balance.currency },
+      rates,
+    );
+    if (!estimates) continue;
+    for (const line of estimates) {
+      if (line.kind === "none") {
+        missing ??= { base: line.base, quote: line.quote };
         continue;
       }
-      try {
-        lines.push({
-          kind: "quote",
-          base: balance.currency,
-          quote,
-          amount: quoteExplicitFx({
-            sourceAmount: balance.available,
-            baseAmount: rate.baseAmount,
-            quoteAmount: rate.quoteAmount,
-          }),
-        });
-      } catch (error) {
-        lines.push({
-          kind: error instanceof AppError && error.code === "FX_DUST" ? "dust" : "invalid",
-          base: balance.currency,
-          quote,
-        });
-      }
+      lines.push(line);
     }
   }
-  return lines;
+  if (lines.length > 0) return { kind: "lines", lines };
+  if (missing) return { kind: "none", base: missing.base, quote: missing.quote };
+  return null;
 }
 
 type BalanceReader = {

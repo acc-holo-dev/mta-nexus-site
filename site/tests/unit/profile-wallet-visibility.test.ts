@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   loadOwnProfileBalances,
-  profileFxLines,
+  profileWalletRates,
   showOwnProfileWallet,
 } from "../../src/features/accounts/profile-wallet-visibility";
 
@@ -39,20 +39,54 @@ describe("own profile wallet visibility", () => {
     ]);
   });
 
-  it("quotes a known balance and keeps a missing rate distinct from zero", () => {
-    const lines = profileFxLines(
-      [
-        { currency: "USD", available: 100 },
-        { currency: "EUR", available: null },
-        { currency: "RUB", available: 0 },
+  it("quotes recorded pairs and skips a missing pair, an unknown read, and zero", () => {
+    expect(
+      profileWalletRates(
+        [
+          { currency: "USD", available: 100 },
+          { currency: "EUR", available: null },
+          { currency: "RUB", available: 0 },
+        ],
+        [{ baseCurrency: "USD", quoteCurrency: "RUB", baseAmount: 100, quoteAmount: 9000 }],
+      ),
+    ).toEqual({
+      kind: "lines",
+      lines: [{ kind: "quote", base: "USD", quote: "RUB", amount: 9000 }],
+    });
+  });
+
+  it("uses one note when no pair is recorded or the rate read failed", () => {
+    expect(
+      profileWalletRates(
+        [
+          { currency: "USD", available: 100 },
+          { currency: "EUR", available: 50 },
+        ],
+        [],
+      ),
+    ).toEqual({ kind: "none", base: "USD", quote: "EUR" });
+    expect(profileWalletRates([{ currency: "USD", available: 100 }], null)).toEqual({
+      kind: "unavailable",
+    });
+    expect(profileWalletRates([{ currency: "USD", available: 0 }], null)).toBeNull();
+    expect(profileWalletRates([{ currency: "USD", available: 100 }], undefined)).toBeNull();
+  });
+
+  it("keeps a recorded pair that is too small or invalid", () => {
+    expect(
+      profileWalletRates(
+        [{ currency: "USD", available: 1 }],
+        [
+          { baseCurrency: "USD", quoteCurrency: "EUR", baseAmount: 100, quoteAmount: 1 },
+          { baseCurrency: "USD", quoteCurrency: "RUB", baseAmount: 0, quoteAmount: 1 },
+        ],
+      ),
+    ).toEqual({
+      kind: "lines",
+      lines: [
+        { kind: "dust", base: "USD", quote: "EUR" },
+        { kind: "invalid", base: "USD", quote: "RUB" },
       ],
-      [{ baseCurrency: "USD", quoteCurrency: "RUB", baseAmount: 100, quoteAmount: 9000 }],
-    );
-    expect(lines).toEqual([
-      { kind: "none", base: "USD", quote: "EUR" },
-      { kind: "quote", base: "USD", quote: "RUB", amount: 9000 },
-      { kind: "none", base: "RUB", quote: "USD" },
-      { kind: "none", base: "RUB", quote: "EUR" },
-    ]);
+    });
   });
 });
