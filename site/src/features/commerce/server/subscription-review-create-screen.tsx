@@ -8,6 +8,10 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { planReviewsService } from "../../../lib/services/commerce/plan-reviews-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkMinH } from "../../shell/link-shell";
 import { pageShellMax5xl } from "../../shell/page-shell";
@@ -78,6 +82,9 @@ export async function SubscriptionReviewCreateScreen({
         </section>
       );
     const scopes = await planReviewsService.scopes(actor, query.scopePage);
+    const fxRates = isWalletEngineEnabled()
+      ? await new WalletPaymentService().listFxRates().catch(() => null)
+      : undefined;
     const { updatedAt, ...input } = plan;
     void updatedAt;
     const href = (page: number) =>
@@ -93,6 +100,7 @@ export async function SubscriptionReviewCreateScreen({
           plan={input}
           actorId={actor.id}
           scopes={scopes.scopes}
+          rates={fxRates}
         />
         {plan.scope === "organization" && !scopes.scopes.length ? (
           <EmptyState title={c.noOrganizations} description={c.noOrganizationsHint} />

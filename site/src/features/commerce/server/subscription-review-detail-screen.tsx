@@ -8,6 +8,10 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { planReviewsService } from "../../../lib/services/commerce/plan-reviews-service";
+import {
+  isWalletEngineEnabled,
+  WalletPaymentService,
+} from "../../../lib/services/commerce/wallet-payment-service";
 import { PlatformSignIn } from "../../shell/guest-auth";
 import { pageShellMax5xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
@@ -67,12 +71,16 @@ export async function SubscriptionReviewDetailScreen({
     recoveryRetry = planReviewHref(id, pageParams.get("organizationId") ?? undefined);
     const selection = planReviewsQuery(pageParams, true),
       detail = await planReviewsService.detail(actor, id, selection.organizationId);
+    const fxRates = isWalletEngineEnabled()
+      ? await new WalletPaymentService().listFxRates().catch(() => null)
+      : undefined;
     return (
       <div className={pageShellMax5xl}>
         <PlanReviewDetailView
           detail={detail}
           locale={locale}
           organizationId={selection.organizationId}
+          rates={fxRates}
         />
       </div>
     );

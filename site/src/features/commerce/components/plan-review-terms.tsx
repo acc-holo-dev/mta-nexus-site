@@ -1,13 +1,16 @@
-import type { CommercialPlanTerms } from "@nexus/domain";
+import type { CommercialPlanTerms, ExplicitFxRate } from "@nexus/domain";
 import { typeGridGap3Sm3, typePrewrapSmSecondary } from "../../shell/type-shell";
 import { formatHistoryAmount } from "../commerce-history-format";
 import { planReviewsCopy } from "../plan-reviews-i18n";
+import { RecordedRateEstimate } from "./recorded-rate-estimate";
 export function PlanReviewTerms({
   terms,
   locale,
+  rates,
 }: {
   terms: CommercialPlanTerms;
   locale: "en" | "ru";
+  rates?: readonly ExplicitFxRate[] | null;
 }) {
   const c = planReviewsCopy(locale);
   return (
@@ -23,6 +26,12 @@ export function PlanReviewTerms({
           <dt>{c.price}</dt>
           <dd className="font-numeric">
             {formatHistoryAmount(terms.price, terms.currency, locale)}
+            <RecordedRateEstimate
+              amount={terms.price}
+              currency={terms.currency}
+              locale={locale}
+              rates={rates}
+            />
           </dd>
         </div>
         <div>

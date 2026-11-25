@@ -1,5 +1,10 @@
 "use client";
-import { type CommercialPlan, commercialFeeEstimate, type PlanReviewCommand } from "@nexus/domain";
+import {
+  type CommercialPlan,
+  commercialFeeEstimate,
+  type ExplicitFxRate,
+  type PlanReviewCommand,
+} from "@nexus/domain";
 import { Button, ErrorState } from "@nexus/ui";
 import { commercialPlanTermsSchema, planReviewCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
@@ -21,14 +26,17 @@ import { confirmedPlanReview, expectedPlanReviewId } from "../plan-review-confir
 import { planReviewError, planReviewsCopy } from "../plan-reviews-i18n";
 import { planReviewHref } from "../plan-reviews-query";
 import { PlanReviewTerms } from "./plan-review-terms";
+import { RecordedRateEstimate } from "./recorded-rate-estimate";
 export function PlanReviewForm({
   plan,
   actorId,
   scopes,
+  rates,
 }: {
   plan: Omit<CommercialPlan, "updatedAt">;
   actorId: string;
   scopes: { id: string; name: string }[];
+  rates?: readonly ExplicitFxRate[] | null;
 }) {
   const { locale } = useNexusLocale(),
     c = planReviewsCopy(locale),
@@ -227,7 +235,7 @@ export function PlanReviewForm({
         style={readyScope !== renderScope ? { display: "none" } : undefined}
         className={panelClipSpace5P5}
       >
-        <PlanReviewTerms terms={shownPlan} locale={locale} />
+        <PlanReviewTerms terms={shownPlan} locale={locale} rates={rates} />
         <p className="text-sm">
           {c.revision} {shownPlan.revision} · {plan.scope === "user" ? c.personal : c.organization}
         </p>
@@ -295,11 +303,27 @@ export function PlanReviewForm({
           <dl className={typeGridGap3Sm2}>
             <div>
               <dt>{c.fee}</dt>
-              <dd>{formatHistoryAmount(estimate.platformFee, currency, locale)}</dd>
+              <dd>
+                {formatHistoryAmount(estimate.platformFee, currency, locale)}
+                <RecordedRateEstimate
+                  amount={estimate.platformFee}
+                  currency={currency}
+                  locale={locale}
+                  rates={rates}
+                />
+              </dd>
             </div>
             <div>
               <dt>{c.proceeds}</dt>
-              <dd>{formatHistoryAmount(estimate.sellerProceeds, currency, locale)}</dd>
+              <dd>
+                {formatHistoryAmount(estimate.sellerProceeds, currency, locale)}
+                <RecordedRateEstimate
+                  amount={estimate.sellerProceeds}
+                  currency={currency}
+                  locale={locale}
+                  rates={rates}
+                />
+              </dd>
             </div>
           </dl>
         ) : null}
