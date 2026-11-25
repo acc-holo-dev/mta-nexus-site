@@ -1,5 +1,6 @@
 "use client";
 
+import { type ExplicitFxRate, publicPriceEstimates } from "@nexus/domain";
 import { Button, ErrorState } from "@nexus/ui";
 import { walletWithdrawalCreateSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
@@ -28,10 +29,12 @@ export function WalletWithdrawForm({
   actorId,
   currency,
   organizationId,
+  rates,
 }: {
   actorId: string;
   currency: "USD" | "EUR" | "RUB";
   organizationId?: string;
+  rates?: readonly ExplicitFxRate[] | null;
 }) {
   const { locale } = useNexusLocale();
   const copy = getWalletCopy(locale);
@@ -174,11 +177,56 @@ export function WalletWithdrawForm({
             {copy.status}: {result.intent.status}
           </p>
           <p>{formatFinancialMinor(result.intent.amount, result.intent.currency, locale)}</p>
+          {rates !== undefined ? (
+            <IntentEstimate
+              amount={result.intent.amount}
+              copy={copy}
+              currency={result.intent.currency}
+              locale={locale}
+              rates={rates}
+            />
+          ) : null}
         </div>
       ) : null}
       <Button type="submit" disabled={busy || provider.status !== "ready"}>
         {busy ? copy.withdrawSubmitting : copy.withdrawSubmit}
       </Button>
     </form>
+  );
+}
+
+function IntentEstimate({
+  amount,
+  copy,
+  currency,
+  locale,
+  rates,
+}: {
+  amount: number;
+  copy: ReturnType<typeof getWalletCopy>;
+  currency: string;
+  locale: "en" | "ru";
+  rates: readonly ExplicitFxRate[] | null;
+}) {
+  const lines = publicPriceEstimates({ price: amount, currency }, rates);
+  if (lines === undefined) return null;
+  if (lines === null) return <p className={typeSmSecondary}>{copy.fxUnavailable}</p>;
+  return (
+    <ul className={typeSmSecondary}>
+      {lines.map((line) => (
+        <li key={line.quote}>
+          {line.kind === "quote"
+            ? copy.fxEstimate.replace(
+                "{destination}",
+                formatFinancialMinor(line.amount, line.quote, locale),
+              )
+            : line.kind === "dust"
+              ? copy.fxDust
+              : line.kind === "invalid"
+                ? copy.fxExceeds
+                : `${line.quote}: ${copy.fxNone}`}
+        </li>
+      ))}
+    </ul>
   );
 }

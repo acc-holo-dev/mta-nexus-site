@@ -434,7 +434,7 @@ export async function WalletWorkspaceScreen({
           </ul>
         </section>
       ) : null}
-      <WalletTopUpForm actorId={user.id} currency={currency} />
+      <WalletTopUpForm actorId={user.id} currency={currency} rates={fxRates} />
       <section className={panelSpace3P5} aria-labelledby="wallet-held-heading">
         <h3 id="wallet-held-heading" className={typeSemiboldPrimary}>
           {copy.held}
@@ -522,6 +522,7 @@ export async function WalletWorkspaceScreen({
                     actorId={user.id}
                     currency={currency}
                     organizationId={org.organizationId}
+                    rates={fxRates}
                   />
                   {org.topUps === null ? (
                     <p className={typeXsMuted}>{copy.orgTopUpsUnavailable}</p>
@@ -641,6 +642,7 @@ export async function WalletWorkspaceScreen({
                         actorId={user.id}
                         currency={currency}
                         organizationId={org.organizationId}
+                        rates={fxRates}
                       />
                       {org.withdrawals === null ? (
                         <p className={typeXsMuted}>{copy.withdrawalsUnavailable}</p>
@@ -704,7 +706,7 @@ export async function WalletWorkspaceScreen({
           <p role="note" className={typeXsMuted}>
             {copy.withdrawalsNote}
           </p>
-          <WalletWithdrawForm actorId={user.id} currency={currency} />
+          <WalletWithdrawForm actorId={user.id} currency={currency} rates={fxRates} />
           {withdrawals === null ? (
             <p className={typeXsMuted}>{copy.withdrawalsUnavailable}</p>
           ) : recentWithdrawals.length === 0 ? (
