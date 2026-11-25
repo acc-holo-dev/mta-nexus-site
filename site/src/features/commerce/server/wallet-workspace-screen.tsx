@@ -342,12 +342,30 @@ export async function WalletWorkspaceScreen({
                 ? copy.balanceUnavailable
                 : formatFinancialMinor(row.available, row.currency, locale)}
             </span>
+            {row.available === null ? null : (
+              <ActivityEstimate
+                amount={row.available}
+                copy={copy}
+                currency={row.currency}
+                locale={locale}
+                rates={fxRates}
+              />
+            )}
             <span className={typeXsMuted}>
               {copy.held}:{" "}
               {row.held === null
                 ? copy.balanceUnavailable
                 : formatFinancialMinor(row.held, row.currency, locale)}
             </span>
+            {row.held === null ? null : (
+              <ActivityEstimate
+                amount={row.held}
+                copy={copy}
+                currency={row.currency}
+                locale={locale}
+                rates={fxRates}
+              />
+            )}
           </Link>
         ))}
       </nav>
