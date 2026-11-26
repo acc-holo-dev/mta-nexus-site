@@ -257,7 +257,7 @@ it("shows an honest recovery state when the reconciliation queue fails", async (
   expect(html).toContain('role="alert"');
   expect(html).toContain(copy.loadUnavailable);
   expect(html).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
-  expect(html).toContain('href="/admin/commerce/reconciliation?filter=review&amp;page=2"');
+  expect(html).toContain('href="/admin/commerce/reconciliation?page=2"');
   expect(html).not.toContain("&lt;ORDER&gt;");
 });
 it("renders an empty review queue with clear-filters recovery when the review filter is active", async () => {

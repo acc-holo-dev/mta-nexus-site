@@ -31,6 +31,29 @@ export function financialReviewQuery(query: URLSearchParams): {
   if (filter !== "all" && filter !== "review") throw invalid();
   return { page: page(query), filter };
 }
+export type FinancialReviewFilters = ReturnType<typeof financialReviewQuery>;
+
+export function financialReviewListHref(
+  base: string,
+  filters: Pick<FinancialReviewFilters, "filter" | "page">,
+) {
+  const params = new URLSearchParams();
+  if (filters.filter !== "review") params.set("filter", filters.filter);
+  if (filters.page > 1) params.set("page", String(filters.page));
+  return params.size ? `${base}?${params}` : base;
+}
+
+export function financialReviewDetailHref(
+  base: string,
+  orderId: string,
+  filter: FinancialReviewFilters["filter"],
+) {
+  const params = new URLSearchParams();
+  if (filter !== "review") params.set("filter", filter);
+  const suffix = params.size ? `?${params}` : "";
+  return `${base}/${encodeURIComponent(orderId)}${suffix}`;
+}
+
 export function financialPageQuery(query: URLSearchParams) {
   keys(query, ["page"]);
   return page(query);

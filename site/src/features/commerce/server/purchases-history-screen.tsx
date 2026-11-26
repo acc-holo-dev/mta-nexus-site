@@ -34,6 +34,7 @@ import { commerceHistoryBetaNotice, getCommerceHistoryCopy } from "../commerce-h
 import { getCommercialCopy } from "../commercial-i18n";
 import { orderCaseCopy } from "../order-case-i18n";
 import { getWalletCopy } from "../wallet-i18n";
+import { purchasesDetailHref, purchasesListHref } from "../purchases-history-query";
 import { HistoryPagination, HistoryShell } from "../workspace-history";
 import { PurchaseTotalEstimate } from "./purchase-total-estimate";
 export async function purchasesHistoryMetadata(): Promise<Metadata> {
@@ -75,19 +76,17 @@ export async function PurchasesHistoryScreen({
   }
 
   if (!user) {
-    const page = typeof query.page === "string" ? query.page : undefined;
-    const returnPath =
-      page && page !== "1"
-        ? `/workspace/purchases?page=${encodeURIComponent(page)}`
-        : "/workspace/purchases";
-    return <PlatformSignIn locale={typedLocale} returnPath={returnPath} />;
+    const page = parseHistoryPage(query.page);
+    return (
+      <PlatformSignIn
+        locale={typedLocale}
+        returnPath={purchasesListHref("/workspace/purchases", page)}
+      />
+    );
   }
 
   const page = parseHistoryPage(query.page);
-  const retryHref =
-    page > 1
-      ? `/workspace/purchases?page=${encodeURIComponent(String(page))}`
-      : "/workspace/purchases";
+  const retryHref = purchasesListHref("/workspace/purchases", page);
   const result = await orderRepository.pageBuyerHistory(user.id, page).catch(() => null);
   if (!result) {
     return (
@@ -161,7 +160,7 @@ export async function PurchasesHistoryScreen({
                   </div>
                 </dl>
                 <Link
-                  href={`/workspace/purchases/${encodeURIComponent(order.id)}`}
+                  href={purchasesDetailHref("/workspace/purchases", order.id, page)}
                   className={linkAccentSmRounded}
                 >
                   {copy.details}

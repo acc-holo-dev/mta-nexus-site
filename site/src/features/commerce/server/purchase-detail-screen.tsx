@@ -40,6 +40,7 @@ import { getCommercialCopy } from "../commercial-i18n";
 import { RecordedRateEstimate } from "../components/recorded-rate-estimate";
 import { orderCaseCopy } from "../order-case-i18n";
 import { orderTermsCopy } from "../order-terms-i18n";
+import { purchasesListHref, purchasesListPageFromDetail } from "../purchases-history-query";
 import { getWalletCopy } from "../wallet-i18n";
 import { WalletPayOrderForm } from "../wallet-pay";
 
@@ -79,7 +80,7 @@ export async function PurchaseDetailScreen({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ page?: string | string[] }>;
+  searchParams: Promise<{ page?: string | string[]; fromPage?: string | string[] }>;
 }) {
   const [locale, store, { id }, query] = await Promise.all([
     getRequestLocale(),
@@ -112,16 +113,21 @@ export async function PurchaseDetailScreen({
       />
     );
   const page = parseHistoryPage(query.page);
-  const retryHref = `/workspace/purchases/${encodeURIComponent(id)}${
-    page > 1 ? `?page=${encodeURIComponent(String(page))}` : ""
-  }`;
+  const listHref = purchasesListHref("/workspace/purchases", purchasesListPageFromDetail(query));
+  const retryParams = new URLSearchParams();
+  if (page > 1) retryParams.set("page", String(page));
+  const fromPage = purchasesListPageFromDetail(query);
+  if (fromPage > 1) retryParams.set("fromPage", String(fromPage));
+  const retryHref = retryParams.size
+    ? `/workspace/purchases/${encodeURIComponent(id)}?${retryParams}`
+    : `/workspace/purchases/${encodeURIComponent(id)}`;
   let result: Awaited<ReturnType<typeof commerceService.getBuyerOrderDetails>>;
   try {
     result = await commerceService.getBuyerOrderDetails(actor, id, page);
   } catch {
     return (
       <div className={pageShellMax4xl}>
-        <Link href="/workspace/purchases" className={linkAccentSmRounded}>
+        <Link href={listHref} className={linkAccentSmRounded}>
           {copy.backToPurchases}
         </Link>
         <ErrorState
@@ -147,7 +153,7 @@ export async function PurchaseDetailScreen({
   return (
     <div className={pageShellMax4xl}>
       <header className="min-w-0 space-y-3 border-b border-base pb-5">
-        <Link href="/workspace/purchases" className={linkAccentSmRounded}>
+        <Link href={listHref} className={linkAccentSmRounded}>
           {copy.backToPurchases}
         </Link>
         <h1 className={typeMinBreakDisplayPrimary}>
@@ -331,7 +337,14 @@ export async function PurchaseDetailScreen({
       {result.totalPages > 1 && (
         <nav aria-label={copy.page} className="flex min-w-0 flex-wrap gap-4 text-sm text-secondary">
           {result.page > 1 && (
-            <Link href={`?page=${result.page - 1}`} className={linkAccentSmRounded}>
+            <Link
+              href={(() => {
+                const params = new URLSearchParams({ page: String(result.page - 1) });
+                if (fromPage > 1) params.set("fromPage", String(fromPage));
+                return `?${params}`;
+              })()}
+              className={linkAccentSmRounded}
+            >
               {copy.previous}
             </Link>
           )}
@@ -339,7 +352,14 @@ export async function PurchaseDetailScreen({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages && (
-            <Link href={`?page=${result.page + 1}`} className={linkAccentSmRounded}>
+            <Link
+              href={(() => {
+                const params = new URLSearchParams({ page: String(result.page + 1) });
+                if (fromPage > 1) params.set("fromPage", String(fromPage));
+                return `?${params}`;
+              })()}
+              className={linkAccentSmRounded}
+            >
               {copy.next}
             </Link>
           )}

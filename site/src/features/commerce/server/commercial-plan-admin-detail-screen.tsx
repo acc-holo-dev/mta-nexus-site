@@ -35,6 +35,7 @@ import {
 } from "../commerce-history-format";
 import { commercialTerms } from "../commercial-confirmation";
 import { getCommercialCopy } from "../commercial-i18n";
+import { commercialAdminListHref } from "../commercial-plan-query";
 import { CommercialPlanForm } from "../commercial-plans";
 import { RecordedRateEstimate } from "../components/recorded-rate-estimate";
 
@@ -50,7 +51,7 @@ export async function CommercialPlanAdminDetailScreen({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ page?: string | string[] }>;
+  searchParams: Promise<{ page?: string | string[]; status?: string | string[] }>;
 }) {
   const [locale, store, { id }, query] = await Promise.all([
     getRequestLocale(),
@@ -83,10 +84,19 @@ export async function CommercialPlanAdminDetailScreen({
     );
   if (user.role !== "admin") notFound();
   const pageNumber = Math.min(parseHistoryPage(query.page), 1000);
-  const returnHref =
-    pageNumber > 1
-      ? `/admin/commerce/plans/${encodeURIComponent(id)}?page=${pageNumber}`
-      : `/admin/commerce/plans/${encodeURIComponent(id)}`;
+  const listStatus = (["draft", "published", "archived"] as const).find(
+    (value) => value === query.status,
+  );
+  const listHref = commercialAdminListHref("/admin/commerce/plans", {
+    status: listStatus,
+    page: 1,
+  });
+  const detailParams = new URLSearchParams();
+  if (pageNumber > 1) detailParams.set("page", String(pageNumber));
+  if (listStatus) detailParams.set("status", listStatus);
+  const returnHref = detailParams.size
+    ? `/admin/commerce/plans/${encodeURIComponent(id)}?${detailParams}`
+    : `/admin/commerce/plans/${encodeURIComponent(id)}`;
   let missing = false;
   const result = await commercialPlanService.adminDetail(user, id, pageNumber).catch((error) => {
     if (error instanceof AppError && (error.statusCode === 404 || error.statusCode === 403)) {
@@ -99,7 +109,7 @@ export async function CommercialPlanAdminDetailScreen({
   if (!result) {
     return (
       <div className={pageShellMax4xl}>
-        <Link href="/admin/commerce/plans" className={linkAccentSm}>
+        <Link href={listHref} className={linkAccentSm}>
           {copy.back}
         </Link>
         <ErrorState
@@ -128,7 +138,7 @@ export async function CommercialPlanAdminDetailScreen({
   };
   return (
     <div className={pageShellMax4xl}>
-      <Link href="/admin/commerce/plans" className={linkAccentSm}>
+      <Link href={listHref} className={linkAccentSm}>
         {copy.back}
       </Link>
       <h1 className={typeBreakDisplayPrimary}>{locale === "ru" ? plan.titleRu : plan.titleEn}</h1>
@@ -180,7 +190,14 @@ export async function CommercialPlanAdminDetailScreen({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className={typeFlexWrapGap4Sm}>
           {result.page > 1 ? (
-            <Link href={`?page=${result.page - 1}`} className={linkAccentSm}>
+            <Link
+              href={(() => {
+                const params = new URLSearchParams({ page: String(result.page - 1) });
+                if (listStatus) params.set("status", listStatus);
+                return `?${params}`;
+              })()}
+              className={linkAccentSm}
+            >
               {copy.previous}
             </Link>
           ) : null}
@@ -188,7 +205,14 @@ export async function CommercialPlanAdminDetailScreen({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={`?page=${result.page + 1}`} className={linkAccentSm}>
+            <Link
+              href={(() => {
+                const params = new URLSearchParams({ page: String(result.page + 1) });
+                if (listStatus) params.set("status", listStatus);
+                return `?${params}`;
+              })()}
+              className={linkAccentSm}
+            >
               {copy.next}
             </Link>
           ) : null}

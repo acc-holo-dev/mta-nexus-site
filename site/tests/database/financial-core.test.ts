@@ -5,6 +5,8 @@ import {
   formatFinancialMinor,
 } from "../../src/features/commerce/financial-i18n";
 import {
+  financialReviewDetailHref,
+  financialReviewListHref,
   financialReviewQuery,
   financialStatementQuery,
 } from "../../src/features/commerce/financial-query";
@@ -75,6 +77,18 @@ it("uses bounded canonical financial filters", () => {
   ).toEqual({ currency: "EUR", organizationId: "org_a", page: 2 });
   expect(financialReviewQuery(new URLSearchParams())).toEqual({ page: 1, filter: "review" });
   expect(() => financialReviewQuery(new URLSearchParams("filter=settle"))).toThrow();
+  expect(
+    financialReviewListHref("/admin/commerce/reconciliation", { filter: "review", page: 1 }),
+  ).toBe("/admin/commerce/reconciliation");
+  expect(
+    financialReviewListHref("/admin/commerce/reconciliation", { filter: "all", page: 3 }),
+  ).toBe("/admin/commerce/reconciliation?filter=all&page=3");
+  expect(financialReviewDetailHref("/admin/commerce/reconciliation", "ord_a", "review")).toBe(
+    "/admin/commerce/reconciliation/ord_a",
+  );
+  expect(financialReviewDetailHref("/admin/commerce/reconciliation", "ord_a", "all")).toBe(
+    "/admin/commerce/reconciliation/ord_a?filter=all",
+  );
 });
 it("formats large minor-unit balances without floating-point or currency mixing", () => {
   expect(formatFinancialMinor("9007199254740993123", "EUR", "en")).toBe(

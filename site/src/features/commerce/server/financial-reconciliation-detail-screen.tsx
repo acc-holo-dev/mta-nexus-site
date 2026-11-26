@@ -27,6 +27,7 @@ import {
   typeXsMuted,
 } from "../../shell/type-shell";
 import { formatHistoryDate, parseHistoryPage } from "../commerce-history-format";
+import { financialReviewListHref } from "../financial-query";
 import {
   financialFlags,
   financialOrderLabel,
@@ -51,7 +52,7 @@ export async function FinancialReconciliationDetailScreen({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ page?: string | string[] }>;
+  searchParams: Promise<{ page?: string | string[]; filter?: string | string[] }>;
 }) {
   const [locale, store, { id }, query] = await Promise.all([
     getRequestLocale(),
@@ -84,10 +85,17 @@ export async function FinancialReconciliationDetailScreen({
     );
   if (user.role !== "admin") notFound();
   const pageNumber = Math.min(parseHistoryPage(query.page), 1000);
-  const returnHref =
-    pageNumber > 1
-      ? `/admin/commerce/reconciliation/${encodeURIComponent(id)}?page=${pageNumber}`
-      : `/admin/commerce/reconciliation/${encodeURIComponent(id)}`;
+  const listFilter = query.filter === "all" ? "all" : "review";
+  const listHref = financialReviewListHref("/admin/commerce/reconciliation", {
+    filter: listFilter,
+    page: 1,
+  });
+  const detailParams = new URLSearchParams();
+  if (pageNumber > 1) detailParams.set("page", String(pageNumber));
+  if (listFilter !== "review") detailParams.set("filter", listFilter);
+  const returnHref = detailParams.size
+    ? `/admin/commerce/reconciliation/${encodeURIComponent(id)}?${detailParams}`
+    : `/admin/commerce/reconciliation/${encodeURIComponent(id)}`;
   let missing = false;
   const result = await financialReviewRepository.detail(user.id, id, pageNumber).catch((error) => {
     if (error instanceof AppError && [403, 404].includes(error.statusCode)) {
@@ -102,7 +110,7 @@ export async function FinancialReconciliationDetailScreen({
   if (!result) {
     return (
       <div className={pageShellMax4xl}>
-        <Link href="/admin/commerce/reconciliation" className={linkAccentSm}>
+        <Link href={listHref} className={linkAccentSm}>
           {copy.back}
         </Link>
         <ErrorState
@@ -124,7 +132,7 @@ export async function FinancialReconciliationDetailScreen({
 
   return (
     <div className={pageShellMax4xl}>
-      <Link href="/admin/commerce/reconciliation" className={linkAccentSm}>
+      <Link href={listHref} className={linkAccentSm}>
         {copy.back}
       </Link>
       <h1 className={typeBreakDisplayPrimary}>{result.order.orderNumber}</h1>
@@ -199,7 +207,14 @@ export async function FinancialReconciliationDetailScreen({
       {result.totalPages > 1 ? (
         <nav aria-label={copy.page} className={typeFlexWrapGap4Sm}>
           {result.page > 1 ? (
-            <Link href={`?page=${result.page - 1}`} className={linkAccentSm}>
+            <Link
+              href={(() => {
+                const params = new URLSearchParams({ page: String(result.page - 1) });
+                if (listFilter !== "review") params.set("filter", listFilter);
+                return `?${params}`;
+              })()}
+              className={linkAccentSm}
+            >
               {copy.previous}
             </Link>
           ) : null}
@@ -207,7 +222,14 @@ export async function FinancialReconciliationDetailScreen({
             {copy.page} {result.page} {copy.of} {result.totalPages}
           </span>
           {result.page < result.totalPages ? (
-            <Link href={`?page=${result.page + 1}`} className={linkAccentSm}>
+            <Link
+              href={(() => {
+                const params = new URLSearchParams({ page: String(result.page + 1) });
+                if (listFilter !== "review") params.set("filter", listFilter);
+                return `?${params}`;
+              })()}
+              className={linkAccentSm}
+            >
               {copy.next}
             </Link>
           ) : null}

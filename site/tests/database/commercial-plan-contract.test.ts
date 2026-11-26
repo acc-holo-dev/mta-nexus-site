@@ -12,6 +12,8 @@ import {
   parseCommercialAmount,
 } from "../../src/features/commerce/commercial-confirmation";
 import {
+  commercialAdminDetailHref,
+  commercialAdminListHref,
   commercialAdminQuery,
   commercialCatalogQuery,
   commercialQuoteQuery,
@@ -145,6 +147,18 @@ it("validates bounded, scoped catalog and admin query contracts", () => {
   });
   expect(() => commercialAdminQuery(new URLSearchParams("status=active"))).toThrow();
   expect(() => commercialCatalogQuery(new URLSearchParams("page=1001"))).toThrow();
+  expect(commercialAdminListHref("/admin/commerce/plans", { status: undefined, page: 1 })).toBe(
+    "/admin/commerce/plans",
+  );
+  expect(commercialAdminListHref("/admin/commerce/plans", { status: "draft", page: 2 })).toBe(
+    "/admin/commerce/plans?status=draft&page=2",
+  );
+  expect(commercialAdminDetailHref("/admin/commerce/plans", "plan_a", undefined)).toBe(
+    "/admin/commerce/plans/plan_a",
+  );
+  expect(commercialAdminDetailHref("/admin/commerce/plans", "plan_a", "archived")).toBe(
+    "/admin/commerce/plans/plan_a?status=archived",
+  );
 });
 it("requires a durable UUID and canonical millisecond order revision", () => {
   const command = {

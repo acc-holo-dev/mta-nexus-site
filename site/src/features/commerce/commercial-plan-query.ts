@@ -43,6 +43,28 @@ export function commercialAdminQuery(query: URLSearchParams) {
     page: integer(single(query, "page", "1"), 1, 1000),
   };
 }
+export type CommercialAdminFilters = ReturnType<typeof commercialAdminQuery>;
+
+export function commercialAdminListHref(
+  base: string,
+  filters: Pick<CommercialAdminFilters, "status" | "page">,
+) {
+  const params = new URLSearchParams();
+  if (filters.status) params.set("status", filters.status);
+  if (filters.page > 1) params.set("page", String(filters.page));
+  return params.size ? `${base}?${params}` : base;
+}
+
+export function commercialAdminDetailHref(
+  base: string,
+  planId: string,
+  status: CommercialAdminFilters["status"],
+) {
+  const params = new URLSearchParams();
+  if (status) params.set("status", status);
+  const suffix = params.size ? `?${params}` : "";
+  return `${base}/${encodeURIComponent(planId)}${suffix}`;
+}
 export function commercialQuoteQuery(query: URLSearchParams) {
   keys(query, ["amount", "currency", "planId", "revision"]);
   const amount = integer(single(query, "amount"), 0, 100_000_000);

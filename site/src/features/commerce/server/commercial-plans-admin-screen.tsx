@@ -28,6 +28,7 @@ import {
 } from "../../shell/type-shell";
 import { formatHistoryAmount, parseHistoryPage } from "../commerce-history-format";
 import { getCommercialCopy } from "../commercial-i18n";
+import { commercialAdminDetailHref, commercialAdminListHref } from "../commercial-plan-query";
 import { RecordedRateEstimate } from "../components/recorded-rate-estimate";
 
 export async function commercialPlansAdminMetadata(): Promise<Metadata> {
@@ -66,13 +67,8 @@ export async function CommercialPlansAdminScreen({
   );
   const pageNumber = Math.min(parseHistoryPage(query.page), 1000);
   const filtersActive = Boolean(status);
-  const returnHref = (() => {
-    const params = new URLSearchParams({
-      ...(status ? { status } : {}),
-      ...(pageNumber > 1 ? { page: String(pageNumber) } : {}),
-    });
-    return params.size ? `/admin/commerce/plans?${params}` : "/admin/commerce/plans";
-  })();
+  const listBase = "/admin/commerce/plans";
+  const returnHref = commercialAdminListHref(listBase, { status, page: pageNumber });
   let forbidden = false;
   const result = await commercialPlanService.adminPage(user, pageNumber, status).catch((error) => {
     if (error instanceof AppError && error.statusCode === 403) {
@@ -153,7 +149,7 @@ export async function CommercialPlansAdminScreen({
           {result.plans.map((plan) => (
             <li key={plan.id} className={panelMinSpace2P5}>
               <Link
-                href={`/admin/commerce/plans/${encodeURIComponent(plan.id)}`}
+                href={commercialAdminDetailHref(listBase, plan.id, status)}
                 className={`break-words font-semibold ${linkAccentSm}`}
               >
                 {locale === "ru" ? plan.titleRu : plan.titleEn}

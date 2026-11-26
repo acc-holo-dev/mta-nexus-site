@@ -27,6 +27,7 @@ import {
 } from "../../shell/type-shell";
 import { parseHistoryPage } from "../commerce-history-format";
 import { RecordedRateEstimate } from "../components/recorded-rate-estimate";
+import { financialReviewDetailHref, financialReviewListHref } from "../financial-query";
 import {
   financialFlags,
   financialOrderLabel,
@@ -83,13 +84,8 @@ export async function FinancialReconciliationScreen({
   const filter = query.filter === "all" ? "all" : "review";
   const pageNumber = Math.min(parseHistoryPage(query.page), 1000);
   const filtersActive = filter === "review";
-  const returnHref = (() => {
-    const params = new URLSearchParams({
-      filter,
-      ...(pageNumber > 1 ? { page: String(pageNumber) } : {}),
-    });
-    return `/admin/commerce/reconciliation?${params}`;
-  })();
+  const listBase = "/admin/commerce/reconciliation";
+  const returnHref = financialReviewListHref(listBase, { filter, page: pageNumber });
   let forbidden = false;
   const result = await financialReviewRepository
     .page(user.id, pageNumber, filter)
@@ -165,7 +161,7 @@ export async function FinancialReconciliationScreen({
           {result.orders.map((order) => (
             <li key={order.id} className={panelMinSpace3P5}>
               <Link
-                href={`/admin/commerce/reconciliation/${encodeURIComponent(order.id)}`}
+                href={financialReviewDetailHref(listBase, order.id, filter)}
                 className={linkAccentTightBreakSemibold}
               >
                 {order.orderNumber}
