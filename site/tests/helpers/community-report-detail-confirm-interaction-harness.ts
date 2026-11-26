@@ -20,6 +20,7 @@ type CommunityReportDetailViewComponent = (props: {
   initial: typeof detail;
   locale: "en";
   staff: true;
+  queueHref?: string;
 }) => ReactNode;
 
 type Element = FlatTestElement;

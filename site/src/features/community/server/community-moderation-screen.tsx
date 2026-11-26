@@ -72,7 +72,15 @@ export async function CommunityModerationScreen({
   const locale = await getRequestLocale(),
     copy = moderationCopy(locale),
     types = discoveryCopy(locale);
-  const returnPath = id ? moderationDetailHref(id) : "/admin/community";
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries((await searchParams) ?? {}))
+    if (value !== undefined)
+      for (const item of Array.isArray(value) ? value : [value]) params.append(key, item);
+  const returnPath = id
+    ? moderationDetailHref(id, null, parseModerationDetailQuery(params)?.list)
+    : params.size
+      ? `/admin/community?${params}`
+      : "/admin/community";
   let actor: Awaited<ReturnType<typeof authService.getSession>>;
   try {
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
@@ -101,10 +109,6 @@ export async function CommunityModerationScreen({
       </div>
     );
   }
-  const params = new URLSearchParams();
-  for (const [key, value] of Object.entries((await searchParams) ?? {}))
-    if (value !== undefined)
-      for (const item of Array.isArray(value) ? value : [value]) params.append(key, item);
   const date = (value: string) => (
     <time dateTime={value}>
       {new Date(value).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
@@ -130,6 +134,7 @@ export async function CommunityModerationScreen({
   );
   if (id) {
     const filters = parseModerationDetailQuery(params);
+    const listHref = filters?.list ? moderationHref(filters.list) : "/admin/community";
     let error = filters ? "" : copy.invalid;
     const raw = filters
       ? await communityModerationService
@@ -148,17 +153,17 @@ export async function CommunityModerationScreen({
     if (!parsed.success)
       return (
         <div className={pageShellStack5}>
-          <Link className={linkAccentSm} href="/admin/community">
+          <Link className={linkAccentSm} href={listHref}>
             {copy.back}
           </Link>
           <h1 className={type2xlBoldPrimary}>{copy.detail}</h1>
-          {failure(error || copy.unavailable, moderationDetailHref(id))}
+          {failure(error || copy.unavailable, moderationDetailHref(id, null, filters?.list))}
         </div>
       );
     const { item, history, nextCursor } = parsed.data;
     return (
       <div className={pageShellMax4xlTight}>
-        <Link className={linkAccentSm} href="/admin/community">
+        <Link className={linkAccentSm} href={listHref}>
           {copy.back}
         </Link>
         <header className={panelMinSpace3P5}>
@@ -223,7 +228,7 @@ export async function CommunityModerationScreen({
         <section className={typeMinSpace4}>
           <h2 className={typeHeadingPrimary}>{copy.history}</h2>
           <p className={typeSmMuted}>{copy.historyScope}</p>
-          <a className={linkAccentSm} href={moderationDetailHref(id)}>
+          <a className={linkAccentSm} href={moderationDetailHref(id, null, filters?.list)}>
             {copy.latest}
           </a>
           {!history.length ? (
@@ -256,7 +261,7 @@ export async function CommunityModerationScreen({
             <Link
               prefetch={false}
               className={linkAccentSm}
-              href={moderationDetailHref(id, nextCursor)}
+              href={moderationDetailHref(id, nextCursor, filters?.list)}
             >
               {copy.older}
             </Link>
@@ -370,7 +375,7 @@ export async function CommunityModerationScreen({
                 <li key={item.id} className={panelMinSpace2P5}>
                   <Link
                     className="block break-words font-semibold text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
-                    href={moderationDetailHref(item.id)}
+                    href={moderationDetailHref(item.id, null, filters)}
                   >
                     {item.title}
                   </Link>

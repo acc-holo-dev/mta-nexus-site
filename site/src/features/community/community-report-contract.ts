@@ -111,6 +111,25 @@ export const communityReportDetailSchema = reportSummarySchema.extend({
 });
 export type CommunityReportPage = z.infer<typeof communityReportPageSchema>;
 export type CommunityReportDetail = z.infer<typeof communityReportDetailSchema>;
+export function communityReportListHref(base: string, filters: CommunityReportQuery) {
+  const params = new URLSearchParams();
+  if (filters.view !== "pending") params.set("view", filters.view);
+  if (filters.page > 1) params.set("page", String(filters.page));
+  if (filters.target) params.set("target", filters.target);
+  if (filters.type) params.set("type", filters.type);
+  if (filters.query) params.set("q", filters.query);
+  return `${base}${params.size ? `?${params}` : ""}`;
+}
+export function communityReportDetailHref(
+  base: string,
+  reportId: string,
+  filters: CommunityReportQuery,
+) {
+  const listHref = communityReportListHref(base, filters);
+  const queryStart = listHref.indexOf("?");
+  const suffix = queryStart >= 0 ? listHref.slice(queryStart) : "";
+  return `${base}/${encodeURIComponent(reportId)}${suffix}`;
+}
 export function confirmsReportDecision(
   value: unknown,
   reportId: string,

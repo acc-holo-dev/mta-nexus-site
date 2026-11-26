@@ -20,7 +20,9 @@ import {
   typeSmMuted,
 } from "../../shell/type-shell";
 import {
+  communityReportDetailHref,
   communityReportDetailSchema,
+  communityReportListHref,
   communityReportPageQuery,
   communityReportPageSchema,
 } from "../community-report-contract";
@@ -57,18 +59,14 @@ export async function CommunityReportScreen({
     copy = communityReportCopy(locale),
     dictionary = getDictionary(locale);
   const base = staff ? "/admin/reports" : "/workspace/reports";
-  const listParams = new URLSearchParams();
-  if (!id) {
-    for (const [key, value] of Object.entries((await searchParams) ?? {})) {
-      if (Array.isArray(value)) for (const item of value) listParams.append(key, item);
-      else if (value !== undefined) listParams.append(key, value);
-    }
-  }
+  const rawSearch = (await searchParams) ?? {};
+  const queueFilters = communityReportPageQuery(rawSearch);
+  const queueHref = queueFilters ? communityReportListHref(base, queueFilters) : base;
   const loginReturn = id
-    ? `${base}/${encodeURIComponent(id)}`
-    : listParams.size
-      ? `${base}?${listParams}`
-      : base;
+    ? queueFilters
+      ? communityReportDetailHref(base, id, queueFilters)
+      : `${base}/${encodeURIComponent(id)}`
+    : queueHref;
   const title = id ? copy.detail : staff ? copy.queue : copy.title;
   const safeReturn = id && !/^[a-zA-Z0-9_-]{1,128}$/u.test(id) ? base : loginReturn;
   let actor: Awaited<ReturnType<typeof authService.getSession>>;
@@ -132,11 +130,12 @@ export async function CommunityReportScreen({
           initial={initial}
           locale={locale}
           staff={staff}
+          queueHref={queueHref}
         />
       </div>
     );
   }
-  const filters = communityReportPageQuery(await searchParams);
+  const filters = queueFilters;
   if (!filters)
     return (
       <div className={pageShellStack4}>
@@ -188,16 +187,20 @@ export function StaffCommunityReportsPage({
 
 export async function WorkspaceCommunityReportDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  return CommunityReportScreen({ id: (await params).id });
+  return CommunityReportScreen({ id: (await params).id, searchParams });
 }
 
 export async function StaffCommunityReportDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  return CommunityReportScreen({ staff: true, id: (await params).id });
+  return CommunityReportScreen({ staff: true, id: (await params).id, searchParams });
 }

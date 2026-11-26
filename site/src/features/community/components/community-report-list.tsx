@@ -20,6 +20,7 @@ import {
 import {
   type CommunityReportPage,
   type CommunityReportQuery,
+  communityReportDetailHref,
   communityReportPageSchema,
   REPORT_TYPES,
 } from "../community-report-contract";
@@ -203,7 +204,7 @@ export function CommunityReportList({
                 <div className="flex min-w-0 flex-wrap justify-between gap-2">
                   <Link
                     className={`break-words text-sm font-semibold text-accent underline ${linkFocusRing}`}
-                    href={`${path}/${encodeURIComponent(report.id)}`}
+                    href={communityReportDetailHref(path, report.id, filters)}
                   >
                     {copy[report.targetType]} · {copy[report.type]}
                   </Link>

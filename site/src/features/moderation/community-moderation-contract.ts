@@ -49,15 +49,26 @@ export function parseModerationQuery(params: URLSearchParams) {
     cursor: point,
   };
 }
-export function parseModerationDetailQuery(params: URLSearchParams) {
-  if ([...params.keys()].some((key) => key !== "cursor" || params.getAll(key).length !== 1))
-    return null;
-  const point = cursor(params);
-  return point === null ? null : { cursor: point };
-}
 type ParsedModerationQuery = NonNullable<ReturnType<typeof parseModerationQuery>>;
 export type ModerationQuery = Pick<ParsedModerationQuery, "query"> &
   Partial<Omit<ParsedModerationQuery, "query">>;
+export function parseModerationDetailQuery(params: URLSearchParams) {
+  const allowed = ["q", "status", "type", "author", "cursor"];
+  if ([...params.keys()].some((key) => !allowed.includes(key) || params.getAll(key).length !== 1))
+    return null;
+  const hasListFilters = ["q", "status", "type", "author"].some((key) => params.has(key));
+  let list: ModerationQuery | null = null;
+  if (hasListFilters) {
+    const listParams = new URLSearchParams();
+    for (const key of ["q", "status", "type", "author"] as const) {
+      if (params.has(key)) listParams.set(key, params.get(key) ?? "");
+    }
+    list = parseModerationQuery(listParams);
+    if (!list) return null;
+  }
+  const point = cursor(params);
+  return point === null ? null : { cursor: point, list };
+}
 export const moderationCommandSchema = z
   .object({
     action: z.enum(["publish", "archive"]),
@@ -138,8 +149,18 @@ export function moderationHref(
   if (point) params.set("cursor", point);
   return `/admin/community${params.size ? `?${params}` : ""}`;
 }
-export function moderationDetailHref(id: string, point?: string | null) {
-  return `/admin/community/${encodeURIComponent(id)}${point ? `?${new URLSearchParams({ cursor: point })}` : ""}`;
+export function moderationDetailHref(
+  id: string,
+  point?: string | null,
+  filters?: Pick<ModerationQuery, "query" | "status" | "type" | "author"> | null,
+) {
+  const params = new URLSearchParams();
+  if (filters?.query) params.set("q", filters.query);
+  if (filters && filters.status !== "draft") params.set("status", filters.status ?? "all");
+  if (filters?.type) params.set("type", filters.type);
+  if (filters?.author) params.set("author", filters.author);
+  if (point) params.set("cursor", point);
+  return `/admin/community/${encodeURIComponent(id)}${params.size ? `?${params}` : ""}`;
 }
 export function confirmsModerationCommand(
   value: unknown,

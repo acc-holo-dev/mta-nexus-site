@@ -24,6 +24,14 @@ export type DiscussionReportBatchComponent = (props: {
   items: typeof items;
   locale: "ru" | "en";
   allowActions: boolean;
+  filtersActive?: boolean;
+  queueFilters?: {
+    view: "pending" | "history";
+    page: number;
+    target?: "content" | "comment";
+    type?: string;
+    query?: string;
+  };
 }) => ReactNode;
 
 const time = "2026-10-11T00:00:00.123456Z";

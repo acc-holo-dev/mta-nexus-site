@@ -33,6 +33,7 @@ import {
   typeSpace1SmPrimary,
   typeXsMuted,
 } from "../../shell/type-shell";
+import { type CommunityReportQuery, communityReportDetailHref } from "../community-report-contract";
 import { communityReportCopy } from "../community-report-copy";
 import { reportGroupsCopy } from "../community-report-groups-copy";
 import type { discussionReportsPageSchema } from "../discussion-reports-contract";
@@ -49,6 +50,7 @@ export function DiscussionReportBatch({
   locale,
   allowActions,
   filtersActive = false,
+  queueFilters,
 }: {
   contentId: string;
   commentId: string | null;
@@ -57,10 +59,16 @@ export function DiscussionReportBatch({
   allowActions: boolean;
   /** True when search, category, history, or a later page narrowed this list. */
   filtersActive?: boolean;
+  /** When set, report detail links keep these queue filters for Back. */
+  queueFilters?: CommunityReportQuery;
 }) {
   const copy = reportBatchCopy(locale),
     labels = communityReportCopy(locale),
-    router = useRouter();
+    router = useRouter(),
+    reportHref = (reportId: string) =>
+      queueFilters
+        ? communityReportDetailHref("/admin/reports", reportId, queueFilters)
+        : `/admin/reports/${encodeURIComponent(reportId)}`;
   const [selected, setSelected] = useState<string[]>([]),
     [action, setAction] = useState<Input["action"]>("resolve"),
     [notes, setNotes] = useState(""),
@@ -367,7 +375,7 @@ export function DiscussionReportBatch({
             {preview.items.map((item) => (
               <li key={item.id} className="space-y-1 rounded-lg border border-base p-3">
                 <Link
-                  href={`/admin/reports/${encodeURIComponent(item.id)}`}
+                  href={reportHref(item.id)}
                   className="inline-flex min-h-11 text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
                   {labels[item.type]} · {item.id}
@@ -439,7 +447,7 @@ export function DiscussionReportBatch({
                 })}
               </time>
               <Link
-                href={`/admin/reports/${encodeURIComponent(item.id)}`}
+                href={reportHref(item.id)}
                 className="flex min-h-11 items-center text-sm text-accent underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
                 {discussionReportsCopy(locale).review}

@@ -49,14 +49,17 @@ export function CommunityReportDetailView({
   initial,
   locale,
   staff = false,
+  queueHref,
 }: {
   id: string;
   initial: CommunityReportDetail | null;
   locale: Locale;
   staff?: boolean;
+  queueHref?: string;
 }) {
   const copy = communityReportCopy(locale),
-    path = `${staff ? "/admin/reports" : "/workspace/reports"}/${encodeURIComponent(id)}`;
+    path = `${staff ? "/admin/reports" : "/workspace/reports"}/${encodeURIComponent(id)}`,
+    backHref = queueHref ?? (staff ? "/admin/reports" : "/workspace/reports");
   function safeMessage(failure: unknown, fallback: string) {
     const text = failure instanceof Error ? failure.message : "";
     return [...Object.values(copy), ...Object.values(getUserPlatformCopy(locale))].includes(text)
@@ -178,10 +181,7 @@ export function CommunityReportDetailView({
   return (
     <div className={pageShellStack5} aria-busy={pending}>
       <div className="flex min-w-0 flex-wrap items-center gap-4">
-        <Link
-          href={staff ? "/admin/reports" : "/workspace/reports"}
-          className={linkAccentSmRounded}
-        >
+        <Link href={backHref} className={linkAccentSmRounded}>
           {copy.back}
         </Link>
         <Button

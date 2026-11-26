@@ -38,6 +38,7 @@ import { discoveryStreamCopy } from "../../src/features/discovery/discovery-stre
 import {
   confirmsModerationCommand,
   moderationCommandSchema,
+  moderationDetailHref,
   moderationDetailSchema,
   moderationHref,
   moderationPageSchema,
@@ -187,7 +188,7 @@ it.each([
 ])("rejects malformed/private moderation filters %s", (params) =>
   expect(parseModerationQuery(new URLSearchParams(params))).toBeNull(),
 );
-it("keeps exact-author/status/type/search filters in queue links and separates detail continuation", () => {
+it("keeps exact-author/status/type/search filters in queue links and detail return paths", () => {
   const filters = parseModerationQuery(
     new URLSearchParams("q=+Lua+&status=all&author=writer&type=post"),
   );
@@ -199,7 +200,24 @@ it("keeps exact-author/status/type/search filters in queue links and separates d
     type: "post",
   });
   expect(moderationHref(filters, "a&b")).toContain("cursor=a%26b");
-  expect(parseModerationDetailQuery(new URLSearchParams("q=private"))).toBeNull();
+  expect(moderationDetailHref("item", null, filters)).toBe(
+    "/admin/community/item?q=Lua&status=all&type=post&author=writer",
+  );
+  expect(moderationDetailHref("item", "a&b", filters)).toContain("cursor=a%26b");
+  const detail = parseModerationDetailQuery(
+    new URLSearchParams("q=Lua&status=all&author=writer&type=post"),
+  );
+  expect(detail?.list).toMatchObject({
+    query: "Lua",
+    status: undefined,
+    author: "writer",
+    type: "post",
+  });
+  expect(detail?.list ? moderationHref(detail.list) : "").toBe(
+    "/admin/community?q=Lua&status=all&type=post&author=writer",
+  );
+  expect(parseModerationDetailQuery(new URLSearchParams("q=private&page=2"))).toBeNull();
+  expect(parseModerationDetailQuery(new URLSearchParams()).cursor).toBeUndefined();
 });
 it("requires current-session staff privilege before any workspace read or command", async () => {
   mocks.allowed.mockReturnValue(false);

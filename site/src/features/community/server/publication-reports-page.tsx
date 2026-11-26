@@ -176,6 +176,7 @@ export async function PublicationReportsPage({
             items={data.items}
             locale={locale}
             allowActions={filters.view === "pending"}
+            queueFilters={filters}
           />
         )}
         <nav aria-label={labels.page} className={typeFlexWrapCenterGap4Sm}>

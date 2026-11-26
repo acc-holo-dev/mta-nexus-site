@@ -2,6 +2,8 @@ import { expect, it } from "vitest";
 import {
   communityReportCreateSchema,
   communityReportDecisionSchema,
+  communityReportDetailHref,
+  communityReportListHref,
   communityReportPageQuery,
   confirmsReportDecision,
   parseCommunityReportQuery,
@@ -57,6 +59,28 @@ it("bounds pages and preserves valid filters through SSR", () => {
   expect(communityReportPageQuery({ page: "2", target: "content" })?.page).toBe(2);
   expect(communityReportPageQuery({ page: ["2", "0"], target: "content" })).toBeNull();
   expect(communityReportPageQuery({ page: "invalid", actorId: "victim" })).toBeNull();
+});
+it("keeps report queue filters on the detail link and the list return", () => {
+  const filters = communityReportPageQuery({
+    view: "history",
+    page: "2",
+    target: "comment",
+    type: "spam",
+    q: "Access",
+  });
+  if (!filters) throw Error("Expected filters");
+  expect(communityReportDetailHref("/admin/reports", "rep_a", filters)).toBe(
+    "/admin/reports/rep_a?view=history&page=2&target=comment&type=spam&q=Access",
+  );
+  expect(communityReportListHref("/admin/reports", filters)).toBe(
+    "/admin/reports?view=history&page=2&target=comment&type=spam&q=Access",
+  );
+  expect(
+    communityReportDetailHref("/workspace/reports", "rep_a", {
+      view: "pending",
+      page: 1,
+    }),
+  ).toBe("/workspace/reports/rep_a");
 });
 it("requires exact target revision for removal and no irrelevant revisions on other decisions", () => {
   const decision = {

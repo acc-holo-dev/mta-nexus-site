@@ -236,6 +236,16 @@ export async function DiscussionReportsScreen({
           items={data.items}
           locale={locale}
           allowActions={filters?.view === "pending"}
+          queueFilters={
+            filters
+              ? {
+                  view: filters.view,
+                  page: 1,
+                  type: filters.type,
+                  ...(filters.query ? { query: filters.query } : {}),
+                }
+              : undefined
+          }
         />
       )}
       <nav className={typeFlexWrapGap4} aria-label={copy.title}>
