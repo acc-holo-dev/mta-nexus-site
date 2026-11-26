@@ -182,6 +182,9 @@ it("limits search and cursor grammar to discussion filters and preserves exact s
     "/admin/community/id%20%2F/discussion?q=%25_&author=Alice&cursor=cursor",
   );
   expect(
+    moderatedDiscussionHref("id /", { query: "%_", author: "Alice" }, undefined, "comment"),
+  ).toBe("/admin/community/id%20%2F/discussion/comment?q=%25_&author=Alice");
+  expect(
     moderatedDiscussionRemoveSchema.safeParse({ expectedRevision: version, reason: " " }).success,
   ).toBe(false);
   expect(

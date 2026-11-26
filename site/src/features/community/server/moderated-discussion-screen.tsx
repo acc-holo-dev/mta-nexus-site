@@ -178,10 +178,20 @@ export async function ModeratedDiscussionScreen({
   }
   const data = parsed.data,
     publication = data.publication;
-  const listFilters =
-    !commentId && filters && "query" in filters
-      ? (filters as NonNullable<ReturnType<typeof parseModeratedDiscussionQuery>>)
-      : null;
+  const discussionListFilters = (() => {
+    if (!filters) return null;
+    if (!commentId && "query" in filters)
+      return filters as NonNullable<ReturnType<typeof parseModeratedDiscussionQuery>>;
+    if (commentId && "list" in filters && filters.list) {
+      return {
+        query: filters.list.query,
+        author: filters.list.author,
+        cursor: undefined,
+      } satisfies NonNullable<ReturnType<typeof parseModeratedDiscussionQuery>>;
+    }
+    return null;
+  })();
+  const listFilters = !commentId ? discussionListFilters : null;
   const emptyFiltered = Boolean(
     listFilters && (listFilters.query || listFilters.author || listFilters.cursor),
   );
@@ -217,7 +227,10 @@ export async function ModeratedDiscussionScreen({
             {copy.publication}
           </Link>
           {commentId && (
-            <Link href={moderatedDiscussionHref(id)} className={linkAccentSm}>
+            <Link
+              href={moderatedDiscussionHref(id, discussionListFilters ?? undefined)}
+              className={linkAccentSm}
+            >
               {copy.back}
             </Link>
           )}
@@ -271,7 +284,12 @@ export async function ModeratedDiscussionScreen({
                   </p>
                   <p className={typePrewrapSmPrimary}>{item.text}</p>
                   <Link
-                    href={moderatedDiscussionHref(id, undefined, undefined, item.id)}
+                    href={moderatedDiscussionHref(
+                      id,
+                      discussionListFilters ?? undefined,
+                      undefined,
+                      item.id,
+                    )}
                     className={linkAccentSm}
                   >
                     {copy.review}
@@ -358,9 +376,7 @@ export async function ModeratedDiscussionScreen({
           prefetch={false}
           href={moderatedDiscussionHref(
             id,
-            commentId
-              ? undefined
-              : (filters as NonNullable<ReturnType<typeof parseModeratedDiscussionQuery>>),
+            discussionListFilters ?? undefined,
             undefined,
             commentId,
           )}
@@ -373,9 +389,7 @@ export async function ModeratedDiscussionScreen({
             prefetch={false}
             href={moderatedDiscussionHref(
               id,
-              commentId
-                ? undefined
-                : (filters as NonNullable<ReturnType<typeof parseModeratedDiscussionQuery>>),
+              discussionListFilters ?? undefined,
               data.nextCursor,
               commentId,
             )}

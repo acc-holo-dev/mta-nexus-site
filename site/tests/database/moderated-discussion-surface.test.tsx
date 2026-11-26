@@ -99,12 +99,25 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(locale === "ru" ? "Модерация обсуждения" : "Discussion moderation");
     expect(html).toContain(`<search aria-label="${moderationCopy(locale).search}"`);
     expect(html).toContain("&lt;script&gt;unsafe&lt;/script&gt;");
-    expect(html).toContain("/admin/community/post/discussion/comment");
+    expect(html).toContain(
+      'href="/admin/community/post/discussion/comment?q=word&amp;author=writer"',
+    );
     expect(html).toContain("q=word&amp;author=writer&amp;cursor=continuation");
     expect(html).not.toContain("/articles/guide");
     expect(html).not.toMatch(/data-removal/u);
   },
 );
+it("keeps discussion filters on the comment detail Back link", async () => {
+  const html = renderToStaticMarkup(
+    await ModeratedDiscussionScreen({
+      id: "post",
+      commentId: "comment",
+      searchParams: Promise.resolve({ q: "word", author: "writer" }),
+    }),
+  );
+  expect(html).toContain('href="/admin/community/post/discussion?q=word&amp;author=writer"');
+  expect(html).toContain("Reviewed text");
+});
 it("renders removed state and retained reason without an active delete control or deleted text", async () => {
   state.discussionDetail.mockResolvedValue({
     ...detail,
