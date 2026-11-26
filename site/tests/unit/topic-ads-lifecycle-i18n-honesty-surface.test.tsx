@@ -37,9 +37,24 @@ it("locks admin ad placement labels to admin-ad-placement-i18n", () => {
   const copy = read("site/src/features/moderation/admin-ad-placement-i18n.ts");
   expect(copy).toContain("title:");
   expect(copy).toContain("emptyTitle:");
+  expect(copy).toContain("loadUnavailable:");
+  expect(copy).toContain("loadUnavailableHint:");
   expect(source).toContain("adminAdPlacementCopy");
   expect(source).toContain("copy.title");
+  expect(source).toContain("ErrorState");
+  expect(source).toContain("slots === null");
+  expect(source).toContain("copy.loadUnavailable");
+  expect(source).toContain("copy.emptyTitle");
   expect(source).not.toContain("Placement lifecycle");
+});
+
+it("keeps admin home ad inventory load failure distinct from empty slots", () => {
+  const home = read("site/src/features/moderation/server/admin-home-screen.tsx");
+  expect(home).toContain("showAdLifecycle");
+  expect(home).toContain("listAdPlacementSummaries().catch(() => null)");
+  expect(home).toContain("slots={adLifecycle ?? null}");
+  expect(home).toContain("retryHref={adminHref({})}");
+  expect(home).not.toContain("{adLifecycle ? (");
 });
 
 it("locks resource-lifecycle bilingual labels to resource-commerce-i18n", () => {

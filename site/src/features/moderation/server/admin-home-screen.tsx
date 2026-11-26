@@ -218,10 +218,11 @@ export async function AdminHomeScreen({
   const { items: pendingContent, hasMore: moreContent } = contentPageResult;
   // UX-24: advertising placement lifecycle admin surface. Read-only inventory
   // overview gated on the feature switch AND full admin role; hidden otherwise.
-  const adLifecycle =
-    advertisingLifecycleEnabled && adminUser.role === "admin"
-      ? await adminService.listAdPlacementSummaries().catch(() => null)
-      : null;
+  // When gated on, null means load failure (ErrorState); [] means empty inventory.
+  const showAdLifecycle = advertisingLifecycleEnabled && adminUser.role === "admin";
+  const adLifecycle = showAdLifecycle
+    ? await adminService.listAdPlacementSummaries().catch(() => null)
+    : undefined;
   const chromeLinkClass =
     "inline-flex min-h-11 items-center rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
 
@@ -283,11 +284,12 @@ export async function AdminHomeScreen({
 
       <AdminHealthStats copy={copy} counts={health.counts} />
 
-      {adLifecycle ? (
+      {showAdLifecycle ? (
         <AdminAdPlacementSection
           locale={locale}
-          slots={adLifecycle}
+          slots={adLifecycle ?? null}
           rendererEnabled={adSlotRendererEnabled}
+          retryHref={adminHref({})}
         />
       ) : null}
 

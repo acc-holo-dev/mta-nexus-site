@@ -1,6 +1,8 @@
 import type { AdSlotPlan } from "@nexus/domain";
-import { EmptyState, SectionHeader, StatusBadge } from "@nexus/ui";
-import type { Locale } from "../../../lib/i18n";
+import { EmptyState, ErrorState, SectionHeader, StatusBadge } from "@nexus/ui";
+import Link from "next/link";
+import { getDictionary, type Locale } from "../../../lib/i18n";
+import { linkAccentSmRounded } from "../../shell/link-shell";
 import {
   typeBreakSemiboldPrimary,
   typeCaptionFaint,
@@ -15,6 +17,9 @@ import { adminAdPlacementCopy } from "../admin-ad-placement-i18n";
  * Management actions and any exposure to production visitors or payments remain
  * behind the NEXT_PUBLIC_ADVERTISING_LIFECYCLE switch and a separate activation
  * gate. When disabled the section does not render at all.
+ *
+ * `slots === null` is a load failure (ErrorState + retry). An empty array is a
+ * real empty inventory (EmptyState) — never treat those as the same outcome.
  */
 
 type SlotSummary = {
@@ -31,18 +36,31 @@ export function AdminAdPlacementSection({
   locale,
   slots,
   rendererEnabled,
+  retryHref,
 }: {
   locale: Locale;
-  slots: SlotSummary[];
+  /** `null` = inventory load failed (not an empty inventory). */
+  slots: readonly SlotSummary[] | null;
   /** Public SponsoredPlacementSlot renderer switch (off by default, UX-25 part A). */
   rendererEnabled: boolean;
+  retryHref: string;
 }) {
   const copy = adminAdPlacementCopy(locale);
-  const enabledCount = slots.filter((s) => s.slot.enabled).length;
+  const dictionary = getDictionary(locale);
   return (
     <section>
       <SectionHeader title={copy.title} description={copy.description} />
-      {slots.length === 0 ? (
+      {slots === null ? (
+        <ErrorState
+          title={copy.loadUnavailable}
+          description={copy.loadUnavailableHint}
+          action={
+            <Link href={retryHref} className={linkAccentSmRounded}>
+              {dictionary.errors.retry}
+            </Link>
+          }
+        />
+      ) : slots.length === 0 ? (
         <EmptyState title={copy.emptyTitle} description={copy.emptyDescription} />
       ) : (
         <ul className="space-y-3">
@@ -66,7 +84,9 @@ export function AdminAdPlacementSection({
               </div>
             </li>
           ))}
-          <li className={typeCaptionFaint}>{copy.enabledTotal(enabledCount)}</li>
+          <li className={typeCaptionFaint}>
+            {copy.enabledTotal(slots.filter((s) => s.slot.enabled).length)}
+          </li>
           <li className={typeCaptionFaint}>
             {rendererEnabled ? copy.rendererOn : copy.rendererOff}
           </li>

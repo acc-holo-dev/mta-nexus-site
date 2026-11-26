@@ -5,6 +5,8 @@ const en = {
   description: "Slots, capacity and active placements (feature-flag, no public exposure)",
   emptyTitle: "No ad slots yet",
   emptyDescription: "Register ad slots through the placement repository as an admin operator.",
+  loadUnavailable: "Placement inventory is temporarily unavailable.",
+  loadUnavailableHint: "Retry to reload ad slots. An empty inventory is not a load failure.",
   positionCapacity: (positionKey: string, capacity: number) =>
     `Position ${positionKey} · capacity ${capacity}`,
   pending: (count: number) => `Pending: ${count}`,
@@ -19,6 +21,9 @@ const ru: typeof en = {
   description: "Слоты, ёмкость и активные размещения (feature-flag, без публичной выдачи)",
   emptyTitle: "Слоты ещё не созданы",
   emptyDescription: "Зарегистрируйте админ-оператором слоты через репозиторий размещений.",
+  loadUnavailable: "Инвентарь размещений временно недоступен.",
+  loadUnavailableHint:
+    "Повторите попытку, чтобы загрузить слоты. Пустой инвентарь — это не сбой загрузки.",
   positionCapacity: (positionKey, capacity) => `Позиция ${positionKey} · ёмкость ${capacity}`,
   pending: (count) => `В ожидании: ${count}`,
   active: (count) => `Активно: ${count}`,
