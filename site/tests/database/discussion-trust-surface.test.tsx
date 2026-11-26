@@ -90,7 +90,9 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain(`<search aria-label="${copy.filters}"`);
     expect(html).toContain('name="q"');
     expect(html).toContain('name="availability"');
-    expect(html).toContain('href="/workspace/discussions/comment"');
+    expect(html).toContain(
+      'href="/workspace/discussions/comment?q=Lua&amp;availability=unavailable"',
+    );
     expect(html).toContain("cursor=next");
     expect(html).not.toContain('href="/articles/');
     expect(await generateMetadata()).toMatchObject({
