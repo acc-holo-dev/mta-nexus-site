@@ -53,10 +53,10 @@ site/
 | ------------- | ----: | -----: |
 | accounts      |    92 | 243632 |
 | commerce      |   208 | 872562 |
-| community     |   155 | 639811 |
+| community     |   155 | 642116 |
 | discovery     |    22 |  50639 |
 | library       |   124 | 526444 |
-| moderation    |    56 | 221046 |
+| moderation    |    56 | 221954 |
 | notifications |    28 | 143879 |
 | organizations |    61 | 207432 |
 | resources     |   232 | 941698 |
