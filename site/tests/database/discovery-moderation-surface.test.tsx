@@ -209,7 +209,7 @@ it.each(["ru", "en"] as const)(
     expect(queue).toContain(`<search aria-label="${moderationCopy(locale).search}"`);
     expect(queue).toContain('name="author"');
     expect(queue).toContain("bg-accent text-white");
-    expect(queue).toContain('href="/admin/community/item"');
+    expect(queue).toContain('href="/admin/community/item?type=post&amp;author=writer"');
     expect(queue).toContain("type=post&amp;author=writer&amp;cursor=older");
     expect(queue).toMatch(/(?:overflow-x-clip|pageShell|page-shell|[A-Za-z]\w*RouteLoading)/);
     const detail = renderToStaticMarkup(await CommunityModerationScreen({ id: "item" }));

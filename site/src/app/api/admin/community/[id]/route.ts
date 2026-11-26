@@ -19,6 +19,8 @@ export async function GET(request: NextRequest, { params }: Context) {
   return userPlatformApi(
     request,
     async (actor) => {
+      if ([...request.nextUrl.searchParams.keys()].some((key) => key !== "cursor"))
+        throw new AppError("Invalid history filters", 400, "VALIDATION_ERROR");
       const filters = parseModerationDetailQuery(request.nextUrl.searchParams);
       if (!filters) throw new AppError("Invalid history filters", 400, "VALIDATION_ERROR");
       await reportRateLimit(actor.id, "search");

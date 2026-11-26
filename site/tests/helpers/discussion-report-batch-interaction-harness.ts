@@ -28,8 +28,8 @@ export type DiscussionReportBatchComponent = (props: {
   queueFilters?: {
     view: "pending" | "history";
     page: number;
-    target?: "content" | "comment";
-    type?: string;
+    target: "content" | "comment" | undefined;
+    type: string | undefined;
     query?: string;
   };
 }) => ReactNode;

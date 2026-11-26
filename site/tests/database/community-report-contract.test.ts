@@ -79,6 +79,8 @@ it("keeps report queue filters on the detail link and the list return", () => {
     communityReportDetailHref("/workspace/reports", "rep_a", {
       view: "pending",
       page: 1,
+      target: undefined,
+      type: undefined,
     }),
   ).toBe("/workspace/reports/rep_a");
 });

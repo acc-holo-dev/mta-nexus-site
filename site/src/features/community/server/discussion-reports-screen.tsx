@@ -241,6 +241,7 @@ export async function DiscussionReportsScreen({
               ? {
                   view: filters.view,
                   page: 1,
+                  target: undefined,
                   type: filters.type,
                   ...(filters.query ? { query: filters.query } : {}),
                 }

@@ -75,7 +75,7 @@ it.each(["en", "ru"] as const)(
     );
     expect(html).toContain(`>${communityReportCopy(locale).title}</h1>`);
     expect(html).toContain(communityReportCopy(locale).unavailable);
-    expect(html).toContain('href="/workspace/reports?q=a+%26+b&amp;view=history"');
+    expect(html).toContain('href="/workspace/reports?view=history&amp;q=a+%26+b"');
     expect(html).not.toContain("/auth/login");
     expect(html).not.toContain("PRIVATE_SESSION");
     expect(mocks.page).not.toHaveBeenCalled();
@@ -110,7 +110,9 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain("page=3");
     expect(html).toContain("page=1");
     expect(html).toContain("target=comment");
-    expect(html).toContain('href="/workspace/reports/report"');
+    expect(html).toContain(
+      'href="/workspace/reports/report?page=2&amp;target=comment&amp;type=abuse"',
+    );
     expect(html).toContain("&lt;script&gt;");
     expect(html).not.toContain("<script>");
   },

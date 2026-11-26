@@ -15,6 +15,11 @@ export function getModeratedDiscussion(
     request,
     async (actor) => {
       const scope = await params;
+      if (
+        scope.commentId &&
+        [...request.nextUrl.searchParams.keys()].some((key) => key !== "cursor")
+      )
+        throw new AppError("Invalid discussion filters", 400, "VALIDATION_ERROR");
       const filters = scope.commentId
         ? parseModerationDetailQuery(request.nextUrl.searchParams)
         : parseModeratedDiscussionQuery(request.nextUrl.searchParams);

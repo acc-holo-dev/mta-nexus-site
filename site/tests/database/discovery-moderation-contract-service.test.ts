@@ -217,7 +217,7 @@ it("keeps exact-author/status/type/search filters in queue links and detail retu
     "/admin/community?q=Lua&status=all&type=post&author=writer",
   );
   expect(parseModerationDetailQuery(new URLSearchParams("q=private&page=2"))).toBeNull();
-  expect(parseModerationDetailQuery(new URLSearchParams()).cursor).toBeUndefined();
+  expect(parseModerationDetailQuery(new URLSearchParams())?.cursor).toBeUndefined();
 });
 it("requires current-session staff privilege before any workspace read or command", async () => {
   mocks.allowed.mockReturnValue(false);
