@@ -196,6 +196,9 @@ export const workspace = {
     directoryFetchError: "Каталог MTA временно недоступен. Попробуйте ещё раз.",
     publicServersLabel: "публичных серверов",
     openListing: "Открыть карточку",
+    listingsProfilesUnavailable: "Ссылки на профили серверов NEXUS временно недоступны.",
+    listingsProfilesUnavailableHint:
+      "Повтор обновляет только ссылки на карточки NEXUS. Официальный каталог MTA ниже отдельный и может загрузиться.",
   },
   workspaceContext: {
     title: "Активный контекст рабочей зоны",

@@ -88,11 +88,18 @@ describe("public MTA directory page behavior", () => {
     },
   );
 
-  it("keeps the catalog shell when listing lookup fails", async () => {
+  it("keeps the catalog shell and shows ErrorState when listing lookup fails", async () => {
     state.listings.mockRejectedValueOnce(new Error("PRIVATE_SQL"));
+    const copy = getDictionary("en").servers;
     const html = renderToStaticMarkup(await ServersPage());
     expect(html).toContain('data-testid="mta-directory"');
     expect(html).toContain('data-profiles="0"');
+    expect(html).toContain('id="servers-listings-profiles-unavailable"');
+    expect(html).toContain('role="alert"');
+    expect(html).toContain(copy.listingsProfilesUnavailable);
+    expect(html).toContain(copy.listingsProfilesUnavailableHint);
+    expect(html).toContain(getDictionary("en").errors.retry);
+    expect(html).toContain('href="/servers"');
     expect(html).not.toContain("PRIVATE_SQL");
   });
 

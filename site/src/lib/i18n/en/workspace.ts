@@ -196,6 +196,9 @@ export const workspace = {
     directoryFetchError: "The MTA directory is temporarily unavailable. Please try again.",
     publicServersLabel: "public servers",
     openListing: "Open listing",
+    listingsProfilesUnavailable: "NEXUS server profile links are temporarily unavailable.",
+    listingsProfilesUnavailableHint:
+      "Retry reloads NEXUS listing links only. The official MTA directory below is separate and may still load.",
   },
   workspaceContext: {
     title: "Active workspace context",
