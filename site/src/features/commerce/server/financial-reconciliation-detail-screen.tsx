@@ -27,7 +27,6 @@ import {
   typeXsMuted,
 } from "../../shell/type-shell";
 import { formatHistoryDate, parseHistoryPage } from "../commerce-history-format";
-import { financialReviewListHref } from "../financial-query";
 import {
   financialFlags,
   financialOrderLabel,
@@ -37,6 +36,7 @@ import {
   formatFinancialMinor,
   getFinancialCopy,
 } from "../financial-i18n";
+import { financialReviewListHref } from "../financial-query";
 import { orderTermsCopy } from "../order-terms-i18n";
 import { ReviewAmountEstimate } from "./financial-reconciliation-screen";
 
