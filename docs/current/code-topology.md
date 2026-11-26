@@ -52,7 +52,7 @@ site/
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
 | accounts      |    92 | 243632 |
-| commerce      |   207 | 863887 |
+| commerce      |   207 | 864891 |
 | community     |   155 | 639811 |
 | discovery     |    22 |  50639 |
 | library       |   124 | 526444 |
@@ -62,7 +62,7 @@ site/
 | resources     |   232 | 941698 |
 | servers       |   113 | 390070 |
 | shell         |   101 | 211348 |
-| support       |    30 | 122639 |
+| support       |    30 | 123436 |
 | trust         |    28 |  83844 |
 
 Эталон границ: [`features/servers/README.md`](../../site/src/features/servers/README.md) (`client` / `server` / `model` + server-only ports, без прямого импорта внутренностей снаружи).

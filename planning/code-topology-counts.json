@@ -14,7 +14,7 @@
       "files": 92
     },
     "commerce": {
-      "bytes": 863887,
+      "bytes": 864891,
       "files": 207
     },
     "community": {
@@ -54,7 +54,7 @@
       "files": 101
     },
     "support": {
-      "bytes": 122639,
+      "bytes": 123436,
       "files": 30
     },
     "trust": {
@@ -75,11 +75,19 @@
       "apps/web"
     ],
     "note": "Canonical packages live under site/packages/*. Root packages/* and apps/web are not workspace members and must stay untracked; host leftovers vary by machine.",
-    "workspace_members": ["site", "site/packages/*"]
+    "workspace_members": [
+      "site",
+      "site/packages/*"
+    ]
   },
   "lib": {
     "i18n_modules": 0,
-    "root_dirs": ["http", "i18n", "platform", "services"],
+    "root_dirs": [
+      "http",
+      "i18n",
+      "platform",
+      "services"
+    ],
     "root_files": 0,
     "root_prefix_hotspots": [],
     "services_root_files": 0,
@@ -96,7 +104,7 @@
     "validation": 19
   },
   "scope": "Git-tracked blobs under site/ at source_sha (git ls-tree). Ignores untracked/ignored host files so CI and dirty worktrees match.",
-  "source_sha": "0c02bcf2bf0355da36094c93121de23d1ed3f718",
+  "source_sha": "0da07f802f6b82efc619853d88caab285e8ed58b",
   "tests": {
     "site_tests_files": 1782
   }
