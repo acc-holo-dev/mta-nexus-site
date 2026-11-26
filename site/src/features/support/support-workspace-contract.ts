@@ -36,6 +36,18 @@ export function supportHref(base: string, filters: SupportQuery, page = filters.
   return `${base}${params.size ? `?${params}` : ""}`;
 }
 
+export function supportCaseHref(
+  base: string,
+  caseId: string,
+  filters: SupportQuery,
+  page = filters.page,
+) {
+  const listHref = supportHref(base, filters, page);
+  const queryStart = listHref.indexOf("?");
+  const suffix = queryStart >= 0 ? listHref.slice(queryStart) : "";
+  return `${base}/${encodeURIComponent(caseId)}${suffix}`;
+}
+
 /** Prefills a new case from a publication title. Does not store a content id. */
 export function publicationSupportHref(title: string) {
   const subject = title.trim().replace(/\s+/gu, " ").slice(0, 120);

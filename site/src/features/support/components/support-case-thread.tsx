@@ -56,10 +56,12 @@ export function SupportCaseThread({
   caseId,
   actorId,
   staffMode = false,
+  queueHref,
 }: {
   caseId: string;
   actorId: string;
   staffMode?: boolean;
+  queueHref?: string;
 }) {
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.support,
@@ -318,6 +320,7 @@ export function SupportCaseThread({
     }
   }
 
+  const queueBackHref = queueHref ?? (staffMode ? "/admin/support" : "/support");
   const backHref = staffMode ? "/admin/support" : "/support";
 
   if (loading) {
@@ -344,7 +347,7 @@ export function SupportCaseThread({
       <div className={pageShellMax4xlDenseTight}>
         <h1 className={typeDisplayPrimary}>{copy.title}</h1>
         <Link
-          href={backHref}
+          href={queueBackHref}
           className="inline-flex min-h-11 items-center text-sm text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           {copy.back}
@@ -375,7 +378,7 @@ export function SupportCaseThread({
   return (
     <div className={pageShellMax4xlTight}>
       <Link
-        href={backHref}
+        href={queueBackHref}
         className="inline-flex min-h-11 items-center gap-1 text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       >
         <ArrowLeft className={typeIcon35} aria-hidden="true" />

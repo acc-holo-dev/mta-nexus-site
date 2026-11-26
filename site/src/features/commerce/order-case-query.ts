@@ -34,3 +34,21 @@ export function orderCasePageQuery(
   }
   return orderCaseQuery(params, filters);
 }
+
+type OrderCaseFilters = ReturnType<typeof orderCasePageQuery>;
+
+export function orderCaseListHref(base: string, filters: OrderCaseFilters) {
+  const params = new URLSearchParams();
+  if (filters.page > 1) params.set("page", String(filters.page));
+  if (filters.reviewStatus) params.set("reviewStatus", filters.reviewStatus);
+  if (filters.threadStatus) params.set("threadStatus", filters.threadStatus);
+  return `${base}${params.size ? `?${params}` : ""}`;
+}
+
+export function orderCaseDetailHref(base: string, caseId: string, filters: OrderCaseFilters) {
+  const params = new URLSearchParams();
+  if (filters.reviewStatus) params.set("reviewStatus", filters.reviewStatus);
+  if (filters.threadStatus) params.set("threadStatus", filters.threadStatus);
+  const suffix = params.size ? `?${params}` : "";
+  return `${base}/${encodeURIComponent(caseId)}${suffix}`;
+}

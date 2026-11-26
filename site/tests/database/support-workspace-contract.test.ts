@@ -8,6 +8,7 @@ import {
 import {
   publicationSupportHref,
   supportActivitySchema,
+  supportCaseHref,
   supportHref,
   supportQuery,
 } from "../../src/features/support/support-workspace-contract";
@@ -30,6 +31,9 @@ it("normalizes supported search filters and preserves them in page links", () =>
   expect(publicationSupportHref("No")).toBe("/support");
   expect(supportHref("/support", filters, 3)).toBe(
     "/support?page=3&q=Access&status=resolved&category=account",
+  );
+  expect(supportCaseHref("/support", "sup_aaaaaaaaaaaaaaaaaaaaaaaa", filters, 3)).toBe(
+    "/support/sup_aaaaaaaaaaaaaaaaaaaaaaaa?page=3&q=Access&status=resolved&category=account",
   );
   expect(supportQuery(new URLSearchParams("status=&category="))).toEqual({ page: 1, q: "" });
   expect(supportQuery(new URLSearchParams("scope=staff&q=Access"), true)?.q).toBe("Access");

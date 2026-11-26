@@ -49,7 +49,7 @@ export async function SupportPageSurface({
   }
   const listReturnPath = params.size ? `${base}?${params}` : base;
   const validId = id !== undefined && /^sup_[a-f0-9]{24}$/u.test(id);
-  const casePath = validId ? `${base}/${id}` : base;
+  const casePath = validId ? `${base}/${id}${params.size ? `?${params}` : ""}` : base;
   let actor: Awaited<ReturnType<typeof authService.getSession>>;
   try {
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
@@ -103,6 +103,7 @@ export async function SupportPageSurface({
         caseId={id}
         staffMode={staff}
         actorId={actor.id}
+        queueHref={listReturnPath}
       />
     ) : (
       <div className={pageShellMax5xlDenseTight}>
@@ -111,7 +112,7 @@ export async function SupportPageSurface({
           title={copy.notFound}
           description={copy.notFoundHint}
           action={
-            <Link href={base} className={linkAccentSmRounded}>
+            <Link href={listReturnPath} className={linkAccentSmRounded}>
               {support.back}
             </Link>
           }
@@ -168,10 +169,22 @@ export function AdminSupportQueuePage({
   return SupportPageSurface({ searchParams, staff: true });
 }
 
-export async function MemberSupportCasePage({ params }: { params: Promise<{ id: string }> }) {
-  return SupportPageSurface({ id: (await params).id });
+export async function MemberSupportCasePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return SupportPageSurface({ id: (await params).id, searchParams });
 }
 
-export async function AdminSupportCasePage({ params }: { params: Promise<{ id: string }> }) {
-  return SupportPageSurface({ id: (await params).id, staff: true });
+export async function AdminSupportCasePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return SupportPageSurface({ id: (await params).id, staff: true, searchParams });
 }

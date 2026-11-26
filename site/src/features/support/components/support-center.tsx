@@ -41,7 +41,7 @@ import {
   reserveSupportCaseRetry,
   resolveSupportRetryActorScope,
 } from "../support-retry";
-import { type SupportQuery, supportHref } from "../support-workspace-contract";
+import { type SupportQuery, supportCaseHref, supportHref } from "../support-workspace-contract";
 import {
   SupportClientFailure,
   supportWorkspaceCopy,
@@ -577,7 +577,7 @@ export function SupportCenter({
           cases.map((supportCase) => (
             <Link
               key={supportCase.id}
-              href={`${basePath}/${encodeURIComponent(supportCase.id)}`}
+              href={supportCaseHref(basePath, supportCase.id, initialFilters, page)}
               className="nexus-panel block min-w-0 space-y-2 p-4 transition-colors hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               <div className={typeFlexWrapStartBetweenGap3}>

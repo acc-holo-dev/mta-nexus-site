@@ -53,7 +53,7 @@ import {
   orderCaseStatusLabel,
   orderCaseThreadLabel,
 } from "../order-case-i18n";
-import { orderCasePageQuery } from "../order-case-query";
+import { orderCaseDetailHref, orderCaseListHref, orderCasePageQuery } from "../order-case-query";
 export async function orderCaseMetadata(staff = false): Promise<Metadata> {
   const copy = orderCaseCopy(await getRequestLocale());
   return {
@@ -405,7 +405,7 @@ export async function OrderCaseListPage({
                 return (
                   <li key={item.id} className={panelSpace2P5}>
                     <Link
-                      href={`${base}/${encodeURIComponent(item.id)}`}
+                      href={orderCaseDetailHref(base, item.id, filters)}
                       className={`break-words font-semibold ${linkAccentSmRounded}`}
                     >
                       {item.subject}
@@ -497,8 +497,11 @@ export async function OrderCaseDetailPage({
     return <PlatformSignIn locale={locale} returnPath={returnPath} />;
   }
   let page = 1;
+  let listBase = staff ? "/admin/commerce/order-cases" : "/workspace/order-cases";
   try {
-    page = orderCasePageQuery(query).page;
+    const listFilters = orderCasePageQuery(query, true);
+    page = listFilters.page;
+    listBase = orderCaseListHref(listBase, listFilters);
   } catch (error) {
     if (!(error instanceof AppError) || error.statusCode !== 400) throw error;
     notFound();
@@ -506,7 +509,6 @@ export async function OrderCaseDetailPage({
   const detailBase = staff
     ? `/admin/commerce/order-cases/${encodeURIComponent(caseId)}`
     : `/workspace/order-cases/${encodeURIComponent(caseId)}`;
-  const listBase = staff ? "/admin/commerce/order-cases" : "/workspace/order-cases";
   const retryHref = (() => {
     const pageParams = new URLSearchParams();
     for (const [key, value] of Object.entries(query)) {

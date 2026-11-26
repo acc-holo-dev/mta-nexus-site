@@ -1,6 +1,11 @@
 import { orderCaseCreateSchema, orderCaseReviewSchema } from "@nexus/validation";
 import { expect, it } from "vitest";
-import { orderCasePageQuery, orderCaseQuery } from "../../src/features/commerce/order-case-query";
+import {
+  orderCaseDetailHref,
+  orderCaseListHref,
+  orderCasePageQuery,
+  orderCaseQuery,
+} from "../../src/features/commerce/order-case-query";
 import {
   confirmOrderCaseCreated,
   confirmOrderCaseReviewed,
@@ -129,4 +134,16 @@ it("cannot confirm a money-moving, mismatched or stale review receipt", () => {
     expect(confirmOrderCaseReviewed({ ...receipt, ...extra }, caseId, review, "reviewing")).toBe(
       false,
     );
+});
+it("keeps order-case filters on the detail link and the list return", () => {
+  const filters = orderCasePageQuery(
+    { reviewStatus: "refund_recommended", threadStatus: "open", page: "2" },
+    true,
+  );
+  expect(orderCaseDetailHref("/workspace/order-cases", caseId, filters)).toBe(
+    `/workspace/order-cases/${caseId}?reviewStatus=refund_recommended&threadStatus=open`,
+  );
+  expect(orderCaseListHref("/workspace/order-cases", filters)).toBe(
+    "/workspace/order-cases?page=2&reviewStatus=refund_recommended&threadStatus=open",
+  );
 });
