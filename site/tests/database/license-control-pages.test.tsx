@@ -72,7 +72,10 @@ import {
 import { getLicenseMaintenanceCopy } from "../../src/features/commerce/license-maintenance-i18n";
 import { getDictionary } from "../../src/lib/i18n";
 
-const params = { params: Promise.resolve({ id: "lic_a" }) };
+const params = {
+  params: Promise.resolve({ id: "lic_a" }),
+  searchParams: Promise.resolve({}),
+};
 const license = {
   id: "lic_a",
   productId: "prd_a",

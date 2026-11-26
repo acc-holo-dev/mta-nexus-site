@@ -63,9 +63,9 @@ it("keeps license archive filters on the detail link and the list return", () =>
 it("keeps license moderation filters on the detail link and the list return", () => {
   const filters = licenseModerationQuery({ page: "3", status: "suspended", q: "beta" });
   expect(licenseModerationDetailHref("lic_b", filters)).toBe(
-    "/admin/licenses/lic_b?page=3&status=suspended&q=beta",
+    "/admin/licenses/lic_b?status=suspended&q=beta&page=3",
   );
-  expect(licenseModerationListHref(filters)).toBe("/admin/licenses?page=3&status=suspended&q=beta");
+  expect(licenseModerationListHref(filters)).toBe("/admin/licenses?status=suspended&q=beta&page=3");
   expect(
     licenseModerationQuery(
       Object.fromEntries(

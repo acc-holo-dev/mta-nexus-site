@@ -99,9 +99,9 @@ export function licenseModerationQuery(
 
 export function licenseModerationListHref(query: LicenseModerationListQuery) {
   const params = new URLSearchParams();
-  if (query.page > 1) params.set("page", String(query.page));
   if (query.status) params.set("status", query.status);
   if (query.q) params.set("q", query.q);
+  if (query.page > 1) params.set("page", String(query.page));
   return `/admin/licenses${params.size ? `?${params}` : ""}`;
 }
 
