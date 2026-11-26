@@ -33,8 +33,8 @@ import {
 import { commerceHistoryBetaNotice, getCommerceHistoryCopy } from "../commerce-history-i18n";
 import { getCommercialCopy } from "../commercial-i18n";
 import { orderCaseCopy } from "../order-case-i18n";
-import { getWalletCopy } from "../wallet-i18n";
 import { purchasesDetailHref, purchasesListHref } from "../purchases-history-query";
+import { getWalletCopy } from "../wallet-i18n";
 import { HistoryPagination, HistoryShell } from "../workspace-history";
 import { PurchaseTotalEstimate } from "./purchase-total-estimate";
 export async function purchasesHistoryMetadata(): Promise<Metadata> {

@@ -27,7 +27,6 @@ import {
 } from "../../shell/type-shell";
 import { parseHistoryPage } from "../commerce-history-format";
 import { RecordedRateEstimate } from "../components/recorded-rate-estimate";
-import { financialReviewDetailHref, financialReviewListHref } from "../financial-query";
 import {
   financialFlags,
   financialOrderLabel,
@@ -35,6 +34,7 @@ import {
   formatFinancialMinor,
   getFinancialCopy,
 } from "../financial-i18n";
+import { financialReviewDetailHref, financialReviewListHref } from "../financial-query";
 
 export function ReviewAmountEstimate({
   amount,
