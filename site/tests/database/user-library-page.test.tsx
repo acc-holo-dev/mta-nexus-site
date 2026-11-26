@@ -181,6 +181,8 @@ describe("private resource library", () => {
     expect(html).not.toContain('data-product="prd_withdrawn"');
     expect(html).toContain("/workspace/library/prd_withdrawn/versions");
     expect(html).toContain("/workspace/library/updates");
+    expect(html).toContain('class="nexus-panel flex flex-col gap-3 p-5 h-full"');
+    expect(html).toContain('class="mt-auto flex flex-col gap-3"');
   });
 
   it("preserves selected filter during pagination and clamps untrusted page input", async () => {

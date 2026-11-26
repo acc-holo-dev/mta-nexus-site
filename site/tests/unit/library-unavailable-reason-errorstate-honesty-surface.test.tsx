@@ -23,4 +23,6 @@ it("locks library unavailableReason to ErrorState", () => {
   expect(source).not.toContain(
     'className="mt-auto text-sm text-muted">{copy.unavailableReason}</p>',
   );
+  expect(source).toContain("${panelFlexColGap3P5} h-full");
+  expect(source).toContain('className="mt-auto flex flex-col gap-3"');
 });

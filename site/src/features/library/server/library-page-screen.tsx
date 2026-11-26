@@ -228,7 +228,7 @@ export async function LibraryPageScreen({
           ) : (
             <ol className={typeGridGap4Md2}>
               {result.items.map((item) => (
-                <li key={item.resourceId} className={panelFlexColGap3P5}>
+                <li key={item.resourceId} className={`${panelFlexColGap3P5} h-full`}>
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <h2 className={typeMinBreakBaseSemiboldPrimary}>
                       {item.downloadable ? item.title : copy.unavailableResource}
@@ -246,49 +246,51 @@ export async function LibraryPageScreen({
                     </time>
                   </p>
 
-                  {item.downloadable && item.slug && item.version ? (
-                    <div className="mt-auto space-y-3">
-                      <p className={typeXsSecondary}>{copy.availableReason}</p>
-                      <ResourceDownloadButton
-                        productId={item.resourceId}
-                        version={item.version}
-                        buildId={item.buildId ?? undefined}
-                        intent={item.buildId ? "selected" : "latest"}
-                      />
-                      <div className={typeFlexWrapGap4}>
-                        <Link href={`/market/${item.slug}`} className={linkAccentInlineSm}>
-                          {copy.open}
-                        </Link>
-                        <Link href={releaseHistoryHref(item.slug)} className={linkAccentInlineSm}>
-                          {releaseCopy.browse}
-                        </Link>
+                  <div className="mt-auto flex flex-col gap-3">
+                    {item.downloadable && item.slug && item.version ? (
+                      <div className="space-y-3">
+                        <p className={typeXsSecondary}>{copy.availableReason}</p>
+                        <ResourceDownloadButton
+                          productId={item.resourceId}
+                          version={item.version}
+                          buildId={item.buildId ?? undefined}
+                          intent={item.buildId ? "selected" : "latest"}
+                        />
+                        <div className={typeFlexWrapGap4}>
+                          <Link href={`/market/${item.slug}`} className={linkAccentInlineSm}>
+                            {copy.open}
+                          </Link>
+                          <Link href={releaseHistoryHref(item.slug)} className={linkAccentInlineSm}>
+                            {releaseCopy.browse}
+                          </Link>
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <ErrorState
-                      id="library-item-unavailable-reason"
-                      title={copy.unavailableReason}
-                      description={copy.unavailableReasonHint}
-                    />
-                  )}
-                  <Link
-                    href={`/workspace/library/${encodeURIComponent(item.resourceId)}/versions`}
-                    className={linkAccentTightSm}
-                  >
-                    {getResourceReleaseControlCopy(locale).manage}
-                  </Link>
-                  <Link
-                    href={`/workspace/library/${encodeURIComponent(item.resourceId)}/collections`}
-                    className={linkAccentTightSm}
-                  >
-                    {libraryCollectionsCopy(locale).toCollection}
-                  </Link>
-                  <Link
-                    href={`/workspace/library/review/${encodeURIComponent(item.resourceId)}`}
-                    className={linkAccentTightSm}
-                  >
-                    {resourceReviewCopy(locale).write}
-                  </Link>
+                    ) : (
+                      <ErrorState
+                        id="library-item-unavailable-reason"
+                        title={copy.unavailableReason}
+                        description={copy.unavailableReasonHint}
+                      />
+                    )}
+                    <Link
+                      href={`/workspace/library/${encodeURIComponent(item.resourceId)}/versions`}
+                      className={linkAccentTightSm}
+                    >
+                      {getResourceReleaseControlCopy(locale).manage}
+                    </Link>
+                    <Link
+                      href={`/workspace/library/${encodeURIComponent(item.resourceId)}/collections`}
+                      className={linkAccentTightSm}
+                    >
+                      {libraryCollectionsCopy(locale).toCollection}
+                    </Link>
+                    <Link
+                      href={`/workspace/library/review/${encodeURIComponent(item.resourceId)}`}
+                      className={linkAccentTightSm}
+                    >
+                      {resourceReviewCopy(locale).write}
+                    </Link>
+                  </div>
                 </li>
               ))}
             </ol>
