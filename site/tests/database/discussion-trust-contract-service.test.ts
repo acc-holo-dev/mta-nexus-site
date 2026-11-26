@@ -13,9 +13,11 @@ vi.mock("@nexus/db", () => ({
 }));
 
 import {
+  ownDiscussionDetailHref,
   ownDiscussionHref,
   ownDiscussionPageSchema,
   ownDiscussionSchema,
+  parseOwnDiscussionDetailQuery,
   parseOwnDiscussionQuery,
 } from "../../src/features/community/discussion-workspace-contract";
 import {
@@ -112,6 +114,16 @@ it("normalizes search and produces durable encoded navigation with exact cursor 
   expect(query?.cursor?.context).toMatch(/^[a-f0-9]{64}$/u);
   expect(parseOwnDiscussionQuery(new URLSearchParams("q=+Lua+"))?.query).toBe("Lua");
   expect(ownDiscussionHref({ query: "" })).toBe("/workspace/discussions");
+  expect(ownDiscussionDetailHref("cmt_a", { query: "Lua", availability: "unavailable" })).toBe(
+    "/workspace/discussions/cmt_a?q=Lua&availability=unavailable",
+  );
+  expect(
+    parseOwnDiscussionDetailQuery(new URLSearchParams("q=Lua&availability=unavailable")),
+  ).toEqual({
+    query: "Lua",
+    availability: "unavailable",
+  });
+  expect(parseOwnDiscussionDetailQuery(new URLSearchParams("q=Lua&cursor=x"))).toBeNull();
   expect(approvalPageHref("Writer", { type: "developer" }, "a&b")).toContain("cursor=a%26b");
 });
 it.each(["2026-02-30T00:00:00.123456Z", "2026-10-11T00:00:00Z", "2026-10-11T00:00:00.1234567Z"])(

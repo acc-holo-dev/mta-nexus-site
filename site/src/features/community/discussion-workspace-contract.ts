@@ -76,3 +76,18 @@ export function ownDiscussionHref(filters: OwnDiscussionQuery, cursor?: string |
   if (cursor) params.set("cursor", cursor);
   return `/workspace/discussions${params.size ? `?${params}` : ""}`;
 }
+
+export function ownDiscussionDetailHref(id: string, filters: OwnDiscussionQuery) {
+  const listHref = ownDiscussionHref({
+    query: filters.query,
+    ...(filters.availability ? { availability: filters.availability } : {}),
+  });
+  const queryStart = listHref.indexOf("?");
+  return `/workspace/discussions/${encodeURIComponent(id)}${queryStart >= 0 ? listHref.slice(queryStart) : ""}`;
+}
+export function parseOwnDiscussionDetailQuery(params: URLSearchParams) {
+  if ([...params.keys()].some((key) => key === "cursor")) return null;
+  const parsed = parseOwnDiscussionQuery(params);
+  if (!parsed) return null;
+  return { query: parsed.query, availability: parsed.availability };
+}

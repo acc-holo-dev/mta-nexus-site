@@ -12,9 +12,13 @@ import { DiscussionCommentActions } from "./discussion-comment-actions";
 export function OwnDiscussionDetail({
   initial,
   locale,
+  listHref = "/workspace/discussions",
+  recoveryHref,
 }: {
   initial: OwnDiscussion;
   locale: Locale;
+  listHref?: string;
+  recoveryHref?: string;
 }) {
   const copy = ownDiscussionCopy(locale),
     [comment, setComment] = useState(initial),
@@ -27,7 +31,7 @@ export function OwnDiscussionDetail({
         <p role="status" className={typeSmSuccess}>
           {copy.removed}
         </p>
-        <Link href="/workspace/discussions" className={linkAccentSm}>
+        <Link href={listHref} className={linkAccentSm}>
           {copy.back}
         </Link>
       </div>
@@ -85,7 +89,7 @@ export function OwnDiscussionDetail({
         locale={locale}
         disabled={pending}
         endpoint={`/api/workspace/discussions/${encodeURIComponent(comment.id)}`}
-        recoveryHref={`/workspace/discussions/${encodeURIComponent(comment.id)}`}
+        recoveryHref={recoveryHref ?? `/workspace/discussions/${encodeURIComponent(comment.id)}`}
         onPending={(value) => {
           setPending(value);
           if (value) setSaved(false);

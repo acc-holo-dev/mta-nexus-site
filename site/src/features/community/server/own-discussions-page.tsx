@@ -23,7 +23,11 @@ import {
   typeSpace1XsMuted,
   typeXsMuted,
 } from "../../shell/type-shell";
-import { ownDiscussionHref, parseOwnDiscussionQuery } from "../discussion-workspace-contract";
+import {
+  ownDiscussionDetailHref,
+  ownDiscussionHref,
+  parseOwnDiscussionQuery,
+} from "../discussion-workspace-contract";
 import { ownDiscussionCopy, ownDiscussionError } from "../discussion-workspace-copy";
 
 export async function ownDiscussionsMetadata() {
@@ -166,7 +170,11 @@ export async function OwnDiscussionsPage({
               <div className={typeFlexMinWrapGap3}>
                 <Link
                   prefetch={false}
-                  href={`/workspace/discussions/${encodeURIComponent(item.id)}`}
+                  href={
+                    filters
+                      ? ownDiscussionDetailHref(item.id, filters)
+                      : `/workspace/discussions/${encodeURIComponent(item.id)}`
+                  }
                   className={linkAccentSm}
                 >
                   {copy.open}
