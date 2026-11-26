@@ -236,34 +236,38 @@ export async function WalletWorkspaceScreen({
       : await walletPaymentService.listHeld(accountId, 20).catch(() => null);
   const orgSellerAccounts =
     available === null
-      ? []
-      : await walletPaymentService.listManageableOrganizationSellerAccounts(user).catch(() => []);
+      ? null
+      : await walletPaymentService.listManageableOrganizationSellerAccounts(user).catch(() => null);
   const withdrawEnabled = isWalletWithdrawEnabled();
-  const orgWalletSummaries = await Promise.all(
-    orgSellerAccounts.map(async (org) => {
-      const [orgAvailable, held, holds, orgTopUps, orgActivity, orgWithdrawals] = await Promise.all(
-        [
-          walletPaymentService.getAvailableBalance(org.accountId, currency).catch(() => null),
-          walletPaymentService.getHeldBalance(org.accountId, currency).catch(() => null),
-          walletPaymentService.listHeld(org.accountId, 20).catch(() => null),
-          walletPaymentService.listRecentTopUps(org.accountId, 20).catch(() => null),
-          walletPaymentService.listRecentActivity(org.accountId, currency, 20).catch(() => null),
-          withdrawEnabled
-            ? walletPaymentService.listRecentWithdrawals(org.accountId, 20).catch(() => null)
-            : Promise.resolve(null),
-        ],
-      );
-      return {
-        ...org,
-        available: orgAvailable,
-        held,
-        holds,
-        topUps: orgTopUps,
-        activity: orgActivity,
-        withdrawals: orgWithdrawals,
-      };
-    }),
-  );
+  const orgWalletSummaries =
+    orgSellerAccounts === null
+      ? []
+      : await Promise.all(
+          orgSellerAccounts.map(async (org) => {
+            const [orgAvailable, held, holds, orgTopUps, orgActivity, orgWithdrawals] =
+              await Promise.all([
+                walletPaymentService.getAvailableBalance(org.accountId, currency).catch(() => null),
+                walletPaymentService.getHeldBalance(org.accountId, currency).catch(() => null),
+                walletPaymentService.listHeld(org.accountId, 20).catch(() => null),
+                walletPaymentService.listRecentTopUps(org.accountId, 20).catch(() => null),
+                walletPaymentService
+                  .listRecentActivity(org.accountId, currency, 20)
+                  .catch(() => null),
+                withdrawEnabled
+                  ? walletPaymentService.listRecentWithdrawals(org.accountId, 20).catch(() => null)
+                  : Promise.resolve(null),
+              ]);
+            return {
+              ...org,
+              available: orgAvailable,
+              held,
+              holds,
+              topUps: orgTopUps,
+              activity: orgActivity,
+              withdrawals: orgWithdrawals,
+            };
+          }),
+        );
   const withdrawals =
     available === null || !withdrawEnabled
       ? null
@@ -444,7 +448,15 @@ export async function WalletWorkspaceScreen({
           {copy.heldNote}
         </p>
         {heldBalance === null || heldList === null ? (
-          <p className={typeXsMuted}>{copy.heldUnavailable}</p>
+          <ErrorState
+            title={copy.heldUnavailable}
+            description={copy.loadUnavailableHint}
+            action={
+              <Link href={returnPath} className={linkAccentSmRounded}>
+                {dictionary.errors.retry}
+              </Link>
+            }
+          />
         ) : (
           <>
             <dl className={typeSpace2Sm}>
@@ -484,7 +496,22 @@ export async function WalletWorkspaceScreen({
           </>
         )}
       </section>
-      {orgWalletSummaries.length > 0 ? (
+      {orgSellerAccounts === null ? (
+        <section className={panelSpace3P5} aria-labelledby="wallet-org-held-heading">
+          <h3 id="wallet-org-held-heading" className={typeSemiboldPrimary}>
+            {copy.heldOrg}
+          </h3>
+          <ErrorState
+            title={copy.loadUnavailable}
+            description={copy.loadUnavailableHint}
+            action={
+              <Link href={returnPath} className={linkAccentSmRounded}>
+                {dictionary.errors.retry}
+              </Link>
+            }
+          />
+        </section>
+      ) : orgWalletSummaries.length > 0 ? (
         <section className={panelSpace3P5} aria-labelledby="wallet-org-held-heading">
           <h3 id="wallet-org-held-heading" className={typeSemiboldPrimary}>
             {copy.heldOrg}
@@ -506,7 +533,15 @@ export async function WalletWorkspaceScreen({
                 <li key={org.organizationId}>
                   <p className={typeSemiboldPrimary}>{org.accountId}</p>
                   {org.available === null ? (
-                    <p className={typeXsMuted}>{copy.loadUnavailable}</p>
+                    <ErrorState
+                      title={copy.loadUnavailable}
+                      description={copy.loadUnavailableHint}
+                      action={
+                        <Link href={returnPath} className={linkAccentSmRounded}>
+                          {dictionary.errors.retry}
+                        </Link>
+                      }
+                    />
                   ) : (
                     <dl className={typeSpace2Sm}>
                       <div>
@@ -531,7 +566,15 @@ export async function WalletWorkspaceScreen({
                     rates={fxRates}
                   />
                   {org.topUps === null ? (
-                    <p className={typeXsMuted}>{copy.orgTopUpsUnavailable}</p>
+                    <ErrorState
+                      title={copy.orgTopUpsUnavailable}
+                      description={copy.loadUnavailableHint}
+                      action={
+                        <Link href={returnPath} className={linkAccentSmRounded}>
+                          {dictionary.errors.retry}
+                        </Link>
+                      }
+                    />
                   ) : orgRecentTopUps.length === 0 ? (
                     <EmptyState title={copy.orgTopUpsEmpty} description={copy.orgTopUpNote} />
                   ) : (
@@ -572,7 +615,15 @@ export async function WalletWorkspaceScreen({
                     </ul>
                   )}
                   {org.held === null || org.holds === null ? (
-                    <p className={typeXsMuted}>{copy.heldUnavailable}</p>
+                    <ErrorState
+                      title={copy.heldUnavailable}
+                      description={copy.loadUnavailableHint}
+                      action={
+                        <Link href={returnPath} className={linkAccentSmRounded}>
+                          {dictionary.errors.retry}
+                        </Link>
+                      }
+                    />
                   ) : holds.length === 0 ? (
                     <EmptyState title={copy.heldOrgEmpty} description={copy.heldOrgEmptyHint} />
                   ) : (
@@ -614,7 +665,15 @@ export async function WalletWorkspaceScreen({
                   />
                   <h4 className={typeSemiboldPrimary}>{copy.orgActivity}</h4>
                   {org.activity === null ? (
-                    <p className={typeXsMuted}>{copy.orgActivityUnavailable}</p>
+                    <ErrorState
+                      title={copy.orgActivityUnavailable}
+                      description={copy.loadUnavailableHint}
+                      action={
+                        <Link href={returnPath} className={linkAccentSmRounded}>
+                          {dictionary.errors.retry}
+                        </Link>
+                      }
+                    />
                   ) : org.activity.length === 0 ? (
                     <EmptyState
                       title={copy.orgActivityEmpty}
@@ -654,7 +713,15 @@ export async function WalletWorkspaceScreen({
                         rates={fxRates}
                       />
                       {org.withdrawals === null ? (
-                        <p className={typeXsMuted}>{copy.withdrawalsUnavailable}</p>
+                        <ErrorState
+                          title={copy.withdrawalsUnavailable}
+                          description={copy.loadUnavailableHint}
+                          action={
+                            <Link href={returnPath} className={linkAccentSmRounded}>
+                              {dictionary.errors.retry}
+                            </Link>
+                          }
+                        />
                       ) : orgRecentWithdrawals.length === 0 ? (
                         <EmptyState
                           title={copy.orgWithdrawalsEmpty}
@@ -716,7 +783,15 @@ export async function WalletWorkspaceScreen({
           </p>
           <WalletWithdrawForm actorId={user.id} currency={currency} rates={fxRates} />
           {withdrawals === null ? (
-            <p className={typeXsMuted}>{copy.withdrawalsUnavailable}</p>
+            <ErrorState
+              title={copy.withdrawalsUnavailable}
+              description={copy.loadUnavailableHint}
+              action={
+                <Link href={returnPath} className={linkAccentSmRounded}>
+                  {dictionary.errors.retry}
+                </Link>
+              }
+            />
           ) : recentWithdrawals.length === 0 ? (
             <EmptyState title={copy.withdrawalsEmpty} description={copy.withdrawalsNote} />
           ) : (
@@ -755,7 +830,15 @@ export async function WalletWorkspaceScreen({
           {copy.activity}
         </h3>
         {activity === null ? (
-          <p className={typeXsMuted}>{copy.activityUnavailable}</p>
+          <ErrorState
+            title={copy.activityUnavailable}
+            description={copy.loadUnavailableHint}
+            action={
+              <Link href={returnPath} className={linkAccentSmRounded}>
+                {dictionary.errors.retry}
+              </Link>
+            }
+          />
         ) : activity.length === 0 ? (
           <EmptyState title={copy.activityEmpty} description={copy.activityEmptyHint} />
         ) : (
@@ -787,7 +870,15 @@ export async function WalletWorkspaceScreen({
           {copy.history}
         </h3>
         {history === null ? (
-          <p className={typeXsMuted}>{copy.historyUnavailable}</p>
+          <ErrorState
+            title={copy.historyUnavailable}
+            description={copy.loadUnavailableHint}
+            action={
+              <Link href={returnPath} className={linkAccentSmRounded}>
+                {dictionary.errors.retry}
+              </Link>
+            }
+          />
         ) : recent.length === 0 ? (
           <EmptyState title={copy.historyEmpty} description={copy.historyEmptyHint} />
         ) : (

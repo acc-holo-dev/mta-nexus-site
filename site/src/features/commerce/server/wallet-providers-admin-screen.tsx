@@ -4,10 +4,12 @@ import type {
   TopUpIntent,
   WithdrawalIntent,
 } from "@nexus/domain";
+import { ErrorState } from "@nexus/ui";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import {
@@ -37,6 +39,7 @@ import { WalletAdminBatchForm } from "../wallet-admin-ops";
 import { getWalletCopy } from "../wallet-i18n";
 
 const walletPaymentService = new WalletPaymentService();
+const providersAdminRetryHref = "/admin/commerce/wallet-providers";
 
 function ProviderAmountEstimate({
   amount,
@@ -103,6 +106,7 @@ export async function walletProvidersAdminMetadata(): Promise<Metadata> {
 export async function WalletProvidersAdminScreen() {
   const [locale, store] = await Promise.all([getRequestLocale(), cookies()]);
   const copy = getWalletCopy(locale);
+  const dictionary = getDictionary(locale);
   let user: Awaited<ReturnType<typeof authService.getSession>>;
   try {
     user = await authService.getSession(store.get("nexus_session")?.value);
@@ -112,12 +116,12 @@ export async function WalletProvidersAdminScreen() {
         locale={locale}
         title={copy.providersAdminTitle}
         message={copy.loadUnavailable}
-        retryHref="/admin/commerce/wallet-providers"
+        retryHref={providersAdminRetryHref}
       />
     );
   }
   if (!user) {
-    return <PlatformSignIn locale={locale} returnPath="/admin/commerce/wallet-providers" />;
+    return <PlatformSignIn locale={locale} returnPath={providersAdminRetryHref} />;
   }
   if (user.role !== "admin") notFound();
 
@@ -237,9 +241,15 @@ export async function WalletProvidersAdminScreen() {
                   {copy.providersAdminHoldsPreviewNote}
                 </p>
                 {eligibleHolds === null ? (
-                  <p role="note" className={typeSmMuted}>
-                    {copy.providersAdminHoldsPreviewUnavailable}
-                  </p>
+                  <ErrorState
+                    title={copy.providersAdminHoldsPreviewUnavailable}
+                    description={copy.loadUnavailableHint}
+                    action={
+                      <Link href={providersAdminRetryHref} className={linkAccentSmRounded}>
+                        {dictionary.errors.retry}
+                      </Link>
+                    }
+                  />
                 ) : eligibleHolds.length ? (
                   <ul className={typeSpace2Sm}>
                     {eligibleHolds.map((hold) => (
@@ -288,9 +298,15 @@ export async function WalletProvidersAdminScreen() {
                   {copy.providersAdminTopupPreviewNote}
                 </p>
                 {eligibleTopups === null ? (
-                  <p role="note" className={typeSmMuted}>
-                    {copy.providersAdminTopupPreviewUnavailable}
-                  </p>
+                  <ErrorState
+                    title={copy.providersAdminTopupPreviewUnavailable}
+                    description={copy.loadUnavailableHint}
+                    action={
+                      <Link href={providersAdminRetryHref} className={linkAccentSmRounded}>
+                        {dictionary.errors.retry}
+                      </Link>
+                    }
+                  />
                 ) : eligibleTopups.length ? (
                   <ul className={typeSpace2Sm}>
                     {eligibleTopups.map((intent) => (
@@ -339,9 +355,15 @@ export async function WalletProvidersAdminScreen() {
                   {copy.providersAdminUnpaidPreviewNote}
                 </p>
                 {eligibleUnpaidOrders === null ? (
-                  <p role="note" className={typeSmMuted}>
-                    {copy.providersAdminUnpaidPreviewUnavailable}
-                  </p>
+                  <ErrorState
+                    title={copy.providersAdminUnpaidPreviewUnavailable}
+                    description={copy.loadUnavailableHint}
+                    action={
+                      <Link href={providersAdminRetryHref} className={linkAccentSmRounded}>
+                        {dictionary.errors.retry}
+                      </Link>
+                    }
+                  />
                 ) : eligibleUnpaidOrders.length ? (
                   <ul className={typeSpace2Sm}>
                     {eligibleUnpaidOrders.map((order) => (
@@ -396,9 +418,15 @@ export async function WalletProvidersAdminScreen() {
                       {copy.providersAdminWithdrawPreviewNote}
                     </p>
                     {eligibleWithdrawals === null ? (
-                      <p role="note" className={typeSmMuted}>
-                        {copy.providersAdminWithdrawPreviewUnavailable}
-                      </p>
+                      <ErrorState
+                        title={copy.providersAdminWithdrawPreviewUnavailable}
+                        description={copy.loadUnavailableHint}
+                        action={
+                          <Link href={providersAdminRetryHref} className={linkAccentSmRounded}>
+                            {dictionary.errors.retry}
+                          </Link>
+                        }
+                      />
                     ) : eligibleWithdrawals.length ? (
                       <ul className={typeSpace2Sm}>
                         {eligibleWithdrawals.map((intent) => (
@@ -443,9 +471,15 @@ export async function WalletProvidersAdminScreen() {
                 {copy.providersAdminIntentsNote}
               </p>
               {intentsUnavailable ? (
-                <p role="note" className={typeSmMuted}>
-                  {copy.providersAdminIntentsUnavailable}
-                </p>
+                <ErrorState
+                  title={copy.providersAdminIntentsUnavailable}
+                  description={copy.loadUnavailableHint}
+                  action={
+                    <Link href={providersAdminRetryHref} className={linkAccentSmRounded}>
+                      {dictionary.errors.retry}
+                    </Link>
+                  }
+                />
               ) : (
                 <div className="grid gap-4">
                   <section className={panelSpace3P5} aria-labelledby="wallet-admin-topups-heading">
