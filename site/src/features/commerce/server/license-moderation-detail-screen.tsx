@@ -12,9 +12,17 @@ import { PlatformSignIn } from "../../shell/guest-auth";
 import { linkAccentSmRounded } from "../../shell/link-shell";
 import { pageShellMax4xl } from "../../shell/page-shell";
 import { PlatformSessionError } from "../../shell/session-error";
+import {
+  licenseModerationDetailHref,
+  licenseModerationListHref,
+  licenseModerationQuery,
+} from "../license-archive-query";
 import { getLicenseControlCopy } from "../license-control-i18n";
 import { LicenseControlPanel } from "../license-controls";
 import { LicenseDetailView } from "../license-detail";
+
+type Query = Record<string, string | string[] | undefined>;
+
 export async function licenseModerationDetailMetadata(): Promise<Metadata> {
   return {
     title: `${getLicenseControlCopy(await getRequestLocale()).moderation} | MTA NEXUS`,
@@ -24,13 +32,22 @@ export async function licenseModerationDetailMetadata(): Promise<Metadata> {
 
 export async function LicenseModerationDetailScreen({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<Query>;
 }) {
-  const [store, locale, { id }] = await Promise.all([cookies(), getRequestLocale(), params]);
+  const [store, locale, { id }, query] = await Promise.all([
+    cookies(),
+    getRequestLocale(),
+    params,
+    searchParams,
+  ]);
   const copy = getLicenseControlCopy(locale);
   const dictionary = getDictionary(locale);
-  const retryHref = `/admin/licenses/${encodeURIComponent(id)}`;
+  const filters = licenseModerationQuery(query);
+  const listHref = licenseModerationListHref(filters);
+  const retryHref = licenseModerationDetailHref(id, filters);
   let user: Awaited<ReturnType<typeof authService.getSession>>;
   try {
     user = await authService.getSession(store.get("nexus_session")?.value);
@@ -40,15 +57,12 @@ export async function LicenseModerationDetailScreen({
         locale={locale}
         title={dictionary.errors.title}
         message={copy.loadUnavailable}
-        retryHref={"/admin/licenses/"}
+        retryHref={listHref}
       />
     );
   }
 
-  if (!user)
-    return (
-      <PlatformSignIn locale={locale} returnPath={`/admin/licenses/${encodeURIComponent(id)}`} />
-    );
+  if (!user) return <PlatformSignIn locale={locale} returnPath={retryHref} />;
   if (!can(user, "admin.moderation")) notFound();
   let license: Awaited<ReturnType<typeof licenseControlService.moderationDetail>> = null;
   try {
@@ -56,7 +70,7 @@ export async function LicenseModerationDetailScreen({
   } catch {
     return (
       <div className={pageShellMax4xl}>
-        <Link href="/admin/licenses" className={linkAccentSmRounded}>
+        <Link href={listHref} className={linkAccentSmRounded}>
           {copy.moderation}
         </Link>
         <ErrorState
@@ -74,7 +88,7 @@ export async function LicenseModerationDetailScreen({
   if (!license) notFound();
   return (
     <div className={pageShellMax4xl}>
-      <Link href="/admin/licenses" className={linkAccentSmRounded}>
+      <Link href={listHref} className={linkAccentSmRounded}>
         {copy.moderation}
       </Link>
       <LicenseDetailView license={license} locale={locale} />

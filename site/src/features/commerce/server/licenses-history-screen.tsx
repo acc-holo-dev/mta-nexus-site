@@ -30,7 +30,11 @@ import {
   licenseStatusLabel,
 } from "../commerce-history-format";
 import { commerceHistoryBetaNotice, getCommerceHistoryCopy } from "../commerce-history-i18n";
-import { licenseArchiveQuery, licenseArchiveUrl } from "../license-archive-query";
+import {
+  licenseArchiveDetailHref,
+  licenseArchiveQuery,
+  licenseArchiveUrl,
+} from "../license-archive-query";
 import { getLicenseControlCopy } from "../license-control-i18n";
 import { getLicenseMaintenanceCopy } from "../license-maintenance-i18n";
 import { getWalletCopy } from "../wallet-i18n";
@@ -205,7 +209,10 @@ export async function LicensesHistoryScreen({ query }: { query: Query }) {
                     </dd>
                   </div>
                 </dl>
-                <Link href={`/workspace/licenses/${license.id}`} className={linkAccentSmRounded}>
+                <Link
+                  href={licenseArchiveDetailHref(license.id, filters)}
+                  className={linkAccentSmRounded}
+                >
                   {control.manage}
                 </Link>
               </li>

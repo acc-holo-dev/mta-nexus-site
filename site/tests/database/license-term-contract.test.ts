@@ -2,8 +2,14 @@ import { expect, it } from "vitest";
 import { licenseMaintenanceOptions } from "../../packages/db/src/license-maintenance-config";
 import { licenseArchiveCsv } from "../../src/features/commerce/license-archive-csv";
 import {
+  licenseArchiveDetailHref,
+  licenseArchiveListHref,
+  licenseArchivePageQuery,
   licenseArchiveQuery,
   licenseArchiveUrl,
+  licenseModerationDetailHref,
+  licenseModerationListHref,
+  licenseModerationQuery,
 } from "../../src/features/commerce/license-archive-query";
 import { licenseTermNotification } from "../../src/features/commerce/license-maintenance-i18n";
 import { formatNotification } from "../../src/features/notifications/notification-copy";
@@ -30,6 +36,43 @@ it("strictly bounds buyer queries and preserves every active filter in navigatio
     "q=%00",
   ])
     expect(() => licenseArchiveQuery(new URLSearchParams(text))).toThrow();
+});
+it("keeps license archive filters on the detail link and the list return", () => {
+  const filters = licenseArchivePageQuery({
+    page: "2",
+    status: "expiring",
+    binding: "bound",
+    term: "finite",
+    sort: "expires_soon",
+    q: "alpha",
+  });
+  expect(licenseArchiveDetailHref("lic_a", filters)).toBe(
+    "/workspace/licenses/lic_a?page=2&status=expiring&binding=bound&term=finite&sort=expires_soon&q=alpha",
+  );
+  expect(licenseArchiveListHref(filters)).toBe(
+    "/workspace/licenses?page=2&status=expiring&binding=bound&term=finite&sort=expires_soon&q=alpha",
+  );
+  expect(
+    licenseArchivePageQuery(
+      Object.fromEntries(
+        new URL(licenseArchiveDetailHref("lic_a", filters), "https://nexus.test").searchParams,
+      ),
+    ),
+  ).toEqual(filters);
+});
+it("keeps license moderation filters on the detail link and the list return", () => {
+  const filters = licenseModerationQuery({ page: "3", status: "suspended", q: "beta" });
+  expect(licenseModerationDetailHref("lic_b", filters)).toBe(
+    "/admin/licenses/lic_b?page=3&status=suspended&q=beta",
+  );
+  expect(licenseModerationListHref(filters)).toBe("/admin/licenses?page=3&status=suspended&q=beta");
+  expect(
+    licenseModerationQuery(
+      Object.fromEntries(
+        new URL(licenseModerationDetailHref("lic_b", filters), "https://nexus.test").searchParams,
+      ),
+    ),
+  ).toEqual(filters);
 });
 it("exports only the displayed safe projection and neutralizes spreadsheet formula cells", () => {
   const date = new Date("2026-10-11T04:00:00.000Z");

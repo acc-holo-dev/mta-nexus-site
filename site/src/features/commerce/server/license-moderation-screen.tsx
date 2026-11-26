@@ -26,9 +26,13 @@ import {
   effectiveLicenseStatus,
   formatHistoryDate,
   licenseStatusLabel,
-  parseHistoryPage,
 } from "../commerce-history-format";
 import { getCommerceHistoryCopy } from "../commerce-history-i18n";
+import {
+  licenseModerationDetailHref,
+  licenseModerationListHref,
+  licenseModerationQuery,
+} from "../license-archive-query";
 import { getLicenseControlCopy } from "../license-control-i18n";
 import { getLicenseMaintenanceCopy } from "../license-maintenance-i18n";
 
@@ -64,21 +68,10 @@ export async function LicenseModerationScreen({
   const copy = getLicenseControlCopy(locale);
   const history = getCommerceHistoryCopy(locale);
   const dictionary = getDictionary(locale);
-  const status =
-    typeof query.status === "string" && Object.hasOwn(history.licenseStatuses, query.status)
-      ? query.status
-      : "";
-  const text = typeof query.q === "string" ? query.q.trim().slice(0, 120) : "";
-  const pageNumber = Math.min(parseHistoryPage(query.page), 1000);
+  const filters = licenseModerationQuery(query);
+  const { status, q: text, page: pageNumber } = filters;
   const filtersActive = Boolean(status || text);
-  const returnHref = (() => {
-    const params = new URLSearchParams({
-      ...(status ? { status } : {}),
-      ...(text ? { q: text } : {}),
-      ...(pageNumber > 1 ? { page: String(pageNumber) } : {}),
-    });
-    return params.size ? `/admin/licenses?${params}` : "/admin/licenses";
-  })();
+  const returnHref = licenseModerationListHref(filters);
   let forbidden = false;
   const result = await licenseControlService
     .moderationPage(user, pageNumber, status, text)
@@ -90,12 +83,7 @@ export async function LicenseModerationScreen({
       return null;
     });
   if (forbidden) notFound();
-  const href = (page: number) =>
-    `/admin/licenses?${new URLSearchParams({
-      ...(status ? { status } : {}),
-      ...(text ? { q: text } : {}),
-      page: String(page),
-    })}`;
+  const href = (page: number) => licenseModerationListHref({ ...filters, page });
 
   if (!result) {
     return (
@@ -173,7 +161,10 @@ export async function LicenseModerationScreen({
                 )}{" "}
                 · {license.expiresAt ? formatHistoryDate(license.expiresAt, locale) : history.never}
               </p>
-              <Link href={`/admin/licenses/${license.id}`} className={linkAccentSm}>
+              <Link
+                href={licenseModerationDetailHref(license.id, filters)}
+                className={linkAccentSm}
+              >
                 {copy.manage} · {license.id}
               </Link>
             </li>
