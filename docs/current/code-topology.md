@@ -53,7 +53,7 @@ site/
 | ------------- | ----: | -----: |
 | accounts      |    92 | 243632 |
 | commerce      |   208 | 877377 |
-| community     |   155 | 644826 |
+| community     |   155 | 644841 |
 | discovery     |    22 |  50639 |
 | library       |   124 | 526623 |
 | moderation    |    56 | 223309 |
