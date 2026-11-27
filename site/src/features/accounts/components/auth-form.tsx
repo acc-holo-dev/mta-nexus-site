@@ -20,35 +20,30 @@ import { authRegisterApiCopy } from "../auth-register-api-copy";
 
 type AuthMode = "login" | "register";
 
-function responseError(
+/**
+ * Map auth API failures onto the locale copy.
+ * Raw Zod text is English, and password field messages must not be repeated.
+ */
+export function authFormResponseError(
   value: unknown,
   locale: Locale,
   registering: boolean,
   fallback: string,
 ): string {
   if (!value || typeof value !== "object") return fallback;
-  const data = value as {
-    code?: unknown;
-    details?: Record<string, { _errors?: unknown }>;
-  };
-  const fieldErrors = ["email", "username", "password", "displayName"].flatMap((field) => {
-    const errors = data.details?.[field]?._errors;
-    return Array.isArray(errors)
-      ? errors.filter((error): error is string => typeof error === "string")
-      : [];
-  });
-  if (fieldErrors.length) return fieldErrors.join(" ");
+  const code = (value as { code?: unknown }).code;
   if (registering) {
     const copy = authRegisterApiCopy(locale);
-    if (data.code === "RATE_LIMIT_EXCEEDED" || data.code === "RATE_LIMITED") return copy.rate;
-    if (data.code === "VALIDATION_ERROR") return copy.validationFailed;
-    if (data.code === "UNAUTHORIZED") return copy.unauthorized;
-    if (data.code === "CONFLICT") return copy.conflict;
+    if (code === "RATE_LIMIT_EXCEEDED" || code === "RATE_LIMITED") return copy.rate;
+    if (code === "VALIDATION_ERROR") return copy.validationFailed;
+    if (code === "UNAUTHORIZED") return copy.unauthorized;
+    if (code === "CONFLICT") return copy.conflict;
     return copy.failed || fallback;
   }
   const copy = authLoginApiCopy(locale);
-  if (data.code === "RATE_LIMIT_EXCEEDED" || data.code === "RATE_LIMITED") return copy.rate;
-  if (data.code === "UNAUTHORIZED" || data.code === "INVALID_CREDENTIALS") return copy.unauthorized;
+  if (code === "RATE_LIMIT_EXCEEDED" || code === "RATE_LIMITED") return copy.rate;
+  if (code === "VALIDATION_ERROR") return copy.invalidCredentials;
+  if (code === "UNAUTHORIZED" || code === "INVALID_CREDENTIALS") return copy.unauthorized;
   return copy.failed || fallback;
 }
 
@@ -100,7 +95,7 @@ export function AuthForm({
       });
       const data = await response.json().catch(() => null);
       if (!response.ok) {
-        setError(responseError(data, locale, registering, copy.genericError));
+        setError(authFormResponseError(data, locale, registering, copy.genericError));
         setLoading(false);
         return;
       }
