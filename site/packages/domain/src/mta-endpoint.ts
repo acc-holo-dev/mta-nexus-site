@@ -2,6 +2,16 @@
  * Resolve game-server hosts using the same browser/Node WHATWG URL parser.
  * The game port is always stored separately from the canonical host.
  */
+function dottedIpv4FromMapped(hostname: string): string | null {
+  // WHATWG serializes ::ffff:0:0/96 as [::ffff:hhhh:hhhh]. That prefix is the
+  // same 32-bit address as dotted IPv4, so both spellings must share one server.
+  const mapped = /^\[::ffff:([0-9a-f]{1,4}):([0-9a-f]{1,4})\]$/u.exec(hostname);
+  if (!mapped) return null;
+  const high = Number.parseInt(mapped[1], 16);
+  const low = Number.parseInt(mapped[2], 16);
+  return `${high >> 8}.${high & 0xff}.${low >> 8}.${low & 0xff}`;
+}
+
 function canonicalMtaHost(input: string): string | null {
   const trimmed = input.trim().toLowerCase();
   // A single terminal DNS dot is allowed; repeated dots are malformed.
@@ -25,7 +35,9 @@ function canonicalMtaHost(input: string): string | null {
     try {
       // URL verifies the entire IPv6 literal and compresses equivalent forms.
       const url = new URL(`http://${bracketed}/`);
-      return url.port === "" && /^\[[0-9a-f:.]+\]$/u.test(url.hostname) ? url.hostname : null;
+      const hostname = url.hostname;
+      if (url.port !== "" || !/^\[[0-9a-f:.]+\]$/u.test(hostname)) return null;
+      return dottedIpv4FromMapped(hostname) ?? hostname;
     } catch {
       return null;
     }
