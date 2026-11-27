@@ -1,7 +1,7 @@
 # Топология кода: AS-IS scoreboard и TO-BE читаемость
 
-**measured_at:** 24 ноября 2026 (Europe/Moscow).  
-**source_sha:** `0c02bcf2b` (`cursor/catalog-filter-keep-2e5e`, catalog search and filters stay in the URL).  
+**measured_at:** 27 ноября 2026 (Europe/Moscow).  
+**source_sha:** `d12737c35` (`cursor/record-audit-tasks-5dbf`, audit fixes through the IPv4-mapped address collapse).  
 **Машинный снимок:** [`planning/code-topology-counts.json`](../../planning/code-topology-counts.json).  
 **Регенерация:** `python3 planning/tools/inventory_code_topology.py --output planning/code-topology-counts.json`  
 **Проверка drift:** `python3 planning/tools/inventory_code_topology.py --check planning/code-topology-counts.json` (git-tracked counts; `source_sha` информативный)
@@ -31,7 +31,7 @@ site/
 
 ## Counts (HEAD inventory)
 
-| Область                    |            Факт на `0c02bcf2b` |
+| Область                    |            Факт на `d12737c35` |
 | -------------------------- | -----------------------------: |
 | `features/*` domains       |                             13 |
 | `components/` tree files   |                              0 |
@@ -42,7 +42,7 @@ site/
 | `lib/services/` root files |                              0 |
 | `lib/**/*-i18n.ts`         |                              0 |
 | `app/**/route.ts`          |                            305 |
-| `site/tests` files         |                           1782 |
+| `site/tests` files         |                           1789 |
 | `@nexus/ui` src files      |                             20 |
 | `@nexus/domain` src files  |                             59 |
 | `@nexus/db` src files      |                            208 |
@@ -51,15 +51,15 @@ site/
 
 | Feature       | files |  bytes |
 | ------------- | ----: | -----: |
-| accounts      |    92 | 243632 |
-| commerce      |   208 | 877377 |
-| community     |   155 | 644841 |
-| discovery     |    22 |  50639 |
-| library       |   124 | 526623 |
-| moderation    |    56 | 223309 |
+| accounts      |    92 | 244066 |
+| commerce      |   208 | 877945 |
+| community     |   155 | 644961 |
+| discovery     |    22 |  50623 |
+| library       |   124 | 527582 |
+| moderation    |    56 | 223639 |
 | notifications |    28 | 143879 |
 | organizations |    61 | 207432 |
-| resources     |   232 | 941698 |
+| resources     |   232 | 943266 |
 | servers       |   113 | 390853 |
 | shell         |   101 | 211348 |
 | support       |    30 | 123436 |
