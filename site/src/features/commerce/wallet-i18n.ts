@@ -854,6 +854,15 @@ export function getWalletCopy(locale: Locale) {
   return locale === "ru" ? copy.ru : copy.en;
 }
 
+export function walletIntentStatusLabel(locale: Locale, status: string) {
+  const copy = getWalletCopy(locale);
+  if (status === "awaiting_provider") return copy.statusAwaiting;
+  if (status === "succeeded") return copy.statusSucceeded;
+  if (status === "failed") return copy.statusFailed;
+  if (status === "cancelled") return copy.statusCancelled;
+  return copy.statusCreated;
+}
+
 export function walletError(locale: Locale, code: unknown): string {
   const table = getWalletCopy(locale).errors;
   return typeof code === "string" && Object.hasOwn(table, code)

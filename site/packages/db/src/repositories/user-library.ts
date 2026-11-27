@@ -122,20 +122,6 @@ export class UserLibraryRepository {
     const joined = sql`FROM owned LEFT JOIN ${products}
       ON ${products.id} = owned.resource_id
       LEFT JOIN ${selections} ON ${selections.productId} = owned.resource_id AND ${selections.userId} = ${userId}`;
-    const totals = await db.execute<CountRow>(sql`
-      ${sources}
-      SELECT count(*)::integer AS "all",
-        count(*) FILTER (WHERE ${ready})::integer AS "ready",
-        count(*) FILTER (WHERE NOT (${ready}))::integer AS "unavailable"
-      ${joined}
-    `);
-    const counts = {
-      all: Number(totals[0]?.all ?? 0),
-      ready: Number(totals[0]?.ready ?? 0),
-      unavailable: Number(totals[0]?.unavailable ?? 0),
-    };
-    const normalizedFilter: UserLibraryFilter =
-      filter === "ready" || filter === "unavailable" ? filter : "all";
     let needle = "";
     for (const char of query.trim()) {
       const code = char.codePointAt(0) ?? 0;
@@ -145,6 +131,21 @@ export class UserLibraryRepository {
     }
     const pattern = needle ? `%${needle.replace(/[\\%_]/g, (char) => `\\${char}`)}%` : "";
     const titleMatch = needle ? sql`${products.title} ILIKE ${pattern} ESCAPE '\\'` : sql`TRUE`;
+    const totals = await db.execute<CountRow>(sql`
+      ${sources}
+      SELECT count(*)::integer AS "all",
+        count(*) FILTER (WHERE ${ready})::integer AS "ready",
+        count(*) FILTER (WHERE NOT (${ready}))::integer AS "unavailable"
+      ${joined}
+      WHERE ${titleMatch}
+    `);
+    const counts = {
+      all: Number(totals[0]?.all ?? 0),
+      ready: Number(totals[0]?.ready ?? 0),
+      unavailable: Number(totals[0]?.unavailable ?? 0),
+    };
+    const normalizedFilter: UserLibraryFilter =
+      filter === "ready" || filter === "unavailable" ? filter : "all";
     const filterClause =
       normalizedFilter === "ready"
         ? sql`WHERE ${ready} AND ${titleMatch}`

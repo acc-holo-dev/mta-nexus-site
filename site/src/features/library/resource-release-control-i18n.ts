@@ -260,6 +260,34 @@ export function resourceStatusLabel(locale: Locale, status: string) {
   );
   return known ? localized[known] : localized.unknown;
 }
+const buildStatusLabels = {
+  en: {
+    draft: "Draft",
+    testing: "Testing",
+    pending_review: "Pending review",
+    published: "Published",
+    quarantined: "Quarantined",
+    retired: "Retired",
+    suspended: "Suspended",
+    archived: "Archived",
+  },
+  ru: {
+    draft: "Черновик",
+    testing: "Тестирование",
+    pending_review: "На проверке",
+    published: "Опубликована",
+    quarantined: "На карантине",
+    retired: "Снята",
+    suspended: "Приостановлена",
+    archived: "В архиве",
+  },
+} as const;
+export function resourceBuildStatusLabel(locale: Locale, status: string) {
+  const labels = locale === "ru" ? buildStatusLabels.ru : buildStatusLabels.en;
+  return Object.hasOwn(labels, status)
+    ? labels[status as keyof typeof labels]
+    : resourceStatusLabel(locale, status);
+}
 export function resourceReleaseControlError(locale: Locale, code: unknown) {
   const errors = getResourceReleaseControlCopy(locale).errors;
   return typeof code === "string" && Object.hasOwn(errors, code)

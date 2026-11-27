@@ -15,6 +15,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { privateApiRequest } from "../../../lib/http/private-api-request";
+import {
+  resourceBuildStatusLabel,
+  resourceStatusLabel,
+} from "../../library/resource-release-control-i18n";
 import { ActionConfirmCheckbox } from "../../shell/action-confirm-checkbox";
 import { confirmAction } from "../../shell/confirm-action";
 import { linkAccentSm } from "../../shell/link-shell";
@@ -170,13 +174,13 @@ export function ResourceLifecycleControls({
       <dl className={typeGridGap2SmSecondarySm2}>
         <div>
           <dt className={typeLabelUpperMuted}>{copy.resourceStatus}</dt>
-          <dd className="text-primary">{product.status}</dd>
+          <dd className="text-primary">{resourceStatusLabel(locale, product.status)}</dd>
         </div>
         <div>
           <dt className={typeLabelUpperMuted}>{copy.selectedBuild}</dt>
           <dd className="text-primary">
             {selectedBuild
-              ? `${selectedBuild.version ?? selectedBuild.id} · ${selectedBuild.status}`
+              ? `${selectedBuild.version ?? selectedBuild.id} · ${resourceBuildStatusLabel(locale, selectedBuild.status)}`
               : copy.noneSelected}
           </dd>
         </div>

@@ -146,7 +146,7 @@ export function LicenseRuntimeProbe({
         <p role="status" aria-live="polite" className={typeSmMuted}>
           {copy.releaseLoading}
         </p>
-      ) : context?.items.length ? (
+      ) : context && context.items.length > 0 ? (
         <>
           <label className={typeBlockSm}>
             <span>{copy.release}</span>
@@ -204,9 +204,9 @@ export function LicenseRuntimeProbe({
             </div>
           )}
         </>
-      ) : (
+      ) : context && context.items.length === 0 && !error ? (
         <EmptyState title={copy.releaseEmpty} description={copy.formErrorHint} />
-      )}
+      ) : null}
       {command && (
         <label className="block space-y-1 text-sm">
           <span>{copy.requestBody}</span>

@@ -11,8 +11,9 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getDictionary } from "../../../lib/i18n";
+import { getDictionary, type Locale } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n/server";
+import { unknownMarker } from "../../../lib/i18n/unknown";
 import { authService } from "../../../lib/services/accounts/auth-service";
 import { commerceService } from "../../../lib/services/commerce/commerce-service";
 import { productService } from "../../../lib/services/commerce/product-service";
@@ -25,8 +26,8 @@ import { resourceQaService } from "../../../lib/services/resources/resource-qa-s
 import { resourceReleaseWatchesService } from "../../../lib/services/resources/resource-release-watches-service";
 import { resourceReviewService } from "../../../lib/services/resources/resource-review-service";
 import { formatHistoryAmount } from "../../commerce/commerce-history-format";
-import { RecordedRateEstimate } from "../../commerce/recorded-rate-estimate";
 import { licenseModelLabel } from "../../commerce/license-model-i18n";
+import { RecordedRateEstimate } from "../../commerce/recorded-rate-estimate";
 import { WalletCheckoutButton } from "../../commerce/wallet-checkout";
 import { FollowButton } from "../../community/follow";
 import { ObjectReportForm } from "../../moderation/object-report";
@@ -71,11 +72,10 @@ import { safeResourceImageUrl } from "../resource-image-url";
 import { resourceReleaseWatchesCopy } from "../resource-release-watches-i18n";
 import { resourceReviewCopy } from "../resource-review-i18n";
 
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024 * 1024) {
-    return `${Math.max(1, Math.round(bytes / 1024))} KB`;
-  }
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+function formatFileSize(bytes: number, locale: Locale): string {
+  if (!Number.isSafeInteger(bytes) || bytes <= 0) return unknownMarker(locale);
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.ceil(bytes / 1024))} KiB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MiB`;
 }
 
 function formatScanStatus(
@@ -718,7 +718,8 @@ export async function ProductDetailPage({
                         {copy.file}: {build.fileName}
                       </span>
                       <span>
-                        {copy.size}: {formatFileSize(build.fileSizeBytes)}
+                        {copy.size}:{" "}
+                        {formatFileSize(build.fileSizeBytes, locale === "ru" ? "ru" : "en")}
                       </span>
                       <span>
                         {copy.mtaVersion}:{" "}
