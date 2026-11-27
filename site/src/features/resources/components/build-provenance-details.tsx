@@ -17,6 +17,33 @@ const toneClass = {
   danger: "border-[color:var(--nexus-danger)]/20 bg-danger-soft text-danger",
 } as const;
 
+type Dictionary = ReturnType<typeof getDictionary>;
+
+/** Locale label for a build status. Unknown values stay raw; underscores are not rewritten. */
+function publicationLabel(status: string, dictionary: Dictionary): string {
+  const product = dictionary.product;
+  switch (status) {
+    case "draft":
+      return product.buildDraft;
+    case "testing":
+      return product.buildTesting;
+    case "pending_review":
+      return product.buildPendingReview;
+    case "published":
+      return product.buildPublished;
+    case "rejected":
+      return product.buildRejected;
+    case "deprecated":
+      return product.buildDeprecated;
+    case "retired":
+      return product.buildRetired;
+    case "quarantined":
+      return dictionary.authorResources.buildLabels.quarantined;
+    default:
+      return status;
+  }
+}
+
 /** Accepts domain Builds and public/library projections (nullables from SQL). */
 export type BuildProvenanceDetailsBuild = {
   status: string;
@@ -40,10 +67,11 @@ export function BuildProvenanceDetails({
   build: BuildProvenanceDetailsBuild;
   locale?: Locale;
 }) {
-  const copy = getDictionary(locale).provenance;
+  const dictionary = getDictionary(locale);
+  const copy = dictionary.provenance;
   const provenance = getBuildProvenance(build);
   const numberLocale = locale === "ru" ? "ru-RU" : "en-US";
-  const publicationState = build.status.replace(/_/g, " ");
+  const publicationState = publicationLabel(build.status, dictionary);
 
   const scanLabel =
     provenance.scanStatus === "clean"
