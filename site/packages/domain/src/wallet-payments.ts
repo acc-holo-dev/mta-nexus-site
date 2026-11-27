@@ -988,9 +988,31 @@ export function buildWalletHoldReleasePosting(input: {
   return entries;
 }
 
+/** Local/CI constant. It is not a production webhook credential. */
+const LOCAL_STUB_WEBHOOK_SIGNATURE = "stub-ok";
+
+function rejectStubWebhookSignature(): never {
+  throw new AppError("Stub webhook signature rejected", 401, "STUB_WEBHOOK_UNAUTHORIZED");
+}
+
 /**
- * Stub provider: production-shaped port with no external network. Useful for
- * local/CI and as the only top-up adapter until real PSP contracts exist.
+ * Reject `x-nexus-stub-signature: stub-ok` when NODE_ENV is production.
+ * Other provider webhooks do not use this header and stay unaffected.
+ */
+export function assertProductionStubSignatureRejected(signature: string | null | undefined): void {
+  if (process.env.NODE_ENV === "production" && signature === LOCAL_STUB_WEBHOOK_SIGNATURE) {
+    rejectStubWebhookSignature();
+  }
+}
+
+function assertLocalStubWebhookSignature(signature: string | undefined): void {
+  if (signature !== LOCAL_STUB_WEBHOOK_SIGNATURE) rejectStubWebhookSignature();
+}
+
+/**
+ * Stub provider for local and CI, with no external network.
+ * In production the constant signature is rejected, so this webhook cannot
+ * credit a top-up or close a payout.
  */
 export class StubPaymentProvider implements PaymentProviderPort {
   readonly id = "stub" as const;
@@ -1016,6 +1038,9 @@ export class StubPaymentProvider implements PaymentProviderPort {
   }
 
   async verifyWebhook(input: VerifyWebhookInput): Promise<VerifiedProviderEvent> {
+    const signature =
+      input.headers["x-nexus-stub-signature"] ?? input.headers["X-Nexus-Stub-Signature"];
+    assertProductionStubSignatureRejected(signature);
     let parsed: unknown;
     try {
       parsed = JSON.parse(input.rawBody) as unknown;
@@ -1026,11 +1051,7 @@ export class StubPaymentProvider implements PaymentProviderPort {
       throw new AppError("Stub webhook body is invalid", 400, "STUB_WEBHOOK_INVALID");
     }
     const body = parsed as Record<string, unknown>;
-    const signature =
-      input.headers["x-nexus-stub-signature"] ?? input.headers["X-Nexus-Stub-Signature"];
-    if (signature !== "stub-ok") {
-      throw new AppError("Stub webhook signature rejected", 401, "STUB_WEBHOOK_UNAUTHORIZED");
-    }
+    assertLocalStubWebhookSignature(signature);
     const kind = body.kind;
     const intentId = body.intentId;
     const amount = body.amount;

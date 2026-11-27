@@ -1,4 +1,10 @@
-import { AppError, RateLimitExceededError, UnauthorizedError, type User } from "@nexus/domain";
+import {
+  AppError,
+  assertProductionStubSignatureRejected,
+  RateLimitExceededError,
+  UnauthorizedError,
+  type User,
+} from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { requireServerJsonContentType } from "../../lib/http/bounded-json";
@@ -88,6 +94,7 @@ export async function walletWebhookRequest(
     });
   const codeBody = (code: string) => ({ code, error: walletError(locale, code) });
   try {
+    assertProductionStubSignatureRejected(request.headers.get("x-nexus-stub-signature"));
     requireWalletEngineEnabled();
     requireServerJsonContentType(request);
     if (!(await consumeRateLimit("resourceInspection", getTrustedRequestIp(request))).success) {
