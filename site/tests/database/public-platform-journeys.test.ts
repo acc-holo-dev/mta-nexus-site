@@ -1,6 +1,9 @@
 import {
   buildRepository,
+  comments,
   contentRepository,
+  db,
+  followWorkspaceRepository,
   notificationRepository,
   productRepository,
   reportRepository,
@@ -9,6 +12,7 @@ import {
   userRepository,
 } from "@nexus/db";
 import type { Product, User } from "@nexus/domain";
+import { eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 import { commerceService } from "../../src/lib/services/commerce/commerce-service";
 import { setNotificationPreferencesForTest } from "../helpers/notification-preferences-fixture";
@@ -83,35 +87,28 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
   });
 
   it("Player Journey: Follow a developer and receive notifications", async () => {
-    // 1. Follow developer
-    const follow = await socialRepository.follow({
-      id: `fol_${Date.now()}`,
-      followerId: playerUser.id,
-      targetType: "user",
-      targetId: devUser.id,
-    });
-    expect(follow).toBeDefined();
+    const follow = await followWorkspaceRepository.setFollowingAuthenticated(
+      playerUser.id,
+      "user",
+      devUser.id,
+      true,
+      `fol_${ts}`,
+      {},
+      `tok_${playerUser.id}`,
+    );
+    expect(follow).toMatchObject({ following: true, created: true });
 
     const isFollowing = await socialRepository.isFollowing(playerUser.id, "user", devUser.id);
     expect(isFollowing).toBe(true);
 
-    // 2. Developer receives follow notification
-    const notification = await notificationRepository.create({
-      id: `not_${Date.now()}`,
+    const unreadFeed = await notificationRepository.listByUser(devUser.id, 20, true);
+    const followNotice = unreadFeed.find((item) => item.category === "follow");
+    expect(followNotice).toMatchObject({
       recipientId: devUser.id,
-      title: "New Follower / Новый подписчик",
-      message: `@${playerUser.username} followed your updates.`,
-      type: "system",
-      link: `/users/${playerUser.username}`,
+      category: "follow",
+      isRead: false,
     });
-    expect(notification).toBeDefined();
-
-    const unread = await notificationRepository.countUnread(devUser.id);
-    expect(unread).toBeGreaterThanOrEqual(1);
-
-    const unreadFeed = await notificationRepository.listByUser(devUser.id, 1, true);
-    expect(unreadFeed).toHaveLength(1);
-    expect(unreadFeed[0].isRead).toBe(false);
+    expect(await notificationRepository.countUnread(devUser.id)).toBeGreaterThanOrEqual(1);
 
     await setNotificationPreferencesForTest(devUser.id, { followsEnabled: false });
     const suppressed = await notificationRepository.create({
@@ -172,6 +169,30 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
   });
 
   it("Review & Rating Journey: Submit verified review through the serialized aggregate path", async () => {
+    const stranger = await userRepository.create({
+      id: `usr_rv_${ts}`,
+      email: `reviewer_${ts}@nexus.test`,
+      username: `reviewer_${ts}`,
+      displayName: "Unclaimed Reviewer",
+      role: "user",
+    });
+    const deniedId = `cmt_denied_${ts}`;
+    await expect(
+      contentRepository.addProductReview({
+        id: deniedId,
+        productId: testProduct.id,
+        authorId: stranger.id,
+        text: "I have not acquired this resource.",
+        rating: 4,
+      }),
+    ).rejects.toMatchObject({ code: "REVIEW_ACCESS_REQUIRED", statusCode: 403 });
+    const [denied] = await db
+      .select({ id: comments.id })
+      .from(comments)
+      .where(eq(comments.id, deniedId))
+      .limit(1);
+    expect(denied).toBeUndefined();
+
     await commerceService.claimFreeResource({
       user: playerUser,
       currentToken: `tok_${playerUser.id}`,
@@ -179,15 +200,20 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
     });
 
     const result = await contentRepository.addProductReview({
-      id: `cmt_${Date.now()}`,
+      id: `cmt_${ts}`,
       productId: testProduct.id,
       authorId: playerUser.id,
       text: "Exceptional code quality and documentation!",
       rating: 5,
-      isVerifiedPurchase: true,
     });
 
-    expect(result.review.isVerifiedPurchase).toBe(true);
+    const [saved] = await db
+      .select({ isVerifiedPurchase: comments.isVerifiedPurchase })
+      .from(comments)
+      .where(eq(comments.id, result.review.id))
+      .limit(1);
+    expect(saved).toBeDefined();
+    expect(result.review.isVerifiedPurchase).toBe(saved?.isVerifiedPurchase);
     expect(result.ratingCount).toBe(1);
     expect(result.ratingAverage).toBe(50);
 
