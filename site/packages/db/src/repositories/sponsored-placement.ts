@@ -24,11 +24,14 @@ import { adPlacements, adSlots, auditEvents, products, servers } from "../schema
  * Every lifecycle move goes through assertAdPlacementTransition; capacity and
  * eligibility are re-checked at transition and at serve time, never inferred
  * from stored state. Management operations require an admin operator. Pausing
- * and rejecting always carry a reason and write an audit event.
+ * and rejecting always carry a reason and write an audit event. The status
+ * change and that audit event commit in the same transaction.
  */
 export type AdActor = { id: string; isAdmin: boolean };
 
 const activeStatuses: AdPlacementStatus[] = ["scheduled", "live", "paused"];
+
+type AdExecutor = Pick<typeof db, "select" | "update" | "insert">;
 
 function requireOperator(actor: AdActor): void {
   if (!actor.isAdmin) {
@@ -54,17 +57,11 @@ export class AdPlacementRepository {
   }
 
   async activeCount(slotId: string): Promise<number> {
-    const [row] = await db
-      .select({ n: count() })
-      .from(adPlacements)
-      .where(and(eq(adPlacements.slotId, slotId), inArray(adPlacements.status, activeStatuses)));
-    return Number(row?.n ?? 0);
+    return this.countActive(db, slotId);
   }
 
   async placement(id: string): Promise<AdPlacementPlan> {
-    const [row] = await db.select().from(adPlacements).where(eq(adPlacements.id, id)).limit(1);
-    if (!row) throw new NotFoundError("Ad placement", id);
-    return row as unknown as AdPlacementPlan;
+    return this.readPlacement(db, id);
   }
 
   // ---------------- writes ----------------
@@ -98,23 +95,31 @@ export class AdPlacementRepository {
     return this.transition(id, "pending_approval");
   }
 
-  /** Approve after re-checking that this placement keeps the slot within capacity. */
+  /**
+   * Reserve capacity under the slot row lock, then commit `scheduled` and its
+   * audit event together. A second approve waits and sees the reservation;
+   * a failed audit write rolls the status back.
+   */
   async approve(actor: AdActor, id: string): Promise<AdPlacementPlan> {
     requireOperator(actor);
-    const current = await this.placement(id);
-    assertAdPlacementTransition(current.status, "scheduled");
-    const [slot] = await db
-      .select({ capacity: adSlots.capacity })
-      .from(adSlots)
-      .where(eq(adSlots.id, current.slotId))
-      .limit(1);
-    if (!slot) throw new NotFoundError("Ad slot", current.slotId);
-    const active = await this.activeCount(current.slotId);
-    const projected = active + (adPlacementHoldsCapacity(current.status) ? 0 : 1);
-    if (!adSlotCapacityIsRespected({ capacity: slot.capacity, active: projected })) {
-      throw new ConflictError("Ad slot capacity would be exceeded");
-    }
-    return this.transition(id, "scheduled", undefined, actor);
+    return db.transaction(async (tx) => {
+      const peeked = await this.readPlacement(tx, id);
+      const [slot] = await tx
+        .select({ capacity: adSlots.capacity })
+        .from(adSlots)
+        .where(eq(adSlots.id, peeked.slotId))
+        .limit(1)
+        .for("update");
+      if (!slot) throw new NotFoundError("Ad slot", peeked.slotId);
+      const current = await this.readPlacement(tx, id);
+      assertAdPlacementTransition(current.status, "scheduled");
+      const active = await this.countActive(tx, current.slotId);
+      const projected = active + (adPlacementHoldsCapacity(current.status) ? 0 : 1);
+      if (!adSlotCapacityIsRespected({ capacity: slot.capacity, active: projected })) {
+        throw new ConflictError("Ad slot capacity would be exceeded");
+      }
+      return this.writeStatus(tx, id, "scheduled", undefined, actor);
+    });
   }
 
   async reject(actor: AdActor, id: string, reason: string): Promise<AdPlacementPlan> {
@@ -125,14 +130,8 @@ export class AdPlacementRepository {
 
   async pause(actor: AdActor, id: string, reason: string): Promise<AdPlacementPlan> {
     requireOperator(actor);
-    const current = await this.placement(id);
-    assertAdPlacementTransition(current.status, "paused", reason);
-    await db
-      .update(adPlacements)
-      .set({ status: "paused", reason, updatedAt: new Date() })
-      .where(eq(adPlacements.id, id));
-    await this.recordAudit(actor, id, "ad_placement.paused", { from: current.status, reason });
-    return this.placement(id);
+    assertAdPlacementTransition((await this.placement(id)).status, "paused", reason);
+    return this.transition(id, "paused", reason, actor);
   }
 
   async resume(actor: AdActor, id: string): Promise<AdPlacementPlan> {
@@ -193,31 +192,64 @@ export class AdPlacementRepository {
     return srv.status === "active" && srv.visibility === "public";
   }
 
+  private async readPlacement(
+    executor: AdExecutor,
+    id: string,
+    lock = false,
+  ): Promise<AdPlacementPlan> {
+    const query = executor.select().from(adPlacements).where(eq(adPlacements.id, id)).limit(1);
+    const [row] = lock ? await query.for("update") : await query;
+    if (!row) throw new NotFoundError("Ad placement", id);
+    return row as unknown as AdPlacementPlan;
+  }
+
+  private async countActive(executor: AdExecutor, slotId: string): Promise<number> {
+    const [row] = await executor
+      .select({ n: count() })
+      .from(adPlacements)
+      .where(and(eq(adPlacements.slotId, slotId), inArray(adPlacements.status, activeStatuses)));
+    return Number(row?.n ?? 0);
+  }
+
   private async transition(
     id: string,
     to: AdPlacementStatus,
     reason?: string,
     actor?: AdActor,
   ): Promise<AdPlacementPlan> {
-    const current = await this.placement(id);
+    return db.transaction((tx) => this.writeStatus(tx, id, to, reason, actor));
+  }
+
+  private async writeStatus(
+    executor: AdExecutor,
+    id: string,
+    to: AdPlacementStatus,
+    reason: string | undefined,
+    actor: AdActor | undefined,
+  ): Promise<AdPlacementPlan> {
+    const current = await this.readPlacement(executor, id, true);
     assertAdPlacementTransition(current.status, to, reason);
-    await db
+    await executor
       .update(adPlacements)
       .set({ status: to, reason: reason ?? null, updatedAt: new Date() })
       .where(eq(adPlacements.id, id));
     if (actor) {
-      await this.recordAudit(actor, id, `ad_placement.${to}`, { from: current.status, reason });
+      await this.recordAudit(executor, actor, id, `ad_placement.${to}`, {
+        from: current.status,
+        reason,
+      });
     }
-    return this.placement(id);
+    return this.readPlacement(executor, id);
   }
 
   private async recordAudit(
+    executor: AdExecutor,
     actor: AdActor,
     placementId: string,
     action: string,
     details: Record<string, unknown>,
   ) {
-    await db.insert(auditEvents).values({
+    await executor.insert(auditEvents).values({
       id: crypto.randomUUID(),
       actorId: actor.id,
       actorType: "admin",
