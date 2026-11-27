@@ -29,6 +29,11 @@ const fullAcceptancePaths = [
   /^apps\/web\/next\.config\.(?:mjs|ts)$/,
   /^packages\/(?:config|security|storage)\//,
   /^packages\/db\/src\/repositories\/(?:initiating-session|commercial-plans|order-operations|subscriptions|entitlements|resource-cart|community-reports|notifications|discussion-management|organization-governance|license-controls)\.ts$/,
+  // Session, password reset, account auth, download authorization, and server claim.
+  // Pull requests on these paths take full acceptance, so auth-browser and
+  // resource-browser stay required instead of dropping to fast CI.
+  /^packages\/db\/src\/repositories\/(?:sessions|auth|account-password-reset|resource-download-authorization|server-claim-authority)\.ts$/,
+  /^apps\/web\/src\/lib\/services\/accounts\/auth-service\.ts$/,
   /^packages\/db\/src\/repositories\/(?:library-collections|library-collection-(?:command|internals)|library-membership-batches|library-selection-batches)\.ts$/,
   /^packages\/db\/src\/repositories\/(?:resource-library-selections|resource-release-watches|resource-release-watch-batches|collection-release-watches)\.ts$/,
   /^packages\/db\/src\/repositories\/(?:web-push-(?:admission-recovery|outbox|worker)|report-notification-delivery|verification-notification-delivery|discussion-notification-delivery|publication-notification-delivery|user-follow-notice|resource-release-worker|support-requester-notice|verification|discussion-moderation-notice|publication-notice|organization-access-notice|license-maintenance|content-reaction-notice|builds)\.ts$/,
