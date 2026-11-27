@@ -16,6 +16,11 @@ export const followCommandSchema = z
   .refine((value) => value.notifyComments === undefined || value.targetType === "content", {
     message: "notifyComments applies only to content follows",
   });
+/**
+ * Pause notices for one followable target. This does not unfollow, disable a
+ * notification category, or confirm that the target exists. An active server
+ * mute is excluded from that server's publication fanout.
+ */
 export const objectMuteCommandSchema = z
   .object({
     expectedActorId: z.string().min(1).max(128).optional(),

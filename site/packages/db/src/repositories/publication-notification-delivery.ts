@@ -2,7 +2,13 @@ import { createHash } from "node:crypto";
 import { noticeStoredTitles, serverPublicationNoticeMessage } from "@nexus/domain";
 import { and, asc, desc, eq, isNull, lte, ne, sql } from "drizzle-orm";
 import { db } from "../client";
-import { content, follows, publicationNotificationDeliveries, servers } from "../schema";
+import {
+  content,
+  follows,
+  objectNotificationMutes,
+  publicationNotificationDeliveries,
+  servers,
+} from "../schema";
 import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
 import { notificationRepository } from "./notifications";
 
@@ -135,6 +141,15 @@ class PublicationNotificationDeliveryRepository {
                 eq(follows.targetType, "server"),
                 eq(follows.targetId, job.serverId),
                 ne(follows.followerId, job.authorId),
+                // Active (user, server, serverId) mute. Category opt-out stays in preferences.
+                // Compare mute rows only; do not join servers or this becomes an existence check.
+                sql`not exists (
+                  select 1 from ${objectNotificationMutes}
+                  where ${objectNotificationMutes.userId} = ${follows.followerId}
+                    and ${objectNotificationMutes.targetType} = ${"server"}
+                    and ${objectNotificationMutes.targetId} = ${follows.targetId}
+                    and ${objectNotificationMutes.mutedUntil} > clock_timestamp()
+                )`,
                 sql`${follows.createdAt} <= ${job.createdAt}::timestamptz`,
                 job.lastFollowerId && job.lastFollowerCreatedAt
                   ? sql`(
@@ -149,7 +164,7 @@ class PublicationNotificationDeliveryRepository {
             )
             .orderBy(desc(follows.createdAt), desc(follows.id))
             .limit(pageLimit + 1)
-            .for("share", { noWait: true });
+            .for("share", { of: follows, noWait: true });
 
           const items = rows.slice(0, pageLimit);
           await lockNotificationPreferencesForUsers(
