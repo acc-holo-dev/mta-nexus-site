@@ -307,6 +307,18 @@ export async function readBoundedMasterPayload(
 
 type MasterFetch = (input: string | URL | Request, init?: RequestInit) => Promise<Response>;
 
+function compareKnownPlayerCounts(
+  left: number | null | undefined,
+  right: number | null | undefined,
+) {
+  const leftKnown = typeof left === "number";
+  const rightKnown = typeof right === "number";
+  if (leftKnown && rightKnown) return right - left;
+  if (leftKnown) return -1;
+  if (rightKnown) return 1;
+  return 0;
+}
+
 export async function requestMtaMasterDirectoryFromEndpoints(
   endpoints: readonly string[],
   fetcher: MasterFetch = fetch,
@@ -347,7 +359,7 @@ export async function requestMtaMasterDirectoryFromEndpoints(
       );
       const servers = parseMtaMasterList(payload)
         .filter((server) => server.responding !== false)
-        .sort((a, b) => (b.players ?? 0) - (a.players ?? 0));
+        .sort((a, b) => compareKnownPlayerCounts(a.players, b.players));
 
       return {
         servers,
