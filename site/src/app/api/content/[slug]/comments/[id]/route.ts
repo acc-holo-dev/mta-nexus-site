@@ -1,4 +1,4 @@
-import { AppError, NotFoundError, RateLimitExceededError } from "@nexus/domain";
+import { AppError, NotFoundError, RateLimitExceededError, UnauthorizedError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import type { NextRequest } from "next/server";
 import { userPlatformApi } from "../../../../../../features/accounts/user-platform-api";
@@ -29,7 +29,13 @@ async function mutate(request: NextRequest, context: Context, remove: boolean) {
         await readBoundedJson(request, 32 * 1024),
       );
       if (!parsed.success) throw new AppError("Invalid command", 400, "COMMENT_COMMAND_INVALID");
-      return contentService.manageComment({ ...parsed.data, slug, commentId: id }, actor);
+      const currentToken = request.cookies.get("nexus_session")?.value;
+      if (!currentToken) throw new UnauthorizedError();
+      return contentService.manageComment(
+        { ...parsed.data, slug, commentId: id },
+        actor,
+        currentToken,
+      );
     },
     200,
     discussionMutationError,

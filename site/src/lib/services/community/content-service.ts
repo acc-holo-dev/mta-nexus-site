@@ -33,11 +33,13 @@ export class ContentService {
       reason?: string;
     },
     actor: User,
+    currentToken: string,
   ) {
     return discussionManagementRepository.mutate({
       ...input,
       actorId: actor.id,
       auditId: generateId("aud"),
+      currentToken,
     });
   }
   async pageArticles(filters: ReturnType<typeof parseContentPage>) {
@@ -259,7 +261,11 @@ export class ContentService {
       {
         id: generateId("aud"),
         actorId: actor.id,
-        actorType: "admin",
+        // The audit union has no moderator member; the stored value remains the role.
+        actorType: (actor.role === "moderator" ? "moderator" : "admin") as
+          | "user"
+          | "system"
+          | "admin",
         action: decision === "publish" ? "content.published" : "content.archived",
         targetId: contentId,
         targetType: "content",

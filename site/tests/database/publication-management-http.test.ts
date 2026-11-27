@@ -155,6 +155,7 @@ it("persists normalized own edits and moderation reasons through the service", a
   expect(mocks.manage).toHaveBeenCalledWith(
     { slug: "article", commentId: "comment", text: "Updated text", expectedRevision },
     actor,
+    "test",
   );
   expect(
     (await DELETE(request("DELETE", { expectedRevision, reason: " Spam " }), comment)).status,
@@ -162,6 +163,7 @@ it("persists normalized own edits and moderation reasons through the service", a
   expect(mocks.manage).toHaveBeenLastCalledWith(
     { slug: "article", commentId: "comment", expectedRevision, reason: "Spam" },
     actor,
+    "test",
   );
 });
 it("requires authentication, same-site mutation, JSON and bounded payloads", async () => {

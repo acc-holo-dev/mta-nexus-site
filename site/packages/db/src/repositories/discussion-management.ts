@@ -4,6 +4,7 @@ import { and, eq, isNull, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, comments, content, users } from "../schema";
 import { discussionModerationNotice } from "./discussion-moderation-notice";
+import { lockInitiatingSession } from "./initiating-session";
 export const discussionRevision = (id: string, text: string) =>
   createHash("sha256")
     .update(JSON.stringify([id, text]))
@@ -21,6 +22,7 @@ type DiscussionMutation = {
   reason?: string;
   auditId: string;
   reportId?: string;
+  currentToken?: string;
 };
 class DiscussionManagementRepository {
   async mutate(input: DiscussionMutation) {
@@ -146,6 +148,8 @@ class DiscussionManagementRepository {
       )
     )
       throw new AppError("Comment changed", 409, "COMMENT_CHANGED");
+    if (typeof input.currentToken === "string")
+      await lockInitiatingSession(tx, input.actorId, input.currentToken);
     await beforeWrite?.({
       contentId: publication.id,
       commentId: current.id,
@@ -181,6 +185,8 @@ class DiscussionManagementRepository {
         authorId: current.authorId,
         commentId: current.id,
       });
+    if (typeof input.currentToken === "string")
+      await lockInitiatingSession(tx, input.actorId, input.currentToken);
     return {
       contentId: publication.id,
       commentId: current.id,
