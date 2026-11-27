@@ -99,7 +99,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "pattern": "^(DOC|OPS|FLOW|UX|GROW)-[0-9]{2}$"
+          "pattern": "^(DOC|OPS|FLOW|UX|GROW|AUD)-[0-9]{2}$"
         },
         "phase": {
           "enum": ["F0", "F1", "F2", "F3", "F4", "F5", "F6"]
@@ -129,7 +129,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "pattern": "^(DOC|OPS|FLOW|UX|GROW)-[0-9]{2}$"
+            "pattern": "^(DOC|OPS|FLOW|UX|GROW|AUD)-[0-9]{2}$"
           },
           "uniqueItems": true
         },
@@ -237,7 +237,7 @@
             "properties": {
               "id": {
                 "type": "string",
-                "pattern": "^(DOC|OPS|FLOW|UX|GROW)-[0-9]{2}$"
+                "pattern": "^(DOC|OPS|FLOW|UX|GROW|AUD)-[0-9]{2}$"
               },
               "when": {
                 "type": "string",

@@ -60,6 +60,18 @@ Git commit с тем же значением. Это evidence registry без ex
 Неучтённое отличие, подмена digest без Git proof, duplicate/stale запись и
 недоступный commit дают FAIL. ID и baseline менять через amendments нельзя.
 
+## Допущенные карточки аудита
+
+Live-очередь может содержать `AUD-01`…`AUD-54`, которых нет в frozen import-baseline.
+Их спецификация зафиксирована в [admitted-tasks.json](admitted-tasks.json) на снимке
+`e3e5da911593ee9229c9e15b8879661bc6d1b94b`. Этот файл после принятия не редактируется.
+Дальнейшее изменение спецификации AUD идёт через [spec-amendments.json](spec-amendments.json)
+с Git-доказательством, как у замороженных ID. Поля исполнения (`execution_state`,
+`execution_notes`, `execution_updated_on`, `current`, `decision_status`, `queue_state`)
+остаются живыми. Исходные 96 пунктов `source-register` и frozen ID не переписываются.
+Каждый `AUD-NN` в `additional_source_ids` покрывается ровно карточкой с тем же ID.
+`specified` по-прежнему не является разрешением на внедрение, production deploy или платежи.
+
 Статусные поля могут эволюционировать в живом JSON по принятому контракту. Для
 спецификаций ledger фиксирует уже принятые значения main; новые незакоммиченные
 отличия автоматически не принимаются. Добавление новых ID требует отдельного
