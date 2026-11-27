@@ -1,10 +1,13 @@
 import {
   buildRepository,
   contentRepository,
+  db,
   developerProfileRepository,
   licenseRepository,
   notificationRepository,
+  orderItems,
   orderRepository,
+  orders,
   productRepository,
   sessionRepository,
   socialRepository,
@@ -12,7 +15,10 @@ import {
   verificationRepository,
 } from "@nexus/db";
 import type { Product, User } from "@nexus/domain";
+import { NextRequest } from "next/server";
 import { beforeAll, describe, expect, it } from "vitest";
+import { GET as downloadAdminBuild } from "../../src/app/api/admin/builds/[buildId]/download/route";
+import { GET as downloadProduct } from "../../src/app/api/products/[id]/download/route";
 import { commerceService } from "../../src/lib/services/commerce/commerce-service";
 
 describe("Nexus 1.3 Security & Trust Hardening", () => {
@@ -166,6 +172,28 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
       isSigned: false,
     });
 
+    await expect(
+      contentRepository.addComment({
+        id: `cmt_sec_unpaid_${ts}`,
+        productId: reviewProduct.id,
+        authorId: userB.id,
+        text: "Unpaid buyer review must be refused",
+        rating: 4,
+        isVerifiedPurchase: true,
+      }),
+    ).rejects.toMatchObject({ code: "REVIEW_ACCESS_REQUIRED" });
+
+    await expect(
+      contentRepository.addComment({
+        id: `cmt_sec_author_${ts}`,
+        productId: reviewProduct.id,
+        authorId: author.id,
+        text: "Author self-review must be refused",
+        rating: 5,
+        isVerifiedPurchase: true,
+      }),
+    ).rejects.toMatchObject({ code: "REVIEW_ACCESS_REQUIRED" });
+
     // After purchase, user B can review
     await commerceService.claimFreeResource({
       user: userB,
@@ -183,15 +211,43 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
     });
     expect(review.isVerifiedPurchase).toBe(true);
 
+    await expect(
+      contentRepository.addComment({
+        id: `cmt_sec_repeat_${ts}`,
+        productId: reviewProduct.id,
+        authorId: userB.id,
+        text: "A second review must be refused",
+        rating: 3,
+        isVerifiedPurchase: true,
+      }),
+    ).rejects.toMatchObject({ code: "REVIEW_CHANGED" });
+
     // Duplicate review must be detectable
     const duplicate = await contentRepository.hasReviewFromUser(reviewProduct.id, userB.id);
     expect(duplicate).toBe(true);
   });
 
   it("Follow validation: target must exist and self-follow is blocked at contract level", async () => {
-    // Following a non-existent product target is rejected by validation contract
-    const fakeTargetExists = await productRepository.findById("prd_does_not_exist_xyz");
-    expect(fakeTargetExists).toBeNull();
+    await expect(
+      socialRepository.follow({
+        id: `fol_sec_self_${ts}`,
+        followerId: userA.id,
+        targetType: "user",
+        targetId: userA.id,
+      }),
+    ).rejects.toMatchObject({ code: "SELF_FOLLOW" });
+    await expect(
+      socialRepository.follow({
+        id: `fol_sec_missing_${ts}`,
+        followerId: userA.id,
+        targetType: "product",
+        targetId: "prd_does_not_exist_xyz",
+      }),
+    ).rejects.toMatchObject({ code: "NOT_FOUND" });
+    expect(await socialRepository.isFollowing(userA.id, "user", userA.id)).toBe(false);
+    expect(await socialRepository.isFollowing(userA.id, "product", "prd_does_not_exist_xyz")).toBe(
+      false,
+    );
 
     // Valid follow works and is queryable
     await socialRepository.follow({
@@ -205,17 +261,45 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
   });
 
   it("Download authorization: published build must exist for delivery, no fallback", async () => {
+    const downloadContext = { params: Promise.resolve({ id: product.id }) };
+    const sameOrigin = () =>
+      new NextRequest(`http://nexus.test/api/products/${product.id}/download`, {
+        method: "GET",
+        headers: {
+          cookie: `nexus_session=tok_${author.id}`,
+          "sec-fetch-site": "same-origin",
+          "sec-fetch-mode": "cors",
+          "sec-fetch-dest": "empty",
+        },
+      });
+    const crossSite = () =>
+      new NextRequest(`http://nexus.test/api/products/${product.id}/download`, {
+        method: "GET",
+        headers: {
+          cookie: `nexus_session=tok_${author.id}`,
+          "sec-fetch-site": "cross-site",
+          "sec-fetch-mode": "navigate",
+          "sec-fetch-dest": "document",
+        },
+      });
+
     // No builds published yet => download must not be possible
     const builds = await buildRepository.listByProduct(product.id);
     expect(builds.length).toBe(0);
+    const emptyDownload = await downloadProduct(sameOrigin(), downloadContext);
+    expect(emptyDownload.status).toBe(404);
+    expect(await emptyDownload.json()).toMatchObject({
+      error: "No published build is available",
+    });
+    const crossSiteEmpty = await downloadProduct(crossSite(), downloadContext);
+    expect(crossSiteEmpty.status).toBe(401);
 
-    // Publish a real build that satisfies the published-safe invariant
-    // (clean scan with scanner identity and scan timestamp).
+    // An unpublished build is still not a delivery fallback.
     await buildRepository.create({
       id: `bld_sec_${ts}`,
       productId: product.id,
       version: "1.0.0",
-      status: "published",
+      status: "draft",
       storageKey: `builds/${product.id}/v1.0.0.zip`,
       sha256Hash: "a".repeat(64),
       fileSizeBytes: 1024,
@@ -230,6 +314,58 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
     const buildsAfter = await buildRepository.listByProduct(product.id);
     expect(buildsAfter.length).toBe(1);
     expect(buildsAfter[0].sha256Hash).toHaveLength(64);
+    expect(buildsAfter[0].status).not.toBe("published");
+    const unpublishedDownload = await downloadProduct(sameOrigin(), downloadContext);
+    expect(unpublishedDownload.status).toBe(404);
+    expect(await unpublishedDownload.json()).toMatchObject({
+      error: "No published build is available",
+    });
+
+    const quarantined = await buildRepository.create({
+      id: `bld_sec_quar_${ts}`,
+      productId: product.id,
+      version: "1.0.1",
+      status: "quarantined",
+      quarantinePreviousStatus: "pending_review",
+      quarantineReason: "Clean scan held out of reviewer delivery",
+      quarantinedAt: new Date(),
+      storageKey: `builds/${product.id}/v1.0.1.zip`,
+      sha256Hash: "c".repeat(64),
+      fileSizeBytes: 1024,
+      fileName: "quarantined.zip",
+      mimeType: "application/zip",
+      scanStatus: "clean",
+      scanner: "test-scanner",
+      scannedAt: new Date(),
+      isSigned: false,
+    });
+    const adminContext = { params: Promise.resolve({ buildId: quarantined.id }) };
+    const adminSameOrigin = await downloadAdminBuild(
+      new NextRequest(`http://nexus.test/api/admin/builds/${quarantined.id}/download`, {
+        method: "GET",
+        headers: {
+          cookie: `nexus_session=tok_${admin.id}`,
+          "sec-fetch-site": "same-origin",
+          "sec-fetch-mode": "cors",
+          "sec-fetch-dest": "empty",
+        },
+      }),
+      adminContext,
+    );
+    expect(adminSameOrigin.status).toBe(409);
+    const adminCrossSite = await downloadAdminBuild(
+      new NextRequest(`http://nexus.test/api/admin/builds/${quarantined.id}/download`, {
+        method: "GET",
+        headers: {
+          cookie: `nexus_session=tok_${admin.id}`,
+          "sec-fetch-site": "cross-site",
+          "sec-fetch-mode": "navigate",
+          "sec-fetch-dest": "document",
+        },
+      }),
+      adminContext,
+    );
+    expect(adminCrossSite.status).toBe(403);
   });
 
   it("Server management: live availability is sourced from the official directory", async () => {
@@ -302,8 +438,47 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
   });
 
   it("Seller dashboard: sales derived from real completed orders only", async () => {
+    const pendingId = `ord_sec_pending_${ts}`;
+    const completedId = `ord_sec_completed_${ts}`;
+    await db.insert(orders).values([
+      {
+        id: pendingId,
+        orderNumber: `PEND-${ts}`,
+        buyerId: userB.id,
+        status: "pending",
+        totalAmount: 0,
+        currency: "USD",
+      },
+      {
+        id: completedId,
+        orderNumber: `DONE-${ts}`,
+        buyerId: userA.id,
+        status: "completed",
+        totalAmount: 0,
+        currency: "USD",
+      },
+    ]);
+    await db.insert(orderItems).values([
+      {
+        id: `oit_sec_pending_${ts}`,
+        orderId: pendingId,
+        productId: product.id,
+        unitPrice: 0,
+        currency: "USD",
+      },
+      {
+        id: `oit_sec_completed_${ts}`,
+        orderId: completedId,
+        productId: product.id,
+        unitPrice: 0,
+        currency: "USD",
+      },
+    ]);
+
     const sales = await orderRepository.listSalesBySeller(author.id);
-    expect(sales.length).toBeGreaterThanOrEqual(0);
+    expect(sales.length).toBeGreaterThan(0);
+    expect(sales.map((sale) => sale.orderId)).toContain(completedId);
+    expect(sales.map((sale) => sale.orderId)).not.toContain(pendingId);
 
     // All returned sales must be from completed orders on author's products
     for (const sale of sales) {

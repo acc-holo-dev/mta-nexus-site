@@ -2,6 +2,10 @@ import { AppError, ValidationError } from "@nexus/domain";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 import { storageService } from "@nexus/storage";
 import { type NextRequest, NextResponse } from "next/server";
+import {
+  isCrossSiteTopLevelDownload,
+  SESSION_COOKIE_NAME,
+} from "../../../../../../features/accounts/session-cookie";
 import { adminBuildDownloadApiCopy } from "../../../../../../features/resources/admin-build-download-api-copy";
 import {
   assertBuildDownloadMetadata,
@@ -51,7 +55,9 @@ export async function GET(
   const copy = adminBuildDownloadApiCopy(resolveLocale(request.cookies.get("nexus_locale")?.value));
 
   try {
-    const token = request.cookies.get("nexus_session")?.value;
+    const token = isCrossSiteTopLevelDownload(request)
+      ? undefined
+      : request.cookies.get(SESSION_COOKIE_NAME)?.value;
     const actor = await authService.getSession(token);
     if (!actor || !can(actor, "admin.moderation")) {
       return json(
@@ -84,7 +90,7 @@ export async function GET(
       return json(context, { error: copy.notFound }, 404);
     }
 
-    if (build.status !== "pending_review" && build.status !== "quarantined") {
+    if (build.status !== "pending_review") {
       return json(
         context,
         {
