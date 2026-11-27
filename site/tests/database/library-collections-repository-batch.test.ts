@@ -161,6 +161,7 @@ it("removes a batch without grants and replays the canonical receipt after revoc
     ...prefix(),
     [collectionRow()],
     [[1]],
+    [["prd_a"], ["prd_b"]],
     [],
     [collectionRow(snapshot)],
     [insertedReceipt(command, snapshot)],
