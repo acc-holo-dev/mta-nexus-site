@@ -4,10 +4,14 @@ import { ForbiddenError } from "@nexus/domain";
 import { getTableColumns } from "drizzle-orm";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const findExactPendingRetry = vi.hoisted(() => vi.fn());
+const { findExactPendingRetry, findProductById, hasManagementAccess } = vi.hoisted(() => ({
+  findExactPendingRetry: vi.fn(),
+  findProductById: vi.fn(),
+  hasManagementAccess: vi.fn(),
+}));
 vi.mock("@nexus/db", () => ({
   buildRepository: { findExactPendingRetry },
-  productRepository: {},
+  productRepository: { findById: findProductById, hasManagementAccess },
   organizationRepository: {},
 }));
 
@@ -43,12 +47,26 @@ describe("pending upload retry authorization", () => {
 
   it("does not reveal existing uploads to actors who lost management access", async () => {
     const service = new ProductService();
-    vi.spyOn(service, "assertCanReleaseBuild").mockRejectedValue(
-      new ForbiddenError("Not authorized"),
-    );
-    await expect(service.recoverPendingBuildUpload(input, actor)).rejects.toBeInstanceOf(
-      ForbiddenError,
-    );
+    findProductById.mockResolvedValue({
+      id: input.productId,
+      authorId: "usr_owner",
+      organizationId: null,
+      price: 0,
+      status: "published",
+      licenseModel: "unlimited",
+    });
+    hasManagementAccess.mockResolvedValue(false);
+    findExactPendingRetry.mockResolvedValue({ id: "bld_hidden" } as Build);
+
+    const recovery = service.recoverPendingBuildUpload(input, actor);
+    await expect(recovery).rejects.toBeInstanceOf(ForbiddenError);
+    await expect(recovery).rejects.toMatchObject({
+      statusCode: 403,
+      code: "FORBIDDEN",
+      message: "Not authorized to publish builds for this product",
+    });
+    expect(findProductById).toHaveBeenCalledWith(input.productId);
+    expect(hasManagementAccess).toHaveBeenCalledWith(input.productId, actor);
     expect(findExactPendingRetry).not.toHaveBeenCalled();
   });
 });
