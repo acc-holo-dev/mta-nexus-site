@@ -63,7 +63,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         context,
         {
           error: copy.invalidCredentials,
-          details: parsed.error.format(),
+          code: "VALIDATION_ERROR",
         },
         400,
       );

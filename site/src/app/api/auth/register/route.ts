@@ -50,7 +50,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return json(
         {
           error: copy.validationFailed,
-          details: parsed.error.format(),
+          code: "VALIDATION_ERROR",
         },
         400,
       );
