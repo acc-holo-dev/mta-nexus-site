@@ -79,6 +79,7 @@ it("allows removal after access is revoked without widening rights", async () =>
     ...prefix(),
     [collectionRow()],
     [[1]],
+    [["prd_a"]],
     [],
     [collectionRow(snapshot)],
     [insertedReceipt(command, snapshot)],

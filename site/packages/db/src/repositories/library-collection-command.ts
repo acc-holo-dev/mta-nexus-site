@@ -53,6 +53,19 @@ export function validateCollectionCommand(input: LibraryCollectionCommandInput) 
     throw new AppError("Invalid collection command", 400, "COLLECTION_INVALID");
   return parsed.data;
 }
+/** Lock composition rows in productId order before the initiating session is locked. */
+async function lockRemovalMembers(
+  tx: ResourceTransaction,
+  collectionId: string,
+  productIds: readonly string[],
+) {
+  await tx
+    .select({ productId: members.productId })
+    .from(members)
+    .where(and(eq(members.collectionId, collectionId), inArray(members.productId, [...productIds])))
+    .orderBy(asc(members.productId))
+    .for("update");
+}
 export function withLibraryCollectionTransaction<T>(
   userId: string,
   run: (tx: ResourceTransaction) => Promise<T>,
@@ -315,6 +328,7 @@ export async function prepareLibraryCollectionCommand(
             .values(missing.map((productId) => ({ collectionId: current.id, productId })));
       });
     } else if (command.action === "remove-many") {
+      await lockRemovalMembers(tx, current.id, command.productIds);
       writes.push(async () => {
         // References can be cleaned up even after resource deletion or revoked access.
         await tx
@@ -363,6 +377,7 @@ export async function prepareLibraryCollectionCommand(
             .values({ collectionId: current.id, productId: command.productId });
       });
     } else if (command.action === "remove") {
+      await lockRemovalMembers(tx, current.id, [command.productId]);
       writes.push(async () => {
         // Lost access does not prevent removal of the owner's private reference.
         await tx
