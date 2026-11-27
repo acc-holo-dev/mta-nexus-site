@@ -28,7 +28,10 @@ export function ResourceDownloadButton({
   productId: string;
   version: string;
   buildId?: string;
-  /** Public detail uses latest; library selection uses selected/pinned. */
+  /**
+   * Follow-latest and the public detail stay `latest` even when the request
+   * carries the current build id. Only a user-selected pin is `selected`.
+   */
   intent?: "latest" | "selected";
   /** When a fixed selection exists but cannot be downloaded, explain instead of silent latest. */
   unavailableReason?: string | null;
@@ -36,7 +39,8 @@ export function ResourceDownloadButton({
   const { dictionary, locale } = useNexusLocale();
   const pathname = usePathname();
   const copy = dictionary.product;
-  const resolvedIntent = intent ?? (buildId ? "selected" : "latest");
+  const resolvedIntent =
+    intent === "latest" ? "latest" : (intent ?? (buildId ? "selected" : "latest"));
   const active = useRef<AbortController | null>(null);
   const downloadUrl = useRef<string | null>(null);
   const [busy, setBusy] = useState(false);
