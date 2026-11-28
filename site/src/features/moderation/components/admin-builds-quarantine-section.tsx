@@ -2,6 +2,7 @@ import { EmptyState, ErrorState, SectionHeader, StatusBadge } from "@nexus/ui";
 import { PackageCheck, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import type { getDictionary, Locale } from "../../../lib/i18n";
+import { unknownMarker } from "../../../lib/i18n/unknown";
 import { BuildQuarantineControls } from "../../resources/quarantine-controls";
 import { linkAccent } from "../../shell/link-shell";
 import { panelFlexBetweenP4 } from "../../shell/panel-shell";
@@ -21,6 +22,12 @@ import { adminStatusLabel, adminStatusTone } from "../admin-status-labels";
 import { storageMaintenanceCopy } from "../storage-maintenance-i18n";
 
 type AdminCopy = ReturnType<typeof getDictionary>["admin"];
+
+function formatQueueSize(bytes: number, locale: Locale) {
+  if (!Number.isSafeInteger(bytes) || bytes <= 0) return unknownMarker(locale);
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.ceil(bytes / 1024))} KiB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MiB`;
+}
 
 type PendingBuild = {
   id: string;
@@ -105,7 +112,7 @@ export function AdminBuildsQuarantineSection({
                   </div>
                   <p className={typeCaptionMuted}>
                     {copy.resource} {build.productId} •{" "}
-                    {(build.fileSizeBytes / 1024 / 1024).toFixed(1)} MB
+                    {formatQueueSize(build.fileSizeBytes, locale)}
                   </p>
                   <p className={typeCaptionSecondary}>
                     {build.productStatus === "published" ? (

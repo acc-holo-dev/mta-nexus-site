@@ -9,7 +9,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from check_tracker import ROOT, load, load_commit_tasks, tracker_tasks, validate_contract, validate_specifications, value_digest
+from check_tracker import ROOT, load, load_commit_tasks, tracker_tasks, validate_contract, validate_extensions, validate_specifications, value_digest
 
 
 class TrackerContractTests(unittest.TestCase):
@@ -19,6 +19,8 @@ class TrackerContractTests(unittest.TestCase):
         cls.schema = load(ROOT / 'planning/task-schema.json')
         cls.frozen = load(ROOT / 'planning/import-baseline/tasks.json')
         cls.amendments = load(ROOT / 'planning/spec-amendments.json')
+        cls.admitted = load(ROOT / 'planning/admitted-tasks.json')
+        cls.source = load(ROOT / 'planning/source-register.json')
 
     def invalid(self, mutate, marker='schema'):
         data = copy.deepcopy(self.data)
@@ -28,14 +30,15 @@ class TrackerContractTests(unittest.TestCase):
     def first(self, data):
         return data['layers']['live']['tasks'][0]
 
-    def specs(self, data=None, amendments=None, loader=None):
+    def specs(self, data=None, amendments=None, loader=None, admitted=None):
         return validate_specifications(self.data if data is None else data, self.frozen,
             self.amendments if amendments is None else amendments,
-            loader or (lambda commit: load_commit_tasks(ROOT, commit)))
+            loader or (lambda commit: load_commit_tasks(ROOT, commit)),
+            self.admitted['tasks'] if admitted is None else admitted)
 
     def test_current_contract(self):
         self.assertEqual(validate_contract(self.data, self.schema), [])
-        self.assertEqual(len(tracker_tasks(self.data)), 83)
+        self.assertEqual(len(tracker_tasks(self.data)), 137)
         self.assertEqual(self.data['baseline_sha'], self.frozen['baseline_sha'])
 
     def test_required_layers(self):
@@ -132,7 +135,20 @@ class TrackerContractTests(unittest.TestCase):
     def test_full_audit(self):
         result=subprocess.run([sys.executable,str(ROOT/'planning/tools/check_tracker.py')],text=True,capture_output=True)
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)
-        report=json.loads(result.stdout);self.assertEqual(sum(report['execution_counts'].values()),83)
+        report=json.loads(result.stdout);self.assertEqual(sum(report['execution_counts'].values()),137)
+
+    def test_admitted_spec_drift_needs_amendment(self):
+        data = copy.deepcopy(self.data)
+        task = next(item for item in tracker_tasks(data) if item['id'] == 'AUD-01')
+        task['acceptance'] = ['unrecorded audit change']
+        self.assertTrue(any('unrecorded specification drift' in problem for problem in self.specs(data=data)))
+
+    def test_admitted_ids_cannot_replace_frozen_ids(self):
+        data = copy.deepcopy(self.data)
+        data['layers']['history']['tasks'] = [task for task in data['layers']['history']['tasks'] if task['id'] != 'DOC-01']
+        data['layers']['history']['count'] -= 1
+        problems = validate_extensions(data, self.frozen, self.admitted, self.source)
+        self.assertTrue(any('Frozen task ID removed' in problem for problem in problems))
 
     def test_malformed_json(self):
         with tempfile.TemporaryDirectory() as directory:

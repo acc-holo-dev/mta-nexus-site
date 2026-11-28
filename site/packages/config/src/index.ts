@@ -1,6 +1,6 @@
 import { Buffer } from "node:buffer";
 import { createECDH, ECDH, timingSafeEqual } from "node:crypto";
-import { isIP } from "node:net";
+import { BlockList, isIP } from "node:net";
 import { z } from "zod";
 
 const BASE64URL_PATTERN = /^[A-Za-z0-9_-]+$/u;
@@ -180,6 +180,38 @@ export function readMtaMasterMirrorUrls(
 export const BUILD_PLACEHOLDER_AUTH_SECRET = "build-only-secret-that-is-long-enough-for-validation";
 export const BUILD_PLACEHOLDER_DATABASE_URL =
   "postgres://nexus:build-only@127.0.0.1:5432/mta_nexus";
+
+/**
+ * Keeps the SMTP address schema valid when production email is not SMTP.
+ * An empty sender must stay empty so this value cannot stand in for SMTP_FROM.
+ */
+const PRODUCTION_UNSET_SMTP_FROM = "no-reply@nexus-mta.invalid";
+
+const productionLoopback = new BlockList();
+productionLoopback.addSubnet("127.0.0.0", 8, "ipv4");
+productionLoopback.addAddress("::1", "ipv6");
+productionLoopback.addSubnet("::ffff:127.0.0.0", 104, "ipv6");
+
+function isProductionLoopbackHostname(hostname: string): boolean {
+  const bare =
+    hostname.startsWith("[") && hostname.endsWith("]") ? hostname.slice(1, -1) : hostname;
+  const normalized = bare.toLowerCase().replace(/\.+$/u, "");
+  if (normalized === "localhost") return true;
+  const family = isIP(normalized);
+  if (family === 4) return productionLoopback.check(normalized, "ipv4");
+  if (family === 6) return productionLoopback.check(normalized, "ipv6");
+  return false;
+}
+
+function productionSmtpSender(env: Record<string, string | undefined>): string {
+  const provided = env.SMTP_FROM;
+  if (env.EMAIL_PROVIDER === "smtp") {
+    if (provided === undefined || provided.trim() === "") return "";
+    return provided;
+  }
+  if (provided === undefined) return PRODUCTION_UNSET_SMTP_FROM;
+  return provided;
+}
 
 /**
  * True only while compiling the production image / Next production build.
@@ -365,7 +397,7 @@ export const envSchema = z
       }
     }
 
-    if (value.EMAIL_PROVIDER === "smtp" && (!value.SMTP_HOST || !value.SMTP_FROM)) {
+    if (value.EMAIL_PROVIDER === "smtp" && (!value.SMTP_HOST || !value.SMTP_FROM.trim())) {
       addIssue("SMTP_HOST", "SMTP email requires a host and sender address");
     }
     if (value.BUILD_SCANNER === "clamav" && !value.CLAMAV_HOST) {
@@ -377,8 +409,17 @@ export const envSchema = z
       if (appUrl.protocol !== "https:") {
         addIssue("NEXT_PUBLIC_APP_URL", "Production application URL must use HTTPS");
       }
-      if (appUrl.hostname === "localhost" || appUrl.hostname === "127.0.0.1") {
+      if (isProductionLoopbackHostname(appUrl.hostname)) {
         addIssue("NEXT_PUBLIC_APP_URL", "Production application URL cannot point to localhost");
+      }
+      if (value.DATABASE_URL.trim().length < 1) {
+        addIssue("DATABASE_URL", "Production database URL must not be blank");
+      }
+      if (value.AUTH_SECRET.trim().length < 32) {
+        addIssue(
+          "AUTH_SECRET",
+          "Production auth secret must be at least 32 non-whitespace characters",
+        );
       }
       // Dockerfile / Next compile may use placeholders; live production processes may not.
       if (!isImageCompilePhase() && value.AUTH_SECRET === BUILD_PLACEHOLDER_AUTH_SECRET) {
@@ -442,12 +483,12 @@ export function getEnvConfig(env: Record<string, string | undefined> = process.e
         SMTP_PORT: "1025",
         SMTP_USER: "",
         SMTP_PASS: "",
-        SMTP_FROM: "no-reply@nexus-mta.invalid",
         WEB_PUSH_VAPID_PUBLIC_KEY: "",
         WEB_PUSH_VAPID_PRIVATE_KEY: "",
         WEB_PUSH_VAPID_SUBJECT: "",
         MTA_MASTER_MIRROR_URLS: "",
         ...withResolvedOrigin,
+        SMTP_FROM: productionSmtpSender(withResolvedOrigin),
       }
     : { ...developmentDefaults, ...withResolvedOrigin };
 

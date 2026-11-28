@@ -65,7 +65,7 @@ export async function DiscoveryStreamPage({
           <Link
             key={type}
             aria-current={state?.type === type ? "page" : undefined}
-            href={discoveryStreamHref({ ...fallback, type, query: state?.query ?? "" })}
+            href={discoveryStreamHref({ ...(state ?? fallback), type })}
             className={linkAccentSm}
           >
             {dictionary.discover[type]}

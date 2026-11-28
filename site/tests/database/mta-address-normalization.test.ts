@@ -13,7 +13,7 @@ describe("MTA address canonicalization across directory, forms and persistence",
     ["127.1", "127.0.0.1"],
     ["2001:0DB8:0000:0000:0000:0000:0000:0001", "[2001:db8::1]"],
     ["bücher.de", "xn--bcher-kva.de"],
-    ["::ffff:192.0.2.1", "[::ffff:c000:201]"],
+    ["::ffff:192.0.2.1", "192.0.2.1"],
     ["example.com.", "example.com"],
   ])("normalizes %s into %s idempotently", (input, expected) => {
     expect(normalizeMtaAddress(input)).toBe(expected);

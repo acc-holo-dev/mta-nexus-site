@@ -305,6 +305,8 @@ export function ContentDiscussion({
               ].slice(-200)
             : parsed.data.items,
       }));
+      if (!older && !focusId)
+        setDisplayCount(query && !parsed.data.hasMore ? parsed.data.items.length : null);
       return true;
     } catch (caught) {
       if (alive.current && !controller.signal.aborted) {

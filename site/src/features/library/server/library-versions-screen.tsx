@@ -156,6 +156,7 @@ export async function LibraryVersionsScreen({
             productId={id}
             version={current.version}
             buildId={current.id}
+            intent={result.selection.mode === "fixed" ? "selected" : "latest"}
           />
           <BuildProvenanceDetails
             build={{

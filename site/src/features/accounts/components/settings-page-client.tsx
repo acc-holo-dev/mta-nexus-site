@@ -251,8 +251,11 @@ export function SettingsPageClient() {
     try {
       await action();
     } catch (error: unknown) {
-      if (error instanceof SettingsRequestError && isSettingsSignedOutError(error)) {
-        setSignedOut(true);
+      if (
+        error instanceof SettingsRequestError &&
+        (isSettingsSignedOutError(error) || error.status === 409)
+      ) {
+        if (isSettingsSignedOutError(error)) setSignedOut(true);
         setSessionSnapshot(null);
         setPreferences(null);
         setPreferenceActorId(null);

@@ -1,5 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
 import {
+  cookieHeaderWithoutSession,
+  isCrossSiteTopLevelDownload,
+} from "./features/accounts/session-cookie";
+import {
   appendVaryHeader,
   isOfflineCacheablePublicPath,
   PUBLIC_OFFLINE_CACHE_HEADER,
@@ -7,6 +11,22 @@ import {
 } from "./features/shell/offline-cache-policy";
 import { rejectUnsafeBrowserRequest } from "./lib/http/browser-request-guard";
 import { isMachineApiRequest } from "./lib/http/browser-request-policy";
+
+const STATE_CHANGING_DOWNLOAD = /^\/api\/(?:products\/[^/]+|admin\/builds\/[^/]+)\/download$/u;
+
+function continueRequest(request: NextRequest) {
+  if (
+    !STATE_CHANGING_DOWNLOAD.test(request.nextUrl.pathname) ||
+    !isCrossSiteTopLevelDownload(request)
+  ) {
+    return NextResponse.next();
+  }
+  const headers = new Headers(request.headers);
+  const cookie = cookieHeaderWithoutSession(headers.get("cookie"));
+  if (cookie) headers.set("cookie", cookie);
+  else headers.delete("cookie");
+  return NextResponse.next({ request: { headers } });
+}
 
 export function proxy(request: NextRequest) {
   if (
@@ -16,7 +36,7 @@ export function proxy(request: NextRequest) {
     const rejected = rejectUnsafeBrowserRequest(request);
     if (rejected) return rejected;
   }
-  const response = NextResponse.next();
+  const response = continueRequest(request);
 
   if (
     request.method !== "GET" ||

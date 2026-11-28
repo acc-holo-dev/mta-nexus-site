@@ -1,6 +1,10 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import {
+  cookieHeaderWithoutSession,
+  isCrossSiteTopLevelDownload,
+} from "../../src/features/accounts/session-cookie";
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
@@ -104,14 +108,71 @@ describe("integrated J4 build upload safety contract", () => {
 
   it("keeps reviewer artifact access private and limited to pending clean builds", () => {
     const route = read("site/src/app/api/admin/builds/[buildId]/download/route.ts");
+    const statusGate = route.slice(
+      route.indexOf("const build = await productService.findBuildById"),
+      route.indexOf('build.scanStatus !== "clean"'),
+    );
 
     expect(route).toContain('can(actor, "admin.moderation")');
-    expect(route).toContain('build.status !== "pending_review"');
+    expect(statusGate).toContain('build.status !== "pending_review"');
+    expect(statusGate).not.toContain("quarantined");
+    expect(route).not.toContain('"quarantined"');
     expect(route).toContain('build.scanStatus !== "clean"');
     expect(route).toContain('"Cache-Control": "private, no-store"');
     expect(route).toContain('Vary: "Cookie"');
     expect(route).toMatch(/"X-Content-SHA256":\s*build\.sha256Hash/u);
     expect(route).toContain("destroyOpenedStream(stored.stream)");
+  });
+
+  it("does not authorize a cross-site top-level download from the session cookie", () => {
+    const headers = (values: Record<string, string>) => ({
+      get: (name: string) => values[name.toLowerCase()] ?? null,
+    });
+    expect(
+      isCrossSiteTopLevelDownload({
+        method: "GET",
+        headers: headers({
+          "sec-fetch-site": "cross-site",
+          "sec-fetch-mode": "navigate",
+          "sec-fetch-dest": "document",
+        }),
+      }),
+    ).toBe(true);
+    expect(
+      isCrossSiteTopLevelDownload({
+        method: "GET",
+        headers: headers({
+          "sec-fetch-site": "same-origin",
+          "sec-fetch-mode": "cors",
+          "sec-fetch-dest": "empty",
+        }),
+      }),
+    ).toBe(false);
+    expect(
+      isCrossSiteTopLevelDownload({
+        method: "GET",
+        headers: headers({
+          "sec-fetch-site": "same-origin",
+          "sec-fetch-mode": "navigate",
+          "sec-fetch-dest": "document",
+        }),
+      }),
+    ).toBe(false);
+    expect(cookieHeaderWithoutSession("nexus_session=abc; nexus_locale=ru")).toBe(
+      "nexus_locale=ru",
+    );
+    expect(cookieHeaderWithoutSession("nexus_session=abc")).toBeNull();
+
+    for (const [path, authorize] of [
+      ["site/src/app/api/products/[id]/download/route.ts", "authorizeResourceDownload("],
+      ["site/src/app/api/admin/builds/[buildId]/download/route.ts", "authorizeReviewDownload("],
+    ] as const) {
+      const route = read(path);
+      const guard = route.indexOf("isCrossSiteTopLevelDownload(request)");
+      expect(guard).toBeGreaterThan(-1);
+      expect(route.indexOf(authorize)).toBeGreaterThan(guard);
+    }
+    expect(read("site/src/proxy.ts")).toContain("isCrossSiteTopLevelDownload");
   });
 
   it("requires build review context and writes the decision audit only in the transactional moderation path", () => {

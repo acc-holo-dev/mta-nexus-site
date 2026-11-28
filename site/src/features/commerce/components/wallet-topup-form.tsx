@@ -17,7 +17,7 @@ import {
 } from "../../shell/type-shell";
 import { parseCommercialAmount } from "../commercial-confirmation";
 import { formatFinancialMinor } from "../financial-i18n";
-import { getWalletCopy, walletError } from "../wallet-i18n";
+import { getWalletCopy, walletError, walletIntentStatusLabel } from "../wallet-i18n";
 import { type ConfirmedWalletTopUp, confirmedWalletTopUp } from "../wallet-topup-confirmation";
 import { RecordedRateEstimate } from "./recorded-rate-estimate";
 import { useWalletProviderSelection } from "./use-wallet-provider-selection";
@@ -164,7 +164,7 @@ export function WalletTopUpForm({
             {copy.intentId}: {result.intent.id}
           </p>
           <p>
-            {copy.status}: {result.intent.status}
+            {copy.status}: {walletIntentStatusLabel(locale, result.intent.status)}
           </p>
           <p>{formatFinancialMinor(result.intent.amount, result.intent.currency, locale)}</p>
           {rates !== undefined ? (

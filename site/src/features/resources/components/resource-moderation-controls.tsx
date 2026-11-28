@@ -14,7 +14,9 @@ import { privateApiRequest } from "../../../lib/http/private-api-request";
 import { confirmedResourceModeration } from "../../library/resource-release-control-confirmation";
 import {
   getResourceReleaseControlCopy,
+  resourceBuildStatusLabel,
   resourceReleaseControlError,
+  resourceStatusLabel,
 } from "../../library/resource-release-control-i18n";
 import { confirmAction } from "../../shell/confirm-action";
 import { useNexusLocale } from "../../shell/locale";
@@ -150,7 +152,7 @@ export function ResourceModerationControls({
       <dl className={typeGridGap2SmSecondarySm2}>
         <div>
           <dt className={typeLabelUpperMuted}>{copy.resourceStatus}</dt>
-          <dd className="text-primary">{product.status}</dd>
+          <dd className="text-primary">{resourceStatusLabel(locale, product.status)}</dd>
         </div>
         <div>
           <dt className={typeLabelUpperMuted}>{copy.allowedAction}</dt>
@@ -167,7 +169,10 @@ export function ResourceModerationControls({
       {selectedBuild && selectedBuild.status !== "published" ? (
         <div className={surfaceInsetP3TextSmSecondary}>
           <p>
-            {copy.buildStatusLine(selectedBuild.version ?? selectedBuild.id, selectedBuild.status)}
+            {copy.buildStatusLine(
+              selectedBuild.version ?? selectedBuild.id,
+              resourceBuildStatusLabel(locale, selectedBuild.status),
+            )}
           </p>
           <Link
             href={unavailableBuildSupportHref()}

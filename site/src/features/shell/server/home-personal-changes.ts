@@ -8,6 +8,54 @@ import type { PersonalChangeReason, PersonalChangesSummary } from "../home-perso
 
 const LIMIT = 12;
 
+/**
+ * Captions the closed Home reason map does not own. The visible label is the
+ * notification's own localized title; these tokens must not reuse another type.
+ */
+type OwnNoticeReason =
+  | "licenseTerm"
+  | "newFollower"
+  | "contentReaction"
+  | "publicationActivity"
+  | "discussionModeration";
+
+const followerTitles = new Set([
+  "New follower",
+  "New Follower",
+  "Новый подписчик",
+  "New Follower / Новый подписчик",
+]);
+const moderationTitles = new Set([
+  "Discussion moderation",
+  "Модерация обсуждения",
+  "Discussion moderation / Модерация обсуждения",
+]);
+
+function notificationKind(data: unknown) {
+  return data && typeof data === "object" && "kind" in data
+    ? String((data as { kind?: unknown }).kind ?? "")
+    : "";
+}
+
+/** Home caption follows this row's own kind. A shared inbox category is not a type. */
+function inboxPersonalReason(
+  data: unknown,
+  category: string,
+  title: string,
+): PersonalChangeReason | OwnNoticeReason | null {
+  const kind = notificationKind(data);
+  if (kind === "resource_release") return "releaseWatch";
+  if (kind === "resource_qa") return "resourceQa";
+  if (kind === "license_term") return "licenseTerm";
+  if (kind === "content_reaction") return "contentReaction";
+  if (kind === "publication_activity") return "publicationActivity";
+  if (kind === "discussion_push" && category === "follow") return "discussionFollow";
+  if (kind === "discussion_push" && category === "content") return "replyToMe";
+  if (category === "follow" && followerTitles.has(title)) return "newFollower";
+  if (category === "content" && moderationTitles.has(title)) return "discussionModeration";
+  return null;
+}
+
 function safeInternalHref(value: string | null | undefined): string | null {
   if (
     !value?.startsWith("/") ||
@@ -19,8 +67,8 @@ function safeInternalHref(value: string | null | undefined): string | null {
 }
 
 /**
- * Finite personal Home summary from effective release watches, discussion follows,
- * and unread replies-to-me (inbox/read semantics). Guest callers should skip this.
+ * Finite personal Home summary. Inbox rows are captioned by their own kind.
+ * Guest callers should skip this.
  */
 export async function loadPersonalChangesSummary(
   actorId: string,
@@ -52,24 +100,17 @@ export async function loadPersonalChangesSummary(
     for (const item of formatted.items) {
       if (items.length >= LIMIT) break;
       const source = raw.items.find((row) => row.id === item.id);
-      const kind =
-        source?.data && typeof source.data === "object" && "kind" in source.data
-          ? String((source.data as { kind?: unknown }).kind ?? "")
-          : "";
       const href = safeInternalHref(item.link);
       if (!href || seen.has(item.id)) continue;
 
-      let reason: PersonalChangeReason | null = null;
-      if (kind === "resource_release" || item.category === "commerce") reason = "releaseWatch";
-      else if (kind === "resource_qa") reason = "resourceQa";
-      else if (item.category === "follow") reason = "discussionFollow";
-      else if (item.category === "content") reason = "replyToMe";
+      const reason = inboxPersonalReason(source?.data, item.category, item.title);
       if (!reason) continue;
 
       seen.add(item.id);
       items.push({
         id: item.id,
-        reason,
+        // Own-notice tokens are outside the closed caption map; the row title is that label.
+        reason: reason as PersonalChangeReason,
         title: reason === "releaseWatch" ? item.message || item.title : item.title,
         href,
         createdAt: item.createdAt,

@@ -27,10 +27,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   try {
     const query = serverReviewQuery(request.nextUrl.searchParams);
     const ip = getTrustedRequestIp(request);
-    if (
-      ip !== "unknown" &&
-      !(await consumeRateLimit("resourceInspection", `server-review-ip:${ip}`)).success
-    ) {
+    if (!(await consumeRateLimit("resourceInspection", `server-review-ip:${ip}`)).success) {
       throw new RateLimitExceededError();
     }
     return jsonWithRequestId(

@@ -1,4 +1,4 @@
-import { AppError } from "@nexus/domain";
+import { AppError, assertProductionStubSignatureRejected } from "@nexus/domain";
 import { walletProviderIdSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import {
@@ -22,10 +22,14 @@ export const POST = withPaymentProviderWebhook(async function POST(
       throw new AppError("Payment provider is unknown", 400, "PAYMENT_PROVIDER_UNKNOWN");
     }
     const rawBody = await readBoundedText(request, 64 * 1024);
+    const headers = requestHeaderRecord(request);
+    assertProductionStubSignatureRejected(
+      headers["x-nexus-stub-signature"] ?? headers["X-Nexus-Stub-Signature"],
+    );
     const result = await walletPaymentService.applyVerifiedWebhook(
       parsedProvider.data,
       rawBody,
-      requestHeaderRecord(request),
+      headers,
     );
     return {
       intent: {

@@ -38,7 +38,7 @@ export async function licenseRuntimeRequest(
     const ip = getTrustedRequestIp(request);
     if (
       !(await consumeRateLimit("licenseCheck", `token:${digest}`)).success ||
-      (ip !== "unknown" && !(await consumeRateLimit("licenseCheck", `ip:${ip}`)).success)
+      !(await consumeRateLimit("licenseCheck", `ip:${ip}`)).success
     )
       throw new RateLimitExceededError();
     const result = await operation(digest);

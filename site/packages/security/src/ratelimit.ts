@@ -57,6 +57,9 @@ export class MemoryRateLimiter implements RateLimiter {
       while (this.hits.size >= this.maxKeys) {
         const oldestKey = this.hits.keys().next().value as string | undefined;
         if (!oldestKey) break;
+        const oldest = this.hits.get(oldestKey);
+        // Capacity is not a reason to forget a bucket that is still inside its window.
+        if (!oldest || oldest.expiresAt > now) break;
         this.hits.delete(oldestKey);
       }
     }

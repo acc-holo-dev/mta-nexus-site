@@ -31,7 +31,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       );
     }
 
-    const article = await contentService.getArticleBySlug(slug);
+    const article = await contentService.getArticleBySlug(slug, { incrementView: false });
     if (!article) {
       return jsonWithRequestId(
         context,

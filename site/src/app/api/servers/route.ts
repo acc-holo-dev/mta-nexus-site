@@ -73,6 +73,7 @@ export async function GET(request: NextRequest) {
       const liveObservation = observationFor(server);
       return {
         ...server,
+        ownerId: undefined,
         liveObservation: liveObservation ?? null,
         liveStatus: mtaLiveStatus(liveObservation, directoryIsStale),
       };

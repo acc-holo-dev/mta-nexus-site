@@ -613,7 +613,7 @@ export function NewResourceForm({
             label={copy.minMtaVersion}
             value={mtaVersionTarget}
             onChange={(event) => setMtaVersionTarget(event.target.value)}
-            pattern="1\.[0-9]+(\.[0-9]+)?"
+            pattern="1\.[0-9]+(\.[0-9]+)?(-[0-9]+(\.[0-9]+){1,2})?"
             maxLength={64}
             readOnly={Boolean(createdProduct || intent)}
           />

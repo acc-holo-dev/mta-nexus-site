@@ -3,6 +3,10 @@ import { consumeRateLimit, generateId } from "@nexus/security";
 import { storageService } from "@nexus/storage";
 import { type NextRequest, NextResponse } from "next/server";
 import {
+  isCrossSiteTopLevelDownload,
+  SESSION_COOKIE_NAME,
+} from "../../../../../features/accounts/session-cookie";
+import {
   assertBuildDownloadMetadata,
   BuildArtifactMismatchError,
 } from "../../../../../features/resources/build-download-metadata";
@@ -50,7 +54,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
   try {
     const { id: productId } = await params;
-    const token = request.cookies.get("nexus_session")?.value;
+    const token = isCrossSiteTopLevelDownload(request)
+      ? undefined
+      : request.cookies.get(SESSION_COOKIE_NAME)?.value;
     const user = token ? await authService.getSession(token) : null;
 
     if (!token || !user) {

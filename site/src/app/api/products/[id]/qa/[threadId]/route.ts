@@ -25,7 +25,7 @@ export async function GET(
   const copy = resourceQaCopy(locale);
   try {
     const ip = getTrustedRequestIp(request);
-    if (ip !== "unknown" && !(await consumeRateLimit("resourceInspection", `qa-ip:${ip}`)).success)
+    if (!(await consumeRateLimit("resourceInspection", `qa-ip:${ip}`)).success)
       throw new RateLimitExceededError();
     const { id, threadId } = await params;
     const actor = await authService.getSession(request.cookies.get("nexus_session")?.value);

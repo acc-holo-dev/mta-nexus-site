@@ -271,9 +271,10 @@ describe("build moderation route integration", () => {
         getRequest(moderatorToken, cleanBuildId),
         { params: Promise.resolve({ buildId: cleanBuildId }) },
       );
-      expect(quarantineEvidence.status).toBe(200);
-      expect(quarantineEvidence.headers.get("Cache-Control")).toBe("private, no-store");
-      expect(Buffer.from(await quarantineEvidence.arrayBuffer())).toEqual(bytes);
+      expect(quarantineEvidence.status).toBe(409);
+      expect(await quarantineEvidence.json()).toEqual({
+        error: adminBuildDownloadApiCopy("en").notAvailableForReview,
+      });
 
       const restored = await moderate(
         moderationRequest(

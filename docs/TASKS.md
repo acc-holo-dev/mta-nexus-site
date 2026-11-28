@@ -942,6 +942,2475 @@ Release applicability: scope_specific_acceptance_not_a_universal_launch_gate.
 - Пилот ещё не проведён; численные эффекты, сроки и бюджеты не измерены.
 - Внешние публикации, приглашения и рассылки не выполняются этим пакетом.
 
+## AUD-01 — Списание с кошелька проверяет баланс до блокировки счёта
+
+**Фаза:** F1. **Приоритет:** P1. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-01. **Решения обсуждения:** NX-011, NX-015.
+
+**Сейчас.** Два одновременных вывода, два расчёта заказа или возврат против вывода проходят одну и ту же сумму. Счёт уходит в минус, второй вывод остаётся в escrow, покупатель получает кредит. Путь за флагами кошелька, в проде деньги сами не двигаются.
+
+**Результат.** Баланс 100, два параллельных списания по 80 с одного `user:{id}`. Одно должно закончиться `WALLET_INSUFFICIENT_FUNDS`, сумма проводок остаётся неотрицательной.
+
+### Область изменений
+
+- `site/packages/db/src/repositories/wallet-withdrawal.ts`
+- `site/packages/db/src/repositories/wallet-order-settlement.ts`
+- `site/packages/db/src/repositories/ledger-posting.ts`
+- `site/packages/db/migrations/0095_ledger_staff_grant.sql`
+
+### Приёмка
+
+- Баланс 100, два параллельных списания по 80 с одного `user:{id}`. Одно должно закончиться `WALLET_INSUFFICIENT_FUNDS`, сумма проводок остаётся неотрицательной.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/packages/db/src/repositories/wallet-withdrawal.ts · `insertHoldAwaiting` берёт `wallet-withdraw:${intent.id}`, читает баланс и только потом `postLedgerBatchInTransaction` берёт `ledger-account:`. `buildWalletSpendPosting` сравнивает `availableBalance` в памяти до этой блокировки. Триггер `ledger_balance_insert_guard` отклоняет только выход за int32, пола «не ниже нуля» нет.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/db/src/repositories/wallet-withdrawal.ts)
+- [site/packages/db/src/repositories/wallet-order-settlement.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/db/src/repositories/wallet-order-settlement.ts)
+- [site/packages/db/src/repositories/ledger-posting.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/db/src/repositories/ledger-posting.ts)
+- [site/packages/db/migrations/0095_ledger_staff_grant.sql · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/db/migrations/0095_ledger_staff_grant.sql)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+- Исправление кода кошелька не включает NEXUS_WALLET_ENGINE и не разрешает реальные выплаты.
+
+## AUD-02 — Повтор события кошелька выглядит как новая проводка
+
+**Фаза:** F1. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-02. **Решения обсуждения:** NX-011, NX-015.
+
+**Сейчас.** Повторный webhook `payout_failed` или уже зачисленный top-up отвечает как новое движение. Журнал второй раз не пишется, API говорит, что написал.
+
+**Результат.** Повтор того же verified `payout_failed` после уже проваленного вывода возвращает `entries: null` и `settled: false`.
+
+### Область изменений
+
+- `site/src/lib/services/commerce/wallet-payment-service.ts`
+- `site/packages/db/src/repositories/wallet-withdrawal.ts`
+
+### Приёмка
+
+- Повтор того же verified `payout_failed` после уже проваленного вывода возвращает `entries: null` и `settled: false`.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/lib/services/commerce/wallet-payment-service.ts · `failVerified` и `creditVerified` возвращают `entries: null`, если событие уже применено. Сервис делает `result.entries ?? entries`, а ответ ставит `settled` / `credited` из `entries !== null`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/lib/services/commerce/wallet-payment-service.ts)
+- [site/packages/db/src/repositories/wallet-withdrawal.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/db/src/repositories/wallet-withdrawal.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+- Исправление кода кошелька не включает NEXUS_WALLET_ENGINE и не разрешает реальные выплаты.
+
+## AUD-03 — Return path пополнения принимается как чужой origin
+
+**Фаза:** F1. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-03. **Решения обсуждения:** NX-011, NX-015.
+
+**Сейчас.** Схема, которая обещает same-origin путь, принимает `/\t/evil.com`, `/\n/evil.com` и `/\r/evil.com`. WHATWG-парсер выкидывает эти символы, и путь становится `https://evil.com/`. Значение сохраняется. Stub сейчас отдаёт `redirectUrl: null`.
+
+**Результат.** Любой `returnPath`, у которого origin от `https://nexus.invalid` другой, не проходит `safeParse`.
+
+### Область изменений
+
+- `site/packages/validation/src/wallet-payments.ts`
+
+### Приёмка
+
+- Любой `returnPath`, у которого origin от `https://nexus.invalid` другой, не проходит `safeParse`.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/packages/validation/src/wallet-payments.ts · Прогон на этом HEAD. `walletTopUpCreateSchema` пропускает все три строки, `new URL(value, "https://nexus.invalid/").href` равен `https://evil.com/`. `//evil.example` схема отвергает.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/validation/src/wallet-payments.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+- Исправление кода кошелька не включает NEXUS_WALLET_ENGINE и не разрешает реальные выплаты.
+
+## AUD-04 — Лимит запросов забывает живой счётчик, когда карта заполнена
+
+**Фаза:** F1. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-04. **Решения обсуждения:** NX-011.
+
+**Сейчас.** После 50 000 новых ключей в том же окне уже заблокированный логин снова разрешён. Проверка лицензии кладёт отдельный ключ `licenseCheck:token:${digest}` на каждый корректный bearer, и все политики делят одну `MemoryRateLimiter`.
+
+**Результат.** Ключ уже вернул `success: false`. До его `resetAt` вставить `maxKeys` других ключей. Следующий `consume` того же ключа остаётся `success: false`.
+
+### Область изменений
+
+- `site/packages/security/src/ratelimit.ts`
+- `site/packages/security/src/rate-limit-policy.ts`
+- `site/src/features/commerce/license-runtime-http.ts`
+
+### Приёмка
+
+- Ключ уже вернул `success: false`. До его `resetAt` вставить `maxKeys` других ключей. Следующий `consume` того же ключа остаётся `success: false`.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/packages/security/src/ratelimit.ts · При полной карте `maintain` удаляет самый старый ключ без проверки `expiresAt`. Отсутствующий ключ получает `success: true`. Логин — 8 попыток за 5 минут.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/security/src/ratelimit.ts)
+- [site/packages/security/src/rate-limit-policy.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/security/src/rate-limit-policy.ts)
+- [site/src/features/commerce/license-runtime-http.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/commerce/license-runtime-http.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-05 — IPv4 и IPv4-mapped IPv6 считаются разными серверами
+
+**Фаза:** F1. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-05. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Тот же адрес можно занять второй записью. Уникальность `(ip_address, port)` и аудит коллизии их не соединяют.
+
+**Результат.** Обе формы дают одну каноническую строку.
+
+### Область изменений
+
+- `site/packages/domain/src/mta-endpoint.ts`
+
+### Приёмка
+
+- Обе формы дают одну каноническую строку.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/packages/domain/src/mta-endpoint.ts · Прогон `normalizeMtaAddress` на этом HEAD. `10.0.0.1` остаётся `10.0.0.1`, `::ffff:10.0.0.1` становится `[::ffff:a00:1]`. Оба `isValidMtaAddress`. То же для `127.0.0.1` и `[::ffff:7f00:1]`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/domain/src/mta-endpoint.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-06 — Скачивание на GET пишет квитанцию и аудит
+
+**Фаза:** F1. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-06. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Переход с другого сайта с cookie `nexus_session` (`SameSite=lax`) создаёт delivery receipt и `product.download_started`, затем отдаёт файл браузеру жертвы. Модераторский GET так же пишет `build.review_artifact_download_started` и отдаёт сборку в `quarantined`. Origin для GET не проверяется. В модераторский вызов не передаётся `currentToken`, сессия в транзакции повторно не блокируется.
+
+**Результат.** Top-level переход с чужого origin на публичный download с живой сессией не создаёт receipt. Модераторский GET отзывает сессию до записи аудита и не отдаёт `quarantined`.
+
+### Область изменений
+
+- `site/src/app/api/products/[id]/download/route.ts`
+- `site/src/app/api/admin/builds/[buildId]/download/route.ts`
+- `site/src/proxy.ts`
+- `site/src/features/accounts/session-cookie.ts`
+
+### Приёмка
+
+- Top-level переход с чужого origin на публичный download с живой сессией не создаёт receipt. Модераторский GET отзывает сессию до записи аудита и не отдаёт `quarantined`.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/app/api/products/\[id\]/download/route.ts · Оба обработчика — `export async function GET`. Публичный вызывает `authorizeResourceDownload` с новым `receiptId` и `auditId`. Прокси пускает безопасный метод до проверки origin.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/products/[id]/download/route.ts)
+- [site/src/app/api/admin/builds/\[buildId\]/download/route.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/admin/builds/[buildId]/download/route.ts)
+- [site/src/proxy.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/proxy.ts)
+- [site/src/features/accounts/session-cookie.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/accounts/session-cookie.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-07 — Вместимость рекламного слота и аудит пишутся отдельными коммитами
+
+**Фаза:** F1. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-07. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Два approve в слот вместимости 1 оба видят `activeCount` 0 и оба становятся `scheduled`. `serveable` отдаёт все живые строки. Падение между `update` и `insert` аудита оставляет статус без записи аудита.
+
+**Результат.** Два параллельных `approve` в слот вместимости 1 оставляют одну строку `scheduled`. Откат аудита откатывает и статус.
+
+### Область изменений
+
+- `site/packages/db/src/repositories/sponsored-placement.ts`
+
+### Приёмка
+
+- Два параллельных `approve` в слот вместимости 1 оставляют одну строку `scheduled`. Откат аудита откатывает и статус.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/packages/db/src/repositories/sponsored-placement.ts · `approve` считает активные, потом вызывает `transition` без транзакции и без `FOR UPDATE` слота. `transition` и `pause` делают `db.update`, затем отдельный `db.insert(auditEvents)`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/db/src/repositories/sponsored-placement.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-08 — PR с сессией и сбросом пароля не запускает auth-browser
+
+**Фаза:** F1. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-08. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Изменение `sessions.ts`, `auth.ts`, `account-password-reset.ts` или `auth-service.ts` на pull request идёт в fast CI. Джоба «Password and session security» не запускается. `auth-browser` входит в `requiredJobs` только при `full`. Эти пути не входят в `fullAcceptancePaths`. Push в `main` по-прежнему поднимает полный контур.
+
+**Результат.** `classifyChanges` по каждому из четырёх файлов даёт набор, в котором есть `auth-browser`.
+
+### Область изменений
+
+- `scripts/ci-policy.mjs`
+- `.github/workflows/ci.yml`
+
+### Приёмка
+
+- `classifyChanges` по каждому из четырёх файлов даёт набор, в котором есть `auth-browser`.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [scripts/ci-policy.mjs · Список полного контура содержит `initiating-session` и `api/auth/`, этих четырёх файлов там нет.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/scripts/ci-policy.mjs)
+- [.github/workflows/ci.yml · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/.github/workflows/ci.yml)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-09 — Правила изоляции клиента не видят чужой server entry
+
+**Фаза:** F1. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-09. **Решения обсуждения:** NX-011.
+
+**Сейчас.** `pnpm analyze:architecture` остаётся зелёным, если клиент commerce импортирует `security-center-server.ts`, а тот тянет `@nexus/db`. Прямой импорт `@nexus/db` из клиента по-прежнему падает. Та же дыра в правилах support, trust, moderation, library, notifications, organizations, community, servers. У accounts и shell этот путь закрыт.
+
+**Результат.** Тот же путь совпадает с `to` у каждого `*-client-isolation`, и фикстурный обход client → server entry → `@nexus/db` даёт нарушение.
+
+### Область изменений
+
+- `.dependency-cruiser.cjs`
+
+### Приёмка
+
+- Тот же путь совпадает с `to` у каждого `*-client-isolation`, и фикстурный обход client → server entry → `@nexus/db` даёт нарушение.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [.dependency-cruiser.cjs · Прогон `RegExp` правил на этом HEAD. `commerce-client-isolation` не совпадает с `site/src/features/accounts/security-center-server.ts` и совпадает с `site/packages/db`. В негативном просмотре пустая альтернатива `||`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/.dependency-cruiser.cjs)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-10 — Production origin пропускает loopback в другой записи
+
+**Фаза:** F1. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-10. **Решения обсуждения:** NX-011.
+
+**Сейчас.** `getEnvConfig` в production принимает `https://[::1]/`, `https://127.0.0.2/` и `https://localhost.`. Проверка обещает запретить localhost.
+
+**Результат.** Каждый из трёх URL при `NODE_ENV=production` бросает `Invalid configuration parameters`.
+
+### Область изменений
+
+- `site/packages/config/src/index.ts`
+
+### Приёмка
+
+- Каждый из трёх URL при `NODE_ENV=production` бросает `Invalid configuration parameters`.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/packages/config/src/index.ts · Условие сравнивает hostname только с `localhost` и `127.0.0.1`. Node для этих трёх URL сообщает другие hostname.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/config/src/index.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-11 — Пустой SMTP sender подменяется заглушкой
+
+**Фаза:** F1. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-11. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Production с `EMAIL_PROVIDER=smtp` и только `SMTP_HOST` стартует. Отправитель становится `no-reply@nexus-mta.invalid`, `SMTP_PASS` остаётся пустым.
+
+**Результат.** SMTP с хостом и без `SMTP_FROM` бросает `Invalid configuration parameters`.
+
+### Область изменений
+
+- `site/packages/config/src/index.ts`
+
+### Приёмка
+
+- SMTP с хостом и без `SMTP_FROM` бросает `Invalid configuration parameters`.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/packages/config/src/index.ts · Production-вход подставляет этот `SMTP_FROM` по умолчанию. Сторож смотрит `!SMTP_HOST || !SMTP_FROM`, заглушка истинна и проходит email-схему.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/config/src/index.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-12 — GET статьи увеличивает публичный viewCount
+
+**Фаза:** F1. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-12. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Каждый `GET /api/content/:slug`, включая повтор и prefetch, прибавляет 1 к публичному `viewCount`. Это не число читателей. Соседний `GET .../comments` счётчик не трогает.
+
+**Результат.** Два `GET` одного slug увеличивают счётчик на 2. Тот же slug на `GET .../comments` счётчик не меняет.
+
+### Область изменений
+
+- `site/src/app/api/content/[slug]/route.ts`
+- `site/packages/db/src/repositories/content.ts`
+
+### Приёмка
+
+- Два `GET` одного slug увеличивают счётчик на 2. Тот же slug на `GET .../comments` счётчик не меняет.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/app/api/content/\[slug\]/route.ts · Детальный обработчик вызывает `getArticleBySlug(slug)` без флага. Репозиторий пишет `viewCount + 1`, если `incrementView !== false`. Комментарии передают `{ incrementView: false }`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/content/[slug]/route.ts)
+- [site/packages/db/src/repositories/content.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/db/src/repositories/content.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-13 — Домашняя лента подписывает чужой тип уведомления
+
+**Фаза:** F2. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-13. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Истечение лицензии показывается как «новая версия отслеживаемого ресурса». Новый подписчик показывается как ответ в обсуждении. Реакция, обновление публикации и снятие комментария показываются как ответ вам.
+
+**Результат.** Три непрочитанных уведомления этих видов получают три разные подписи, ни одна не берётся от release-watch, discussion-follow или reply-to-you.
+
+### Область изменений
+
+- `site/src/features/shell/server/home-personal-changes.ts`
+- `site/packages/db/src/repositories/license-maintenance.ts`
+- `site/packages/db/src/repositories/user-follow-notice.ts`
+
+### Приёмка
+
+- Три непрочитанных уведомления этих видов получают три разные подписи, ни одна не берётся от release-watch, discussion-follow или reply-to-you.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/features/shell/server/home-personal-changes.ts · Ветка `kind === "resource_release" || category === "commerce"`, затем любой `follow`, затем любой `content`. Лицензия пишется как `category: "commerce"` и `kind: "license_term"`. Подписчик пишется как `category: "follow"`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/shell/server/home-personal-changes.ts)
+- [site/packages/db/src/repositories/license-maintenance.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/db/src/repositories/license-maintenance.ts)
+- [site/packages/db/src/repositories/user-follow-notice.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/db/src/repositories/user-follow-notice.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-14 — Follow-latest подписан как выбранная версия
+
+**Фаза:** F2. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-14. **Решения обсуждения:** NX-011.
+
+**Сейчас.** При режиме latest страница пишет, что версия последняя, а кнопка пишет «скачать выбранную v…». Запрос при этом несёт id этой сборки.
+
+**Результат.** Ресурс библиотеки в режиме latest показывает строку latest-download, `data-download-intent` равен `latest`, id сборки в запросе остаётся.
+
+### Область изменений
+
+- `site/src/features/resources/components/resource-download-button.tsx`
+- `site/src/features/library/server/library-versions-screen.tsx`
+
+### Приёмка
+
+- Ресурс библиотеки в режиме latest показывает строку latest-download, `data-download-intent` равен `latest`, id сборки в запросе остаётся.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/features/resources/components/resource-download-button.tsx · `resolvedIntent` равен `intent ?? (buildId ? "selected" : "latest")`. Экран версий для `mode !== "fixed"` берёт `result.latest`, печатает `copy.latest` и передаёт `buildId={current.id}` без `intent`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/resources/components/resource-download-button.tsx)
+- [site/src/features/library/server/library-versions-screen.tsx · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/library/server/library-versions-screen.tsx)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-15 — Пробельный секрет проходит production-проверку длины
+
+**Фаза:** F1. **Приоритет:** P3. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-15. **Решения обсуждения:** NX-011.
+
+**Сейчас.** `DATABASE_URL` из одного пробела и `AUTH_SECRET` из 32 пробелов проходят production-схему. Отсекаются только плейсхолдеры сборки образа.
+
+**Результат.** Оба значения в production бросают `Invalid configuration parameters`.
+
+### Область изменений
+
+- `site/packages/config/src/index.ts`
+
+### Приёмка
+
+- Оба значения в production бросают `Invalid configuration parameters`.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: independent_of_launch_blocker.
+
+### Источники
+
+- [site/packages/config/src/index.ts · `z.string().min(1)` и `z.string().min(32)`, поля не обрезаются.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/config/src/index.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-16 — Решение модератора по публикации пишется как admin
+
+**Фаза:** F1. **Приоритет:** P3. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-16. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Модератор, опубликовавший или архивировавший материал, в аудите записан как `actorType: "admin"`. Доступ при этом верный: `admin.moderation` есть у роли `moderator`.
+
+**Результат.** Публикация от модератора сохраняет его роль и его `actorId`.
+
+### Область изменений
+
+- `site/src/lib/services/community/content-service.ts`
+- `site/packages/security/src/policy.ts`
+
+### Приёмка
+
+- Публикация от модератора сохраняет его роль и его `actorId`.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: independent_of_launch_blocker.
+
+### Источники
+
+- [site/src/lib/services/community/content-service.ts · `moderateContent` проверяет `can(actor, "admin.moderation")` и всегда пишет `actorType: "admin"`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/lib/services/community/content-service.ts)
+- [site/packages/security/src/policy.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/security/src/policy.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-17 — Русские настройки уведомлений оставляют английские термины
+
+**Фаза:** F2. **Приоритет:** P3. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-17. **Решения обсуждения:** NX-011.
+
+**Сейчас.** На `ru` абзац, который отделяет переключатели категорий от mute конкретной публикации, содержит `Mute/snooze`, `security/account notices`, `Push`, `watch`. Рядом остаются `Object mute` и `malware / security incident`.
+
+**Результат.** При локали `ru` эти три строки не содержат этих английских фрагментов.
+
+### Область изменений
+
+- `site/src/lib/i18n/ru/admin.ts`
+
+### Приёмка
+
+- При локали `ru` эти три строки не содержат этих английских фрагментов.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: independent_of_launch_blocker.
+
+### Источники
+
+- [site/src/lib/i18n/ru/admin.ts · Строки `notificationDescription`, `contentUpdatesDescription` и `quarantineNotifyDownloaders`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/lib/i18n/ru/admin.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-18 — Состояние сборки в provenance печатается сырым статусом
+
+**Фаза:** F2. **Приоритет:** P3. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-18. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Русская карточка ресурса и библиотеки показывает `published` или `pending review`. Подпись поля локализована, значение нет. Статус сканирования на том же компоненте берётся из словаря.
+
+**Результат.** При локали `ru` опубликованная сборка показывает русский статус.
+
+### Область изменений
+
+- `site/src/features/resources/components/build-provenance-details.tsx`
+
+### Приёмка
+
+- При локали `ru` опубликованная сборка показывает русский статус.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: independent_of_launch_blocker.
+
+### Источники
+
+- [site/src/features/resources/components/build-provenance-details.tsx · `publicationState = build.status.replace(/_/g, " ")`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/resources/components/build-provenance-details.tsx)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-19 — Тест доступа рецензента не закрывает карантин
+
+**Фаза:** F1. **Приоритет:** P3. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-19. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Заголовок обещает доступ только к pending clean builds. Чистая сборка в `quarantined` по-прежнему скачивается, тест остаётся зелёным.
+
+**Результат.** GET сборки `quarantined` + `scanStatus: "clean"` получает отказ. Этот кейс сейчас отсутствует.
+
+### Область изменений
+
+- `site/tests/unit/j4-upload-integrated-safety.test.ts`
+- `site/src/app/api/admin/builds/[buildId]/download/route.ts`
+
+### Приёмка
+
+- GET сборки `quarantined` + `scanStatus: "clean"` получает отказ. Этот кейс сейчас отсутствует.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: independent_of_launch_blocker.
+
+### Источники
+
+- [site/tests/unit/j4-upload-integrated-safety.test.ts · Тест ищет подстроку `build.status !== "pending_review"`. Условие маршрута — `!== "pending_review" && !== "quarantined"`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/tests/unit/j4-upload-integrated-safety.test.ts)
+- [site/src/app/api/admin/builds/\[buildId\]/download/route.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/admin/builds/[buildId]/download/route.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-20 — «Целостность отзыва» не пробует три отказа, которые называет
+
+**Фаза:** F1. **Приоритет:** P3. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-20. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Неоплаченный отзыв, отзыв автора о своём ресурсе и второй отзыв могут начать приниматься, сюита останется зелёной. Кейс пишет один успешный комментарий.
+
+**Результат.** Отдельные вызовы для неоплаченного покупателя, автора и повторного сохранения. Этих трёх вызовов в тесте нет.
+
+### Область изменений
+
+- `site/tests/database/security-hardening.test.ts`
+
+### Приёмка
+
+- Отдельные вызовы для неоплаченного покупателя, автора и повторного сохранения. Этих трёх вызовов в тесте нет.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: independent_of_launch_blocker.
+
+### Источники
+
+- [site/tests/database/security-hardening.test.ts · После `hasBought === false` создаётся продукт с `price: 0`, делается claim и один `addComment` с `isVerifiedPurchase: true`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/tests/database/security-hardening.test.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-21 — «Проверка follow» не подписывает на себя и на отсутствующую цель
+
+**Фаза:** F1. **Приоритет:** P3. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-21. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Самоподписка или подписка на отсутствующий id через `socialRepository.follow` оставляет тест зелёным. Метод вставляет строку и цель не проверяет.
+
+**Результат.** `follow` с `followerId === targetId` и с отсутствующим `targetId` отвергается. Этот тест такие вызовы не делает.
+
+### Область изменений
+
+- `site/tests/database/security-hardening.test.ts`
+- `site/packages/db/src/repositories/social.ts`
+
+### Приёмка
+
+- `follow` с `followerId === targetId` и с отсутствующим `targetId` отвергается. Этот тест такие вызовы не делает.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: independent_of_launch_blocker.
+
+### Источники
+
+- [site/tests/database/security-hardening.test.ts · Тело смотрит `findById("prd_does_not_exist_xyz")`, затем один успешный `follow` с `userA` на автора.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/tests/database/security-hardening.test.ts)
+- [site/packages/db/src/repositories/social.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/db/src/repositories/social.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-22 — «Авторизация скачивания» не запрашивает файл
+
+**Фаза:** F1. **Приоритет:** P3. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-22. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Снятие требования опубликованной сборки этот тест не уронит. Он только считает строки.
+
+**Результат.** GET download при пустом списке сборок и ещё раз после неопубликованной сборки. Этих запросов в тесте нет.
+
+### Область изменений
+
+- `site/tests/database/security-hardening.test.ts`
+- `site/src/app/api/products/[id]/download/route.ts`
+
+### Приёмка
+
+- GET download при пустом списке сборок и ещё раз после неопубликованной сборки. Этих запросов в тесте нет.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: independent_of_launch_blocker.
+
+### Источники
+
+- [site/tests/database/security-hardening.test.ts · `builds.length === 0`, затем `create`, затем `buildsAfter.length === 1` и длина `sha256Hash`. Запроса к download нет.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/tests/database/security-hardening.test.ts)
+- [site/src/app/api/products/\[id\]/download/route.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/products/[id]/download/route.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-23 — Проверка продаж продавца не может упасть на пустом списке
+
+**Фаза:** F1. **Приоритет:** P3. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-23. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Выдача pending или cancelled заказов пройдёт этот тест: у автора нет заказов, цикл по статусу не выполняется.
+
+**Результат.** Pending-заказ этого автора отсутствует в `listSalesBySeller`. Такой фикстуры нет.
+
+### Область изменений
+
+- `site/tests/database/security-hardening.test.ts`
+
+### Приёмка
+
+- Pending-заказ этого автора отсутствует в `listSalesBySeller`. Такой фикстуры нет.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: independent_of_launch_blocker.
+
+### Источники
+
+- [site/tests/database/security-hardening.test.ts · `expect(sales.length).toBeGreaterThanOrEqual(0)` истинно для любого массива. Заказ в фикстуру не вставляется.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/tests/database/security-hardening.test.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-24 — Путь подписки сам вставляет уведомление, которое якобы проверяет
+
+**Фаза:** F1. **Приоритет:** P3. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-24. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Остановка `userFollowNotice` этот тест не уронит. Уведомление вставляет сам тест.
+
+**Результат.** Подписка через `setFollowingAuthenticated` создаёт строку `category: "follow"` без прямого `notificationRepository.create`.
+
+### Область изменений
+
+- `site/tests/database/public-platform-journeys.test.ts`
+
+### Приёмка
+
+- Подписка через `setFollowingAuthenticated` создаёт строку `category: "follow"` без прямого `notificationRepository.create`.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: independent_of_launch_blocker.
+
+### Источники
+
+- [site/tests/database/public-platform-journeys.test.ts · `socialRepository.follow` уведомление не создаёт. Следом идёт `notificationRepository.create` с заголовком «New Follower / Новый подписчик». `setFollowingAuthenticated` не вызывается.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/tests/database/public-platform-journeys.test.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-25 — Флаг verified purchase в тесте равен константе, которую тест сам передал
+
+**Фаза:** F1. **Приоритет:** P3. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-25. **Решения обсуждения:** NX-011.
+
+**Сейчас.** `expect(result.review.isVerifiedPurchase).toBe(true)` не ловит подмену флага. Пользователь без claim не пробуется.
+
+**Результат.** `addProductReview` без claim получает отказ доступа. Возвращённый флаг читается из сохранённой строки.
+
+### Область изменений
+
+- `site/tests/database/public-platform-journeys.test.ts`
+
+### Приёмка
+
+- `addProductReview` без claim получает отказ доступа. Возвращённый флаг читается из сохранённой строки.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: independent_of_launch_blocker.
+
+### Источники
+
+- [site/tests/database/public-platform-journeys.test.ts · Тест передаёт `isVerifiedPurchase: true` после `claimFreeResource` и ожидает то же `true`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/tests/database/public-platform-journeys.test.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-26 — Восстановление загрузки подменяет проверку прав, которую называет
+
+**Фаза:** F1. **Приоритет:** P3. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-26. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Если `assertCanReleaseBuild` перестанет отказывать чужому актору, тест останется зелёным. Шпион бросает ошибку до настоящего метода, `findExactPendingRetry` не вызывается по построению.
+
+**Результат.** `recoverPendingBuildUpload` с настоящим `assertCanReleaseBuild` для актора без `build.release` даёт `ForbiddenError` до `findExactPendingRetry`.
+
+### Область изменений
+
+- `site/tests/database/build-upload-recovery-authorization.test.ts`
+
+### Приёмка
+
+- `recoverPendingBuildUpload` с настоящим `assertCanReleaseBuild` для актора без `build.release` даёт `ForbiddenError` до `findExactPendingRetry`.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: independent_of_launch_blocker.
+
+### Источники
+
+- [site/tests/database/build-upload-recovery-authorization.test.ts · `vi.spyOn(service, "assertCanReleaseBuild").mockRejectedValue(new ForbiddenError(...))`, затем `expect(findExactPendingRetry).not.toHaveBeenCalled()`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/tests/database/build-upload-recovery-authorization.test.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-27 — Пробел в карте CI для download authorization и server claim
+
+**Фаза:** F1. **Приоритет:** P3. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-27. **Решения обсуждения:** NX-011.
+
+**Сейчас.** `resource-download-authorization.ts` и `server-claim-authority.ts` не входят в полный контур, поэтому PR с только этими файлами не запускает `resource-browser`. Это сосед AUD-08, отдельный путь.
+
+**Результат.** `classifyChanges` по каждому из двух файлов требует `resource-browser`.
+
+### Область изменений
+
+- `scripts/ci-policy.mjs`
+
+### Приёмка
+
+- `classifyChanges` по каждому из двух файлов требует `resource-browser`.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: independent_of_launch_blocker.
+
+### Источники
+
+- [scripts/ci-policy.mjs · `fullAcceptancePaths` перечисляет конкретные репозитории и `api/auth/`. Этих двух файлов в списке нет, а browser-джобы добавляются только при `full`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/scripts/ci-policy.mjs)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-28 — Правка и удаление комментария не держат сессию
+
+**Фаза:** F1. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-28. **Решения обсуждения:** NX-011.
+
+**Сейчас.** После успешного `getSession` выход или отзыв сессии не останавливает правку, удаление и их аудит. Создание комментария блокирует сессию до вставки и ещё раз до коммита. Тот же репозиторий обслуживает workspace.
+
+**Результат.** Отозвать сессию после начала `PATCH` или `DELETE` комментария. Транзакция должна откатиться без изменения текста и без строки аудита.
+
+### Область изменений
+
+- `site/src/app/api/content/[slug]/comments/[id]/route.ts`
+- `site/src/lib/services/community/content-service.ts`
+- `site/packages/db/src/repositories/discussion-management.ts`
+
+### Приёмка
+
+- Отозвать сессию после начала `PATCH` или `DELETE` комментария. Транзакция должна откатиться без изменения текста и без строки аудита.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/app/api/content/\[slug\]/comments/\[id\]/route.ts · Маршрут передаёт в `manageComment` только `actor`. У `DiscussionMutation` нет `currentToken`, в `discussion-management.ts` нет `lockInitiatingSession`. Создание в `content-comments.ts` вызывает `lockInitiatingSession` дважды.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/content/[slug]/comments/[id]/route.ts)
+- [site/src/lib/services/community/content-service.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/lib/services/community/content-service.ts)
+- [site/packages/db/src/repositories/discussion-management.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/db/src/repositories/discussion-management.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-29 — Публикация сервера обходит mute объекта
+
+**Фаза:** F1. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-29. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Mute сервера не останавливает inbox и push `newServerUpdate` подписчикам. Mute обсуждения такие уведомления уже отсекает. Mute — отдельная таблица, не подписка.
+
+**Результат.** Активный mute `(user, server, serverId)` исключает этого подписчика из рассылки. Выключенная категория серверов этому не замена.
+
+### Область изменений
+
+- `site/packages/db/src/repositories/publication-notification-delivery.ts`
+- `site/src/features/community/follow-workspace-contract.ts`
+
+### Приёмка
+
+- Активный mute `(user, server, serverId)` исключает этого подписчика из рассылки. Выключенная категория серверов этому не замена.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/packages/db/src/repositories/publication-notification-delivery.ts · `FOLLOW_TYPES` включает `server`, текст mute обещает паузу уведомлений объекта без отписки. Выборка подписчиков сервера фильтрует только `follows` и горизонт публикации, без `object_notification_mutes`. Для контента стоит `notActivelyMuted` с `mutedUntil > clock_timestamp()`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/db/src/repositories/publication-notification-delivery.ts)
+- [site/src/features/community/follow-workspace-contract.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/community/follow-workspace-contract.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-30 — Удаление из коллекции блокирует строки после сессии
+
+**Фаза:** F1. **Приоритет:** P3. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-30. **Решения обсуждения:** NX-011.
+
+**Сейчас.** `remove` и `remove-many` берут блокировку строк состава только внутри `write()`, уже после `lockInitiatingSession`. Ожидание этих строк держит строку сессии. Добавление, перенос и сверка блокируют дочерние строки в `prepare`.
+
+**Результат.** В `prepare` выбрать целевые строки состава `FOR UPDATE` в порядке `productId`. Сессия блокируется только после этого.
+
+### Область изменений
+
+- `site/packages/db/src/repositories/library-collection-command.ts`
+
+### Приёмка
+
+- В `prepare` выбрать целевые строки состава `FOR UPDATE` в порядке `productId`. Сессия блокируется только после этого.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: independent_of_launch_blocker.
+
+### Источники
+
+- [site/packages/db/src/repositories/library-collection-command.ts · Комментарий контракта требует все блокировки полномочий до сессии. `applyLibraryCollectionCommand` сначала вызывает `prepare`, затем `lockInitiatingSession`, затем `write()`. Для `remove` и `remove-many` в `prepare` нет `FOR UPDATE` по `library_collection_items`, только отложенный `delete`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/db/src/repositories/library-collection-command.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-31 — Каталог master-list сортирует неизвестное число игроков как ноль
+
+**Фаза:** F2. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-31. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Сервер без поля `players` встаёт в один ряд с пустыми. Публичный каталог отдаёт этот порядок, поэтому неизвестный онлайн оказывается ниже любого положительного числа и вровень с нулём. Карточка при этом пишет «неизвестно», а не `0`.
+
+**Результат.** Запись без флага числа игроков при сортировке каталога не равна записи с `players: 0`.
+
+### Область изменений
+
+- `site/src/lib/services/servers/mta-master-directory-service.ts`
+- `site/src/features/servers/model/mta-directory-page.ts`
+- `site/src/app/api/servers/directory/route.ts`
+
+### Приёмка
+
+- Запись без флага числа игроков при сортировке каталога не равна записи с `players: 0`.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/lib/services/servers/mta-master-directory-service.ts · Сортировка снимка — `(b.players ?? 0) - (a.players ?? 0)`. При `minPlayers === 0` страница каталога отдаёт этот массив как есть. Компонент каталога для `players === undefined` показывает `playersUnknown`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/lib/services/servers/mta-master-directory-service.ts)
+- [site/src/features/servers/model/mta-directory-page.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/servers/model/mta-directory-page.ts)
+- [site/src/app/api/servers/directory/route.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/servers/directory/route.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-32 — Анонимный список серверов отдаёт id владельца
+
+**Фаза:** F1. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-32. **Решения обсуждения:** NX-011.
+
+**Сейчас.** `GET /api/servers` без входа возвращает все колонки публичного активного сервера, включая `ownerId`. По этому ответу можно связать сервер с аккаунтом владельца. Список управляемых серверов это поле не выбирает.
+
+**Результат.** Тело анонимного `GET /api/servers` не содержит `ownerId`.
+
+### Область изменений
+
+- `site/packages/db/src/repositories/servers.ts`
+- `site/src/app/api/servers/route.ts`
+
+### Приёмка
+
+- Тело анонимного `GET /api/servers` не содержит `ownerId`.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/packages/db/src/repositories/servers.ts · `listActivePublic` делает `db.select().from(servers)`. Обработчик без проверки сессии кладёт строку в ответ через `...server`. `managedServerFields` содержит `id`, `name`, `slug`, `ipAddress`, `port`, `organizationId`, `status`, `visibility`, `isVerified`, `updatedAt`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/db/src/repositories/servers.ts)
+- [site/src/app/api/servers/route.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/servers/route.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-33 — Русский заголовок раздела кошелька в условиях — английская фраза
+
+**Фаза:** F2. **Приоритет:** P3. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-33. **Решения обсуждения:** NX-011.
+
+**Сейчас.** При включённом `NEXUS_WALLET_ENGINE` русская страница условий показывает второй заголовок раздела кошелька как `Stored value site wallet`.
+
+**Результат.** Этот заголовок в локали `ru` — русская фраза того же раздела.
+
+### Область изменений
+
+- `site/src/lib/i18n/ru/legal.ts`
+- `site/src/features/shell/server/legal-document-page.tsx`
+
+### Приёмка
+
+- Этот заголовок в локали `ru` — русская фраза того же раздела.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: independent_of_launch_blocker.
+
+### Источники
+
+- [site/src/lib/i18n/ru/legal.ts · Ключ `legal.terms.walletSections[1].title` в русской локали равен этой английской фразе. Страница подставляет `walletSections` и печатает `section.title` в `h2`. Соседние ключи en и ru на месте, пустого ключа нет.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/lib/i18n/ru/legal.ts)
+- [site/src/features/shell/server/legal-document-page.tsx · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/shell/server/legal-document-page.tsx)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-34 — Возврат после входа уходит на чужой сайт
+
+**Фаза:** F1. **Приоритет:** P1. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-34. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Гость с `/auth/login?next=/..//evil.com` или `/%2e%2e//evil.com` после успешного входа попадает на `https://evil.com`. Форма подставляет результат в `window.location.replace`. Прямой `//evil.com` и `https://evil.com` по-прежнему отбрасываются.
+
+**Результат.** Для этих трёх значений и для `/foo/..//evil.com/phish?x=1` разбор возвращает `null`, а разрешение пути — `/workspace`. Принятый адрес, открытый через `location.replace`, остаётся на этом хосте.
+
+### Область изменений
+
+- `site/src/features/shell/auth-return.ts`
+- `site/src/features/accounts/components/auth-form.tsx`
+
+### Приёмка
+
+- Для этих трёх значений и для `/foo/..//evil.com/phish?x=1` разбор возвращает `null`, а разрешение пути — `/workspace`. Принятый адрес, открытый через `location.replace`, остаётся на этом хосте.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/features/shell/auth-return.ts · Прогон на этом HEAD. `parseAuthReturnPath("/..//evil.com")`, `/%2e%2e//evil.com` и `/.%2e//evil.com` возвращают `"//evil.com"`. `resolveAuthReturnPath` отдаёт ту же строку. Проверка origin видит `https://nexus.invalid`, потому что `pathname` уже `//evil.com`, а `href` — `https://nexus.invalid//evil.com`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/shell/auth-return.ts)
+- [site/src/features/accounts/components/auth-form.tsx · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/accounts/components/auth-form.tsx)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-35 — Соседние маршруты персонала не спрашивают текущий пароль
+
+**Фаза:** F1. **Приоритет:** P1. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-35. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Сессия модератора публикует или архивирует материал, решает верификацию, приостанавливает ресурс и закрывает жалобу без текущего пароля. Те же действия на `POST /api/admin/actions` пароль требуют. Публикация сообщества вызывает тот же `contentService.moderateContent`.
+
+**Результат.** Каждый из четырёх маршрутов отвергает отсутствующий или неверный текущий пароль до изменения строки, так же как `/api/admin/actions`.
+
+### Область изменений
+
+- `site/src/app/api/admin/community/[id]/route.ts`
+- `site/src/app/api/admin/verification/[id]/route.ts`
+- `site/src/app/api/admin/resources/[id]/route.ts`
+- `site/src/app/api/admin/reports/[id]/route.ts`
+- `site/packages/security/src/fresh-auth-policy.ts`
+- `site/src/app/api/admin/actions/route.ts`
+
+### Приёмка
+
+- Каждый из четырёх маршрутов отвергает отсутствующий или неверный текущий пароль до изменения строки, так же как `/api/admin/actions`.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/app/api/admin/community/\[id\]/route.ts · `CRITICAL_STAFF_ADMIN_ACTIONS` включает `content` publish/archive, `verification` approve/reject, `product` suspend/restore и `report` resolve/dismiss. `actions` вызывает `confirmStaffActionPassword`. Четыре соседних маршрута принимают команду и токен сессии, поля пароля в их схемах нет.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/admin/community/[id]/route.ts)
+- [site/src/app/api/admin/verification/\[id\]/route.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/admin/verification/[id]/route.ts)
+- [site/src/app/api/admin/resources/\[id\]/route.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/admin/resources/[id]/route.ts)
+- [site/src/app/api/admin/reports/\[id\]/route.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/admin/reports/[id]/route.ts)
+- [site/packages/security/src/fresh-auth-policy.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/security/src/fresh-auth-policy.ts)
+- [site/src/app/api/admin/actions/route.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/admin/actions/route.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-36 — Карантин сборки не привязывает пароль к транзакции
+
+**Фаза:** F1. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-36. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Approve и reject передают `expectedPasswordHash` в транзакцию модерации. Quarantine и restore в том же обработчике пароль проверяют один раз до ветки и хеш внутрь не передают. Политика `staff_action` требует повторной проверки внутри транзакции.
+
+**Результат.** Карантин и восстановление не коммитятся, если тот же хеш пароля не перепроверен внутри их транзакции.
+
+### Область изменений
+
+- `site/src/app/api/admin/actions/route.ts`
+- `site/packages/security/src/fresh-auth-policy.ts`
+
+### Приёмка
+
+- Карантин и восстановление не коммитятся, если тот же хеш пароля не перепроверен внутри их транзакции.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/app/api/admin/actions/route.ts · `staffActionRequiresPasswordHashRecheck` истинен только для build approve/reject. Ветка `quarantine` вызывает `quarantineBuild` без хеша, `restore` — `restoreQuarantinedBuild` без хеша.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/admin/actions/route.ts)
+- [site/packages/security/src/fresh-auth-policy.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/security/src/fresh-auth-policy.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-37 — Смена аккаунта оставляет на экране данные предыдущего
+
+**Фаза:** F2. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-37. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Ответ 409 на смену пароля, отзыв сессии или настройки уведомлений оставляет email восстановления и список сессий предыдущего аккаунта. Перезагрузка приватности или профиля разработчика при чужом id показывает ошибку и не убирает имя, переключатели, специальности и ссылки.
+
+**Результат.** 409 и несовпадение id в том же ходе убирают email, сессии, черновик профиля и контакты. Они не появляются снова, пока загрузка не совпадёт с текущей сессией.
+
+### Область изменений
+
+- `site/src/features/accounts/components/settings-page-client.tsx`
+- `site/src/features/accounts/components/profile-privacy-editor.tsx`
+- `site/src/features/accounts/components/developer-profile-editor.tsx`
+
+### Приёмка
+
+- 409 и несовпадение id в том же ходе убирают email, сессии, черновик профиля и контакты. Они не появляются снова, пока загрузка не совпадёт с текущей сессией.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/features/accounts/components/settings-page-client.tsx · `perform` очищает снимок только при `isSettingsSignedOutError`, а это статус 401 с текстом «Authentication required» или «Требуется вход». В приватности несовпадение id бросает ошибку, catch пишет только `setNotice`. В профиле разработчика catch пишет только `setError`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/accounts/components/settings-page-client.tsx)
+- [site/src/features/accounts/components/profile-privacy-editor.tsx · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/accounts/components/profile-privacy-editor.tsx)
+- [site/src/features/accounts/components/developer-profile-editor.tsx · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/accounts/components/developer-profile-editor.tsx)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-38 — Русские вход и регистрация показывают английские ошибки Zod
+
+**Фаза:** F2. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-38. **Решения обсуждения:** NX-011.
+
+**Сейчас.** При локали `ru` адрес вроде `a@b` даёт в форме «Invalid email address». Имя из пробела и одной буквы даёт «Too small: expected string to have >=2 characters».
+
+**Результат.** Ошибка проверки на русском экране берётся только из русской копии. В тексте нет этих двух английских фраз.
+
+### Область изменений
+
+- `site/src/features/accounts/components/auth-form.tsx`
+- `site/src/app/api/auth/register/route.ts`
+- `site/src/app/api/auth/login/route.ts`
+
+### Приёмка
+
+- Ошибка проверки на русском экране берётся только из русской копии. В тексте нет этих двух английских фраз.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/features/accounts/components/auth-form.tsx · Оба маршрута на неудачном `safeParse` возвращают `details: parsed.error.format()`. Форма собирает `_errors` полей и возвращает их раньше веток `authRegisterApiCopy` и `authLoginApiCopy`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/accounts/components/auth-form.tsx)
+- [site/src/app/api/auth/register/route.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/auth/register/route.ts)
+- [site/src/app/api/auth/login/route.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/auth/login/route.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-39 — Заказ со скидкой помечается как несведённые суммы
+
+**Фаза:** F1. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-39. **Решения обсуждения:** NX-011, NX-015.
+
+**Сейчас.** Оплаченный заказ с промокодом хранит каталожные цены в строках и сумму к оплате в итоге. Экран условий показывает, что строки не сходятся с итогом.
+
+**Результат.** Если строки дают `listAmount` и `listAmount - discountAmount === totalAmount`, флаг ложный и экран этого не показывает.
+
+### Область изменений
+
+- `site/packages/db/src/repositories/order-terms.ts`
+- `site/src/features/commerce/server/order-terms-report.tsx`
+- `site/src/lib/services/commerce/wallet-payment-service.ts`
+
+### Приёмка
+
+- Если строки дают `listAmount` и `listAmount - discountAmount === totalAmount`, флаг ложный и экран этого не показывает.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/packages/db/src/repositories/order-terms.ts · Checkout пишет `totalAmount: chargedAmount` и `unitPrice: product.price`, плюс `listAmount` и `discountAmount`. Отчёт считает `amountMismatch`, когда сумма `unitPrice` не равна `order.totalAmount`, и не читает `listAmount`. Экран выводит флаг `amountMismatch`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/db/src/repositories/order-terms.ts)
+- [site/src/features/commerce/server/order-terms-report.tsx · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/commerce/server/order-terms-report.tsx)
+- [site/src/lib/services/commerce/wallet-payment-service.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/lib/services/commerce/wallet-payment-service.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+- Исправление кода кошелька не включает NEXUS_WALLET_ENGINE и не разрешает реальные выплаты.
+
+## AUD-40 — Покупка своего лота оставляет неоплаченный заказ
+
+**Фаза:** F1. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-40. **Решения обсуждения:** NX-011, NX-015.
+
+**Сейчас.** Покупатель, который является продавцом-пользователем лота, получает pending-заказ. Списание затем падает с `WALLET_SPEND_INVALID`. Заказ уже закоммичен отдельной транзакцией, экран покупки снова предлагает оплату.
+
+**Результат.** Такой checkout не создаёт pending-заказ. Кнопка оплаты для этого лота не остаётся доступной.
+
+### Область изменений
+
+- `site/src/lib/services/commerce/wallet-payment-service.ts`
+- `site/packages/db/src/repositories/orders.ts`
+- `site/packages/db/src/repositories/wallet-order-settlement.ts`
+
+### Приёмка
+
+- Такой checkout не создаёт pending-заказ. Кнопка оплаты для этого лота не остаётся доступной.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/lib/services/commerce/wallet-payment-service.ts · `createPendingPaidOrder` вызывает `orders.create`, а тот пишет заказ в своей транзакции. `settleOrderFromWallet` идёт следующим вызовом. Проверка `sellerAccountId === user:${buyerId}` стоит уже внутри settle.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/lib/services/commerce/wallet-payment-service.ts)
+- [site/packages/db/src/repositories/orders.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/db/src/repositories/orders.ts)
+- [site/packages/db/src/repositories/wallet-order-settlement.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/db/src/repositories/wallet-order-settlement.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+- Исправление кода кошелька не включает NEXUS_WALLET_ENGINE и не разрешает реальные выплаты.
+
+## AUD-41 — Вывод средств не требует текущий пароль
+
+**Фаза:** F1. **Приоритет:** P1. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-41. **Решения обсуждения:** NX-011, NX-015.
+
+**Сейчас.** При `NEXUS_WALLET_ENGINE=1` и `NEXUS_WALLET_WITHDRAW=1` живая сессия ставит холд, отменяет его и закрывает stub-выплату. Политика `withdrawal` говорит, что сессии для этого недостаточно.
+
+**Результат.** Старт, отмена и stub-settle без текущего пароля падают до вызова сервиса. Верный пароль для действия `withdrawal` проверяется ещё раз внутри транзакции.
+
+### Область изменений
+
+- `site/src/app/api/wallet/withdrawals/route.ts`
+- `site/src/app/api/wallet/withdrawals/[id]/cancel/route.ts`
+- `site/src/app/api/wallet/withdrawals/[id]/stub-settle/route.ts`
+- `site/packages/security/src/fresh-auth-policy.ts`
+- `site/packages/validation/src/wallet-payments.ts`
+
+### Приёмка
+
+- Старт, отмена и stub-settle без текущего пароля падают до вызова сервиса. Верный пароль для действия `withdrawal` проверяется ещё раз внутри транзакции.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/app/api/wallet/withdrawals/route.ts · `freshAuthRequirement("withdrawal")` принимает только `current_password`, `sessionSatisfies` равен `false`. `walletWithdrawalCreateSchema` поля пароля не содержит. `POST` сверяет заголовок актора и вызывает `startWithdrawal`. Отмена и stub-settle устроены так же.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/wallet/withdrawals/route.ts)
+- [site/src/app/api/wallet/withdrawals/\[id\]/cancel/route.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/wallet/withdrawals/[id]/cancel/route.ts)
+- [site/src/app/api/wallet/withdrawals/\[id\]/stub-settle/route.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/wallet/withdrawals/[id]/stub-settle/route.ts)
+- [site/packages/security/src/fresh-auth-policy.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/security/src/fresh-auth-policy.ts)
+- [site/packages/validation/src/wallet-payments.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/validation/src/wallet-payments.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+- Исправление кода кошелька не включает NEXUS_WALLET_ENGINE и не разрешает реальные выплаты.
+
+## AUD-42 — Stub-webhook принимает постоянную подпись `stub-ok`
+
+**Фаза:** F1. **Приоритет:** P1. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-42. **Решения обсуждения:** NX-011, NX-015.
+
+**Сейчас.** При включённом движке кошелька неаутентифицированный `POST /api/wallet/providers/stub/webhook` с заголовком `x-nexus-stub-signature: stub-ok` подтверждает пополнение или выплату. Подпись — константа в исходниках, не секрет. Провайдер `stub` зарегистрирован рядом с живыми портами и в production не отключается.
+
+**Результат.** При `NODE_ENV=production` этот заголовок отвергается, кредит пополнения и закрытие выплаты не применяются.
+
+### Область изменений
+
+- `site/packages/domain/src/wallet-payments.ts`
+- `site/src/app/api/wallet/providers/[providerId]/webhook/route.ts`
+- `site/src/features/commerce/wallet-http.ts`
+
+### Приёмка
+
+- При `NODE_ENV=production` этот заголовок отвергается, кредит пополнения и закрытие выплаты не применяются.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/packages/domain/src/wallet-payments.ts · `verifyWebhook` сравнивает заголовок с `"stub-ok"` и не читает `NODE_ENV`. `walletWebhookRequest` требует только `requireWalletEngineEnabled()`. `defaultWalletPaymentProviders` всегда создаёт `StubPaymentProvider`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/domain/src/wallet-payments.ts)
+- [site/src/app/api/wallet/providers/\[providerId\]/webhook/route.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/wallet/providers/[providerId]/webhook/route.ts)
+- [site/src/features/commerce/wallet-http.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/commerce/wallet-http.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+- Исправление кода кошелька не включает NEXUS_WALLET_ENGINE и не разрешает реальные выплаты.
+
+## AUD-43 — Stub-пополнение зачисляет баланс без кассы и без запрета production
+
+**Фаза:** F1. **Приоритет:** P1. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-43. **Решения обсуждения:** NX-011, NX-015.
+
+**Сейчас.** При `NEXUS_WALLET_ENGINE=1` владелец намерения вызывает `POST /api/wallet/topups/:id/stub-credit` и получает кредит на сумму намерения. Платёжного провайдера нет. Окружение production маршрут не отличает от локального. Это другой вход, чем анонимный webhook из AUD-42: здесь нужна сессия владельца счёта.
+
+**Результат.** При `NODE_ENV=production` этот `POST` не зачисляет кредит и не помечает намерение успешным.
+
+### Область изменений
+
+- `site/src/app/api/wallet/topups/[id]/stub-credit/route.ts`
+- `site/src/lib/services/commerce/wallet-payment-service.ts`
+
+### Приёмка
+
+- При `NODE_ENV=production` этот `POST` не зачисляет кредит и не помечает намерение успешным.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/app/api/wallet/topups/\[id\]/stub-credit/route.ts · Обработчик проверяет актора и вызывает `creditStubTopUp`. Метод требует только включённый движок, сверяет `accountId` и `providerId === "stub"`, затем сам собирает тело и вызывает `applyVerifiedWebhook` с заголовком `x-nexus-stub-signature: stub-ok`. Проверки `NODE_ENV` нет.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/wallet/topups/[id]/stub-credit/route.ts)
+- [site/src/lib/services/commerce/wallet-payment-service.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/lib/services/commerce/wallet-payment-service.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+- Исправление кода кошелька не включает NEXUS_WALLET_ENGINE и не разрешает реальные выплаты.
+
+## AUD-44 — Недоверенный адрес пропускает лимит отзывов и вопросов
+
+**Фаза:** F1. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-44. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Запрос без верного `x-nexus-proxy-secret` получает ip `unknown`. Списки отзывов ресурса, отзывов сервера и вопросов к ресурсу тогда не вызывают `consumeRateLimit` вообще. Проверка лицензии в этом случае тоже не тратит ведро IP. Ведро токена лицензии остаётся.
+
+**Результат.** Запрос с ip `unknown` на эти четыре GET всё равно расходует лимит. Исчерпание лимита отвечает 429.
+
+### Область изменений
+
+- `site/packages/security/src/request-ip.ts`
+- `site/src/app/api/products/[id]/reviews/route.ts`
+- `site/src/app/api/products/[id]/qa/route.ts`
+- `site/src/app/api/products/[id]/qa/[threadId]/route.ts`
+- `site/src/app/api/servers/[id]/reviews/route.ts`
+- `site/src/features/commerce/license-runtime-http.ts`
+
+### Приёмка
+
+- Запрос с ip `unknown` на эти четыре GET всё равно расходует лимит. Исчерпание лимита отвечает 429.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/packages/security/src/request-ip.ts · `getClientIp` возвращает `"unknown"`, если прокси не доказан или в заголовках нет IP. Четыре публичных GET и проверка лицензии ограничивают IP только при `ip !== "unknown"`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/security/src/request-ip.ts)
+- [site/src/app/api/products/\[id\]/reviews/route.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/products/[id]/reviews/route.ts)
+- [site/src/app/api/products/\[id\]/qa/route.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/products/[id]/qa/route.ts)
+- [site/src/app/api/products/\[id\]/qa/\[threadId\]/route.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/products/[id]/qa/[threadId]/route.ts)
+- [site/src/app/api/servers/\[id\]/reviews/route.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/servers/[id]/reviews/route.ts)
+- [site/src/features/commerce/license-runtime-http.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/commerce/license-runtime-http.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-45 — Продавец снимает удержание кошелька чужими часами
+
+**Фаза:** F1. **Приоритет:** P1. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-45. **Решения обсуждения:** NX-011, NX-015.
+
+**Сейчас.** Продавец со включённым кошельком отправляет `nowIso` из будущего. Удержания с `releaseAt` позже настоящих часов сервера всё равно переводятся из escrow на доступный баланс, до 50 за запрос. Тот же приём у администратора в `POST /api/admin/commerce/wallet-holds/release-matured` снимает удержания всех продавцов.
+
+**Результат.** Запрос продавца с `nowIso` позже `releaseAt` ещё не наступившего удержания не меняет статус и баланс. Часами запроса служит время сервера.
+
+### Область изменений
+
+- `site/src/app/api/wallet/holds/release-matured/route.ts`
+- `site/packages/validation/src/wallet-payments.ts`
+- `site/src/lib/services/commerce/wallet-payment-service.ts`
+- `site/packages/db/src/repositories/wallet-seller-holds.ts`
+
+### Приёмка
+
+- Запрос продавца с `nowIso` позже `releaseAt` ещё не наступившего удержания не меняет статус и баланс. Часами запроса служит время сервера.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/app/api/wallet/holds/release-matured/route.ts · `walletHoldReleaseSchema` принимает любой `z.string().datetime()`. Маршрут продавца передаёт `parsed.data.nowIso` в `releaseMaturedHolds`. Репозиторий сравнивает `walletSellerHolds.releaseAt <= now` с этой датой и проводит проводку освобождения.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/app/api/wallet/holds/release-matured/route.ts)
+- [site/packages/validation/src/wallet-payments.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/validation/src/wallet-payments.ts)
+- [site/src/lib/services/commerce/wallet-payment-service.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/lib/services/commerce/wallet-payment-service.ts)
+- [site/packages/db/src/repositories/wallet-seller-holds.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/db/src/repositories/wallet-seller-holds.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+- Исправление кода кошелька не включает NEXUS_WALLET_ENGINE и не разрешает реальные выплаты.
+
+## AUD-46 — Вкладки ленты сбрасывают уже выбранные фильтры
+
+**Фаза:** F2. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-46. **Решения обсуждения:** NX-011.
+
+**Сейчас.** На `/discover/stream` вкладки «Серверы», «Авторы» и «Организации» оставляют только поисковую строку. Отметка «проверенные», а для серверов ещё язык, регион и режим, пропадают даже при повторном нажатии на текущую вкладку. Список становится нефильтрованным.
+
+**Результат.** Вкладка сохраняет текущие `q` и `verified`, для типа `servers` сохраняет `language`, `region` и `gameMode`, и не переносит `cursor`.
+
+### Область изменений
+
+- `site/src/features/discovery/server/discovery-stream-page.tsx`
+- `site/src/features/discovery/discovery-stream-contract.ts`
+
+### Приёмка
+
+- Вкладка сохраняет текущие `q` и `verified`, для типа `servers` сохраняет `language`, `region` и `gameMode`, и не переносит `cursor`.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/features/discovery/server/discovery-stream-page.tsx · Вкладка строит адрес как `discoveryStreamHref({ ...fallback, type, query })`. `fallback` — это разбор пустого запроса, поэтому `verified` ложен, а поля сервера пустые. `discoveryStreamHref` записывает эти поля только когда они заданы. Ссылки «раньше/позже» передают полный `state`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/discovery/server/discovery-stream-page.tsx)
+- [site/src/features/discovery/discovery-stream-contract.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/discovery/discovery-stream-contract.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-47 — Статус ресурса показывается машинным кодом
+
+**Фаза:** F2. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-47. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Модератор и автор видят `pending_review`, `suspended`, `quarantined` вместо русской или английской подписи. То же у выбранной сборки.
+
+**Результат.** Строка статуса и строка сборки показывают подпись активной локали, а не код.
+
+### Область изменений
+
+- `site/src/features/resources/components/resource-moderation-controls.tsx`
+- `site/src/features/resources/components/resource-lifecycle-controls.tsx`
+- `site/src/features/library/resource-release-control-i18n.ts`
+
+### Приёмка
+
+- Строка статуса и строка сборки показывают подпись активной локали, а не код.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/features/resources/components/resource-moderation-controls.tsx · Оба блока выводят `{product.status}` и `selectedBuild.status`. Рядом уже есть `resourceStatusLabel`: для `ru` значение `pending_review` равно «На проверке». На экране управления те же коды переведены в `statusLabels` и `buildLabels`, но эти блоки их не вызывают.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/resources/components/resource-moderation-controls.tsx)
+- [site/src/features/resources/components/resource-lifecycle-controls.tsx · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/resources/components/resource-lifecycle-controls.tsx)
+- [site/src/features/library/resource-release-control-i18n.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/library/resource-release-control-i18n.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-48 — Квитанция кошелька показывает код операции
+
+**Фаза:** F2. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-48. **Решения обсуждения:** NX-011.
+
+**Сейчас.** После пополнения или вывода строка статуса показывает `awaiting_provider`, `succeeded`, `failed` или `cancelled`. На странице кошелька те же состояния уже переведены.
+
+**Результат.** Обе квитанции показывают ту же подпись, что список операций кошелька.
+
+### Область изменений
+
+- `site/src/features/commerce/components/wallet-topup-form.tsx`
+- `site/src/features/commerce/components/wallet-withdraw-form.tsx`
+- `site/src/features/commerce/wallet-i18n.ts`
+
+### Приёмка
+
+- Обе квитанции показывают ту же подпись, что список операций кошелька.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/features/commerce/components/wallet-topup-form.tsx · Формы пишут `{result.intent.status}`. В `getWalletCopy` для `ru` есть `statusAwaiting` = «Ожидает провайдера», `statusSucceeded` = «Зачислено» и остальные. `wallet-workspace-screen.tsx` вызывает `statusLabel`, формы нет.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/commerce/components/wallet-topup-form.tsx)
+- [site/src/features/commerce/components/wallet-withdraw-form.tsx · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/commerce/components/wallet-withdraw-form.tsx)
+- [site/src/features/commerce/wallet-i18n.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/commerce/wallet-i18n.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-49 — Сбой загрузки сборок лицензии выглядит как пустой список
+
+**Фаза:** F2. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-49. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Если `/api/licenses/:id/runtime-config` не отвечает, пользователь видит и ошибку, и пустое состояние «сборок нет». Нельзя отличить лицензию без сборок от сбоя.
+
+**Результат.** При сбое запроса виден только `ErrorState`. `EmptyState` появляется только когда разобранный ответ содержит пустой `items`.
+
+### Область изменений
+
+- `site/src/features/commerce/components/license-runtime-probe.tsx`
+
+### Приёмка
+
+- При сбое запроса виден только `ErrorState`. `EmptyState` появляется только когда разобранный ответ содержит пустой `items`.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/features/commerce/components/license-runtime-probe.tsx · При неразборчивом ответе или исключении выставляется `copy.releaseFailed`, а `context` остаётся `null`. После загрузки ветка `context?.items.length` ложна, и рисуется `EmptyState` с `copy.releaseEmpty`. Пустой разобранный список и сбой попадают в одну ветку.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/commerce/components/license-runtime-probe.tsx)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-50 — Поиск комментариев оставляет в заголовке полный счётчик
+
+**Фаза:** F2. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-50. **Решения обсуждения:** NX-011.
+
+**Сейчас.** При поиске или переходе к одному комментарию заголовок по-прежнему показывает число всех комментариев статьи. Список при этом короче, в том числе пустой.
+
+**Результат.** Если `hasMore` ложен и нет фокуса, число в заголовке равно `page.items.length`. Без поиска и без фокуса оно остаётся равным `commentCount`.
+
+### Область изменений
+
+- `site/src/features/community/components/content-discussion.tsx`
+- `site/src/features/community/server/article-page.tsx`
+- `site/packages/db/src/repositories/content-discussion.ts`
+
+### Приёмка
+
+- Если `hasMore` ложен и нет фокуса, число в заголовке равно `page.items.length`. Без поиска и без фокуса оно остаётся равным `commentCount`.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/features/community/components/content-discussion.tsx · Страница передаёт `count={article.commentCount}`. `displayCount` начинается с этого числа и меняется только на `null` после своего комментария или удаления. `load()` подставляет `q` или `comment`, заменяет `page.items` и счётчик не трогает. Репозиторий при запросе оставляет строки по тексту и имени автора, не больше 20 на страницу.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/community/components/content-discussion.tsx)
+- [site/src/features/community/server/article-page.tsx · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/community/server/article-page.tsx)
+- [site/packages/db/src/repositories/content-discussion.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/db/src/repositories/content-discussion.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-51 — Число на вкладке библиотеки не учитывает поиск
+
+**Фаза:** F2. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-51. **Решения обсуждения:** NX-011.
+
+**Сейчас.** При поиске по названию вкладки «Все», «Готово» и «Недоступно» показывают размер всей полки. Список и строка «показано N из M» уже отфильтрованы. На полной странице результатов вкладка обещает больше записей, чем есть в списке.
+
+**Результат.** При непустом поиске число на каждой вкладке равно числу её совпадений. Без поиска вкладка по-прежнему равна размеру своей полки.
+
+### Область изменений
+
+- `site/src/features/library/server/library-page-screen.tsx`
+- `site/packages/db/src/repositories/user-library.ts`
+
+### Приёмка
+
+- При непустом поиске число на каждой вкладке равно числу её совпадений. Без поиска вкладка по-прежнему равна размеру своей полки.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/features/library/server/library-page-screen.tsx · Подпись вкладки — `result.counts[value]`. Эти `counts` считаются без `ILIKE` по названию. Список и `result.total` используют `titleMatch`. Ссылка вкладки при этом сохраняет `q`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/library/server/library-page-screen.tsx)
+- [site/packages/db/src/repositories/user-library.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/db/src/repositories/user-library.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-52 — Один и тот же архив показывает два размера
+
+**Фаза:** F2. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-52. **Решения обсуждения:** NX-011.
+
+**Сейчас.** На карточке ресурса и на странице версий один и тот же `fileSizeBytes` превращается в разные числа. Файл в 1025 байт на карточке — «1 KB», в истории версий — «2 KiB». Файл короче 512 байт, включая 0, на карточке всегда «1 KB», а история версий для неположительного размера показывает маркер неизвестного значения.
+
+**Результат.** Оба экрана для одного `fileSizeBytes` показывают одно число и одну единицу. Нулевой и неположительный размер не отображается как 1 KB.
+
+### Область изменений
+
+- `site/src/features/resources/server/detail-page.tsx`
+- `site/src/features/resources/server/versions-page.tsx`
+
+### Приёмка
+
+- Оба экрана для одного `fileSizeBytes` показывают одно число и одну единицу. Нулевой и неположительный размер не отображается как 1 KB.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/features/resources/server/detail-page.tsx · `formatFileSize` для размера меньше 1 МиБ делает `Math.max(1, Math.round(bytes / 1024))` и пишет `KB`. `formatBuildSize` для того же диапазона делает `Math.max(1, Math.ceil(bytes / 1024))` и пишет `KiB`, а при `bytes <= 0` возвращает `unknownMarker`. Обе функции читают `fileSizeBytes`.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/resources/server/detail-page.tsx)
+- [site/src/features/resources/server/versions-page.tsx · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/resources/server/versions-page.tsx)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-53 — Форма нового ресурса не принимает каноническую версию MTA
+
+**Фаза:** F2. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-53. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Автор не может опубликовать первый билд с минимальной версией вида `1.6.0-9.22279.0`. Браузер помечает поле неверным и не отправляет форму. Та же строка принимается API и следующим редактором билда, а в подсказке редактора она и указана как пример.
+
+**Результат.** `1.6.0-9.22279.0` в форме нового ресурса не блокирует отправку и сохраняется как минимум продукта и цель первого билда. `1.6` и `1.6.0` по-прежнему проходят.
+
+### Область изменений
+
+- `site/src/features/resources/components/new-resource-form.tsx`
+- `site/packages/validation/src/mta-version.ts`
+- `site/packages/validation/src/index.ts`
+- `site/packages/validation/src/resource-build-workspace.ts`
+- `site/src/features/resources/components/resource-build-controls.tsx`
+- `site/src/features/resources/resource-requirements-i18n.ts`
+
+### Приёмка
+
+- `1.6.0-9.22279.0` в форме нового ресурса не блокирует отправку и сохраняется как минимум продукта и цель первого билда. `1.6` и `1.6.0` по-прежнему проходят.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/features/resources/components/new-resource-form.tsx · У поля `mtaMinVersion` стоит `pattern="1\.[0-9]+(\.[0-9]+)?"`, у формы нет `noValidate`, кнопка `type="submit"`. `MTA_VERSION_PATTERN` — `/^1\.\d+(?:\.\d+)?(?:-\d+(?:\.\d+){1,2})?$/`, его использует `createProductSchema` и `resource-build-workspace`. Редактор билда отдаёт это поле без `pattern`, placeholder — `1.6.0-9.22279.0`. Пустое поле по-прежнему можно оставить.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/resources/components/new-resource-form.tsx)
+- [site/packages/validation/src/mta-version.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/validation/src/mta-version.ts)
+- [site/packages/validation/src/index.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/validation/src/index.ts)
+- [site/packages/validation/src/resource-build-workspace.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/packages/validation/src/resource-build-workspace.ts)
+- [site/src/features/resources/components/resource-build-controls.tsx · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/resources/components/resource-build-controls.tsx)
+- [site/src/features/resources/resource-requirements-i18n.ts · e3e5da911593ee9229c9e15b8879661bc6d1b94b](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/resources/resource-requirements-i18n.ts)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
+## AUD-54 — В очереди проверки маленький архив показан как 0.0 MB
+
+**Фаза:** F2. **Приоритет:** P2. **Решение:** existing_goal. **Очередь:** specified. **Исполнение:** not_started. **Область полномочий:** local_development.
+
+**Заметка исполнения.** Зафиксировано аудитом кода на e3e5da911593ee9229c9e15b8879661bc6d1b94b. Исполнение не начиналось.
+
+**Исходные пункты:** AUD-54. **Решения обсуждения:** NX-011.
+
+**Сейчас.** Модератор в очереди ожидающих билдов видит `0.0 MB` у обычного небольшого архива. Размер выглядит как пустая загрузка, хотя файл, имя и хеш на месте.
+
+**Результат.** Архив меньше 0,05 МиБ в этой очереди не отображается как `0.0 MB`. Число и единица совпадают с размером того же `fileSizeBytes` на карточке версии.
+
+### Область изменений
+
+- `site/src/features/moderation/components/admin-builds-quarantine-section.tsx`
+
+### Приёмка
+
+- Архив меньше 0,05 МиБ в этой очереди не отображается как `0.0 MB`. Число и единица совпадают с размером того же `fileSizeBytes` на карточке версии.
+
+### Проверки при реализации
+
+- На коммите новее e3e5da911593ee9229c9e15b8879661bc6d1b94b повторить приёмку этой карточки. Прежний CI PASS на этот SHA не переносится.
+- Проверка должна отличать описанный отказ от соседнего успешного поведения и не требовать production deploy.
+
+### Зависимости и условия
+
+Без обязательных task dependencies.
+
+Независимый подтверждённый дефект аудита кода. Не блокирует и не ждёт соседние AUD-карточки.
+
+Release applicability: fix_confirmed_defect_before_next_beta_candidate.
+
+### Источники
+
+- [site/src/features/moderation/components/admin-builds-quarantine-section.tsx · Строка билда считает размер так: `(build.fileSizeBytes / 1024 / 1024).toFixed(1)` и всегда дописывает `MB`. Порог `0.0` — всё, что меньше 52 429 байт: `10_000 / 1024 / 1024` даёт `0.0095`, `toFixed(1)` даёт `0.0`. Отдельные форматтеры страницы ресурса и списка версий для такого размера показывают килобайты, не ноль.](https://github.com/acc-holo-dev/mta-nexus-site/blob/e3e5da911593ee9229c9e15b8879661bc6d1b94b/site/src/features/moderation/components/admin-builds-quarantine-section.tsx)
+
+### Ограничения
+
+- specified фиксирует подтверждённый дефект и не является разрешением на внедрение.
+- Не включать коммерческий контур, не проводить реальные платежи и не деплоить production.
+- Не менять frozen import-baseline и не переписывать карточки DOC, OPS, FLOW, UX и GROW.
+
 ## DOC-01 — Зафиксировать baseline решений и карту всех документов
 
 **Фаза:** F0. **Приоритет:** P1. **Решение:** accepted_direction. **Очередь:** specified. **Исполнение:** done. **Область полномочий:** local_development.

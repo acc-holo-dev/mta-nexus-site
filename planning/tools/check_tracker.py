@@ -5,6 +5,7 @@ import argparse
 import collections
 import hashlib
 import json
+import re
 import subprocess
 from pathlib import Path
 
@@ -87,14 +88,64 @@ def load_commit_tasks(repo: Path, commit: str):
     return json.loads(raw)
 
 
-def validate_specifications(data, frozen, evidence, load_commit) -> list[str]:
+AUD_ID = re.compile(r"^AUD-[0-9]{2}$")
+MUTABLE_STATUS_FIELDS = {
+    "execution_state", "execution_notes", "execution_updated_on",
+    "current", "decision_status", "queue_state",
+}
+
+
+def validate_extensions(data, frozen, admitted, source) -> list[str]:
+    """AUD cards are an additive admission. Frozen IDs and the original 96 sources stay put."""
+    if not isinstance(admitted, dict):
+        return ["Missing planning/admitted-tasks.json"]
+    problems = []
+    if admitted.get("schema_version") != 1:
+        problems.append("admitted-tasks schema_version must be 1")
+    if admitted.get("baseline_sha") != frozen.get("baseline_sha"):
+        problems.append("admitted-tasks baseline_sha drifted from the frozen import")
+    audit_sha = admitted.get("audit_sha")
+    if not isinstance(audit_sha, str) or re.fullmatch(r"[a-f0-9]{40}", audit_sha) is None:
+        problems.append("admitted-tasks audit_sha must be the audited commit")
+    admitted_tasks = admitted.get("tasks")
+    if not isinstance(admitted_tasks, list):
+        return problems + ["admitted-tasks.tasks must be a list"]
+    admitted_ids = [task.get("id") for task in admitted_tasks]
+    if (
+        len(admitted_ids) != len(set(admitted_ids))
+        or any(not isinstance(task_id, str) or AUD_ID.fullmatch(task_id) is None for task_id in admitted_ids)
+    ):
+        problems.append("admitted task IDs must be unique AUD-NN values")
+    live_ids = [task["id"] for task in tracker_tasks(data)]
+    frozen_ids = [task["id"] for task in frozen["tasks"]]
+    if set(frozen_ids) - set(live_ids):
+        problems.append("Frozen task ID removed from live tracker")
+    if set(live_ids) - set(frozen_ids) != set(admitted_ids):
+        problems.append("Live task IDs diverged from frozen baseline plus admitted extensions")
+    history_ids = {task["id"] for task in data["layers"]["history"]["tasks"]}
+    if history_ids & set(admitted_ids):
+        problems.append("Admitted audit tasks must stay in the live layer")
+    covered = collections.defaultdict(list)
+    for task in tracker_tasks(data):
+        for source_id in task["source_ids"]:
+            covered[source_id].append(task["id"])
+    additional = set(source.get("additional_source_ids") or [])
+    live_by_id = {task["id"]: task for task in tracker_tasks(data)}
+    for task_id in admitted_ids:
+        if task_id not in additional:
+            problems.append("Missing additional source coverage " + task_id)
+        elif covered[task_id] != [task_id]:
+            problems.append("Stale audit source map " + task_id)
+        elif live_by_id[task_id]["source_ids"] != [task_id]:
+            problems.append(task_id + " source_ids must be exactly its own ID")
+    return problems
+
+
+def validate_specifications(data, frozen, evidence, load_commit, admitted_tasks=None) -> list[str]:
     digest_schema = {"type": "string", "pattern": "^[a-f0-9]{64}$"}
     entry_properties = {
-        "id": {"type": "string", "pattern": "^(DOC|OPS|FLOW|UX|GROW)-[0-9]{2}$"},
-        "field": {"enum": sorted(set(frozen["tasks"][0]) - {
-            "id", "execution_state", "execution_notes", "execution_updated_on",
-            "current", "decision_status", "queue_state",
-        })},
+        "id": {"type": "string", "pattern": "^(DOC|OPS|FLOW|UX|GROW|AUD)-[0-9]{2}$"},
+        "field": {"enum": sorted(set(frozen["tasks"][0]) - MUTABLE_STATUS_FIELDS - {"id"})},
         "baseline_sha256": digest_schema,
         "value_sha256": digest_schema,
         "commit": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
@@ -121,18 +172,17 @@ def validate_specifications(data, frozen, evidence, load_commit) -> list[str]:
         if key in amendments:
             problems.append(f"Duplicate amendment: {key}")
         amendments[key] = entry
-    mutable_status_fields = {
-        "execution_state", "execution_notes", "execution_updated_on",
-        "current", "decision_status", "queue_state",
-    }
     frozen_by = {task["id"]: task for task in frozen["tasks"]}
+    admitted_by = {task["id"]: task for task in (admitted_tasks or [])}
     for task in tracker_tasks(data):
         base = frozen_by.get(task["id"])
         if base is None:
-            problems.append("Task missing from frozen baseline: " + task["id"])
+            base = admitted_by.get(task["id"])
+        if base is None:
+            problems.append("Task missing from frozen baseline and admitted extensions: " + task["id"])
             continue
         for field, value in base.items():
-            if field in mutable_status_fields or task.get(field) == value:
+            if field in MUTABLE_STATUS_FIELDS or task.get(field) == value:
                 continue
             key = (task["id"], field)
             entry = amendments.get(key)
@@ -199,8 +249,14 @@ def main() -> int:
     checks.append("Live tracker mode/metadata and frozen import-baseline present")
 
     frozen = load(baseline / "tasks.json")
-    frozen_ids = [t["id"] for t in frozen["tasks"]]
-    require(set(frozen_ids) == set(ids), "Live task IDs diverged from import-baseline")
+    try:
+        admitted = load(plan / "admitted-tasks.json")
+    except (OSError, ValueError) as error:
+        admitted = None
+        problems.append(f"admitted-tasks.json: {error}")
+    source = load(plan / "source-register.json")
+    problems.extend(validate_extensions(data, frozen, admitted, source))
+    checks.append("Frozen IDs retained; AUD cards match admitted-tasks.json and source coverage")
     require(frozen["package_status"] == "review_draft", "import-baseline must remain review_draft")
     require(
         all(t["execution_state"] == "not_started" for t in frozen["tasks"]),
@@ -222,8 +278,9 @@ def main() -> int:
     problems.extend(validate_specifications(
         data, frozen, load(plan / "spec-amendments.json"),
         lambda commit: load_commit_tasks(repo, commit),
+        None if admitted is None else admitted.get("tasks"),
     ))
-    checks.append("Specification fields match frozen baseline or exact Git-evidenced amendments")
+    checks.append("Specification fields match frozen baseline, admitted audit cards, or exact Git-evidenced amendments")
 
     done = [t["id"] for t in tasks if t["execution_state"] == "done"]
     for required in ("DOC-01", "DOC-02", "DOC-03"):

@@ -82,8 +82,13 @@ export function DeveloperProfileEditor({
         !parsed.success ||
         parsed.data.id !== actorId ||
         (profile && parsed.data.id !== profile.id)
-      )
+      ) {
+        setProfile(null);
+        setSpecialties("");
+        setGithub("");
+        setDiscord("");
         throw new Error(copy.unavailable);
+      }
       apply(parsed.data);
     } catch (caught) {
       setError(safeMessage(caught, copy.unavailable));
@@ -125,9 +130,15 @@ export function DeveloperProfileEditor({
           verificationMutationError,
         ),
       );
+      if (response.success && response.data.id !== profile.id) {
+        setProfile(null);
+        setSpecialties("");
+        setGithub("");
+        setDiscord("");
+        throw new Error(copy.mutationUnavailable);
+      }
       if (
         !response.success ||
-        response.data.id !== profile.id ||
         Date.parse(response.data.updatedAt) <= Date.parse(profile.updatedAt) ||
         JSON.stringify(response.data.specialties) !== JSON.stringify(parsed.data.specialties) ||
         response.data.githubUrl !== parsed.data.githubUrl ||
