@@ -39,7 +39,7 @@ describe("published content detail HTTP behavior", () => {
       params: Promise.resolve({ slug: "missing" }),
     });
     expect(response.status).toBe(404);
-    expect(mocks.article).toHaveBeenCalledWith("missing");
+    expect(mocks.article).toHaveBeenCalledWith("missing", { incrementView: false });
     expect(mocks.comments).not.toHaveBeenCalled();
   });
 

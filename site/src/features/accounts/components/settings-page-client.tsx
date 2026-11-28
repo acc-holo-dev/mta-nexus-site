@@ -262,7 +262,6 @@ export function SettingsPageClient() {
         setRecoveryEmail(null);
         setPassword({ currentPassword: "", newPassword: "" });
         setRecoveryPassword("");
-        if (error.status === 409) setLoadError(true);
       }
 
       setNotice({

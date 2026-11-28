@@ -37,7 +37,7 @@ it.each(["en", "ru"] as const)("renders localized build constraints in %s", (loc
   const copy = getDictionary(locale).publishing;
 
   expect(html).toContain('pattern="v?[0-9]+\\.[0-9]+(\\.[0-9]+)?(-[a-zA-Z0-9.]+)?"');
-  expect(html).toContain('pattern="1\\.[0-9]+(\\.[0-9]+)?"');
+  expect(html).toContain('pattern="1\\.[0-9]+(\\.[0-9]+)?(-[0-9]+(\\.[0-9]+){1,2})?"');
   expect(html).toContain('accept=".zip,.rar,.7z,.lua"');
   expect(html).toContain(copy.buildFileRequirements.replace("{maxFileSize}", "64"));
   expect(html).toContain("min-h-11");
